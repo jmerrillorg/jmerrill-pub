@@ -1,0 +1,16 @@
+# Waiting On Semantics
+
+Waiting On is derived from the current outstanding governed action, not from stage label alone.
+
+| Canonical blocker | Waiting On | Waiting reason |
+|---|---|---|
+| PACKAGE_ACCEPTED | Prospect | AUTHOR_PACKAGE_ACCEPTANCE |
+| AGREEMENT_EXECUTED | Contract | CONTRACT_EXECUTION_REQUIRED |
+| INITIAL_PAYMENT_RECEIVED | Payment | INITIAL_PAYMENT_REQUIRED |
+| CURRENT_ARTIFACT_BOUND | Artifact | ARTIFACT_REQUIRED |
+| PRIOR_AUTHOR_GATE_RESOLVED | Author | AUTHOR_EDITORIAL_APPROVAL |
+| AUTHOR_APPROVAL_NOT_AUTHENTICATION | Author | AUTHOR_EDITORIAL_APPROVAL |
+| AUTHOR_CHANGES_REQUESTED | Editor | AUTHOR_CHANGES_REQUESTED |
+| AUTHOR_HOLD_REQUESTED | Author | GOVERNED_HOLD |
+| CANONICAL_AUTHORITY_RECONCILIATION | Reconciliation Required | SYSTEM_RECONCILIATION |
+| No current governed action | Not Waiting | NO_CURRENT_GOVERNED_ACTION |

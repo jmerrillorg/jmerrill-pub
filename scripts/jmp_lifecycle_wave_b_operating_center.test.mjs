@@ -141,12 +141,14 @@ test('three lifecycle dimensions remain distinct and package accepted is not Joi
     packageState: 'Package Accepted / payment option selection pending',
     pipelineStage: 'Prospect commercial',
     owner: 'Prospect',
+    nextAction: 'Choose payment option',
   })
 
   assert.equal(projection.prospectCommercialState, 'PACKAGE_ACCEPTED')
   assert.equal(projection.authorRelationshipState, 'PROSPECT')
   assert.equal(projection.joinedTheFamily.value, 'NO')
-  assert.equal(projection.waitingOn, 'Prospect')
+  assert.equal(projection.waitingTruth.waitingOn, 'Prospect')
+  assert.equal(projection.waitingTruth.waitingReason, 'INITIAL_PAYMENT_REQUIRED')
 })
 
 test('author action, human wait, and system attention are separate fields', () => {
@@ -157,6 +159,7 @@ test('author action, human wait, and system attention are separate fields', () =
     legacySourceState: 'Line Author Review',
     owner: 'Author',
     nextAction: 'Approve Line Edit',
+    evidenceLinks: [{ label: 'Line artifact', href: 'sharepoint://title-4/line.docx', checksum: 'a'.repeat(64), artifactType: 'LINE_ARTIFACT', current: true }],
   })
   const systemWait = projectCanonicalPublisherLifecycle({
     author: 'Author',
@@ -165,13 +168,14 @@ test('author action, human wait, and system attention are separate fields', () =
     legacySourceState: 'Line Editing',
     owner: 'JM1 Automation',
     dependency: 'Foundry provider backpressure',
+    nextAction: 'Retry provider capacity',
     evidenceLinks: [{ label: 'Approved developmental artifact', href: 'sharepoint://title-5/approved-developmental.docx', checksum: 'b'.repeat(64), artifactType: 'APPROVED_DEVELOPMENTAL_ARTIFACT', current: true }],
     authorApproved: true,
   })
 
-  assert.equal(authorWait.waitingOn, 'Author')
+  assert.equal(authorWait.waitingTruth.waitingOn, 'Author')
   assert.equal(authorWait.authorActionRequired.label, 'YES')
-  assert.equal(systemWait.waitingOn, 'JMP/System')
+  assert.equal(systemWait.waitingTruth.waitingOn, 'JMP/System')
   assert.equal(systemWait.authorActionRequired.label, 'NO')
   assert.equal(systemWait.systemAttention.code, 'PROVIDER_BACKPRESSURE')
 })

@@ -61,6 +61,18 @@ export type CanonicalStageTrustClassification =
   | 'EDITORIAL_GATE_BLOCKED'
   | 'LEGACY_GOVERNED_EXCEPTION'
 
+export type CanonicalWaitingTrustClassification =
+  | 'TRUSTED_WAITING_ON'
+  | 'NOT_WAITING'
+  | 'RECONCILIATION_REQUIRED'
+  | 'INSUFFICIENT_ACTION_EVIDENCE'
+
+export type CanonicalTimerTrustClassification =
+  | 'TRUSTED_TIMER'
+  | 'NO_ACTIVE_TIMER'
+  | 'INSUFFICIENT_TIMESTAMP_EVIDENCE'
+  | 'RECONCILIATION_REQUIRED'
+
 export type CanonicalEvidenceRecord = {
   source: string
   value: string
@@ -136,6 +148,13 @@ export type CanonicalPublisherProjectionInput = {
   changesRequested?: boolean
   holdRequested?: boolean
   transitionAuthorized?: boolean
+  waitingStartedAt?: string
+  waitingStartEvent?: string
+  waitingStartEventId?: string
+  waitingStartEvidence?: string
+  holdStartedAt?: string
+  holdEndedAt?: string
+  projectionAsOf?: string
   workspaceProvisioningEvidenceText?: string
   formatEvidenceText?: string
   artifactEvidenceSource?: string
@@ -269,6 +288,26 @@ export type CanonicalPublisherReadModel = {
     rawClaimedSubstage: SubstageCode | 'DATA_GAP'
     manualInterventionRequiredForRecompute: 'YES' | 'NO'
   }
+  waitingTruth: {
+    requiredNextAction: string
+    waitingOn: WaitingOwner
+    waitingReason: string
+    waitingStartedAt: string
+    waitingStartEvent: string
+    waitingStartEventId: string
+    waitingStartEvidence: string
+    elapsedWaitTime: string
+    elapsedDays: number | null
+    activeTimer: 'YES' | 'NO'
+    holdStartedAt: string
+    holdEndedAt: string
+    activeWaitDuration: string
+    calendarDuration: string
+    waitingTrustClassification: CanonicalWaitingTrustClassification
+    timerTrustClassification: CanonicalTimerTrustClassification
+    exceptionReason: string
+    timerDisplay: string
+  }
   waveC1EvidenceAuthority: {
     artifact: ReturnType<typeof evaluateWaveC1ArtifactAuthority>
     commercial: ReturnType<typeof evaluateWaveC1CommercialAuthority>
@@ -377,7 +416,8 @@ export function projectCanonicalPublisherLifecycle(input: CanonicalPublisherProj
       JMP_PUBLISHING_LIFECYCLE_REGISTRY.flatMap((candidate) => candidate.substages).find(
         (candidate) => candidate.substageCode === stageTruth.projectedSubstage,
       ) || null)
-  const waitingOn = canonicalWaitingOwner(input)
+  const waitingTruth = governedWaitingTruthFor(input, stageTruth, canonicalAuthority)
+  const waitingOn = waitingTruth.waitingOn
   const systemAttention = canonicalAuthority.requiresReconciliation || !canonicalAuthority.isCurrentOperationalAuthority
     ? canonicalAuthority.requiresReconciliation
       ? {
@@ -460,6 +500,7 @@ export function projectCanonicalPublisherLifecycle(input: CanonicalPublisherProj
     lifecycleEvidence,
     canonicalAuthority,
     stageTruth,
+    waitingTruth,
     waveC1EvidenceAuthority,
     workingImprint: 'DATA_GAP',
     recommendedImprint: 'DATA_GAP',
@@ -482,7 +523,7 @@ export function projectCanonicalPublisherLifecycle(input: CanonicalPublisherProj
     royaltyPayoutReadiness: royaltyReadinessFor(input),
     readiness: readinessFor(input, mapping),
     nextGovernedAction,
-    age: typeof input.ageDays === 'number' ? `${input.ageDays} day${input.ageDays === 1 ? '' : 's'}` : 'unknown',
+    age: waitingTruth.timerDisplay,
     dataGaps,
     sourceAttribution: ['Dataverse', 'Publisher Operating Center read model', 'JMP lifecycle registry v1.0'],
   }
@@ -783,6 +824,239 @@ function editorialGateFor(
     projectedStage: claimedStage,
     projectedSubstage: claimedSubstage,
   }
+}
+
+function governedWaitingTruthFor(
+  input: CanonicalPublisherProjectionInput,
+  stageTruth: CanonicalPublisherReadModel['stageTruth'],
+  canonicalAuthority: CanonicalPublisherReadModel['canonicalAuthority'],
+): CanonicalPublisherReadModel['waitingTruth'] {
+  const now = parseTimestamp(input.projectionAsOf) || new Date()
+  const blocked = stageTruth.blockingTransition !== 'NONE'
+  const onHold = input.holdRequested === true || /hold/i.test(`${input.exactBlocker || ''} ${input.dependency || ''}`)
+  const waiting = waitingSemanticsFor(input, stageTruth, canonicalAuthority, blocked, onHold)
+  const startedAt = input.waitingStartedAt || ''
+  const started = parseTimestamp(startedAt)
+  const holdStarted = parseTimestamp(input.holdStartedAt)
+  const holdEnded = parseTimestamp(input.holdEndedAt)
+  const calendarDays = started ? Math.max(0, Math.floor((now.getTime() - started.getTime()) / 86400000)) : null
+  const heldDays =
+    started && holdStarted
+      ? Math.max(0, Math.floor(((holdEnded || now).getTime() - holdStarted.getTime()) / 86400000))
+      : 0
+  const activeDays = calendarDays === null ? null : Math.max(0, calendarDays - heldDays)
+  const timerTrustClassification: CanonicalTimerTrustClassification =
+    waiting.waitingTrustClassification === 'RECONCILIATION_REQUIRED'
+      ? 'RECONCILIATION_REQUIRED'
+      : waiting.waitingTrustClassification === 'NOT_WAITING' || onHold
+        ? 'NO_ACTIVE_TIMER'
+        : started && input.waitingStartEvent
+          ? 'TRUSTED_TIMER'
+          : 'INSUFFICIENT_TIMESTAMP_EVIDENCE'
+  const elapsedWaitTime =
+    timerTrustClassification === 'TRUSTED_TIMER' && activeDays !== null
+      ? `${activeDays} day${activeDays === 1 ? '' : 's'}`
+      : timerTrustClassification === 'NO_ACTIVE_TIMER'
+        ? 'NONE'
+        : 'NOT_AUTHORITATIVE'
+
+  return {
+    requiredNextAction: waiting.requiredNextAction,
+    waitingOn: waiting.waitingOn,
+    waitingReason: waiting.waitingReason,
+    waitingStartedAt: timerTrustClassification === 'TRUSTED_TIMER' ? startedAt : '',
+    waitingStartEvent: timerTrustClassification === 'TRUSTED_TIMER' ? input.waitingStartEvent || '' : '',
+    waitingStartEventId: timerTrustClassification === 'TRUSTED_TIMER' ? input.waitingStartEventId || '' : '',
+    waitingStartEvidence: timerTrustClassification === 'TRUSTED_TIMER' ? input.waitingStartEvidence || '' : '',
+    elapsedWaitTime,
+    elapsedDays: timerTrustClassification === 'TRUSTED_TIMER' ? activeDays : null,
+    activeTimer: timerTrustClassification === 'TRUSTED_TIMER' ? 'YES' : 'NO',
+    holdStartedAt: input.holdStartedAt || '',
+    holdEndedAt: input.holdEndedAt || '',
+    activeWaitDuration: timerTrustClassification === 'TRUSTED_TIMER' ? elapsedWaitTime : 'NONE',
+    calendarDuration: calendarDays === null ? 'NOT_AUTHORITATIVE' : `${calendarDays} day${calendarDays === 1 ? '' : 's'}`,
+    waitingTrustClassification: waiting.waitingTrustClassification,
+    timerTrustClassification,
+    exceptionReason: timerExceptionReason(waiting.waitingTrustClassification, timerTrustClassification, onHold),
+    timerDisplay:
+      timerTrustClassification === 'TRUSTED_TIMER'
+        ? elapsedWaitTime
+        : timerTrustClassification === 'NO_ACTIVE_TIMER'
+          ? 'No active timer'
+          : timerTrustClassification === 'RECONCILIATION_REQUIRED'
+            ? 'Reconciliation required before timer starts'
+            : 'Timing evidence unavailable',
+  }
+}
+
+function waitingSemanticsFor(
+  input: CanonicalPublisherProjectionInput,
+  stageTruth: CanonicalPublisherReadModel['stageTruth'],
+  canonicalAuthority: CanonicalPublisherReadModel['canonicalAuthority'],
+  blocked: boolean,
+  onHold: boolean,
+): Pick<
+  CanonicalPublisherReadModel['waitingTruth'],
+  'requiredNextAction' | 'waitingOn' | 'waitingReason' | 'waitingTrustClassification'
+> {
+  if (canonicalAuthority.requiresReconciliation || stageTruth.trustClassification === 'RECONCILIATION_REQUIRED') {
+    return {
+      requiredNextAction: 'Reconcile canonical title authority',
+      waitingOn: 'Reconciliation Required',
+      waitingReason: 'SYSTEM_RECONCILIATION',
+      waitingTrustClassification: 'RECONCILIATION_REQUIRED',
+    }
+  }
+
+  if (
+    !canonicalAuthority.isCurrentOperationalAuthority ||
+    (stageTruth.trustClassification === 'LEGACY_GOVERNED_EXCEPTION' && stageTruth.projectedStage === 'POST_PUBLICATION')
+  ) {
+    return {
+      requiredNextAction: 'No current governed action is outstanding',
+      waitingOn: 'Not Waiting',
+      waitingReason: 'NO_CURRENT_GOVERNED_ACTION',
+      waitingTrustClassification: 'NOT_WAITING',
+    }
+  }
+
+  if (onHold) {
+    return {
+      requiredNextAction: input.nextAction || 'Resume from governed hold when authorized',
+      waitingOn: stageTruth.blockingPartyClass === 'NONE' ? canonicalWaitingOwner(input) : stageTruth.blockingPartyClass,
+      waitingReason: 'GOVERNED_HOLD',
+      waitingTrustClassification: 'TRUSTED_WAITING_ON',
+    }
+  }
+
+  if (blocked) {
+    return waitingForBlockingTransition(stageTruth)
+  }
+
+  if (
+    (input.authorApproved === true || input.transitionAuthorized === true || input.authorDecisionCaptured === true) &&
+    /AUTHOR.*REVIEW.*DELIVER/i.test(input.waitingStartEvent || '')
+  ) {
+    return {
+      requiredNextAction: 'No current governed action is outstanding',
+      waitingOn: 'Not Waiting',
+      waitingReason: 'AUTHOR_GATE_RESOLVED',
+      waitingTrustClassification: 'NOT_WAITING',
+    }
+  }
+
+  const explicitAction = input.nextAction || input.waitingStartEvent || ''
+  const explicitReason = waitingReasonFromAction(explicitAction)
+  const owner = ownerForWaitingReason(explicitReason, canonicalWaitingOwner(input))
+  if (explicitAction && (owner !== 'JMP' || input.waitingStartedAt)) {
+    return {
+      requiredNextAction: input.nextAction || input.waitingStartEvent || 'Current governed action became outstanding',
+      waitingOn: owner,
+      waitingReason: explicitReason,
+      waitingTrustClassification: 'TRUSTED_WAITING_ON',
+    }
+  }
+
+  if (explicitAction && stageTruth.trustClassification === 'TRUSTED_STAGE') {
+    return {
+      requiredNextAction: input.nextAction || input.waitingStartEvent || 'Current governed action became outstanding',
+      waitingOn: owner,
+      waitingReason: explicitReason,
+      waitingTrustClassification: 'INSUFFICIENT_ACTION_EVIDENCE',
+    }
+  }
+
+  return {
+    requiredNextAction: 'No current governed action is outstanding',
+    waitingOn: 'Not Waiting',
+    waitingReason: 'NO_CURRENT_GOVERNED_ACTION',
+    waitingTrustClassification: 'NOT_WAITING',
+  }
+}
+
+function waitingForBlockingTransition(
+  stageTruth: CanonicalPublisherReadModel['stageTruth'],
+): Pick<
+  CanonicalPublisherReadModel['waitingTruth'],
+  'requiredNextAction' | 'waitingOn' | 'waitingReason' | 'waitingTrustClassification'
+> {
+  switch (stageTruth.blockingTransition) {
+    case 'PACKAGE_ACCEPTED':
+      return waiting('Record author package acceptance', 'Prospect', 'AUTHOR_PACKAGE_ACCEPTANCE')
+    case 'AGREEMENT_EXECUTED':
+      return waiting('Obtain executed publishing agreement', 'Contract', 'CONTRACT_EXECUTION_REQUIRED')
+    case 'INITIAL_PAYMENT_RECEIVED':
+      return waiting('Receive required initial payment', 'Payment', 'INITIAL_PAYMENT_REQUIRED')
+    case 'CURRENT_ARTIFACT_BOUND':
+      return waiting('Bind the current governed artifact', 'Artifact', 'ARTIFACT_REQUIRED')
+    case 'AUTHOR_APPROVAL_NOT_AUTHENTICATION':
+    case 'PRIOR_AUTHOR_GATE_RESOLVED':
+      return waiting('Obtain governed author approval', 'Author', 'AUTHOR_EDITORIAL_APPROVAL')
+    case 'AUTHOR_CHANGES_REQUESTED':
+      return waiting('Process author-requested changes', 'Editor', 'AUTHOR_CHANGES_REQUESTED')
+    case 'AUTHOR_HOLD_REQUESTED':
+      return waiting('Resume from author hold when authorized', 'Author', 'GOVERNED_HOLD')
+    case 'LIFECYCLE_MAPPING':
+    case 'CANONICAL_AUTHORITY_RECONCILIATION':
+      return {
+        requiredNextAction: 'Reconcile canonical title authority',
+        waitingOn: 'Reconciliation Required',
+        waitingReason: 'SYSTEM_RECONCILIATION',
+        waitingTrustClassification: 'RECONCILIATION_REQUIRED',
+      }
+    default:
+      return waiting(`Resolve ${stageTruth.blockingTransition}`, stageTruth.blockingPartyClass === 'NONE' ? 'JMP/System' : stageTruth.blockingPartyClass, 'SYSTEM_RECONCILIATION')
+  }
+}
+
+function waiting(requiredNextAction: string, waitingOn: WaitingOwner, waitingReason: string) {
+  return {
+    requiredNextAction,
+    waitingOn,
+    waitingReason,
+    waitingTrustClassification: 'TRUSTED_WAITING_ON' as const,
+  }
+}
+
+function waitingReasonFromAction(action: string) {
+  const normalized = normalize(action)
+  if (/AUTHOR.*REVIEW.*DELIVER|AUTHOR.*APPROV|AUTHOR.*REVIEW|RESPONSE/.test(normalized)) return 'AUTHOR_EDITORIAL_APPROVAL'
+  if (/RESUME|QUEUE|EDITOR|LINE|COPY|DEVELOPMENTAL/.test(normalized)) return 'EDITORIAL_WORK_IN_PROGRESS'
+  if (/CONTRACT|AGREEMENT|SIGN/.test(normalized)) return 'CONTRACT_EXECUTION_REQUIRED'
+  if (/PAYMENT|INVOICE|STRIPE/.test(normalized)) return 'INITIAL_PAYMENT_REQUIRED'
+  if (/PUBLISHER|JACKIE|APPROVAL/.test(normalized)) return 'PUBLISHER_REVIEW_REQUIRED'
+  if (/VENDOR|DISTRIBUTOR|EXTERNAL/.test(normalized)) return 'EXTERNAL_VENDOR_ACTION'
+  if (/ARTIFACT|MANUSCRIPT|PROOF/.test(normalized)) return 'ARTIFACT_REQUIRED'
+  return 'SYSTEM_RECONCILIATION'
+}
+
+function ownerForWaitingReason(reason: string, fallback: WaitingOwner): WaitingOwner {
+  if (reason === 'AUTHOR_EDITORIAL_APPROVAL') return 'Author'
+  if (reason === 'CONTRACT_EXECUTION_REQUIRED') return 'Contract'
+  if (reason === 'INITIAL_PAYMENT_REQUIRED') return fallback === 'Prospect' ? 'Prospect' : 'Payment'
+  if (reason === 'EDITORIAL_WORK_IN_PROGRESS') return fallback === 'Author' ? 'Editor' : fallback
+  if (reason === 'PUBLISHER_REVIEW_REQUIRED') return 'JMP'
+  if (reason === 'EXTERNAL_VENDOR_ACTION') return 'External'
+  if (reason === 'ARTIFACT_REQUIRED') return 'Artifact'
+  return fallback
+}
+
+function timerExceptionReason(
+  waitingTrust: CanonicalWaitingTrustClassification,
+  timerTrust: CanonicalTimerTrustClassification,
+  onHold: boolean,
+) {
+  if (waitingTrust === 'RECONCILIATION_REQUIRED') return 'Canonical responsibility must be reconciled before a timer can start.'
+  if (waitingTrust === 'NOT_WAITING') return 'No current governed action is outstanding.'
+  if (onHold) return 'Governed hold suppresses active wait accumulation.'
+  if (timerTrust === 'INSUFFICIENT_TIMESTAMP_EVIDENCE') return 'No authoritative responsibility-transfer event timestamp is surfaced; CreatedOn/ModifiedOn/ageDays fallback is prohibited.'
+  return 'Authoritative responsibility-transfer event anchors the timer.'
+}
+
+function parseTimestamp(value?: string) {
+  if (!value) return null
+  const parsed = new Date(value)
+  return Number.isNaN(parsed.getTime()) ? null : parsed
 }
 
 function stageSequence(stage: StageCode | 'DATA_GAP') {
