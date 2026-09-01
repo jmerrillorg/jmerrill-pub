@@ -40,4 +40,3 @@ Before full canon ratification, Jackie should confirm:
 1. Whether the Path B J0-J8 consolidation framing supersedes, maps to, or sits above the current 01-10 lifecycle registry.
 2. Whether the CMM extension should become v2.1.
 3. Which source should be treated as the formal CMM v2.0 document if different from the security baseline methodology package.
-
