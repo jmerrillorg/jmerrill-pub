@@ -1,6 +1,6 @@
 # Legacy Fallback Analysis
 
-Last Verified: 2026-09-01T23:31:15.786Z
+Last Verified: 2026-09-01T23:40:56.677Z
 
 Finding: legacy/raw rows could still influence visible title state indirectly through primary-row selection.
 
