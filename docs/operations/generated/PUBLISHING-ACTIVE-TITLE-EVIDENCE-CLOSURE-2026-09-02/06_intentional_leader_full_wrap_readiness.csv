@@ -1,0 +1,23 @@
+field,value,evidence_source,status
+title,The Intentional Leader Volume I,Dataverse title e797232b-da7a-f111-ab0f-00224820105b,VERIFIED
+task,Full Wrap Preparation - The Intentional Leader Volume I,Prior governed task evidence,VERIFIED
+task_id,6dd4bddc-07a0-f111-b8dc-000d3a14673b,Prior governed task evidence,VERIFIED
+full_wrap_route,run-full-wrap-executor,Prior runtime evidence,EXISTS
+feature_flag,JM1_FULL_WRAP_EXECUTOR_ENABLED=true,Prior runtime evidence,EXISTS
+prior_executor_result,FULL_WRAP_EXECUTION_BLOCKED / REQUIRED_INPUT_DATA_MISSING,Prior task execution evidence,VERIFIED
+publication_intent,COMMISSIONING / NON_RELEASE,JMP-BLOCK05-FINAL-LIVE-WORKSTREAM-CERTIFICATION-2026-08-26,VERIFIED
+trim_size,6 x 9,JMP-ONBOARDING-FIRST-PRODUCTION-FULL-WRAP-2026-08-25,VERIFIED
+final_page_count,275,JMP-ONBOARDING-FIRST-PRODUCTION-FULL-WRAP-2026-08-25,VERIFIED
+interior_proof_checksum,0138d7a474cc4ab2d8369b4ae0642842d8bdbd041ec9029347b15daf051975ed,JMP-ONBOARDING-FIRST-PRODUCTION-FULL-WRAP-2026-08-25,VERIFIED
+superseded_page_count,393,JMP-ONBOARDING-FIRST-PRODUCTION-FULL-WRAP-2026-08-25,SUPERSEDED_NOT_USED
+imprint,J Merrill Publishing,JMP-BLOCK05-FINAL-LIVE-WORKSTREAM-CERTIFICATION-2026-08-26,VERIFIED
+isbn_required,NO,JMP-BLOCK05-FINAL-LIVE-WORKSTREAM-CERTIFICATION-2026-08-26,NOT_REQUIRED
+barcode_required,NO,JMP-BLOCK05-FINAL-LIVE-WORKSTREAM-CERTIFICATION-2026-08-26,NOT_REQUIRED
+distribution_required,NO,JMP-BLOCK05-FINAL-LIVE-WORKSTREAM-CERTIFICATION-2026-08-26,NOT_REQUIRED
+publication_launch_required,NO,JMP-BLOCK05-FINAL-LIVE-WORKSTREAM-CERTIFICATION-2026-08-26,NOT_REQUIRED
+source_cover_checksum,539c21a146812c38a5b33c065862c667a720926bc6777a14da41101d6350a774,JMP-ONBOARDING-FIRST-PRODUCTION-FULL-WRAP-2026-08-25,VERIFIED
+approved_back_cover_copy,NOT FOUND,Repo/Dataverse governed evidence search,MISSING
+task_title_input_binding,NOT CERTIFIED,Prior executor 422 evidence,MISSING
+paper_profile_if_required,NOT CERTIFIED,Full Wrap input readiness review,MISSING_IF_REQUIRED
+exact_marks_asset_if_used,NOT CERTIFIED,Full Wrap input readiness review,MISSING_IF_USED
+full_wrap_ready,NO,Computed readiness,FAIL_CLOSED
