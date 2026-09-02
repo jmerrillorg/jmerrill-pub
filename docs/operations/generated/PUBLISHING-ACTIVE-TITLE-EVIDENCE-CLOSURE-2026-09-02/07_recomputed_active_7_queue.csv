@@ -1,0 +1,8 @@
+author,title,current_stage,current_substage,waiting_on,system_attention,next_governed_action,transition_ready,production_ready,communication_needed
+Esther Dillard,Establishing Glory,LINE_EDITING,Idempotent transition already completed,NONE,NO,No action in this closure pass,YES,NO,NO
+Quanisha Dockery,Indomitable,DEVELOPMENTAL_EDITING,Author corrections/resubmission expected,AUTHOR,NO,Wait for author resubmission,NO,NO,NO
+Sean Smith Sr.,Before You Were Born,DEVELOPMENTAL_EDITING,Author review decision pending after operator response,AUTHOR,NO,Wait for governed author review decision,NO,NO,NO
+Atta Boateng,Untitled,EDITORIAL_REVIEW,Delivery proven and author action outstanding,AUTHOR,NO,Wait for author response,NO,NO,NO
+J Merrill Publishing,The Intentional Leader,FULL_WRAP_PREPARATION,Full Wrap inputs incomplete,JMP,YES,Approve/bind missing Full Wrap inputs,NO,NO,NO
+Unknown,The Long Watch,LINE_EDITING,Cadence send blocked,JMP,YES,Repair canonical intake reference and rerun governed send,NO,NO,YES
+Unknown,The General's Will and Last Testament,LINE_EDITING,Authority conflict unresolved,JMP,YES,Resolve controlling project/gate chain,NO,NO,NO
