@@ -28,4 +28,3 @@
 ## Scope Controls
 
 No Contact, Title, agreement, payment, Stripe, commercial, contract, lifecycle-stage, workflow, schema, provider-delivery, or author-communication mutation was performed outside the two writes listed above.
-

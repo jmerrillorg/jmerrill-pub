@@ -59,4 +59,3 @@ The selected title already carried the canonical contact reference `contact:8b2a
 ## Existing Author Profile Check
 
 No existing `jm1_authorprofile` row was found for selected Contact `8b2a87d4-418b-f111-ab10-000d3a1a9efa` before provisioning.
-

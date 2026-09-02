@@ -44,4 +44,3 @@ This package records the narrow Founder-authorized production provisioning of ex
 ## Final State
 
 `FINAL_PROOF_CONTRACT_STATUS` may proceed past `INTERNAL_SYNTHETIC_AUTHOR_PROFILE_PREREQUISITE_MISSING` in the next proof stream. This package does not rerun cadence proof and does not authorize any author-facing delivery.
-
