@@ -1,0 +1,18 @@
+field,value,evidence_source,status
+title,The Intentional Leader Volume I,Dataverse title e797232b-da7a-f111-ab0f-00224820105b,VERIFIED
+task,Full Wrap Preparation - The Intentional Leader Volume I,Prior governed task evidence,VERIFIED
+task_id,6dd4bddc-07a0-f111-b8dc-000d3a14673b,Prior governed task evidence,VERIFIED
+full_wrap_route,run-full-wrap-executor,Prior runtime evidence,EXISTS
+feature_flag,JM1_FULL_WRAP_EXECUTOR_ENABLED=true,Prior runtime evidence,EXISTS
+prior_executor_result,FULL_WRAP_EXECUTION_BLOCKED / REQUIRED_INPUT_DATA_MISSING,Prior task execution evidence,VERIFIED
+trim_size,6 x 9,JMP-ONBOARDING-FIRST-PRODUCTION-FULL-WRAP-2026-08-25,VERIFIED
+final_page_count,275,JMP-ONBOARDING-FIRST-PRODUCTION-FULL-WRAP-2026-08-25,VERIFIED
+imprint,J Merrill Publishing,JMP-BLOCK05-FINAL-LIVE-WORKSTREAM-CERTIFICATION-2026-08-26,VERIFIED
+isbn_required,NO,JMP-BLOCK05-FINAL-LIVE-WORKSTREAM-CERTIFICATION-2026-08-26,NOT_REQUIRED
+barcode_required,NO,JMP-BLOCK05-FINAL-LIVE-WORKSTREAM-CERTIFICATION-2026-08-26,NOT_REQUIRED
+distribution_required,NO,JMP-BLOCK05-FINAL-LIVE-WORKSTREAM-CERTIFICATION-2026-08-26,NOT_REQUIRED
+approved_back_cover_copy,NOT FOUND,Repo/Dataverse governed evidence search,MISSING
+task_title_input_binding,NOT CERTIFIED,Prior executor 422 evidence,MISSING
+paper_profile_if_required,NOT CERTIFIED,Full Wrap input readiness review,MISSING_IF_REQUIRED
+exact_marks_asset_if_used,NOT CERTIFIED,Full Wrap input readiness review,MISSING_IF_USED
+full_wrap_ready,NO,Computed readiness,FAIL_CLOSED
