@@ -1,0 +1,40 @@
+{
+  "eventId": "GOV-AUTHOR-EXPERIENCE-AUTHORITY-CONTRACT-v1.1-RATIFIED-2026-09-02",
+  "eventType": "GOVERNANCE_RATIFICATION",
+  "eventScope": "EVIDENCE_LOCAL_REPOSITORY_EVENT_ONLY",
+  "occurredOn": "2026-09-02",
+  "artifact": {
+    "name": "JMP Author Experience & Authority Contract",
+    "version": "v1.1",
+    "path": "docs/governance/publishing/JMP-Author-Experience-Authority-Contract-v1.1.md",
+    "priorStatus": "CANON-CANDIDATE / NOT RATIFIED",
+    "finalStatus": "CANONICAL GOVERNANCE STANDARD / RATIFIED",
+    "priorVersion": "v1.0 / HELD / SUPERSEDED BY v1.1"
+  },
+  "founderDisposition": "RATIFY_WITH_NARROW_CLARIFICATIONS",
+  "namespaceRuling": {
+    "authorExperienceDecisionClass": "AX0-AX5",
+    "pathBSystemActionAuthority": "A0-A5",
+    "editorialApprovalGates": "existing A1-A9 canonical gate identifiers with full canonical names where ambiguity is possible"
+  },
+  "clarificationsApplied": [
+    "AX_NAMESPACE_STABILITY",
+    "AX5_LEGAL_SUFFICIENCY_BOUNDARY",
+    "TIER_2_HARD_HOLD",
+    "QUALIFIED_IDENTIFIER_RULE",
+    "ACTION_EVENT_IMMUTABILITY"
+  ],
+  "boundaries": {
+    "v1ImplementationAuthorized": false,
+    "tier1SecurityProofStatus": "UNCHANGED / NOT PROVEN",
+    "tier2SecurityProofStatus": "NOT PROVEN / HOLD",
+    "portalActionRuntimeProof": "NOT PROVEN",
+    "clientTitleAutomationFreeze": "ACTIVE",
+    "publishingDiscretionaryArchitectureFreeze": "ACTIVE",
+    "runtimeFilesChanged": 0,
+    "schemaChanges": 0,
+    "workflowChanges": 0,
+    "productionMutations": 0
+  },
+  "dataverseExecutionLogWrite": "NOT_PERFORMED"
+}
