@@ -1,0 +1,11 @@
+ACTION,AX_CLASS,PATH_B_AUTHORITY,TIER,TIER2_HOLD,PROOF_STATUS,EVIDENCE
+VIEW_TITLE_STATUS,AX0,A0 Observe,Tier 1,No,PASS_WITH_SOURCE_AND_UNAUTH_RUNTIME_PROOF,"Authority Contract v1.1 lines 97; /api/author/context 401 without session"
+VIEW_ARTIFACT,AX0,A0 Observe,Tier 1 by current non-sensitive editorial artifact,Conditional,PASS_WITH_SOURCE_AND_TEST_PROOF,"Authority Contract v1.1 line 98; author_active_stage_artifact_visibility 7/7 checked"
+DOWNLOAD_ARTIFACT,AX0,A0 Observe,Tier 1 by current non-sensitive editorial artifact,Conditional,PASS_WITH_SOURCE_AND_TEST_PROOF,"Authority Contract v1.1 line 99; download route requires visible current artifact and owned publishing asset"
+ACKNOWLEDGE_DELIVERY,AX1,A2 Internal Write,Tier 1,No,NOT_RUNTIME_PROVEN_FOR_V1,"Authority Contract v1.1 line 100; no V1 portal implementation authorized"
+APPROVE_ARTIFACT,AX2,A2 evidence with Path B effect evaluated separately,Tier 1 unless sensitive,Conditional,PASS_FOR_EMAIL_RESPONSE_RUNTIME_NOT_PORTAL_V1,"Authority Contract v1.1 line 101; author_decision_closeout_propagation 25/25 pass"
+REQUEST_CHANGES,AX2,A2 Internal Write,Tier 1,Conditional,PASS_FOR_EMAIL_RESPONSE_RUNTIME_NOT_PORTAL_V1,"Authority Contract v1.1 line 102; change-request path fails closed on wrong title/package"
+REQUEST_CLARIFICATION,AX2,A2 Internal Write,Tier 1,Conditional,NOT_RUNTIME_PROVEN_FOR_V1,"Authority Contract v1.1 line 103; no V1 portal implementation authorized"
+PLACE_HOLD,AX2,A2 Internal Write; A5 if consequential,Tier 1/Tier 2 by reason,Yes if consequential,NOT_RUNTIME_PROVEN_FOR_V1,"Authority Contract v1.1 line 104"
+RESUME_FROM_HOLD,AX2,A2 Internal Write; A4/A5 if consequential,Tier 1/Tier 2 by scope,Yes if consequential,NOT_RUNTIME_PROVEN_FOR_V1,"Authority Contract v1.1 line 105"
+UPDATE_ALLOWED_PROFILE_INFORMATION,AX1 or AX2,A2 Internal Write; A5 if legal/payee identity changes,Tier 1/Tier 2 by field,Yes for sensitive/legal/payee fields,NOT_RUNTIME_PROVEN_FOR_V1,"Authority Contract v1.1 line 110"
