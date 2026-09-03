@@ -1,0 +1,17 @@
+field,value
+last_verified,2026-09-02T21:33:45Z
+origin_main_after_pr_713_714,6c33f2afc6ec45f523e5a00026cdb2a4d21df38b
+pr_713_merge_sha,98e20c1901f4c25f430446ae9ad1fd8dca151032
+pr_714_merge_sha,6c33f2afc6ec45f523e5a00026cdb2a4d21df38b
+active_projects,7
+jmp_actions_required,4
+author_actions_required,3
+communications_needed,1
+transition_ready_titles,1
+production_ready_titles,0
+client_title_automation_freeze,ACTIVE
+autonomous_client_title_execution_authorized,NO
+authorized_author_communications_max,1
+authorized_author_communication_candidate,The Long Watch
+fresh_outlook_duplicate_send_readback,NO_MATCH_FOUND
+source,PUBLISHING-ACTIVE-TITLE-EVIDENCE-CLOSURE-2026-09-02 and bounded Publishing mailbox readback
