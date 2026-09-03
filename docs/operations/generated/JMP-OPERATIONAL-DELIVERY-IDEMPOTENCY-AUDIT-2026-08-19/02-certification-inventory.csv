@@ -1,0 +1,6 @@
+executionLogId,createdOn,titleReferenced,gateId,classification
+dd44a1a7-e898-f111-b8dc-6045bdd69435,2026-08-15T20:34:05Z,"Untitled (synthetic/test title, pre-existing, unrelated to session)",eeffc5fb-5698-f111-8076-000d3a14673b,NO_IMPACT
+ab48a205-7b9b-f111-b8dc-000d3a14673b,2026-08-19T03:06:54Z,"Before You Were Born (Sean Crowley) - GOVERNING",e996abe7-2f8e-f111-8077-000d3a14673b,REAL_GOVERNING_CERTIFICATION
+93febe11-7b9b-f111-b8dc-7c1e525b15c2,2026-08-19T03:07:11Z,"Before You Were Born - DUPLICATE (bug, pre-fix replay)",e996abe7-2f8e-f111-8077-000d3a14673b,DUPLICATE_NON_GOVERNING
+99153717-7b9b-f111-b8dc-00224820105b,2026-08-19T03:07:21Z,"Before You Were Born - DUPLICATE (bug, pre-fix replay)",e996abe7-2f8e-f111-8077-000d3a14673b,DUPLICATE_NON_GOVERNING
+8724b90c-7c9b-f111-b8dc-00224820105b,2026-08-19T03:14:19Z,"Before You Were Born gate reused by disposable post-fix verification test (test-only, not a real send)",e996abe7-2f8e-f111-8077-000d3a14673b,RECOVERY_VALIDATION_TEST

@@ -1,0 +1,2 @@
+title,gateId,gateStatusThroughoutIncident,nextStageAuthorizedThroughoutIncident,classification
+Before You Were Born,e996abe7-2f8e-f111-8077-000d3a14673b,196650002 (Awaiting Author Response) — never incorrect,false — never incorrect,DUPLICATE_LOG_ONLY (gate status/authorization field itself was never wrong; only awaitingsince/description drifted)
