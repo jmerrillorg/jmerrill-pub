@@ -1,3 +1,5 @@
+import { evaluateAuthorWorkspaceEntitlement } from '../author-portal-access'
+
 const STRIPE_API_BASE = 'https://api.stripe.com'
 
 const EXECUTION_STATUS = {
@@ -147,6 +149,7 @@ export async function processPublishingPaymentSuccess(input: PublishingPaymentSu
   let joinedFamily = false
   let joinedFamilyLogId: string | null = null
   let joinedFamilyState = 'BLOCKED_AGREEMENT_NOT_EXECUTED'
+  let authorPortalEntitlement: ReturnType<typeof evaluateAuthorWorkspaceEntitlement> | null = null
   if (signedContract) {
     await dataverseRequest(config, token, `opportunities(${opportunityId})`, {
       method: 'PATCH',
@@ -180,6 +183,18 @@ export async function processPublishingPaymentSuccess(input: PublishingPaymentSu
     }
     joinedFamily = true
     joinedFamilyState = 'JOINED_THE_FAMILY'
+    authorPortalEntitlement = evaluateAuthorWorkspaceEntitlement({
+      joinedTheFamily: true,
+      workspaceStatus: AUTHOR_PORTAL_STATUS.ACTIVE,
+      contactId: normalizeString(opportunity._parentcontactid_value) || normalizeString(opportunity._customerid_value),
+      opportunityId,
+      intakeReference: normalizeString(opportunity.jm1pub_intaketrackingid),
+    })
+    await logAuthorPortalEntitlementGuard(config, token, {
+      opportunity,
+      opportunityId,
+      entitlement: authorPortalEntitlement,
+    })
   } else {
     const blockName = `JOINED-THE-FAMILY-BLOCKED-${opportunityId}`
     const existingBlockLog = await findExecutionLog(config, token, blockName, 'JOINED_THE_FAMILY_BLOCKED')
@@ -227,6 +242,7 @@ export async function processPublishingPaymentSuccess(input: PublishingPaymentSu
     joinedFamily,
     joinedFamilyState,
     joinedFamilyLogId,
+    authorPortalEntitlement,
     notification,
     liveActions: {
       updatesFirstPaymentStatus: paymentUpdated,
@@ -561,6 +577,34 @@ async function logNotificationResult(config: DataverseConfig, token: string, inp
     sourceEntity: 'opportunity',
     sourceRecordId: input.opportunityId,
     status: input.notification.accepted ? 'success' : 'failed',
+  })
+}
+
+async function logAuthorPortalEntitlementGuard(config: DataverseConfig, token: string, input: {
+  opportunityId: string
+  opportunity: DataverseRow
+  entitlement: ReturnType<typeof evaluateAuthorWorkspaceEntitlement>
+}) {
+  const eventType = input.entitlement.systemAttentionRequired
+    ? 'AUTHOR_PORTAL_ENTITLEMENT_MISSING'
+    : 'AUTHOR_PORTAL_ENTITLEMENT_CONFIRMED'
+  const name = `${eventType}-${input.opportunityId}`
+  const existing = await findExecutionLog(config, token, name, eventType)
+  if (existing) return
+
+  await postExecutionLog(config, token, {
+    name,
+    actionType: eventType,
+    description: [
+      `Author portal entitlement guard evaluated ${authorName(input.opportunity)} / ${titleName(input.opportunity)} after Joined the Family.`,
+      `State ${input.entitlement.state}; reason ${input.entitlement.reason}; matching grants ${input.entitlement.matchingGrantCount}.`,
+      input.entitlement.systemAttentionRequired
+        ? 'Workspace status is active but no scoped author portal entitlement was found; this requires governed repair before author access can be treated as complete.'
+        : 'A scoped author portal entitlement exists. No duplicate workspace, payment change, production progression, or author-facing communication occurred in this payment consumer.',
+    ].join(' '),
+    sourceEntity: 'opportunity',
+    sourceRecordId: input.opportunityId,
+    status: input.entitlement.systemAttentionRequired ? 'failed' : 'success',
   })
 }
 

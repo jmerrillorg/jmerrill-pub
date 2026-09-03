@@ -59,6 +59,7 @@
     "stripe-connect-reminder-cadence-guard": "node --test scripts/stripe_connect_reminder_cadence.test.mjs scripts/stripe_connect_reminder_runtime.test.mjs scripts/stripe_connect_post_remediation_closure.test.mjs",
     "stripe-connect-reminder-cadence": "node scripts/stripe_connect_reminder_runtime.mjs --load-app-settings",
     "cv01a-author-experience-guard": "node --test scripts/cv01a_author_experience.test.mjs",
+    "atta-editorial-delivery-entitlement-guard": "node --test scripts/atta_editorial_delivery_entitlement_guard.test.mjs",
     "jm1-bootstrap": "node scripts/jm1_bootstrap.mjs",
     "jm1-bootstrap-guard": "node --test scripts/jm1_bootstrap_guard.test.mjs",
     "jm1-canon-consistency-guard": "node --test scripts/jm1_canon_consistency_guard.test.mjs",
