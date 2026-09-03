@@ -1,0 +1,34 @@
+{
+  "cycle": "PUBLISHING_PROOF_ENABLEMENT_FREEZE_EXIT_2026_09_02",
+  "verified_at": "2026-09-02T04:47:24.358308Z",
+  "repo_head": "6f79da18de0ae9b918908bb266651f0a95880ae6",
+  "origin_main": "6f79da18de0ae9b918908bb266651f0a95880ae6",
+  "selected_validation_title": "Before You Were Born mocked internal validation fixture",
+  "selected_lifecycle_segment": "EDITORIAL_PRODUCTION/DEVELOPMENTAL_EDITING package cadence release to author-review package sent in mocked internal validation",
+  "proof_contract": "docs/operations/generated/PUBLISHING-PROOF-ENABLEMENT-FREEZE-EXIT-2026-09-02/04-proof-contract-instance.md",
+  "five_dimensions": {
+    "STATE": "PASS_FOR_INTERNAL_VALIDATION",
+    "EVIDENCE": "PASS_WITH_LIMITATION",
+    "TIME": "PASS",
+    "AUTHORITY": "PASS_FOR_INTERNAL_VALIDATION",
+    "DEPENDENCY": "PASS_LOCAL_MOCKED_PROOF_BLOCKED_FOR_AUTONOMOUS_PROOF"
+  },
+  "manual_intervention_count": 0,
+  "maturity_classification": "PROVEN \u2014 ALM MATURITY BLOCK",
+  "tests": {
+    "editorialCadenceReleaseConsumer": "18/18 PASS",
+    "package_orchestrator_dispatch": "54/54 PASS",
+    "jm1_canon_consistency_guard": "4/4 PASS",
+    "type_check": "PASS",
+    "diagnostic_runner_lint": "PASS"
+  },
+  "production_mutations": 0,
+  "client_title_automation_freeze": "ACTIVE",
+  "publishing_discretionary_architecture_freeze": "ACTIVE",
+  "runtime_implementation_authorized": "NO_GENERAL_AUTHORITY",
+  "founder_review": {
+    "first_governed_proof_milestone": "SATISFIED_FOR_FOUNDER_REVIEW",
+    "client_title_freeze_eligible": "NO",
+    "discretionary_architecture_freeze_eligible": "FOUNDER_REVIEW_ONLY"
+  }
+}
