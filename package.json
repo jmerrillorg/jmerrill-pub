@@ -18,6 +18,7 @@
     "public-catalog-projection-guard": "node --test scripts/public_catalog_projection.test.mjs",
     "public-author-privacy-guard": "node --test scripts/public_author_privacy_guard.test.mjs",
     "catalog-reconciliation-final-guard": "node scripts/catalog_reconciliation_final_guard.mjs",
+    "catalog-authority-contract-guard": "node --test scripts/publishing_catalog_authority_contract.test.mjs",
     "slice2-commercial-catalog-schema-spec-guard": "node --test scripts/slice2_commercial_catalog_schema_spec_guard.mjs",
     "slice3-implementation-planning-guard": "node --test scripts/slice3_implementation_planning_guard.test.mjs",
     "author-auth-guard": "node scripts/check-author-operating-center-auth.mjs && node scripts/author_external_id_claim_resolution.test.mjs && node --test scripts/author_activation_recovery_governance.test.mjs scripts/author_email_otp_login.test.mjs",

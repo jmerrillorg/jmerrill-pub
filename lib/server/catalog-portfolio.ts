@@ -93,6 +93,10 @@ export function classifyTitlePortfolio({
   const titleStage = formatted(title, 'jm1pub_stage')
   const publicCatalogStatus = formatted(title, 'jm1pub_publiccatalogstatus')
   const publicationStatus = stringValue(title.jm1pub_publicationstatus)
+  const canonicalWorkKey = stringValue(title.jm1pub_catalogworkkey)
+  const currentCatalogState = stringValue(title.jm1pub_currentcatalogstate)
+  const catalogLifecycleDetail = stringValue(title.jm1pub_cataloglifecycledetail)
+  const marketingAuthorityState = stringValue(title.jm1pub_marketingauthoritystate)
   const titleName = stringValue(title.jm1pub_titlename || title.jm1pub_name)
   const slug = stringValue(title.jm1pub_slug)
   const normalizedStage = normalizeWorkspaceText(titleStage)
@@ -159,6 +163,10 @@ export function classifyTitlePortfolio({
   if (publicCatalogStatus) evidence.push(`public catalog status: ${publicCatalogStatus}`)
   if (publicationStatus) evidence.push(`publication status: ${publicationStatus}`)
   if (slug) evidence.push(`catalog slug: ${slug}`)
+  if (canonicalWorkKey) evidence.push(`canonical work key: ${canonicalWorkKey}`)
+  if (currentCatalogState) evidence.push(`explicit catalog state: ${currentCatalogState}`)
+  if (catalogLifecycleDetail) evidence.push(`catalog lifecycle detail: ${catalogLifecycleDetail}`)
+  if (marketingAuthorityState) evidence.push(`marketing authority: ${marketingAuthorityState}`)
   if (isbn13s.length) evidence.push(`ISBN-13 present: ${isbn13s.join(', ')}`)
   if (distributionStatuses.length) evidence.push(`distribution status: ${distributionStatuses.join(', ')}`)
   if (activeStage) {
@@ -180,6 +188,52 @@ export function classifyTitlePortfolio({
       publicationStatus,
       activeFormats: assetFormats,
       isbn13s,
+    }
+  }
+
+  if (canonicalWorkKey) {
+    if (['RETIRED', 'INACTIVE', 'WITHDRAWN', 'RIGHTS_REVERTED'].includes(currentCatalogState)) {
+      return {
+        state: 'archive_historical',
+        label: 'Archive / Historical',
+        evidence,
+        confidence: 'high',
+        catalogStatus: currentCatalogState,
+        distributionStatus: distributionStatuses.join(', '),
+        publicationStatus,
+        activeFormats: assetFormats,
+        isbn13s,
+      }
+    }
+
+    if (currentCatalogState === 'UNRESOLVED' || marketingAuthorityState === 'UNRESOLVED') {
+      return {
+        state: 'reconciliation_required',
+        label: 'Reconciliation Required',
+        evidence,
+        confidence: 'high',
+        exceptionReason: 'The explicit canonical catalog authority requires reconciliation.',
+        catalogStatus: currentCatalogState,
+        distributionStatus: distributionStatuses.join(', '),
+        publicationStatus,
+        activeFormats: assetFormats,
+        isbn13s,
+      }
+    }
+
+    if (currentCatalogState === 'ACTIVE') {
+      const activeLaunch = catalogLifecycleDetail === 'ACTIVE_LAUNCH_LIFECYCLE'
+      return {
+        state: activeLaunch ? 'active_pipeline' : 'published_catalog',
+        label: activeLaunch ? 'Active Pipeline' : 'Published Catalog',
+        evidence,
+        confidence: 'high',
+        catalogStatus: currentCatalogState,
+        distributionStatus: distributionStatuses.join(', '),
+        publicationStatus,
+        activeFormats: assetFormats,
+        isbn13s,
+      }
     }
   }
 

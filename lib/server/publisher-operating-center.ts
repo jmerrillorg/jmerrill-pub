@@ -1445,7 +1445,7 @@ async function getRecentIntakes(config: DataverseServerConfig) {
 async function getRecentTitles(config: DataverseServerConfig) {
   return dataverseList(config, 'jm1pub_titles', {
     $select:
-      'jm1pub_titleid,jm1pub_name,jm1pub_titlename,jm1pub_authorname,jm1pub_stage,jm1pub_status,jm1pub_publicationstatus,jm1pub_publiccatalogstatus,jm1_canonicalstatus,jm1_canonicaltitlereference,jm1_canonicalauthorcontactreference,jm1_sourceauthority,_jm1pub_contract_value,_jm1_author_value,createdon,modifiedon',
+      'jm1pub_titleid,jm1pub_name,jm1pub_titlename,jm1pub_authorname,jm1pub_stage,jm1pub_status,jm1pub_publicationstatus,jm1pub_publiccatalogstatus,jm1pub_catalogworkkey,jm1pub_currentcatalogstate,jm1pub_cataloglifecycledetail,jm1pub_marketingauthoritystate,jm1_canonicalstatus,jm1_canonicaltitlereference,jm1_canonicalauthorcontactreference,jm1_sourceauthority,_jm1pub_contract_value,_jm1_author_value,createdon,modifiedon',
     $orderby: 'createdon desc',
     $top: '250',
   })

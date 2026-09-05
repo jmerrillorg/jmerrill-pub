@@ -1,0 +1,287 @@
+{
+  "generatedAt": "2026-09-05T14:59:27.770Z",
+  "mode": "DRY_RUN",
+  "environment": {
+    "name": "core",
+    "resource": "https://jm1hq.crm.dynamics.com",
+    "organizationId": "9dafb403-b493-f011-a700-000d3a106f37"
+  },
+  "solutionUniqueName": "JM1_Publishing",
+  "existingTables": {
+    "jm1pub_title": {
+      "@odata.context": "https://jm1hq.crm.dynamics.com/api/data/v9.2/$metadata#EntityDefinitions(MetadataId,LogicalName,SchemaName,EntitySetName,PrimaryIdAttribute,PrimaryNameAttribute)/$entity",
+      "MetadataId": "6c68b5ec-6191-f011-b4cc-7c1e525b3eb3",
+      "LogicalName": "jm1pub_title",
+      "PrimaryNameAttribute": "jm1pub_titlename",
+      "PrimaryIdAttribute": "jm1pub_titleid",
+      "SchemaName": "jm1pub_Title",
+      "EntitySetName": "jm1pub_titles"
+    },
+    "jm1pub_edition": {
+      "@odata.context": "https://jm1hq.crm.dynamics.com/api/data/v9.2/$metadata#EntityDefinitions(MetadataId,LogicalName,SchemaName,EntitySetName,PrimaryIdAttribute,PrimaryNameAttribute)/$entity",
+      "MetadataId": "bc1d7cc9-6491-f011-b4cc-7c1e5200a881",
+      "LogicalName": "jm1pub_edition",
+      "PrimaryNameAttribute": "jm1pub_editionname",
+      "PrimaryIdAttribute": "jm1pub_editionid",
+      "SchemaName": "jm1pub_Edition",
+      "EntitySetName": "jm1pub_editions"
+    },
+    "jm1pub_publishingasset": {
+      "@odata.context": "https://jm1hq.crm.dynamics.com/api/data/v9.2/$metadata#EntityDefinitions(MetadataId,LogicalName,SchemaName,EntitySetName,PrimaryIdAttribute,PrimaryNameAttribute)/$entity",
+      "MetadataId": "9bffacfa-c27a-f111-ab0f-7c1e525b15c2",
+      "LogicalName": "jm1pub_publishingasset",
+      "PrimaryNameAttribute": "jm1pub_name",
+      "PrimaryIdAttribute": "jm1pub_publishingassetid",
+      "SchemaName": "jm1pub_PublishingAsset",
+      "EntitySetName": "jm1pub_publishingassets"
+    }
+  },
+  "actions": [
+    {
+      "kind": "table",
+      "name": "jm1pub_isbnallocation",
+      "status": "EXISTS",
+      "metadataId": "88e8496a-37a9-f111-aaac-6045bdd69678"
+    },
+    {
+      "kind": "field",
+      "table": "jm1pub_title",
+      "name": "jm1pub_catalogworkkey",
+      "status": "EXISTS",
+      "metadataId": "9a008392-37a9-f111-aaac-000d3a9eacee"
+    },
+    {
+      "kind": "field",
+      "table": "jm1pub_title",
+      "name": "jm1pub_publisheroriginstate",
+      "status": "EXISTS",
+      "metadataId": "9f380e9d-37a9-f111-aaab-000d3a14673b"
+    },
+    {
+      "kind": "field",
+      "table": "jm1pub_title",
+      "name": "jm1pub_authoritychangefinding",
+      "status": "EXISTS",
+      "metadataId": "54ea909f-37a9-f111-aaac-7c1e525b15c2"
+    },
+    {
+      "kind": "field",
+      "table": "jm1pub_title",
+      "name": "jm1pub_currentcatalogstate",
+      "status": "EXISTS",
+      "metadataId": "77f157a3-37a9-f111-aaab-000d3a14673b"
+    },
+    {
+      "kind": "field",
+      "table": "jm1pub_title",
+      "name": "jm1pub_cataloglifecycledetail",
+      "status": "EXISTS",
+      "metadataId": "27639c11-3aa9-f111-aaab-00224820105b"
+    },
+    {
+      "kind": "field",
+      "table": "jm1pub_title",
+      "name": "jm1pub_marketingauthoritystate",
+      "status": "EXISTS",
+      "metadataId": "b7aa71a5-37a9-f111-aaab-00224820105b"
+    },
+    {
+      "kind": "field",
+      "table": "jm1pub_title",
+      "name": "jm1pub_retirementstate",
+      "status": "EXISTS",
+      "metadataId": "efaa71a5-37a9-f111-aaab-00224820105b"
+    },
+    {
+      "kind": "field",
+      "table": "jm1pub_title",
+      "name": "jm1pub_rightsholdstate",
+      "status": "EXISTS",
+      "metadataId": "e0046fab-37a9-f111-aaab-00224820105b"
+    },
+    {
+      "kind": "field",
+      "table": "jm1pub_title",
+      "name": "jm1pub_catalogsourcechecksum",
+      "status": "EXISTS",
+      "metadataId": "f5141bac-37a9-f111-aaac-7c1e525b15c2"
+    },
+    {
+      "kind": "field",
+      "table": "jm1pub_title",
+      "name": "jm1pub_catalogcorrelationid",
+      "status": "EXISTS",
+      "metadataId": "ae5c5baf-37a9-f111-aaac-6045bdd69435"
+    },
+    {
+      "kind": "field",
+      "table": "jm1pub_title",
+      "name": "jm1pub_currenteditionreference",
+      "status": "EXISTS",
+      "metadataId": "27eb10b1-37a9-f111-aaab-000d3a14673b"
+    },
+    {
+      "kind": "field",
+      "table": "jm1pub_edition",
+      "name": "jm1pub_canonicaleditionkey",
+      "status": "EXISTS",
+      "metadataId": "2e2b34b6-37a9-f111-aaac-6045bdd69435"
+    },
+    {
+      "kind": "field",
+      "table": "jm1pub_edition",
+      "name": "jm1pub_editionrelationship",
+      "status": "EXISTS",
+      "metadataId": "d73008be-37a9-f111-aaab-000d3a14673b"
+    },
+    {
+      "kind": "field",
+      "table": "jm1pub_edition",
+      "name": "jm1pub_catalogsourcechecksum",
+      "status": "EXISTS",
+      "metadataId": "2d7f69c3-37a9-f111-aaab-00224820105b"
+    },
+    {
+      "kind": "field",
+      "table": "jm1pub_edition",
+      "name": "jm1pub_catalogcorrelationid",
+      "status": "EXISTS",
+      "metadataId": "d0de28c7-37a9-f111-aaac-7c1e525b15c2"
+    },
+    {
+      "kind": "field",
+      "table": "jm1pub_edition",
+      "name": "jm1pub_publicationdatesource",
+      "status": "EXISTS",
+      "metadataId": "29a250d3-37a9-f111-aaac-7c1e525b15c2"
+    },
+    {
+      "kind": "field",
+      "table": "jm1pub_publishingasset",
+      "name": "jm1pub_canonicalproductkey",
+      "status": "EXISTS",
+      "metadataId": "7204a1d6-37a9-f111-aaab-00224820105b"
+    },
+    {
+      "kind": "field",
+      "table": "jm1pub_publishingasset",
+      "name": "jm1pub_catalogdistributionstate",
+      "status": "EXISTS",
+      "metadataId": "21fb4bdd-37a9-f111-aaab-000d3a14673b"
+    },
+    {
+      "kind": "field",
+      "table": "jm1pub_publishingasset",
+      "name": "jm1pub_rawlegacystatus",
+      "status": "EXISTS",
+      "metadataId": "02eefbde-37a9-f111-aaab-00224820105b"
+    },
+    {
+      "kind": "field",
+      "table": "jm1pub_publishingasset",
+      "name": "jm1pub_rawhouse",
+      "status": "EXISTS",
+      "metadataId": "7a30b6e4-37a9-f111-aaab-000d3a14673b"
+    },
+    {
+      "kind": "field",
+      "table": "jm1pub_publishingasset",
+      "name": "jm1pub_rawcontract",
+      "status": "EXISTS",
+      "metadataId": "c6d756ec-37a9-f111-aaac-6045bdd69738"
+    },
+    {
+      "kind": "field",
+      "table": "jm1pub_publishingasset",
+      "name": "jm1pub_rawisdistributed",
+      "status": "EXISTS",
+      "metadataId": "63c1a4ef-37a9-f111-aaac-6045bdd69435"
+    },
+    {
+      "kind": "field",
+      "table": "jm1pub_publishingasset",
+      "name": "jm1pub_catalogsourcechecksum",
+      "status": "EXISTS",
+      "metadataId": "d0cc17f4-37a9-f111-aaab-000d3a14673b"
+    },
+    {
+      "kind": "field",
+      "table": "jm1pub_publishingasset",
+      "name": "jm1pub_catalogcorrelationid",
+      "status": "EXISTS",
+      "metadataId": "c02ee4f8-37a9-f111-aaab-00224820105b"
+    },
+    {
+      "kind": "field",
+      "table": "jm1pub_publishingasset",
+      "name": "jm1pub_sourcerownumber",
+      "status": "EXISTS",
+      "metadataId": "379b3dfa-37a9-f111-aaab-000d3a14673b"
+    },
+    {
+      "kind": "field",
+      "table": "jm1pub_isbnallocation",
+      "name": "jm1pub_normalizedisbn",
+      "status": "EXISTS",
+      "metadataId": "3e7baf02-38a9-f111-aaac-7c1e525b15c2"
+    },
+    {
+      "kind": "field",
+      "table": "jm1pub_isbnallocation",
+      "name": "jm1pub_allocationclassification",
+      "status": "EXISTS",
+      "metadataId": "5673d004-38a9-f111-aaac-000d3a9eacee"
+    },
+    {
+      "kind": "field",
+      "table": "jm1pub_isbnallocation",
+      "name": "jm1pub_rawisbn13",
+      "status": "EXISTS",
+      "metadataId": "dca7f709-38a9-f111-aaab-000d3a14673b"
+    },
+    {
+      "kind": "field",
+      "table": "jm1pub_isbnallocation",
+      "name": "jm1pub_rawisbn",
+      "status": "EXISTS",
+      "metadataId": "a2fc3d09-38a9-f111-aaac-6045bdd69678"
+    },
+    {
+      "kind": "field",
+      "table": "jm1pub_isbnallocation",
+      "name": "jm1pub_sourcerownumber",
+      "status": "EXISTS",
+      "metadataId": "fd695916-38a9-f111-aaac-6045bdd69678"
+    },
+    {
+      "kind": "field",
+      "table": "jm1pub_isbnallocation",
+      "name": "jm1pub_catalogsourcechecksum",
+      "status": "EXISTS",
+      "metadataId": "ee28bf16-38a9-f111-aaab-000d3a14673b"
+    },
+    {
+      "kind": "field",
+      "table": "jm1pub_isbnallocation",
+      "name": "jm1pub_catalogcorrelationid",
+      "status": "EXISTS",
+      "metadataId": "0429bf16-38a9-f111-aaab-000d3a14673b"
+    },
+    {
+      "kind": "field",
+      "table": "jm1pub_isbnallocation",
+      "name": "jm1pub_isassigned",
+      "status": "EXISTS",
+      "metadataId": "910eff1c-38a9-f111-aaab-00224820105b"
+    },
+    {
+      "kind": "relationship",
+      "name": "jm1pub_Edition_PublishingAssets",
+      "status": "EXISTS",
+      "metadataId": "c9e0f922-38a9-f111-aaab-00224820105b"
+    }
+  ],
+  "summary": {
+    "EXISTS": 35
+  }
+}

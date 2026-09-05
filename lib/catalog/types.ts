@@ -81,6 +81,26 @@ export type CatalogStats = {
   lastUpdated: string
 }
 
+export type PublishingMarketingAuthority = {
+  CanonicalWorkId: string
+  CanonicalAuthorId: string
+  Title: string
+  AuthorDisplayName: string
+  CurrentLifecycleState: string
+  PublicationDate: string
+  ReleaseDate: string
+  ActiveState: string
+  MarketingAuthorityState: string
+  CurrentEditionId: string
+  AvailableFormats: CatalogFormat[]
+  PrimaryCoverAsset: string
+  PurchaseCTA: string
+  FeaturedAuthorEligibility: boolean
+  MarketingHealthEligibility: boolean
+  RetirementState: string
+  RightsHoldState: string
+}
+
 export type PublicCatalogPageUrls = {
   titlePage: string
   authorPages: string[]
