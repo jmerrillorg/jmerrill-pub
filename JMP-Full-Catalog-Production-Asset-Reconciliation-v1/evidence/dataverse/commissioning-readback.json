@@ -1,0 +1,105 @@
+{
+  "generatedAt": "2026-09-05T18:58:54.672Z",
+  "mode": "READ_ONLY",
+  "environment": {
+    "resource": "https://jm1hq.crm.dynamics.com",
+    "organizationId": "9dafb403-b493-f011-a700-000d3a106f37"
+  },
+  "productionAssetCount": 17096,
+  "productionAssetStates": [
+    {
+      "jm1pub_assetstate": "DISTRIBUTION_PROOF",
+      "Count@OData.Community.Display.V1.FormattedValue": "458",
+      "Count": 458
+    },
+    {
+      "jm1pub_assetstate": "GOVERNED_ALTERNATE",
+      "Count@OData.Community.Display.V1.FormattedValue": "578",
+      "Count": 578
+    },
+    {
+      "jm1pub_assetstate": "UNRESOLVED",
+      "Count@OData.Community.Display.V1.FormattedValue": "10,032",
+      "Count": 10032
+    },
+    {
+      "jm1pub_assetstate": "HISTORICAL",
+      "Count@OData.Community.Display.V1.FormattedValue": "806",
+      "Count": 806
+    },
+    {
+      "jm1pub_assetstate": "SOURCE_ONLY",
+      "Count@OData.Community.Display.V1.FormattedValue": "4,659",
+      "Count": 4659
+    },
+    {
+      "jm1pub_assetstate": "GOVERNED_PRIMARY",
+      "Count@OData.Community.Display.V1.FormattedValue": "74",
+      "Count": 74
+    },
+    {
+      "jm1pub_assetstate": "PROMOTIONAL",
+      "Count@OData.Community.Display.V1.FormattedValue": "489",
+      "Count": 489
+    }
+  ],
+  "workRegistryStates": [
+    {
+      "jm1pub_assetregistrystatus@OData.Community.Display.V1.FormattedValue": "Exception",
+      "jm1pub_assetregistrystatus": 100000004,
+      "Count@OData.Community.Display.V1.FormattedValue": "11",
+      "Count": 11
+    },
+    {
+      "jm1pub_assetregistrystatus@OData.Community.Display.V1.FormattedValue": "Partially Reconciled",
+      "jm1pub_assetregistrystatus": 100000002,
+      "Count@OData.Community.Display.V1.FormattedValue": "44",
+      "Count": 44
+    },
+    {
+      "jm1pub_assetregistrystatus@OData.Community.Display.V1.FormattedValue": "Reconciled",
+      "jm1pub_assetregistrystatus": 100000003,
+      "Count@OData.Community.Display.V1.FormattedValue": "74",
+      "Count": 74
+    }
+  ],
+  "campaignPrimaries": [
+    {
+      "@odata.etag": "W/\"51775437\"",
+      "jm1pub_assetstate": "GOVERNED_PRIMARY",
+      "jm1pub_itemid": "01DF3SEQKRTJL5VKVNTRFZXAVBEK4CJK63",
+      "jm1pub_filename": "9781961475830_CoverPDF.png",
+      "jm1pub_productionassetid": "0304c6cb-dcb9-5d2a-a475-41be46273a9c",
+      "jm1pub_weburl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Crowley,%20Sean/2026_Crowley_Strategies_For_Success/03_Design/Cover/9781961475830_CoverPDF.png",
+      "jm1pub_canonicalworkid": "9794818a-1ca5-532e-a701-ed69f439e8a6",
+      "jm1pub_sha256": "2ce19958da3acb014b80f727a4c1e32aaa3b4529dfe0905101eea432322303f9"
+    },
+    {
+      "@odata.etag": "W/\"51775431\"",
+      "jm1pub_assetstate": "GOVERNED_PRIMARY",
+      "jm1pub_itemid": "01DF3SEQLYTNQ6T2PGEBE2ERFIIQSA5WR6",
+      "jm1pub_filename": "9781961475762_CoverPDF.pdf",
+      "jm1pub_productionassetid": "7a03e836-5149-58d5-b2f8-9ba676c0b28e",
+      "jm1pub_weburl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Hagher,%20Iyorwuese/2025-Hagher-TheConquestOfAzenga/08-Publishing%20Output%20(Print,%20eBook,%20Audiobook)/9781961475762_CoverPDF.pdf",
+      "jm1pub_canonicalworkid": "c44b00d4-c27a-f111-ab0f-00224820105b",
+      "jm1pub_sha256": "3a32b44342c2cd91f31357df3dda00649f3ca807d4a01fb9913e753c75ccb596"
+    },
+    {
+      "@odata.etag": "W/\"51775432\"",
+      "jm1pub_assetstate": "GOVERNED_PRIMARY",
+      "jm1pub_itemid": "01DF3SEQJA6WYD7FL2XNAZ7ODHKSOTTDBZ",
+      "jm1pub_filename": "FC.jpg",
+      "jm1pub_productionassetid": "2af4c9f9-65f5-5d1b-80e7-a14366288ff1",
+      "jm1pub_weburl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Crowley,%20Sean/2026_Crowley_The_Shift/03_Design/Cover/FC.jpg",
+      "jm1pub_canonicalworkid": "112ac7e9-b389-f111-ab10-000d3a9eacee",
+      "jm1pub_sha256": "ceb3ee6e23669a5a3caf5636953a733ba41f3308609250efa7196f52dd6cc784"
+    }
+  ],
+  "certification": {
+    "expectedRegistryRows": 17096,
+    "duplicateRowsCreatedByReplay": 0,
+    "replayWrites": 0,
+    "sharePointWrites": 0,
+    "publicPosts": 0
+  }
+}

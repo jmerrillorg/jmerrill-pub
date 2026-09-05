@@ -1,0 +1,2846 @@
+[
+  {
+    "canonicalWorkId": "34926ac0-c37a-f111-ab0f-00224820105b",
+    "canonicalAuthorId": "7ceb3332-882a-f111-88b4-00224820105b",
+    "authorDisplayName": "J Derrick Johnson",
+    "title": "100 Wisdom Lessons for Life and Living",
+    "lifecycleDetail": "PUBLISHED_CATALOG",
+    "marketingAuthorityState": "MARKETING_ELIGIBLE",
+    "readinessState": "READY",
+    "matchedAssetCount": 121,
+    "coverCandidateCount": 3,
+    "primaryMarketingCover": {
+      "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQPVYFI2HB2ZYRFL3EG5TYBIHUYZ",
+      "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+      "itemId": "01DF3SEQPVYFI2HB2ZYRFL3EG5TYBIHUYZ",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Johnson,%20J%20Derrick/2025-Johnson-100WisdomLessons/07-Pre-Publishing%20(Cover,%20Metadata)/9781961475571-Perfect.pdf",
+      "relativePath": "08_Backlist/Johnson, J Derrick/2025-Johnson-100WisdomLessons/07-Pre-Publishing (Cover, Metadata)/9781961475571-Perfect.pdf"
+    },
+    "ambiguity": []
+  },
+  {
+    "canonicalWorkId": "d0f603d3-c27a-f111-ab0f-000d3a14673b",
+    "canonicalAuthorId": "c0ae096e-fa9d-f111-b8dc-000d3a14673b",
+    "authorDisplayName": "Donjia Walls",
+    "title": "27 Days to Overcoming Depression",
+    "lifecycleDetail": "PUBLISHED_CATALOG",
+    "marketingAuthorityState": "MARKETING_ELIGIBLE",
+    "readinessState": "AMBIGUOUS",
+    "matchedAssetCount": 424,
+    "coverCandidateCount": 47,
+    "primaryMarketingCover": null,
+    "ambiguity": [
+      {
+        "itemId": "01DF3SEQIHHSBCUAXCB5HZEY2QLUFU6ROD",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/01_Pre-Pipeline/_Projects/10.%20Post-Publishing/Walls,%20Donjia%20-%2027%20Days%20To%20Overcoming%20Depression/Title/03%20Design%20and%20Formatting/9781961475366_CoverPDF-Nimbus.pdf",
+        "relativePath": "01_Pre-Pipeline/_Projects/10. Post-Publishing/Walls, Donjia - 27 Days To Overcoming Depression/Title/03 Design and Formatting/9781961475366_CoverPDF-Nimbus.pdf"
+      },
+      {
+        "itemId": "01DF3SEQJJVRFXQTU5S5EIHULQBX7DQJXP",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/01_Pre-Pipeline/_Projects/10.%20Post-Publishing/Walls,%20Donjia%20-%2027%20Days%20To%20Overcoming%20Depression/Title/03%20Design%20and%20Formatting/9781961475366_CoverPDF-Nimbus-Nimbus.pdf",
+        "relativePath": "01_Pre-Pipeline/_Projects/10. Post-Publishing/Walls, Donjia - 27 Days To Overcoming Depression/Title/03 Design and Formatting/9781961475366_CoverPDF-Nimbus-Nimbus.pdf"
+      },
+      {
+        "itemId": "01DF3SEQKFBIEJ7P7LERD3JXUZ5B5P65NH",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/01_Pre-Pipeline/_Projects/10.%20Post-Publishing/Walls,%20Donjia%20-%2027%20Days%20To%20Overcoming%20Depression/Title/06%20Distribution%20Setup/9781961475366_CoverPDF%20copy.pdf",
+        "relativePath": "01_Pre-Pipeline/_Projects/10. Post-Publishing/Walls, Donjia - 27 Days To Overcoming Depression/Title/06 Distribution Setup/9781961475366_CoverPDF copy.pdf"
+      },
+      {
+        "itemId": "01DF3SEQNNV7WRZGMOKBBKFWCP2DBFSTGE",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/01_Pre-Pipeline/_Projects/10.%20Post-Publishing/Walls,%20Donjia%20-%2027%20Days%20To%20Overcoming%20Depression/Title/06%20Distribution%20Setup/9781961475366_CoverPDF%20copy-Nimbus-Nimbus.pdf",
+        "relativePath": "01_Pre-Pipeline/_Projects/10. Post-Publishing/Walls, Donjia - 27 Days To Overcoming Depression/Title/06 Distribution Setup/9781961475366_CoverPDF copy-Nimbus-Nimbus.pdf"
+      },
+      {
+        "itemId": "01DF3SEQOQOCYU52FVPFCKBPDO5B57SOHD",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/01_Pre-Pipeline/_Projects/10.%20Post-Publishing/Walls,%20Donjia%20-%2027%20Days%20To%20Overcoming%20Depression/Title/06%20Distribution%20Setup/9781961475366_CoverPDF%20copy-Nimbus.pdf",
+        "relativePath": "01_Pre-Pipeline/_Projects/10. Post-Publishing/Walls, Donjia - 27 Days To Overcoming Depression/Title/06 Distribution Setup/9781961475366_CoverPDF copy-Nimbus.pdf"
+      }
+    ]
+  },
+  {
+    "canonicalWorkId": "69b21fc6-c27a-f111-ab0f-000d3a14673b",
+    "canonicalAuthorId": "b7ed8a5b-fa9d-f111-b8dc-7c1e525b15c2",
+    "authorDisplayName": "Daphanny Baker",
+    "title": "365 Days of Transparency",
+    "lifecycleDetail": "PUBLISHED_CATALOG",
+    "marketingAuthorityState": "MARKETING_ELIGIBLE",
+    "readinessState": "READY",
+    "matchedAssetCount": 50,
+    "coverCandidateCount": 21,
+    "primaryMarketingCover": {
+      "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQOHXWLJ5XY7LVDZDQRXVGSISRBG",
+      "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+      "itemId": "01DF3SEQOHXWLJ5XY7LVDZDQRXVGSISRBG",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Baker,%20Daphanny/9781950719921/_COVER/9781950719921-Perfect.jpg",
+      "relativePath": "08_Backlist/Baker, Daphanny/9781950719921/_COVER/9781950719921-Perfect.jpg"
+    },
+    "ambiguity": []
+  },
+  {
+    "canonicalWorkId": "3e09d7cb-c27a-f111-ab0f-6045bdd69678",
+    "canonicalAuthorId": "48ed579b-0260-5874-aa62-9e632f37c0aa",
+    "authorDisplayName": "Ericka Johnson Settles",
+    "title": "7 Step Jumpstart to Becoming Your Best Self",
+    "lifecycleDetail": "PUBLISHED_CATALOG",
+    "marketingAuthorityState": "MARKETING_ELIGIBLE",
+    "readinessState": "READY",
+    "matchedAssetCount": 51,
+    "coverCandidateCount": 21,
+    "primaryMarketingCover": {
+      "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQIVO4Z5XVVEZBELCCKQJFTIGJHS",
+      "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+      "itemId": "01DF3SEQIVO4Z5XVVEZBELCCKQJFTIGJHS",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Johnson%20Settles,%20Ericka/9781954414747/05-COVER/9781954414747-Perfect.png",
+      "relativePath": "08_Backlist/Johnson Settles, Ericka/9781954414747/05-COVER/9781954414747-Perfect.png"
+    },
+    "ambiguity": []
+  },
+  {
+    "canonicalWorkId": "6f8904ca-c27a-f111-ab0f-6045bdd69738",
+    "canonicalAuthorId": "abed8a5b-fa9d-f111-b8dc-7c1e525b15c2",
+    "authorDisplayName": "Shecara Norris",
+    "title": "A Blended Family",
+    "lifecycleDetail": "PUBLISHED_CATALOG",
+    "marketingAuthorityState": "MARKETING_ELIGIBLE",
+    "readinessState": "READY",
+    "matchedAssetCount": 84,
+    "coverCandidateCount": 9,
+    "primaryMarketingCover": {
+      "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQKNXXID7IWLBBH2CUQXV6XFWGOT",
+      "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+      "itemId": "01DF3SEQKNXXID7IWLBBH2CUQXV6XFWGOT",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Norris,%20Shecara/9781954414129/05-COVER/9781954414129-Perfect.pdf",
+      "relativePath": "08_Backlist/Norris, Shecara/9781954414129/05-COVER/9781954414129-Perfect.pdf"
+    },
+    "ambiguity": []
+  },
+  {
+    "canonicalWorkId": "778904ca-c27a-f111-ab0f-6045bdd69738",
+    "canonicalAuthorId": "4177ba6b-fa9d-f111-b8db-7c1e5248501c",
+    "authorDisplayName": "Eryonna Barrino",
+    "title": "A Little Bit of Everything",
+    "lifecycleDetail": "PUBLISHED_CATALOG",
+    "marketingAuthorityState": "MARKETING_ELIGIBLE",
+    "readinessState": "READY",
+    "matchedAssetCount": 42,
+    "coverCandidateCount": 15,
+    "primaryMarketingCover": {
+      "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQK4H22JPYQXMRGISWSWKNYK7B7Z",
+      "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+      "itemId": "01DF3SEQK4H22JPYQXMRGISWSWKNYK7B7Z",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Barrino,%20Eryonna/9781954414396/05-COVER/9781954414389_FC.jpg",
+      "relativePath": "08_Backlist/Barrino, Eryonna/9781954414396/05-COVER/9781954414389_FC.jpg"
+    },
+    "ambiguity": []
+  },
+  {
+    "canonicalWorkId": "c74b00d4-c27a-f111-ab0f-00224820105b",
+    "canonicalAuthorId": "c8c8747e-6675-f111-ab0f-6045bdd69678",
+    "authorDisplayName": "Iyorwuese Hagher",
+    "title": "A Portrait of Paradise",
+    "lifecycleDetail": "PUBLISHED_CATALOG",
+    "marketingAuthorityState": "MARKETING_ELIGIBLE",
+    "readinessState": "AMBIGUOUS",
+    "matchedAssetCount": 76,
+    "coverCandidateCount": 3,
+    "primaryMarketingCover": null,
+    "ambiguity": [
+      {
+        "itemId": "01DF3SEQLIUUTSA5Q2IFG2RSEGYMB42NPC",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Hagher,%20Iyorwuese/2025-Hagher-APortraitOfParadise/04%20Cover%20Design/9781961475663_Case.pdf",
+        "relativePath": "08_Backlist/Hagher, Iyorwuese/2025-Hagher-APortraitOfParadise/04 Cover Design/9781961475663_Case.pdf"
+      },
+      {
+        "itemId": "01DF3SEQLREGJIJMOL7BHYTFYER4PHEGWQ",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Hagher,%20Iyorwuese/2025-Hagher-APortraitOfParadise/04%20Cover%20Design/9781961475656_CoverPDF.pdf",
+        "relativePath": "08_Backlist/Hagher, Iyorwuese/2025-Hagher-APortraitOfParadise/04 Cover Design/9781961475656_CoverPDF.pdf"
+      },
+      {
+        "itemId": "01DF3SEQP7H3HJPAQG3VHZ7RNZKMAW7FI4",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Hagher,%20Iyorwuese/2025-Hagher-APortraitOfParadise/08%20Distribution%20Records/9781961475656_CoverPDF.pdf",
+        "relativePath": "08_Backlist/Hagher, Iyorwuese/2025-Hagher-APortraitOfParadise/08 Distribution Records/9781961475656_CoverPDF.pdf"
+      }
+    ]
+  },
+  {
+    "canonicalWorkId": "841a04cd-c27a-f111-ab0f-000d3a14673b",
+    "canonicalAuthorId": "632d8d61-fa9d-f111-b8dc-7c1e525b15c2",
+    "authorDisplayName": "Shelley McIntosh",
+    "title": "A Principal's Tale",
+    "lifecycleDetail": "PUBLISHED_CATALOG",
+    "marketingAuthorityState": "MARKETING_ELIGIBLE",
+    "readinessState": "READY",
+    "matchedAssetCount": 71,
+    "coverCandidateCount": 12,
+    "primaryMarketingCover": {
+      "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQJJ5ZHR5SCTFNGJVT2WGBEV4WVH",
+      "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+      "itemId": "01DF3SEQJJ5ZHR5SCTFNGJVT2WGBEV4WVH",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/McIntosh,%20Shelley/9781950719662/_COVER/9781950719662-Cover.jpg",
+      "relativePath": "08_Backlist/McIntosh, Shelley/9781950719662/_COVER/9781950719662-Cover.jpg"
+    },
+    "ambiguity": []
+  },
+  {
+    "canonicalWorkId": "37ce3ac0-c37a-f111-ab0f-7c1e525b15c2",
+    "canonicalAuthorId": "5cb9d134-98e9-5a35-a41e-eaaa0126b64c",
+    "authorDisplayName": "Alesia Corpening",
+    "title": "A Truebies Guide, Part 1",
+    "lifecycleDetail": "PUBLISHED_CATALOG",
+    "marketingAuthorityState": "MARKETING_ELIGIBLE",
+    "readinessState": "AMBIGUOUS",
+    "matchedAssetCount": 9,
+    "coverCandidateCount": 5,
+    "primaryMarketingCover": null,
+    "ambiguity": [
+      {
+        "itemId": "01DF3SEQKTVXRDGIAJTFGKYJDMSKVZA4FX",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/01_Pre-Pipeline/00_Inquiry/_Backlist/CORPENING,%20ALESIA/a%20truebies%20guide%20part%201/05-COVER/9781950719624-Perfect-B.pdf",
+        "relativePath": "01_Pre-Pipeline/00_Inquiry/_Backlist/CORPENING, ALESIA/a truebies guide part 1/05-COVER/9781950719624-Perfect-B.pdf"
+      },
+      {
+        "itemId": "01DF3SEQMKDR34XRZ5GRG34NIEL2RRNXGO",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/01_Pre-Pipeline/00_Inquiry/_Backlist/CORPENING,%20ALESIA/a%20truebies%20guide%20part%201/05-COVER/9781950719624-Perfect-A.pdf",
+        "relativePath": "01_Pre-Pipeline/00_Inquiry/_Backlist/CORPENING, ALESIA/a truebies guide part 1/05-COVER/9781950719624-Perfect-A.pdf"
+      }
+    ]
+  },
+  {
+    "canonicalWorkId": "2c946ac0-c37a-f111-ab0f-00224820105b",
+    "canonicalAuthorId": "5cb9d134-98e9-5a35-a41e-eaaa0126b64c",
+    "authorDisplayName": "Alesia Corpening",
+    "title": "A Truebies Guide, Part 2",
+    "lifecycleDetail": "PUBLISHED_CATALOG",
+    "marketingAuthorityState": "MARKETING_ELIGIBLE",
+    "readinessState": "READY",
+    "matchedAssetCount": 137,
+    "coverCandidateCount": 6,
+    "primaryMarketingCover": {
+      "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQNQCYS3EDUFIFCJ23XKBQ5ULZWS",
+      "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+      "itemId": "01DF3SEQNQCYS3EDUFIFCJ23XKBQ5ULZWS",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Corpening,%20Alesia/9781950719327/_COVER/9781950719327-Perfect.jpg",
+      "relativePath": "08_Backlist/Corpening, Alesia/9781950719327/_COVER/9781950719327-Perfect.jpg"
+    },
+    "ambiguity": []
+  },
+  {
+    "canonicalWorkId": "614797d0-c27a-f111-ab0f-7c1e525b15c2",
+    "canonicalAuthorId": "4a56c9ff-4389-f111-ab10-6045bdd69678",
+    "authorDisplayName": "Carolyn Pierce",
+    "title": "Abortion!",
+    "lifecycleDetail": "PUBLISHED_CATALOG",
+    "marketingAuthorityState": "MARKETING_ELIGIBLE",
+    "readinessState": "MISSING",
+    "matchedAssetCount": 0,
+    "coverCandidateCount": 0,
+    "primaryMarketingCover": null,
+    "ambiguity": []
+  },
+  {
+    "canonicalWorkId": "79064bcd-c27a-f111-ab0f-00224820105b",
+    "canonicalAuthorId": "d60fe371-fa9d-f111-b8db-7c1e5248501c",
+    "authorDisplayName": "Alice Pryor",
+    "title": "According to Mark",
+    "lifecycleDetail": "PUBLISHED_CATALOG",
+    "marketingAuthorityState": "MARKETING_ELIGIBLE",
+    "readinessState": "READY",
+    "matchedAssetCount": 48,
+    "coverCandidateCount": 9,
+    "primaryMarketingCover": {
+      "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQISJTCDCLQM2VBYBWPZAXPDURDQ",
+      "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+      "itemId": "01DF3SEQISJTCDCLQM2VBYBWPZAXPDURDQ",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Pryor,%20Alice/9781954414549/05-COVER/9781954414532_FC.jpg",
+      "relativePath": "08_Backlist/Pryor, Alice/9781954414549/05-COVER/9781954414532_FC.jpg"
+    },
+    "ambiguity": []
+  },
+  {
+    "canonicalWorkId": "7a064bcd-c27a-f111-ab0f-00224820105b",
+    "canonicalAuthorId": "cb85e9fa-85a9-5d5b-a91e-d627a9f5ce16",
+    "authorDisplayName": "Dennis Brown",
+    "title": "Aligned!",
+    "lifecycleDetail": "PUBLISHED_CATALOG",
+    "marketingAuthorityState": "MARKETING_ELIGIBLE",
+    "readinessState": "READY",
+    "matchedAssetCount": 87,
+    "coverCandidateCount": 9,
+    "primaryMarketingCover": {
+      "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQJ4DTMA4INHNJEJWRCG24UYYPHN",
+      "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+      "itemId": "01DF3SEQJ4DTMA4INHNJEJWRCG24UYYPHN",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Brown,%20Dennis/9781954414068/05-COVER/9781954414051_FC.jpg",
+      "relativePath": "08_Backlist/Brown, Dennis/9781954414068/05-COVER/9781954414051_FC.jpg"
+    },
+    "ambiguity": []
+  },
+  {
+    "canonicalWorkId": "7b064bcd-c27a-f111-ab0f-00224820105b",
+    "canonicalAuthorId": "38c02501-ffe7-5f8d-aec6-ef439d31cbcb",
+    "authorDisplayName": "Jaylonna Stevette",
+    "title": "Almost Happy",
+    "lifecycleDetail": "PUBLISHED_CATALOG",
+    "marketingAuthorityState": "MARKETING_ELIGIBLE",
+    "readinessState": "AMBIGUOUS",
+    "matchedAssetCount": 114,
+    "coverCandidateCount": 15,
+    "primaryMarketingCover": null,
+    "ambiguity": [
+      {
+        "itemId": "01DF3SEQIFERPBOPW675DYBAYSDAPNUXFP",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/07_Archive/10%20BACKLIST/STEVETTE,%20JAYLONNA/9781954414587/05-COVER/safeerr_ahmed-attachments/ALMOST%20HAPPY.jpg",
+        "relativePath": "07_Archive/10 BACKLIST/STEVETTE, JAYLONNA/9781954414587/05-COVER/safeerr_ahmed-attachments/ALMOST HAPPY.jpg"
+      },
+      {
+        "itemId": "01DF3SEQJ3NT42TA466RFZRS7GAAXQIPIT",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/07_Archive/Backlist/STEVETTE,%20JAYLONNA/9781954414587/05-COVER/safeerr_ahmed-attachments/ALMOST%20HAPPY.jpg",
+        "relativePath": "07_Archive/Backlist/STEVETTE, JAYLONNA/9781954414587/05-COVER/safeerr_ahmed-attachments/ALMOST HAPPY.jpg"
+      },
+      {
+        "itemId": "01DF3SEQJSV5WZXIT5YJGZ7TPJZYIRJNP6",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/07_Archive/10%20BACKLIST/STEVETTE,%20JAYLONNA/9781954414587/05-COVER/ALMOST%20HAPPY.png",
+        "relativePath": "07_Archive/10 BACKLIST/STEVETTE, JAYLONNA/9781954414587/05-COVER/ALMOST HAPPY.png"
+      },
+      {
+        "itemId": "01DF3SEQL2VXVTQR64HRDZ6MGFXNXNBITQ",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/07_Archive/Backlist/STEVETTE,%20JAYLONNA/9781954414587/05-COVER/safeerr_ahmed-attachments/ALMOST%20HAPPY%20E-Book.jpg",
+        "relativePath": "07_Archive/Backlist/STEVETTE, JAYLONNA/9781954414587/05-COVER/safeerr_ahmed-attachments/ALMOST HAPPY E-Book.jpg"
+      },
+      {
+        "itemId": "01DF3SEQOLJG5MBGPUPRELGOCRG7S5FRYI",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/07_Archive/10%20BACKLIST/STEVETTE,%20JAYLONNA/9781954414587/05-COVER/safeerr_ahmed-attachments/ALMOST%20HAPPY%20E-Book.jpg",
+        "relativePath": "07_Archive/10 BACKLIST/STEVETTE, JAYLONNA/9781954414587/05-COVER/safeerr_ahmed-attachments/ALMOST HAPPY E-Book.jpg"
+      },
+      {
+        "itemId": "01DF3SEQOVSOO7KZ3HHFGLHEO5QGV45PPV",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/07_Archive/Backlist/STEVETTE,%20JAYLONNA/9781954414587/05-COVER/ALMOST%20HAPPY.png",
+        "relativePath": "07_Archive/Backlist/STEVETTE, JAYLONNA/9781954414587/05-COVER/ALMOST HAPPY.png"
+      }
+    ]
+  },
+  {
+    "canonicalWorkId": "4009d7cb-c27a-f111-ab0f-6045bdd69678",
+    "canonicalAuthorId": "05adc867-fa9d-f111-b8dc-7c1e525b15c2",
+    "authorDisplayName": "Ericka Thornton",
+    "title": "Are You Sure That You Are Ready?",
+    "lifecycleDetail": "PUBLISHED_CATALOG",
+    "marketingAuthorityState": "MARKETING_ELIGIBLE",
+    "readinessState": "PARTIAL",
+    "matchedAssetCount": 78,
+    "coverCandidateCount": 0,
+    "primaryMarketingCover": null,
+    "ambiguity": []
+  },
+  {
+    "canonicalWorkId": "9b4b00d4-c27a-f111-ab0f-00224820105b",
+    "canonicalAuthorId": "4a56c9ff-4389-f111-ab10-6045bdd69678",
+    "authorDisplayName": "Carolyn Pierce",
+    "title": "Because the Lord is My Shepherd",
+    "lifecycleDetail": "PUBLISHED_CATALOG",
+    "marketingAuthorityState": "MARKETING_ELIGIBLE",
+    "readinessState": "MISSING",
+    "matchedAssetCount": 0,
+    "coverCandidateCount": 0,
+    "primaryMarketingCover": null,
+    "ambiguity": []
+  },
+  {
+    "canonicalWorkId": "998797ca-c27a-f111-ab0f-7c1e525b15c2",
+    "canonicalAuthorId": "0f22af65-fa9d-f111-b8db-7c1e5248501c",
+    "authorDisplayName": "Deborah Eiland",
+    "title": "BEE Careful",
+    "lifecycleDetail": "PUBLISHED_CATALOG",
+    "marketingAuthorityState": "MARKETING_ELIGIBLE",
+    "readinessState": "READY",
+    "matchedAssetCount": 324,
+    "coverCandidateCount": 21,
+    "primaryMarketingCover": {
+      "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQL5RSYJ5JZUXFB3CWXBOXGDVOW4",
+      "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+      "itemId": "01DF3SEQL5RSYJ5JZUXFB3CWXBOXGDVOW4",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Eiland,%20Deborah/bee%20careful/04-COVER/9781954414822_FC.jpg",
+      "relativePath": "08_Backlist/Eiland, Deborah/bee careful/04-COVER/9781954414822_FC.jpg"
+    },
+    "ambiguity": []
+  },
+  {
+    "canonicalWorkId": "928904ca-c27a-f111-ab0f-6045bdd69738",
+    "canonicalAuthorId": "95ae096e-fa9d-f111-b8dc-000d3a14673b",
+    "authorDisplayName": "Terry Stephens",
+    "title": "Biblical Prescriptions for Life's Troubles",
+    "lifecycleDetail": "PUBLISHED_CATALOG",
+    "marketingAuthorityState": "MARKETING_ELIGIBLE",
+    "readinessState": "READY",
+    "matchedAssetCount": 54,
+    "coverCandidateCount": 22,
+    "primaryMarketingCover": {
+      "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQKAJTAZ5OFRT5DZMMGHMI4KFJA6",
+      "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+      "itemId": "01DF3SEQKAJTAZ5OFRT5DZMMGHMI4KFJA6",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Stephens,%20Terry/9781954414891/04-COVER%203/9781954414907_FC.jpg",
+      "relativePath": "08_Backlist/Stephens, Terry/9781954414891/04-COVER 3/9781954414907_FC.jpg"
+    },
+    "ambiguity": []
+  },
+  {
+    "canonicalWorkId": "901a04cd-c27a-f111-ab0f-000d3a14673b",
+    "canonicalAuthorId": "e121af65-fa9d-f111-b8db-7c1e5248501c",
+    "authorDisplayName": "Nathaniel Short",
+    "title": "Bodacious",
+    "lifecycleDetail": "PUBLISHED_CATALOG",
+    "marketingAuthorityState": "MARKETING_ELIGIBLE",
+    "readinessState": "READY",
+    "matchedAssetCount": 27,
+    "coverCandidateCount": 6,
+    "primaryMarketingCover": {
+      "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQOALHYV3HILENE33SU6NX2XJLOX",
+      "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+      "itemId": "01DF3SEQOALHYV3HILENE33SU6NX2XJLOX",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Short,%20Nathaniel/Bodacious/_COVER/9781954414044-Cover.jpg",
+      "relativePath": "08_Backlist/Short, Nathaniel/Bodacious/_COVER/9781954414044-Cover.jpg"
+    },
+    "ambiguity": []
+  },
+  {
+    "canonicalWorkId": "938904ca-c27a-f111-ab0f-6045bdd69738",
+    "canonicalAuthorId": "f88ba081-c1e6-5032-acf1-a2c54764dcc8",
+    "authorDisplayName": "Christina Banner",
+    "title": "Come Out of Hiding",
+    "lifecycleDetail": "PUBLISHED_CATALOG",
+    "marketingAuthorityState": "MARKETING_ELIGIBLE",
+    "readinessState": "READY",
+    "matchedAssetCount": 35,
+    "coverCandidateCount": 3,
+    "primaryMarketingCover": {
+      "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQP5ODLB5L4MOBGZIVP26BMI5VXK",
+      "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+      "itemId": "01DF3SEQP5ODLB5L4MOBGZIVP26BMI5VXK",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Banner,%20Christina/9781792313707/_final/cover.jpg",
+      "relativePath": "08_Backlist/Banner, Christina/9781792313707/_final/cover.jpg"
+    },
+    "ambiguity": []
+  },
+  {
+    "canonicalWorkId": "7967a4c3-c37a-f111-ab0f-6045bdd69678",
+    "canonicalAuthorId": "cb85e9fa-85a9-5d5b-a91e-d627a9f5ce16",
+    "authorDisplayName": "Dennis Brown",
+    "title": "Connected!",
+    "lifecycleDetail": "PUBLISHED_CATALOG",
+    "marketingAuthorityState": "MARKETING_ELIGIBLE",
+    "readinessState": "READY",
+    "matchedAssetCount": 45,
+    "coverCandidateCount": 6,
+    "primaryMarketingCover": {
+      "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQL73MHQ7POH25FYU4YWPUWRBFT5",
+      "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+      "itemId": "01DF3SEQL73MHQ7POH25FYU4YWPUWRBFT5",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Brown,%20Dennis/9781954414167/_COVER/9781954414167-Perfect.jpg",
+      "relativePath": "08_Backlist/Brown, Dennis/9781954414167/_COVER/9781954414167-Perfect.jpg"
+    },
+    "ambiguity": []
+  },
+  {
+    "canonicalWorkId": "9a8797ca-c27a-f111-ab0f-7c1e525b15c2",
+    "canonicalAuthorId": "840a1c61-fa9d-f111-b8dc-000d3a14673b",
+    "authorDisplayName": "Gloria Patterson",
+    "title": "Conquer Your Fears and Win",
+    "lifecycleDetail": "PUBLISHED_CATALOG",
+    "marketingAuthorityState": "MARKETING_ELIGIBLE",
+    "readinessState": "PARTIAL",
+    "matchedAssetCount": 48,
+    "coverCandidateCount": 3,
+    "primaryMarketingCover": null,
+    "ambiguity": []
+  },
+  {
+    "canonicalWorkId": "33106fd3-c27a-f111-ab0f-6045bdd69435",
+    "canonicalAuthorId": "7d7ed521-5d51-5f18-a05c-32f8eef6e37d",
+    "authorDisplayName": "Lisa Taylor",
+    "title": "Damaged",
+    "lifecycleDetail": "PUBLISHED_CATALOG",
+    "marketingAuthorityState": "MARKETING_ELIGIBLE",
+    "readinessState": "AMBIGUOUS",
+    "matchedAssetCount": 158,
+    "coverCandidateCount": 5,
+    "primaryMarketingCover": null,
+    "ambiguity": [
+      {
+        "itemId": "01DF3SEQKZCY3GP7V2FFGKADWM67XUDRVA",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Taylor,%20Lisa/2025-Taylor-Damaged/05%20Book%20Production/cover_02.png",
+        "relativePath": "08_Backlist/Taylor, Lisa/2025-Taylor-Damaged/05 Book Production/cover_02.png"
+      },
+      {
+        "itemId": "01DF3SEQLEDHIE2ZVE4FC2TXQ76CZA6CUP",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Taylor,%20Lisa/2025-Taylor-Damaged/05%20Book%20Production/cover_01.png",
+        "relativePath": "08_Backlist/Taylor, Lisa/2025-Taylor-Damaged/05 Book Production/cover_01.png"
+      },
+      {
+        "itemId": "01DF3SEQLOVEH7NJJJ5BCYD5B6PXR4DNX6",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Taylor,%20Lisa/2025-Taylor-Damaged/05%20Book%20Production/My%20cover%20picture.jpg",
+        "relativePath": "08_Backlist/Taylor, Lisa/2025-Taylor-Damaged/05 Book Production/My cover picture.jpg"
+      }
+    ]
+  },
+  {
+    "canonicalWorkId": "c70f6fd3-c27a-f111-ab0f-6045bdd69435",
+    "canonicalAuthorId": "b3146974-c6b8-5d6e-a564-62d4a598e73a",
+    "authorDisplayName": "Agape International Cathedral",
+    "title": "Delicious Ideas!",
+    "lifecycleDetail": "PUBLISHED_CATALOG",
+    "marketingAuthorityState": "MARKETING_ELIGIBLE",
+    "readinessState": "READY",
+    "matchedAssetCount": 39,
+    "coverCandidateCount": 1,
+    "primaryMarketingCover": {
+      "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQLU2PSINOREYJDLUWW4JN665AZ6",
+      "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+      "itemId": "01DF3SEQLU2PSINOREYJDLUWW4JN665AZ6",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Agape%20International%20Cathedral/Title/06%20Distribution%20Setup/9781961475335_CoverPDF.pdf",
+      "relativePath": "08_Backlist/Agape International Cathedral/Title/06 Distribution Setup/9781961475335_CoverPDF.pdf"
+    },
+    "ambiguity": []
+  },
+  {
+    "canonicalWorkId": "2c966ac0-c37a-f111-ab0f-00224820105b",
+    "canonicalAuthorId": "2e8af707-519f-530a-a68a-5424065281c1",
+    "authorDisplayName": "USAF",
+    "title": "Department of the Air Force Mission Driven Leadership",
+    "lifecycleDetail": "PUBLISHED_CATALOG",
+    "marketingAuthorityState": "MARKETING_ELIGIBLE",
+    "readinessState": "READY",
+    "matchedAssetCount": 56,
+    "coverCandidateCount": 8,
+    "primaryMarketingCover": {
+      "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQJ3YFRB5XTNPREYL4QNXRPBUVTP",
+      "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+      "itemId": "01DF3SEQJ3YFRB5XTNPREYL4QNXRPBUVTP",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/02_Active-Pipeline/07_Distribution/2025-USAF-CADPLeadershipBookProject/4%20%E2%80%93%20Design%20%26%20Layout/Cover%20Concepts/9781961475694_FC.jpg",
+      "relativePath": "02_Active-Pipeline/07_Distribution/2025-USAF-CADPLeadershipBookProject/4 – Design & Layout/Cover Concepts/9781961475694_FC.jpg"
+    },
+    "ambiguity": []
+  },
+  {
+    "canonicalWorkId": "9c4b00d4-c27a-f111-ab0f-00224820105b",
+    "canonicalAuthorId": "10adc867-fa9d-f111-b8dc-7c1e525b15c2",
+    "authorDisplayName": "Sean Smith, Sr.",
+    "title": "Destined to Break the Curse",
+    "lifecycleDetail": "PUBLISHED_CATALOG",
+    "marketingAuthorityState": "MARKETING_ELIGIBLE",
+    "readinessState": "MISSING",
+    "matchedAssetCount": 0,
+    "coverCandidateCount": 0,
+    "primaryMarketingCover": null,
+    "ambiguity": []
+  },
+  {
+    "canonicalWorkId": "7b67a4c3-c37a-f111-ab0f-6045bdd69678",
+    "canonicalAuthorId": "10adc867-fa9d-f111-b8dc-7c1e525b15c2",
+    "authorDisplayName": "Sean Smith, Sr.",
+    "title": "Destined to Break the Curse Devotional",
+    "lifecycleDetail": "PUBLISHED_CATALOG",
+    "marketingAuthorityState": "MARKETING_ELIGIBLE",
+    "readinessState": "PARTIAL",
+    "matchedAssetCount": 34,
+    "coverCandidateCount": 3,
+    "primaryMarketingCover": null,
+    "ambiguity": []
+  },
+  {
+    "canonicalWorkId": "80064bcd-c27a-f111-ab0f-00224820105b",
+    "canonicalAuthorId": "95ae096e-fa9d-f111-b8dc-000d3a14673b",
+    "authorDisplayName": "Terry Stephens",
+    "title": "Discipline and Direction",
+    "lifecycleDetail": "PUBLISHED_CATALOG",
+    "marketingAuthorityState": "MARKETING_ELIGIBLE",
+    "readinessState": "AMBIGUOUS",
+    "matchedAssetCount": 40,
+    "coverCandidateCount": 21,
+    "primaryMarketingCover": null,
+    "ambiguity": [
+      {
+        "itemId": "01DF3SEQIYEMNUZL63ZFHYYT2DODQKWKQH",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Stephens,%20Terry/9781954414914/04-COVER/Discipline%20and%20Direction.jpg",
+        "relativePath": "08_Backlist/Stephens, Terry/9781954414914/04-COVER/Discipline and Direction.jpg"
+      },
+      {
+        "itemId": "01DF3SEQJLSCULOE4PSBGKZFDTZCCJ5VLD",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Stephens,%20Terry/9781954414914/04-COVER/9781954414914_CoverPDF.png",
+        "relativePath": "08_Backlist/Stephens, Terry/9781954414914/04-COVER/9781954414914_CoverPDF.png"
+      },
+      {
+        "itemId": "01DF3SEQNNH7RVIH57TNAKD3AHDFA2MMPU",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Stephens,%20Terry/9781954414914/04-COVER/Discipline%20and%20Direction%20(1).jpg",
+        "relativePath": "08_Backlist/Stephens, Terry/9781954414914/04-COVER/Discipline and Direction (1).jpg"
+      },
+      {
+        "itemId": "01DF3SEQP3SK2X5QD3RBE3N5OE37CDSZML",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Stephens,%20Terry/9781954414914/04-COVER/Discipline%20and%20Direction%20E-Book.jpg",
+        "relativePath": "08_Backlist/Stephens, Terry/9781954414914/04-COVER/Discipline and Direction E-Book.jpg"
+      }
+    ]
+  },
+  {
+    "canonicalWorkId": "cc4b00d4-c27a-f111-ab0f-00224820105b",
+    "canonicalAuthorId": "49b7ff73-fa9d-f111-b8dc-000d3a14673b",
+    "authorDisplayName": "Regina Scales",
+    "title": "Divinely Inspired",
+    "lifecycleDetail": "PUBLISHED_CATALOG",
+    "marketingAuthorityState": "MARKETING_ELIGIBLE",
+    "readinessState": "READY",
+    "matchedAssetCount": 58,
+    "coverCandidateCount": 11,
+    "primaryMarketingCover": {
+      "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQP7VBNKHERVQFGZNWLSJOBTA6DF",
+      "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+      "itemId": "01DF3SEQP7VBNKHERVQFGZNWLSJOBTA6DF",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Scales,%20Regina/Divinely%20Inspired/04-COVER/9781961475175_FC.jpg",
+      "relativePath": "08_Backlist/Scales, Regina/Divinely Inspired/04-COVER/9781961475175_FC.jpg"
+    },
+    "ambiguity": []
+  },
+  {
+    "canonicalWorkId": "9242c1c2-c37a-f111-ab0f-000d3a14673b",
+    "canonicalAuthorId": "a7801f4d-1d76-f111-ab0f-6045bdd69435",
+    "authorDisplayName": "Jackie Smith, Jr.",
+    "title": "Establishing Glory",
+    "lifecycleDetail": "PUBLISHED_CATALOG",
+    "marketingAuthorityState": "MARKETING_ELIGIBLE",
+    "readinessState": "AMBIGUOUS",
+    "matchedAssetCount": 134,
+    "coverCandidateCount": 17,
+    "primaryMarketingCover": null,
+    "ambiguity": [
+      {
+        "itemId": "01DF3SEQJHZJL66YSMWRFL5R23R7ANEVIV",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Smith,%20Jackie/Establishing%20Glory%20-%20The%20Relationship%20Collection/_COVER/9781950719846-Perfect.png",
+        "relativePath": "08_Backlist/Smith, Jackie/Establishing Glory - The Relationship Collection/_COVER/9781950719846-Perfect.png"
+      },
+      {
+        "itemId": "01DF3SEQN7J77A4RN4EFFKHNIYIQXKKSHE",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Smith,%20Jackie/Establishing%20Glory%20-%20The%20Relationship%20Collection/_COVER/9781950719846-Perfect.jpg",
+        "relativePath": "08_Backlist/Smith, Jackie/Establishing Glory - The Relationship Collection/_COVER/9781950719846-Perfect.jpg"
+      }
+    ]
+  },
+  {
+    "canonicalWorkId": "9342c1c2-c37a-f111-ab0f-000d3a14673b",
+    "canonicalAuthorId": "a7801f4d-1d76-f111-ab0f-6045bdd69435",
+    "authorDisplayName": "Jackie Smith, Jr.",
+    "title": "Establishing Glory 2",
+    "lifecycleDetail": "PUBLISHED_CATALOG",
+    "marketingAuthorityState": "MARKETING_ELIGIBLE",
+    "readinessState": "PARTIAL",
+    "matchedAssetCount": 32,
+    "coverCandidateCount": 0,
+    "primaryMarketingCover": null,
+    "ambiguity": []
+  },
+  {
+    "canonicalWorkId": "7e67a4c3-c37a-f111-ab0f-6045bdd69678",
+    "canonicalAuthorId": "a7801f4d-1d76-f111-ab0f-6045bdd69435",
+    "authorDisplayName": "Jackie Smith, Jr.",
+    "title": "Establishing Glory 3",
+    "lifecycleDetail": "PUBLISHED_CATALOG",
+    "marketingAuthorityState": "MARKETING_ELIGIBLE",
+    "readinessState": "PARTIAL",
+    "matchedAssetCount": 39,
+    "coverCandidateCount": 0,
+    "primaryMarketingCover": null,
+    "ambiguity": []
+  },
+  {
+    "canonicalWorkId": "b1b61ac7-c37a-f111-ab0f-00224820105b",
+    "canonicalAuthorId": "a7801f4d-1d76-f111-ab0f-6045bdd69435",
+    "authorDisplayName": "Jackie Smith, Jr.",
+    "title": "Establishing Glory: The Praise and Worship Handbook",
+    "lifecycleDetail": "PUBLISHED_CATALOG",
+    "marketingAuthorityState": "MARKETING_ELIGIBLE",
+    "readinessState": "MISSING",
+    "matchedAssetCount": 0,
+    "coverCandidateCount": 0,
+    "primaryMarketingCover": null,
+    "ambiguity": []
+  },
+  {
+    "canonicalWorkId": "9d8797ca-c27a-f111-ab0f-7c1e525b15c2",
+    "canonicalAuthorId": "a7801f4d-1d76-f111-ab0f-6045bdd69435",
+    "authorDisplayName": "Jackie Smith, Jr.",
+    "title": "Establishing Glory: The Praise and Worship Handbook (2nd Edition)",
+    "lifecycleDetail": "PUBLISHED_CATALOG",
+    "marketingAuthorityState": "MARKETING_ELIGIBLE",
+    "readinessState": "MISSING",
+    "matchedAssetCount": 0,
+    "coverCandidateCount": 0,
+    "primaryMarketingCover": null,
+    "ambiguity": []
+  },
+  {
+    "canonicalWorkId": "dbb71ac7-c37a-f111-ab0f-00224820105b",
+    "canonicalAuthorId": "a7801f4d-1d76-f111-ab0f-6045bdd69435",
+    "authorDisplayName": "Jackie Smith, Jr.",
+    "title": "Establishing Glory: The Relationship Handbook",
+    "lifecycleDetail": "PUBLISHED_CATALOG",
+    "marketingAuthorityState": "MARKETING_ELIGIBLE",
+    "readinessState": "MISSING",
+    "matchedAssetCount": 0,
+    "coverCandidateCount": 0,
+    "primaryMarketingCover": null,
+    "ambiguity": []
+  },
+  {
+    "canonicalWorkId": "161405c7-c37a-f111-ab0f-7c1e525b15c2",
+    "canonicalAuthorId": "49ffe45a-fa9d-f111-b8dc-000d3a14673b",
+    "authorDisplayName": "Shana Byrd",
+    "title": "Focus, Trust, & Follow",
+    "lifecycleDetail": "PUBLISHED_CATALOG",
+    "marketingAuthorityState": "MARKETING_ELIGIBLE",
+    "readinessState": "READY",
+    "matchedAssetCount": 97,
+    "coverCandidateCount": 17,
+    "primaryMarketingCover": {
+      "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQKCHB5GDFBKVNBKZTM2VDHPXVQD",
+      "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+      "itemId": "01DF3SEQKCHB5GDFBKVNBKZTM2VDHPXVQD",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Byrd,%20Shana/9781950719495/_COVER/9781950719495-Perfect.jpg",
+      "relativePath": "08_Backlist/Byrd, Shana/9781950719495/_COVER/9781950719495-Perfect.jpg"
+    },
+    "ambiguity": []
+  },
+  {
+    "canonicalWorkId": "958904ca-c27a-f111-ab0f-6045bdd69738",
+    "canonicalAuthorId": "c82ada67-fa9d-f111-b8dc-000d3a14673b",
+    "authorDisplayName": "Kelli Milligan Stammen",
+    "title": "For What It's Worth",
+    "lifecycleDetail": "PUBLISHED_CATALOG",
+    "marketingAuthorityState": "MARKETING_ELIGIBLE",
+    "readinessState": "READY",
+    "matchedAssetCount": 42,
+    "coverCandidateCount": 10,
+    "primaryMarketingCover": {
+      "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQOOLXHHFNPHBZF2C5ROMJP3JDGZ",
+      "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+      "itemId": "01DF3SEQOOLXHHFNPHBZF2C5ROMJP3JDGZ",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Milligan%20Stammen,%20Kelli/9781950719723/05-COVER/9781950719716_FC.jpg",
+      "relativePath": "08_Backlist/Milligan Stammen, Kelli/9781950719723/05-COVER/9781950719716_FC.jpg"
+    },
+    "ambiguity": []
+  },
+  {
+    "canonicalWorkId": "24e01ad3-c27a-f111-ab0f-6045bdd69678",
+    "canonicalAuthorId": "6fead373-fa9d-f111-b8dc-7c1e525b15c2",
+    "authorDisplayName": "Karen Hill",
+    "title": "From Stylist to CEO",
+    "lifecycleDetail": "PUBLISHED_CATALOG",
+    "marketingAuthorityState": "MARKETING_ELIGIBLE",
+    "readinessState": "PARTIAL",
+    "matchedAssetCount": 2,
+    "coverCandidateCount": 0,
+    "primaryMarketingCover": null,
+    "ambiguity": []
+  },
+  {
+    "canonicalWorkId": "6109d7cb-c27a-f111-ab0f-6045bdd69678",
+    "canonicalAuthorId": "38c02501-ffe7-5f8d-aec6-ef439d31cbcb",
+    "authorDisplayName": "Jaylonna Stevette",
+    "title": "Getting Back 2 Happy",
+    "lifecycleDetail": "PUBLISHED_CATALOG",
+    "marketingAuthorityState": "MARKETING_ELIGIBLE",
+    "readinessState": "PARTIAL",
+    "matchedAssetCount": 62,
+    "coverCandidateCount": 3,
+    "primaryMarketingCover": null,
+    "ambiguity": []
+  },
+  {
+    "canonicalWorkId": "9542c1c2-c37a-f111-ab0f-000d3a14673b",
+    "canonicalAuthorId": "38c02501-ffe7-5f8d-aec6-ef439d31cbcb",
+    "authorDisplayName": "Jaylonna Stevette",
+    "title": "Getting Back 2 Happy: The Chronicles of Tabby (Unabridged)",
+    "lifecycleDetail": "PUBLISHED_CATALOG",
+    "marketingAuthorityState": "MARKETING_ELIGIBLE",
+    "readinessState": "MISSING",
+    "matchedAssetCount": 0,
+    "coverCandidateCount": 0,
+    "primaryMarketingCover": null,
+    "ambiguity": []
+  },
+  {
+    "canonicalWorkId": "d0b91ac7-c37a-f111-ab0f-00224820105b",
+    "canonicalAuthorId": "0efbcddf-d37c-55c2-ab6a-9ea653bfa7b9",
+    "authorDisplayName": "Kimberly Reeder",
+    "title": "Girl, Did You Know... ?",
+    "lifecycleDetail": "PUBLISHED_CATALOG",
+    "marketingAuthorityState": "MARKETING_ELIGIBLE",
+    "readinessState": "READY",
+    "matchedAssetCount": 249,
+    "coverCandidateCount": 3,
+    "primaryMarketingCover": {
+      "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQIAFQUOZXNDCNCKE2YKRQ4GBLNR",
+      "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+      "itemId": "01DF3SEQIAFQUOZXNDCNCKE2YKRQ4GBLNR",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Reeder,%20Kimberly/2025-Reeder-GirlDidYouKnow/08-Publishing%20Output%20(Print,%20eBook,%20Audiobook)/9781961475748_CoverPDF.png",
+      "relativePath": "08_Backlist/Reeder, Kimberly/2025-Reeder-GirlDidYouKnow/08-Publishing Output (Print, eBook, Audiobook)/9781961475748_CoverPDF.png"
+    },
+    "ambiguity": []
+  },
+  {
+    "canonicalWorkId": "25e01ad3-c27a-f111-ab0f-6045bdd69678",
+    "canonicalAuthorId": "4a56c9ff-4389-f111-ab10-6045bdd69678",
+    "authorDisplayName": "Carolyn Pierce",
+    "title": "Girl, You're Not Crazy. You're Dealing with a Narcissist",
+    "lifecycleDetail": "PUBLISHED_CATALOG",
+    "marketingAuthorityState": "MARKETING_ELIGIBLE",
+    "readinessState": "MISSING",
+    "matchedAssetCount": 0,
+    "coverCandidateCount": 0,
+    "primaryMarketingCover": null,
+    "ambiguity": []
+  },
+  {
+    "canonicalWorkId": "7f67a4c3-c37a-f111-ab0f-6045bdd69678",
+    "canonicalAuthorId": "95ae096e-fa9d-f111-b8dc-000d3a14673b",
+    "authorDisplayName": "Terry Stephens",
+    "title": "God’s Business Plan",
+    "lifecycleDetail": "PUBLISHED_CATALOG",
+    "marketingAuthorityState": "MARKETING_ELIGIBLE",
+    "readinessState": "READY",
+    "matchedAssetCount": 33,
+    "coverCandidateCount": 6,
+    "primaryMarketingCover": {
+      "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQPZRM2UNBYP3BBZ4LDA2YCW636R",
+      "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+      "itemId": "01DF3SEQPZRM2UNBYP3BBZ4LDA2YCW636R",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Stephens,%20Terry/9780985263126/05-COVER/9780985263126-Perfect.png",
+      "relativePath": "08_Backlist/Stephens, Terry/9780985263126/05-COVER/9780985263126-Perfect.png"
+    },
+    "ambiguity": []
+  },
+  {
+    "canonicalWorkId": "1c3274cd-c27a-f111-ab0f-6045bdd69435",
+    "canonicalAuthorId": "92817142-abc3-5959-a7fb-cb46f7047a45",
+    "authorDisplayName": "Tekisha Wimbush",
+    "title": "God's Nudge",
+    "lifecycleDetail": "PUBLISHED_CATALOG",
+    "marketingAuthorityState": "MARKETING_ELIGIBLE",
+    "readinessState": "AMBIGUOUS",
+    "matchedAssetCount": 70,
+    "coverCandidateCount": 57,
+    "primaryMarketingCover": null,
+    "ambiguity": [
+      {
+        "itemId": "01DF3SEQJ6JIBH3PTIBVA22K4KCENHZOZ4",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Wimbush,%20Tekisha/9781950719884/05-COVER/9781950719884-Perfect.png",
+        "relativePath": "08_Backlist/Wimbush, Tekisha/9781950719884/05-COVER/9781950719884-Perfect.png"
+      },
+      {
+        "itemId": "01DF3SEQLJFAMSZ3XA6FDK6UC2VJ2OGIZP",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Wilson,%20Dean/9781950719884/05-COVER/9781950719884-Perfect.png",
+        "relativePath": "08_Backlist/Wilson, Dean/9781950719884/05-COVER/9781950719884-Perfect.png"
+      }
+    ]
+  },
+  {
+    "canonicalWorkId": "6209d7cb-c27a-f111-ab0f-6045bdd69678",
+    "canonicalAuthorId": "e68aa56a-882a-f111-88b4-6045bdd69678",
+    "authorDisplayName": "Thomas Johnson",
+    "title": "God's Word for This World",
+    "lifecycleDetail": "PUBLISHED_CATALOG",
+    "marketingAuthorityState": "MARKETING_ELIGIBLE",
+    "readinessState": "READY",
+    "matchedAssetCount": 258,
+    "coverCandidateCount": 42,
+    "primaryMarketingCover": {
+      "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQJKRP5HSCTGMZB24CUIPINFNM4P",
+      "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+      "itemId": "01DF3SEQJKRP5HSCTGMZB24CUIPINFNM4P",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Johnson%20Sr,%20Thomas/9781954414419/05-COVER/9781954414402_FC.jpg",
+      "relativePath": "08_Backlist/Johnson Sr, Thomas/9781954414419/05-COVER/9781954414402_FC.jpg"
+    },
+    "ambiguity": []
+  },
+  {
+    "canonicalWorkId": "9d42c1c2-c37a-f111-ab0f-000d3a14673b",
+    "canonicalAuthorId": "a80a1c61-fa9d-f111-b8dc-000d3a14673b",
+    "authorDisplayName": "Toni Kleckley",
+    "title": "Grandmothers Educating Minds",
+    "lifecycleDetail": "PUBLISHED_CATALOG",
+    "marketingAuthorityState": "MARKETING_ELIGIBLE",
+    "readinessState": "READY",
+    "matchedAssetCount": 45,
+    "coverCandidateCount": 30,
+    "primaryMarketingCover": {
+      "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQLCSKZP3XOYHJB3XH7TGAF2D6HT",
+      "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+      "itemId": "01DF3SEQLCSKZP3XOYHJB3XH7TGAF2D6HT",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Kleckley,%20Toni/9781954414211/05-COVER/9781954414211-Perfect.png",
+      "relativePath": "08_Backlist/Kleckley, Toni/9781954414211/05-COVER/9781954414211-Perfect.png"
+    },
+    "ambiguity": []
+  },
+  {
+    "canonicalWorkId": "624797d0-c27a-f111-ab0f-7c1e525b15c2",
+    "canonicalAuthorId": "38c02501-ffe7-5f8d-aec6-ef439d31cbcb",
+    "authorDisplayName": "Jaylonna Stevette",
+    "title": "Have You Considered My Servant?",
+    "lifecycleDetail": "PUBLISHED_CATALOG",
+    "marketingAuthorityState": "MARKETING_ELIGIBLE",
+    "readinessState": "READY",
+    "matchedAssetCount": 21,
+    "coverCandidateCount": 3,
+    "primaryMarketingCover": {
+      "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQN6CUMGSUBDWRF2VD4M3D6XCZCD",
+      "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+      "itemId": "01DF3SEQN6CUMGSUBDWRF2VD4M3D6XCZCD",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Stevette,%20Jaylonna/Have%20You%20Considered/04-COVER/9781961475311-Perfect.png",
+      "relativePath": "08_Backlist/Stevette, Jaylonna/Have You Considered/04-COVER/9781961475311-Perfect.png"
+    },
+    "ambiguity": []
+  },
+  {
+    "canonicalWorkId": "d6b91ac7-c37a-f111-ab0f-00224820105b",
+    "canonicalAuthorId": "7f7bf5a6-4a89-5691-a8ee-c578c18b8a7b",
+    "authorDisplayName": "Cheryl Travis",
+    "title": "Help God, I Am - the Collection",
+    "lifecycleDetail": "PUBLISHED_CATALOG",
+    "marketingAuthorityState": "MARKETING_ELIGIBLE",
+    "readinessState": "READY",
+    "matchedAssetCount": 24,
+    "coverCandidateCount": 12,
+    "primaryMarketingCover": {
+      "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQLCX2QHG4OXXNCJ5OESOYPZD6QJ",
+      "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+      "itemId": "01DF3SEQLCX2QHG4OXXNCJ5OESOYPZD6QJ",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Travis,%20Cheryl/9781954414358/05-COVER/9781954414341_FC.jpg",
+      "relativePath": "08_Backlist/Travis, Cheryl/9781954414358/05-COVER/9781954414341_FC.jpg"
+    },
+    "ambiguity": []
+  },
+  {
+    "canonicalWorkId": "293274cd-c27a-f111-ab0f-6045bdd69435",
+    "canonicalAuthorId": "7f7bf5a6-4a89-5691-a8ee-c578c18b8a7b",
+    "authorDisplayName": "Cheryl Travis",
+    "title": "Help God, I Am Afraid",
+    "lifecycleDetail": "PUBLISHED_CATALOG",
+    "marketingAuthorityState": "MARKETING_ELIGIBLE",
+    "readinessState": "READY",
+    "matchedAssetCount": 15,
+    "coverCandidateCount": 3,
+    "primaryMarketingCover": {
+      "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQLQPNSPWCY52NAJHHBV46ANFWLS",
+      "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+      "itemId": "01DF3SEQLQPNSPWCY52NAJHHBV46ANFWLS",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Travis,%20Cheryl/9781950719167/_FINAL/9781950719167-ebook-cover.jpg",
+      "relativePath": "08_Backlist/Travis, Cheryl/9781950719167/_FINAL/9781950719167-ebook-cover.jpg"
+    },
+    "ambiguity": []
+  },
+  {
+    "canonicalWorkId": "6309d7cb-c27a-f111-ab0f-6045bdd69678",
+    "canonicalAuthorId": "7f7bf5a6-4a89-5691-a8ee-c578c18b8a7b",
+    "authorDisplayName": "Cheryl Travis",
+    "title": "Help God, I Am Angry",
+    "lifecycleDetail": "PUBLISHED_CATALOG",
+    "marketingAuthorityState": "MARKETING_ELIGIBLE",
+    "readinessState": "PARTIAL",
+    "matchedAssetCount": 15,
+    "coverCandidateCount": 9,
+    "primaryMarketingCover": null,
+    "ambiguity": []
+  },
+  {
+    "canonicalWorkId": "99064bcd-c27a-f111-ab0f-00224820105b",
+    "canonicalAuthorId": "7f7bf5a6-4a89-5691-a8ee-c578c18b8a7b",
+    "authorDisplayName": "Cheryl Travis",
+    "title": "Help God, I Am Confused",
+    "lifecycleDetail": "PUBLISHED_CATALOG",
+    "marketingAuthorityState": "MARKETING_ELIGIBLE",
+    "readinessState": "READY",
+    "matchedAssetCount": 17,
+    "coverCandidateCount": 9,
+    "primaryMarketingCover": {
+      "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQMIQM3NFC7MVFHL5CRZB24TOCGK",
+      "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+      "itemId": "01DF3SEQMIQM3NFC7MVFHL5CRZB24TOCGK",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Travis,%20Cheryl/9781950719785/_COVER/9781950719785-Cover.jpg",
+      "relativePath": "08_Backlist/Travis, Cheryl/9781950719785/_COVER/9781950719785-Cover.jpg"
+    },
+    "ambiguity": []
+  },
+  {
+    "canonicalWorkId": "343274cd-c27a-f111-ab0f-6045bdd69435",
+    "canonicalAuthorId": "7f7bf5a6-4a89-5691-a8ee-c578c18b8a7b",
+    "authorDisplayName": "Cheryl Travis",
+    "title": "Help God, I Am Hurt",
+    "lifecycleDetail": "PUBLISHED_CATALOG",
+    "marketingAuthorityState": "MARKETING_ELIGIBLE",
+    "readinessState": "READY",
+    "matchedAssetCount": 23,
+    "coverCandidateCount": 3,
+    "primaryMarketingCover": {
+      "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQNKOO7AB3GGHFB2GL4RLRP76EQI",
+      "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+      "itemId": "01DF3SEQNKOO7AB3GGHFB2GL4RLRP76EQI",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Travis,%20Cheryl/9781950719303/_FINAL/cover.jpg",
+      "relativePath": "08_Backlist/Travis, Cheryl/9781950719303/_FINAL/cover.jpg"
+    },
+    "ambiguity": []
+  },
+  {
+    "canonicalWorkId": "6409d7cb-c27a-f111-ab0f-6045bdd69678",
+    "canonicalAuthorId": "7f7bf5a6-4a89-5691-a8ee-c578c18b8a7b",
+    "authorDisplayName": "Cheryl Travis",
+    "title": "Help God, I Am Lonely",
+    "lifecycleDetail": "PUBLISHED_CATALOG",
+    "marketingAuthorityState": "MARKETING_ELIGIBLE",
+    "readinessState": "READY",
+    "matchedAssetCount": 12,
+    "coverCandidateCount": 6,
+    "primaryMarketingCover": {
+      "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQJ4SSBOV7USDFFIUOXXCTCX7MPI",
+      "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+      "itemId": "01DF3SEQJ4SSBOV7USDFFIUOXXCTCX7MPI",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Travis,%20Cheryl/9781950719822/_COVER/9781950719822-Cover.jpg",
+      "relativePath": "08_Backlist/Travis, Cheryl/9781950719822/_COVER/9781950719822-Cover.jpg"
+    },
+    "ambiguity": []
+  },
+  {
+    "canonicalWorkId": "9e8797ca-c27a-f111-ab0f-7c1e525b15c2",
+    "canonicalAuthorId": "7f7bf5a6-4a89-5691-a8ee-c578c18b8a7b",
+    "authorDisplayName": "Cheryl Travis",
+    "title": "Help God, I Am Lost",
+    "lifecycleDetail": "PUBLISHED_CATALOG",
+    "marketingAuthorityState": "MARKETING_ELIGIBLE",
+    "readinessState": "READY",
+    "matchedAssetCount": 24,
+    "coverCandidateCount": 15,
+    "primaryMarketingCover": {
+      "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQLK6HAJ3CJVW5GYR6KEJZPLYSZ3",
+      "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+      "itemId": "01DF3SEQLK6HAJ3CJVW5GYR6KEJZPLYSZ3",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Travis,%20Cheryl/9781950719709/_COVER/9781950719709-Amazon.jpg",
+      "relativePath": "08_Backlist/Travis, Cheryl/9781950719709/_COVER/9781950719709-Amazon.jpg"
+    },
+    "ambiguity": []
+  },
+  {
+    "canonicalWorkId": "6509d7cb-c27a-f111-ab0f-6045bdd69678",
+    "canonicalAuthorId": "7f7bf5a6-4a89-5691-a8ee-c578c18b8a7b",
+    "authorDisplayName": "Cheryl Travis",
+    "title": "Help God, I Am Sad",
+    "lifecycleDetail": "PUBLISHED_CATALOG",
+    "marketingAuthorityState": "MARKETING_ELIGIBLE",
+    "readinessState": "READY",
+    "matchedAssetCount": 15,
+    "coverCandidateCount": 9,
+    "primaryMarketingCover": {
+      "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQJMALAUCV4ONJEJUTWDY24EJXL7",
+      "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+      "itemId": "01DF3SEQJMALAUCV4ONJEJUTWDY24EJXL7",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Travis,%20Cheryl/9781950719761/_COVER/9781950719761-Cover.jpg",
+      "relativePath": "08_Backlist/Travis, Cheryl/9781950719761/_COVER/9781950719761-Cover.jpg"
+    },
+    "ambiguity": []
+  },
+  {
+    "canonicalWorkId": "554797d0-c27a-f111-ab0f-7c1e525b15c2",
+    "canonicalAuthorId": "c1269d54-fa9d-f111-b8dc-000d3a14673b",
+    "authorDisplayName": "Mildred Beard",
+    "title": "Hodge Podge of Life",
+    "lifecycleDetail": "PUBLISHED_CATALOG",
+    "marketingAuthorityState": "MARKETING_ELIGIBLE",
+    "readinessState": "READY",
+    "matchedAssetCount": 194,
+    "coverCandidateCount": 3,
+    "primaryMarketingCover": {
+      "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQIHK5OTUDRVG5B3DDG5WHOMUB2W",
+      "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+      "itemId": "01DF3SEQIHK5OTUDRVG5B3DDG5WHOMUB2W",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Beard,%20Mildred/9781954414938/05-DISTRIBUTION/9781954414938_CoverPDF.pdf",
+      "relativePath": "08_Backlist/Beard, Mildred/9781954414938/05-DISTRIBUTION/9781954414938_CoverPDF.pdf"
+    },
+    "ambiguity": []
+  },
+  {
+    "canonicalWorkId": "564797d0-c27a-f111-ab0f-7c1e525b15c2",
+    "canonicalAuthorId": "f584c05f-ced2-5b60-a70b-382f6cfaeb90",
+    "authorDisplayName": "Tawonna Mars",
+    "title": "Hop, Hop, Hop",
+    "lifecycleDetail": "PUBLISHED_CATALOG",
+    "marketingAuthorityState": "MARKETING_ELIGIBLE",
+    "readinessState": "READY",
+    "matchedAssetCount": 75,
+    "coverCandidateCount": 9,
+    "primaryMarketingCover": {
+      "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQIBB25DTO4EURAIMWECMKHUEWEM",
+      "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+      "itemId": "01DF3SEQIBB25DTO4EURAIMWECMKHUEWEM",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Mars,%20Tawonna/9781954414105/05-COVER/_IMAGES/9781954414105_CoverPDF.jpg",
+      "relativePath": "08_Backlist/Mars, Tawonna/9781954414105/05-COVER/_IMAGES/9781954414105_CoverPDF.jpg"
+    },
+    "ambiguity": []
+  },
+  {
+    "canonicalWorkId": "563274cd-c27a-f111-ab0f-6045bdd69435",
+    "canonicalAuthorId": "d2ed8a5b-fa9d-f111-b8dc-7c1e525b15c2",
+    "authorDisplayName": "Maurche Reed",
+    "title": "I Am My Worst Enemy!",
+    "lifecycleDetail": "PUBLISHED_CATALOG",
+    "marketingAuthorityState": "MARKETING_ELIGIBLE",
+    "readinessState": "READY",
+    "matchedAssetCount": 29,
+    "coverCandidateCount": 9,
+    "primaryMarketingCover": {
+      "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQL7DDN2GRFNQ5ELJWU55SISM6SV",
+      "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+      "itemId": "01DF3SEQL7DDN2GRFNQ5ELJWU55SISM6SV",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Reed,%20Maurche/9781950719549/_COVER/9781950719549-Perfect.jpg",
+      "relativePath": "08_Backlist/Reed, Maurche/9781950719549/_COVER/9781950719549-Perfect.jpg"
+    },
+    "ambiguity": []
+  },
+  {
+    "canonicalWorkId": "df0f6fd3-c27a-f111-ab0f-6045bdd69435",
+    "canonicalAuthorId": "d7f33bc2-e0cd-58d4-a398-d2935f8978fa",
+    "authorDisplayName": "KD Heard",
+    "title": "Inner Peace Through Life's Storms",
+    "lifecycleDetail": "PUBLISHED_CATALOG",
+    "marketingAuthorityState": "MARKETING_ELIGIBLE",
+    "readinessState": "MISSING",
+    "matchedAssetCount": 0,
+    "coverCandidateCount": 0,
+    "primaryMarketingCover": null,
+    "ambiguity": []
+  },
+  {
+    "canonicalWorkId": "971a04cd-c27a-f111-ab0f-000d3a14673b",
+    "canonicalAuthorId": "aecce0fb-872a-f111-88b4-000d3a14673b",
+    "authorDisplayName": "Edith Clay",
+    "title": "Inspirations from God",
+    "lifecycleDetail": "PUBLISHED_CATALOG",
+    "marketingAuthorityState": "MARKETING_ELIGIBLE",
+    "readinessState": "READY",
+    "matchedAssetCount": 463,
+    "coverCandidateCount": 13,
+    "primaryMarketingCover": {
+      "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQMF2Z2NBIIJRJAZHZQUS6YPGXMJ",
+      "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+      "itemId": "01DF3SEQMF2Z2NBIIJRJAZHZQUS6YPGXMJ",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Clay,%20Edith/9781950719808/_COVER/9781950719808-Cover.jpg",
+      "relativePath": "08_Backlist/Clay, Edith/9781950719808/_COVER/9781950719808-Cover.jpg"
+    },
+    "ambiguity": []
+  },
+  {
+    "canonicalWorkId": "26e01ad3-c27a-f111-ab0f-6045bdd69678",
+    "canonicalAuthorId": "0f22af65-fa9d-f111-b8db-7c1e5248501c",
+    "authorDisplayName": "Deborah Eiland",
+    "title": "Jalen Becomes a Big Brother",
+    "lifecycleDetail": "PUBLISHED_CATALOG",
+    "marketingAuthorityState": "MARKETING_ELIGIBLE",
+    "readinessState": "AMBIGUOUS",
+    "matchedAssetCount": 300,
+    "coverCandidateCount": 12,
+    "primaryMarketingCover": null,
+    "ambiguity": [
+      {
+        "itemId": "01DF3SEQI4SK7N6Q26KBE2LYT2UNCR2FVB",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/01_Pre-Pipeline/_Projects/10.%20Post-Publishing/Eiland,%20Deborah%20-%20Jalen%20Becomes%20a%20Big%20Brother/Title/05%20Book%20Production/9781961475403_CoverPDF1-Nimbus-2-Nimbus.pdf",
+        "relativePath": "01_Pre-Pipeline/_Projects/10. Post-Publishing/Eiland, Deborah - Jalen Becomes a Big Brother/Title/05 Book Production/9781961475403_CoverPDF1-Nimbus-2-Nimbus.pdf"
+      },
+      {
+        "itemId": "01DF3SEQIIP6ZETISKAVBL2DHJVLCNKYVW",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/01_Pre-Pipeline/_Projects/10.%20Post-Publishing/Eiland,%20Deborah%20-%20Jalen%20Becomes%20a%20Big%20Brother/Title/05%20Book%20Production/9781961475403_CoverPDF-Nimbus.pdf",
+        "relativePath": "01_Pre-Pipeline/_Projects/10. Post-Publishing/Eiland, Deborah - Jalen Becomes a Big Brother/Title/05 Book Production/9781961475403_CoverPDF-Nimbus.pdf"
+      },
+      {
+        "itemId": "01DF3SEQIORVASI54OA5DYEOQO4JRUZYY4",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/01_Pre-Pipeline/_Projects/10.%20Post-Publishing/Eiland,%20Deborah%20-%20Jalen%20Becomes%20a%20Big%20Brother/Title/05%20Book%20Production/9781961475403_CoverPDF-Nimbus-Nimbus.pdf",
+        "relativePath": "01_Pre-Pipeline/_Projects/10. Post-Publishing/Eiland, Deborah - Jalen Becomes a Big Brother/Title/05 Book Production/9781961475403_CoverPDF-Nimbus-Nimbus.pdf"
+      },
+      {
+        "itemId": "01DF3SEQKAMKXA45QCYFEI6K265CJPJYXV",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/01_Pre-Pipeline/_Projects/10.%20Post-Publishing/Eiland,%20Deborah%20-%20Jalen%20Becomes%20a%20Big%20Brother/Title/05%20Book%20Production/9781961475403_CoverPDF-Nimbus-2.pdf",
+        "relativePath": "01_Pre-Pipeline/_Projects/10. Post-Publishing/Eiland, Deborah - Jalen Becomes a Big Brother/Title/05 Book Production/9781961475403_CoverPDF-Nimbus-2.pdf"
+      },
+      {
+        "itemId": "01DF3SEQMKXPQE6UOEK5HIT2CZBXS5NZBT",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/01_Pre-Pipeline/_Projects/10.%20Post-Publishing/Eiland,%20Deborah%20-%20Jalen%20Becomes%20a%20Big%20Brother/Title/05%20Book%20Production/9781961475403_CoverPDF1.pdf",
+        "relativePath": "01_Pre-Pipeline/_Projects/10. Post-Publishing/Eiland, Deborah - Jalen Becomes a Big Brother/Title/05 Book Production/9781961475403_CoverPDF1.pdf"
+      },
+      {
+        "itemId": "01DF3SEQNG4LNHXZNVYNFLKXX2QZWPD26Q",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/01_Pre-Pipeline/_Projects/10.%20Post-Publishing/Eiland,%20Deborah%20-%20Jalen%20Becomes%20a%20Big%20Brother/Title/05%20Book%20Production/9781961475403_CoverPDF1-Nimbus.pdf",
+        "relativePath": "01_Pre-Pipeline/_Projects/10. Post-Publishing/Eiland, Deborah - Jalen Becomes a Big Brother/Title/05 Book Production/9781961475403_CoverPDF1-Nimbus.pdf"
+      },
+      {
+        "itemId": "01DF3SEQOEC7CF7COK5BH2HJYAI2E6UQKE",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/01_Pre-Pipeline/_Projects/10.%20Post-Publishing/Eiland,%20Deborah%20-%20Jalen%20Becomes%20a%20Big%20Brother/Title/05%20Book%20Production/9781961475403_CoverPDF1-Nimbus-2.pdf",
+        "relativePath": "01_Pre-Pipeline/_Projects/10. Post-Publishing/Eiland, Deborah - Jalen Becomes a Big Brother/Title/05 Book Production/9781961475403_CoverPDF1-Nimbus-2.pdf"
+      },
+      {
+        "itemId": "01DF3SEQPL3JT7GS7QCFAIUDLHELB4DY5X",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/01_Pre-Pipeline/_Projects/10.%20Post-Publishing/Eiland,%20Deborah%20-%20Jalen%20Becomes%20a%20Big%20Brother/Title/05%20Book%20Production/9781961475403_CoverPDF1-Nimbus-Nimbus.pdf",
+        "relativePath": "01_Pre-Pipeline/_Projects/10. Post-Publishing/Eiland, Deborah - Jalen Becomes a Big Brother/Title/05 Book Production/9781961475403_CoverPDF1-Nimbus-Nimbus.pdf"
+      }
+    ]
+  },
+  {
+    "canonicalWorkId": "a5084bcd-c27a-f111-ab0f-00224820105b",
+    "canonicalAuthorId": "6d2d8d61-fa9d-f111-b8dc-7c1e525b15c2",
+    "authorDisplayName": "Janet Stephens",
+    "title": "Jewels by Lady J",
+    "lifecycleDetail": "PUBLISHED_CATALOG",
+    "marketingAuthorityState": "MARKETING_ELIGIBLE",
+    "readinessState": "READY",
+    "matchedAssetCount": 151,
+    "coverCandidateCount": 12,
+    "primaryMarketingCover": {
+      "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQO3TBSC2VH4LJB3DYAH5QOZURQX",
+      "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+      "itemId": "01DF3SEQO3TBSC2VH4LJB3DYAH5QOZURQX",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Stephens,%20Janet/9781950719280/_COVER/9781950719280-PerfectC.png",
+      "relativePath": "08_Backlist/Stephens, Janet/9781950719280/_COVER/9781950719280-PerfectC.png"
+    },
+    "ambiguity": []
+  },
+  {
+    "canonicalWorkId": "574797d0-c27a-f111-ab0f-7c1e525b15c2",
+    "canonicalAuthorId": "a52ada67-fa9d-f111-b8dc-000d3a14673b",
+    "authorDisplayName": "Adrean Young",
+    "title": "Just What I Needed",
+    "lifecycleDetail": "PUBLISHED_CATALOG",
+    "marketingAuthorityState": "MARKETING_ELIGIBLE",
+    "readinessState": "READY",
+    "matchedAssetCount": 1012,
+    "coverCandidateCount": 9,
+    "primaryMarketingCover": {
+      "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQOB7TQQILYOLVHLGYPP5NQ5N5D6",
+      "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+      "itemId": "01DF3SEQOB7TQQILYOLVHLGYPP5NQ5N5D6",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Young,%20Adrean/Just%20What%20I%20Needed%20-%20Daily%20Devotional/_COVER/9781950719860-Cover.jpg",
+      "relativePath": "08_Backlist/Young, Adrean/Just What I Needed - Daily Devotional/_COVER/9781950719860-Cover.jpg"
+    },
+    "ambiguity": []
+  },
+  {
+    "canonicalWorkId": "aa084bcd-c27a-f111-ab0f-00224820105b",
+    "canonicalAuthorId": "95ae096e-fa9d-f111-b8dc-000d3a14673b",
+    "authorDisplayName": "Terry Stephens",
+    "title": "Kingdom Equipment 101",
+    "lifecycleDetail": "PUBLISHED_CATALOG",
+    "marketingAuthorityState": "MARKETING_ELIGIBLE",
+    "readinessState": "READY",
+    "matchedAssetCount": 30,
+    "coverCandidateCount": 12,
+    "primaryMarketingCover": {
+      "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQO4BTTRGNQBBNHZ5QGJL7JF7WYQ",
+      "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+      "itemId": "01DF3SEQO4BTTRGNQBBNHZ5QGJL7JF7WYQ",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Stephens,%20Terry/9781954414778/05-COVER/9781954414761_FC.jpg",
+      "relativePath": "08_Backlist/Stephens, Terry/9781954414778/05-COVER/9781954414761_FC.jpg"
+    },
+    "ambiguity": []
+  },
+  {
+    "canonicalWorkId": "ab084bcd-c27a-f111-ab0f-00224820105b",
+    "canonicalAuthorId": "b7ed8a5b-fa9d-f111-b8dc-7c1e525b15c2",
+    "authorDisplayName": "Daphanny Baker",
+    "title": "Lady Daphanny's Altar",
+    "lifecycleDetail": "PUBLISHED_CATALOG",
+    "marketingAuthorityState": "MARKETING_ELIGIBLE",
+    "readinessState": "READY",
+    "matchedAssetCount": 114,
+    "coverCandidateCount": 12,
+    "primaryMarketingCover": {
+      "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQLIL2TXSGLPPRCYOHLDCHVVF5FI",
+      "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+      "itemId": "01DF3SEQLIL2TXSGLPPRCYOHLDCHVVF5FI",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Baker,%20Daphanny/Baker,%20Daphanny%20-%20Lady%20Daphanny%27s%20Altar/978-1-961475-09-0/04-COVER/9781961475090-Perfect.png",
+      "relativePath": "08_Backlist/Baker, Daphanny/Baker, Daphanny - Lady Daphanny's Altar/978-1-961475-09-0/04-COVER/9781961475090-Perfect.png"
+    },
+    "ambiguity": []
+  },
+  {
+    "canonicalWorkId": "6909d7cb-c27a-f111-ab0f-6045bdd69678",
+    "canonicalAuthorId": "85b767cc-ccd6-5620-af4e-52fe1e922a7b",
+    "authorDisplayName": "Lisa Clark",
+    "title": "Let Me Tell You about It",
+    "lifecycleDetail": "PUBLISHED_CATALOG",
+    "marketingAuthorityState": "MARKETING_ELIGIBLE",
+    "readinessState": "READY",
+    "matchedAssetCount": 27,
+    "coverCandidateCount": 15,
+    "primaryMarketingCover": {
+      "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQP4HBDWUMEL3REISKJBXUD4LZNL",
+      "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+      "itemId": "01DF3SEQP4HBDWUMEL3REISKJBXUD4LZNL",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Clark,%20Lisa/9781954414983/05-COVER/9781954414990_FC.jpg",
+      "relativePath": "08_Backlist/Clark, Lisa/9781954414983/05-COVER/9781954414990_FC.jpg"
+    },
+    "ambiguity": []
+  },
+  {
+    "canonicalWorkId": "b3084bcd-c27a-f111-ab0f-00224820105b",
+    "canonicalAuthorId": "9eb2965f-fa9d-f111-b8db-7c1e5248501c",
+    "authorDisplayName": "Deanna Jones",
+    "title": "Life after Detour",
+    "lifecycleDetail": "PUBLISHED_CATALOG",
+    "marketingAuthorityState": "MARKETING_ELIGIBLE",
+    "readinessState": "READY",
+    "matchedAssetCount": 95,
+    "coverCandidateCount": 14,
+    "primaryMarketingCover": {
+      "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQLPVCT3CPY6UBEZFZA5UTOFFTDY",
+      "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+      "itemId": "01DF3SEQLPVCT3CPY6UBEZFZA5UTOFFTDY",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Jones,%20Deanna/Jones,%20Deanna%20-%20Life%20After%20Detour%20Update/LIFE%20AFTER%20DETOUR/04-COVER/_IMAGES/9781950719389-blank.jpg",
+      "relativePath": "08_Backlist/Jones, Deanna/Jones, Deanna - Life After Detour Update/LIFE AFTER DETOUR/04-COVER/_IMAGES/9781950719389-blank.jpg"
+    },
+    "ambiguity": []
+  },
+  {
+    "canonicalWorkId": "835f72d0-c27a-f111-ab0f-6045bdd69738",
+    "canonicalAuthorId": "b8b2965f-fa9d-f111-b8db-7c1e5248501c",
+    "authorDisplayName": "Kurt Broadnax",
+    "title": "Love Is an Action Word",
+    "lifecycleDetail": "PUBLISHED_CATALOG",
+    "marketingAuthorityState": "MARKETING_ELIGIBLE",
+    "readinessState": "AMBIGUOUS",
+    "matchedAssetCount": 15,
+    "coverCandidateCount": 9,
+    "primaryMarketingCover": null,
+    "ambiguity": [
+      {
+        "itemId": "01DF3SEQK3NWGPPFCLTVCKMFZULLWUMZKR",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Broadnax,%20Kurt/9781950719983/_COVER/9781950719983-Cover.jpg",
+        "relativePath": "08_Backlist/Broadnax, Kurt/9781950719983/_COVER/9781950719983-Cover.jpg"
+      },
+      {
+        "itemId": "01DF3SEQKIYRUMZNYRHRBYIEHTVVVZKUWK",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Broadnax,%20Kurt/9781950719983/_COVER/_IMAGES/couple-5813286_960_720.jpeg",
+        "relativePath": "08_Backlist/Broadnax, Kurt/9781950719983/_COVER/_IMAGES/couple-5813286_960_720.jpeg"
+      }
+    ]
+  },
+  {
+    "canonicalWorkId": "991a04cd-c27a-f111-ab0f-000d3a14673b",
+    "canonicalAuthorId": "32ff2165-882a-f111-88b4-6045bdd69738",
+    "authorDisplayName": "Diane Johnson",
+    "title": "Love Lucy",
+    "lifecycleDetail": "PUBLISHED_CATALOG",
+    "marketingAuthorityState": "MARKETING_ELIGIBLE",
+    "readinessState": "READY",
+    "matchedAssetCount": 24,
+    "coverCandidateCount": 15,
+    "primaryMarketingCover": {
+      "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQOVXSD7ZUTRB5AYS7EUCOEHORBT",
+      "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+      "itemId": "01DF3SEQOVXSD7ZUTRB5AYS7EUCOEHORBT",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Johnson,%20Diane/9781950719945/_COVER/9781950719945-Perfect.png",
+      "relativePath": "08_Backlist/Johnson, Diane/9781950719945/_COVER/9781950719945-Perfect.png"
+    },
+    "ambiguity": []
+  },
+  {
+    "canonicalWorkId": "9a1a04cd-c27a-f111-ab0f-000d3a14673b",
+    "canonicalAuthorId": "deed8a5b-fa9d-f111-b8dc-7c1e525b15c2",
+    "authorDisplayName": "Thaddues Smith",
+    "title": "Love of My Life",
+    "lifecycleDetail": "PUBLISHED_CATALOG",
+    "marketingAuthorityState": "MARKETING_ELIGIBLE",
+    "readinessState": "READY",
+    "matchedAssetCount": 99,
+    "coverCandidateCount": 24,
+    "primaryMarketingCover": {
+      "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQOXNBEBZ73FNZEKEU3HBBEEN43C",
+      "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+      "itemId": "01DF3SEQOXNBEBZ73FNZEKEU3HBBEEN43C",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Smith,%20Thaddues/9781954414273/05-COVER/9781954414266_FC.jpg",
+      "relativePath": "08_Backlist/Smith, Thaddues/9781954414273/05-COVER/9781954414266_FC.jpg"
+    },
+    "ambiguity": []
+  },
+  {
+    "canonicalWorkId": "ec0f6fd3-c27a-f111-ab0f-6045bdd69435",
+    "canonicalAuthorId": "4a56c9ff-4389-f111-ab10-6045bdd69678",
+    "authorDisplayName": "Carolyn Pierce",
+    "title": "Loving the Addict",
+    "lifecycleDetail": "PUBLISHED_CATALOG",
+    "marketingAuthorityState": "MARKETING_ELIGIBLE",
+    "readinessState": "READY",
+    "matchedAssetCount": 2,
+    "coverCandidateCount": 2,
+    "primaryMarketingCover": {
+      "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQMWIOCLEL6AWJCIAPYZ3EG6P22M",
+      "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+      "itemId": "01DF3SEQMWIOCLEL6AWJCIAPYZ3EG6P22M",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Booker-Pierce,%20Carolyn/Loving%20the%20Addict%20-%20While%20Taking%20Care%20of%20Yourself%20First/_COVER/9781950719570-Amazon.jpg",
+      "relativePath": "08_Backlist/Booker-Pierce, Carolyn/Loving the Addict - While Taking Care of Yourself First/_COVER/9781950719570-Amazon.jpg"
+    },
+    "ambiguity": []
+  },
+  {
+    "canonicalWorkId": "584797d0-c27a-f111-ab0f-7c1e525b15c2",
+    "canonicalAuthorId": "8e0a1c61-fa9d-f111-b8dc-000d3a14673b",
+    "authorDisplayName": "Bailey Cunningham",
+    "title": "Melodies from Heaven",
+    "lifecycleDetail": "PUBLISHED_CATALOG",
+    "marketingAuthorityState": "MARKETING_ELIGIBLE",
+    "readinessState": "READY",
+    "matchedAssetCount": 12,
+    "coverCandidateCount": 6,
+    "primaryMarketingCover": {
+      "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQKFE7VYR4MR5VFLIZ4SZ2EBEEBH",
+      "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+      "itemId": "01DF3SEQKFE7VYR4MR5VFLIZ4SZ2EBEEBH",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Cunningham,%20Bailey/9781950719747/_COVER/9781950719747-Cover.jpg",
+      "relativePath": "08_Backlist/Cunningham, Bailey/9781950719747/_COVER/9781950719747-Cover.jpg"
+    },
+    "ambiguity": []
+  },
+  {
+    "canonicalWorkId": "903274cd-c27a-f111-ab0f-6045bdd69435",
+    "canonicalAuthorId": "632d8d61-fa9d-f111-b8dc-7c1e525b15c2",
+    "authorDisplayName": "Shelley McIntosh",
+    "title": "Memoir of a Black Christian Nationalist",
+    "lifecycleDetail": "PUBLISHED_CATALOG",
+    "marketingAuthorityState": "MARKETING_ELIGIBLE",
+    "readinessState": "AMBIGUOUS",
+    "matchedAssetCount": 192,
+    "coverCandidateCount": 30,
+    "primaryMarketingCover": null,
+    "ambiguity": [
+      {
+        "itemId": "01DF3SEQITD3NFL46XYBHKPH3RCTN3UPBA",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/McIntosh,%20Shelley/9781954414198/_COVER/9781954414198-Perfect%20Folder/Links/redburstbackground.tif",
+        "relativePath": "08_Backlist/McIntosh, Shelley/9781954414198/_COVER/9781954414198-Perfect Folder/Links/redburstbackground.tif"
+      },
+      {
+        "itemId": "01DF3SEQLLVWLWAIKTARBZZZWUT46KSCEB",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/McIntosh,%20Shelley/9781954414198/_COVER/9781954414198-Perfect%20Folder/Links/ShelleyPhoto.tif",
+        "relativePath": "08_Backlist/McIntosh, Shelley/9781954414198/_COVER/9781954414198-Perfect Folder/Links/ShelleyPhoto.tif"
+      }
+    ]
+  },
+  {
+    "canonicalWorkId": "594797d0-c27a-f111-ab0f-7c1e525b15c2",
+    "canonicalAuthorId": "20adc867-fa9d-f111-b8dc-7c1e525b15c2",
+    "authorDisplayName": "Marvin Grayson",
+    "title": "Mirror of Refining Insight",
+    "lifecycleDetail": "PUBLISHED_CATALOG",
+    "marketingAuthorityState": "MARKETING_ELIGIBLE",
+    "readinessState": "READY",
+    "matchedAssetCount": 87,
+    "coverCandidateCount": 9,
+    "primaryMarketingCover": {
+      "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQIDMWCM5BAUKZCKY5WMBMWM7MN3",
+      "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+      "itemId": "01DF3SEQIDMWCM5BAUKZCKY5WMBMWM7MN3",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Grayson,%20Marvin/9781954414372/05-COVER/9781954414372-Perfect.jpg",
+      "relativePath": "08_Backlist/Grayson, Marvin/9781954414372/05-COVER/9781954414372-Perfect.jpg"
+    },
+    "ambiguity": []
+  },
+  {
+    "canonicalWorkId": "d4f603d3-c27a-f111-ab0f-000d3a14673b",
+    "canonicalAuthorId": "4a56c9ff-4389-f111-ab10-6045bdd69678",
+    "authorDisplayName": "Carolyn Pierce",
+    "title": "More Than a Village",
+    "lifecycleDetail": "PUBLISHED_CATALOG",
+    "marketingAuthorityState": "MARKETING_ELIGIBLE",
+    "readinessState": "MISSING",
+    "matchedAssetCount": 0,
+    "coverCandidateCount": 0,
+    "primaryMarketingCover": null,
+    "ambiguity": []
+  },
+  {
+    "canonicalWorkId": "67137ed6-c27a-f111-ab0f-6045bdd69738",
+    "canonicalAuthorId": "56b7ff73-fa9d-f111-b8dc-000d3a14673b",
+    "authorDisplayName": "Will Harris",
+    "title": "Music Ministry Unplugged",
+    "lifecycleDetail": "PUBLISHED_CATALOG",
+    "marketingAuthorityState": "MARKETING_ELIGIBLE",
+    "readinessState": "READY",
+    "matchedAssetCount": 49,
+    "coverCandidateCount": 6,
+    "primaryMarketingCover": {
+      "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQKBRFZPCF54TVEJAK57G2XFFAOV",
+      "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+      "itemId": "01DF3SEQKBRFZPCF54TVEJAK57G2XFFAOV",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Harris,%20Will/2025-Harris-MusicMinistryUnplugged/08-Publishing%20Output%20(Print,%20eBook,%20Audiobook)/9781961475724_CoverPDF.png",
+      "relativePath": "08_Backlist/Harris, Will/2025-Harris-MusicMinistryUnplugged/08-Publishing Output (Print, eBook, Audiobook)/9781961475724_CoverPDF.png"
+    },
+    "ambiguity": []
+  },
+  {
+    "canonicalWorkId": "d5084bcd-c27a-f111-ab0f-00224820105b",
+    "canonicalAuthorId": "7aae096e-fa9d-f111-b8dc-000d3a14673b",
+    "authorDisplayName": "Christy Grogg",
+    "title": "My ABC's",
+    "lifecycleDetail": "PUBLISHED_CATALOG",
+    "marketingAuthorityState": "MARKETING_ELIGIBLE",
+    "readinessState": "READY",
+    "matchedAssetCount": 39,
+    "coverCandidateCount": 6,
+    "primaryMarketingCover": {
+      "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQN3PUGFKXUORNGJW5IDFW3ZEZCI",
+      "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+      "itemId": "01DF3SEQN3PUGFKXUORNGJW5IDFW3ZEZCI",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Grogg,%20Christy/9781954414464/05-COVER/9781954414457_FC.jpg",
+      "relativePath": "08_Backlist/Grogg, Christy/9781954414464/05-COVER/9781954414457_FC.jpg"
+    },
+    "ambiguity": []
+  },
+  {
+    "canonicalWorkId": "a05f72d0-c27a-f111-ab0f-6045bdd69738",
+    "canonicalAuthorId": "38c02501-ffe7-5f8d-aec6-ef439d31cbcb",
+    "authorDisplayName": "Jaylonna Stevette",
+    "title": "Naughty Tales",
+    "lifecycleDetail": "PUBLISHED_CATALOG",
+    "marketingAuthorityState": "MARKETING_ELIGIBLE",
+    "readinessState": "PARTIAL",
+    "matchedAssetCount": 25,
+    "coverCandidateCount": 0,
+    "primaryMarketingCover": null,
+    "ambiguity": []
+  },
+  {
+    "canonicalWorkId": "9e3274cd-c27a-f111-ab0f-6045bdd69435",
+    "canonicalAuthorId": "3affe45a-fa9d-f111-b8dc-000d3a14673b",
+    "authorDisplayName": "Pamela Smith",
+    "title": "Never Give up on Love",
+    "lifecycleDetail": "PUBLISHED_CATALOG",
+    "marketingAuthorityState": "MARKETING_ELIGIBLE",
+    "readinessState": "AMBIGUOUS",
+    "matchedAssetCount": 135,
+    "coverCandidateCount": 9,
+    "primaryMarketingCover": null,
+    "ambiguity": [
+      {
+        "itemId": "01DF3SEQN5B32SI6N5DRC2K2YHLXSTYR4R",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Smith,%20Pamela/9781950719525/_COVER/9781950719525-Amazon.jpg",
+        "relativePath": "08_Backlist/Smith, Pamela/9781950719525/_COVER/9781950719525-Amazon.jpg"
+      },
+      {
+        "itemId": "01DF3SEQOJZX625W3EFVEKFZ6YIUAWKQKD",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Smith,%20Pamela/9781950719525/_COVER/9781950719525-Perfect.jpg",
+        "relativePath": "08_Backlist/Smith, Pamela/9781950719525/_COVER/9781950719525-Perfect.jpg"
+      }
+    ]
+  },
+  {
+    "canonicalWorkId": "865f72d0-c27a-f111-ab0f-6045bdd69738",
+    "canonicalAuthorId": "fa21af65-fa9d-f111-b8db-7c1e5248501c",
+    "authorDisplayName": "Wayne Pounds",
+    "title": "Number 23 and Me",
+    "lifecycleDetail": "PUBLISHED_CATALOG",
+    "marketingAuthorityState": "MARKETING_ELIGIBLE",
+    "readinessState": "PARTIAL",
+    "matchedAssetCount": 102,
+    "coverCandidateCount": 36,
+    "primaryMarketingCover": null,
+    "ambiguity": []
+  },
+  {
+    "canonicalWorkId": "5b4797d0-c27a-f111-ab0f-7c1e525b15c2",
+    "canonicalAuthorId": "c3ed8a5b-fa9d-f111-b8dc-7c1e525b15c2",
+    "authorDisplayName": "Veronica Brown",
+    "title": "One Soul",
+    "lifecycleDetail": "PUBLISHED_CATALOG",
+    "marketingAuthorityState": "MARKETING_ELIGIBLE",
+    "readinessState": "READY",
+    "matchedAssetCount": 30,
+    "coverCandidateCount": 4,
+    "primaryMarketingCover": {
+      "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQMKBEHHACLIG5BYUPTNTPPX2622",
+      "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+      "itemId": "01DF3SEQMKBEHHACLIG5BYUPTNTPPX2622",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Brown,%20Veronica/One%20Soul/_COVER/9781950719600-Cover.jpg",
+      "relativePath": "08_Backlist/Brown, Veronica/One Soul/_COVER/9781950719600-Cover.jpg"
+    },
+    "ambiguity": []
+  },
+  {
+    "canonicalWorkId": "5c4797d0-c27a-f111-ab0f-7c1e525b15c2",
+    "canonicalAuthorId": "ae35c16d-fa9d-f111-b8dc-7c1e525b15c2",
+    "authorDisplayName": "Earline Neal",
+    "title": "Ordinary People Searching for Greatness",
+    "lifecycleDetail": "PUBLISHED_CATALOG",
+    "marketingAuthorityState": "MARKETING_ELIGIBLE",
+    "readinessState": "READY",
+    "matchedAssetCount": 75,
+    "coverCandidateCount": 33,
+    "primaryMarketingCover": {
+      "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQN6CK36OP6S6BBYU4HK6YD5CPQU",
+      "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+      "itemId": "01DF3SEQN6CK36OP6S6BBYU4HK6YD5CPQU",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Neal,%20Earline/9781954414860/04-COVER/9781954414884_FC.jpg",
+      "relativePath": "08_Backlist/Neal, Earline/9781954414860/04-COVER/9781954414884_FC.jpg"
+    },
+    "ambiguity": []
+  },
+  {
+    "canonicalWorkId": "992156cd-c37a-f111-ab0f-00224820105b",
+    "canonicalAuthorId": "b7ed8a5b-fa9d-f111-b8dc-7c1e525b15c2",
+    "authorDisplayName": "Daphanny Baker",
+    "title": "Peaches Can Do It!",
+    "lifecycleDetail": "PUBLISHED_CATALOG",
+    "marketingAuthorityState": "MARKETING_ELIGIBLE",
+    "readinessState": "AMBIGUOUS",
+    "matchedAssetCount": 211,
+    "coverCandidateCount": 4,
+    "primaryMarketingCover": null,
+    "ambiguity": [
+      {
+        "itemId": "01DF3SEQJAJDPPUOQV7JEJFNOPGIIOS2NQ",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Baker,%20Daphanny/Baker,%20Daphanny%20-%20Peaches%20Can%20Do%20It/Peaches%20Can%20Do%20It!/05%20Book%20Production/Image_Cover.png",
+        "relativePath": "08_Backlist/Baker, Daphanny/Baker, Daphanny - Peaches Can Do It/Peaches Can Do It!/05 Book Production/Image_Cover.png"
+      },
+      {
+        "itemId": "01DF3SEQMLU5Y6CNW5IFFY5YXZL2QTCZC7",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Baker,%20Daphanny/Baker,%20Daphanny%20-%20Peaches%20Can%20Do%20It/Peaches%20Can%20Do%20It!/02%20Manuscript%20Development%20and%20Editing/Peaches_Images/Image_Cover.jpeg",
+        "relativePath": "08_Backlist/Baker, Daphanny/Baker, Daphanny - Peaches Can Do It/Peaches Can Do It!/02 Manuscript Development and Editing/Peaches_Images/Image_Cover.jpeg"
+      },
+      {
+        "itemId": "01DF3SEQOV4A7WXALNLBG2GA4KUFPCVXPR",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Baker,%20Daphanny/Baker,%20Daphanny%20-%20Peaches%20Can%20Do%20It/Peaches%20Can%20Do%20It!/05%20Book%20Production/Image_Cover.jpg",
+        "relativePath": "08_Backlist/Baker, Daphanny/Baker, Daphanny - Peaches Can Do It/Peaches Can Do It!/05 Book Production/Image_Cover.jpg"
+      }
+    ]
+  },
+  {
+    "canonicalWorkId": "f0084bcd-c27a-f111-ab0f-00224820105b",
+    "canonicalAuthorId": "22ffe45a-fa9d-f111-b8dc-000d3a14673b",
+    "authorDisplayName": "Ashanti Flemister",
+    "title": "Pieces of Me All over the Place",
+    "lifecycleDetail": "PUBLISHED_CATALOG",
+    "marketingAuthorityState": "MARKETING_ELIGIBLE",
+    "readinessState": "AMBIGUOUS",
+    "matchedAssetCount": 47,
+    "coverCandidateCount": 10,
+    "primaryMarketingCover": null,
+    "ambiguity": [
+      {
+        "itemId": "01DF3SEQJM6VS4ND3CMNEJONPHTE455XOI",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Flemister,%20Ashanti/9781950719686/_COVER/_IMAGES/36bw%20(2).jpg",
+        "relativePath": "08_Backlist/Flemister, Ashanti/9781950719686/_COVER/_IMAGES/36bw (2).jpg"
+      },
+      {
+        "itemId": "01DF3SEQNWLIPYX5MGUNEYGJWRPNXS74NC",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Flemister,%20Ashanti/9781950719686/_COVER/41Ktp8yp6ZL._SY346_.jpg",
+        "relativePath": "08_Backlist/Flemister, Ashanti/9781950719686/_COVER/41Ktp8yp6ZL._SY346_.jpg"
+      }
+    ]
+  },
+  {
+    "canonicalWorkId": "f1084bcd-c27a-f111-ab0f-00224820105b",
+    "canonicalAuthorId": "2fffe45a-fa9d-f111-b8dc-000d3a14673b",
+    "authorDisplayName": "Natasha Gilchrist",
+    "title": "Pretty Wings",
+    "lifecycleDetail": "PUBLISHED_CATALOG",
+    "marketingAuthorityState": "MARKETING_ELIGIBLE",
+    "readinessState": "READY",
+    "matchedAssetCount": 22,
+    "coverCandidateCount": 9,
+    "primaryMarketingCover": {
+      "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQNQNUVNDQHWNVF3WC7MLMDO3HH4",
+      "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+      "itemId": "01DF3SEQNQNUVNDQHWNVF3WC7MLMDO3HH4",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Gilchrist,%20Natasha/9781954414082/_COVER/_IMAGES/image001.png",
+      "relativePath": "08_Backlist/Gilchrist, Natasha/9781954414082/_COVER/_IMAGES/image001.png"
+    },
+    "ambiguity": []
+  },
+  {
+    "canonicalWorkId": "d5f603d3-c27a-f111-ab0f-000d3a14673b",
+    "canonicalAuthorId": "43999b62-888b-525d-ac6c-a99e379c3d2f",
+    "authorDisplayName": "Juanita Travis",
+    "title": "Rhyming It up with Church Stuff",
+    "lifecycleDetail": "PUBLISHED_CATALOG",
+    "marketingAuthorityState": "MARKETING_ELIGIBLE",
+    "readinessState": "AMBIGUOUS",
+    "matchedAssetCount": 349,
+    "coverCandidateCount": 53,
+    "primaryMarketingCover": null,
+    "ambiguity": [
+      {
+        "itemId": "01DF3SEQKIJT5SBSF3WVE3Y4TQ72AHCAMZ",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/Archive/Active%20Projects/07.%20Pre-Publishing%20(Cover)/Travis,%20Juanita%20-%20Rhyming%20it%20up%20with%20church%20stuff/Rhyming%20it%20up%20with%20church%20stuff/Rhyming%20It%20Up%20with%20Church%20Stuff/Kindle/Rhyming-It-Up-with-Church-Stuff-Kindle-2025-05-08.epub",
+        "relativePath": "Archive/Active Projects/07. Pre-Publishing (Cover)/Travis, Juanita - Rhyming it up with church stuff/Rhyming it up with church stuff/Rhyming It Up with Church Stuff/Kindle/Rhyming-It-Up-with-Church-Stuff-Kindle-2025-05-08.epub"
+      },
+      {
+        "itemId": "01DF3SEQNO5MEEI3JDY5CZCW4YJIYYKGO7",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/Archive/Active%20Projects/07.%20Pre-Publishing%20(Cover)/Travis,%20Juanita%20-%20Rhyming%20it%20up%20with%20church%20stuff/Rhyming%20it%20up%20with%20church%20stuff/Rhyming%20It%20Up%20with%20Church%20Stuff/Kindle/Rhyming-It-Up-with-Church-Stuff-Kindle-2025-05-08-Nimbus-Nimbus-Nimbus-Nimbus.epub",
+        "relativePath": "Archive/Active Projects/07. Pre-Publishing (Cover)/Travis, Juanita - Rhyming it up with church stuff/Rhyming it up with church stuff/Rhyming It Up with Church Stuff/Kindle/Rhyming-It-Up-with-Church-Stuff-Kindle-2025-05-08-Nimbus-Nimbus-Nimbus-Nimbus.epub"
+      },
+      {
+        "itemId": "01DF3SEQPQCMGG5NR7EFDKGHN4ZMNXWRRK",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/Archive/Active%20Projects/07.%20Pre-Publishing%20(Cover)/Travis,%20Juanita%20-%20Rhyming%20it%20up%20with%20church%20stuff/Rhyming%20it%20up%20with%20church%20stuff/Rhyming%20It%20Up%20with%20Church%20Stuff/Kindle/Rhyming-It-Up-with-Church-Stuff-Kindle-2025-05-08-Nimbus-Nimbus.epub",
+        "relativePath": "Archive/Active Projects/07. Pre-Publishing (Cover)/Travis, Juanita - Rhyming it up with church stuff/Rhyming it up with church stuff/Rhyming It Up with Church Stuff/Kindle/Rhyming-It-Up-with-Church-Stuff-Kindle-2025-05-08-Nimbus-Nimbus.epub"
+      },
+      {
+        "itemId": "01DF3SEQPSGDOS6MTZNZF2TCJLWOWFKY33",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/Archive/Active%20Projects/07.%20Pre-Publishing%20(Cover)/Travis,%20Juanita%20-%20Rhyming%20it%20up%20with%20church%20stuff/Rhyming%20it%20up%20with%20church%20stuff/Rhyming%20It%20Up%20with%20Church%20Stuff/Kindle/Rhyming-It-Up-with-Church-Stuff-Kindle-2025-05-08-Nimbus.epub",
+        "relativePath": "Archive/Active Projects/07. Pre-Publishing (Cover)/Travis, Juanita - Rhyming it up with church stuff/Rhyming it up with church stuff/Rhyming It Up with Church Stuff/Kindle/Rhyming-It-Up-with-Church-Stuff-Kindle-2025-05-08-Nimbus.epub"
+      },
+      {
+        "itemId": "01DF3SEQPXR22GY34XSVF3KM66UFD6GHT7",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/Archive/Active%20Projects/07.%20Pre-Publishing%20(Cover)/Travis,%20Juanita%20-%20Rhyming%20it%20up%20with%20church%20stuff/Rhyming%20it%20up%20with%20church%20stuff/Rhyming%20It%20Up%20with%20Church%20Stuff/Kindle/Rhyming-It-Up-with-Church-Stuff-Kindle-2025-05-08-Nimbus-Nimbus-Nimbus.epub",
+        "relativePath": "Archive/Active Projects/07. Pre-Publishing (Cover)/Travis, Juanita - Rhyming it up with church stuff/Rhyming it up with church stuff/Rhyming It Up with Church Stuff/Kindle/Rhyming-It-Up-with-Church-Stuff-Kindle-2025-05-08-Nimbus-Nimbus-Nimbus.epub"
+      }
+    ]
+  },
+  {
+    "canonicalWorkId": "b73274cd-c27a-f111-ab0f-6045bdd69435",
+    "canonicalAuthorId": "b8b2965f-fa9d-f111-b8db-7c1e5248501c",
+    "authorDisplayName": "Kurt Broadnax",
+    "title": "Seasons of Life",
+    "lifecycleDetail": "PUBLISHED_CATALOG",
+    "marketingAuthorityState": "MARKETING_ELIGIBLE",
+    "readinessState": "READY",
+    "matchedAssetCount": 48,
+    "coverCandidateCount": 21,
+    "primaryMarketingCover": {
+      "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQKB4CRDFBE4AFBJILACUTX6STWU",
+      "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+      "itemId": "01DF3SEQKB4CRDFBE4AFBJILACUTX6STWU",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Broadnax,%20Kurt/9781961475069/04-COVER/9781961475076_FC.jpg",
+      "relativePath": "08_Backlist/Broadnax, Kurt/9781961475069/04-COVER/9781961475076_FC.jpg"
+    },
+    "ambiguity": []
+  },
+  {
+    "canonicalWorkId": "a01a04cd-c27a-f111-ab0f-000d3a14673b",
+    "canonicalAuthorId": "adf89d59-fa9d-f111-b8db-7c1e5248501c",
+    "authorDisplayName": "Darlene Carson",
+    "title": "She",
+    "lifecycleDetail": "PUBLISHED_CATALOG",
+    "marketingAuthorityState": "MARKETING_ELIGIBLE",
+    "readinessState": "READY",
+    "matchedAssetCount": 31,
+    "coverCandidateCount": 12,
+    "primaryMarketingCover": {
+      "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQKIG7WPRJDOGNF26HQFSE7E3DMA",
+      "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+      "itemId": "01DF3SEQKIG7WPRJDOGNF26HQFSE7E3DMA",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Carson,%20Darlene/9781950719907/_COVER/SHE%20Cover/9781950719907-Perfect.jpg",
+      "relativePath": "08_Backlist/Carson, Darlene/9781950719907/_COVER/SHE Cover/9781950719907-Perfect.jpg"
+    },
+    "ambiguity": []
+  },
+  {
+    "canonicalWorkId": "bff603d3-c27a-f111-ab0f-000d3a14673b",
+    "canonicalAuthorId": "8fe9a467-4389-f111-ab10-6045bdd69678",
+    "authorDisplayName": "Cynthia Sloan",
+    "title": "Speech Therapy Works!",
+    "lifecycleDetail": "PUBLISHED_CATALOG",
+    "marketingAuthorityState": "MARKETING_ELIGIBLE",
+    "readinessState": "READY",
+    "matchedAssetCount": 34,
+    "coverCandidateCount": 9,
+    "primaryMarketingCover": {
+      "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQLAQN7PFCLNSZCYX52AEDMVZJ6X",
+      "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+      "itemId": "01DF3SEQLAQN7PFCLNSZCYX52AEDMVZJ6X",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Sloan,%20Cynthia/9781950719563/_COVER/9781950719563-Perfect.jpg",
+      "relativePath": "08_Backlist/Sloan, Cynthia/9781950719563/_COVER/9781950719563-Perfect.jpg"
+    },
+    "ambiguity": []
+  },
+  {
+    "canonicalWorkId": "9794818a-1ca5-532e-a701-ed69f439e8a6",
+    "canonicalAuthorId": "dfb397e7-3b7c-f111-ab0f-6045bdd69435",
+    "authorDisplayName": "Sean A Crowley I",
+    "title": "Strategies for Success",
+    "lifecycleDetail": "ACTIVE_LAUNCH_LIFECYCLE",
+    "marketingAuthorityState": "MARKETING_ELIGIBLE",
+    "readinessState": "READY",
+    "matchedAssetCount": 45,
+    "coverCandidateCount": 15,
+    "primaryMarketingCover": {
+      "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQKRTJL5VKVNTRFZXAVBEK4CJK63",
+      "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+      "itemId": "01DF3SEQKRTJL5VKVNTRFZXAVBEK4CJK63",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Crowley,%20Sean/2026_Crowley_Strategies_For_Success/03_Design/Cover/9781961475830_CoverPDF.png",
+      "relativePath": "08_Backlist/Crowley, Sean/2026_Crowley_Strategies_For_Success/03_Design/Cover/9781961475830_CoverPDF.png"
+    },
+    "ambiguity": []
+  },
+  {
+    "canonicalWorkId": "15e01ad3-c27a-f111-ab0f-6045bdd69678",
+    "canonicalAuthorId": "ec21af65-fa9d-f111-b8db-7c1e5248501c",
+    "authorDisplayName": "Brandyn McElroy",
+    "title": "Support Beyond the Cycle",
+    "lifecycleDetail": "PUBLISHED_CATALOG",
+    "marketingAuthorityState": "MARKETING_ELIGIBLE",
+    "readinessState": "READY",
+    "matchedAssetCount": 24,
+    "coverCandidateCount": 15,
+    "primaryMarketingCover": {
+      "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQNFCBZYOELE7JBK3Q4XNMBQQKP2",
+      "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+      "itemId": "01DF3SEQNFCBZYOELE7JBK3Q4XNMBQQKP2",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/McElroy,%20Brandyn/9781950719969/_COVER/9781950719969-Cover.jpg",
+      "relativePath": "08_Backlist/McElroy, Brandyn/9781950719969/_COVER/9781950719969-Cover.jpg"
+    },
+    "ambiguity": []
+  },
+  {
+    "canonicalWorkId": "60137ed6-c27a-f111-ab0f-6045bdd69738",
+    "canonicalAuthorId": "56b7ff73-fa9d-f111-b8dc-000d3a14673b",
+    "authorDisplayName": "Will Harris",
+    "title": "Taylor Made",
+    "lifecycleDetail": "PUBLISHED_CATALOG",
+    "marketingAuthorityState": "MARKETING_ELIGIBLE",
+    "readinessState": "READY",
+    "matchedAssetCount": 81,
+    "coverCandidateCount": 7,
+    "primaryMarketingCover": {
+      "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQLPQC3CXBXQE5BLVHA5OEOVO2VL",
+      "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+      "itemId": "01DF3SEQLPQC3CXBXQE5BLVHA5OEOVO2VL",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Harris,%20Will/978-1-961475-22-9/04-COVER/_IMAGES/240318%20WILL%20HARRIS%20TAYLOR%20MADEFRONT.jpg",
+      "relativePath": "08_Backlist/Harris, Will/978-1-961475-22-9/04-COVER/_IMAGES/240318 WILL HARRIS TAYLOR MADEFRONT.jpg"
+    },
+    "ambiguity": []
+  },
+  {
+    "canonicalWorkId": "16e01ad3-c27a-f111-ab0f-6045bdd69678",
+    "canonicalAuthorId": "c2e8dab4-1da3-53ea-a1e4-91a6d655ee2b",
+    "authorDisplayName": "Obadiah Harris",
+    "title": "The Celestial Advantage",
+    "lifecycleDetail": "PUBLISHED_CATALOG",
+    "marketingAuthorityState": "MARKETING_ELIGIBLE",
+    "readinessState": "READY",
+    "matchedAssetCount": 2,
+    "coverCandidateCount": 2,
+    "primaryMarketingCover": {
+      "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQLAQIGFHT255REYW7ITDVFATNYA",
+      "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+      "itemId": "01DF3SEQLAQIGFHT255REYW7ITDVFATNYA",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Harris,%20Obadiah/The%20Celestial%20Advantage/_COVER/agold-book.png",
+      "relativePath": "08_Backlist/Harris, Obadiah/The Celestial Advantage/_COVER/agold-book.png"
+    },
+    "ambiguity": []
+  },
+  {
+    "canonicalWorkId": "c44b00d4-c27a-f111-ab0f-00224820105b",
+    "canonicalAuthorId": "c8c8747e-6675-f111-ab0f-6045bdd69678",
+    "authorDisplayName": "Iyorwuese Hagher",
+    "title": "The Conquest of Azenga",
+    "lifecycleDetail": "PUBLISHED_CATALOG",
+    "marketingAuthorityState": "MARKETING_ELIGIBLE",
+    "readinessState": "READY",
+    "matchedAssetCount": 37,
+    "coverCandidateCount": 3,
+    "primaryMarketingCover": {
+      "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQLYTNQ6T2PGEBE2ERFIIQSA5WR6",
+      "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+      "itemId": "01DF3SEQLYTNQ6T2PGEBE2ERFIIQSA5WR6",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Hagher,%20Iyorwuese/2025-Hagher-TheConquestOfAzenga/08-Publishing%20Output%20(Print,%20eBook,%20Audiobook)/9781961475762_CoverPDF.pdf",
+      "relativePath": "08_Backlist/Hagher, Iyorwuese/2025-Hagher-TheConquestOfAzenga/08-Publishing Output (Print, eBook, Audiobook)/9781961475762_CoverPDF.pdf"
+    },
+    "ambiguity": []
+  },
+  {
+    "canonicalWorkId": "f96286cf-c37a-f111-ab0f-000d3a14673b",
+    "canonicalAuthorId": "c2e8dab4-1da3-53ea-a1e4-91a6d655ee2b",
+    "authorDisplayName": "Obadiah Harris",
+    "title": "The Doctrine of Last Things",
+    "lifecycleDetail": "PUBLISHED_CATALOG",
+    "marketingAuthorityState": "MARKETING_ELIGIBLE",
+    "readinessState": "READY",
+    "matchedAssetCount": 30,
+    "coverCandidateCount": 15,
+    "primaryMarketingCover": {
+      "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQKPZJQFGRU24JFY23EREU47IEMI",
+      "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+      "itemId": "01DF3SEQKPZJQFGRU24JFY23EREU47IEMI",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Harris,%20Obadiah/9781954414440/05-COVER/9781954414440_Amazon.jpg",
+      "relativePath": "08_Backlist/Harris, Obadiah/9781954414440/05-COVER/9781954414440_Amazon.jpg"
+    },
+    "ambiguity": []
+  },
+  {
+    "canonicalWorkId": "b67835ca-c37a-f111-ab0f-6045bdd69678",
+    "canonicalAuthorId": "9c0a1c61-fa9d-f111-b8dc-000d3a14673b",
+    "authorDisplayName": "Tracy Norris",
+    "title": "The Essence of Life, Love Letters to Christ",
+    "lifecycleDetail": "PUBLISHED_CATALOG",
+    "marketingAuthorityState": "MARKETING_ELIGIBLE",
+    "readinessState": "PARTIAL",
+    "matchedAssetCount": 9,
+    "coverCandidateCount": 0,
+    "primaryMarketingCover": null,
+    "ambiguity": []
+  },
+  {
+    "canonicalWorkId": "c84b00d4-c27a-f111-ab0f-00224820105b",
+    "canonicalAuthorId": "0027cd12-8b02-529c-af7a-f2c714ddfadb",
+    "authorDisplayName": "Cheryl Cook",
+    "title": "The Fight for the Promiseland",
+    "lifecycleDetail": "PUBLISHED_CATALOG",
+    "marketingAuthorityState": "MARKETING_ELIGIBLE",
+    "readinessState": "READY",
+    "matchedAssetCount": 19,
+    "coverCandidateCount": 2,
+    "primaryMarketingCover": {
+      "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQNYZOVF64GI7VBLUQ5PDFR3JM5L",
+      "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+      "itemId": "01DF3SEQNYZOVF64GI7VBLUQ5PDFR3JM5L",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Cook,%20Cheryl/2025-Cook-Promiseland/08-Publishing%20Output%20(Print,%20eBook,%20Audiobook)/9781961475632_CoverPDF.pdf",
+      "relativePath": "08_Backlist/Cook, Cheryl/2025-Cook-Promiseland/08-Publishing Output (Print, eBook, Audiobook)/9781961475632_CoverPDF.pdf"
+    },
+    "ambiguity": []
+  },
+  {
+    "canonicalWorkId": "d6f603d3-c27a-f111-ab0f-000d3a14673b",
+    "canonicalAuthorId": "cb85e9fa-85a9-5d5b-a91e-d627a9f5ce16",
+    "authorDisplayName": "Dennis Brown",
+    "title": "The Flame",
+    "lifecycleDetail": "PUBLISHED_CATALOG",
+    "marketingAuthorityState": "MARKETING_ELIGIBLE",
+    "readinessState": "AMBIGUOUS",
+    "matchedAssetCount": 963,
+    "coverCandidateCount": 18,
+    "primaryMarketingCover": null,
+    "ambiguity": [
+      {
+        "itemId": "01DF3SEQI6BL6SM2IHQVGJEPNBGDGE2XEU",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Brown,%20Dennis/The%20Flame/02-MANUSCRIPT/_ORIGINAL/00%20Naz%20Flame%202/2018/01%20Jan%20-%20Mar/92%20%20Becoming%20a%20House%20of%20Prayer%20%20part%206%20Recovering%20Our%20Purpose%2003-28-2018.pdf",
+        "relativePath": "08_Backlist/Brown, Dennis/The Flame/02-MANUSCRIPT/_ORIGINAL/00 Naz Flame 2/2018/01 Jan - Mar/92  Becoming a House of Prayer  part 6 Recovering Our Purpose 03-28-2018.pdf"
+      },
+      {
+        "itemId": "01DF3SEQI6BNU5QAFR3VEK2YAI3BPAY4XX",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/01_Pre-Pipeline/_Projects/04.%20Editing/_On%20Hold/Brown,%20Dennis%20-%20The%20Flame/Title/02-MANUSCRIPT/_ORIGINAL/00%20Naz%20Flame%202/2018/01%20Jan%20-%20Mar/92%20%20Becoming%20a%20House%20of%20Prayer%20%20part%206%20Recovering%20Our%20Purpose%2003-28-2018.pdf",
+        "relativePath": "01_Pre-Pipeline/_Projects/04. Editing/_On Hold/Brown, Dennis - The Flame/Title/02-MANUSCRIPT/_ORIGINAL/00 Naz Flame 2/2018/01 Jan - Mar/92  Becoming a House of Prayer  part 6 Recovering Our Purpose 03-28-2018.pdf"
+      },
+      {
+        "itemId": "01DF3SEQIQ42TENHFJV5DIFQNEUZL3WRFR",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/01_Pre-Pipeline/_Projects/04.%20Editing/_On%20Hold/Brown,%20Dennis%20-%20The%20Flame/Title/02-MANUSCRIPT/_ORIGINAL/00%20Naz%20Flame%202/2019/01%20Jan%20-%20Mar/115%20Discoveriing%20Life%20Together%20%2002-13-2019-Nimbus.pdf",
+        "relativePath": "01_Pre-Pipeline/_Projects/04. Editing/_On Hold/Brown, Dennis - The Flame/Title/02-MANUSCRIPT/_ORIGINAL/00 Naz Flame 2/2019/01 Jan - Mar/115 Discoveriing Life Together  02-13-2019-Nimbus.pdf"
+      },
+      {
+        "itemId": "01DF3SEQISQJTA7JVCPFDZWAGDYY3EJNJ4",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/02_Active-Pipeline/04_Editorial/06_Hold/Brown,%20Dennis%20-%20The%20Flame/02-MANUSCRIPT/_ORIGINAL/00%20Naz%20Flame%202/2018/01%20Jan%20-%20Mar/92%20%20Becoming%20a%20House%20of%20Prayer%20%20part%206%20Recovering%20Our%20Purpose%2003-28-2018.pdf",
+        "relativePath": "02_Active-Pipeline/04_Editorial/06_Hold/Brown, Dennis - The Flame/02-MANUSCRIPT/_ORIGINAL/00 Naz Flame 2/2018/01 Jan - Mar/92  Becoming a House of Prayer  part 6 Recovering Our Purpose 03-28-2018.pdf"
+      },
+      {
+        "itemId": "01DF3SEQJXAGDBJSKZLZBI7JPDE25M6SDN",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/02_Active-Pipeline/04_Editorial/06_Hold/Brown,%20Dennis%20-%20The%20Flame/02-MANUSCRIPT/_ORIGINAL/00%20Naz%20Flame%202/2020/01%20Jan%20%20Mar/142%20Unprepared%20-%20An%20Inevitable%20Discovery%20%2002-26-2020.pdf",
+        "relativePath": "02_Active-Pipeline/04_Editorial/06_Hold/Brown, Dennis - The Flame/02-MANUSCRIPT/_ORIGINAL/00 Naz Flame 2/2020/01 Jan  Mar/142 Unprepared - An Inevitable Discovery  02-26-2020.pdf"
+      },
+      {
+        "itemId": "01DF3SEQK4M5Q4RLEJXZG3HJWS3S5XL53H",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/02_Active-Pipeline/04_Editorial/06_Hold/Brown,%20Dennis%20-%20The%20Flame/02-MANUSCRIPT/_ORIGINAL/00%20Naz%20Flame%202/2019/01%20Jan%20-%20Mar/115%20Discoveriing%20Life%20Together%20%2002-13-2019.pdf",
+        "relativePath": "02_Active-Pipeline/04_Editorial/06_Hold/Brown, Dennis - The Flame/02-MANUSCRIPT/_ORIGINAL/00 Naz Flame 2/2019/01 Jan - Mar/115 Discoveriing Life Together  02-13-2019.pdf"
+      },
+      {
+        "itemId": "01DF3SEQKAICAIXVKLKZC2ICSGJ4L3PZ6K",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/01_Pre-Pipeline/_Projects/04.%20Editing/_On%20Hold/Brown,%20Dennis%20-%20The%20Flame/Title/02-MANUSCRIPT/_ORIGINAL/00%20Naz%20Flame%202/2018/01%20Jan%20-%20Mar/90%20%20Becoming%20a%20House%20of%20Prayer%20%20part%204%20%20%20Uncovering%20the%20Grace%20Note%20%2002-28-2018.pdf",
+        "relativePath": "01_Pre-Pipeline/_Projects/04. Editing/_On Hold/Brown, Dennis - The Flame/Title/02-MANUSCRIPT/_ORIGINAL/00 Naz Flame 2/2018/01 Jan - Mar/90  Becoming a House of Prayer  part 4   Uncovering the Grace Note  02-28-2018.pdf"
+      },
+      {
+        "itemId": "01DF3SEQLCOVXESYCTV5BLUJOAE667TRL4",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/01_Pre-Pipeline/_Projects/04.%20Editing/_On%20Hold/Brown,%20Dennis%20-%20The%20Flame/Title/02-MANUSCRIPT/_ORIGINAL/00%20Naz%20Flame%202/2020/02%20Apr-June/145%20%20Rediscovering%20Genuine%20Awe%2004-08-2020.pdf",
+        "relativePath": "01_Pre-Pipeline/_Projects/04. Editing/_On Hold/Brown, Dennis - The Flame/Title/02-MANUSCRIPT/_ORIGINAL/00 Naz Flame 2/2020/02 Apr-June/145  Rediscovering Genuine Awe 04-08-2020.pdf"
+      },
+      {
+        "itemId": "01DF3SEQMBUESHHBIOFJFID4KIRY2YNBEY",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/02_Active-Pipeline/04_Editorial/06_Hold/Brown,%20Dennis%20-%20The%20Flame/02-MANUSCRIPT/_ORIGINAL/00%20Naz%20Flame%202/2018/01%20Jan%20-%20Mar/90%20%20Becoming%20a%20House%20of%20Prayer%20%20part%204%20%20%20Uncovering%20the%20Grace%20Note%20%2002-28-2018.pdf",
+        "relativePath": "02_Active-Pipeline/04_Editorial/06_Hold/Brown, Dennis - The Flame/02-MANUSCRIPT/_ORIGINAL/00 Naz Flame 2/2018/01 Jan - Mar/90  Becoming a House of Prayer  part 4   Uncovering the Grace Note  02-28-2018.pdf"
+      },
+      {
+        "itemId": "01DF3SEQN7322LL2LPBBGZTXNPNEQL3C43",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Brown,%20Dennis/The%20Flame/02-MANUSCRIPT/_ORIGINAL/00%20Naz%20Flame%202/2018/01%20Jan%20-%20Mar/90%20%20Becoming%20a%20House%20of%20Prayer%20%20part%204%20%20%20Uncovering%20the%20Grace%20Note%20%2002-28-2018.pdf",
+        "relativePath": "08_Backlist/Brown, Dennis/The Flame/02-MANUSCRIPT/_ORIGINAL/00 Naz Flame 2/2018/01 Jan - Mar/90  Becoming a House of Prayer  part 4   Uncovering the Grace Note  02-28-2018.pdf"
+      },
+      {
+        "itemId": "01DF3SEQNBE7W5PTGRERHILZUO2HZ5OH7W",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/01_Pre-Pipeline/_Projects/04.%20Editing/_On%20Hold/Brown,%20Dennis%20-%20The%20Flame/Title/02-MANUSCRIPT/_ORIGINAL/00%20Naz%20Flame%202/2018/01%20Jan%20-%20Mar/90%20%20Becoming%20a%20House%20of%20Prayer%20%20part%204%20%20%20Uncovering%20the%20Grace%20Note%20%2002-28-2018-Nimbus.pdf",
+        "relativePath": "01_Pre-Pipeline/_Projects/04. Editing/_On Hold/Brown, Dennis - The Flame/Title/02-MANUSCRIPT/_ORIGINAL/00 Naz Flame 2/2018/01 Jan - Mar/90  Becoming a House of Prayer  part 4   Uncovering the Grace Note  02-28-2018-Nimbus.pdf"
+      },
+      {
+        "itemId": "01DF3SEQNBQGEJCHUKZZDYMO5PNT2N3PGU",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/01_Pre-Pipeline/_Projects/04.%20Editing/_On%20Hold/Brown,%20Dennis%20-%20The%20Flame/Title/02-MANUSCRIPT/_ORIGINAL/00%20Naz%20Flame%202/2020/01%20Jan%20%20Mar/142%20Unprepared%20-%20An%20Inevitable%20Discovery%20%2002-26-2020-Nimbus.pdf",
+        "relativePath": "01_Pre-Pipeline/_Projects/04. Editing/_On Hold/Brown, Dennis - The Flame/Title/02-MANUSCRIPT/_ORIGINAL/00 Naz Flame 2/2020/01 Jan  Mar/142 Unprepared - An Inevitable Discovery  02-26-2020-Nimbus.pdf"
+      },
+      {
+        "itemId": "01DF3SEQNJOVMIRIS3KZBKPPDBJGJ3UNGN",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Brown,%20Dennis/The%20Flame/02-MANUSCRIPT/_ORIGINAL/00%20Naz%20Flame%202/2020/01%20Jan%20%20Mar/142%20Unprepared%20-%20An%20Inevitable%20Discovery%20%2002-26-2020.pdf",
+        "relativePath": "08_Backlist/Brown, Dennis/The Flame/02-MANUSCRIPT/_ORIGINAL/00 Naz Flame 2/2020/01 Jan  Mar/142 Unprepared - An Inevitable Discovery  02-26-2020.pdf"
+      },
+      {
+        "itemId": "01DF3SEQOAPYN5D72S2NAIMHC6DYO4AM45",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/01_Pre-Pipeline/_Projects/04.%20Editing/_On%20Hold/Brown,%20Dennis%20-%20The%20Flame/Title/02-MANUSCRIPT/_ORIGINAL/00%20Naz%20Flame%202/2019/01%20Jan%20-%20Mar/115%20Discoveriing%20Life%20Together%20%2002-13-2019.pdf",
+        "relativePath": "01_Pre-Pipeline/_Projects/04. Editing/_On Hold/Brown, Dennis - The Flame/Title/02-MANUSCRIPT/_ORIGINAL/00 Naz Flame 2/2019/01 Jan - Mar/115 Discoveriing Life Together  02-13-2019.pdf"
+      },
+      {
+        "itemId": "01DF3SEQODHIQJIPZPBVF32EAV7E4UJAYS",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/02_Active-Pipeline/04_Editorial/06_Hold/Brown,%20Dennis%20-%20The%20Flame/02-MANUSCRIPT/_ORIGINAL/00%20Naz%20Flame%202/2020/02%20Apr-June/145%20%20Rediscovering%20Genuine%20Awe%2004-08-2020.pdf",
+        "relativePath": "02_Active-Pipeline/04_Editorial/06_Hold/Brown, Dennis - The Flame/02-MANUSCRIPT/_ORIGINAL/00 Naz Flame 2/2020/02 Apr-June/145  Rediscovering Genuine Awe 04-08-2020.pdf"
+      },
+      {
+        "itemId": "01DF3SEQONDYHO2RHKHJAKGCYVG5CYL37E",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Brown,%20Dennis/The%20Flame/02-MANUSCRIPT/_ORIGINAL/00%20Naz%20Flame%202/2019/01%20Jan%20-%20Mar/115%20Discoveriing%20Life%20Together%20%2002-13-2019.pdf",
+        "relativePath": "08_Backlist/Brown, Dennis/The Flame/02-MANUSCRIPT/_ORIGINAL/00 Naz Flame 2/2019/01 Jan - Mar/115 Discoveriing Life Together  02-13-2019.pdf"
+      },
+      {
+        "itemId": "01DF3SEQOS7ELZBMI5BZBYL2EF2PQ3LVT6",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Brown,%20Dennis/The%20Flame/02-MANUSCRIPT/_ORIGINAL/00%20Naz%20Flame%202/2020/02%20Apr-June/145%20%20Rediscovering%20Genuine%20Awe%2004-08-2020.pdf",
+        "relativePath": "08_Backlist/Brown, Dennis/The Flame/02-MANUSCRIPT/_ORIGINAL/00 Naz Flame 2/2020/02 Apr-June/145  Rediscovering Genuine Awe 04-08-2020.pdf"
+      },
+      {
+        "itemId": "01DF3SEQPWMIWIPFDQV5ELRWGS26W3LNOF",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/01_Pre-Pipeline/_Projects/04.%20Editing/_On%20Hold/Brown,%20Dennis%20-%20The%20Flame/Title/02-MANUSCRIPT/_ORIGINAL/00%20Naz%20Flame%202/2020/01%20Jan%20%20Mar/142%20Unprepared%20-%20An%20Inevitable%20Discovery%20%2002-26-2020.pdf",
+        "relativePath": "01_Pre-Pipeline/_Projects/04. Editing/_On Hold/Brown, Dennis - The Flame/Title/02-MANUSCRIPT/_ORIGINAL/00 Naz Flame 2/2020/01 Jan  Mar/142 Unprepared - An Inevitable Discovery  02-26-2020.pdf"
+      }
+    ]
+  },
+  {
+    "canonicalWorkId": "17e01ad3-c27a-f111-ab0f-6045bdd69678",
+    "canonicalAuthorId": "0f22af65-fa9d-f111-b8db-7c1e5248501c",
+    "authorDisplayName": "Deborah Eiland",
+    "title": "The Girl with the Ebony Locs and the Three Bears",
+    "lifecycleDetail": "PUBLISHED_CATALOG",
+    "marketingAuthorityState": "MARKETING_ELIGIBLE",
+    "readinessState": "PARTIAL",
+    "matchedAssetCount": 182,
+    "coverCandidateCount": 0,
+    "primaryMarketingCover": null,
+    "ambiguity": []
+  },
+  {
+    "canonicalWorkId": "5d4797d0-c27a-f111-ab0f-7c1e525b15c2",
+    "canonicalAuthorId": "6fead373-fa9d-f111-b8dc-7c1e525b15c2",
+    "authorDisplayName": "Karen Hill",
+    "title": "The Great Hair Restart",
+    "lifecycleDetail": "PUBLISHED_CATALOG",
+    "marketingAuthorityState": "MARKETING_ELIGIBLE",
+    "readinessState": "AMBIGUOUS",
+    "matchedAssetCount": 591,
+    "coverCandidateCount": 49,
+    "primaryMarketingCover": null,
+    "ambiguity": [
+      {
+        "itemId": "01DF3SEQKMZGVA3ZF5J5HIFXXSBOPHENKA",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Hill,%20Karen/The%20Great%20Hair%20Restart/04-COVER/9781961475137-Perfect.png",
+        "relativePath": "08_Backlist/Hill, Karen/The Great Hair Restart/04-COVER/9781961475137-Perfect.png"
+      },
+      {
+        "itemId": "01DF3SEQKVSHOT3JVL2RC3SAG53VIVGHB2",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/01_Pre-Pipeline/_Projects/10.%20Post-Publishing/Hill,%20Karen%20-%20Journal/Title/04-COVER/9781961475267-Perfect.png",
+        "relativePath": "01_Pre-Pipeline/_Projects/10. Post-Publishing/Hill, Karen - Journal/Title/04-COVER/9781961475267-Perfect.png"
+      },
+      {
+        "itemId": "01DF3SEQLM4ZIEGYBSNVBIQZHJHQVLBATU",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/02_Active-Pipeline/07_Distribution/Hill,%20Karen/04-COVER/9781961475267-Perfect.png",
+        "relativePath": "02_Active-Pipeline/07_Distribution/Hill, Karen/04-COVER/9781961475267-Perfect.png"
+      },
+      {
+        "itemId": "01DF3SEQMPKE4VVQDZGJD3WRLTYWVFRBAD",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Hill,%20Karen/The%20Great%20Hair%20Restart%20-%20The%20Journal/04-COVER/9781961475267-Perfect.png",
+        "relativePath": "08_Backlist/Hill, Karen/The Great Hair Restart - The Journal/04-COVER/9781961475267-Perfect.png"
+      },
+      {
+        "itemId": "01DF3SEQNUIJ55NNXCOVFKP6CC23YJMP42",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/01_Pre-Pipeline/_Projects/10.%20Post-Publishing/Hill,%20Karen%20-%20Journal/Title/04-COVER/9781961475267-Perfect-Nimbus.png",
+        "relativePath": "01_Pre-Pipeline/_Projects/10. Post-Publishing/Hill, Karen - Journal/Title/04-COVER/9781961475267-Perfect-Nimbus.png"
+      },
+      {
+        "itemId": "01DF3SEQO5SANRDGBFFZCJ6BJA6KV3LPTN",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/01_Pre-Pipeline/_Projects/10.%20Post-Publishing/Hill,%20Karen%20-%20Journal/Title/04-COVER/9781961475267-Perfect-Nimbus-Nimbus.png",
+        "relativePath": "01_Pre-Pipeline/_Projects/10. Post-Publishing/Hill, Karen - Journal/Title/04-COVER/9781961475267-Perfect-Nimbus-Nimbus.png"
+      }
+    ]
+  },
+  {
+    "canonicalWorkId": "885f72d0-c27a-f111-ab0f-6045bdd69738",
+    "canonicalAuthorId": "d2ed8a5b-fa9d-f111-b8dc-7c1e525b15c2",
+    "authorDisplayName": "Maurche Reed",
+    "title": "The Healed Me",
+    "lifecycleDetail": "PUBLISHED_CATALOG",
+    "marketingAuthorityState": "MARKETING_ELIGIBLE",
+    "readinessState": "AMBIGUOUS",
+    "matchedAssetCount": 97,
+    "coverCandidateCount": 30,
+    "primaryMarketingCover": null,
+    "ambiguity": [
+      {
+        "itemId": "01DF3SEQJ2DUE5GOJYWJGLQ2CV3PBWJAZA",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Reed,%20Maurche/9781954414624/05-COVER/logo.jpeg",
+        "relativePath": "08_Backlist/Reed, Maurche/9781954414624/05-COVER/logo.jpeg"
+      },
+      {
+        "itemId": "01DF3SEQJD5ZFIBDB2SBB3WNMSTTNAORAB",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Reed,%20Maurche/9781954414624/05-COVER/_IMAGES/AD1DA377-C54A-4DA5-9D7D-B98385B14217.jpeg",
+        "relativePath": "08_Backlist/Reed, Maurche/9781954414624/05-COVER/_IMAGES/AD1DA377-C54A-4DA5-9D7D-B98385B14217.jpeg"
+      },
+      {
+        "itemId": "01DF3SEQJJYLGWWVMJNVCKJHVOIMERUIXU",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Reed,%20Maurche/9781954414624/05-COVER/_IMAGES/0A920727-70B3-465B-A357-0D05A980D17D.jpeg",
+        "relativePath": "08_Backlist/Reed, Maurche/9781954414624/05-COVER/_IMAGES/0A920727-70B3-465B-A357-0D05A980D17D.jpeg"
+      },
+      {
+        "itemId": "01DF3SEQK4VM7MHS7B3RDKR3VVK2K4F55J",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Reed,%20Maurche/9781954414624/05-COVER/_IMAGES/ATT00001.jpg",
+        "relativePath": "08_Backlist/Reed, Maurche/9781954414624/05-COVER/_IMAGES/ATT00001.jpg"
+      },
+      {
+        "itemId": "01DF3SEQMHTARJFO4SVRCYDIOEDNFKFB3I",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Reed,%20Maurche/9781954414624/05-COVER/9781954414624_CoverPDF.png",
+        "relativePath": "08_Backlist/Reed, Maurche/9781954414624/05-COVER/9781954414624_CoverPDF.png"
+      },
+      {
+        "itemId": "01DF3SEQO62PP2ESXHFJE3TNQH52ETRBSF",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Reed,%20Maurche/9781954414624/05-COVER/_IMAGES/crop01.jpg",
+        "relativePath": "08_Backlist/Reed, Maurche/9781954414624/05-COVER/_IMAGES/crop01.jpg"
+      }
+    ]
+  },
+  {
+    "canonicalWorkId": "c2f603d3-c27a-f111-ab0f-000d3a14673b",
+    "canonicalAuthorId": "abb2965f-fa9d-f111-b8db-7c1e5248501c",
+    "authorDisplayName": "Randall Beverly",
+    "title": "The Hood",
+    "lifecycleDetail": "PUBLISHED_CATALOG",
+    "marketingAuthorityState": "MARKETING_ELIGIBLE",
+    "readinessState": "READY",
+    "matchedAssetCount": 57,
+    "coverCandidateCount": 18,
+    "primaryMarketingCover": {
+      "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQJIY3XZA4K5Z5H3QCT2B476V5DM",
+      "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+      "itemId": "01DF3SEQJIY3XZA4K5Z5H3QCT2B476V5DM",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Beverly,%20Randall/9781950719471/_COVER/amazon.jpg",
+      "relativePath": "08_Backlist/Beverly, Randall/9781950719471/_COVER/amazon.jpg"
+    },
+    "ambiguity": []
+  },
+  {
+    "canonicalWorkId": "0b6386cf-c37a-f111-ab0f-000d3a14673b",
+    "canonicalAuthorId": "92817142-abc3-5959-a7fb-cb46f7047a45",
+    "authorDisplayName": "Tekisha Wimbush",
+    "title": "The I Am in Me",
+    "lifecycleDetail": "PUBLISHED_CATALOG",
+    "marketingAuthorityState": "MARKETING_ELIGIBLE",
+    "readinessState": "AMBIGUOUS",
+    "matchedAssetCount": 15,
+    "coverCandidateCount": 3,
+    "primaryMarketingCover": null,
+    "ambiguity": [
+      {
+        "itemId": "01DF3SEQIURJYCHF3NINAJXWS6MCS6KQSQ",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Wilson,%20Dean/9781954414501/9781954414501_CoverPDF%5B85240529%5D.png",
+        "relativePath": "08_Backlist/Wilson, Dean/9781954414501/9781954414501_CoverPDF[85240529].png"
+      },
+      {
+        "itemId": "01DF3SEQLADSFDYDFWHJCJ7Y226ZEI6Z5R",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Wimbush,%20Tekisha/9781954414501/9781954414501_CoverPDF%5B85240529%5D.png",
+        "relativePath": "08_Backlist/Wimbush, Tekisha/9781954414501/9781954414501_CoverPDF[85240529].png"
+      }
+    ]
+  },
+  {
+    "canonicalWorkId": "3d37c9d0-c37a-f111-ab0f-6045bdd69678",
+    "canonicalAuthorId": "92817142-abc3-5959-a7fb-cb46f7047a45",
+    "authorDisplayName": "Tekisha Wimbush",
+    "title": "The I Am in Me Part 2",
+    "lifecycleDetail": "PUBLISHED_CATALOG",
+    "marketingAuthorityState": "MARKETING_ELIGIBLE",
+    "readinessState": "AMBIGUOUS",
+    "matchedAssetCount": 45,
+    "coverCandidateCount": 18,
+    "primaryMarketingCover": null,
+    "ambiguity": [
+      {
+        "itemId": "01DF3SEQOHRABD53RDZFCYN62W2AUDWLUK",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Wimbush,%20Tekisha/9781954414525/05-COVER/9781954414518_FC.jpg",
+        "relativePath": "08_Backlist/Wimbush, Tekisha/9781954414525/05-COVER/9781954414518_FC.jpg"
+      },
+      {
+        "itemId": "01DF3SEQPC5BYFHRDWXZFK6SL7ZS6CEBBS",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Wilson,%20Dean/9781954414525/05-COVER/9781954414518_FC.jpg",
+        "relativePath": "08_Backlist/Wilson, Dean/9781954414525/05-COVER/9781954414518_FC.jpg"
+      }
+    ]
+  },
+  {
+    "canonicalWorkId": "944b00d4-c27a-f111-ab0f-00224820105b",
+    "canonicalAuthorId": "40c8a8e5-872a-f111-88b4-7c1e525b15c2",
+    "authorDisplayName": "Rosetta Perry",
+    "title": "The Journey",
+    "lifecycleDetail": "PUBLISHED_CATALOG",
+    "marketingAuthorityState": "MARKETING_ELIGIBLE",
+    "readinessState": "AMBIGUOUS",
+    "matchedAssetCount": 61,
+    "coverCandidateCount": 36,
+    "primaryMarketingCover": null,
+    "ambiguity": [
+      {
+        "itemId": "01DF3SEQOA7EWCN6ZOEZHIP2FIGBWIOE5R",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Perry,%20Rosetta/9781954414297/05-COVER/_IMAGES/3d.jpg",
+        "relativePath": "08_Backlist/Perry, Rosetta/9781954414297/05-COVER/_IMAGES/3d.jpg"
+      },
+      {
+        "itemId": "01DF3SEQOMFCEDXXHIGFDY66KH3N5LBEOO",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Perry,%20Rosetta/9781954414297/05-COVER/_IMAGES/Photo%20-%20Google%20Photos_files/unnamed.jpg",
+        "relativePath": "08_Backlist/Perry, Rosetta/9781954414297/05-COVER/_IMAGES/Photo - Google Photos_files/unnamed.jpg"
+      }
+    ]
+  },
+  {
+    "canonicalWorkId": "a12556cd-c37a-f111-ab0f-00224820105b",
+    "canonicalAuthorId": "f88ba081-c1e6-5032-acf1-a2c54764dcc8",
+    "authorDisplayName": "Christina Banner",
+    "title": "The Little Girl with the Plow!",
+    "lifecycleDetail": "PUBLISHED_CATALOG",
+    "marketingAuthorityState": "MARKETING_ELIGIBLE",
+    "readinessState": "AMBIGUOUS",
+    "matchedAssetCount": 117,
+    "coverCandidateCount": 18,
+    "primaryMarketingCover": null,
+    "ambiguity": [
+      {
+        "itemId": "01DF3SEQJUZALJBT2W3VGJD62UUJFM5NGP",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Banner,%20Christina/9781954414334/05-COVER/_IMAGES/image002.jpg",
+        "relativePath": "08_Backlist/Banner, Christina/9781954414334/05-COVER/_IMAGES/image002.jpg"
+      },
+      {
+        "itemId": "01DF3SEQOUTHQ2WF52M5FZIWQ5IHU4WWXX",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Banner,%20Christina/9781954414334/05-COVER/_IMAGES/image001.jpg",
+        "relativePath": "08_Backlist/Banner, Christina/9781954414334/05-COVER/_IMAGES/image001.jpg"
+      }
+    ]
+  },
+  {
+    "canonicalWorkId": "c3f603d3-c27a-f111-ab0f-000d3a14673b",
+    "canonicalAuthorId": "84ae096e-fa9d-f111-b8dc-000d3a14673b",
+    "authorDisplayName": "Sylvia Benson",
+    "title": "The Master's Piece",
+    "lifecycleDetail": "PUBLISHED_CATALOG",
+    "marketingAuthorityState": "MARKETING_ELIGIBLE",
+    "readinessState": "READY",
+    "matchedAssetCount": 39,
+    "coverCandidateCount": 15,
+    "primaryMarketingCover": {
+      "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQMY7O2BQ5HVAJHJEAD4SYTTCRP3",
+      "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+      "itemId": "01DF3SEQMY7O2BQ5HVAJHJEAD4SYTTCRP3",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Benson,%20Sylvia/9781954414488/05-COVER/9781954414471_FC.jpg",
+      "relativePath": "08_Backlist/Benson, Sylvia/9781954414488/05-COVER/9781954414471_FC.jpg"
+    },
+    "ambiguity": []
+  },
+  {
+    "canonicalWorkId": "930f6fd3-c27a-f111-ab0f-6045bdd69435",
+    "canonicalAuthorId": "b7ed8a5b-fa9d-f111-b8dc-7c1e525b15c2",
+    "authorDisplayName": "Daphanny Baker",
+    "title": "The Messenger",
+    "lifecycleDetail": "PUBLISHED_CATALOG",
+    "marketingAuthorityState": "MARKETING_ELIGIBLE",
+    "readinessState": "AMBIGUOUS",
+    "matchedAssetCount": 157,
+    "coverCandidateCount": 27,
+    "primaryMarketingCover": null,
+    "ambiguity": [
+      {
+        "itemId": "01DF3SEQLCFKDBFUJMW5BIJBIX4DMCIJFD",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Baker,%20Daphanny/Baker,%20Daphanny%20-%20The%20Messenger/9781961475151/04-COVER/9781961475151-Perfect.jpg",
+        "relativePath": "08_Backlist/Baker, Daphanny/Baker, Daphanny - The Messenger/9781961475151/04-COVER/9781961475151-Perfect.jpg"
+      },
+      {
+        "itemId": "01DF3SEQOQHU2LFMMBDZFZE6AAQ2VRUQVF",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Baker,%20Daphanny/Baker,%20Daphanny%20-%20The%20Messenger/9781961475151/04-COVER/9781961475151-Perfect.png",
+        "relativePath": "08_Backlist/Baker, Daphanny/Baker, Daphanny - The Messenger/9781961475151/04-COVER/9781961475151-Perfect.png"
+      }
+    ]
+  },
+  {
+    "canonicalWorkId": "69137ed6-c27a-f111-ab0f-6045bdd69738",
+    "canonicalAuthorId": "b7ed8a5b-fa9d-f111-b8dc-7c1e525b15c2",
+    "authorDisplayName": "Daphanny Baker",
+    "title": "The Messenger 2",
+    "lifecycleDetail": "PUBLISHED_CATALOG",
+    "marketingAuthorityState": "MARKETING_ELIGIBLE",
+    "readinessState": "READY",
+    "matchedAssetCount": 8,
+    "coverCandidateCount": 4,
+    "primaryMarketingCover": {
+      "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQNHRMG5J42D7ZH34AURMI4HXQPE",
+      "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+      "itemId": "01DF3SEQNHRMG5J42D7ZH34AURMI4HXQPE",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Baker,%20Daphanny/2025-Baker-TheMessenger2/07-Pre-Publishing%20(Cover,%20Metadata)/9781961475618_CoverPDF.png",
+      "relativePath": "08_Backlist/Baker, Daphanny/2025-Baker-TheMessenger2/07-Pre-Publishing (Cover, Metadata)/9781961475618_CoverPDF.png"
+    },
+    "ambiguity": []
+  },
+  {
+    "canonicalWorkId": "8f5f72d0-c27a-f111-ab0f-6045bdd69738",
+    "canonicalAuthorId": "6177ba6b-fa9d-f111-b8db-7c1e5248501c",
+    "authorDisplayName": "Shaniqua Williams",
+    "title": "The Never Before Told Story of the Gelatin Monster",
+    "lifecycleDetail": "PUBLISHED_CATALOG",
+    "marketingAuthorityState": "MARKETING_ELIGIBLE",
+    "readinessState": "READY",
+    "matchedAssetCount": 42,
+    "coverCandidateCount": 18,
+    "primaryMarketingCover": {
+      "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQLKIVYTHIFU5ZELCLT4X2G27DSQ",
+      "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+      "itemId": "01DF3SEQLKIVYTHIFU5ZELCLT4X2G27DSQ",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Williams,%20Shaniqua/9781954414648/05-COVER/9781954414631_FC.jpg",
+      "relativePath": "08_Backlist/Williams, Shaniqua/9781954414648/05-COVER/9781954414631_FC.jpg"
+    },
+    "ambiguity": []
+  },
+  {
+    "canonicalWorkId": "07106fd3-c27a-f111-ab0f-6045bdd69435",
+    "canonicalAuthorId": "69b1e63f-7831-537e-a700-d82696d9a9db",
+    "authorDisplayName": "Felix Catheline",
+    "title": "The Paper Champ",
+    "lifecycleDetail": "PUBLISHED_CATALOG",
+    "marketingAuthorityState": "MARKETING_ELIGIBLE",
+    "readinessState": "READY",
+    "matchedAssetCount": 6,
+    "coverCandidateCount": 1,
+    "primaryMarketingCover": {
+      "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQLL7M66CFCU2FBYL6FSF525JXPP",
+      "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+      "itemId": "01DF3SEQLL7M66CFCU2FBYL6FSF525JXPP",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/07_Archive/2025/2025-Catheline-ThePaperChamp/06%20Distribution%20Setup/9781961475533_CoverPDF.pdf",
+      "relativePath": "07_Archive/2025/2025-Catheline-ThePaperChamp/06 Distribution Setup/9781961475533_CoverPDF.pdf"
+    },
+    "ambiguity": []
+  },
+  {
+    "canonicalWorkId": "19e01ad3-c27a-f111-ab0f-6045bdd69678",
+    "canonicalAuthorId": "0f22af65-fa9d-f111-b8db-7c1e5248501c",
+    "authorDisplayName": "Deborah Eiland",
+    "title": "The Princess and the Black-eyed Pea",
+    "lifecycleDetail": "PUBLISHED_CATALOG",
+    "marketingAuthorityState": "MARKETING_ELIGIBLE",
+    "readinessState": "AMBIGUOUS",
+    "matchedAssetCount": 102,
+    "coverCandidateCount": 52,
+    "primaryMarketingCover": null,
+    "ambiguity": [
+      {
+        "itemId": "01DF3SEQI7VZEPSJWFZNAJUO3XK4JRBHJP",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/07_Archive/10%20BACKLIST/EILAND,%20DEBORAH%20A/9781954414693/05-COVER/_IMAGES/Princess-0-cover-final.psd_0002_Black-Eyed-Pea-copy.png",
+        "relativePath": "07_Archive/10 BACKLIST/EILAND, DEBORAH A/9781954414693/05-COVER/_IMAGES/Princess-0-cover-final.psd_0002_Black-Eyed-Pea-copy.png"
+      },
+      {
+        "itemId": "01DF3SEQIJN5KCL7HYVRGI2IKLVG7VI2Q5",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/07_Archive/10%20BACKLIST/EILAND,%20DEBORAH%20A/9781954414693/05-COVER/_IMAGES/Princess-0-cover-final.psd_0004_Princess-copy.png",
+        "relativePath": "07_Archive/10 BACKLIST/EILAND, DEBORAH A/9781954414693/05-COVER/_IMAGES/Princess-0-cover-final.psd_0004_Princess-copy.png"
+      },
+      {
+        "itemId": "01DF3SEQIKLWJE3MXGLZGLENPLZQA2OSVX",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/07_Archive/Backlist/EILAND,%20DEBORAH%20A/9781954414693/05-COVER/_IMAGES/Princess-0-cover-final.psd_0006_Black-Eyed-Pea.png",
+        "relativePath": "07_Archive/Backlist/EILAND, DEBORAH A/9781954414693/05-COVER/_IMAGES/Princess-0-cover-final.psd_0006_Black-Eyed-Pea.png"
+      },
+      {
+        "itemId": "01DF3SEQIOJ25BCXI4OBAK7JPOJ3L7AVGX",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/07_Archive/Backlist/EILAND,%20DEBORAH%20A/9781954414693/05-COVER/_IMAGES/Princess-0-cover-final.psd_0010_By--Deborah--Eiland-illustrated-by-Penny-Weber.png",
+        "relativePath": "07_Archive/Backlist/EILAND, DEBORAH A/9781954414693/05-COVER/_IMAGES/Princess-0-cover-final.psd_0010_By--Deborah--Eiland-illustrated-by-Penny-Weber.png"
+      },
+      {
+        "itemId": "01DF3SEQJKBRNWVX4ROFDIDB3GEFWIR4DF",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/07_Archive/10%20BACKLIST/EILAND,%20DEBORAH%20A/9781954414693/05-COVER/_IMAGES/Princess-0-cover-final.psd_0006_Black-Eyed-Pea.png",
+        "relativePath": "07_Archive/10 BACKLIST/EILAND, DEBORAH A/9781954414693/05-COVER/_IMAGES/Princess-0-cover-final.psd_0006_Black-Eyed-Pea.png"
+      },
+      {
+        "itemId": "01DF3SEQJUNDZEXYY64RFZXMZPDURK7I5W",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/07_Archive/10%20BACKLIST/EILAND,%20DEBORAH%20A/9781954414693/05-COVER/_IMAGES/Princess-0-cover-final.psd_0013_base.png",
+        "relativePath": "07_Archive/10 BACKLIST/EILAND, DEBORAH A/9781954414693/05-COVER/_IMAGES/Princess-0-cover-final.psd_0013_base.png"
+      },
+      {
+        "itemId": "01DF3SEQJWAXU2QU2SQFGKFLHFFTB7KYO3",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/07_Archive/10%20BACKLIST/EILAND,%20DEBORAH%20A/9781954414693/05-COVER/_IMAGES/Princess-0-cover-final.psd_0005_The-copy.png",
+        "relativePath": "07_Archive/10 BACKLIST/EILAND, DEBORAH A/9781954414693/05-COVER/_IMAGES/Princess-0-cover-final.psd_0005_The-copy.png"
+      },
+      {
+        "itemId": "01DF3SEQK6OTK3GGOL5NFLWVNDEDMHZMUZ",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/07_Archive/Backlist/EILAND,%20DEBORAH%20A/9781954414693/05-COVER/_IMAGES/Princess-0-cover-final.psd_0009_The.png",
+        "relativePath": "07_Archive/Backlist/EILAND, DEBORAH A/9781954414693/05-COVER/_IMAGES/Princess-0-cover-final.psd_0009_The.png"
+      },
+      {
+        "itemId": "01DF3SEQKMAF4Q6V6ASBBZFNSGAGMHIR5R",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/07_Archive/10%20BACKLIST/EILAND,%20DEBORAH%20A/9781954414693/05-COVER/_IMAGES/Princess-0-cover-final.psd_0000_book-summary-and-bio-here.png",
+        "relativePath": "07_Archive/10 BACKLIST/EILAND, DEBORAH A/9781954414693/05-COVER/_IMAGES/Princess-0-cover-final.psd_0000_book-summary-and-bio-here.png"
+      },
+      {
+        "itemId": "01DF3SEQKWOOGOSY35FJAYQVVDGLRFXNGK",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/07_Archive/Backlist/EILAND,%20DEBORAH%20A/9781954414693/05-COVER/_IMAGES/Princess-0-cover-final.psd_0002_Black-Eyed-Pea-copy.png",
+        "relativePath": "07_Archive/Backlist/EILAND, DEBORAH A/9781954414693/05-COVER/_IMAGES/Princess-0-cover-final.psd_0002_Black-Eyed-Pea-copy.png"
+      },
+      {
+        "itemId": "01DF3SEQL2MMTM7BME2ZDIFF3XC43RDJ4Q",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/07_Archive/10%20BACKLIST/EILAND,%20DEBORAH%20A/9781954414693/05-COVER/_IMAGES/Princess-0-cover-final.psd_0003_and-the-copy.png",
+        "relativePath": "07_Archive/10 BACKLIST/EILAND, DEBORAH A/9781954414693/05-COVER/_IMAGES/Princess-0-cover-final.psd_0003_and-the-copy.png"
+      },
+      {
+        "itemId": "01DF3SEQL46H3ADILICZAI43QMVHDKC5LO",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/07_Archive/10%20BACKLIST/EILAND,%20DEBORAH%20A/9781954414693/05-COVER/_IMAGES/Princess-0-cover-final.psd_0001_Adapted-from-------------------The-Princess-and-the-Pea.png",
+        "relativePath": "07_Archive/10 BACKLIST/EILAND, DEBORAH A/9781954414693/05-COVER/_IMAGES/Princess-0-cover-final.psd_0001_Adapted-from-------------------The-Princess-and-the-Pea.png"
+      },
+      {
+        "itemId": "01DF3SEQLFSIFYB5OQOVGK5X4QXQ2VST4Y",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/07_Archive/10%20BACKLIST/EILAND,%20DEBORAH%20A/9781954414693/05-COVER/_IMAGES/Princess-0-cover-final.psd_0009_The.png",
+        "relativePath": "07_Archive/10 BACKLIST/EILAND, DEBORAH A/9781954414693/05-COVER/_IMAGES/Princess-0-cover-final.psd_0009_The.png"
+      },
+      {
+        "itemId": "01DF3SEQLPCLRWK4STLJAKVH3RPSOVRGAO",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/07_Archive/Backlist/EILAND,%20DEBORAH%20A/9781954414693/05-COVER/_IMAGES/Princess-0-cover-final.psd_0003_and-the-copy.png",
+        "relativePath": "07_Archive/Backlist/EILAND, DEBORAH A/9781954414693/05-COVER/_IMAGES/Princess-0-cover-final.psd_0003_and-the-copy.png"
+      },
+      {
+        "itemId": "01DF3SEQLSCYSCZ57YFFDY6VMG56V4GYHQ",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/07_Archive/Backlist/EILAND,%20DEBORAH%20A/9781954414693/05-COVER/_IMAGES/Princess-0-cover-final.psd_0013_base.png",
+        "relativePath": "07_Archive/Backlist/EILAND, DEBORAH A/9781954414693/05-COVER/_IMAGES/Princess-0-cover-final.psd_0013_base.png"
+      },
+      {
+        "itemId": "01DF3SEQMIOYQTTHYW7BHJLJ7ZZM5UH5YO",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/07_Archive/Backlist/EILAND,%20DEBORAH%20A/9781954414693/05-COVER/_IMAGES/Princess-0-cover-final.psd_0005_The-copy.png",
+        "relativePath": "07_Archive/Backlist/EILAND, DEBORAH A/9781954414693/05-COVER/_IMAGES/Princess-0-cover-final.psd_0005_The-copy.png"
+      },
+      {
+        "itemId": "01DF3SEQNQ6XYJDJCUQJFYYCQI44CTL3A7",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/07_Archive/10%20BACKLIST/EILAND,%20DEBORAH%20A/9781954414693/05-COVER/_IMAGES/Princess-0-cover-final.psd_0007_and-the.png",
+        "relativePath": "07_Archive/10 BACKLIST/EILAND, DEBORAH A/9781954414693/05-COVER/_IMAGES/Princess-0-cover-final.psd_0007_and-the.png"
+      },
+      {
+        "itemId": "01DF3SEQNSOCW77DR36NF2UIZRL3OQV2P4",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/07_Archive/Backlist/EILAND,%20DEBORAH%20A/9781954414693/05-COVER/_IMAGES/Princess-0-cover-final.psd_0004_Princess-copy.png",
+        "relativePath": "07_Archive/Backlist/EILAND, DEBORAH A/9781954414693/05-COVER/_IMAGES/Princess-0-cover-final.psd_0004_Princess-copy.png"
+      },
+      {
+        "itemId": "01DF3SEQOZYUPIUT53JVHKJ77AR7UMTOCB",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/07_Archive/Backlist/EILAND,%20DEBORAH%20A/9781954414693/05-COVER/_IMAGES/Princess-0-cover-final.psd_0001_Adapted-from-------------------The-Princess-and-the-Pea.png",
+        "relativePath": "07_Archive/Backlist/EILAND, DEBORAH A/9781954414693/05-COVER/_IMAGES/Princess-0-cover-final.psd_0001_Adapted-from-------------------The-Princess-and-the-Pea.png"
+      },
+      {
+        "itemId": "01DF3SEQP7QLWVAWNMYNC25SWKM6YC3GN7",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/07_Archive/10%20BACKLIST/EILAND,%20DEBORAH%20A/9781954414693/05-COVER/_IMAGES/Princess-0-cover-final.psd_0010_By--Deborah--Eiland-illustrated-by-Penny-Weber.png",
+        "relativePath": "07_Archive/10 BACKLIST/EILAND, DEBORAH A/9781954414693/05-COVER/_IMAGES/Princess-0-cover-final.psd_0010_By--Deborah--Eiland-illustrated-by-Penny-Weber.png"
+      },
+      {
+        "itemId": "01DF3SEQPLCT4NR4PDRJEJOIX2PQ7BOH6X",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/07_Archive/Backlist/EILAND,%20DEBORAH%20A/9781954414693/05-COVER/_IMAGES/Princess-0-cover-final.psd_0007_and-the.png",
+        "relativePath": "07_Archive/Backlist/EILAND, DEBORAH A/9781954414693/05-COVER/_IMAGES/Princess-0-cover-final.psd_0007_and-the.png"
+      },
+      {
+        "itemId": "01DF3SEQPMTUGWDAHEZBBLFS5NC2UMDM5E",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/07_Archive/Backlist/EILAND,%20DEBORAH%20A/9781954414693/05-COVER/_IMAGES/Princess-0-cover-final.psd_0008_Princess.png",
+        "relativePath": "07_Archive/Backlist/EILAND, DEBORAH A/9781954414693/05-COVER/_IMAGES/Princess-0-cover-final.psd_0008_Princess.png"
+      },
+      {
+        "itemId": "01DF3SEQPRAXUZBSZHQ5GJEW66MIIFOZED",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/07_Archive/10%20BACKLIST/EILAND,%20DEBORAH%20A/9781954414693/05-COVER/_IMAGES/Princess-0-cover-final.psd_0008_Princess.png",
+        "relativePath": "07_Archive/10 BACKLIST/EILAND, DEBORAH A/9781954414693/05-COVER/_IMAGES/Princess-0-cover-final.psd_0008_Princess.png"
+      },
+      {
+        "itemId": "01DF3SEQPW6IGBC7FTLJAIQTOOH5IAO6UO",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/07_Archive/Backlist/EILAND,%20DEBORAH%20A/9781954414693/05-COVER/_IMAGES/Princess-0-cover-final.psd_0000_book-summary-and-bio-here.png",
+        "relativePath": "07_Archive/Backlist/EILAND, DEBORAH A/9781954414693/05-COVER/_IMAGES/Princess-0-cover-final.psd_0000_book-summary-and-bio-here.png"
+      }
+    ]
+  },
+  {
+    "canonicalWorkId": "d7f603d3-c27a-f111-ab0f-000d3a14673b",
+    "canonicalAuthorId": "e8e1a253-fa9d-f111-b8db-7c1e5248501c",
+    "authorDisplayName": "Lyle Goddard",
+    "title": "The Release of the Spirit",
+    "lifecycleDetail": "PUBLISHED_CATALOG",
+    "marketingAuthorityState": "MARKETING_ELIGIBLE",
+    "readinessState": "MISSING",
+    "matchedAssetCount": 0,
+    "coverCandidateCount": 0,
+    "primaryMarketingCover": null,
+    "ambiguity": []
+  },
+  {
+    "canonicalWorkId": "112ac7e9-b389-f111-ab10-000d3a9eacee",
+    "canonicalAuthorId": "dfb397e7-3b7c-f111-ab0f-6045bdd69435",
+    "authorDisplayName": "Sean A Crowley I",
+    "title": "The Shift",
+    "lifecycleDetail": "NEW_RECENTLY_RELEASED",
+    "marketingAuthorityState": "MARKETING_ELIGIBLE",
+    "readinessState": "READY",
+    "matchedAssetCount": 46,
+    "coverCandidateCount": 8,
+    "primaryMarketingCover": {
+      "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQJA6WYD7FL2XNAZ7ODHKSOTTDBZ",
+      "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+      "itemId": "01DF3SEQJA6WYD7FL2XNAZ7ODHKSOTTDBZ",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Crowley,%20Sean/2026_Crowley_The_Shift/03_Design/Cover/FC.jpg",
+      "relativePath": "08_Backlist/Crowley, Sean/2026_Crowley_The_Shift/03_Design/Cover/FC.jpg"
+    },
+    "ambiguity": []
+  },
+  {
+    "canonicalWorkId": "62137ed6-c27a-f111-ab0f-6045bdd69738",
+    "canonicalAuthorId": "b7269d54-fa9d-f111-b8dc-000d3a14673b",
+    "authorDisplayName": "R. Dorian Night",
+    "title": "The Sun, the Shadow, and the Silence",
+    "lifecycleDetail": "PUBLISHED_CATALOG",
+    "marketingAuthorityState": "MARKETING_ELIGIBLE",
+    "readinessState": "AMBIGUOUS",
+    "matchedAssetCount": 46,
+    "coverCandidateCount": 2,
+    "primaryMarketingCover": null,
+    "ambiguity": [
+      {
+        "itemId": "01DF3SEQKSUMTANYVADJG3RWCUWYDRJWB7",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Gilchrest,%20Devin/2025-Gilchrest-TheSunTheShadowAndTheSilence/Title/06%20Distribution%20Setup/9781961475557_CoverPDF.pdf",
+        "relativePath": "08_Backlist/Gilchrest, Devin/2025-Gilchrest-TheSunTheShadowAndTheSilence/Title/06 Distribution Setup/9781961475557_CoverPDF.pdf"
+      },
+      {
+        "itemId": "01DF3SEQOGXJXHWH4LJ5FKXVI3HS4VG376",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Gilchrest,%20Devin/2025-Gilchrest-TheSunTheShadowAndTheSilence/Title/05%20Book%20Production/9781961475557_CoverPDF.pdf",
+        "relativePath": "08_Backlist/Gilchrest, Devin/2025-Gilchrest-TheSunTheShadowAndTheSilence/Title/05 Book Production/9781961475557_CoverPDF.pdf"
+      }
+    ]
+  },
+  {
+    "canonicalWorkId": "e2411beb-7978-5270-a2ff-4e59ed0d77c8",
+    "canonicalAuthorId": "050189e8-f6ea-5481-abf0-6f961615be97",
+    "authorDisplayName": "Permelia Smith",
+    "title": "The Tithe Is the Lord's",
+    "lifecycleDetail": "PUBLISHED_CATALOG",
+    "marketingAuthorityState": "MARKETING_ELIGIBLE",
+    "readinessState": "PARTIAL",
+    "matchedAssetCount": 12,
+    "coverCandidateCount": 0,
+    "primaryMarketingCover": null,
+    "ambiguity": []
+  },
+  {
+    "canonicalWorkId": "c9f603d3-c27a-f111-ab0f-000d3a14673b",
+    "canonicalAuthorId": "b62ada67-fa9d-f111-b8dc-000d3a14673b",
+    "authorDisplayName": "Leslie Banks",
+    "title": "Uncomfortable Conversations with God",
+    "lifecycleDetail": "PUBLISHED_CATALOG",
+    "marketingAuthorityState": "MARKETING_ELIGIBLE",
+    "readinessState": "READY",
+    "matchedAssetCount": 9,
+    "coverCandidateCount": 3,
+    "primaryMarketingCover": {
+      "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQMMEY5ZCD5ASJEI24QHDMPXVNWI",
+      "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+      "itemId": "01DF3SEQMMEY5ZCD5ASJEI24QHDMPXVNWI",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Banks,%20Leslie/9780578523712/_FINAL/UNCOMFORTABLE%20CONVERSATIONS%20WITH%20GOD_KDPFullCover_6by9_v3%20(3).pdf",
+      "relativePath": "08_Backlist/Banks, Leslie/9780578523712/_FINAL/UNCOMFORTABLE CONVERSATIONS WITH GOD_KDPFullCover_6by9_v3 (3).pdf"
+    },
+    "ambiguity": []
+  },
+  {
+    "canonicalWorkId": "994b00d4-c27a-f111-ab0f-00224820105b",
+    "canonicalAuthorId": "36d9bd54-fa9d-f111-b8dc-7c1e525b15c2",
+    "authorDisplayName": "Tia Benincase",
+    "title": "Understanding the Misunderstood",
+    "lifecycleDetail": "PUBLISHED_CATALOG",
+    "marketingAuthorityState": "MARKETING_ELIGIBLE",
+    "readinessState": "PARTIAL",
+    "matchedAssetCount": 26,
+    "coverCandidateCount": 3,
+    "primaryMarketingCover": null,
+    "ambiguity": []
+  },
+  {
+    "canonicalWorkId": "9d8ffdd6-c27a-f111-ab0f-7c1e525b15c2",
+    "canonicalAuthorId": "26621431-fa9d-f111-b8dc-7c1e525b15c2",
+    "authorDisplayName": "Winter Dockery",
+    "title": "War Mother",
+    "lifecycleDetail": "PUBLISHED_CATALOG",
+    "marketingAuthorityState": "MARKETING_ELIGIBLE",
+    "readinessState": "AMBIGUOUS",
+    "matchedAssetCount": 464,
+    "coverCandidateCount": 3,
+    "primaryMarketingCover": null,
+    "ambiguity": [
+      {
+        "itemId": "01DF3SEQJI2LLNHQ4XD5BYWINW3KJ3F532",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Dockery,%20Winter/Dockery,%20Winter%20-%20War%20Mother/Title/02%20Manuscript%20Development%20and%20Editing/_IMAGES/0ec3d446-f607-4faa-b2ba-069f51ec6354-manuscript-War-Mother/full%20cover-Nimbus-Nimbus.png",
+        "relativePath": "08_Backlist/Dockery, Winter/Dockery, Winter - War Mother/Title/02 Manuscript Development and Editing/_IMAGES/0ec3d446-f607-4faa-b2ba-069f51ec6354-manuscript-War-Mother/full cover-Nimbus-Nimbus.png"
+      },
+      {
+        "itemId": "01DF3SEQL7SNNWY6VJGNEZANCJCSNPE3WV",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Dockery,%20Winter/Dockery,%20Winter%20-%20War%20Mother/Title/02%20Manuscript%20Development%20and%20Editing/_IMAGES/0ec3d446-f607-4faa-b2ba-069f51ec6354-manuscript-War-Mother/full%20cover-Nimbus.png",
+        "relativePath": "08_Backlist/Dockery, Winter/Dockery, Winter - War Mother/Title/02 Manuscript Development and Editing/_IMAGES/0ec3d446-f607-4faa-b2ba-069f51ec6354-manuscript-War-Mother/full cover-Nimbus.png"
+      },
+      {
+        "itemId": "01DF3SEQNT6FHMUZUC25CYQJQFAC7C5XC3",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Dockery,%20Winter/Dockery,%20Winter%20-%20War%20Mother/Title/02%20Manuscript%20Development%20and%20Editing/_IMAGES/0ec3d446-f607-4faa-b2ba-069f51ec6354-manuscript-War-Mother/full%20cover.png",
+        "relativePath": "08_Backlist/Dockery, Winter/Dockery, Winter - War Mother/Title/02 Manuscript Development and Editing/_IMAGES/0ec3d446-f607-4faa-b2ba-069f51ec6354-manuscript-War-Mother/full cover.png"
+      }
+    ]
+  },
+  {
+    "canonicalWorkId": "935f72d0-c27a-f111-ab0f-6045bdd69738",
+    "canonicalAuthorId": "7177ba6b-fa9d-f111-b8db-7c1e5248501c",
+    "authorDisplayName": "Dean Wilson",
+    "title": "Warrior's Breed",
+    "lifecycleDetail": "PUBLISHED_CATALOG",
+    "marketingAuthorityState": "MARKETING_ELIGIBLE",
+    "readinessState": "READY",
+    "matchedAssetCount": 48,
+    "coverCandidateCount": 9,
+    "primaryMarketingCover": {
+      "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQMKHJ3TRIQ5WNBICX7RZS72LILB",
+      "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+      "itemId": "01DF3SEQMKHJ3TRIQ5WNBICX7RZS72LILB",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Wilson,%20Dean/9781954414662/04-COVER/DEANWILSON.jpeg",
+      "relativePath": "08_Backlist/Wilson, Dean/9781954414662/04-COVER/DEANWILSON.jpeg"
+    },
+    "ambiguity": []
+  },
+  {
+    "canonicalWorkId": "d9f603d3-c27a-f111-ab0f-000d3a14673b",
+    "canonicalAuthorId": "632d8d61-fa9d-f111-b8dc-7c1e525b15c2",
+    "authorDisplayName": "Shelley McIntosh",
+    "title": "Warriors and Angels",
+    "lifecycleDetail": "PUBLISHED_CATALOG",
+    "marketingAuthorityState": "MARKETING_ELIGIBLE",
+    "readinessState": "AMBIGUOUS",
+    "matchedAssetCount": 6,
+    "coverCandidateCount": 2,
+    "primaryMarketingCover": null,
+    "ambiguity": [
+      {
+        "itemId": "01DF3SEQMWZUIL5GBL6FA2L3HXMATBXR74",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/07_Archive/2025/2025-McIntosh-WarriorsAndAngels/05%20Book%20Production/9781961475519_CoverPDF.pdf",
+        "relativePath": "07_Archive/2025/2025-McIntosh-WarriorsAndAngels/05 Book Production/9781961475519_CoverPDF.pdf"
+      },
+      {
+        "itemId": "01DF3SEQNCAFUPGQLXWJDKZRHOMFZZKZ3A",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/07_Archive/2025/2025-McIntosh-WarriorsAndAngels/06%20Distribution%20Setup/9781961475519_CoverPDF.pdf",
+        "relativePath": "07_Archive/2025/2025-McIntosh-WarriorsAndAngels/06 Distribution Setup/9781961475519_CoverPDF.pdf"
+      }
+    ]
+  },
+  {
+    "canonicalWorkId": "3ee961cd-c37a-f111-ab0f-7c1e525b15c2",
+    "canonicalAuthorId": "d62ada67-fa9d-f111-b8dc-000d3a14673b",
+    "authorDisplayName": "Carol Roye",
+    "title": "What Goes up Must Come down Let's Face It",
+    "lifecycleDetail": "PUBLISHED_CATALOG",
+    "marketingAuthorityState": "MARKETING_ELIGIBLE",
+    "readinessState": "READY",
+    "matchedAssetCount": 81,
+    "coverCandidateCount": 23,
+    "primaryMarketingCover": {
+      "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQJ6I6IWEQNRRFEL2GW64GGV3XO7",
+      "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+      "itemId": "01DF3SEQJ6I6IWEQNRRFEL2GW64GGV3XO7",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Roye,%20Carol/9781954414310/05-COVER/9781954414303_FC.png",
+      "relativePath": "08_Backlist/Roye, Carol/9781954414310/05-COVER/9781954414303_FC.png"
+    },
+    "ambiguity": []
+  },
+  {
+    "canonicalWorkId": "9a4b00d4-c27a-f111-ab0f-00224820105b",
+    "canonicalAuthorId": "e40fe371-fa9d-f111-b8db-7c1e5248501c",
+    "authorDisplayName": "Mack Hughley",
+    "title": "When a Thug Meets Jesus",
+    "lifecycleDetail": "PUBLISHED_CATALOG",
+    "marketingAuthorityState": "MARKETING_ELIGIBLE",
+    "readinessState": "READY",
+    "matchedAssetCount": 135,
+    "coverCandidateCount": 30,
+    "primaryMarketingCover": {
+      "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQKDZL5YC5UVPBEZMKN3RXMJHY3F",
+      "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+      "itemId": "01DF3SEQKDZL5YC5UVPBEZMKN3RXMJHY3F",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Hughley,%20Mack/978-1-961475-97-7/04-COVER/9781961475977_FC.jpg",
+      "relativePath": "08_Backlist/Hughley, Mack/978-1-961475-97-7/04-COVER/9781961475977_FC.jpg"
+    },
+    "ambiguity": []
+  },
+  {
+    "canonicalWorkId": "65137ed6-c27a-f111-ab0f-6045bdd69738",
+    "canonicalAuthorId": "f10fe371-fa9d-f111-b8db-7c1e5248501c",
+    "authorDisplayName": "Gwendolyn Rucker-Carr",
+    "title": "When Zuri Came to Earth",
+    "lifecycleDetail": "PUBLISHED_CATALOG",
+    "marketingAuthorityState": "MARKETING_ELIGIBLE",
+    "readinessState": "PARTIAL",
+    "matchedAssetCount": 10,
+    "coverCandidateCount": 0,
+    "primaryMarketingCover": null,
+    "ambiguity": []
+  },
+  {
+    "canonicalWorkId": "9e8ffdd6-c27a-f111-ab0f-7c1e525b15c2",
+    "canonicalAuthorId": "e12ada67-fa9d-f111-b8dc-000d3a14673b",
+    "authorDisplayName": "Rodney Waller",
+    "title": "Why Faith Works for Some and Not for Others",
+    "lifecycleDetail": "PUBLISHED_CATALOG",
+    "marketingAuthorityState": "MARKETING_ELIGIBLE",
+    "readinessState": "PARTIAL",
+    "matchedAssetCount": 12,
+    "coverCandidateCount": 0,
+    "primaryMarketingCover": null,
+    "ambiguity": []
+  },
+  {
+    "canonicalWorkId": "604797d0-c27a-f111-ab0f-7c1e525b15c2",
+    "canonicalAuthorId": "5277ba6b-fa9d-f111-b8db-7c1e5248501c",
+    "authorDisplayName": "David Williams",
+    "title": "Words of a Troubled Soul",
+    "lifecycleDetail": "PUBLISHED_CATALOG",
+    "marketingAuthorityState": "MARKETING_ELIGIBLE",
+    "readinessState": "READY",
+    "matchedAssetCount": 177,
+    "coverCandidateCount": 6,
+    "primaryMarketingCover": {
+      "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQJ2LFYBYZ3KUFEIEFR5N4F2YPCP",
+      "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+      "itemId": "01DF3SEQJ2LFYBYZ3KUFEIEFR5N4F2YPCP",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Williams,%20David/9781954414563/05-COVER/1x/Artboard%201.png",
+      "relativePath": "08_Backlist/Williams, David/9781954414563/05-COVER/1x/Artboard 1.png"
+    },
+    "ambiguity": []
+  },
+  {
+    "canonicalWorkId": "a74b00d4-c27a-f111-ab0f-00224820105b",
+    "canonicalAuthorId": "4a56c9ff-4389-f111-ab10-6045bdd69678",
+    "authorDisplayName": "Carolyn Pierce",
+    "title": "You're Still Not Crazy",
+    "lifecycleDetail": "PUBLISHED_CATALOG",
+    "marketingAuthorityState": "MARKETING_ELIGIBLE",
+    "readinessState": "READY",
+    "matchedAssetCount": 2,
+    "coverCandidateCount": 2,
+    "primaryMarketingCover": {
+      "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQIP347IOOPCNZCL5KKTO6AGEXWL",
+      "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+      "itemId": "01DF3SEQIP347IOOPCNZCL5KKTO6AGEXWL",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Booker-Pierce,%20Carolyn/You%E2%80%99re%20Still%20Not%20Crazy%20-%20You%20may%20be%20an%20empath%20dealing%20with%20a%20narcissist/_COVER/9781954414235-Cover.jpg",
+      "relativePath": "08_Backlist/Booker-Pierce, Carolyn/You’re Still Not Crazy - You may be an empath dealing with a narcissist/_COVER/9781954414235-Cover.jpg"
+    },
+    "ambiguity": []
+  },
+  {
+    "canonicalWorkId": "236386cf-c37a-f111-ab0f-000d3a14673b",
+    "canonicalAuthorId": "aaae096e-fa9d-f111-b8dc-000d3a14673b",
+    "authorDisplayName": "Essence Easley",
+    "title": "Your brain has too much what, mommy??",
+    "lifecycleDetail": "PUBLISHED_CATALOG",
+    "marketingAuthorityState": "MARKETING_ELIGIBLE",
+    "readinessState": "READY",
+    "matchedAssetCount": 88,
+    "coverCandidateCount": 15,
+    "primaryMarketingCover": {
+      "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQJKXSZF7UFXTJGJ7362GYKXDWCA",
+      "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+      "itemId": "01DF3SEQJKXSZF7UFXTJGJ7362GYKXDWCA",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Easley,%20Essence/9781954414785/04-COVER/9781954414792_FC.jpg",
+      "relativePath": "08_Backlist/Easley, Essence/9781954414785/04-COVER/9781954414792_FC.jpg"
+    },
+    "ambiguity": []
+  },
+  {
+    "canonicalWorkId": "66137ed6-c27a-f111-ab0f-6045bdd69738",
+    "canonicalAuthorId": "29d9bd54-fa9d-f111-b8dc-7c1e525b15c2",
+    "authorDisplayName": "Kiena Hughley",
+    "title": "Your Peace Is a Priority",
+    "lifecycleDetail": "PUBLISHED_CATALOG",
+    "marketingAuthorityState": "MARKETING_ELIGIBLE",
+    "readinessState": "AMBIGUOUS",
+    "matchedAssetCount": 248,
+    "coverCandidateCount": 20,
+    "primaryMarketingCover": null,
+    "ambiguity": [
+      {
+        "itemId": "01DF3SEQIFAT2GB2JEYZGZ4EAUJ5ZEM2LL",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Hughley,%20Kiena/Your%20Peace%20is%20a%20Priority/03%20Design%20and%20Formatting/Cover02-Nimbus-Nimbus.png",
+        "relativePath": "08_Backlist/Hughley, Kiena/Your Peace is a Priority/03 Design and Formatting/Cover02-Nimbus-Nimbus.png"
+      },
+      {
+        "itemId": "01DF3SEQIHNV6TVCIH55HK4I33QFHLQBJF",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Hughley,%20Kiena/Your%20Peace%20is%20a%20Priority/03%20Design%20and%20Formatting/Cover01-Nimbus-2-Nimbus.png",
+        "relativePath": "08_Backlist/Hughley, Kiena/Your Peace is a Priority/03 Design and Formatting/Cover01-Nimbus-2-Nimbus.png"
+      },
+      {
+        "itemId": "01DF3SEQIM2SXVD5GUV5EZ7IZMDK5S6UF4",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Hughley,%20Kiena/Your%20Peace%20is%20a%20Priority/03%20Design%20and%20Formatting/COVER2.png",
+        "relativePath": "08_Backlist/Hughley, Kiena/Your Peace is a Priority/03 Design and Formatting/COVER2.png"
+      },
+      {
+        "itemId": "01DF3SEQINL2RKJ27VEJA3AZWOJAK4HSMM",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Hughley,%20Kiena/Your%20Peace%20is%20a%20Priority/03%20Design%20and%20Formatting/COVER1.png",
+        "relativePath": "08_Backlist/Hughley, Kiena/Your Peace is a Priority/03 Design and Formatting/COVER1.png"
+      },
+      {
+        "itemId": "01DF3SEQKGB54GKNIYVFHYIYOSU22ERB4G",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Hughley,%20Kiena/Your%20Peace%20is%20a%20Priority/03%20Design%20and%20Formatting/Cover01-Nimbus-2.png",
+        "relativePath": "08_Backlist/Hughley, Kiena/Your Peace is a Priority/03 Design and Formatting/Cover01-Nimbus-2.png"
+      },
+      {
+        "itemId": "01DF3SEQMF4NQVZJ5QFVAZAJ4PBPUG4AXH",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Hughley,%20Kiena/Your%20Peace%20is%20a%20Priority/05%20Book%20Production/COVER3-Nimbus.png",
+        "relativePath": "08_Backlist/Hughley, Kiena/Your Peace is a Priority/05 Book Production/COVER3-Nimbus.png"
+      },
+      {
+        "itemId": "01DF3SEQMMK7QGHT3XFNCKB5LU3W7QPJUN",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Hughley,%20Kiena/Your%20Peace%20is%20a%20Priority/03%20Design%20and%20Formatting/COVER1-Nimbus.png",
+        "relativePath": "08_Backlist/Hughley, Kiena/Your Peace is a Priority/03 Design and Formatting/COVER1-Nimbus.png"
+      },
+      {
+        "itemId": "01DF3SEQN4OAK664BIOFHZXAXSQTR57GJJ",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Hughley,%20Kiena/Your%20Peace%20is%20a%20Priority/05%20Book%20Production/COVER3-Nimbus-Nimbus.png",
+        "relativePath": "08_Backlist/Hughley, Kiena/Your Peace is a Priority/05 Book Production/COVER3-Nimbus-Nimbus.png"
+      },
+      {
+        "itemId": "01DF3SEQNKHRQNEWWO7JFYU3NLXO6FPCEG",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Hughley,%20Kiena/Your%20Peace%20is%20a%20Priority/03%20Design%20and%20Formatting/Cover01-Nimbus.png",
+        "relativePath": "08_Backlist/Hughley, Kiena/Your Peace is a Priority/03 Design and Formatting/Cover01-Nimbus.png"
+      },
+      {
+        "itemId": "01DF3SEQNNQ25XRSFOLZGYH7GP5GLU7GQ7",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Hughley,%20Kiena/Your%20Peace%20is%20a%20Priority/03%20Design%20and%20Formatting/Cover02-Nimbus.png",
+        "relativePath": "08_Backlist/Hughley, Kiena/Your Peace is a Priority/03 Design and Formatting/Cover02-Nimbus.png"
+      },
+      {
+        "itemId": "01DF3SEQOHFA7EU7WHEFCZYOFQRKJA37ZY",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Hughley,%20Kiena/Your%20Peace%20is%20a%20Priority/05%20Book%20Production/COVER3.png",
+        "relativePath": "08_Backlist/Hughley, Kiena/Your Peace is a Priority/05 Book Production/COVER3.png"
+      },
+      {
+        "itemId": "01DF3SEQOVHJRC6BG45ZALJ37NPY7VG7UA",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Hughley,%20Kiena/Your%20Peace%20is%20a%20Priority/03%20Design%20and%20Formatting/Cover01.png",
+        "relativePath": "08_Backlist/Hughley, Kiena/Your Peace is a Priority/03 Design and Formatting/Cover01.png"
+      },
+      {
+        "itemId": "01DF3SEQOWEXLUJCUQZNFYHESRLI5334TK",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Hughley,%20Kiena/Your%20Peace%20is%20a%20Priority/03%20Design%20and%20Formatting/COVER2-Nimbus.png",
+        "relativePath": "08_Backlist/Hughley, Kiena/Your Peace is a Priority/03 Design and Formatting/COVER2-Nimbus.png"
+      },
+      {
+        "itemId": "01DF3SEQOWNWQNM44LUFH35XC2VREKMOMN",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Hughley,%20Kiena/Your%20Peace%20is%20a%20Priority/03%20Design%20and%20Formatting/COVER.png",
+        "relativePath": "08_Backlist/Hughley, Kiena/Your Peace is a Priority/03 Design and Formatting/COVER.png"
+      },
+      {
+        "itemId": "01DF3SEQPBXMYC6JKRUFAZZJUN7IW7I56A",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Hughley,%20Kiena/Your%20Peace%20is%20a%20Priority/03%20Design%20and%20Formatting/COVER-Nimbus.png",
+        "relativePath": "08_Backlist/Hughley, Kiena/Your Peace is a Priority/03 Design and Formatting/COVER-Nimbus.png"
+      },
+      {
+        "itemId": "01DF3SEQPPEYNWC2U5JFBYZFV2GLAPRAKH",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Hughley,%20Kiena/Your%20Peace%20is%20a%20Priority/03%20Design%20and%20Formatting/Cover02.png",
+        "relativePath": "08_Backlist/Hughley, Kiena/Your Peace is a Priority/03 Design and Formatting/Cover02.png"
+      },
+      {
+        "itemId": "01DF3SEQPRNWVKI6CZOZFYNADSSYUYQNOD",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Hughley,%20Kiena/Your%20Peace%20is%20a%20Priority/03%20Design%20and%20Formatting/Cover01-Nimbus-Nimbus.png",
+        "relativePath": "08_Backlist/Hughley, Kiena/Your Peace is a Priority/03 Design and Formatting/Cover01-Nimbus-Nimbus.png"
+      }
+    ]
+  }
+]

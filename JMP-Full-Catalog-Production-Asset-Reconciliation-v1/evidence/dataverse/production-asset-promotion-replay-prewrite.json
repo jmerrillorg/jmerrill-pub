@@ -1,0 +1,16 @@
+{
+  "generatedAt": "2026-09-05T18:45:47.466Z",
+  "mode": "EXECUTE",
+  "environment": "https://jm1hq.crm.dynamics.com",
+  "counts": {
+    "total": 17096,
+    "creates": 0,
+    "existing": 17096,
+    "deletes": 0
+  },
+  "safeguards": {
+    "fileCopies": 0,
+    "sharePointWrites": 0,
+    "publicPosts": 0
+  }
+}

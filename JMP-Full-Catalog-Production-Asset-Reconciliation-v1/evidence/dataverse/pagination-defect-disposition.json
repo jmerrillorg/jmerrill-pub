@@ -1,0 +1,12 @@
+{
+  "classification": "EVIDENCE_SCRIPT_PAGINATION_DEFECT_CORRECTED",
+  "finding": "$top=5000 capped the first replay readback, causing 12096 conditional create attempts against rows that already existed.",
+  "platformBehavior": "Dataverse rejected all 12096 attempts because deterministic record IDs and If-None-Match prevented duplicates.",
+  "dataImpact": {
+    "duplicatesCreated": 0,
+    "recordsDeleted": 0,
+    "recordsModified": 0
+  },
+  "correction": "Removed the total cap, followed @odata.nextLink across all pages, and reran the full replay.",
+  "correctedReplayExpected": "17096 existing; 0 creates; 0 writes"
+}

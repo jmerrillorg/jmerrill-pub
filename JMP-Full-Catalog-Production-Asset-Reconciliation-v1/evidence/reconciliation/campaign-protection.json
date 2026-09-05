@@ -1,0 +1,88 @@
+[
+  {
+    "canonicalWorkId": "c74b00d4-c27a-f111-ab0f-00224820105b",
+    "canonicalAuthorId": "c8c8747e-6675-f111-ab0f-6045bdd69678",
+    "authorDisplayName": "Iyorwuese Hagher",
+    "title": "A Portrait of Paradise",
+    "lifecycleDetail": "PUBLISHED_CATALOG",
+    "marketingAuthorityState": "MARKETING_ELIGIBLE",
+    "readinessState": "AMBIGUOUS",
+    "matchedAssetCount": 76,
+    "coverCandidateCount": 3,
+    "primaryMarketingCover": null,
+    "ambiguity": [
+      {
+        "itemId": "01DF3SEQLIUUTSA5Q2IFG2RSEGYMB42NPC",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Hagher,%20Iyorwuese/2025-Hagher-APortraitOfParadise/04%20Cover%20Design/9781961475663_Case.pdf",
+        "relativePath": "08_Backlist/Hagher, Iyorwuese/2025-Hagher-APortraitOfParadise/04 Cover Design/9781961475663_Case.pdf"
+      },
+      {
+        "itemId": "01DF3SEQLREGJIJMOL7BHYTFYER4PHEGWQ",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Hagher,%20Iyorwuese/2025-Hagher-APortraitOfParadise/04%20Cover%20Design/9781961475656_CoverPDF.pdf",
+        "relativePath": "08_Backlist/Hagher, Iyorwuese/2025-Hagher-APortraitOfParadise/04 Cover Design/9781961475656_CoverPDF.pdf"
+      },
+      {
+        "itemId": "01DF3SEQP7H3HJPAQG3VHZ7RNZKMAW7FI4",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Hagher,%20Iyorwuese/2025-Hagher-APortraitOfParadise/08%20Distribution%20Records/9781961475656_CoverPDF.pdf",
+        "relativePath": "08_Backlist/Hagher, Iyorwuese/2025-Hagher-APortraitOfParadise/08 Distribution Records/9781961475656_CoverPDF.pdf"
+      }
+    ]
+  },
+  {
+    "canonicalWorkId": "9794818a-1ca5-532e-a701-ed69f439e8a6",
+    "canonicalAuthorId": "dfb397e7-3b7c-f111-ab0f-6045bdd69435",
+    "authorDisplayName": "Sean A Crowley I",
+    "title": "Strategies for Success",
+    "lifecycleDetail": "ACTIVE_LAUNCH_LIFECYCLE",
+    "marketingAuthorityState": "MARKETING_ELIGIBLE",
+    "readinessState": "READY",
+    "matchedAssetCount": 45,
+    "coverCandidateCount": 15,
+    "primaryMarketingCover": {
+      "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQKRTJL5VKVNTRFZXAVBEK4CJK63",
+      "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+      "itemId": "01DF3SEQKRTJL5VKVNTRFZXAVBEK4CJK63",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Crowley,%20Sean/2026_Crowley_Strategies_For_Success/03_Design/Cover/9781961475830_CoverPDF.png",
+      "relativePath": "08_Backlist/Crowley, Sean/2026_Crowley_Strategies_For_Success/03_Design/Cover/9781961475830_CoverPDF.png"
+    },
+    "ambiguity": []
+  },
+  {
+    "canonicalWorkId": "c44b00d4-c27a-f111-ab0f-00224820105b",
+    "canonicalAuthorId": "c8c8747e-6675-f111-ab0f-6045bdd69678",
+    "authorDisplayName": "Iyorwuese Hagher",
+    "title": "The Conquest of Azenga",
+    "lifecycleDetail": "PUBLISHED_CATALOG",
+    "marketingAuthorityState": "MARKETING_ELIGIBLE",
+    "readinessState": "READY",
+    "matchedAssetCount": 37,
+    "coverCandidateCount": 3,
+    "primaryMarketingCover": {
+      "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQLYTNQ6T2PGEBE2ERFIIQSA5WR6",
+      "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+      "itemId": "01DF3SEQLYTNQ6T2PGEBE2ERFIIQSA5WR6",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Hagher,%20Iyorwuese/2025-Hagher-TheConquestOfAzenga/08-Publishing%20Output%20(Print,%20eBook,%20Audiobook)/9781961475762_CoverPDF.pdf",
+      "relativePath": "08_Backlist/Hagher, Iyorwuese/2025-Hagher-TheConquestOfAzenga/08-Publishing Output (Print, eBook, Audiobook)/9781961475762_CoverPDF.pdf"
+    },
+    "ambiguity": []
+  },
+  {
+    "canonicalWorkId": "112ac7e9-b389-f111-ab10-000d3a9eacee",
+    "canonicalAuthorId": "dfb397e7-3b7c-f111-ab0f-6045bdd69435",
+    "authorDisplayName": "Sean A Crowley I",
+    "title": "The Shift",
+    "lifecycleDetail": "NEW_RECENTLY_RELEASED",
+    "marketingAuthorityState": "MARKETING_ELIGIBLE",
+    "readinessState": "READY",
+    "matchedAssetCount": 46,
+    "coverCandidateCount": 8,
+    "primaryMarketingCover": {
+      "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQJA6WYD7FL2XNAZ7ODHKSOTTDBZ",
+      "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+      "itemId": "01DF3SEQJA6WYD7FL2XNAZ7ODHKSOTTDBZ",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist/Crowley,%20Sean/2026_Crowley_The_Shift/03_Design/Cover/FC.jpg",
+      "relativePath": "08_Backlist/Crowley, Sean/2026_Crowley_The_Shift/03_Design/Cover/FC.jpg"
+    },
+    "ambiguity": []
+  }
+]

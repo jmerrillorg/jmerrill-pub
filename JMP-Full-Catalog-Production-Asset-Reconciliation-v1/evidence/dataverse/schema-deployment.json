@@ -1,0 +1,94 @@
+{
+  "generatedAt": "2026-09-05T18:40:54.021Z",
+  "mode": "EXECUTE",
+  "environment": "https://jm1hq.crm.dynamics.com",
+  "entitySetName": "jm1pub_productionassets",
+  "actions": [
+    {
+      "type": "table",
+      "name": "jm1pub_productionasset",
+      "action": "NO_OP"
+    },
+    {
+      "type": "field",
+      "name": "jm1pub_stablekey",
+      "action": "NO_OP"
+    },
+    {
+      "type": "field",
+      "name": "jm1pub_driveid",
+      "action": "NO_OP"
+    },
+    {
+      "type": "field",
+      "name": "jm1pub_itemid",
+      "action": "NO_OP"
+    },
+    {
+      "type": "field",
+      "name": "jm1pub_filename",
+      "action": "NO_OP"
+    },
+    {
+      "type": "field",
+      "name": "jm1pub_mimetype",
+      "action": "NO_OP"
+    },
+    {
+      "type": "field",
+      "name": "jm1pub_assettype",
+      "action": "NO_OP"
+    },
+    {
+      "type": "field",
+      "name": "jm1pub_assetstate",
+      "action": "NO_OP"
+    },
+    {
+      "type": "field",
+      "name": "jm1pub_canonicalauthorid",
+      "action": "NO_OP"
+    },
+    {
+      "type": "field",
+      "name": "jm1pub_canonicalworkid",
+      "action": "NO_OP"
+    },
+    {
+      "type": "field",
+      "name": "jm1pub_canonicalproductid",
+      "action": "NO_OP"
+    },
+    {
+      "type": "field",
+      "name": "jm1pub_matchbasis",
+      "action": "NO_OP"
+    },
+    {
+      "type": "field",
+      "name": "jm1pub_sha256",
+      "action": "NO_OP"
+    },
+    {
+      "type": "field",
+      "name": "jm1pub_weburl",
+      "action": "NO_OP"
+    },
+    {
+      "type": "field",
+      "name": "jm1pub_relativepath",
+      "action": "NO_OP"
+    },
+    {
+      "type": "field",
+      "name": "jm1pub_size",
+      "action": "CREATE"
+    },
+    {
+      "type": "field",
+      "name": "jm1pub_lastmodified",
+      "action": "CREATE"
+    }
+  ],
+  "destructiveChanges": 0
+}

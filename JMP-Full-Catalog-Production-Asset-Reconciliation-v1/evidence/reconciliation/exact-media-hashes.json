@@ -1,0 +1,520 @@
+[
+  {
+    "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQLL7M66CFCU2FBYL6FSF525JXPP",
+    "itemId": "01DF3SEQLL7M66CFCU2FBYL6FSF525JXPP",
+    "relativePath": "07_Archive/2025/2025-Catheline-ThePaperChamp/06 Distribution Setup/9781961475533_CoverPDF.pdf",
+    "sha256": "bd9b8d20e176891b140dbf414f9ecbd8786c31bdae3ec11b0f4492ca3b8d4cf6",
+    "state": "CAPTURED"
+  },
+  {
+    "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQPVYFI2HB2ZYRFL3EG5TYBIHUYZ",
+    "itemId": "01DF3SEQPVYFI2HB2ZYRFL3EG5TYBIHUYZ",
+    "relativePath": "08_Backlist/Johnson, J Derrick/2025-Johnson-100WisdomLessons/07-Pre-Publishing (Cover, Metadata)/9781961475571-Perfect.pdf",
+    "sha256": "4eaeab96a7ef5fcdb3b36bb949128c0969efd554d5964c9fbfefa6594abcb0fb",
+    "state": "CAPTURED"
+  },
+  {
+    "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQNYZOVF64GI7VBLUQ5PDFR3JM5L",
+    "itemId": "01DF3SEQNYZOVF64GI7VBLUQ5PDFR3JM5L",
+    "relativePath": "08_Backlist/Cook, Cheryl/2025-Cook-Promiseland/08-Publishing Output (Print, eBook, Audiobook)/9781961475632_CoverPDF.pdf",
+    "sha256": "dd4ebae1aae49f94bfeaf83eb5b04cdb5eb0f93bcfb474aec86e182f7f5e215b",
+    "state": "CAPTURED"
+  },
+  {
+    "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQNHRMG5J42D7ZH34AURMI4HXQPE",
+    "itemId": "01DF3SEQNHRMG5J42D7ZH34AURMI4HXQPE",
+    "relativePath": "08_Backlist/Baker, Daphanny/2025-Baker-TheMessenger2/07-Pre-Publishing (Cover, Metadata)/9781961475618_CoverPDF.png",
+    "sha256": "9f1862cdadce1d4090f467155198248b60c42524ccd6f01e3ac9ee04bfc88aa2",
+    "state": "CAPTURED"
+  },
+  {
+    "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQJ3YFRB5XTNPREYL4QNXRPBUVTP",
+    "itemId": "01DF3SEQJ3YFRB5XTNPREYL4QNXRPBUVTP",
+    "relativePath": "02_Active-Pipeline/07_Distribution/2025-USAF-CADPLeadershipBookProject/4 – Design & Layout/Cover Concepts/9781961475694_FC.jpg",
+    "sha256": "d8a810c926ad4b2eef8da565ccd77b1b628866d943e99972bb2199f62af55fce",
+    "state": "CAPTURED"
+  },
+  {
+    "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQLYTNQ6T2PGEBE2ERFIIQSA5WR6",
+    "itemId": "01DF3SEQLYTNQ6T2PGEBE2ERFIIQSA5WR6",
+    "relativePath": "08_Backlist/Hagher, Iyorwuese/2025-Hagher-TheConquestOfAzenga/08-Publishing Output (Print, eBook, Audiobook)/9781961475762_CoverPDF.pdf",
+    "sha256": "3a32b44342c2cd91f31357df3dda00649f3ca807d4a01fb9913e753c75ccb596",
+    "state": "CAPTURED"
+  },
+  {
+    "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQJA6WYD7FL2XNAZ7ODHKSOTTDBZ",
+    "itemId": "01DF3SEQJA6WYD7FL2XNAZ7ODHKSOTTDBZ",
+    "relativePath": "08_Backlist/Crowley, Sean/2026_Crowley_The_Shift/03_Design/Cover/FC.jpg",
+    "sha256": "ceb3ee6e23669a5a3caf5636953a733ba41f3308609250efa7196f52dd6cc784",
+    "state": "CAPTURED"
+  },
+  {
+    "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQKBRFZPCF54TVEJAK57G2XFFAOV",
+    "itemId": "01DF3SEQKBRFZPCF54TVEJAK57G2XFFAOV",
+    "relativePath": "08_Backlist/Harris, Will/2025-Harris-MusicMinistryUnplugged/08-Publishing Output (Print, eBook, Audiobook)/9781961475724_CoverPDF.png",
+    "sha256": "2e99837b11986a1d6c1549d028cd3d2a514ca30f533203875553f75c68ddec29",
+    "state": "CAPTURED"
+  },
+  {
+    "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQIAFQUOZXNDCNCKE2YKRQ4GBLNR",
+    "itemId": "01DF3SEQIAFQUOZXNDCNCKE2YKRQ4GBLNR",
+    "relativePath": "08_Backlist/Reeder, Kimberly/2025-Reeder-GirlDidYouKnow/08-Publishing Output (Print, eBook, Audiobook)/9781961475748_CoverPDF.png",
+    "sha256": "a11a2d7a6dd1538771ad3a59569b7399f2dfa66369ad87103fa8f61afbc2c16e",
+    "state": "CAPTURED"
+  },
+  {
+    "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQKRTJL5VKVNTRFZXAVBEK4CJK63",
+    "itemId": "01DF3SEQKRTJL5VKVNTRFZXAVBEK4CJK63",
+    "relativePath": "08_Backlist/Crowley, Sean/2026_Crowley_Strategies_For_Success/03_Design/Cover/9781961475830_CoverPDF.png",
+    "sha256": "2ce19958da3acb014b80f727a4c1e32aaa3b4529dfe0905101eea432322303f9",
+    "state": "CAPTURED"
+  },
+  {
+    "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQK4H22JPYQXMRGISWSWKNYK7B7Z",
+    "itemId": "01DF3SEQK4H22JPYQXMRGISWSWKNYK7B7Z",
+    "relativePath": "08_Backlist/Barrino, Eryonna/9781954414396/05-COVER/9781954414389_FC.jpg",
+    "sha256": "2b1dba62695f40c02cae458db47c706f353a68ba2ab2d249db032f94fd56c68b",
+    "state": "CAPTURED"
+  },
+  {
+    "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQMKBEHHACLIG5BYUPTNTPPX2622",
+    "itemId": "01DF3SEQMKBEHHACLIG5BYUPTNTPPX2622",
+    "relativePath": "08_Backlist/Brown, Veronica/One Soul/_COVER/9781950719600-Cover.jpg",
+    "sha256": "b105800c62890c4eaf24e190854fc68732b4d1b9dd723a6a34ba982c83ab2163",
+    "state": "CAPTURED"
+  },
+  {
+    "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQLAQIGFHT255REYW7ITDVFATNYA",
+    "itemId": "01DF3SEQLAQIGFHT255REYW7ITDVFATNYA",
+    "relativePath": "08_Backlist/Harris, Obadiah/The Celestial Advantage/_COVER/agold-book.png",
+    "sha256": "4eae26ba4e0cd6043099f6178c27ef01708d09bca3de58080975f8deb06cdbb3",
+    "state": "CAPTURED"
+  },
+  {
+    "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQMWIOCLEL6AWJCIAPYZ3EG6P22M",
+    "itemId": "01DF3SEQMWIOCLEL6AWJCIAPYZ3EG6P22M",
+    "relativePath": "08_Backlist/Booker-Pierce, Carolyn/Loving the Addict - While Taking Care of Yourself First/_COVER/9781950719570-Amazon.jpg",
+    "sha256": "5e1680176e1324f173b6ad0280aed2a3f26f513e44890334c0ef4d3cc0d1518c",
+    "state": "CAPTURED"
+  },
+  {
+    "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQIP347IOOPCNZCL5KKTO6AGEXWL",
+    "itemId": "01DF3SEQIP347IOOPCNZCL5KKTO6AGEXWL",
+    "relativePath": "08_Backlist/Booker-Pierce, Carolyn/You’re Still Not Crazy - You may be an empath dealing with a narcissist/_COVER/9781954414235-Cover.jpg",
+    "sha256": "ab72cf27268a51a13fb3fd85ef2e0964132c820b7138bf2c912626b3687b1ce4",
+    "state": "CAPTURED"
+  },
+  {
+    "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQOHXWLJ5XY7LVDZDQRXVGSISRBG",
+    "itemId": "01DF3SEQOHXWLJ5XY7LVDZDQRXVGSISRBG",
+    "relativePath": "08_Backlist/Baker, Daphanny/9781950719921/_COVER/9781950719921-Perfect.jpg",
+    "sha256": "58214f2dd18bbc4fcf364fa40402c36f8338fdc8420e6f041944a5ae6bb115d8",
+    "state": "CAPTURED"
+  },
+  {
+    "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQOB7TQQILYOLVHLGYPP5NQ5N5D6",
+    "itemId": "01DF3SEQOB7TQQILYOLVHLGYPP5NQ5N5D6",
+    "relativePath": "08_Backlist/Young, Adrean/Just What I Needed - Daily Devotional/_COVER/9781950719860-Cover.jpg",
+    "sha256": "f8acca1c85c6eadb14ab297e04859b62354f80c0ea3dd680741ae1945372a473",
+    "state": "CAPTURED"
+  },
+  {
+    "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQLIL2TXSGLPPRCYOHLDCHVVF5FI",
+    "itemId": "01DF3SEQLIL2TXSGLPPRCYOHLDCHVVF5FI",
+    "relativePath": "08_Backlist/Baker, Daphanny/Baker, Daphanny - Lady Daphanny's Altar/978-1-961475-09-0/04-COVER/9781961475090-Perfect.png",
+    "sha256": "bd07fcc7a50cf745088f1514f884b6305a0e0ea1186a63f1c547f01cbd120c43",
+    "state": "CAPTURED"
+  },
+  {
+    "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQIHK5OTUDRVG5B3DDG5WHOMUB2W",
+    "itemId": "01DF3SEQIHK5OTUDRVG5B3DDG5WHOMUB2W",
+    "relativePath": "08_Backlist/Beard, Mildred/9781954414938/05-DISTRIBUTION/9781954414938_CoverPDF.pdf",
+    "sha256": "2b4ac5443d075d25be246208062a0e62e673cd45c9786443ae043a94bf98c8c1",
+    "state": "CAPTURED"
+  },
+  {
+    "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQMMEY5ZCD5ASJEI24QHDMPXVNWI",
+    "itemId": "01DF3SEQMMEY5ZCD5ASJEI24QHDMPXVNWI",
+    "relativePath": "08_Backlist/Banks, Leslie/9780578523712/_FINAL/UNCOMFORTABLE CONVERSATIONS WITH GOD_KDPFullCover_6by9_v3 (3).pdf",
+    "sha256": "3e5f67f4806bddbac2decb81bf4cdeb78a2455edf2bd35200b582c3f0f3dbeaf",
+    "state": "CAPTURED"
+  },
+  {
+    "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQMY7O2BQ5HVAJHJEAD4SYTTCRP3",
+    "itemId": "01DF3SEQMY7O2BQ5HVAJHJEAD4SYTTCRP3",
+    "relativePath": "08_Backlist/Benson, Sylvia/9781954414488/05-COVER/9781954414471_FC.jpg",
+    "sha256": "c0a11cbdab8cc406a36a1c7ee27fc8bc3ace2d23bc47ca64cb0e45362af5a4e8",
+    "state": "CAPTURED"
+  },
+  {
+    "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQJIY3XZA4K5Z5H3QCT2B476V5DM",
+    "itemId": "01DF3SEQJIY3XZA4K5Z5H3QCT2B476V5DM",
+    "relativePath": "08_Backlist/Beverly, Randall/9781950719471/_COVER/amazon.jpg",
+    "sha256": "0a9729b613ab25086be900e9389fa53cb14f704fd56ca43776b1f34f370f1f93",
+    "state": "CAPTURED"
+  },
+  {
+    "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQKB4CRDFBE4AFBJILACUTX6STWU",
+    "itemId": "01DF3SEQKB4CRDFBE4AFBJILACUTX6STWU",
+    "relativePath": "08_Backlist/Broadnax, Kurt/9781961475069/04-COVER/9781961475076_FC.jpg",
+    "sha256": "40eb4799707cac7809453cac88bb1ca55b254d5ddec84d5311f672fa6b31fa5f",
+    "state": "CAPTURED"
+  },
+  {
+    "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQP5ODLB5L4MOBGZIVP26BMI5VXK",
+    "itemId": "01DF3SEQP5ODLB5L4MOBGZIVP26BMI5VXK",
+    "relativePath": "08_Backlist/Banner, Christina/9781792313707/_final/cover.jpg",
+    "sha256": "afd3800c7c088c83c75a116b9e1e256ed763103d858d963cedbedbbf9d81c7b9",
+    "state": "CAPTURED"
+  },
+  {
+    "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQJ4DTMA4INHNJEJWRCG24UYYPHN",
+    "itemId": "01DF3SEQJ4DTMA4INHNJEJWRCG24UYYPHN",
+    "relativePath": "08_Backlist/Brown, Dennis/9781954414068/05-COVER/9781954414051_FC.jpg",
+    "sha256": "cac3640d0e0925a65729f9f5ad479595555496d38cc081e4bf80723aa1884a39",
+    "state": "CAPTURED"
+  },
+  {
+    "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQL73MHQ7POH25FYU4YWPUWRBFT5",
+    "itemId": "01DF3SEQL73MHQ7POH25FYU4YWPUWRBFT5",
+    "relativePath": "08_Backlist/Brown, Dennis/9781954414167/_COVER/9781954414167-Perfect.jpg",
+    "sha256": "a4f02889b93ca7dd5c5189ab9409b6562cc438d6392f7b2c202388e1c5b63743",
+    "state": "CAPTURED"
+  },
+  {
+    "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQKCHB5GDFBKVNBKZTM2VDHPXVQD",
+    "itemId": "01DF3SEQKCHB5GDFBKVNBKZTM2VDHPXVQD",
+    "relativePath": "08_Backlist/Byrd, Shana/9781950719495/_COVER/9781950719495-Perfect.jpg",
+    "sha256": "e9face97c8079437ffab5a7b935faed540a56a5f58d2b531aaf5c1b1b7f4df02",
+    "state": "CAPTURED"
+  },
+  {
+    "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQKIG7WPRJDOGNF26HQFSE7E3DMA",
+    "itemId": "01DF3SEQKIG7WPRJDOGNF26HQFSE7E3DMA",
+    "relativePath": "08_Backlist/Carson, Darlene/9781950719907/_COVER/SHE Cover/9781950719907-Perfect.jpg",
+    "sha256": "a6d2419fdf955f05a9a0177c3f3749617d0f3f16607ae203a85cc8cd5c5197eb",
+    "state": "CAPTURED"
+  },
+  {
+    "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQP4HBDWUMEL3REISKJBXUD4LZNL",
+    "itemId": "01DF3SEQP4HBDWUMEL3REISKJBXUD4LZNL",
+    "relativePath": "08_Backlist/Clark, Lisa/9781954414983/05-COVER/9781954414990_FC.jpg",
+    "sha256": "65e32b9b425f28f0798e4a6e429750506d32c5709aca87410e53f155e71a950d",
+    "state": "CAPTURED"
+  },
+  {
+    "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQMF2Z2NBIIJRJAZHZQUS6YPGXMJ",
+    "itemId": "01DF3SEQMF2Z2NBIIJRJAZHZQUS6YPGXMJ",
+    "relativePath": "08_Backlist/Clay, Edith/9781950719808/_COVER/9781950719808-Cover.jpg",
+    "sha256": "29cd50f2222f99263747e8008e038b8f4f95e25f5658e23d885db07a6c7e17f3",
+    "state": "CAPTURED"
+  },
+  {
+    "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQNQCYS3EDUFIFCJ23XKBQ5ULZWS",
+    "itemId": "01DF3SEQNQCYS3EDUFIFCJ23XKBQ5ULZWS",
+    "relativePath": "08_Backlist/Corpening, Alesia/9781950719327/_COVER/9781950719327-Perfect.jpg",
+    "sha256": "ae21184bd4b44a618e3d3db28cd39a1788635e6fa346f31f662ba8051c720a04",
+    "state": "CAPTURED"
+  },
+  {
+    "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQKFE7VYR4MR5VFLIZ4SZ2EBEEBH",
+    "itemId": "01DF3SEQKFE7VYR4MR5VFLIZ4SZ2EBEEBH",
+    "relativePath": "08_Backlist/Cunningham, Bailey/9781950719747/_COVER/9781950719747-Cover.jpg",
+    "sha256": "d322e4620e6b75a8c3a6c6c7b4872b8596b441684dd3bfa21422e68d4611a1af",
+    "state": "CAPTURED"
+  },
+  {
+    "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQJKXSZF7UFXTJGJ7362GYKXDWCA",
+    "itemId": "01DF3SEQJKXSZF7UFXTJGJ7362GYKXDWCA",
+    "relativePath": "08_Backlist/Easley, Essence/9781954414785/04-COVER/9781954414792_FC.jpg",
+    "sha256": "2f9f17ca8cd4b3093e3e1f1fe1260dd36487d9b7110840ce78977a1edf25d9ae",
+    "state": "CAPTURED"
+  },
+  {
+    "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQNQNUVNDQHWNVF3WC7MLMDO3HH4",
+    "itemId": "01DF3SEQNQNUVNDQHWNVF3WC7MLMDO3HH4",
+    "relativePath": "08_Backlist/Gilchrist, Natasha/9781954414082/_COVER/_IMAGES/image001.png",
+    "sha256": "637d06fd6477d8f57f46d5ed50b498700edd951040fc1932fa8546781d73063f",
+    "state": "CAPTURED"
+  },
+  {
+    "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQN3PUGFKXUORNGJW5IDFW3ZEZCI",
+    "itemId": "01DF3SEQN3PUGFKXUORNGJW5IDFW3ZEZCI",
+    "relativePath": "08_Backlist/Grogg, Christy/9781954414464/05-COVER/9781954414457_FC.jpg",
+    "sha256": "9fdef10bb3a5a0e0610e00f31b36b148ebcca788e9f43fc680252c6daa9f1494",
+    "state": "CAPTURED"
+  },
+  {
+    "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQIDMWCM5BAUKZCKY5WMBMWM7MN3",
+    "itemId": "01DF3SEQIDMWCM5BAUKZCKY5WMBMWM7MN3",
+    "relativePath": "08_Backlist/Grayson, Marvin/9781954414372/05-COVER/9781954414372-Perfect.jpg",
+    "sha256": "ce94cf1107ab270ffcef99b46c10367102c5c9ffd9052007dd412f6eb590ada5",
+    "state": "CAPTURED"
+  },
+  {
+    "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQLPQC3CXBXQE5BLVHA5OEOVO2VL",
+    "itemId": "01DF3SEQLPQC3CXBXQE5BLVHA5OEOVO2VL",
+    "relativePath": "08_Backlist/Harris, Will/978-1-961475-22-9/04-COVER/_IMAGES/240318 WILL HARRIS TAYLOR MADEFRONT.jpg",
+    "sha256": "a0b0b2b4266c2cd6126c0383344fda8e17ebba52474b76c90761e19429167b48",
+    "state": "CAPTURED"
+  },
+  {
+    "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQKPZJQFGRU24JFY23EREU47IEMI",
+    "itemId": "01DF3SEQKPZJQFGRU24JFY23EREU47IEMI",
+    "relativePath": "08_Backlist/Harris, Obadiah/9781954414440/05-COVER/9781954414440_Amazon.jpg",
+    "sha256": "4d18962637aae36483ac0a12d8065a47fb0edfc63173b9e61c4361b3a6a8e4be",
+    "state": "CAPTURED"
+  },
+  {
+    "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQKDZL5YC5UVPBEZMKN3RXMJHY3F",
+    "itemId": "01DF3SEQKDZL5YC5UVPBEZMKN3RXMJHY3F",
+    "relativePath": "08_Backlist/Hughley, Mack/978-1-961475-97-7/04-COVER/9781961475977_FC.jpg",
+    "sha256": "c456086bb5d69ff8ad1bb80e4f6d0a6c7482b6ddc7f52bdc1111e397c8e71c24",
+    "state": "CAPTURED"
+  },
+  {
+    "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQIVO4Z5XVVEZBELCCKQJFTIGJHS",
+    "itemId": "01DF3SEQIVO4Z5XVVEZBELCCKQJFTIGJHS",
+    "relativePath": "08_Backlist/Johnson Settles, Ericka/9781954414747/05-COVER/9781954414747-Perfect.png",
+    "sha256": "c865849dd73f303dd1349ab1dfd7b4ad1c11ad4afab0951035de49c43537a750",
+    "state": "CAPTURED"
+  },
+  {
+    "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQJKRP5HSCTGMZB24CUIPINFNM4P",
+    "itemId": "01DF3SEQJKRP5HSCTGMZB24CUIPINFNM4P",
+    "relativePath": "08_Backlist/Johnson Sr, Thomas/9781954414419/05-COVER/9781954414402_FC.jpg",
+    "sha256": "26be5fa2b9b80035e146cf28dc930a6bc895c0562269aa16bc7af98140356e09",
+    "state": "CAPTURED"
+  },
+  {
+    "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQOVXSD7ZUTRB5AYS7EUCOEHORBT",
+    "itemId": "01DF3SEQOVXSD7ZUTRB5AYS7EUCOEHORBT",
+    "relativePath": "08_Backlist/Johnson, Diane/9781950719945/_COVER/9781950719945-Perfect.png",
+    "sha256": "b0bd7ed0d58777a78f4ce8d91288e21a1631cd41add3295a6fdcac0ce2114c3a",
+    "state": "CAPTURED"
+  },
+  {
+    "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQLPVCT3CPY6UBEZFZA5UTOFFTDY",
+    "itemId": "01DF3SEQLPVCT3CPY6UBEZFZA5UTOFFTDY",
+    "relativePath": "08_Backlist/Jones, Deanna/Jones, Deanna - Life After Detour Update/LIFE AFTER DETOUR/04-COVER/_IMAGES/9781950719389-blank.jpg",
+    "sha256": "71976d6e3458b63010b35f426f90a1176e5836cfd7331d23e55c6b023234c5ba",
+    "state": "CAPTURED"
+  },
+  {
+    "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQLCSKZP3XOYHJB3XH7TGAF2D6HT",
+    "itemId": "01DF3SEQLCSKZP3XOYHJB3XH7TGAF2D6HT",
+    "relativePath": "08_Backlist/Kleckley, Toni/9781954414211/05-COVER/9781954414211-Perfect.png",
+    "sha256": "7503b65ce93ac4611e0542ad7c896d61d76d0912ae0d07e37542ae36b12e5d6e",
+    "state": "CAPTURED"
+  },
+  {
+    "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQIBB25DTO4EURAIMWECMKHUEWEM",
+    "itemId": "01DF3SEQIBB25DTO4EURAIMWECMKHUEWEM",
+    "relativePath": "08_Backlist/Mars, Tawonna/9781954414105/05-COVER/_IMAGES/9781954414105_CoverPDF.jpg",
+    "sha256": "d79971ca3d056cd3ac9f0ae6b5a6f5193769cc77f0a246b0b674cae401d6e81e",
+    "state": "CAPTURED"
+  },
+  {
+    "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQNFCBZYOELE7JBK3Q4XNMBQQKP2",
+    "itemId": "01DF3SEQNFCBZYOELE7JBK3Q4XNMBQQKP2",
+    "relativePath": "08_Backlist/McElroy, Brandyn/9781950719969/_COVER/9781950719969-Cover.jpg",
+    "sha256": "0a6dd07b1693af3d433307bb767377906955d9ed554f4cafb6ba192c89b1476f",
+    "state": "CAPTURED"
+  },
+  {
+    "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQOOLXHHFNPHBZF2C5ROMJP3JDGZ",
+    "itemId": "01DF3SEQOOLXHHFNPHBZF2C5ROMJP3JDGZ",
+    "relativePath": "08_Backlist/Milligan Stammen, Kelli/9781950719723/05-COVER/9781950719716_FC.jpg",
+    "sha256": "2a2b6517f93951ab584ff4b05cae7cb3bc2b861f0fe2bd60c17b8ae8b690d2b1",
+    "state": "CAPTURED"
+  },
+  {
+    "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQJJ5ZHR5SCTFNGJVT2WGBEV4WVH",
+    "itemId": "01DF3SEQJJ5ZHR5SCTFNGJVT2WGBEV4WVH",
+    "relativePath": "08_Backlist/McIntosh, Shelley/9781950719662/_COVER/9781950719662-Cover.jpg",
+    "sha256": "d57eb68dc0f3896662f52808914aca90e0ddf60fc794da875a7b676bcea04af2",
+    "state": "CAPTURED"
+  },
+  {
+    "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQN6CK36OP6S6BBYU4HK6YD5CPQU",
+    "itemId": "01DF3SEQN6CK36OP6S6BBYU4HK6YD5CPQU",
+    "relativePath": "08_Backlist/Neal, Earline/9781954414860/04-COVER/9781954414884_FC.jpg",
+    "sha256": "e018e39750f668222cc3597d6be920bcad8e6f887052178200774688b1a2476c",
+    "state": "CAPTURED"
+  },
+  {
+    "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQISJTCDCLQM2VBYBWPZAXPDURDQ",
+    "itemId": "01DF3SEQISJTCDCLQM2VBYBWPZAXPDURDQ",
+    "relativePath": "08_Backlist/Pryor, Alice/9781954414549/05-COVER/9781954414532_FC.jpg",
+    "sha256": "05154c47831ba768c66cf81a3e7c61c1f5d465349bd10f7d032782f36fa91068",
+    "state": "CAPTURED"
+  },
+  {
+    "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQL7DDN2GRFNQ5ELJWU55SISM6SV",
+    "itemId": "01DF3SEQL7DDN2GRFNQ5ELJWU55SISM6SV",
+    "relativePath": "08_Backlist/Reed, Maurche/9781950719549/_COVER/9781950719549-Perfect.jpg",
+    "sha256": "70aae65a095209a24882ee89429f6ded23b90f7f05e0fd72b25c3525bbcbb6e8",
+    "state": "CAPTURED"
+  },
+  {
+    "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQP7VBNKHERVQFGZNWLSJOBTA6DF",
+    "itemId": "01DF3SEQP7VBNKHERVQFGZNWLSJOBTA6DF",
+    "relativePath": "08_Backlist/Scales, Regina/Divinely Inspired/04-COVER/9781961475175_FC.jpg",
+    "sha256": "df63baaee3f1c1c8979b23a998c1020ef548edd127c21e53759dd06bbe0184dd",
+    "state": "CAPTURED"
+  },
+  {
+    "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQJ6I6IWEQNRRFEL2GW64GGV3XO7",
+    "itemId": "01DF3SEQJ6I6IWEQNRRFEL2GW64GGV3XO7",
+    "relativePath": "08_Backlist/Roye, Carol/9781954414310/05-COVER/9781954414303_FC.png",
+    "sha256": "4f56213b936daa9db8ef68faf3e700d21fe5099f8010f20c17f17907e955d513",
+    "state": "CAPTURED"
+  },
+  {
+    "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQOALHYV3HILENE33SU6NX2XJLOX",
+    "itemId": "01DF3SEQOALHYV3HILENE33SU6NX2XJLOX",
+    "relativePath": "08_Backlist/Short, Nathaniel/Bodacious/_COVER/9781954414044-Cover.jpg",
+    "sha256": "afe93723221c2976cbf680f07d325ec393212712e7db74fc91cc4e453de131cc",
+    "state": "CAPTURED"
+  },
+  {
+    "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQLAQN7PFCLNSZCYX52AEDMVZJ6X",
+    "itemId": "01DF3SEQLAQN7PFCLNSZCYX52AEDMVZJ6X",
+    "relativePath": "08_Backlist/Sloan, Cynthia/9781950719563/_COVER/9781950719563-Perfect.jpg",
+    "sha256": "3ce31fc5bcd8397bd52b2dcd35099f2c59ac3f9bc0f705a5d446bcf30bb9461a",
+    "state": "CAPTURED"
+  },
+  {
+    "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQOXNBEBZ73FNZEKEU3HBBEEN43C",
+    "itemId": "01DF3SEQOXNBEBZ73FNZEKEU3HBBEEN43C",
+    "relativePath": "08_Backlist/Smith, Thaddues/9781954414273/05-COVER/9781954414266_FC.jpg",
+    "sha256": "2b8ce3d18da7fa2dc697f8d4d8dc78cd0418337c7fb6bb4f0b8e52e589962005",
+    "state": "CAPTURED"
+  },
+  {
+    "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQO3TBSC2VH4LJB3DYAH5QOZURQX",
+    "itemId": "01DF3SEQO3TBSC2VH4LJB3DYAH5QOZURQX",
+    "relativePath": "08_Backlist/Stephens, Janet/9781950719280/_COVER/9781950719280-PerfectC.png",
+    "sha256": "2671333e75bce066134837d1242948309b8bb2b7c6e90dc2547292b4eb29dc87",
+    "state": "CAPTURED"
+  },
+  {
+    "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQN6CUMGSUBDWRF2VD4M3D6XCZCD",
+    "itemId": "01DF3SEQN6CUMGSUBDWRF2VD4M3D6XCZCD",
+    "relativePath": "08_Backlist/Stevette, Jaylonna/Have You Considered/04-COVER/9781961475311-Perfect.png",
+    "sha256": "307323ce852a051d67f40aef1327e7650b419e70d2a49527c66e7e5419dab593",
+    "state": "CAPTURED"
+  },
+  {
+    "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQJ4SSBOV7USDFFIUOXXCTCX7MPI",
+    "itemId": "01DF3SEQJ4SSBOV7USDFFIUOXXCTCX7MPI",
+    "relativePath": "08_Backlist/Travis, Cheryl/9781950719822/_COVER/9781950719822-Cover.jpg",
+    "sha256": "f9d65e476d732491486aa7537863020640008e47a3378d198942bc69bca0158f",
+    "state": "CAPTURED"
+  },
+  {
+    "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQLK6HAJ3CJVW5GYR6KEJZPLYSZ3",
+    "itemId": "01DF3SEQLK6HAJ3CJVW5GYR6KEJZPLYSZ3",
+    "relativePath": "08_Backlist/Travis, Cheryl/9781950719709/_COVER/9781950719709-Amazon.jpg",
+    "sha256": "e15fd370dceaff86c93f8adbab6c31a9deac5ae00ad261ccd0b7fa722a52d568",
+    "state": "CAPTURED"
+  },
+  {
+    "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQNKOO7AB3GGHFB2GL4RLRP76EQI",
+    "itemId": "01DF3SEQNKOO7AB3GGHFB2GL4RLRP76EQI",
+    "relativePath": "08_Backlist/Travis, Cheryl/9781950719303/_FINAL/cover.jpg",
+    "sha256": "de79be09079c991bde9592be31df9520a31f29767819e86d9ea5efc5c4966cc6",
+    "state": "CAPTURED"
+  },
+  {
+    "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQKAJTAZ5OFRT5DZMMGHMI4KFJA6",
+    "itemId": "01DF3SEQKAJTAZ5OFRT5DZMMGHMI4KFJA6",
+    "relativePath": "08_Backlist/Stephens, Terry/9781954414891/04-COVER 3/9781954414907_FC.jpg",
+    "sha256": "f3eb8eb9a814d813863c6353853468fc0f622fef79ccb432e8f870292d701e6b",
+    "state": "CAPTURED"
+  },
+  {
+    "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQJMALAUCV4ONJEJUTWDY24EJXL7",
+    "itemId": "01DF3SEQJMALAUCV4ONJEJUTWDY24EJXL7",
+    "relativePath": "08_Backlist/Travis, Cheryl/9781950719761/_COVER/9781950719761-Cover.jpg",
+    "sha256": "5e48a5dba33ded0b0ab50eb8216318694e7d19f047bc60c5cd8e759060b89f75",
+    "state": "CAPTURED"
+  },
+  {
+    "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQLCX2QHG4OXXNCJ5OESOYPZD6QJ",
+    "itemId": "01DF3SEQLCX2QHG4OXXNCJ5OESOYPZD6QJ",
+    "relativePath": "08_Backlist/Travis, Cheryl/9781954414358/05-COVER/9781954414341_FC.jpg",
+    "sha256": "eab08fad49cdebb8091d953922acf34c1c44fc4b0bc418374f5a28d4e3873c29",
+    "state": "CAPTURED"
+  },
+  {
+    "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQLQPNSPWCY52NAJHHBV46ANFWLS",
+    "itemId": "01DF3SEQLQPNSPWCY52NAJHHBV46ANFWLS",
+    "relativePath": "08_Backlist/Travis, Cheryl/9781950719167/_FINAL/9781950719167-ebook-cover.jpg",
+    "sha256": "3163da133ac248d520c9baffb5bf2945c046fb9167da1ab853efdd16f2e7802a",
+    "state": "CAPTURED"
+  },
+  {
+    "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQJ2LFYBYZ3KUFEIEFR5N4F2YPCP",
+    "itemId": "01DF3SEQJ2LFYBYZ3KUFEIEFR5N4F2YPCP",
+    "relativePath": "08_Backlist/Williams, David/9781954414563/05-COVER/1x/Artboard 1.png",
+    "sha256": "26fbb7f5aab251c87b94ce25bc5a690a1cfa96198f32182114cd37fb190461ce",
+    "state": "CAPTURED"
+  },
+  {
+    "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQMKHJ3TRIQ5WNBICX7RZS72LILB",
+    "itemId": "01DF3SEQMKHJ3TRIQ5WNBICX7RZS72LILB",
+    "relativePath": "08_Backlist/Wilson, Dean/9781954414662/04-COVER/DEANWILSON.jpeg",
+    "sha256": "a475169a4ecd3843342876087bcc4aa165961676ebc4f064349c2273035ac165",
+    "state": "CAPTURED"
+  },
+  {
+    "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQPZRM2UNBYP3BBZ4LDA2YCW636R",
+    "itemId": "01DF3SEQPZRM2UNBYP3BBZ4LDA2YCW636R",
+    "relativePath": "08_Backlist/Stephens, Terry/9780985263126/05-COVER/9780985263126-Perfect.png",
+    "sha256": "79fceeff3bbd6de71ca834ccf04bd6029b7a34fdf47ec9842ec79c222afdeb7e",
+    "state": "CAPTURED"
+  },
+  {
+    "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQO4BTTRGNQBBNHZ5QGJL7JF7WYQ",
+    "itemId": "01DF3SEQO4BTTRGNQBBNHZ5QGJL7JF7WYQ",
+    "relativePath": "08_Backlist/Stephens, Terry/9781954414778/05-COVER/9781954414761_FC.jpg",
+    "sha256": "2834246bbdc5fd8d2b56092a812080bab472690c704a067dafbd39b264bd36e1",
+    "state": "CAPTURED"
+  },
+  {
+    "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQMIQM3NFC7MVFHL5CRZB24TOCGK",
+    "itemId": "01DF3SEQMIQM3NFC7MVFHL5CRZB24TOCGK",
+    "relativePath": "08_Backlist/Travis, Cheryl/9781950719785/_COVER/9781950719785-Cover.jpg",
+    "sha256": "ee7a159813823202c93af0b9896f22a14f454bd873c7435aed5a576926e87945",
+    "state": "CAPTURED"
+  },
+  {
+    "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQLKIVYTHIFU5ZELCLT4X2G27DSQ",
+    "itemId": "01DF3SEQLKIVYTHIFU5ZELCLT4X2G27DSQ",
+    "relativePath": "08_Backlist/Williams, Shaniqua/9781954414648/05-COVER/9781954414631_FC.jpg",
+    "sha256": "efc65d288bd3e273b0368cc9aa25e4292351a8a0466fb8414694460d2dfb9e00",
+    "state": "CAPTURED"
+  },
+  {
+    "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQL5RSYJ5JZUXFB3CWXBOXGDVOW4",
+    "itemId": "01DF3SEQL5RSYJ5JZUXFB3CWXBOXGDVOW4",
+    "relativePath": "08_Backlist/Eiland, Deborah/bee careful/04-COVER/9781954414822_FC.jpg",
+    "sha256": "f852e3ad9f57d7b0f279e8b70a51816f8140560153e92b0de823e07fe72cc502",
+    "state": "CAPTURED"
+  },
+  {
+    "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQLU2PSINOREYJDLUWW4JN665AZ6",
+    "itemId": "01DF3SEQLU2PSINOREYJDLUWW4JN665AZ6",
+    "relativePath": "08_Backlist/Agape International Cathedral/Title/06 Distribution Setup/9781961475335_CoverPDF.pdf",
+    "sha256": "a71294011dfc3502c7b3ded29416bbcf338e82144c39eaa029c0001cac4b9838",
+    "state": "CAPTURED"
+  },
+  {
+    "productionAssetKey": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQKNXXID7IWLBBH2CUQXV6XFWGOT",
+    "itemId": "01DF3SEQKNXXID7IWLBBH2CUQXV6XFWGOT",
+    "relativePath": "08_Backlist/Norris, Shecara/9781954414129/05-COVER/9781954414129-Perfect.pdf",
+    "sha256": "4dd35fe88fdeb2c6a22bd37abc16408f029f62bf007f8676856f04505ab01a30",
+    "state": "CAPTURED"
+  }
+]
