@@ -29,7 +29,7 @@ Source SHA-256: `c48f2335c64e3952d2068d271a0e1f43fc28430960c839e2c4d5b54d4ab5131
 23. **IDEMPOTENCY:** Proven. Final replay reports 0 creates, 0 updates, 692 no-ops, and 0 deletes.
 24. **DOWNSTREAM MARKETING CONTRACT:** Implemented as `listPublishingMarketingAuthority()` in the Publishing runtime with all 17 required fields. It selects only canonical reconciliation rows and derives eligibility from explicit Publishing authority, not legacy fields. Internal operating classification now prefers explicit canonical state.
 25. **FOUNDER DECISIONS REQUIRED:** One governance decision only: approve or decline the Canon Candidate. There are no title-by-title reconciliation exceptions.
-26. **CANON-CANDIDATE:** `JMP Catalog Authority & Product Identity Standard v0.1 - CANON-CANDIDATE` is prepared and remains pending Founder approval. It is not self-ratified.
+26. **CANON RATIFIED:** `JMP Catalog Authority & Product Identity Standard v0.1` was approved and ratified by Founder on 2026-09-05. The former Canon Candidate status is superseded.
 27. **FINAL CLASSIFICATION:** `JMP CATALOG AUTHORITY - OPERATIONALLY RESTORED`, subject only to the separately stated Founder governance gate. The underlying reconciliation classification is `JMP CATALOG - CANONICALLY RECONCILED`.
 28. **COMMITS / PR / EVIDENCE:** Initial implementation commit `08ebe765` is published in PR [#723](https://github.com/jmerrillorg/jmerrill-pub/pull/723). Source, normalization registers, Dataverse plans and ledgers, independent validation, replay proof, authority-search record, governance candidate, and the accompanying final workbook are indexed by SHA-256 in this package.
 

@@ -1,11 +1,11 @@
 # JMP Catalog Authority & Product Identity Standard v0.1
 
-Status: CANON-CANDIDATE  
-Owner: J Merrill Publishing  
-Ratification authority: Founder  
-Candidate date: 2026-09-05
+Status: CANON / FOUNDER RATIFIED
+Owner: J Merrill Publishing
+Ratification authority: Founder
+Ratification date: 2026-09-05
 
-This document is a governance candidate. It does not create canon by its own publication. Founder approval is required before it becomes binding JMP canon.
+This document is the authoritative, Founder-ratified JMP Catalog Authority & Product Identity Standard.
 
 ## 1. Ownership Boundary
 
@@ -61,5 +61,7 @@ Every commissioning records source checksum, correlation ID, pre-write plan, wri
 
 ## Founder Gate
 
-Decision: PENDING FOUNDER APPROVAL  
-Effect of approval: This candidate becomes the authoritative JMP Catalog Authority & Product Identity Standard.
+Decision: APPROVED
+Authority: Founder
+Result: RATIFIED
+Effective date: 2026-09-05
