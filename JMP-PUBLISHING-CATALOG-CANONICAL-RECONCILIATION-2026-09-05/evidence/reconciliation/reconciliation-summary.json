@@ -1,0 +1,88 @@
+{
+  "generatedAt": "2026-09-05T14:52:22.725Z",
+  "classification": "JMP CATALOG — CANONICALLY RECONCILED",
+  "source": {
+    "path": "canonical_catalog_source.tsv",
+    "sha256": "c48f2335c64e3952d2068d271a0e1f43fc28430960c839e2c4d5b54d4ab51316",
+    "columns": [
+      "ISBN13",
+      "Title",
+      "Format",
+      "Status",
+      "ISBN",
+      "KINDLE",
+      "Published",
+      "ListPrice",
+      "Cost",
+      "FortyPercent",
+      "New",
+      "AuthorCopy",
+      "Author",
+      "Contract",
+      "IsDistributed",
+      "House"
+    ]
+  },
+  "dataversePreflight": {
+    "environment": {
+      "resource": "https://jm1hq.crm.dynamics.com",
+      "apiBase": "https://jm1hq.crm.dynamics.com/api/data/v9.2",
+      "organizationId": "9dafb403-b493-f011-a700-000d3a106f37",
+      "userId": "55ae9ef6-ef93-f011-b4cc-7ced8d1cd64f",
+      "businessUnitId": "b589d1e7-e690-f011-b4cc-7c1e525b3eb3"
+    },
+    "counts": {
+      "jm1pub_titles": 402,
+      "jm1pub_editions": 0,
+      "jm1pub_publishingassets": 315,
+      "jm1pub_assetmarketplaces": 522,
+      "jm1pub_contracts": 3,
+      "contacts": 5000
+    }
+  },
+  "counts": {
+    "SOURCE_PRODUCT_ROWS": 300,
+    "RESERVED_ISBNS": 111,
+    "SOURCE_ROWS": 411,
+    "CANONICAL_AUTHORS": 82,
+    "CANONICAL_WORKS": 129,
+    "EDITIONS": 133,
+    "FORMAT_PRODUCTS": 300,
+    "PUBLISHER_ORIGIN_CONFIRMED": 129,
+    "AUTHORITY_CHANGES_FOUND": 0,
+    "ACTIVE_WORKS": 129,
+    "RETIRED_WORKS": 0,
+    "INACTIVE_WORKS": 0,
+    "WITHDRAWN_OR_RIGHTS_REVERTED_WORKS": 0,
+    "UNRESOLVED_WORKS": 0,
+    "MARKETING_ELIGIBLE": 129,
+    "MARKETING_HELD": 0,
+    "MARKETING_PROHIBITED": 0,
+    "MARKETING_AUTHORITY_UNRESOLVED": 0,
+    "EXISTING_TITLE_IDS_PRESERVED": 127,
+    "EXISTING_PRODUCT_IDS_PRESERVED": 292
+  },
+  "invariants": {
+    "rawSourcePreserved": true,
+    "reservedRowsExcludedFromWorks": true,
+    "sourceRowsAccountedFor": true,
+    "uniqueAuthorIds": true,
+    "uniqueWorkIds": true,
+    "uniqueEditionIds": true,
+    "uniqueProductIds": true,
+    "shelleyBaseline": true,
+    "recentTitleProtection": true
+  },
+  "legacyCodeFindings": {
+    "Status": "OPAQUE_LEGACY_CODE",
+    "House": "OPAQUE_LEGACY_CODE",
+    "Contract": "OPAQUE_LEGACY_CODE",
+    "IsDistributed": "Y/N treated only as the workbook explicit distribution flag; it does not establish contract or marketing authority."
+  },
+  "editionDecisions": {
+    "Establishing Glory": "Three edition/release families: 2019 original, 2021 reissue, and a later product family. Historic products are preserved; distribution remains product-specific.",
+    "BEE Careful": "Two complete same-date ISBN families retained as parallel editions. Neither family is deleted or silently superseded.",
+    "The Great Hair Restart": "The 2024 family is the original edition and the 2025 family is a new edition. Both remain distributed according to the explicit source flag."
+  },
+  "founderDecisionsRequired": []
+}

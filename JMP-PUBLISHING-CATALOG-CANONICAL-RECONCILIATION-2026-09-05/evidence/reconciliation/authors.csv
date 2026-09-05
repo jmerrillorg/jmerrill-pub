@@ -1,0 +1,83 @@
+canonicalAuthorId,canonicalAuthorKey,authorDisplayName,aliases,sourceProductRows,existingContactMatched,matchBasis,matchCandidateCount
+a52ada67-fa9d-f111-b8dc-000d3a14673b,adrean young,Adrean Young,,2,true,CONTACT_FULLNAME,2
+b3146974-c6b8-5d6e-a564-62d4a598e73a,agape international cathedral,Agape International Cathedral,,3,false,DETERMINISTIC_NEW_ID,0
+5cb9d134-98e9-5a35-a41e-eaaa0126b64c,alesia corpening,Alesia Corpening,,4,false,DETERMINISTIC_NEW_ID,0
+d60fe371-fa9d-f111-b8db-7c1e5248501c,alice pryor,Alice Pryor,,3,true,CONTACT_FULLNAME,2
+22ffe45a-fa9d-f111-b8dc-000d3a14673b,ashanti flemister,Ashanti Flemister,,2,true,CONTACT_FULLNAME,2
+8e0a1c61-fa9d-f111-b8dc-000d3a14673b,bailey cunningham,Bailey Cunningham,Bailery Cunningham,2,true,CONTACT_FULLNAME,1
+ec21af65-fa9d-f111-b8db-7c1e5248501c,brandyn mcelroy,Brandyn McElroy,,2,true,CONTACT_FULLNAME,2
+d62ada67-fa9d-f111-b8dc-000d3a14673b,carol roye,Carol Roye,,2,true,CONTACT_FULLNAME,2
+4a56c9ff-4389-f111-ab10-6045bdd69678,carolyn pierce,Carolyn Pierce,Carolyn Booker-Pierce,12,true,CONTACT_FULLNAME,2
+0027cd12-8b02-529c-af7a-f2c714ddfadb,cheryl cook,Cheryl Cook,,2,false,DETERMINISTIC_NEW_ID,0
+7f7bf5a6-4a89-5691-a8ee-c578c18b8a7b,cheryl travis,Cheryl Travis,,16,false,DETERMINISTIC_NEW_ID,0
+f88ba081-c1e6-5032-acf1-a2c54764dcc8,christina banner,Christina Banner,Christina Chislom,4,false,DETERMINISTIC_NEW_ID,0
+7aae096e-fa9d-f111-b8dc-000d3a14673b,christy grogg,Christy Grogg,,2,true,CONTACT_FULLNAME,2
+8fe9a467-4389-f111-ab10-6045bdd69678,cynthia sloan,Cynthia Sloan,,2,true,CONTACT_FULLNAME,2
+b7ed8a5b-fa9d-f111-b8dc-7c1e525b15c2,daphanny baker,Daphanny Baker,,10,true,CONTACT_FULLNAME,2
+adf89d59-fa9d-f111-b8db-7c1e5248501c,darlene carson,Darlene Carson,M Darlene Carson,2,true,CONTACT_FULLNAME,2
+5277ba6b-fa9d-f111-b8db-7c1e5248501c,david williams,David Williams,,3,true,CONTACT_FULLNAME,2
+7177ba6b-fa9d-f111-b8db-7c1e5248501c,dean wilson,Dean Wilson,,2,true,CONTACT_FULLNAME,2
+9eb2965f-fa9d-f111-b8db-7c1e5248501c,deanna jones,Deanna Jones,,2,true,CONTACT_FULLNAME,2
+0f22af65-fa9d-f111-b8db-7c1e5248501c,deborah eiland,Deborah Eiland,,14,true,CONTACT_FULLNAME,2
+cb85e9fa-85a9-5d5b-a91e-d627a9f5ce16,dennis brown,Dennis Brown,,6,false,DETERMINISTIC_NEW_ID,0
+32ff2165-882a-f111-88b4-6045bdd69738,diane johnson,Diane Johnson,,2,true,CONTACT_FULLNAME,2
+c0ae096e-fa9d-f111-b8dc-000d3a14673b,donjia walls,Donjia Walls,,2,true,CONTACT_FULLNAME,2
+ae35c16d-fa9d-f111-b8dc-7c1e525b15c2,earline neal,Earline Neal,,3,true,CONTACT_FULLNAME,2
+aecce0fb-872a-f111-88b4-000d3a14673b,edith clay,Edith Clay,,2,true,CONTACT_FULLNAME,1
+48ed579b-0260-5874-aa62-9e632f37c0aa,ericka johnson settles,Ericka Johnson Settles,,3,false,DETERMINISTIC_NEW_ID,0
+05adc867-fa9d-f111-b8dc-7c1e525b15c2,ericka thornton,Ericka Thornton,,2,true,CONTACT_FULLNAME,2
+4177ba6b-fa9d-f111-b8db-7c1e5248501c,eryonna barrino,Eryonna Barrino,,2,true,CONTACT_FULLNAME,2
+aaae096e-fa9d-f111-b8dc-000d3a14673b,essence easley,Essence Easley,,2,true,CONTACT_FULLNAME,2
+69b1e63f-7831-537e-a700-d82696d9a9db,felix catheline,Felix Catheline,,2,false,DETERMINISTIC_NEW_ID,0
+840a1c61-fa9d-f111-b8dc-000d3a14673b,gloria patterson,Gloria Patterson,,3,true,CONTACT_FULLNAME,2
+f10fe371-fa9d-f111-b8db-7c1e5248501c,gwendolyn rucker carr,Gwendolyn Rucker-Carr,,2,true,CONTACT_FULLNAME,2
+c8c8747e-6675-f111-ab0f-6045bdd69678,iyorwuese hagher,Iyorwuese Hagher,,6,true,CONTACT_FULLNAME,2
+7ceb3332-882a-f111-88b4-00224820105b,j derrick johnson,J Derrick Johnson,,4,true,CONTACT_FULLNAME,1
+a7801f4d-1d76-f111-ab0f-6045bdd69435,jackie smith jr,"Jackie Smith, Jr.",,19,true,CONTACT_FULLNAME,4
+6d2d8d61-fa9d-f111-b8dc-7c1e525b15c2,janet stephens,Janet Stephens,,3,true,CONTACT_FULLNAME,2
+38c02501-ffe7-5f8d-aec6-ef439d31cbcb,jaylonna stevette,Jaylonna Stevette,,10,false,DETERMINISTIC_NEW_ID,0
+43999b62-888b-525d-ac6c-a99e379c3d2f,juanita travis,Juanita Travis,,2,false,DETERMINISTIC_NEW_ID,0
+6fead373-fa9d-f111-b8dc-7c1e525b15c2,karen hill,Karen Hill,,9,true,CONTACT_FULLNAME,2
+d7f33bc2-e0cd-58d4-a398-d2935f8978fa,kd heard,KD Heard,,2,false,DETERMINISTIC_NEW_ID,0
+c82ada67-fa9d-f111-b8dc-000d3a14673b,kelli milligan stammen,Kelli Milligan Stammen,,2,true,CONTACT_FULLNAME,2
+29d9bd54-fa9d-f111-b8dc-7c1e525b15c2,kiena hughley,Kiena Hughley,,2,true,CONTACT_FULLNAME,2
+0efbcddf-d37c-55c2-ab6a-9ea653bfa7b9,kimberly reeder,Kimberly Reeder,,2,false,DETERMINISTIC_NEW_ID,0
+b8b2965f-fa9d-f111-b8db-7c1e5248501c,kurt broadnax,Kurt Broadnax,,4,true,CONTACT_FULLNAME,2
+b62ada67-fa9d-f111-b8dc-000d3a14673b,leslie banks,Leslie Banks,,2,true,CONTACT_FULLNAME,2
+85b767cc-ccd6-5620-af4e-52fe1e922a7b,lisa clark,Lisa Clark,,2,false,DETERMINISTIC_NEW_ID,0
+7d7ed521-5d51-5f18-a05c-32f8eef6e37d,lisa taylor,Lisa Taylor,,2,false,DETERMINISTIC_NEW_ID,0
+e8e1a253-fa9d-f111-b8db-7c1e5248501c,lyle goddard,Lyle Goddard,,2,true,CONTACT_FULLNAME,2
+e40fe371-fa9d-f111-b8db-7c1e5248501c,mack hughley,Mack Hughley,,2,true,CONTACT_FULLNAME,2
+20adc867-fa9d-f111-b8dc-7c1e525b15c2,marvin grayson,Marvin Grayson,,3,true,CONTACT_FULLNAME,2
+d2ed8a5b-fa9d-f111-b8dc-7c1e525b15c2,maurche reed,Maurche Reed,,5,true,CONTACT_FULLNAME,2
+c1269d54-fa9d-f111-b8dc-000d3a14673b,mildred beard,Mildred Beard,,2,true,CONTACT_FULLNAME,2
+2fffe45a-fa9d-f111-b8dc-000d3a14673b,natasha gilchrist,Natasha Gilchrist,Natasha Gilchrest,2,true,CONTACT_FULLNAME,1
+e121af65-fa9d-f111-b8db-7c1e5248501c,nathaniel short,Nathaniel Short,,2,true,CONTACT_FULLNAME,2
+c2e8dab4-1da3-53ea-a1e4-91a6d655ee2b,obadiah harris,Obadiah Harris,,5,false,DETERMINISTIC_NEW_ID,0
+3affe45a-fa9d-f111-b8dc-000d3a14673b,pamela smith,Pamela Smith,,2,true,CONTACT_FULLNAME,2
+050189e8-f6ea-5481-abf0-6f961615be97,permelia smith,Permelia Smith,,2,false,DETERMINISTIC_NEW_ID,0
+b7269d54-fa9d-f111-b8dc-000d3a14673b,r dorian night,R. Dorian Night,Devin Gilchrest,2,true,CONTACT_FULLNAME,2
+abb2965f-fa9d-f111-b8db-7c1e5248501c,randall beverly,Randall Beverly,,2,true,CONTACT_FULLNAME,2
+49b7ff73-fa9d-f111-b8dc-000d3a14673b,regina scales,Regina Scales,,3,true,CONTACT_FULLNAME,2
+e12ada67-fa9d-f111-b8dc-000d3a14673b,rodney waller,Rodney Waller,,2,true,CONTACT_FULLNAME,2
+40c8a8e5-872a-f111-88b4-7c1e525b15c2,rosetta perry,Rosetta Perry,,2,true,CONTACT_FULLNAME,2
+dfb397e7-3b7c-f111-ab0f-6045bdd69435,sean a crowley i,Sean A Crowley I,Sean Crowley,5,true,CONTACT_FULLNAME,1
+10adc867-fa9d-f111-b8dc-7c1e525b15c2,sean smith sr,"Sean Smith, Sr.",,4,true,CONTACT_FULLNAME,2
+49ffe45a-fa9d-f111-b8dc-000d3a14673b,shana byrd,Shana Byrd,,2,true,CONTACT_FULLNAME,2
+6177ba6b-fa9d-f111-b8db-7c1e5248501c,shaniqua williams,Shaniqua Williams,,2,true,CONTACT_FULLNAME,2
+abed8a5b-fa9d-f111-b8dc-7c1e525b15c2,shecara norris,Shecara Norris,,3,true,CONTACT_FULLNAME,2
+632d8d61-fa9d-f111-b8dc-7c1e525b15c2,shelley mcintosh,Shelley McIntosh,,8,true,CONTACT_FULLNAME,2
+84ae096e-fa9d-f111-b8dc-000d3a14673b,sylvia benson,Sylvia Benson,,3,true,CONTACT_FULLNAME,2
+f584c05f-ced2-5b60-a70b-382f6cfaeb90,tawonna mars,Tawonna Mars,Tawana Mars,2,false,DETERMINISTIC_NEW_ID,0
+92817142-abc3-5959-a7fb-cb46f7047a45,tekisha wimbush,Tekisha Wimbush,,6,false,DETERMINISTIC_NEW_ID,0
+95ae096e-fa9d-f111-b8dc-000d3a14673b,terry stephens,Terry Stephens,,9,true,CONTACT_FULLNAME,2
+deed8a5b-fa9d-f111-b8dc-7c1e525b15c2,thaddues smith,Thaddues Smith,,3,true,CONTACT_FULLNAME,2
+e68aa56a-882a-f111-88b4-6045bdd69678,thomas johnson,Thomas Johnson,,2,true,CONTACT_FULLNAME,2
+36d9bd54-fa9d-f111-b8dc-7c1e525b15c2,tia benincase,Tia Benincase,,2,true,CONTACT_FULLNAME,2
+a80a1c61-fa9d-f111-b8dc-000d3a14673b,toni kleckley,Toni Kleckley,,2,true,CONTACT_FULLNAME,2
+9c0a1c61-fa9d-f111-b8dc-000d3a14673b,tracy norris,Tracy Norris,,2,true,CONTACT_FULLNAME,2
+2e8af707-519f-530a-a68a-5424065281c1,usaf,USAF,,2,false,DETERMINISTIC_NEW_ID,0
+c3ed8a5b-fa9d-f111-b8dc-7c1e525b15c2,veronica brown,Veronica Brown,,2,true,CONTACT_FULLNAME,2
+fa21af65-fa9d-f111-b8db-7c1e5248501c,wayne pounds,Wayne Pounds,,2,true,CONTACT_FULLNAME,2
+56b7ff73-fa9d-f111-b8dc-000d3a14673b,will harris,Will Harris,,6,true,CONTACT_FULLNAME,2
+26621431-fa9d-f111-b8dc-7c1e525b15c2,winter dockery,Winter Dockery,,2,true,CONTACT_FULLNAME,3

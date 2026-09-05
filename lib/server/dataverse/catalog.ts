@@ -8,6 +8,7 @@ import type {
   CatalogStats,
   CatalogTitleDetail,
   CatalogTitleSummary,
+  PublishingMarketingAuthority,
 } from '@/lib/catalog/types'
 import { projectPublicCatalogTitles } from '@/lib/catalog/public-projection'
 import {
@@ -26,6 +27,7 @@ type DataverseCatalogConfig = {
   titleEntitySet: string
   assetEntitySet: string
   marketplaceEntitySet: string
+  editionEntitySet: string
   contactEntitySet: string
 }
 
@@ -35,8 +37,11 @@ const DEFAULT_ENTITY_SETS = {
   titles: 'jm1pub_titles',
   assets: 'jm1pub_publishingassets',
   marketplaces: 'jm1pub_assetmarketplaces',
+  editions: 'jm1pub_editions',
   contacts: 'contacts',
 }
+
+const CATALOG_AUTHORITY_CORRELATION_ID = 'JMP-CATALOG-CANONICAL-20260905'
 
 const TITLE_SELECT = [
   'jm1pub_titleid',
@@ -232,6 +237,113 @@ export async function getCatalogStats(): Promise<CatalogReadResult<CatalogStats>
       imprintCount: new Set(titles.map((title) => stringField(title, 'jm1pub_certifiedimprint')).filter(Boolean)).size,
       lastUpdated: new Date().toISOString(),
     }
+  })
+}
+
+export async function listPublishingMarketingAuthority(): Promise<CatalogReadResult<PublishingMarketingAuthority[]>> {
+  return withCatalogRead(async (config, token) => {
+    const titles = await dataverseGetCollection(config, token, config.titleEntitySet, {
+      select: [
+        'jm1pub_titleid',
+        'jm1pub_titlename',
+        'jm1pub_authorname',
+        '_jm1_primaryauthor_value',
+        'jm1pub_cataloglifecycledetail',
+        'jm1pub_currentcatalogstate',
+        'jm1pub_marketingauthoritystate',
+        'jm1pub_currenteditionreference',
+        'jm1pub_retirementstate',
+        'jm1pub_rightsholdstate',
+      ],
+      filter: `statecode eq 0 and jm1_canonicalstatus eq 'CANONICAL_PUBLISHING_WORK' and jm1_reconciliationcorrelationid eq '${CATALOG_AUTHORITY_CORRELATION_ID}'`,
+      orderby: 'jm1pub_titlename asc',
+    })
+    const titleIds = titles.map((row) => stringField(row, 'jm1pub_titleid')).filter(Boolean)
+    const [assets, editions] = await Promise.all([
+      dataverseGetCollectionByLookup(
+        config,
+        token,
+        config.assetEntitySet,
+        [
+          'jm1pub_publishingassetid',
+          '_jm1pub_titleid_value',
+          '_jm1pub_editionid_value',
+          'jm1pub_assetformat',
+          'jm1pub_publicationdate',
+          'jm1pub_coverurl',
+          'jm1pub_catalogdistributionstate',
+        ],
+        '_jm1pub_titleid_value',
+        titleIds,
+      ),
+      dataverseGetCollectionByLookup(
+        config,
+        token,
+        config.editionEntitySet,
+        ['jm1pub_editionid', '_jm1pub_title_value', 'jm1pub_releasedate'],
+        '_jm1pub_title_value',
+        titleIds,
+      ),
+    ])
+    const assetIds = assets.map((row) => stringField(row, 'jm1pub_publishingassetid')).filter(Boolean)
+    const marketplaces = assetIds.length
+      ? await dataverseGetCollectionByLookup(
+          config,
+          token,
+          config.marketplaceEntitySet,
+          ['jm1pub_assetmarketplaceid', '_jm1pub_publishingassetid_value', 'jm1pub_listingurl', 'jm1pub_marketplacestatus'],
+          '_jm1pub_publishingassetid_value',
+          assetIds,
+        ).catch(() => [])
+      : []
+    const assetsByTitle = groupRowsByLookup(assets, '_jm1pub_titleid_value')
+    const editionById = new Map(editions.map((row) => [stringField(row, 'jm1pub_editionid'), row]))
+    const marketplacesByAsset = groupRowsByLookup(marketplaces, '_jm1pub_publishingassetid_value')
+
+    return titles.map((title) => {
+      const workId = stringField(title, 'jm1pub_titleid')
+      const workAssets = assetsByTitle.get(workId) || []
+      const currentEditionId = stringField(title, 'jm1pub_currenteditionreference')
+      const currentEdition = editionById.get(currentEditionId)
+      const distributedAssets = workAssets.filter(
+        (asset) => stringField(asset, 'jm1pub_catalogdistributionstate') === 'CURRENTLY_DISTRIBUTED',
+      )
+      const publicationDates = workAssets.map((asset) => dateField(asset, 'jm1pub_publicationdate')).filter(Boolean).sort()
+      const purchaseCTA = distributedAssets
+        .flatMap((asset) => marketplacesByAsset.get(stringField(asset, 'jm1pub_publishingassetid')) || [])
+        .map((marketplace) => stringField(marketplace, 'jm1pub_listingurl'))
+        .find(Boolean) || ''
+      const marketingAuthorityState = stringField(title, 'jm1pub_marketingauthoritystate')
+
+      return {
+        CanonicalWorkId: workId,
+        CanonicalAuthorId: stringField(title, '_jm1_primaryauthor_value'),
+        Title: stringField(title, 'jm1pub_titlename'),
+        AuthorDisplayName: stringField(title, 'jm1pub_authorname'),
+        CurrentLifecycleState: stringField(title, 'jm1pub_cataloglifecycledetail'),
+        PublicationDate: publicationDates[0] || '',
+        ReleaseDate: currentEdition ? dateField(currentEdition, 'jm1pub_releasedate') : '',
+        ActiveState: stringField(title, 'jm1pub_currentcatalogstate'),
+        MarketingAuthorityState: marketingAuthorityState,
+        CurrentEditionId: currentEditionId,
+        AvailableFormats: Array.from(
+          new Set(
+            distributedAssets.map((asset) =>
+              normalizeFormat(
+                stringField(asset, 'jm1pub_assetformat@OData.Community.Display.V1.FormattedValue') ||
+                  stringField(asset, 'jm1pub_assetformat'),
+              ),
+            ),
+          ),
+        ),
+        PrimaryCoverAsset: firstString(distributedAssets, 'jm1pub_coverurl'),
+        PurchaseCTA: purchaseCTA,
+        FeaturedAuthorEligibility: marketingAuthorityState === 'MARKETING_ELIGIBLE',
+        MarketingHealthEligibility: marketingAuthorityState === 'MARKETING_ELIGIBLE',
+        RetirementState: stringField(title, 'jm1pub_retirementstate'),
+        RightsHoldState: stringField(title, 'jm1pub_rightsholdstate'),
+      }
+    })
   })
 }
 
@@ -508,6 +620,7 @@ function getCatalogConfig(): { ok: true; value: DataverseCatalogConfig } | { ok:
     assetEntitySet: process.env.DATAVERSE_CATALOG_ASSET_ENTITY_SET || DEFAULT_ENTITY_SETS.assets,
     marketplaceEntitySet:
       process.env.DATAVERSE_CATALOG_MARKETPLACE_ENTITY_SET || DEFAULT_ENTITY_SETS.marketplaces,
+    editionEntitySet: process.env.DATAVERSE_CATALOG_EDITION_ENTITY_SET || DEFAULT_ENTITY_SETS.editions,
     contactEntitySet: process.env.DATAVERSE_CATALOG_CONTACT_ENTITY_SET || DEFAULT_ENTITY_SETS.contacts,
   }
 
@@ -520,6 +633,7 @@ function getCatalogConfig(): { ok: true; value: DataverseCatalogConfig } | { ok:
     titleEntitySet: config.titleEntitySet,
     assetEntitySet: config.assetEntitySet,
     marketplaceEntitySet: config.marketplaceEntitySet,
+    editionEntitySet: config.editionEntitySet,
     contactEntitySet: config.contactEntitySet,
   }
 

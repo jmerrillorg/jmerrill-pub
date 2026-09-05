@@ -725,13 +725,13 @@ async function buildProjectSummaries(
     const title =
       (overrides.titleId
         ? await dataverseFirst(config, 'jm1pub_titles', {
-            $select: 'jm1pub_titleid,jm1pub_titlename,jm1pub_slug,jm1pub_authorname,jm1pub_authordisplayname,jm1pub_stage,jm1pub_publiccatalogstatus,jm1pub_publicationstatus',
+            $select: 'jm1pub_titleid,jm1pub_titlename,jm1pub_slug,jm1pub_authorname,jm1pub_authordisplayname,jm1pub_stage,jm1pub_publiccatalogstatus,jm1pub_publicationstatus,jm1pub_catalogworkkey,jm1pub_currentcatalogstate,jm1pub_cataloglifecycledetail,jm1pub_marketingauthoritystate',
             $filter: `jm1pub_titleid eq ${overrides.titleId}`,
           })
         : null) ||
       (projectTitle
         ? await dataverseFirst(config, 'jm1pub_titles', {
-            $select: 'jm1pub_titleid,jm1pub_titlename,jm1pub_slug,jm1pub_authorname,jm1pub_authordisplayname,jm1pub_stage,jm1pub_publiccatalogstatus,jm1pub_publicationstatus',
+            $select: 'jm1pub_titleid,jm1pub_titlename,jm1pub_slug,jm1pub_authorname,jm1pub_authordisplayname,jm1pub_stage,jm1pub_publiccatalogstatus,jm1pub_publicationstatus,jm1pub_catalogworkkey,jm1pub_currentcatalogstate,jm1pub_cataloglifecycledetail,jm1pub_marketingauthoritystate',
             $filter: `jm1pub_titlename eq '${escapeODataText(projectTitle)}'`,
           })
         : null)
@@ -867,13 +867,13 @@ async function buildProjectSummaries(
     const title =
       (overrides.titleId && projectTitle === session.title
         ? await dataverseFirst(config, 'jm1pub_titles', {
-            $select: 'jm1pub_titleid,jm1pub_titlename,jm1pub_slug,jm1pub_authorname,jm1pub_authordisplayname,jm1pub_stage,jm1pub_publiccatalogstatus,jm1pub_publicationstatus',
+            $select: 'jm1pub_titleid,jm1pub_titlename,jm1pub_slug,jm1pub_authorname,jm1pub_authordisplayname,jm1pub_stage,jm1pub_publiccatalogstatus,jm1pub_publicationstatus,jm1pub_catalogworkkey,jm1pub_currentcatalogstate,jm1pub_cataloglifecycledetail,jm1pub_marketingauthoritystate',
             $filter: `jm1pub_titleid eq ${overrides.titleId}`,
           })
         : null) ||
       (projectTitle
         ? await dataverseFirst(config, 'jm1pub_titles', {
-            $select: 'jm1pub_titleid,jm1pub_titlename,jm1pub_slug,jm1pub_authorname,jm1pub_authordisplayname,jm1pub_stage,jm1pub_publiccatalogstatus,jm1pub_publicationstatus',
+            $select: 'jm1pub_titleid,jm1pub_titlename,jm1pub_slug,jm1pub_authorname,jm1pub_authordisplayname,jm1pub_stage,jm1pub_publiccatalogstatus,jm1pub_publicationstatus,jm1pub_catalogworkkey,jm1pub_currentcatalogstate,jm1pub_cataloglifecycledetail,jm1pub_marketingauthoritystate',
             $filter: `jm1pub_titlename eq '${escapeODataText(projectTitle)}'`,
           })
         : null)
@@ -914,13 +914,13 @@ async function buildProjectSummaries(
     const title =
       (relationshipTitle.titleId
         ? await dataverseFirst(config, 'jm1pub_titles', {
-            $select: 'jm1pub_titleid,jm1pub_titlename,jm1pub_slug,jm1pub_authorname,jm1pub_authordisplayname,jm1pub_stage,jm1pub_publiccatalogstatus,jm1pub_publicationstatus',
+            $select: 'jm1pub_titleid,jm1pub_titlename,jm1pub_slug,jm1pub_authorname,jm1pub_authordisplayname,jm1pub_stage,jm1pub_publiccatalogstatus,jm1pub_publicationstatus,jm1pub_catalogworkkey,jm1pub_currentcatalogstate,jm1pub_cataloglifecycledetail,jm1pub_marketingauthoritystate',
             $filter: `jm1pub_titleid eq ${relationshipTitle.titleId}`,
           })
         : null) ||
       (relationshipTitle.title
         ? await dataverseFirst(config, 'jm1pub_titles', {
-            $select: 'jm1pub_titleid,jm1pub_titlename,jm1pub_slug,jm1pub_authorname,jm1pub_authordisplayname,jm1pub_stage,jm1pub_publiccatalogstatus,jm1pub_publicationstatus',
+            $select: 'jm1pub_titleid,jm1pub_titlename,jm1pub_slug,jm1pub_authorname,jm1pub_authordisplayname,jm1pub_stage,jm1pub_publiccatalogstatus,jm1pub_publicationstatus,jm1pub_catalogworkkey,jm1pub_currentcatalogstate,jm1pub_cataloglifecycledetail,jm1pub_marketingauthoritystate',
             $filter: `jm1pub_titlename eq '${escapeODataText(relationshipTitle.title)}'`,
           })
         : null)

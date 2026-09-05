@@ -1,0 +1,32 @@
+{
+  "generatedAt": "2026-09-05T14:33:39.125Z",
+  "mode": "READ_ONLY",
+  "authority": "JMP Publishing SharePoint drive",
+  "publishingDriveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+  "method": "Microsoft Graph Search; results restricted to the Publisher-owned drive. Filename candidates are separated from generic contract-clause content hits.",
+  "graphSearchStatus": "UNAVAILABLE_CURRENT_TOKEN_SCOPE",
+  "graphSearchError": "403 termination: {\"error\":{\"code\":\"Forbidden\",\"message\":\"Access to OneDriveFile in Graph API requires the following permissions: Files.Read.All or Sites.Read.All or Files.ReadWrite.All or Sites.ReadWrite.All or Sites.Selected. However, the application only has the following permissions granted: User.ReadWrite.All\",\"target\":\"\",\"httpCode\":403},\"Instrumentation\":{\"TraceId\":\"0a8cd2ad-069c-7bc1-4454-fc0e8baf8f92\"}}",
+  "queries": [],
+  "resultCounts": {},
+  "affirmativeFilenameCandidates": [],
+  "localAuthorityEvidence": [
+    {
+      "source": "docs/operations/generated/JMP-BLOCK09-POST-DISTRIBUTION-TITLE-MANAGEMENT-COMMISSIONING-2026-08-26/12-real-financial-boundary.md",
+      "finding": "Real title retired for commissioning: 0; real rights reverted for commissioning: 0; real distribution takedown for commissioning: 0."
+    },
+    {
+      "source": "docs/operations/generated/JMP-BLOCK09-POST-DISTRIBUTION-TITLE-MANAGEMENT-COMMISSIONING-2026-08-26/09-health-marketing-contract-archive.md",
+      "finding": "Retirement, rights reversion, and distribution takedown are explicitly separate facts; reversion is review-gated and not automatic."
+    },
+    {
+      "source": "docs/operations/generated/JMP-TRANCHE-5-POST-PUBLICATION-OPERATIONS-IMPLEMENTATION-2026-08-08/16-retirement-runtime.md",
+      "finding": "No title is retired automatically."
+    },
+    {
+      "source": "docs/operations/generated/JMP-TRANCHE-5-POST-PUBLICATION-OPERATIONS-IMPLEMENTATION-2026-08-08/17-reversion-runtime.md",
+      "finding": "No rights are reverted automatically."
+    }
+  ],
+  "determination": "NO_AUTHORITY_CHANGE_FOUND_IN_AVAILABLE_GOVERNED_EVIDENCE_GRAPH_SEARCH_SCOPE_LIMIT_RECORDED",
+  "caveat": "Search hits containing generic termination language inside agreement templates are not treated as executed authority-changing events."
+}
