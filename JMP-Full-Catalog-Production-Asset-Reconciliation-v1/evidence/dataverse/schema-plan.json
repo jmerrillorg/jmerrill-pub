@@ -1,0 +1,28 @@
+{
+  "version": "1.0",
+  "mode": "ADDITIVE_ONLY",
+  "table": "jm1pub_productionasset",
+  "purpose": "File-level production evidence references; SharePoint remains byte authority.",
+  "identity": "SHA-256-derived Dataverse row GUID from SharePoint DriveId + ItemId",
+  "fields": [
+    "jm1pub_name",
+    "jm1pub_stablekey",
+    "jm1pub_driveid",
+    "jm1pub_itemid",
+    "jm1pub_weburl",
+    "jm1pub_relativepath",
+    "jm1pub_filename",
+    "jm1pub_mimetype",
+    "jm1pub_size",
+    "jm1pub_lastmodified",
+    "jm1pub_assettype",
+    "jm1pub_assetstate",
+    "jm1pub_canonicalauthorid",
+    "jm1pub_canonicalworkid",
+    "jm1pub_canonicalproductid",
+    "jm1pub_matchbasis",
+    "jm1pub_sha256"
+  ],
+  "destructiveChanges": 0,
+  "fileCopies": 0
+}

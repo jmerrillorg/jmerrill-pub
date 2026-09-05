@@ -1,0 +1,576 @@
+[
+  {
+    "canonicalAuthorId": "a52ada67-fa9d-f111-b8dc-000d3a14673b",
+    "authorDisplayName": "Adrean Young",
+    "state": "MISSING",
+    "candidateCount": 0,
+    "primaryAuthorPhoto": null
+  },
+  {
+    "canonicalAuthorId": "b3146974-c6b8-5d6e-a564-62d4a598e73a",
+    "authorDisplayName": "Agape International Cathedral",
+    "state": "MISSING",
+    "candidateCount": 0,
+    "primaryAuthorPhoto": null
+  },
+  {
+    "canonicalAuthorId": "5cb9d134-98e9-5a35-a41e-eaaa0126b64c",
+    "authorDisplayName": "Alesia Corpening",
+    "state": "MISSING",
+    "candidateCount": 0,
+    "primaryAuthorPhoto": null
+  },
+  {
+    "canonicalAuthorId": "d60fe371-fa9d-f111-b8db-7c1e5248501c",
+    "authorDisplayName": "Alice Pryor",
+    "state": "MISSING",
+    "candidateCount": 0,
+    "primaryAuthorPhoto": null
+  },
+  {
+    "canonicalAuthorId": "22ffe45a-fa9d-f111-b8dc-000d3a14673b",
+    "authorDisplayName": "Ashanti Flemister",
+    "state": "MISSING",
+    "candidateCount": 0,
+    "primaryAuthorPhoto": null
+  },
+  {
+    "canonicalAuthorId": "8e0a1c61-fa9d-f111-b8dc-000d3a14673b",
+    "authorDisplayName": "Bailey Cunningham",
+    "state": "MISSING",
+    "candidateCount": 0,
+    "primaryAuthorPhoto": null
+  },
+  {
+    "canonicalAuthorId": "ec21af65-fa9d-f111-b8db-7c1e5248501c",
+    "authorDisplayName": "Brandyn McElroy",
+    "state": "MISSING",
+    "candidateCount": 0,
+    "primaryAuthorPhoto": null
+  },
+  {
+    "canonicalAuthorId": "d62ada67-fa9d-f111-b8dc-000d3a14673b",
+    "authorDisplayName": "Carol Roye",
+    "state": "MISSING",
+    "candidateCount": 0,
+    "primaryAuthorPhoto": null
+  },
+  {
+    "canonicalAuthorId": "4a56c9ff-4389-f111-ab10-6045bdd69678",
+    "authorDisplayName": "Carolyn Pierce",
+    "state": "MISSING",
+    "candidateCount": 0,
+    "primaryAuthorPhoto": null
+  },
+  {
+    "canonicalAuthorId": "0027cd12-8b02-529c-af7a-f2c714ddfadb",
+    "authorDisplayName": "Cheryl Cook",
+    "state": "MISSING",
+    "candidateCount": 0,
+    "primaryAuthorPhoto": null
+  },
+  {
+    "canonicalAuthorId": "7f7bf5a6-4a89-5691-a8ee-c578c18b8a7b",
+    "authorDisplayName": "Cheryl Travis",
+    "state": "MISSING",
+    "candidateCount": 0,
+    "primaryAuthorPhoto": null
+  },
+  {
+    "canonicalAuthorId": "f88ba081-c1e6-5032-acf1-a2c54764dcc8",
+    "authorDisplayName": "Christina Banner",
+    "state": "READY",
+    "candidateCount": 1,
+    "primaryAuthorPhoto": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQN3ODKB3ONXFRGYLKBDRHTSX2HJ"
+  },
+  {
+    "canonicalAuthorId": "7aae096e-fa9d-f111-b8dc-000d3a14673b",
+    "authorDisplayName": "Christy Grogg",
+    "state": "MISSING",
+    "candidateCount": 0,
+    "primaryAuthorPhoto": null
+  },
+  {
+    "canonicalAuthorId": "8fe9a467-4389-f111-ab10-6045bdd69678",
+    "authorDisplayName": "Cynthia Sloan",
+    "state": "MISSING",
+    "candidateCount": 0,
+    "primaryAuthorPhoto": null
+  },
+  {
+    "canonicalAuthorId": "b7ed8a5b-fa9d-f111-b8dc-7c1e525b15c2",
+    "authorDisplayName": "Daphanny Baker",
+    "state": "MISSING",
+    "candidateCount": 0,
+    "primaryAuthorPhoto": null
+  },
+  {
+    "canonicalAuthorId": "adf89d59-fa9d-f111-b8db-7c1e5248501c",
+    "authorDisplayName": "Darlene Carson",
+    "state": "MISSING",
+    "candidateCount": 0,
+    "primaryAuthorPhoto": null
+  },
+  {
+    "canonicalAuthorId": "5277ba6b-fa9d-f111-b8db-7c1e5248501c",
+    "authorDisplayName": "David Williams",
+    "state": "MISSING",
+    "candidateCount": 0,
+    "primaryAuthorPhoto": null
+  },
+  {
+    "canonicalAuthorId": "7177ba6b-fa9d-f111-b8db-7c1e5248501c",
+    "authorDisplayName": "Dean Wilson",
+    "state": "MISSING",
+    "candidateCount": 0,
+    "primaryAuthorPhoto": null
+  },
+  {
+    "canonicalAuthorId": "9eb2965f-fa9d-f111-b8db-7c1e5248501c",
+    "authorDisplayName": "Deanna Jones",
+    "state": "MISSING",
+    "candidateCount": 0,
+    "primaryAuthorPhoto": null
+  },
+  {
+    "canonicalAuthorId": "0f22af65-fa9d-f111-b8db-7c1e5248501c",
+    "authorDisplayName": "Deborah Eiland",
+    "state": "MISSING",
+    "candidateCount": 0,
+    "primaryAuthorPhoto": null
+  },
+  {
+    "canonicalAuthorId": "cb85e9fa-85a9-5d5b-a91e-d627a9f5ce16",
+    "authorDisplayName": "Dennis Brown",
+    "state": "MISSING",
+    "candidateCount": 0,
+    "primaryAuthorPhoto": null
+  },
+  {
+    "canonicalAuthorId": "32ff2165-882a-f111-88b4-6045bdd69738",
+    "authorDisplayName": "Diane Johnson",
+    "state": "MISSING",
+    "candidateCount": 0,
+    "primaryAuthorPhoto": null
+  },
+  {
+    "canonicalAuthorId": "c0ae096e-fa9d-f111-b8dc-000d3a14673b",
+    "authorDisplayName": "Donjia Walls",
+    "state": "MISSING",
+    "candidateCount": 0,
+    "primaryAuthorPhoto": null
+  },
+  {
+    "canonicalAuthorId": "ae35c16d-fa9d-f111-b8dc-7c1e525b15c2",
+    "authorDisplayName": "Earline Neal",
+    "state": "MISSING",
+    "candidateCount": 0,
+    "primaryAuthorPhoto": null
+  },
+  {
+    "canonicalAuthorId": "aecce0fb-872a-f111-88b4-000d3a14673b",
+    "authorDisplayName": "Edith Clay",
+    "state": "MISSING",
+    "candidateCount": 0,
+    "primaryAuthorPhoto": null
+  },
+  {
+    "canonicalAuthorId": "48ed579b-0260-5874-aa62-9e632f37c0aa",
+    "authorDisplayName": "Ericka Johnson Settles",
+    "state": "MISSING",
+    "candidateCount": 0,
+    "primaryAuthorPhoto": null
+  },
+  {
+    "canonicalAuthorId": "05adc867-fa9d-f111-b8dc-7c1e525b15c2",
+    "authorDisplayName": "Ericka Thornton",
+    "state": "MISSING",
+    "candidateCount": 0,
+    "primaryAuthorPhoto": null
+  },
+  {
+    "canonicalAuthorId": "4177ba6b-fa9d-f111-b8db-7c1e5248501c",
+    "authorDisplayName": "Eryonna Barrino",
+    "state": "MISSING",
+    "candidateCount": 0,
+    "primaryAuthorPhoto": null
+  },
+  {
+    "canonicalAuthorId": "aaae096e-fa9d-f111-b8dc-000d3a14673b",
+    "authorDisplayName": "Essence Easley",
+    "state": "MISSING",
+    "candidateCount": 0,
+    "primaryAuthorPhoto": null
+  },
+  {
+    "canonicalAuthorId": "69b1e63f-7831-537e-a700-d82696d9a9db",
+    "authorDisplayName": "Felix Catheline",
+    "state": "MISSING",
+    "candidateCount": 0,
+    "primaryAuthorPhoto": null
+  },
+  {
+    "canonicalAuthorId": "840a1c61-fa9d-f111-b8dc-000d3a14673b",
+    "authorDisplayName": "Gloria Patterson",
+    "state": "MISSING",
+    "candidateCount": 0,
+    "primaryAuthorPhoto": null
+  },
+  {
+    "canonicalAuthorId": "f10fe371-fa9d-f111-b8db-7c1e5248501c",
+    "authorDisplayName": "Gwendolyn Rucker-Carr",
+    "state": "MISSING",
+    "candidateCount": 0,
+    "primaryAuthorPhoto": null
+  },
+  {
+    "canonicalAuthorId": "c8c8747e-6675-f111-ab0f-6045bdd69678",
+    "authorDisplayName": "Iyorwuese Hagher",
+    "state": "AMBIGUOUS",
+    "candidateCount": 34,
+    "primaryAuthorPhoto": null
+  },
+  {
+    "canonicalAuthorId": "7ceb3332-882a-f111-88b4-00224820105b",
+    "authorDisplayName": "J Derrick Johnson",
+    "state": "MISSING",
+    "candidateCount": 0,
+    "primaryAuthorPhoto": null
+  },
+  {
+    "canonicalAuthorId": "a7801f4d-1d76-f111-ab0f-6045bdd69435",
+    "authorDisplayName": "Jackie Smith, Jr.",
+    "state": "AMBIGUOUS",
+    "candidateCount": 9,
+    "primaryAuthorPhoto": null
+  },
+  {
+    "canonicalAuthorId": "6d2d8d61-fa9d-f111-b8dc-7c1e525b15c2",
+    "authorDisplayName": "Janet Stephens",
+    "state": "MISSING",
+    "candidateCount": 0,
+    "primaryAuthorPhoto": null
+  },
+  {
+    "canonicalAuthorId": "38c02501-ffe7-5f8d-aec6-ef439d31cbcb",
+    "authorDisplayName": "Jaylonna Stevette",
+    "state": "AMBIGUOUS",
+    "candidateCount": 5,
+    "primaryAuthorPhoto": null
+  },
+  {
+    "canonicalAuthorId": "43999b62-888b-525d-ac6c-a99e379c3d2f",
+    "authorDisplayName": "Juanita Travis",
+    "state": "MISSING",
+    "candidateCount": 0,
+    "primaryAuthorPhoto": null
+  },
+  {
+    "canonicalAuthorId": "6fead373-fa9d-f111-b8dc-7c1e525b15c2",
+    "authorDisplayName": "Karen Hill",
+    "state": "MISSING",
+    "candidateCount": 0,
+    "primaryAuthorPhoto": null
+  },
+  {
+    "canonicalAuthorId": "d7f33bc2-e0cd-58d4-a398-d2935f8978fa",
+    "authorDisplayName": "KD Heard",
+    "state": "MISSING",
+    "candidateCount": 0,
+    "primaryAuthorPhoto": null
+  },
+  {
+    "canonicalAuthorId": "c82ada67-fa9d-f111-b8dc-000d3a14673b",
+    "authorDisplayName": "Kelli Milligan Stammen",
+    "state": "MISSING",
+    "candidateCount": 0,
+    "primaryAuthorPhoto": null
+  },
+  {
+    "canonicalAuthorId": "29d9bd54-fa9d-f111-b8dc-7c1e525b15c2",
+    "authorDisplayName": "Kiena Hughley",
+    "state": "MISSING",
+    "candidateCount": 0,
+    "primaryAuthorPhoto": null
+  },
+  {
+    "canonicalAuthorId": "0efbcddf-d37c-55c2-ab6a-9ea653bfa7b9",
+    "authorDisplayName": "Kimberly Reeder",
+    "state": "AMBIGUOUS",
+    "candidateCount": 9,
+    "primaryAuthorPhoto": null
+  },
+  {
+    "canonicalAuthorId": "b8b2965f-fa9d-f111-b8db-7c1e5248501c",
+    "authorDisplayName": "Kurt Broadnax",
+    "state": "MISSING",
+    "candidateCount": 0,
+    "primaryAuthorPhoto": null
+  },
+  {
+    "canonicalAuthorId": "b62ada67-fa9d-f111-b8dc-000d3a14673b",
+    "authorDisplayName": "Leslie Banks",
+    "state": "MISSING",
+    "candidateCount": 0,
+    "primaryAuthorPhoto": null
+  },
+  {
+    "canonicalAuthorId": "85b767cc-ccd6-5620-af4e-52fe1e922a7b",
+    "authorDisplayName": "Lisa Clark",
+    "state": "MISSING",
+    "candidateCount": 0,
+    "primaryAuthorPhoto": null
+  },
+  {
+    "canonicalAuthorId": "7d7ed521-5d51-5f18-a05c-32f8eef6e37d",
+    "authorDisplayName": "Lisa Taylor",
+    "state": "READY",
+    "candidateCount": 1,
+    "primaryAuthorPhoto": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQN5DHO54TDBP5HYIHBVXMBASYMD"
+  },
+  {
+    "canonicalAuthorId": "e8e1a253-fa9d-f111-b8db-7c1e5248501c",
+    "authorDisplayName": "Lyle Goddard",
+    "state": "MISSING",
+    "candidateCount": 0,
+    "primaryAuthorPhoto": null
+  },
+  {
+    "canonicalAuthorId": "e40fe371-fa9d-f111-b8db-7c1e5248501c",
+    "authorDisplayName": "Mack Hughley",
+    "state": "MISSING",
+    "candidateCount": 0,
+    "primaryAuthorPhoto": null
+  },
+  {
+    "canonicalAuthorId": "20adc867-fa9d-f111-b8dc-7c1e525b15c2",
+    "authorDisplayName": "Marvin Grayson",
+    "state": "MISSING",
+    "candidateCount": 0,
+    "primaryAuthorPhoto": null
+  },
+  {
+    "canonicalAuthorId": "d2ed8a5b-fa9d-f111-b8dc-7c1e525b15c2",
+    "authorDisplayName": "Maurche Reed",
+    "state": "MISSING",
+    "candidateCount": 0,
+    "primaryAuthorPhoto": null
+  },
+  {
+    "canonicalAuthorId": "c1269d54-fa9d-f111-b8dc-000d3a14673b",
+    "authorDisplayName": "Mildred Beard",
+    "state": "MISSING",
+    "candidateCount": 0,
+    "primaryAuthorPhoto": null
+  },
+  {
+    "canonicalAuthorId": "2fffe45a-fa9d-f111-b8dc-000d3a14673b",
+    "authorDisplayName": "Natasha Gilchrist",
+    "state": "MISSING",
+    "candidateCount": 0,
+    "primaryAuthorPhoto": null
+  },
+  {
+    "canonicalAuthorId": "e121af65-fa9d-f111-b8db-7c1e5248501c",
+    "authorDisplayName": "Nathaniel Short",
+    "state": "MISSING",
+    "candidateCount": 0,
+    "primaryAuthorPhoto": null
+  },
+  {
+    "canonicalAuthorId": "c2e8dab4-1da3-53ea-a1e4-91a6d655ee2b",
+    "authorDisplayName": "Obadiah Harris",
+    "state": "MISSING",
+    "candidateCount": 0,
+    "primaryAuthorPhoto": null
+  },
+  {
+    "canonicalAuthorId": "3affe45a-fa9d-f111-b8dc-000d3a14673b",
+    "authorDisplayName": "Pamela Smith",
+    "state": "MISSING",
+    "candidateCount": 0,
+    "primaryAuthorPhoto": null
+  },
+  {
+    "canonicalAuthorId": "050189e8-f6ea-5481-abf0-6f961615be97",
+    "authorDisplayName": "Permelia Smith",
+    "state": "MISSING",
+    "candidateCount": 0,
+    "primaryAuthorPhoto": null
+  },
+  {
+    "canonicalAuthorId": "b7269d54-fa9d-f111-b8dc-000d3a14673b",
+    "authorDisplayName": "R. Dorian Night",
+    "state": "MISSING",
+    "candidateCount": 0,
+    "primaryAuthorPhoto": null
+  },
+  {
+    "canonicalAuthorId": "abb2965f-fa9d-f111-b8db-7c1e5248501c",
+    "authorDisplayName": "Randall Beverly",
+    "state": "MISSING",
+    "candidateCount": 0,
+    "primaryAuthorPhoto": null
+  },
+  {
+    "canonicalAuthorId": "49b7ff73-fa9d-f111-b8dc-000d3a14673b",
+    "authorDisplayName": "Regina Scales",
+    "state": "MISSING",
+    "candidateCount": 0,
+    "primaryAuthorPhoto": null
+  },
+  {
+    "canonicalAuthorId": "e12ada67-fa9d-f111-b8dc-000d3a14673b",
+    "authorDisplayName": "Rodney Waller",
+    "state": "MISSING",
+    "candidateCount": 0,
+    "primaryAuthorPhoto": null
+  },
+  {
+    "canonicalAuthorId": "40c8a8e5-872a-f111-88b4-7c1e525b15c2",
+    "authorDisplayName": "Rosetta Perry",
+    "state": "MISSING",
+    "candidateCount": 0,
+    "primaryAuthorPhoto": null
+  },
+  {
+    "canonicalAuthorId": "dfb397e7-3b7c-f111-ab0f-6045bdd69435",
+    "authorDisplayName": "Sean A Crowley I",
+    "state": "READY",
+    "candidateCount": 1,
+    "primaryAuthorPhoto": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se:01DF3SEQIMGDLSXLBB7NAYYOMXKTDNZGWR"
+  },
+  {
+    "canonicalAuthorId": "10adc867-fa9d-f111-b8dc-7c1e525b15c2",
+    "authorDisplayName": "Sean Smith, Sr.",
+    "state": "MISSING",
+    "candidateCount": 0,
+    "primaryAuthorPhoto": null
+  },
+  {
+    "canonicalAuthorId": "49ffe45a-fa9d-f111-b8dc-000d3a14673b",
+    "authorDisplayName": "Shana Byrd",
+    "state": "MISSING",
+    "candidateCount": 0,
+    "primaryAuthorPhoto": null
+  },
+  {
+    "canonicalAuthorId": "6177ba6b-fa9d-f111-b8db-7c1e5248501c",
+    "authorDisplayName": "Shaniqua Williams",
+    "state": "MISSING",
+    "candidateCount": 0,
+    "primaryAuthorPhoto": null
+  },
+  {
+    "canonicalAuthorId": "abed8a5b-fa9d-f111-b8dc-7c1e525b15c2",
+    "authorDisplayName": "Shecara Norris",
+    "state": "MISSING",
+    "candidateCount": 0,
+    "primaryAuthorPhoto": null
+  },
+  {
+    "canonicalAuthorId": "632d8d61-fa9d-f111-b8dc-7c1e525b15c2",
+    "authorDisplayName": "Shelley McIntosh",
+    "state": "MISSING",
+    "candidateCount": 0,
+    "primaryAuthorPhoto": null
+  },
+  {
+    "canonicalAuthorId": "84ae096e-fa9d-f111-b8dc-000d3a14673b",
+    "authorDisplayName": "Sylvia Benson",
+    "state": "MISSING",
+    "candidateCount": 0,
+    "primaryAuthorPhoto": null
+  },
+  {
+    "canonicalAuthorId": "f584c05f-ced2-5b60-a70b-382f6cfaeb90",
+    "authorDisplayName": "Tawonna Mars",
+    "state": "MISSING",
+    "candidateCount": 0,
+    "primaryAuthorPhoto": null
+  },
+  {
+    "canonicalAuthorId": "92817142-abc3-5959-a7fb-cb46f7047a45",
+    "authorDisplayName": "Tekisha Wimbush",
+    "state": "MISSING",
+    "candidateCount": 0,
+    "primaryAuthorPhoto": null
+  },
+  {
+    "canonicalAuthorId": "95ae096e-fa9d-f111-b8dc-000d3a14673b",
+    "authorDisplayName": "Terry Stephens",
+    "state": "MISSING",
+    "candidateCount": 0,
+    "primaryAuthorPhoto": null
+  },
+  {
+    "canonicalAuthorId": "deed8a5b-fa9d-f111-b8dc-7c1e525b15c2",
+    "authorDisplayName": "Thaddues Smith",
+    "state": "MISSING",
+    "candidateCount": 0,
+    "primaryAuthorPhoto": null
+  },
+  {
+    "canonicalAuthorId": "e68aa56a-882a-f111-88b4-6045bdd69678",
+    "authorDisplayName": "Thomas Johnson",
+    "state": "MISSING",
+    "candidateCount": 0,
+    "primaryAuthorPhoto": null
+  },
+  {
+    "canonicalAuthorId": "36d9bd54-fa9d-f111-b8dc-7c1e525b15c2",
+    "authorDisplayName": "Tia Benincase",
+    "state": "MISSING",
+    "candidateCount": 0,
+    "primaryAuthorPhoto": null
+  },
+  {
+    "canonicalAuthorId": "a80a1c61-fa9d-f111-b8dc-000d3a14673b",
+    "authorDisplayName": "Toni Kleckley",
+    "state": "MISSING",
+    "candidateCount": 0,
+    "primaryAuthorPhoto": null
+  },
+  {
+    "canonicalAuthorId": "9c0a1c61-fa9d-f111-b8dc-000d3a14673b",
+    "authorDisplayName": "Tracy Norris",
+    "state": "MISSING",
+    "candidateCount": 0,
+    "primaryAuthorPhoto": null
+  },
+  {
+    "canonicalAuthorId": "2e8af707-519f-530a-a68a-5424065281c1",
+    "authorDisplayName": "USAF",
+    "state": "MISSING",
+    "candidateCount": 0,
+    "primaryAuthorPhoto": null
+  },
+  {
+    "canonicalAuthorId": "c3ed8a5b-fa9d-f111-b8dc-7c1e525b15c2",
+    "authorDisplayName": "Veronica Brown",
+    "state": "MISSING",
+    "candidateCount": 0,
+    "primaryAuthorPhoto": null
+  },
+  {
+    "canonicalAuthorId": "fa21af65-fa9d-f111-b8db-7c1e5248501c",
+    "authorDisplayName": "Wayne Pounds",
+    "state": "MISSING",
+    "candidateCount": 0,
+    "primaryAuthorPhoto": null
+  },
+  {
+    "canonicalAuthorId": "56b7ff73-fa9d-f111-b8dc-000d3a14673b",
+    "authorDisplayName": "Will Harris",
+    "state": "MISSING",
+    "candidateCount": 0,
+    "primaryAuthorPhoto": null
+  },
+  {
+    "canonicalAuthorId": "26621431-fa9d-f111-b8dc-7c1e525b15c2",
+    "authorDisplayName": "Winter Dockery",
+    "state": "AMBIGUOUS",
+    "candidateCount": 2,
+    "primaryAuthorPhoto": null
+  }
+]

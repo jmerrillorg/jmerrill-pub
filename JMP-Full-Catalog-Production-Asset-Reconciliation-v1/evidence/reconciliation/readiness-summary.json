@@ -1,0 +1,21 @@
+{
+  "generatedAt": "2026-09-05T18:58:53.252Z",
+  "counts": {
+    "works": 129,
+    "ready": 74,
+    "partial": 16,
+    "missing": 11,
+    "ambiguous": 28,
+    "authorPhotosReady": 3,
+    "authorPhotosAmbiguous": 5,
+    "authorPhotosMissing": 74,
+    "registeredFiles": 17096,
+    "linkedFiles": 11796,
+    "potentialDuplicateGroups": 3298
+  },
+  "safeguards": {
+    "sharePointWrites": 0,
+    "dataverseWrites": 0,
+    "publicPosts": 0
+  }
+}

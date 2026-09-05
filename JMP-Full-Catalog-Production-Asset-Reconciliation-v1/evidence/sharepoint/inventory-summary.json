@@ -1,0 +1,41 @@
+{
+  "generatedAt": "2026-09-05T18:58:44.971Z",
+  "source": {
+    "site": "Publishing Team",
+    "library": "Documents",
+    "driveId": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+    "historicalRootItemId": "01DF3SEQL5EUK3P73AUJDJ3G47RYEPIOXT",
+    "productionRoots": [
+      "08_Backlist",
+      "10_Backlist-Consolidated",
+      "07_Archive",
+      "Archive/Active Projects",
+      "02_Active-Pipeline",
+      "01_Pre-Pipeline"
+    ],
+    "historicalRootWebUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/08_Backlist"
+  },
+  "mode": "READ_ONLY_METADATA",
+  "counts": {
+    "catalogAuthors": 82,
+    "canonicalWorks": 129,
+    "formatProducts": 300,
+    "topLevelAuthorFolders": 81,
+    "matchedAuthorFolders": 80,
+    "unmatchedAuthorFolders": 1,
+    "folders": 10240,
+    "files": 17096,
+    "filesMatchedToWork": 11796,
+    "worksWithAtLeastOneMatchedFile": 118,
+    "worksWithoutMatchedFile": 11
+  },
+  "safeguards": {
+    "sharePointWrites": 0,
+    "dataverseWrites": 0,
+    "fileDownloads": 0,
+    "publicPosts": 0
+  },
+  "unmatchedAuthorFolders": [
+    "Ward, Shanna"
+  ]
+}

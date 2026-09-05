@@ -78,7 +78,8 @@
     "portfolio-automation-wave2-guard": "node --test scripts/jmp_portfolio_automation_controller.test.mjs scripts/jmp_portfolio_automation_wave2.test.mjs",
     "portfolio-automation-wave2": "node scripts/jmp_portfolio_automation_wave2.mjs",
     "portfolio-automation-wave3-guard": "node --test scripts/jmp_portfolio_automation_controller.test.mjs scripts/jmp_portfolio_automation_wave2.test.mjs scripts/jmp_portfolio_automation_wave3.test.mjs",
-    "portfolio-automation-wave3": "node scripts/jmp_portfolio_automation_wave3.mjs"
+    "portfolio-automation-wave3": "node scripts/jmp_portfolio_automation_wave3.mjs",
+    "production-asset-registry-guard": "node --test scripts/jmp_production_asset_registry_guard.test.mjs"
   },
   "dependencies": {
     "@azure/communication-email": "^1.1.0",
