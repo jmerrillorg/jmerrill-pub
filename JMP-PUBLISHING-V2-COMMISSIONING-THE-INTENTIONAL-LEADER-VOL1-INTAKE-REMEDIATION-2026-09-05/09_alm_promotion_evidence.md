@@ -10,6 +10,11 @@ Dataverse followed Development -> validation -> managed export -> JM1-Test manag
 - UAT application user: `c7796849-2fa9-f111-aaab-002248046451`; role assignment: `System Administrator`; status: `PASS`.
 - Publishing host: `app-jm1-pub-prod-v2`; isolated slot: `staging`.
 - Staging URL: `https://app-jm1-pub-prod-v2-staging.azurewebsites.net`.
+- Application workflow: `https://github.com/jmerrillorg/jmerrill-pub/actions/runs/33970236550`.
+- Staging release SHA: `f7574f6b130309b62f7a088a45b9002c6d4c7d28`.
+- Build, deployment, and staging health certification: `PASS`.
+- Staging health status: `ready`.
+- Production release remained `6f79da18de0ae9b918908bb266651f0a95880ae6`.
 - Production promotion: not authorized and not executed.
 
-The final application run and release SHA are appended after the staging workflow completes.
+The workflow's production promotion job was skipped. The deployed staging release is isolated from Production and reads from JM1-Test.

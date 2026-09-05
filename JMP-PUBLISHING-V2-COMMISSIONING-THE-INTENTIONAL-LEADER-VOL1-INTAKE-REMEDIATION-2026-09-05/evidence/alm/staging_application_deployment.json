@@ -1,0 +1,20 @@
+{
+  "status": "PASS",
+  "verifiedAt": "2026-09-05T14:02:17.982Z",
+  "workflowUrl": "https://github.com/jmerrillorg/jmerrill-pub/actions/runs/33970236550",
+  "staging": {
+    "url": "https://app-jm1-pub-prod-v2-staging.azurewebsites.net",
+    "release": "f7574f6b130309b62f7a088a45b9002c6d4c7d28",
+    "health": "ready",
+    "authorIntakeRouteHttpStatus": 200,
+    "unauthenticatedApiHttpStatus": 401,
+    "environment": "JM1-Test",
+    "classification": "COMMISSIONING_UAT"
+  },
+  "production": {
+    "promotionAuthorized": false,
+    "promotionExecuted": false,
+    "workflowJobConclusion": "skipped",
+    "release": "6f79da18de0ae9b918908bb266651f0a95880ae6"
+  }
+}
