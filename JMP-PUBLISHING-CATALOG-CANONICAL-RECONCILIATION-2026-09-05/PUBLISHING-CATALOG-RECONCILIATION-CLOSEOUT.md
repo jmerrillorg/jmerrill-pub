@@ -31,7 +31,7 @@ Source SHA-256: `c48f2335c64e3952d2068d271a0e1f43fc28430960c839e2c4d5b54d4ab5131
 25. **FOUNDER DECISIONS REQUIRED:** One governance decision only: approve or decline the Canon Candidate. There are no title-by-title reconciliation exceptions.
 26. **CANON-CANDIDATE:** `JMP Catalog Authority & Product Identity Standard v0.1 - CANON-CANDIDATE` is prepared and remains pending Founder approval. It is not self-ratified.
 27. **FINAL CLASSIFICATION:** `JMP CATALOG AUTHORITY - OPERATIONALLY RESTORED`, subject only to the separately stated Founder governance gate. The underlying reconciliation classification is `JMP CATALOG - CANONICALLY RECONCILED`.
-28. **COMMITS / PR / EVIDENCE:** Source, normalization registers, Dataverse plans and ledgers, independent validation, replay proof, authority-search record, governance candidate, and final workbook are contained in this package. Commit and pull-request references are appended when the branch is published.
+28. **COMMITS / PR / EVIDENCE:** Initial implementation commit `08ebe765` is published in PR [#723](https://github.com/jmerrillorg/jmerrill-pub/pull/723). Source, normalization registers, Dataverse plans and ledgers, independent validation, replay proof, authority-search record, governance candidate, and the accompanying final workbook are indexed by SHA-256 in this package.
 
 ## Protection Proof
 

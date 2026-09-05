@@ -7,7 +7,7 @@ Correlation ID: `JMP-CATALOG-CANONICAL-20260905`
 |---|---:|---|
 | ALM-AND-DATAVERSE-COMMISSIONING.md | 2694 | `f0f73ea649e2fef5ecd3292cc566feba6c6b6ae9b0a3ce3ac4ef4fab9c866df4` |
 | JMP-Catalog-Authority-and-Product-Identity-Standard-v0.1-CANON-CANDIDATE.md | 4951 | `6ff7eeabce303318860cec9667ad9a671ec9e48291280a92d9fe481a56849e1c` |
-| PUBLISHING-CATALOG-RECONCILIATION-CLOSEOUT.md | 4849 | `e12e1ec7e88ceddf0eae84a4968e1ff25d6db2a4c95590d9fcc84975e8bddd8d` |
+| PUBLISHING-CATALOG-RECONCILIATION-CLOSEOUT.md | 4919 | `ecffd8da3fed88fdb9fc955d0867ed9aa67a31fa8dc9fe47d6e908722d527bfa` |
 | evidence/dataverse/catalog-promotion-dry-run.json | 693746 | `a11f3573a8212e929cb4bf1ce620aac64f6ebbba69b7e400497c8bb21271cf89` |
 | evidence/dataverse/catalog-promotion-incremental-prewrite.json | 710012 | `dbaf8fd12158b92a4c82b2856dbe0523cbab7b1dc0ea56d3f66c9f3d6b4a837a` |
 | evidence/dataverse/catalog-promotion-prewrite.json | 1574007 | `7092f9d3d6a1e67d771718302258b8d2786ce1ae9819e3402944645e86fb5ec5` |
