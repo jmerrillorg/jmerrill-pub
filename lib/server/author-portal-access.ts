@@ -220,12 +220,7 @@ export function resolveAuthorPortalAccessGrant({
       }
     }
 
-    if (matches.length === 1) {
-      return {
-        ...matches[0],
-        intakeReference: requestedReference,
-      }
-    }
+    return null
   }
 
   return matches[0]

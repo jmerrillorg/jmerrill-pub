@@ -34,6 +34,29 @@ export function getDataverseServerConfig(): DataverseServerConfig | null {
   return config
 }
 
+export function getV2DataverseServerConfig(): DataverseServerConfig | null {
+  const resourceUrl = cleanUrl(process.env.V2_DATAVERSE_RESOURCE_URL)
+  const baseUrl = cleanUrl(
+    process.env.V2_DATAVERSE_WEB_API_BASE_URL ||
+      process.env.V2_DATAVERSE_ENVIRONMENT_URL ||
+      (resourceUrl ? `${resourceUrl}/api/data/v9.2` : undefined),
+  )
+
+  const config = {
+    tenantId: process.env.V2_DATAVERSE_TENANT_ID?.trim() || process.env.DATAVERSE_TENANT_ID?.trim() || '',
+    clientId: process.env.V2_DATAVERSE_CLIENT_ID?.trim() || process.env.DATAVERSE_CLIENT_ID?.trim() || '',
+    clientSecret: process.env.V2_DATAVERSE_CLIENT_SECRET?.trim() || process.env.DATAVERSE_CLIENT_SECRET?.trim() || '',
+    resourceUrl,
+    webApiBaseUrl: baseUrl?.endsWith('/api/data/v9.2') ? baseUrl : `${baseUrl}/api/data/v9.2`,
+  }
+
+  if (!config.tenantId || !config.clientId || !config.clientSecret || !config.resourceUrl || !config.webApiBaseUrl) {
+    return null
+  }
+
+  return config
+}
+
 export async function dataverseList(
   config: DataverseServerConfig,
   entitySet: string,
@@ -127,6 +150,33 @@ export async function dataversePatch(
     const text = await safeResponseText(response)
     throw new Error(`dataverse_patch_failed:${entitySet}:${response.status}:${text.slice(0, 200)}`)
   }
+}
+
+export async function dataverseAction(
+  config: DataverseServerConfig,
+  actionName: string,
+  payload: Record<string, unknown>,
+) {
+  const token = await getDataverseAccessToken(config)
+  const response = await fetch(`${config.webApiBaseUrl}/${actionName}`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${token}`,
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+      'OData-MaxVersion': '4.0',
+      'OData-Version': '4.0',
+    },
+    body: JSON.stringify(payload),
+    cache: 'no-store',
+  })
+
+  const text = await safeResponseText(response)
+  if (!response.ok) {
+    throw new Error(`dataverse_action_failed:${actionName}:${response.status}:${text.slice(0, 300)}`)
+  }
+
+  return text ? (JSON.parse(text) as Record<string, unknown>) : {}
 }
 
 export function dataverseFormatted(row: DataverseRow, logicalName: string, fallback = '') {

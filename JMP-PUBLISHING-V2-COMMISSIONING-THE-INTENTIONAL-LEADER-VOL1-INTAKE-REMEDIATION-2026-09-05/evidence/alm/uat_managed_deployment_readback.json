@@ -1,0 +1,44 @@
+{
+  "status": "PASS",
+  "environment": "JM1-Test",
+  "whoAmI": {
+    "@odata.context": "https://jm1test.crm.dynamics.com/api/data/v9.2/$metadata#Microsoft.Dynamics.CRM.WhoAmIResponse",
+    "BusinessUnitId": "28e7df8f-f171-f111-ab0e-7ced8d70f765",
+    "UserId": "c4eedf8f-f171-f111-ab0e-7ced8d70f765",
+    "OrganizationId": "bb7a9d9e-8e73-f111-b27b-000d3a31ff17"
+  },
+  "solution": {
+    "@odata.etag": "W/\"4543437\"",
+    "solutionid": "bc03010d-6aee-4668-9c51-9241182b4c97",
+    "uniquename": "JMP_PublishingV2",
+    "ismanaged": true,
+    "version": "1.0.4.0"
+  },
+  "customApi": {
+    "@odata.etag": "W/\"4538878\"",
+    "uniquename": "jmpv2_SaveIntakeResponses",
+    "customapiid": "befcf37d-568d-4798-9917-9d1c7d6a56f3"
+  },
+  "responseTable": {
+    "@odata.context": "https://jm1test.crm.dynamics.com/api/data/v9.2/$metadata#EntityDefinitions(LogicalName,IsManaged)/$entity",
+    "MetadataId": "c8c06656-abb7-497e-9d19-c4b413b647ac",
+    "IsManaged": true,
+    "LogicalName": "jmpv2_intakeresponse"
+  },
+  "environmentTable": {
+    "@odata.context": "https://jm1test.crm.dynamics.com/api/data/v9.2/$metadata#EntityDefinitions(LogicalName,IsManaged)/$entity",
+    "MetadataId": "b51e3551-276f-4d8e-bfea-da999bef3448",
+    "IsManaged": true,
+    "LogicalName": "jmpv2_environmentauthority"
+  },
+  "environmentAuthority": {
+    "@odata.etag": "W/\"4548546\"",
+    "jmpv2_isactive": true,
+    "jmpv2_classification": "COMMISSIONING_UAT",
+    "jmpv2_environmentname": "JM1-Test",
+    "jmpv2_organizationid": "bb7a9d9e-8e73-f111-b27b-000d3a31ff17",
+    "jmpv2_environmentauthorityid": "4b2c083d-2ca9-f111-aaab-70a8a59b112b"
+  },
+  "packageSha256": "10b2c8c09b09fc2df0136e9b521184565b8bd87ca81110569369b0326215a8a9",
+  "completedAt": "2026-09-05T13:18:20.752Z"
+}

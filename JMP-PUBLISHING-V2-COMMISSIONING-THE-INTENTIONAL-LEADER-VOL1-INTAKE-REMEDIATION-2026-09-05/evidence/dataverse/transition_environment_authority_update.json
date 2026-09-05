@@ -1,0 +1,15 @@
+{
+  "status": "PASS",
+  "environment": "JM1-Dev",
+  "whoAmI": {
+    "@odata.context": "https://org52409ff2.crm.dynamics.com/api/data/v9.2/$metadata#Microsoft.Dynamics.CRM.WhoAmIResponse",
+    "BusinessUnitId": "bada8118-d0c5-f011-bbd2-000d3a307e8c",
+    "UserId": "2ee78118-d0c5-f011-bbd2-000d3a307e8c",
+    "OrganizationId": "579864ae-44cc-f011-95c7-000d3a37fe06"
+  },
+  "pluginAssemblyId": "f43c41ca-91a7-f111-b8de-6045bd01d436",
+  "priorVersion": "1.0.0.0",
+  "updatedVersion": "1.0.0.3",
+  "hardcodedEnvironmentLabels": 0,
+  "completedAt": "2026-09-05T13:10:48.808Z"
+}

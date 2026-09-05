@@ -33,6 +33,7 @@ import {
   projectCanonicalPublisherLifecycle,
   type CanonicalPublisherReadModel,
 } from '../publishing/lifecycle/operating-center-read-model'
+import { getPublisherV2IntakeReadback, type V2IntakeReadback } from './v2-intake'
 
 const TITLE_STAGE_EDITORIAL = 100000006
 const ASSET_STATUS_STAGED = 100000000
@@ -776,11 +777,13 @@ export type PublisherOperatingCenterSnapshot = {
   royalties: PublisherRoyaltyReviewQueue
   today: PublisherTodaySnapshot
   titleOperatingView: PublisherTitleOperatingView
+  v2Intake: V2IntakeReadback | null
 }
 
 type DataverseRow = Record<string, unknown>
 
 export async function buildPublisherOperatingCenterSnapshot(): Promise<PublisherOperatingCenterSnapshot> {
+  const v2Intake = await getPublisherV2IntakeReadback()
   const config = getDataverseServerConfig()
   if (!config) {
     return {
@@ -811,6 +814,7 @@ export async function buildPublisherOperatingCenterSnapshot(): Promise<Publisher
       royalties: readRoyaltyReviewQueue(),
       today: emptyPublisherToday(),
       titleOperatingView: emptyTitleOperatingView(),
+      v2Intake,
     }
   }
 
@@ -892,6 +896,7 @@ export async function buildPublisherOperatingCenterSnapshot(): Promise<Publisher
     royalties: readRoyaltyReviewQueue(),
     today,
     titleOperatingView,
+    v2Intake,
   }
 }
 

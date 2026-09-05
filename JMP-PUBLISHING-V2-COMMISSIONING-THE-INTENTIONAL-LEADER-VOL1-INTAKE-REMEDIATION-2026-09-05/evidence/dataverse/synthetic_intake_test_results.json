@@ -1,0 +1,161 @@
+{
+  "startedAt": "2026-09-05T13:08:21.910Z",
+  "environment": "JM1-Dev",
+  "whoAmI": {
+    "@odata.context": "https://org52409ff2.crm.dynamics.com/api/data/v9.2/$metadata#Microsoft.Dynamics.CRM.WhoAmIResponse",
+    "BusinessUnitId": "bada8118-d0c5-f011-bbd2-000d3a307e8c",
+    "UserId": "2ee78118-d0c5-f011-bbd2-000d3a307e8c",
+    "OrganizationId": "579864ae-44cc-f011-95c7-000d3a37fe06"
+  },
+  "run": "INTAKE-REMEDIATION-1788613694086",
+  "ids": {
+    "inquiryId": "6f70b6d9-2aa9-f111-aaac-6045bd01daa8",
+    "intakeId": "5597f6d9-2aa9-f111-aaab-000d3a30bedf",
+    "lifecycleId": "645dcc16-93a7-f111-b8dd-000d3a30bedf",
+    "authorId": "af381151-e54a-4bff-b567-4f18e51902d5"
+  },
+  "tests": [
+    {
+      "name": "partial save accepted",
+      "status": "PASS",
+      "detail": true
+    },
+    {
+      "name": "partial save remains incomplete",
+      "status": "PASS",
+      "detail": true
+    },
+    {
+      "name": "partial save has four deterministic reasons",
+      "status": "PASS",
+      "detail": true
+    },
+    {
+      "name": "partial response persists",
+      "status": "PASS",
+      "detail": true
+    },
+    {
+      "name": "lifecycle remains Stage 02",
+      "status": "PASS",
+      "detail": true
+    },
+    {
+      "name": "wrong author denied",
+      "status": "PASS"
+    },
+    {
+      "name": "wrong engagement denied",
+      "status": "PASS"
+    },
+    {
+      "name": "wrong lifecycle denied",
+      "status": "PASS"
+    },
+    {
+      "name": "wrong intake denied",
+      "status": "PASS"
+    },
+    {
+      "name": "unknown question denied",
+      "status": "PASS"
+    },
+    {
+      "name": "direct response create denied",
+      "status": "PASS"
+    },
+    {
+      "name": "direct completeness write denied",
+      "status": "PASS"
+    },
+    {
+      "name": "remaining answers save",
+      "status": "PASS",
+      "detail": true
+    },
+    {
+      "name": "all-answer save is ready not complete",
+      "status": "PASS",
+      "detail": true
+    },
+    {
+      "name": "submission is required",
+      "status": "PASS",
+      "detail": true
+    },
+    {
+      "name": "five response rows exist",
+      "status": "PASS",
+      "detail": true
+    },
+    {
+      "name": "replay does not duplicate response",
+      "status": "PASS"
+    },
+    {
+      "name": "response version increments",
+      "status": "PASS",
+      "detail": true
+    },
+    {
+      "name": "response authority context recorded",
+      "status": "PASS",
+      "detail": true
+    },
+    {
+      "name": "response correlation recorded",
+      "status": "PASS",
+      "detail": true
+    },
+    {
+      "name": "response environment is authoritative",
+      "status": "PASS",
+      "detail": true
+    },
+    {
+      "name": "complete submission accepted",
+      "status": "PASS",
+      "detail": true
+    },
+    {
+      "name": "completeness derives complete",
+      "status": "PASS",
+      "detail": true
+    },
+    {
+      "name": "submitted timestamp derives",
+      "status": "PASS",
+      "detail": true
+    },
+    {
+      "name": "completion reasons cleared",
+      "status": "PASS",
+      "detail": true
+    },
+    {
+      "name": "all response rows submitted",
+      "status": "PASS",
+      "detail": true
+    },
+    {
+      "name": "direct response update denied",
+      "status": "PASS"
+    },
+    {
+      "name": "direct response delete denied",
+      "status": "PASS"
+    },
+    {
+      "name": "lifecycle still Stage 02 after submit",
+      "status": "PASS",
+      "detail": true
+    },
+    {
+      "name": "environment config resolves development identity",
+      "status": "PASS"
+    }
+  ],
+  "passed": 30,
+  "failed": 0,
+  "completedAt": "2026-09-05T13:08:21.910Z"
+}

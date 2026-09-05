@@ -121,7 +121,7 @@ export function AuthorGate({
         email,
         challengeId,
         code: otpCode,
-        callbackUrl: '/author/portal',
+        callbackUrl: `${window.location.pathname}${window.location.search}`,
       })
       if (result?.error) throw new Error('The code was not accepted. Please check the code and try again.')
 

@@ -312,6 +312,7 @@ export function PublisherOperatingCenterClient({ initialSnapshot, signedIn, oper
       </section>
 
       <section className="mx-auto w-full max-w-none px-5 py-6 sm:px-8 2xl:px-10">
+        {snapshot?.v2Intake ? <V2IntakeReadbackPanel intake={snapshot.v2Intake} /> : null}
         {snapshot && (
             <TitlePipelineBoard
             snapshot={snapshot}
@@ -1018,6 +1019,42 @@ export function PublisherOperatingCenterClient({ initialSnapshot, signedIn, oper
         </div>
       </section>
     </main>
+  )
+}
+
+function V2IntakeReadbackPanel({ intake }: { intake: NonNullable<PublisherOperatingCenterSnapshot['v2Intake']> }) {
+  return (
+    <section className="mb-6 border border-amber-300/30 bg-amber-300/[0.07] p-5 sm:p-6">
+      <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+        <div>
+          <p className="font-mono text-[10px] uppercase text-amber-200">Commissioning / UAT V2 authority</p>
+          <h2 className="mt-2 text-2xl font-semibold text-white">{intake.title}</h2>
+          <p className="mt-1 text-sm text-white/60">{intake.author}</p>
+        </div>
+        <div className="flex flex-wrap gap-2 text-xs">
+          <span className="border border-amber-200/25 px-3 py-2 text-amber-100">{intake.stage}</span>
+          <span className="border border-white/10 px-3 py-2 text-white/65">{intake.environment}</span>
+        </div>
+      </div>
+      <dl className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <ReadbackDatum label="Intake status" value={intake.status} />
+        <ReadbackDatum label="Waiting on" value={intake.waitingOn} />
+        <ReadbackDatum label="Next action" value={intake.nextAction} />
+        <ReadbackDatum label="Specific attention" value={`${intake.outstandingCount} Intake requirements outstanding`} />
+      </dl>
+      <div className="mt-5 border-t border-white/10 pt-4 text-xs leading-6 text-white/55">
+        Manuscript: <strong className="text-white/80">{intake.manuscript.filename}</strong>
+      </div>
+    </section>
+  )
+}
+
+function ReadbackDatum({ label, value }: { label: string; value: string }) {
+  return (
+    <div>
+      <dt className="font-mono text-[10px] uppercase text-white/40">{label}</dt>
+      <dd className="mt-1 text-sm font-semibold text-white/85">{value}</dd>
+    </div>
   )
 }
 

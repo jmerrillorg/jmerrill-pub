@@ -22,7 +22,7 @@ env:
   AZURE_RESOURCE_GROUP: ${{ vars.JM1_PUB_APP_SERVICE_RESOURCE_GROUP }}
   AZURE_WEBAPP_NAME: ${{ vars.JM1_PUB_APP_SERVICE_NAME }}
   AZURE_STAGING_SLOT: staging
-  STAGING_HEALTH_URL: https://app-jm1-pub-prod-staging.azurewebsites.net/api/health
+  STAGING_HEALTH_URL: https://app-jm1-pub-prod-v2-staging.azurewebsites.net/api/health
   PRODUCTION_HEALTH_URL: https://jmerrill.pub/api/health
 
 jobs:
@@ -136,7 +136,7 @@ jobs:
             --resource-group "$AZURE_RESOURCE_GROUP" \
             --name "$AZURE_WEBAPP_NAME" \
             --slot "$AZURE_STAGING_SLOT" \
-            --settings JM1_RELEASE_SHA="${{ github.sha }}" SCM_DO_BUILD_DURING_DEPLOYMENT=false ENABLE_ORYX_BUILD=false WEBSITE_RUN_FROM_PACKAGE=1 WEBSITE_SKIP_NODE_MODULES_TAR=1 WEBSITE_WARMUP_PATH=/api/health WEBSITE_WARMUP_STATUSES=200 \
+            --settings JM1_RELEASE_SHA="${{ github.sha }}" V2_DATAVERSE_RESOURCE_URL="https://jm1test.crm.dynamics.com" V2_DATAVERSE_WEB_API_BASE_URL="https://jm1test.crm.dynamics.com/api/data/v9.2" SCM_DO_BUILD_DURING_DEPLOYMENT=false ENABLE_ORYX_BUILD=false WEBSITE_RUN_FROM_PACKAGE=1 WEBSITE_SKIP_NODE_MODULES_TAR=1 WEBSITE_WARMUP_PATH=/api/health WEBSITE_WARMUP_STATUSES=200 \
             --output none
           az webapp deploy \
             --resource-group "$AZURE_RESOURCE_GROUP" \

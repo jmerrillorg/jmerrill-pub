@@ -69,7 +69,7 @@ test('new author still sees onboarding and payment setup', () => {
   assert.equal(tasks.paymentRoyaltyRequired, true)
 })
 
-test('global access code can be scoped by explicit reference', () => {
+test('project access code denies an unbound reference override', () => {
   process.env.AUTHOR_PORTAL_ACCESS_REGISTRY_JSON = JSON.stringify([
     { code: 'shared-code', intakeReference: 'JMP-INT-1', title: 'First' },
   ])
@@ -79,8 +79,7 @@ test('global access code can be scoped by explicit reference', () => {
     requestedReference: 'JMP-INT-2',
   })
 
-  assert.ok(grant)
-  assert.equal(grant?.intakeReference, 'JMP-INT-2')
+  assert.equal(grant, null)
 })
 
 test('expired access code is rejected', () => {

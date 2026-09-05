@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict'
+import { createHash } from 'node:crypto'
 import test from 'node:test'
 import createJiti from 'jiti'
 
@@ -9,14 +10,15 @@ const terminology = jiti('../lib/server/author-facing-terminology.ts')
 const humanFirst = jiti('../lib/server/jm1-human-first-why-first-policy.ts')
 
 function attachment(role, fileName, contentType, bytes) {
+  const content = Buffer.from(bytes)
   return {
     role,
     artifactId: `artifact-${role}`,
     fileName,
     contentType,
-    contentBytesBase64: Buffer.from(bytes).toString('base64'),
-    sizeBytes: Buffer.byteLength(bytes),
-    sha256: 'checksum-present',
+    contentBytesBase64: content.toString('base64'),
+    sizeBytes: content.byteLength,
+    sha256: createHash('sha256').update(content).digest('hex'),
   }
 }
 

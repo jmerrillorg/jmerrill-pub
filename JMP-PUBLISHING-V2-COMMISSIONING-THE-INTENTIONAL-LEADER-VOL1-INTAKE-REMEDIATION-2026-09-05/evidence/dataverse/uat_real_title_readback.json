@@ -1,0 +1,214 @@
+{
+  "status": "PASS",
+  "generatedAt": "2026-09-05T13:26:17.191Z",
+  "currentStage": "02 Intake",
+  "environment": "JM1-Test",
+  "outstandingQuestions": 5,
+  "waitingOn": "Author",
+  "nextAction": "Complete Intake",
+  "manuscript": {
+    "filename": "The Intentional Leader Volume I - V2 Intake Source.docx",
+    "checksum": "701c16b72ff107603f0c09acd264434e97146b93b80ba4f175fb7bdbe3515d06"
+  },
+  "tests": [
+    {
+      "name": "Commissioning organization identity",
+      "status": "PASS",
+      "detail": "bb7a9d9e-8e73-f111-b27b-000d3a31ff17"
+    },
+    {
+      "name": "Managed solution version",
+      "status": "PASS",
+      "detail": "1.0.4.0"
+    },
+    {
+      "name": "Solution is managed",
+      "status": "PASS",
+      "detail": true
+    },
+    {
+      "name": "One engagement anchor",
+      "status": "PASS",
+      "detail": 1
+    },
+    {
+      "name": "One Intake record",
+      "status": "PASS",
+      "detail": 1
+    },
+    {
+      "name": "One lifecycle instance",
+      "status": "PASS",
+      "detail": 1
+    },
+    {
+      "name": "No duplicate V2 author profile",
+      "status": "PASS",
+      "detail": 0
+    },
+    {
+      "name": "No duplicate engagement table row",
+      "status": "PASS",
+      "detail": 0
+    },
+    {
+      "name": "Current stage is 02 Intake",
+      "status": "PASS",
+      "detail": "02_INTAKE"
+    },
+    {
+      "name": "Lifecycle remains active",
+      "status": "PASS",
+      "detail": true
+    },
+    {
+      "name": "Only one completed transition",
+      "status": "PASS",
+      "detail": 1
+    },
+    {
+      "name": "No 02 to 03 transition",
+      "status": "PASS",
+      "detail": [
+        "02_INTAKE"
+      ]
+    },
+    {
+      "name": "Intake remains incomplete",
+      "status": "PASS",
+      "detail": "REQUIRES_CLARIFICATION"
+    },
+    {
+      "name": "Five deterministic blockers",
+      "status": "PASS",
+      "detail": "MISSING_TARGET_AUDIENCE;RIGHTS_PROVENANCE_DISCLOSURE_REQUIRES_CURRENT_CONFIRMATION;SENSITIVE_CONTENT_DISCLOSURE_REQUIRES_CURRENT_CONFIRMATION;ACCESSIBILITY_INFORMATION_REQUIRES_CURRENT_CONFIRMATION;SERIES_INFORMATION_REQUIRES_CURRENT_CONFIRMATION"
+    },
+    {
+      "name": "No programmatic Jackie responses",
+      "status": "PASS",
+      "detail": 0
+    },
+    {
+      "name": "Title authority preserved",
+      "status": "PASS",
+      "detail": "The Intentional Leader, Volume I"
+    },
+    {
+      "name": "Author authority preserved",
+      "status": "PASS",
+      "detail": "Jackie Smith Jr"
+    },
+    {
+      "name": "Contact binding preserved",
+      "status": "PASS",
+      "detail": "d38aa56a-882a-f111-88b4-6045bdd69678"
+    },
+    {
+      "name": "One manuscript binding",
+      "status": "PASS",
+      "detail": 1
+    },
+    {
+      "name": "Manuscript filename preserved",
+      "status": "PASS",
+      "detail": "The Intentional Leader Volume I - V2 Intake Source.docx"
+    },
+    {
+      "name": "Manuscript checksum preserved",
+      "status": "PASS",
+      "detail": "701c16b72ff107603f0c09acd264434e97146b93b80ba4f175fb7bdbe3515d06"
+    },
+    {
+      "name": "Manuscript remains certified",
+      "status": "PASS",
+      "detail": "CERTIFIED_FOR_EDITORIAL_REVIEW"
+    },
+    {
+      "name": "Workspace identity preserved",
+      "status": "PASS",
+      "detail": "01DF3SEQPE2CYM7TA5JFD2LPUMHLK5L2CE"
+    },
+    {
+      "name": "Workspace remains in 02 Intake",
+      "status": "PASS",
+      "detail": "/drives/b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se/root:/01_Pipeline_A-Z/02 - Intake"
+    },
+    {
+      "name": "Intake folder remains present",
+      "status": "PASS",
+      "detail": "01DF3SEQPHYXL7MJEZFJEJSSC2BWHMQOQP"
+    },
+    {
+      "name": "Bound manuscript remains in Intake folder",
+      "status": "PASS",
+      "detail": "01DF3SEQJQ4TOTWXAVD5GZ5SOR3R7VPFKF"
+    },
+    {
+      "name": "Projection record remains successful",
+      "status": "PASS",
+      "detail": "MOVED_AFTER_COMMITTED_TRANSITION"
+    },
+    {
+      "name": "Waiting on is Author",
+      "status": "PASS",
+      "detail": "Author"
+    },
+    {
+      "name": "Next action is Complete Intake",
+      "status": "PASS",
+      "detail": "Complete Intake"
+    },
+    {
+      "name": "Timer is none",
+      "status": "PASS",
+      "detail": "None"
+    },
+    {
+      "name": "Environment authority is JM1-Test",
+      "status": "PASS",
+      "detail": "JM1-Test"
+    },
+    {
+      "name": "Environment classification is Commissioning UAT",
+      "status": "PASS",
+      "detail": "COMMISSIONING_UAT"
+    },
+    {
+      "name": "Current experience has no Dev label leakage",
+      "status": "PASS",
+      "detail": "JM1-Test"
+    },
+    {
+      "name": "Direct completeness write",
+      "status": "PASS",
+      "detail": "PATCH jmpv2_intakesubmissions(6368e4bc-17a9-f111-aaac-70a8a5b27793) failed 400: {\"error\":{\"code\":\"0x80040265\",\"message\":\"DIRECT_INTAKE_COMPLETENESS_WRITE_DENIED\"}}"
+    },
+    {
+      "name": "Direct response create",
+      "status": "PASS",
+      "detail": "POST jmpv2_intakeresponses failed 400: {\"error\":{\"code\":\"0x80040265\",\"message\":\"DIRECT_INTAKE_RESPONSE_WRITE_DENIED\"}}"
+    },
+    {
+      "name": "Wrong author command",
+      "status": "PASS",
+      "detail": "POST jmpv2_SaveIntakeResponses failed 400: {\"error\":{\"code\":\"0x80040265\",\"message\":\"AUTHOR_NOT_AUTHORIZED\"}}"
+    },
+    {
+      "name": "Negative proofs did not move lifecycle",
+      "status": "PASS",
+      "detail": "02_INTAKE"
+    },
+    {
+      "name": "Negative proofs created no response",
+      "status": "PASS",
+      "detail": 0
+    },
+    {
+      "name": "Negative proofs did not alter completeness",
+      "status": "PASS",
+      "detail": "REQUIRES_CLARIFICATION"
+    }
+  ],
+  "passed": 39,
+  "failed": 0
+}
