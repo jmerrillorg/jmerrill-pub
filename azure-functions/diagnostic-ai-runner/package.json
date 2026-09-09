@@ -16,9 +16,13 @@
     "@azure/identity": "^4.5.0",
     "@azure/storage-blob": "^12.32.0",
     "@azure/storage-queue": "^12.31.0",
-    "applicationinsights": "^2.9.8",
+    "applicationinsights": "^3.16.0",
     "docx": "^9.7.1",
     "jszip": "^3.10.1",
     "mammoth": "^1.12.0"
+  },
+  "overrides": {
+    "@xmldom/xmldom": "0.8.15",
+    "nanoid": "5.1.16"
   }
 }
