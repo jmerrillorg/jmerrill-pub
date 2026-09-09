@@ -1,0 +1,38 @@
+{
+  "canonicalBaselineTests": 2203,
+  "integratedTests": { "pass": 2241, "fail": 0 },
+  "focusedInboundTests": { "pass": 38, "fail": 0 },
+  "lint": "PASS",
+  "idempotency": "PASS",
+  "authorizationNegativeTests": "PASS",
+  "noDuplicateCommunication": "PASS",
+  "noPartialDataverseAuthority": "PASS",
+  "healthRoute": { "path": "/api/health", "httpStatus": 200, "status": "ready" },
+  "functionRegistrations": {
+    "total": 52,
+    "http": 43,
+    "timer": 8,
+    "storageQueue": 1,
+    "newInbound": 8
+  },
+  "package": {
+    "sha256": "7548804f5e7a406e7fc0b8c9f99861a6385bbb9ef89f192e4d0226b558ecac5d",
+    "independentBuildHashesMatch": true,
+    "entries": 17611,
+    "dependencyEntries": 17356,
+    "functionSourceModules": 45,
+    "inboundSupportModules": 15,
+    "testEntries": 0,
+    "localSettingsOrEnvEntries": 0
+  },
+  "secretPatternScan": "PASS",
+  "productionMutations": 0,
+  "dataverseMutations": 0,
+  "communications": 0,
+  "dependencyAudit": {
+    "lockfileChanged": false,
+    "moderate": 4,
+    "high": 2,
+    "disposition": "INHERITED_REVIEW_REQUIRED"
+  }
+}
