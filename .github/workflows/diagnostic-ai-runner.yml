@@ -76,12 +76,13 @@ jobs:
           (
             cd "$package_root"
             npm ci --omit=dev --ignore-scripts
+            find . -exec touch -h --date="@$source_date_epoch" {} +
           )
           test -f "$package_root/node_modules/@azure/functions/package.json"
 
           (
             cd "$package_root"
-            zip -X -q -r "$package_path" .
+            find . -mindepth 1 -print | LC_ALL=C sort | zip -X -q "$package_path" -@
           )
 
           test -f "$package_path"
