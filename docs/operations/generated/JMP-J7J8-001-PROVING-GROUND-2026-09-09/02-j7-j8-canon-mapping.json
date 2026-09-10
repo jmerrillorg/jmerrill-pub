@@ -1,0 +1,24 @@
+{
+  "exactJ7Scope": "Milestone 7 production-readiness preparation only: authority chain, prerequisite gates, human checkpoints, safe task payloads, internal visibility payload, and execution-log payload.",
+  "exactJ8Scope": "Milestone 8 distribution-setup readiness only plus mock/non-publishing distribution validation: metadata, ISBN/imprint, file readiness, pricing/territory, channel setup, proof-order gates, safe task payloads, internal visibility payload, and execution-log payload.",
+  "sourceBindings": [
+    "docs/operations/int-pub-005-milestone-7-production-readiness.md",
+    "docs/operations/int-pub-005-milestone-8-distribution-setup-readiness.md",
+    "azure-functions/diagnostic-ai-runner/src/production/milestone7ProductionReadiness.js",
+    "azure-functions/diagnostic-ai-runner/src/distribution/milestone8DistributionSetupReadiness.js",
+    "azure-functions/diagnostic-ai-runner/src/production/productionPipelineV2Doctrine.js",
+    "azure-functions/diagnostic-ai-runner/src/canon/milestoneCanonAlignment.js"
+  ],
+  "nonAuthorizedLiveActions": {
+    "startsMilestone9": false,
+    "startsPublicLaunchRelease": false,
+    "setsPublicReleaseDate": false,
+    "submitsToDistributionPlatforms": false,
+    "sendsLaunchEmail": false,
+    "createsRoyaltySetup": false,
+    "startsPostReleaseWork": false,
+    "activatesEditorialAgent": false,
+    "activatesMarketingAgent": false,
+    "usesQboForNewLogic": false
+  }
+}

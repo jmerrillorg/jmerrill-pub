@@ -1,0 +1,10 @@
+{
+  "noDuplicateAuthorAction": "PASS",
+  "noRepeatApproval": "PASS",
+  "noRepeatPayment": "PASS",
+  "noInternalSystemLanguageAuthorFacing": "PASS",
+  "founderHumanGatePreservedWhereRequired": "PASS",
+  "technologySupportsClientExperience": "PASS",
+  "systemGeneratedFrom": "publishing@email.jmerrill.one",
+  "replyDestination": "publishing@jmerrill.one"
+}
