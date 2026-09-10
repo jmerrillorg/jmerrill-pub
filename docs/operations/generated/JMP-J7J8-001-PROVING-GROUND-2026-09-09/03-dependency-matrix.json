@@ -1,0 +1,13 @@
+{
+  "e3SharedPrerequisiteProgram": "CLOSED_FOR_SUPERVISED_DEV_PROVING",
+  "publishingJ7J8EntryReady": "PUBLISHING_J7_J8_ENTRY_READY_WITH_BOUNDED_HOLDS",
+  "enterpriseWorkTitleRuntime": "PASS",
+  "secretlessOidc": "PASS",
+  "leastPrivilege": "PASS_FOR_DEV_SUPERVISED",
+  "blockedOrHeldCapabilities": [
+    "NO_PRODUCTION_AUTONOMY",
+    "NO_CLIENT_TITLE_AUTONOMY",
+    "NO_EXTERNAL_DISTRIBUTION_SUBMISSION",
+    "NO_TENANT_RATIONALIZATION_EXECUTION"
+  ]
+}

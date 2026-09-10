@@ -1,0 +1,172 @@
+[
+  {
+    "capability": "UNKNOWN_WORK",
+    "result": "DENIED",
+    "partialAuthorityEffects": 0,
+    "unauthorizedExternalEffects": 0,
+    "realAuthorEffects": 0,
+    "reason": "UNKNOWN_WORK_FAILS_CLOSED",
+    "rollbackClass": "SAFE_HOLD_REQUIRED",
+    "evidence": "JMP-J7J8-001:JMP-DEV-J7J8-001:UNKNOWN_WORK"
+  },
+  {
+    "capability": "UNKNOWN_PUBLISHING_TITLE",
+    "result": "DENIED",
+    "partialAuthorityEffects": 0,
+    "unauthorizedExternalEffects": 0,
+    "realAuthorEffects": 0,
+    "reason": "UNKNOWN_PUBLISHING_TITLE_FAILS_CLOSED",
+    "rollbackClass": "SAFE_HOLD_REQUIRED",
+    "evidence": "JMP-J7J8-001:JMP-DEV-J7J8-001:UNKNOWN_PUBLISHING_TITLE"
+  },
+  {
+    "capability": "MISSING_PROJECTION",
+    "result": "DENIED",
+    "partialAuthorityEffects": 0,
+    "unauthorizedExternalEffects": 0,
+    "realAuthorEffects": 0,
+    "reason": "MISSING_PROJECTION_FAILS_CLOSED",
+    "rollbackClass": "SAFE_HOLD_REQUIRED",
+    "evidence": "JMP-J7J8-001:JMP-DEV-J7J8-001:MISSING_PROJECTION"
+  },
+  {
+    "capability": "DUPLICATE_PROJECTION",
+    "result": "DENIED",
+    "partialAuthorityEffects": 0,
+    "unauthorizedExternalEffects": 0,
+    "realAuthorEffects": 0,
+    "reason": "DUPLICATE_PROJECTION_FAILS_CLOSED",
+    "rollbackClass": "SAFE_HOLD_REQUIRED",
+    "evidence": "JMP-J7J8-001:JMP-DEV-J7J8-001:DUPLICATE_PROJECTION"
+  },
+  {
+    "capability": "STALE_ARTIFACT_VERSION",
+    "result": "DENIED",
+    "partialAuthorityEffects": 0,
+    "unauthorizedExternalEffects": 0,
+    "realAuthorEffects": 0,
+    "reason": "STALE_ARTIFACT_VERSION_FAILS_CLOSED",
+    "rollbackClass": "SAFE_HOLD_REQUIRED",
+    "evidence": "JMP-J7J8-001:JMP-DEV-J7J8-001:STALE_ARTIFACT_VERSION"
+  },
+  {
+    "capability": "CHECKSUM_MISMATCH",
+    "result": "DENIED",
+    "partialAuthorityEffects": 0,
+    "unauthorizedExternalEffects": 0,
+    "realAuthorEffects": 0,
+    "reason": "CHECKSUM_MISMATCH_FAILS_CLOSED",
+    "rollbackClass": "SAFE_HOLD_REQUIRED",
+    "evidence": "JMP-J7J8-001:JMP-DEV-J7J8-001:CHECKSUM_MISMATCH"
+  },
+  {
+    "capability": "MISSING_PRODUCTION_AUTHORITY",
+    "result": "DENIED",
+    "partialAuthorityEffects": 0,
+    "unauthorizedExternalEffects": 0,
+    "realAuthorEffects": 0,
+    "reason": "MISSING_PRODUCTION_AUTHORITY_FAILS_CLOSED",
+    "rollbackClass": "SAFE_HOLD_REQUIRED",
+    "evidence": "JMP-J7J8-001:JMP-DEV-J7J8-001:MISSING_PRODUCTION_AUTHORITY"
+  },
+  {
+    "capability": "MISSING_DISTRIBUTION_AUTHORITY",
+    "result": "DENIED",
+    "partialAuthorityEffects": 0,
+    "unauthorizedExternalEffects": 0,
+    "realAuthorEffects": 0,
+    "reason": "MISSING_DISTRIBUTION_AUTHORITY_FAILS_CLOSED",
+    "rollbackClass": "SAFE_HOLD_REQUIRED",
+    "evidence": "JMP-J7J8-001:JMP-DEV-J7J8-001:MISSING_DISTRIBUTION_AUTHORITY"
+  },
+  {
+    "capability": "DUPLICATE_FORMAT_PRODUCT",
+    "result": "DENIED",
+    "partialAuthorityEffects": 0,
+    "unauthorizedExternalEffects": 0,
+    "realAuthorEffects": 0,
+    "reason": "DUPLICATE_FORMAT_PRODUCT_FAILS_CLOSED",
+    "rollbackClass": "SAFE_HOLD_REQUIRED",
+    "evidence": "JMP-J7J8-001:JMP-DEV-J7J8-001:DUPLICATE_FORMAT_PRODUCT"
+  },
+  {
+    "capability": "DUPLICATE_DISTRIBUTION_SUBMISSION",
+    "result": "DENIED",
+    "partialAuthorityEffects": 0,
+    "unauthorizedExternalEffects": 0,
+    "realAuthorEffects": 0,
+    "reason": "DUPLICATE_DISTRIBUTION_SUBMISSION_FAILS_CLOSED",
+    "rollbackClass": "IRREVERSIBLE_REQUIRES_HUMAN_GATE",
+    "evidence": "JMP-J7J8-001:JMP-DEV-J7J8-001:DUPLICATE_DISTRIBUTION_SUBMISSION"
+  },
+  {
+    "capability": "CROSS_WORK_ARTIFACT",
+    "result": "DENIED",
+    "partialAuthorityEffects": 0,
+    "unauthorizedExternalEffects": 0,
+    "realAuthorEffects": 0,
+    "reason": "CROSS_WORK_ARTIFACT_FAILS_CLOSED",
+    "rollbackClass": "SAFE_HOLD_REQUIRED",
+    "evidence": "JMP-J7J8-001:JMP-DEV-J7J8-001:CROSS_WORK_ARTIFACT"
+  },
+  {
+    "capability": "CROSS_TITLE_ARTIFACT",
+    "result": "DENIED",
+    "partialAuthorityEffects": 0,
+    "unauthorizedExternalEffects": 0,
+    "realAuthorEffects": 0,
+    "reason": "CROSS_TITLE_ARTIFACT_FAILS_CLOSED",
+    "rollbackClass": "SAFE_HOLD_REQUIRED",
+    "evidence": "JMP-J7J8-001:JMP-DEV-J7J8-001:CROSS_TITLE_ARTIFACT"
+  },
+  {
+    "capability": "UNAUTHORIZED_BAND_2_ACTION",
+    "result": "DENIED",
+    "partialAuthorityEffects": 0,
+    "unauthorizedExternalEffects": 0,
+    "realAuthorEffects": 0,
+    "reason": "UNAUTHORIZED_BAND_2_ACTION_FAILS_CLOSED",
+    "rollbackClass": "SAFE_HOLD_REQUIRED",
+    "evidence": "JMP-J7J8-001:JMP-DEV-J7J8-001:UNAUTHORIZED_BAND_2_ACTION"
+  },
+  {
+    "capability": "DIRECT_STATE_BYPASS",
+    "result": "DENIED",
+    "partialAuthorityEffects": 0,
+    "unauthorizedExternalEffects": 0,
+    "realAuthorEffects": 0,
+    "reason": "DIRECT_STATE_BYPASS_FAILS_CLOSED",
+    "rollbackClass": "SAFE_HOLD_REQUIRED",
+    "evidence": "JMP-J7J8-001:JMP-DEV-J7J8-001:DIRECT_STATE_BYPASS"
+  },
+  {
+    "capability": "UNAUTHORIZED_EXTERNAL_ACTION",
+    "result": "DENIED",
+    "partialAuthorityEffects": 0,
+    "unauthorizedExternalEffects": 0,
+    "realAuthorEffects": 0,
+    "reason": "UNAUTHORIZED_EXTERNAL_ACTION_FAILS_CLOSED",
+    "rollbackClass": "IRREVERSIBLE_REQUIRES_HUMAN_GATE",
+    "evidence": "JMP-J7J8-001:JMP-DEV-J7J8-001:UNAUTHORIZED_EXTERNAL_ACTION"
+  },
+  {
+    "capability": "UNAVAILABLE_REQUIRED_CAPACITY",
+    "result": "DENIED",
+    "partialAuthorityEffects": 0,
+    "unauthorizedExternalEffects": 0,
+    "realAuthorEffects": 0,
+    "reason": "UNAVAILABLE_REQUIRED_CAPACITY_FAILS_CLOSED",
+    "rollbackClass": "SAFE_HOLD_REQUIRED",
+    "evidence": "JMP-J7J8-001:JMP-DEV-J7J8-001:UNAVAILABLE_REQUIRED_CAPACITY"
+  },
+  {
+    "capability": "UNSANITIZED_AUTHOR_FACING_ARTIFACT",
+    "result": "DENIED",
+    "partialAuthorityEffects": 0,
+    "unauthorizedExternalEffects": 0,
+    "realAuthorEffects": 0,
+    "reason": "UNSANITIZED_AUTHOR_FACING_ARTIFACT_FAILS_CLOSED",
+    "rollbackClass": "SAFE_HOLD_REQUIRED",
+    "evidence": "JMP-J7J8-001:JMP-DEV-J7J8-001:UNSANITIZED_AUTHOR_FACING_ARTIFACT"
+  }
+]

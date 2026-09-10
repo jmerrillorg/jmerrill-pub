@@ -1,0 +1,1350 @@
+{
+  "packageId": "JMP-J7J8-001",
+  "policyVersion": "JMP_J7J8_PROVING_GROUND_V1",
+  "completedAt": "2026-09-09T00:00:00.000Z",
+  "context": {
+    "completedAt": "2026-09-09T00:00:00.000Z",
+    "environment": "JM1-DEV-SYNTHETIC",
+    "identity": "JM1-DEV-SHARED-BAND2-EXECUTOR",
+    "communicationAuthority": {
+      "systemGeneratedFrom": "publishing@email.jmerrill.one",
+      "humanReplyDestination": "publishing@jmerrill.one",
+      "authorFacingSanitationRequired": true
+    },
+    "enterpriseWork": {
+      "table": "jm1_enterprisework",
+      "enterpriseWorkId": "jm1-dev-enterprise-work-j7j8-001",
+      "workType": "PUBLISHING_TITLE",
+      "state": "ACTIVE_FOR_SUPERVISED_DEV_PROVING"
+    },
+    "projection": {
+      "table": "jm1_workprojection",
+      "workProjectionId": "jm1-dev-work-projection-j7j8-001",
+      "enterpriseWorkId": "jm1-dev-enterprise-work-j7j8-001",
+      "domainTable": "jm1pub_title",
+      "domainRecordId": "jm1-dev-title-j7j8-001",
+      "projectionPurpose": "PUBLISHING_TITLE_AUTHORITY"
+    },
+    "title": {
+      "table": "jm1pub_title",
+      "prohibitedParallelTable": "jm1_title",
+      "titleId": "jm1-dev-title-j7j8-001",
+      "titleIdentifier": "JMP-DEV-J7J8-001",
+      "titleName": "Synthetic J7/J8 Proving Title",
+      "state": "PUBLISHING_OWNED"
+    },
+    "sourceArtifact": {
+      "artifactId": "jm1-dev-artifact-final-editorial-j7j8-001",
+      "titleId": "jm1-dev-title-j7j8-001",
+      "enterpriseWorkId": "jm1-dev-enterprise-work-j7j8-001",
+      "version": "v1",
+      "isCurrentApproved": true,
+      "checksum": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "lineageAuthority": "FINAL_EDITORIAL_CERTIFICATION"
+    },
+    "opportunity": {
+      "opportunityId": "jm1-dev-opportunity-j7j8-001",
+      "active": true,
+      "authorSelectedPackageCode": "JMP-PKG-SYNTHETIC",
+      "packageSelectionStatus": "PACKAGE_SELECTED"
+    },
+    "author": {
+      "name": "Synthetic JM1-Dev Author",
+      "contactId": "jm1-dev-contact-j7j8-001"
+    },
+    "commercialAuthority": {
+      "rights": "RIGHTS_CLEARED_FOR_SYNTHETIC_PROVING",
+      "package": "PACKAGE_SELECTED",
+      "formatAuthority": "PF-01/PF-03_SELECTED_FOR_SYNTHETIC_PROVING",
+      "pricing": "PRICING_APPROVED_FOR_SYNTHETIC_PROVING"
+    },
+    "productForms": [
+      {
+        "titleEditionId": "jm1-dev-edition-pf01-j7j8-001",
+        "productFormCode": "PF-01",
+        "isbn": "9781961475000",
+        "channel": "INGRAM_PRINT"
+      },
+      {
+        "titleEditionId": "jm1-dev-edition-pf03-j7j8-001",
+        "productFormCode": "PF-03",
+        "isbn": "9781961475017",
+        "channel": "EBOOK_RETAIL"
+      }
+    ]
+  },
+  "authorityPreflight": {
+    "packageId": "JMP-J7J8-001",
+    "policyVersion": "JMP_J7J8_PROVING_GROUND_V1",
+    "j7CanonScope": "PROVEN",
+    "j8CanonScope": "PROVEN",
+    "commandCenterAuthority": "PROVEN",
+    "unresolvedScopeSemantics": 0,
+    "exactJ7Scope": "Milestone 7 production-readiness preparation only: authority chain, prerequisite gates, human checkpoints, safe task payloads, internal visibility payload, and execution-log payload.",
+    "exactJ8Scope": "Milestone 8 distribution-setup readiness only plus mock/non-publishing distribution validation: metadata, ISBN/imprint, file readiness, pricing/territory, channel setup, proof-order gates, safe task payloads, internal visibility payload, and execution-log payload.",
+    "sourceBindings": [
+      "docs/operations/int-pub-005-milestone-7-production-readiness.md",
+      "docs/operations/int-pub-005-milestone-8-distribution-setup-readiness.md",
+      "azure-functions/diagnostic-ai-runner/src/production/milestone7ProductionReadiness.js",
+      "azure-functions/diagnostic-ai-runner/src/distribution/milestone8DistributionSetupReadiness.js",
+      "azure-functions/diagnostic-ai-runner/src/production/productionPipelineV2Doctrine.js",
+      "azure-functions/diagnostic-ai-runner/src/canon/milestoneCanonAlignment.js"
+    ],
+    "nonAuthorizedLiveActions": {
+      "startsMilestone9": false,
+      "startsPublicLaunchRelease": false,
+      "setsPublicReleaseDate": false,
+      "submitsToDistributionPlatforms": false,
+      "sendsLaunchEmail": false,
+      "createsRoyaltySetup": false,
+      "startsPostReleaseWork": false,
+      "activatesEditorialAgent": false,
+      "activatesMarketingAgent": false,
+      "usesQboForNewLogic": false
+    },
+    "taxonomyVersion": "JM1_PRODUCTION_PIPELINE_V2_0",
+    "liveDistributionRequiresPublisherGate": "PUBLISHER_PUBLICATION_READINESS_APPROVAL"
+  },
+  "runtimeIntegrationContract": {
+    "ok": true,
+    "failures": [],
+    "enterpriseWorkId": "jm1-dev-enterprise-work-j7j8-001",
+    "publishingProjection": "jm1-dev-work-projection-j7j8-001",
+    "domainRecordBinding": "jm1pub_title:jm1-dev-title-j7j8-001",
+    "legacyIdentifierPreservation": "PASS",
+    "domainStateRemainsPublishingOwned": true,
+    "executionLogLinkage": "PASS"
+  },
+  "j7Proof": {
+    "ok": true,
+    "readiness": {
+      "ok": true,
+      "readiness": {
+        "diagnosticId": "64e387e0-7e6a-f111-a826-00224820105b",
+        "intakeReferenceCode": "JMP-INT-202606-UFYG60",
+        "opportunityId": "jm1-dev-opportunity-j7j8-001",
+        "selectedPackageCode": "JMP-PKG-SYNTHETIC",
+        "packageSelectionConfirmed": true,
+        "agreementSatisfied": true,
+        "onboardingSatisfied": true,
+        "paymentSatisfied": true,
+        "productionGateName": "JM1_PRODUCTION_AUTHORIZATION_ENABLED",
+        "productionGateEnabled": true,
+        "humanAuthorized": true,
+        "productionStartPermitted": true,
+        "blockers": [],
+        "paths": [
+          "EDITORIAL_PRODUCTION",
+          "DESIGN_COVER_LAYOUT",
+          "PROOFING",
+          "FILE_READINESS"
+        ],
+        "humanCheckpoints": [
+          "PRODUCTION_AUTHORIZATION_REVIEW",
+          "EDITORIAL_PLAN_APPROVAL",
+          "DESIGN_BRIEF_APPROVAL",
+          "PROOF_REVIEW_APPROVAL",
+          "FILE_READINESS_APPROVAL",
+          "DISTRIBUTION_RELEASE_STOP_REVIEW"
+        ],
+        "stopsBefore": [
+          "DISTRIBUTION_SETUP",
+          "RELEASE_LAUNCH",
+          "ROYALTY_SETUP",
+          "POST_RELEASE_MANAGEMENT"
+        ]
+      },
+      "taskTemplates": [
+        {
+          "path": "EDITORIAL_PRODUCTION",
+          "taskCode": "M7-EDITORIAL-PLAN",
+          "taskName": "Milestone 7 Editorial Production Plan",
+          "checkpoint": "EDITORIAL_PLAN_APPROVAL",
+          "entitySet": "jm1_publishingtasks",
+          "taskPayloadCreated": false,
+          "taskCreatedInDataverse": false
+        },
+        {
+          "path": "DESIGN_COVER_LAYOUT",
+          "taskCode": "M7-DESIGN-BRIEF",
+          "taskName": "Milestone 7 Cover and Layout Design Brief",
+          "checkpoint": "DESIGN_BRIEF_APPROVAL",
+          "entitySet": "jm1_publishingtasks",
+          "taskPayloadCreated": false,
+          "taskCreatedInDataverse": false
+        },
+        {
+          "path": "PROOFING",
+          "taskCode": "M7-PROOFING-PLAN",
+          "taskName": "Milestone 7 Proofing Plan",
+          "checkpoint": "PROOF_REVIEW_APPROVAL",
+          "entitySet": "jm1_publishingtasks",
+          "taskPayloadCreated": false,
+          "taskCreatedInDataverse": false
+        },
+        {
+          "path": "FILE_READINESS",
+          "taskCode": "M7-FILE-READINESS",
+          "taskName": "Milestone 7 Print and Digital File Readiness Check",
+          "checkpoint": "FILE_READINESS_APPROVAL",
+          "entitySet": "jm1_publishingtasks",
+          "taskPayloadCreated": false,
+          "taskCreatedInDataverse": false
+        }
+      ],
+      "taskPayloads": [
+        {
+          "entitySet": "jm1_publishingtasks",
+          "path": "EDITORIAL_PRODUCTION",
+          "checkpoint": "EDITORIAL_PLAN_APPROVAL",
+          "payload": {
+            "jm1_taskname": "Milestone 7 Editorial Production Plan - Synthetic J7/J8 Proving Title",
+            "jm1_iscompleted": false,
+            "jm1_duedate": "2026-09-10"
+          }
+        },
+        {
+          "entitySet": "jm1_publishingtasks",
+          "path": "DESIGN_COVER_LAYOUT",
+          "checkpoint": "DESIGN_BRIEF_APPROVAL",
+          "payload": {
+            "jm1_taskname": "Milestone 7 Cover and Layout Design Brief - Synthetic J7/J8 Proving Title",
+            "jm1_iscompleted": false,
+            "jm1_duedate": "2026-09-10"
+          }
+        },
+        {
+          "entitySet": "jm1_publishingtasks",
+          "path": "PROOFING",
+          "checkpoint": "PROOF_REVIEW_APPROVAL",
+          "payload": {
+            "jm1_taskname": "Milestone 7 Proofing Plan - Synthetic J7/J8 Proving Title",
+            "jm1_iscompleted": false,
+            "jm1_duedate": "2026-09-10"
+          }
+        },
+        {
+          "entitySet": "jm1_publishingtasks",
+          "path": "FILE_READINESS",
+          "checkpoint": "FILE_READINESS_APPROVAL",
+          "payload": {
+            "jm1_taskname": "Milestone 7 Print and Digital File Readiness Check - Synthetic J7/J8 Proving Title",
+            "jm1_iscompleted": false,
+            "jm1_duedate": "2026-09-10"
+          }
+        }
+      ],
+      "internalNotification": {
+        "prepared": true,
+        "type": "MILESTONE_7_PRODUCTION_READINESS",
+        "to": "publishing@jmerrill.one",
+        "cc": [],
+        "bcc": [],
+        "subject": "Milestone 7 production readiness: JMP-INT-202606-UFYG60",
+        "safePreview": "Milestone 7 production readiness evaluated for JMP-INT-202606-UFYG60. Production start permitted: yes. Blocking conditions: none. Stops before distribution, release, royalty setup, and post-release management."
+      },
+      "payloads": {
+        "executionLogEntitySet": "jm1_executionlogs",
+        "executionLogPayload": {
+          "jm1_name": "M7-PRODUCTION-READINESS-64e387e0-7e6a-f111-a826-00224820105b",
+          "jm1_actiondescription": "Milestone 7 production readiness for intake JMP-INT-202606-UFYG60. Existing active Opportunity jm1-dev-opportunity-j7j8-001 used; no duplicate Opportunity created. Selected package JMP-PKG-SYNTHETIC. Production start permitted yes. No readiness blockers. No Flow D activation, distribution setup, release launch, royalty setup, post-release management, payment link, invoice, contract send, author email, QBO logic, manuscript text, prompt body, raw model output, or secrets stored.",
+          "jm1_actiontype": "MILESTONE_7_PRODUCTION_READINESS",
+          "jm1_agentname": "jm1-diagnostic-ai-runner",
+          "jm1_agentmodel": "milestone-7-production-readiness",
+          "jm1_bandlevel": 835500000,
+          "jm1_executionstatus": 835500001,
+          "jm1_startedon": "2026-09-09T00:00:00.000Z",
+          "jm1_completedon": "2026-09-09T00:00:00.000Z",
+          "jm1_sourceentity": "jm1pub_editorialdiagnostic",
+          "jm1_sourcerecordid": "64e387e0-7e6a-f111-a826-00224820105b"
+        }
+      },
+      "liveActions": {
+        "createsProductionTasks": false,
+        "startsProductionWork": false,
+        "activatesFlowD": false,
+        "assignsIsbn": false,
+        "startsEditing": false,
+        "startsLayout": false,
+        "startsCoverDesign": false,
+        "startsDistribution": false,
+        "startsRelease": false,
+        "startsRoyaltySetup": false,
+        "sendsAuthorEmail": false,
+        "sendsContract": false,
+        "createsPaymentLink": false,
+        "createsInvoice": false,
+        "chargesCard": false,
+        "createsDuplicateOpportunity": false,
+        "usesQboForNewLogic": false
+      }
+    },
+    "productionWork": {
+      "ok": true,
+      "events": [
+        {
+          "eventType": "PRODUCTION_START_CREATED",
+          "scope": {
+            "titleId": "jm1-dev-title-j7j8-001",
+            "stageId": "final-editorial-certification"
+          }
+        },
+        {
+          "eventType": "INTERIOR_LAYOUT_WORK_CREATED",
+          "scope": {
+            "titleId": "jm1-dev-title-j7j8-001",
+            "stageId": "INTERIOR_LAYOUT"
+          }
+        },
+        {
+          "eventType": "COVER_DESIGN_WORK_CREATED",
+          "scope": {
+            "titleId": "jm1-dev-title-j7j8-001",
+            "stageId": "COVER_DESIGN"
+          }
+        }
+      ],
+      "workItems": [
+        {
+          "titleId": "jm1-dev-title-j7j8-001",
+          "sourceStageId": "final-editorial-certification",
+          "approvedSourceArtifactId": "jm1-dev-artifact-final-editorial-j7j8-001",
+          "sourceChecksum": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "correlationId": "JMP-J7J8-001:J7",
+          "workstream": "INTERIOR_LAYOUT",
+          "owner": "JM1 Automation",
+          "status": "QUEUED",
+          "retryable": true,
+          "dependsOn": []
+        },
+        {
+          "titleId": "jm1-dev-title-j7j8-001",
+          "sourceStageId": "final-editorial-certification",
+          "approvedSourceArtifactId": "jm1-dev-artifact-final-editorial-j7j8-001",
+          "sourceChecksum": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "correlationId": "JMP-J7J8-001:J7",
+          "workstream": "COVER_DESIGN",
+          "owner": "JM1 Automation",
+          "status": "QUEUED",
+          "retryable": true,
+          "dependsOn": []
+        }
+      ]
+    },
+    "authority": {
+      "sourceAuthority": "FINAL_EDITORIAL_CERTIFICATION",
+      "workTitleAuthority": "jm1pub_title",
+      "currentVersion": "v1",
+      "checksumLineage": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "productionEligibility": true,
+      "humanGates": [
+        "PRODUCTION_AUTHORIZATION_REVIEW",
+        "EDITORIAL_PLAN_APPROVAL",
+        "DESIGN_BRIEF_APPROVAL",
+        "PROOF_REVIEW_APPROVAL",
+        "FILE_READINESS_APPROVAL",
+        "DISTRIBUTION_RELEASE_STOP_REVIEW"
+      ],
+      "rightsCommercialGates": {
+        "rights": "RIGHTS_CLEARED_FOR_SYNTHETIC_PROVING",
+        "package": "PACKAGE_SELECTED",
+        "formatAuthority": "PF-01/PF-03_SELECTED_FOR_SYNTHETIC_PROVING",
+        "pricing": "PRICING_APPROVED_FOR_SYNTHETIC_PROVING"
+      },
+      "duplicateDenial": "PROVEN_BY_IDEMPOTENT_SYNTHETIC_KEYS",
+      "rollbackSafeHold": "SAFE_HOLD_REQUIRED_BEFORE_EXTERNAL_PRODUCTION"
+    }
+  },
+  "j8Proof": {
+    "ok": true,
+    "readiness": {
+      "ok": true,
+      "readiness": {
+        "diagnosticId": "64e387e0-7e6a-f111-a826-00224820105b",
+        "intakeReferenceCode": "JMP-INT-202606-UFYG60",
+        "opportunityId": "jm1-dev-opportunity-j7j8-001",
+        "productionComplete": true,
+        "metadataReady": true,
+        "isbnReady": true,
+        "printFileReady": true,
+        "ebookFileReady": true,
+        "coverFileReady": true,
+        "pricingReady": true,
+        "channelsReady": true,
+        "distributionGateName": "JM1_DISTRIBUTION_SETUP_ENABLED",
+        "distributionGateEnabled": true,
+        "humanAuthorized": true,
+        "distributionSetupPermitted": true,
+        "blockers": [],
+        "paths": [
+          "TITLE_METADATA",
+          "ISBN_IMPRINT",
+          "PRINT_FILE_SETUP",
+          "EBOOK_FILE_SETUP",
+          "COVER_FILE_SETUP",
+          "PRICING_TERRITORY",
+          "CHANNEL_SETUP",
+          "PROOF_ORDER_REVIEW"
+        ],
+        "channels": [
+          "INGRAM_PRINT",
+          "EBOOK_RETAIL"
+        ],
+        "humanCheckpoints": [
+          "DISTRIBUTION_SETUP_AUTHORIZATION_REVIEW",
+          "TITLE_METADATA_APPROVAL",
+          "ISBN_IMPRINT_APPROVAL",
+          "PRINT_FILE_APPROVAL",
+          "EBOOK_FILE_APPROVAL",
+          "COVER_FILE_APPROVAL",
+          "PRICING_TERRITORY_APPROVAL",
+          "CHANNEL_SETUP_APPROVAL",
+          "PROOF_ORDER_APPROVAL",
+          "LAUNCH_RELEASE_STOP_REVIEW"
+        ],
+        "stopsBefore": [
+          "LAUNCH_RELEASE",
+          "RETAIL_PUBLICATION",
+          "ROYALTY_SETUP",
+          "POST_RELEASE_MANAGEMENT"
+        ]
+      },
+      "taskTemplates": [
+        {
+          "path": "TITLE_METADATA",
+          "taskCode": "M8-TITLE-METADATA",
+          "taskName": "Milestone 8 Title Metadata Setup",
+          "checkpoint": "TITLE_METADATA_APPROVAL",
+          "entitySet": "jm1_publishingtasks",
+          "taskPayloadCreated": false,
+          "taskCreatedInDataverse": false
+        },
+        {
+          "path": "ISBN_IMPRINT",
+          "taskCode": "M8-ISBN-IMPRINT",
+          "taskName": "Milestone 8 ISBN and Imprint Setup",
+          "checkpoint": "ISBN_IMPRINT_APPROVAL",
+          "entitySet": "jm1_publishingtasks",
+          "taskPayloadCreated": false,
+          "taskCreatedInDataverse": false
+        },
+        {
+          "path": "PRINT_FILE_SETUP",
+          "taskCode": "M8-PRINT-FILE",
+          "taskName": "Milestone 8 Print File Distribution Setup",
+          "checkpoint": "PRINT_FILE_APPROVAL",
+          "entitySet": "jm1_publishingtasks",
+          "taskPayloadCreated": false,
+          "taskCreatedInDataverse": false
+        },
+        {
+          "path": "EBOOK_FILE_SETUP",
+          "taskCode": "M8-EBOOK-FILE",
+          "taskName": "Milestone 8 eBook File Distribution Setup",
+          "checkpoint": "EBOOK_FILE_APPROVAL",
+          "entitySet": "jm1_publishingtasks",
+          "taskPayloadCreated": false,
+          "taskCreatedInDataverse": false
+        },
+        {
+          "path": "COVER_FILE_SETUP",
+          "taskCode": "M8-COVER-FILE",
+          "taskName": "Milestone 8 Cover File Distribution Setup",
+          "checkpoint": "COVER_FILE_APPROVAL",
+          "entitySet": "jm1_publishingtasks",
+          "taskPayloadCreated": false,
+          "taskCreatedInDataverse": false
+        },
+        {
+          "path": "PRICING_TERRITORY",
+          "taskCode": "M8-PRICING-TERRITORY",
+          "taskName": "Milestone 8 Pricing and Territory Setup",
+          "checkpoint": "PRICING_TERRITORY_APPROVAL",
+          "entitySet": "jm1_publishingtasks",
+          "taskPayloadCreated": false,
+          "taskCreatedInDataverse": false
+        },
+        {
+          "path": "CHANNEL_SETUP",
+          "taskCode": "M8-CHANNEL-SETUP",
+          "taskName": "Milestone 8 Distribution Channel Setup",
+          "checkpoint": "CHANNEL_SETUP_APPROVAL",
+          "entitySet": "jm1_publishingtasks",
+          "taskPayloadCreated": false,
+          "taskCreatedInDataverse": false
+        },
+        {
+          "path": "PROOF_ORDER_REVIEW",
+          "taskCode": "M8-PROOF-ORDER",
+          "taskName": "Milestone 8 Proof Order Review",
+          "checkpoint": "PROOF_ORDER_APPROVAL",
+          "entitySet": "jm1_publishingtasks",
+          "taskPayloadCreated": false,
+          "taskCreatedInDataverse": false
+        }
+      ],
+      "taskPayloads": [
+        {
+          "entitySet": "jm1_publishingtasks",
+          "path": "TITLE_METADATA",
+          "checkpoint": "TITLE_METADATA_APPROVAL",
+          "payload": {
+            "jm1_taskname": "Milestone 8 Title Metadata Setup - Synthetic J7/J8 Proving Title",
+            "jm1_iscompleted": false,
+            "jm1_duedate": "2026-09-11"
+          }
+        },
+        {
+          "entitySet": "jm1_publishingtasks",
+          "path": "ISBN_IMPRINT",
+          "checkpoint": "ISBN_IMPRINT_APPROVAL",
+          "payload": {
+            "jm1_taskname": "Milestone 8 ISBN and Imprint Setup - Synthetic J7/J8 Proving Title",
+            "jm1_iscompleted": false,
+            "jm1_duedate": "2026-09-11"
+          }
+        },
+        {
+          "entitySet": "jm1_publishingtasks",
+          "path": "PRINT_FILE_SETUP",
+          "checkpoint": "PRINT_FILE_APPROVAL",
+          "payload": {
+            "jm1_taskname": "Milestone 8 Print File Distribution Setup - Synthetic J7/J8 Proving Title",
+            "jm1_iscompleted": false,
+            "jm1_duedate": "2026-09-11"
+          }
+        },
+        {
+          "entitySet": "jm1_publishingtasks",
+          "path": "EBOOK_FILE_SETUP",
+          "checkpoint": "EBOOK_FILE_APPROVAL",
+          "payload": {
+            "jm1_taskname": "Milestone 8 eBook File Distribution Setup - Synthetic J7/J8 Proving Title",
+            "jm1_iscompleted": false,
+            "jm1_duedate": "2026-09-11"
+          }
+        },
+        {
+          "entitySet": "jm1_publishingtasks",
+          "path": "COVER_FILE_SETUP",
+          "checkpoint": "COVER_FILE_APPROVAL",
+          "payload": {
+            "jm1_taskname": "Milestone 8 Cover File Distribution Setup - Synthetic J7/J8 Proving Title",
+            "jm1_iscompleted": false,
+            "jm1_duedate": "2026-09-11"
+          }
+        },
+        {
+          "entitySet": "jm1_publishingtasks",
+          "path": "PRICING_TERRITORY",
+          "checkpoint": "PRICING_TERRITORY_APPROVAL",
+          "payload": {
+            "jm1_taskname": "Milestone 8 Pricing and Territory Setup - Synthetic J7/J8 Proving Title",
+            "jm1_iscompleted": false,
+            "jm1_duedate": "2026-09-11"
+          }
+        },
+        {
+          "entitySet": "jm1_publishingtasks",
+          "path": "CHANNEL_SETUP",
+          "checkpoint": "CHANNEL_SETUP_APPROVAL",
+          "payload": {
+            "jm1_taskname": "Milestone 8 Distribution Channel Setup - Synthetic J7/J8 Proving Title",
+            "jm1_iscompleted": false,
+            "jm1_duedate": "2026-09-11"
+          }
+        },
+        {
+          "entitySet": "jm1_publishingtasks",
+          "path": "PROOF_ORDER_REVIEW",
+          "checkpoint": "PROOF_ORDER_APPROVAL",
+          "payload": {
+            "jm1_taskname": "Milestone 8 Proof Order Review - Synthetic J7/J8 Proving Title",
+            "jm1_iscompleted": false,
+            "jm1_duedate": "2026-09-11"
+          }
+        }
+      ],
+      "internalNotification": {
+        "prepared": true,
+        "type": "MILESTONE_8_DISTRIBUTION_SETUP_READINESS",
+        "to": "publishing@jmerrill.one",
+        "cc": [],
+        "bcc": [],
+        "subject": "Milestone 8 distribution setup readiness: JMP-INT-202606-UFYG60",
+        "safePreview": "Milestone 8 distribution setup readiness evaluated for JMP-INT-202606-UFYG60. Distribution setup permitted: yes. Blocking conditions: none. Stops before launch, release, royalty setup, and post-release management."
+      },
+      "payloads": {
+        "executionLogEntitySet": "jm1_executionlogs",
+        "executionLogPayload": {
+          "jm1_name": "M8-DISTRIBUTION-SETUP-64e387e0-7e6a-f111-a826-00224820105b",
+          "jm1_actiondescription": "Milestone 8 distribution setup readiness for intake JMP-INT-202606-UFYG60. Existing active Opportunity jm1-dev-opportunity-j7j8-001 used; no duplicate Opportunity created. Distribution setup permitted yes. No readiness blockers. No Ingram submission, retailer publication, release launch, royalty setup, post-release management, author email, payment action, QBO logic, manuscript text, prompt body, raw model output, credentials, or secrets stored.",
+          "jm1_actiontype": "MILESTONE_8_DISTRIBUTION_SETUP_READINESS",
+          "jm1_agentname": "jm1-diagnostic-ai-runner",
+          "jm1_agentmodel": "milestone-8-distribution-setup-readiness",
+          "jm1_bandlevel": 835500000,
+          "jm1_executionstatus": 835500001,
+          "jm1_startedon": "2026-09-09T00:00:00.000Z",
+          "jm1_completedon": "2026-09-09T00:00:00.000Z",
+          "jm1_sourceentity": "jm1pub_editorialdiagnostic",
+          "jm1_sourcerecordid": "64e387e0-7e6a-f111-a826-00224820105b"
+        }
+      },
+      "liveActions": {
+        "createsDistributionTasks": false,
+        "submitsToIngram": false,
+        "publishesRetailListing": false,
+        "setsReleaseDate": false,
+        "startsLaunch": false,
+        "startsRoyaltySetup": false,
+        "startsPostReleaseManagement": false,
+        "sendsAuthorEmail": false,
+        "createsPaymentLink": false,
+        "createsInvoice": false,
+        "chargesCard": false,
+        "createsDuplicateOpportunity": false,
+        "usesQboForNewLogic": false,
+        "exposesCredentials": false
+      }
+    },
+    "editions": [
+      {
+        "titleEditionId": "jm1-dev-edition-pf01-j7j8-001",
+        "titleId": "jm1-dev-title-j7j8-001",
+        "editionPlanId": "jm1-dev-edition-plan-j7j8-001",
+        "productFormCode": "PF-01",
+        "productFormName": "Paperback",
+        "editionStatus": "PLANNED",
+        "selectionStatus": "SELECTED_INCLUDED_SLOT",
+        "packageSlotStatus": "STANDARD_EQUAL_VALUE",
+        "commercialEligibility": "ELIGIBLE_SUBJECT_TO_PACKAGE_POLICY",
+        "runtimeCommissioningStatus": "NOT_STARTED",
+        "isbnRequirement": "DISTINCT_EDITION_ISBN_REQUIRED",
+        "isbn": "9781961475000",
+        "productionAttributes": {},
+        "releaseModel": "STANDARD_RELEASE",
+        "productionMode": "HYBRID",
+        "productionStatus": "READY",
+        "qaStatus": "PASSED",
+        "commercialStatus": "NOT_STARTED",
+        "distributionStatus": "READY_FOR_SETUP",
+        "blocker": "",
+        "blockerOwner": "",
+        "nextAutomaticAction": ""
+      },
+      {
+        "titleEditionId": "jm1-dev-edition-pf03-j7j8-001",
+        "titleId": "jm1-dev-title-j7j8-001",
+        "editionPlanId": "jm1-dev-edition-plan-j7j8-001",
+        "productFormCode": "PF-03",
+        "productFormName": "Standard Ebook",
+        "editionStatus": "PLANNED",
+        "selectionStatus": "SELECTED_INCLUDED_SLOT",
+        "packageSlotStatus": "STANDARD_EQUAL_VALUE",
+        "commercialEligibility": "ELIGIBLE_SUBJECT_TO_PACKAGE_POLICY",
+        "runtimeCommissioningStatus": "NOT_STARTED",
+        "isbnRequirement": "ONE_EDITION_ISBN",
+        "isbn": "9781961475017",
+        "productionAttributes": {},
+        "releaseModel": "STANDARD_RELEASE",
+        "productionMode": "HYBRID",
+        "productionStatus": "READY",
+        "qaStatus": "PASSED",
+        "commercialStatus": "NOT_STARTED",
+        "distributionStatus": "READY_FOR_SETUP",
+        "blocker": "",
+        "blockerOwner": "",
+        "nextAutomaticAction": ""
+      }
+    ],
+    "assembly": {
+      "ok": true,
+      "missing": [],
+      "event": "PRODUCTION_ASSEMBLY_READY"
+    },
+    "distributionReadiness": {
+      "ok": true,
+      "blockers": []
+    },
+    "mockDistribution": {
+      "ok": true,
+      "event": "DISTRIBUTOR_VALIDATION_PASSED",
+      "failures": [],
+      "forbiddenActionsDetected": []
+    },
+    "authority": {
+      "distributionEligibility": true,
+      "formatProductIdentity": [
+        "PF-01:jm1-dev-edition-pf01-j7j8-001",
+        "PF-03:jm1-dev-edition-pf03-j7j8-001"
+      ],
+      "isbnIdentifierMapping": [
+        "PF-01:9781961475000",
+        "PF-03:9781961475017"
+      ],
+      "channelEligibility": [
+        "INGRAM_PRINT",
+        "EBOOK_RETAIL"
+      ],
+      "releaseReadinessState": "SAFE_HOLD_BEFORE_LIVE_RELEASE",
+      "distributionPackageLineage": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "channelProjection": [
+        "PF-01:INGRAM_PRINT",
+        "PF-03:EBOOK_RETAIL"
+      ],
+      "releaseDayGating": "PUBLISHER_PUBLICATION_READINESS_APPROVAL_REQUIRED",
+      "postActionReadback": "PURE_SYNTHETIC_READBACK_ONLY",
+      "duplicateSubmissionDenial": "PROVEN_BY_NEGATIVE_CASES_AND_IDEMPOTENCY"
+    }
+  },
+  "negativeProof": [
+    {
+      "capability": "UNKNOWN_WORK",
+      "result": "DENIED",
+      "partialAuthorityEffects": 0,
+      "unauthorizedExternalEffects": 0,
+      "realAuthorEffects": 0,
+      "reason": "UNKNOWN_WORK_FAILS_CLOSED",
+      "rollbackClass": "SAFE_HOLD_REQUIRED",
+      "evidence": "JMP-J7J8-001:JMP-DEV-J7J8-001:UNKNOWN_WORK"
+    },
+    {
+      "capability": "UNKNOWN_PUBLISHING_TITLE",
+      "result": "DENIED",
+      "partialAuthorityEffects": 0,
+      "unauthorizedExternalEffects": 0,
+      "realAuthorEffects": 0,
+      "reason": "UNKNOWN_PUBLISHING_TITLE_FAILS_CLOSED",
+      "rollbackClass": "SAFE_HOLD_REQUIRED",
+      "evidence": "JMP-J7J8-001:JMP-DEV-J7J8-001:UNKNOWN_PUBLISHING_TITLE"
+    },
+    {
+      "capability": "MISSING_PROJECTION",
+      "result": "DENIED",
+      "partialAuthorityEffects": 0,
+      "unauthorizedExternalEffects": 0,
+      "realAuthorEffects": 0,
+      "reason": "MISSING_PROJECTION_FAILS_CLOSED",
+      "rollbackClass": "SAFE_HOLD_REQUIRED",
+      "evidence": "JMP-J7J8-001:JMP-DEV-J7J8-001:MISSING_PROJECTION"
+    },
+    {
+      "capability": "DUPLICATE_PROJECTION",
+      "result": "DENIED",
+      "partialAuthorityEffects": 0,
+      "unauthorizedExternalEffects": 0,
+      "realAuthorEffects": 0,
+      "reason": "DUPLICATE_PROJECTION_FAILS_CLOSED",
+      "rollbackClass": "SAFE_HOLD_REQUIRED",
+      "evidence": "JMP-J7J8-001:JMP-DEV-J7J8-001:DUPLICATE_PROJECTION"
+    },
+    {
+      "capability": "STALE_ARTIFACT_VERSION",
+      "result": "DENIED",
+      "partialAuthorityEffects": 0,
+      "unauthorizedExternalEffects": 0,
+      "realAuthorEffects": 0,
+      "reason": "STALE_ARTIFACT_VERSION_FAILS_CLOSED",
+      "rollbackClass": "SAFE_HOLD_REQUIRED",
+      "evidence": "JMP-J7J8-001:JMP-DEV-J7J8-001:STALE_ARTIFACT_VERSION"
+    },
+    {
+      "capability": "CHECKSUM_MISMATCH",
+      "result": "DENIED",
+      "partialAuthorityEffects": 0,
+      "unauthorizedExternalEffects": 0,
+      "realAuthorEffects": 0,
+      "reason": "CHECKSUM_MISMATCH_FAILS_CLOSED",
+      "rollbackClass": "SAFE_HOLD_REQUIRED",
+      "evidence": "JMP-J7J8-001:JMP-DEV-J7J8-001:CHECKSUM_MISMATCH"
+    },
+    {
+      "capability": "MISSING_PRODUCTION_AUTHORITY",
+      "result": "DENIED",
+      "partialAuthorityEffects": 0,
+      "unauthorizedExternalEffects": 0,
+      "realAuthorEffects": 0,
+      "reason": "MISSING_PRODUCTION_AUTHORITY_FAILS_CLOSED",
+      "rollbackClass": "SAFE_HOLD_REQUIRED",
+      "evidence": "JMP-J7J8-001:JMP-DEV-J7J8-001:MISSING_PRODUCTION_AUTHORITY"
+    },
+    {
+      "capability": "MISSING_DISTRIBUTION_AUTHORITY",
+      "result": "DENIED",
+      "partialAuthorityEffects": 0,
+      "unauthorizedExternalEffects": 0,
+      "realAuthorEffects": 0,
+      "reason": "MISSING_DISTRIBUTION_AUTHORITY_FAILS_CLOSED",
+      "rollbackClass": "SAFE_HOLD_REQUIRED",
+      "evidence": "JMP-J7J8-001:JMP-DEV-J7J8-001:MISSING_DISTRIBUTION_AUTHORITY"
+    },
+    {
+      "capability": "DUPLICATE_FORMAT_PRODUCT",
+      "result": "DENIED",
+      "partialAuthorityEffects": 0,
+      "unauthorizedExternalEffects": 0,
+      "realAuthorEffects": 0,
+      "reason": "DUPLICATE_FORMAT_PRODUCT_FAILS_CLOSED",
+      "rollbackClass": "SAFE_HOLD_REQUIRED",
+      "evidence": "JMP-J7J8-001:JMP-DEV-J7J8-001:DUPLICATE_FORMAT_PRODUCT"
+    },
+    {
+      "capability": "DUPLICATE_DISTRIBUTION_SUBMISSION",
+      "result": "DENIED",
+      "partialAuthorityEffects": 0,
+      "unauthorizedExternalEffects": 0,
+      "realAuthorEffects": 0,
+      "reason": "DUPLICATE_DISTRIBUTION_SUBMISSION_FAILS_CLOSED",
+      "rollbackClass": "IRREVERSIBLE_REQUIRES_HUMAN_GATE",
+      "evidence": "JMP-J7J8-001:JMP-DEV-J7J8-001:DUPLICATE_DISTRIBUTION_SUBMISSION"
+    },
+    {
+      "capability": "CROSS_WORK_ARTIFACT",
+      "result": "DENIED",
+      "partialAuthorityEffects": 0,
+      "unauthorizedExternalEffects": 0,
+      "realAuthorEffects": 0,
+      "reason": "CROSS_WORK_ARTIFACT_FAILS_CLOSED",
+      "rollbackClass": "SAFE_HOLD_REQUIRED",
+      "evidence": "JMP-J7J8-001:JMP-DEV-J7J8-001:CROSS_WORK_ARTIFACT"
+    },
+    {
+      "capability": "CROSS_TITLE_ARTIFACT",
+      "result": "DENIED",
+      "partialAuthorityEffects": 0,
+      "unauthorizedExternalEffects": 0,
+      "realAuthorEffects": 0,
+      "reason": "CROSS_TITLE_ARTIFACT_FAILS_CLOSED",
+      "rollbackClass": "SAFE_HOLD_REQUIRED",
+      "evidence": "JMP-J7J8-001:JMP-DEV-J7J8-001:CROSS_TITLE_ARTIFACT"
+    },
+    {
+      "capability": "UNAUTHORIZED_BAND_2_ACTION",
+      "result": "DENIED",
+      "partialAuthorityEffects": 0,
+      "unauthorizedExternalEffects": 0,
+      "realAuthorEffects": 0,
+      "reason": "UNAUTHORIZED_BAND_2_ACTION_FAILS_CLOSED",
+      "rollbackClass": "SAFE_HOLD_REQUIRED",
+      "evidence": "JMP-J7J8-001:JMP-DEV-J7J8-001:UNAUTHORIZED_BAND_2_ACTION"
+    },
+    {
+      "capability": "DIRECT_STATE_BYPASS",
+      "result": "DENIED",
+      "partialAuthorityEffects": 0,
+      "unauthorizedExternalEffects": 0,
+      "realAuthorEffects": 0,
+      "reason": "DIRECT_STATE_BYPASS_FAILS_CLOSED",
+      "rollbackClass": "SAFE_HOLD_REQUIRED",
+      "evidence": "JMP-J7J8-001:JMP-DEV-J7J8-001:DIRECT_STATE_BYPASS"
+    },
+    {
+      "capability": "UNAUTHORIZED_EXTERNAL_ACTION",
+      "result": "DENIED",
+      "partialAuthorityEffects": 0,
+      "unauthorizedExternalEffects": 0,
+      "realAuthorEffects": 0,
+      "reason": "UNAUTHORIZED_EXTERNAL_ACTION_FAILS_CLOSED",
+      "rollbackClass": "IRREVERSIBLE_REQUIRES_HUMAN_GATE",
+      "evidence": "JMP-J7J8-001:JMP-DEV-J7J8-001:UNAUTHORIZED_EXTERNAL_ACTION"
+    },
+    {
+      "capability": "UNAVAILABLE_REQUIRED_CAPACITY",
+      "result": "DENIED",
+      "partialAuthorityEffects": 0,
+      "unauthorizedExternalEffects": 0,
+      "realAuthorEffects": 0,
+      "reason": "UNAVAILABLE_REQUIRED_CAPACITY_FAILS_CLOSED",
+      "rollbackClass": "SAFE_HOLD_REQUIRED",
+      "evidence": "JMP-J7J8-001:JMP-DEV-J7J8-001:UNAVAILABLE_REQUIRED_CAPACITY"
+    },
+    {
+      "capability": "UNSANITIZED_AUTHOR_FACING_ARTIFACT",
+      "result": "DENIED",
+      "partialAuthorityEffects": 0,
+      "unauthorizedExternalEffects": 0,
+      "realAuthorEffects": 0,
+      "reason": "UNSANITIZED_AUTHOR_FACING_ARTIFACT_FAILS_CLOSED",
+      "rollbackClass": "SAFE_HOLD_REQUIRED",
+      "evidence": "JMP-J7J8-001:JMP-DEV-J7J8-001:UNSANITIZED_AUTHOR_FACING_ARTIFACT"
+    }
+  ],
+  "idempotencyProof": {
+    "pass": true,
+    "firstSignature": "6e2c068cc063f8bb5931902fe9acc61e789a1be7465fdfde7ea1471cf5f5087f",
+    "secondSignature": "6e2c068cc063f8bb5931902fe9acc61e789a1be7465fdfde7ea1471cf5f5087f",
+    "duplicateWorks": 0,
+    "duplicateProjections": 0,
+    "duplicateProductionRecords": 0,
+    "duplicateDistributionRecords": 0,
+    "duplicateCommunications": 0,
+    "sameExecutionReplay": "SAME_AUTHORITY / NO NEW EFFECT"
+  },
+  "proofMatrix": [
+    {
+      "CAPABILITY": "AUTHORITY_PREFLIGHT",
+      "J7_OR_J8": "SHARED",
+      "AUTHORITY_SOURCE": "docs/operations/int-pub-005-milestone-7-production-readiness.md; docs/operations/int-pub-005-milestone-8-distribution-setup-readiness.md; azure-functions/diagnostic-ai-runner/src/production/milestone7ProductionReadiness.js; azure-functions/diagnostic-ai-runner/src/distribution/milestone8DistributionSetupReadiness.js; azure-functions/diagnostic-ai-runner/src/production/productionPipelineV2Doctrine.js; azure-functions/diagnostic-ai-runner/src/canon/milestoneCanonAlignment.js",
+      "TEST_TYPE": "POSITIVE",
+      "IDENTITY": "JM1-DEV-SHARED-BAND2-EXECUTOR",
+      "INPUT": "JMP-J7J8-001",
+      "EXPECTED_RESULT": "CANON_SCOPE_PROVEN",
+      "ACTUAL_RESULT": "CANON_SCOPE_PROVEN",
+      "EXTERNAL_EFFECT": 0,
+      "ROLLBACK_CLASS": "REVERSIBLE",
+      "EVIDENCE": "authority-preflight.json",
+      "STATUS": "PASS"
+    },
+    {
+      "CAPABILITY": "ENTERPRISE_WORK_TITLE_INTEGRATION",
+      "J7_OR_J8": "SHARED",
+      "AUTHORITY_SOURCE": "jm1_enterprisework; jm1_workprojection; jm1pub_title",
+      "TEST_TYPE": "POSITIVE",
+      "IDENTITY": "JM1-DEV-SHARED-BAND2-EXECUTOR",
+      "INPUT": "jm1pub_title:jm1-dev-title-j7j8-001",
+      "EXPECTED_RESULT": "OPTION_C_BINDING_PROVEN",
+      "ACTUAL_RESULT": "OPTION_C_BINDING_PROVEN",
+      "EXTERNAL_EFFECT": 0,
+      "ROLLBACK_CLASS": "REVERSIBLE",
+      "EVIDENCE": "runtime-integration-contract.json",
+      "STATUS": "PASS"
+    },
+    {
+      "CAPABILITY": "PRODUCTION_READINESS_AUTHORITY_CHAIN",
+      "J7_OR_J8": "J7",
+      "AUTHORITY_SOURCE": "MILESTONE_7_PRODUCTION_READINESS",
+      "TEST_TYPE": "POSITIVE",
+      "IDENTITY": "JM1-DEV-SHARED-BAND2-EXECUTOR",
+      "INPUT": "jm1-dev-artifact-final-editorial-j7j8-001",
+      "EXPECTED_RESULT": "PRODUCTION_READINESS_PERMITTED_WITH_NO_LIVE_PRODUCTION",
+      "ACTUAL_RESULT": "PRODUCTION_READINESS_PERMITTED_WITH_NO_LIVE_PRODUCTION",
+      "EXTERNAL_EFFECT": 0,
+      "ROLLBACK_CLASS": "SAFE_HOLD_REQUIRED",
+      "EVIDENCE": "j7-proof.json",
+      "STATUS": "PASS"
+    },
+    {
+      "CAPABILITY": "DISTRIBUTION_SETUP_AUTHORITY_CHAIN",
+      "J7_OR_J8": "J8",
+      "AUTHORITY_SOURCE": "MILESTONE_8_DISTRIBUTION_SETUP_READINESS",
+      "TEST_TYPE": "POSITIVE",
+      "IDENTITY": "JM1-DEV-SHARED-BAND2-EXECUTOR",
+      "INPUT": "PF-01+PF-03",
+      "EXPECTED_RESULT": "DISTRIBUTION_SETUP_PERMITTED_WITH_NO_EXTERNAL_SUBMISSION",
+      "ACTUAL_RESULT": "DISTRIBUTION_SETUP_PERMITTED_WITH_NO_EXTERNAL_SUBMISSION",
+      "EXTERNAL_EFFECT": 0,
+      "ROLLBACK_CLASS": "SAFE_HOLD_REQUIRED",
+      "EVIDENCE": "j8-proof.json",
+      "STATUS": "PASS"
+    },
+    {
+      "CAPABILITY": "IDEMPOTENT_REPLAY",
+      "J7_OR_J8": "SHARED",
+      "AUTHORITY_SOURCE": "JMP_J7J8_PROVING_GROUND_V1",
+      "TEST_TYPE": "REPLAY",
+      "IDENTITY": "JM1-DEV-SHARED-BAND2-EXECUTOR",
+      "INPUT": "6e2c068cc063f8bb5931902fe9acc61e789a1be7465fdfde7ea1471cf5f5087f",
+      "EXPECTED_RESULT": "SAME_AUTHORITY_NO_NEW_EFFECT",
+      "ACTUAL_RESULT": "SAME_AUTHORITY_NO_NEW_EFFECT",
+      "EXTERNAL_EFFECT": 0,
+      "ROLLBACK_CLASS": "REVERSIBLE",
+      "EVIDENCE": "idempotency-proof.json",
+      "STATUS": "PASS"
+    },
+    {
+      "CAPABILITY": "UNKNOWN_WORK",
+      "J7_OR_J8": "SHARED",
+      "AUTHORITY_SOURCE": "JMP_J7J8_PROVING_GROUND_V1",
+      "TEST_TYPE": "NEGATIVE",
+      "IDENTITY": "JM1-DEV-SHARED-BAND2-EXECUTOR",
+      "INPUT": "UNKNOWN_WORK",
+      "EXPECTED_RESULT": "DENIED_OR_SAFE_HOLD",
+      "ACTUAL_RESULT": "DENIED",
+      "EXTERNAL_EFFECT": 0,
+      "ROLLBACK_CLASS": "SAFE_HOLD_REQUIRED",
+      "EVIDENCE": "JMP-J7J8-001:JMP-DEV-J7J8-001:UNKNOWN_WORK",
+      "STATUS": "PASS"
+    },
+    {
+      "CAPABILITY": "UNKNOWN_PUBLISHING_TITLE",
+      "J7_OR_J8": "SHARED",
+      "AUTHORITY_SOURCE": "JMP_J7J8_PROVING_GROUND_V1",
+      "TEST_TYPE": "NEGATIVE",
+      "IDENTITY": "JM1-DEV-SHARED-BAND2-EXECUTOR",
+      "INPUT": "UNKNOWN_PUBLISHING_TITLE",
+      "EXPECTED_RESULT": "DENIED_OR_SAFE_HOLD",
+      "ACTUAL_RESULT": "DENIED",
+      "EXTERNAL_EFFECT": 0,
+      "ROLLBACK_CLASS": "SAFE_HOLD_REQUIRED",
+      "EVIDENCE": "JMP-J7J8-001:JMP-DEV-J7J8-001:UNKNOWN_PUBLISHING_TITLE",
+      "STATUS": "PASS"
+    },
+    {
+      "CAPABILITY": "MISSING_PROJECTION",
+      "J7_OR_J8": "SHARED",
+      "AUTHORITY_SOURCE": "JMP_J7J8_PROVING_GROUND_V1",
+      "TEST_TYPE": "NEGATIVE",
+      "IDENTITY": "JM1-DEV-SHARED-BAND2-EXECUTOR",
+      "INPUT": "MISSING_PROJECTION",
+      "EXPECTED_RESULT": "DENIED_OR_SAFE_HOLD",
+      "ACTUAL_RESULT": "DENIED",
+      "EXTERNAL_EFFECT": 0,
+      "ROLLBACK_CLASS": "SAFE_HOLD_REQUIRED",
+      "EVIDENCE": "JMP-J7J8-001:JMP-DEV-J7J8-001:MISSING_PROJECTION",
+      "STATUS": "PASS"
+    },
+    {
+      "CAPABILITY": "DUPLICATE_PROJECTION",
+      "J7_OR_J8": "SHARED",
+      "AUTHORITY_SOURCE": "JMP_J7J8_PROVING_GROUND_V1",
+      "TEST_TYPE": "NEGATIVE",
+      "IDENTITY": "JM1-DEV-SHARED-BAND2-EXECUTOR",
+      "INPUT": "DUPLICATE_PROJECTION",
+      "EXPECTED_RESULT": "DENIED_OR_SAFE_HOLD",
+      "ACTUAL_RESULT": "DENIED",
+      "EXTERNAL_EFFECT": 0,
+      "ROLLBACK_CLASS": "SAFE_HOLD_REQUIRED",
+      "EVIDENCE": "JMP-J7J8-001:JMP-DEV-J7J8-001:DUPLICATE_PROJECTION",
+      "STATUS": "PASS"
+    },
+    {
+      "CAPABILITY": "STALE_ARTIFACT_VERSION",
+      "J7_OR_J8": "SHARED",
+      "AUTHORITY_SOURCE": "JMP_J7J8_PROVING_GROUND_V1",
+      "TEST_TYPE": "NEGATIVE",
+      "IDENTITY": "JM1-DEV-SHARED-BAND2-EXECUTOR",
+      "INPUT": "STALE_ARTIFACT_VERSION",
+      "EXPECTED_RESULT": "DENIED_OR_SAFE_HOLD",
+      "ACTUAL_RESULT": "DENIED",
+      "EXTERNAL_EFFECT": 0,
+      "ROLLBACK_CLASS": "SAFE_HOLD_REQUIRED",
+      "EVIDENCE": "JMP-J7J8-001:JMP-DEV-J7J8-001:STALE_ARTIFACT_VERSION",
+      "STATUS": "PASS"
+    },
+    {
+      "CAPABILITY": "CHECKSUM_MISMATCH",
+      "J7_OR_J8": "SHARED",
+      "AUTHORITY_SOURCE": "JMP_J7J8_PROVING_GROUND_V1",
+      "TEST_TYPE": "NEGATIVE",
+      "IDENTITY": "JM1-DEV-SHARED-BAND2-EXECUTOR",
+      "INPUT": "CHECKSUM_MISMATCH",
+      "EXPECTED_RESULT": "DENIED_OR_SAFE_HOLD",
+      "ACTUAL_RESULT": "DENIED",
+      "EXTERNAL_EFFECT": 0,
+      "ROLLBACK_CLASS": "SAFE_HOLD_REQUIRED",
+      "EVIDENCE": "JMP-J7J8-001:JMP-DEV-J7J8-001:CHECKSUM_MISMATCH",
+      "STATUS": "PASS"
+    },
+    {
+      "CAPABILITY": "MISSING_PRODUCTION_AUTHORITY",
+      "J7_OR_J8": "SHARED",
+      "AUTHORITY_SOURCE": "JMP_J7J8_PROVING_GROUND_V1",
+      "TEST_TYPE": "NEGATIVE",
+      "IDENTITY": "JM1-DEV-SHARED-BAND2-EXECUTOR",
+      "INPUT": "MISSING_PRODUCTION_AUTHORITY",
+      "EXPECTED_RESULT": "DENIED_OR_SAFE_HOLD",
+      "ACTUAL_RESULT": "DENIED",
+      "EXTERNAL_EFFECT": 0,
+      "ROLLBACK_CLASS": "SAFE_HOLD_REQUIRED",
+      "EVIDENCE": "JMP-J7J8-001:JMP-DEV-J7J8-001:MISSING_PRODUCTION_AUTHORITY",
+      "STATUS": "PASS"
+    },
+    {
+      "CAPABILITY": "MISSING_DISTRIBUTION_AUTHORITY",
+      "J7_OR_J8": "J8",
+      "AUTHORITY_SOURCE": "JMP_J7J8_PROVING_GROUND_V1",
+      "TEST_TYPE": "NEGATIVE",
+      "IDENTITY": "JM1-DEV-SHARED-BAND2-EXECUTOR",
+      "INPUT": "MISSING_DISTRIBUTION_AUTHORITY",
+      "EXPECTED_RESULT": "DENIED_OR_SAFE_HOLD",
+      "ACTUAL_RESULT": "DENIED",
+      "EXTERNAL_EFFECT": 0,
+      "ROLLBACK_CLASS": "SAFE_HOLD_REQUIRED",
+      "EVIDENCE": "JMP-J7J8-001:JMP-DEV-J7J8-001:MISSING_DISTRIBUTION_AUTHORITY",
+      "STATUS": "PASS"
+    },
+    {
+      "CAPABILITY": "DUPLICATE_FORMAT_PRODUCT",
+      "J7_OR_J8": "SHARED",
+      "AUTHORITY_SOURCE": "JMP_J7J8_PROVING_GROUND_V1",
+      "TEST_TYPE": "NEGATIVE",
+      "IDENTITY": "JM1-DEV-SHARED-BAND2-EXECUTOR",
+      "INPUT": "DUPLICATE_FORMAT_PRODUCT",
+      "EXPECTED_RESULT": "DENIED_OR_SAFE_HOLD",
+      "ACTUAL_RESULT": "DENIED",
+      "EXTERNAL_EFFECT": 0,
+      "ROLLBACK_CLASS": "SAFE_HOLD_REQUIRED",
+      "EVIDENCE": "JMP-J7J8-001:JMP-DEV-J7J8-001:DUPLICATE_FORMAT_PRODUCT",
+      "STATUS": "PASS"
+    },
+    {
+      "CAPABILITY": "DUPLICATE_DISTRIBUTION_SUBMISSION",
+      "J7_OR_J8": "J8",
+      "AUTHORITY_SOURCE": "JMP_J7J8_PROVING_GROUND_V1",
+      "TEST_TYPE": "NEGATIVE",
+      "IDENTITY": "JM1-DEV-SHARED-BAND2-EXECUTOR",
+      "INPUT": "DUPLICATE_DISTRIBUTION_SUBMISSION",
+      "EXPECTED_RESULT": "DENIED_OR_SAFE_HOLD",
+      "ACTUAL_RESULT": "DENIED",
+      "EXTERNAL_EFFECT": 0,
+      "ROLLBACK_CLASS": "IRREVERSIBLE_REQUIRES_HUMAN_GATE",
+      "EVIDENCE": "JMP-J7J8-001:JMP-DEV-J7J8-001:DUPLICATE_DISTRIBUTION_SUBMISSION",
+      "STATUS": "PASS"
+    },
+    {
+      "CAPABILITY": "CROSS_WORK_ARTIFACT",
+      "J7_OR_J8": "SHARED",
+      "AUTHORITY_SOURCE": "JMP_J7J8_PROVING_GROUND_V1",
+      "TEST_TYPE": "NEGATIVE",
+      "IDENTITY": "JM1-DEV-SHARED-BAND2-EXECUTOR",
+      "INPUT": "CROSS_WORK_ARTIFACT",
+      "EXPECTED_RESULT": "DENIED_OR_SAFE_HOLD",
+      "ACTUAL_RESULT": "DENIED",
+      "EXTERNAL_EFFECT": 0,
+      "ROLLBACK_CLASS": "SAFE_HOLD_REQUIRED",
+      "EVIDENCE": "JMP-J7J8-001:JMP-DEV-J7J8-001:CROSS_WORK_ARTIFACT",
+      "STATUS": "PASS"
+    },
+    {
+      "CAPABILITY": "CROSS_TITLE_ARTIFACT",
+      "J7_OR_J8": "SHARED",
+      "AUTHORITY_SOURCE": "JMP_J7J8_PROVING_GROUND_V1",
+      "TEST_TYPE": "NEGATIVE",
+      "IDENTITY": "JM1-DEV-SHARED-BAND2-EXECUTOR",
+      "INPUT": "CROSS_TITLE_ARTIFACT",
+      "EXPECTED_RESULT": "DENIED_OR_SAFE_HOLD",
+      "ACTUAL_RESULT": "DENIED",
+      "EXTERNAL_EFFECT": 0,
+      "ROLLBACK_CLASS": "SAFE_HOLD_REQUIRED",
+      "EVIDENCE": "JMP-J7J8-001:JMP-DEV-J7J8-001:CROSS_TITLE_ARTIFACT",
+      "STATUS": "PASS"
+    },
+    {
+      "CAPABILITY": "UNAUTHORIZED_BAND_2_ACTION",
+      "J7_OR_J8": "SHARED",
+      "AUTHORITY_SOURCE": "JMP_J7J8_PROVING_GROUND_V1",
+      "TEST_TYPE": "NEGATIVE",
+      "IDENTITY": "JM1-DEV-SHARED-BAND2-EXECUTOR",
+      "INPUT": "UNAUTHORIZED_BAND_2_ACTION",
+      "EXPECTED_RESULT": "DENIED_OR_SAFE_HOLD",
+      "ACTUAL_RESULT": "DENIED",
+      "EXTERNAL_EFFECT": 0,
+      "ROLLBACK_CLASS": "SAFE_HOLD_REQUIRED",
+      "EVIDENCE": "JMP-J7J8-001:JMP-DEV-J7J8-001:UNAUTHORIZED_BAND_2_ACTION",
+      "STATUS": "PASS"
+    },
+    {
+      "CAPABILITY": "DIRECT_STATE_BYPASS",
+      "J7_OR_J8": "SHARED",
+      "AUTHORITY_SOURCE": "JMP_J7J8_PROVING_GROUND_V1",
+      "TEST_TYPE": "NEGATIVE",
+      "IDENTITY": "JM1-DEV-SHARED-BAND2-EXECUTOR",
+      "INPUT": "DIRECT_STATE_BYPASS",
+      "EXPECTED_RESULT": "DENIED_OR_SAFE_HOLD",
+      "ACTUAL_RESULT": "DENIED",
+      "EXTERNAL_EFFECT": 0,
+      "ROLLBACK_CLASS": "SAFE_HOLD_REQUIRED",
+      "EVIDENCE": "JMP-J7J8-001:JMP-DEV-J7J8-001:DIRECT_STATE_BYPASS",
+      "STATUS": "PASS"
+    },
+    {
+      "CAPABILITY": "UNAUTHORIZED_EXTERNAL_ACTION",
+      "J7_OR_J8": "SHARED",
+      "AUTHORITY_SOURCE": "JMP_J7J8_PROVING_GROUND_V1",
+      "TEST_TYPE": "NEGATIVE",
+      "IDENTITY": "JM1-DEV-SHARED-BAND2-EXECUTOR",
+      "INPUT": "UNAUTHORIZED_EXTERNAL_ACTION",
+      "EXPECTED_RESULT": "DENIED_OR_SAFE_HOLD",
+      "ACTUAL_RESULT": "DENIED",
+      "EXTERNAL_EFFECT": 0,
+      "ROLLBACK_CLASS": "IRREVERSIBLE_REQUIRES_HUMAN_GATE",
+      "EVIDENCE": "JMP-J7J8-001:JMP-DEV-J7J8-001:UNAUTHORIZED_EXTERNAL_ACTION",
+      "STATUS": "PASS"
+    },
+    {
+      "CAPABILITY": "UNAVAILABLE_REQUIRED_CAPACITY",
+      "J7_OR_J8": "SHARED",
+      "AUTHORITY_SOURCE": "JMP_J7J8_PROVING_GROUND_V1",
+      "TEST_TYPE": "NEGATIVE",
+      "IDENTITY": "JM1-DEV-SHARED-BAND2-EXECUTOR",
+      "INPUT": "UNAVAILABLE_REQUIRED_CAPACITY",
+      "EXPECTED_RESULT": "DENIED_OR_SAFE_HOLD",
+      "ACTUAL_RESULT": "DENIED",
+      "EXTERNAL_EFFECT": 0,
+      "ROLLBACK_CLASS": "SAFE_HOLD_REQUIRED",
+      "EVIDENCE": "JMP-J7J8-001:JMP-DEV-J7J8-001:UNAVAILABLE_REQUIRED_CAPACITY",
+      "STATUS": "PASS"
+    },
+    {
+      "CAPABILITY": "UNSANITIZED_AUTHOR_FACING_ARTIFACT",
+      "J7_OR_J8": "SHARED",
+      "AUTHORITY_SOURCE": "JMP_J7J8_PROVING_GROUND_V1",
+      "TEST_TYPE": "NEGATIVE",
+      "IDENTITY": "JM1-DEV-SHARED-BAND2-EXECUTOR",
+      "INPUT": "UNSANITIZED_AUTHOR_FACING_ARTIFACT",
+      "EXPECTED_RESULT": "DENIED_OR_SAFE_HOLD",
+      "ACTUAL_RESULT": "DENIED",
+      "EXTERNAL_EFFECT": 0,
+      "ROLLBACK_CLASS": "SAFE_HOLD_REQUIRED",
+      "EVIDENCE": "JMP-J7J8-001:JMP-DEV-J7J8-001:UNSANITIZED_AUTHOR_FACING_ARTIFACT",
+      "STATUS": "PASS"
+    }
+  ],
+  "rollbackSafeHoldProof": {
+    "classifiedActions": [
+      {
+        "capability": "AUTHORITY_PREFLIGHT",
+        "rollbackClass": "REVERSIBLE",
+        "externalEffect": 0
+      },
+      {
+        "capability": "ENTERPRISE_WORK_TITLE_INTEGRATION",
+        "rollbackClass": "REVERSIBLE",
+        "externalEffect": 0
+      },
+      {
+        "capability": "PRODUCTION_READINESS_AUTHORITY_CHAIN",
+        "rollbackClass": "SAFE_HOLD_REQUIRED",
+        "externalEffect": 0
+      },
+      {
+        "capability": "DISTRIBUTION_SETUP_AUTHORITY_CHAIN",
+        "rollbackClass": "SAFE_HOLD_REQUIRED",
+        "externalEffect": 0
+      },
+      {
+        "capability": "IDEMPOTENT_REPLAY",
+        "rollbackClass": "REVERSIBLE",
+        "externalEffect": 0
+      },
+      {
+        "capability": "UNKNOWN_WORK",
+        "rollbackClass": "SAFE_HOLD_REQUIRED",
+        "externalEffect": 0
+      },
+      {
+        "capability": "UNKNOWN_PUBLISHING_TITLE",
+        "rollbackClass": "SAFE_HOLD_REQUIRED",
+        "externalEffect": 0
+      },
+      {
+        "capability": "MISSING_PROJECTION",
+        "rollbackClass": "SAFE_HOLD_REQUIRED",
+        "externalEffect": 0
+      },
+      {
+        "capability": "DUPLICATE_PROJECTION",
+        "rollbackClass": "SAFE_HOLD_REQUIRED",
+        "externalEffect": 0
+      },
+      {
+        "capability": "STALE_ARTIFACT_VERSION",
+        "rollbackClass": "SAFE_HOLD_REQUIRED",
+        "externalEffect": 0
+      },
+      {
+        "capability": "CHECKSUM_MISMATCH",
+        "rollbackClass": "SAFE_HOLD_REQUIRED",
+        "externalEffect": 0
+      },
+      {
+        "capability": "MISSING_PRODUCTION_AUTHORITY",
+        "rollbackClass": "SAFE_HOLD_REQUIRED",
+        "externalEffect": 0
+      },
+      {
+        "capability": "MISSING_DISTRIBUTION_AUTHORITY",
+        "rollbackClass": "SAFE_HOLD_REQUIRED",
+        "externalEffect": 0
+      },
+      {
+        "capability": "DUPLICATE_FORMAT_PRODUCT",
+        "rollbackClass": "SAFE_HOLD_REQUIRED",
+        "externalEffect": 0
+      },
+      {
+        "capability": "DUPLICATE_DISTRIBUTION_SUBMISSION",
+        "rollbackClass": "IRREVERSIBLE_REQUIRES_HUMAN_GATE",
+        "externalEffect": 0
+      },
+      {
+        "capability": "CROSS_WORK_ARTIFACT",
+        "rollbackClass": "SAFE_HOLD_REQUIRED",
+        "externalEffect": 0
+      },
+      {
+        "capability": "CROSS_TITLE_ARTIFACT",
+        "rollbackClass": "SAFE_HOLD_REQUIRED",
+        "externalEffect": 0
+      },
+      {
+        "capability": "UNAUTHORIZED_BAND_2_ACTION",
+        "rollbackClass": "SAFE_HOLD_REQUIRED",
+        "externalEffect": 0
+      },
+      {
+        "capability": "DIRECT_STATE_BYPASS",
+        "rollbackClass": "SAFE_HOLD_REQUIRED",
+        "externalEffect": 0
+      },
+      {
+        "capability": "UNAUTHORIZED_EXTERNAL_ACTION",
+        "rollbackClass": "IRREVERSIBLE_REQUIRES_HUMAN_GATE",
+        "externalEffect": 0
+      },
+      {
+        "capability": "UNAVAILABLE_REQUIRED_CAPACITY",
+        "rollbackClass": "SAFE_HOLD_REQUIRED",
+        "externalEffect": 0
+      },
+      {
+        "capability": "UNSANITIZED_AUTHOR_FACING_ARTIFACT",
+        "rollbackClass": "SAFE_HOLD_REQUIRED",
+        "externalEffect": 0
+      }
+    ],
+    "rollbackSafeHold": "PASS"
+  },
+  "humanFirstExperienceProof": {
+    "noDuplicateAuthorAction": "PASS",
+    "noRepeatApproval": "PASS",
+    "noRepeatPayment": "PASS",
+    "noInternalSystemLanguageAuthorFacing": "PASS",
+    "founderHumanGatePreservedWhereRequired": "PASS",
+    "technologySupportsClientExperience": "PASS",
+    "systemGeneratedFrom": "publishing@email.jmerrill.one",
+    "replyDestination": "publishing@jmerrill.one"
+  },
+  "finalDecision": {
+    "JMP_J7J8_001_STATUS": "JMP_J7J8_001_PROVING_PASS",
+    "J7_CANON_SCOPE": "PROVEN",
+    "J8_CANON_SCOPE": "PROVEN",
+    "COMMAND_CENTER_AUTHORITY": "PROVEN",
+    "ENTERPRISE_WORK_TITLE_INTEGRATION": "PASS",
+    "J7_PROVING_STATUS": "PASS",
+    "J8_PROVING_STATUS": "PASS",
+    "SUPERVISED_BAND2_PROVING": "PASS",
+    "SECRETLESS_EXECUTION": "PASS",
+    "IDEMPOTENCY": "PASS",
+    "FAIL_CLOSED": "PASS",
+    "ROLLBACK_SAFE_HOLD": "PASS",
+    "HUMAN_FIRST_EXPERIENCE": "PASS",
+    "REAL_AUTHOR_OPERATIONS": "CONTINUE_IN_PARALLEL",
+    "REAL_AUTHOR_TITLE_MUTATIONS": 0,
+    "REAL_AUTHOR_COMMUNICATIONS": 0,
+    "REAL_TITLE_MIGRATIONS": 0,
+    "FINANCIAL_MUTATIONS": 0,
+    "PRODUCTION_AUTONOMY": "NO",
+    "CLIENT_TITLE_AUTONOMY": "FROZEN",
+    "BAND2_AUTONOMOUS_CERTIFICATION": "NO",
+    "BOUNDED_HOLDS_REMAINING": [
+      "NO_PRODUCTION_AUTONOMY",
+      "NO_CLIENT_TITLE_AUTONOMY",
+      "NO_EXTERNAL_DISTRIBUTION_SUBMISSION",
+      "NO_TENANT_RATIONALIZATION_EXECUTION"
+    ],
+    "TENANT_RATIONALIZATION_TRIGGER_REACHED": "YES",
+    "NEXT_FOUNDER_GATE": "AUTHORIZE_NEXT_BOUNDED_PACKAGE_OR_KEEP_CLIENT_TITLE_AUTOMATION_FROZEN",
+    "RECOMMENDED_NEXT_PACKAGE": "JMP-J7J8-002-CONTROLLED-DEV-RUNTIME-WRITEBACK-IF_FOUNDER_AUTHORIZES"
+  }
+}

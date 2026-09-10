@@ -1,0 +1,115 @@
+{
+  "classifiedActions": [
+    {
+      "capability": "AUTHORITY_PREFLIGHT",
+      "rollbackClass": "REVERSIBLE",
+      "externalEffect": 0
+    },
+    {
+      "capability": "ENTERPRISE_WORK_TITLE_INTEGRATION",
+      "rollbackClass": "REVERSIBLE",
+      "externalEffect": 0
+    },
+    {
+      "capability": "PRODUCTION_READINESS_AUTHORITY_CHAIN",
+      "rollbackClass": "SAFE_HOLD_REQUIRED",
+      "externalEffect": 0
+    },
+    {
+      "capability": "DISTRIBUTION_SETUP_AUTHORITY_CHAIN",
+      "rollbackClass": "SAFE_HOLD_REQUIRED",
+      "externalEffect": 0
+    },
+    {
+      "capability": "IDEMPOTENT_REPLAY",
+      "rollbackClass": "REVERSIBLE",
+      "externalEffect": 0
+    },
+    {
+      "capability": "UNKNOWN_WORK",
+      "rollbackClass": "SAFE_HOLD_REQUIRED",
+      "externalEffect": 0
+    },
+    {
+      "capability": "UNKNOWN_PUBLISHING_TITLE",
+      "rollbackClass": "SAFE_HOLD_REQUIRED",
+      "externalEffect": 0
+    },
+    {
+      "capability": "MISSING_PROJECTION",
+      "rollbackClass": "SAFE_HOLD_REQUIRED",
+      "externalEffect": 0
+    },
+    {
+      "capability": "DUPLICATE_PROJECTION",
+      "rollbackClass": "SAFE_HOLD_REQUIRED",
+      "externalEffect": 0
+    },
+    {
+      "capability": "STALE_ARTIFACT_VERSION",
+      "rollbackClass": "SAFE_HOLD_REQUIRED",
+      "externalEffect": 0
+    },
+    {
+      "capability": "CHECKSUM_MISMATCH",
+      "rollbackClass": "SAFE_HOLD_REQUIRED",
+      "externalEffect": 0
+    },
+    {
+      "capability": "MISSING_PRODUCTION_AUTHORITY",
+      "rollbackClass": "SAFE_HOLD_REQUIRED",
+      "externalEffect": 0
+    },
+    {
+      "capability": "MISSING_DISTRIBUTION_AUTHORITY",
+      "rollbackClass": "SAFE_HOLD_REQUIRED",
+      "externalEffect": 0
+    },
+    {
+      "capability": "DUPLICATE_FORMAT_PRODUCT",
+      "rollbackClass": "SAFE_HOLD_REQUIRED",
+      "externalEffect": 0
+    },
+    {
+      "capability": "DUPLICATE_DISTRIBUTION_SUBMISSION",
+      "rollbackClass": "IRREVERSIBLE_REQUIRES_HUMAN_GATE",
+      "externalEffect": 0
+    },
+    {
+      "capability": "CROSS_WORK_ARTIFACT",
+      "rollbackClass": "SAFE_HOLD_REQUIRED",
+      "externalEffect": 0
+    },
+    {
+      "capability": "CROSS_TITLE_ARTIFACT",
+      "rollbackClass": "SAFE_HOLD_REQUIRED",
+      "externalEffect": 0
+    },
+    {
+      "capability": "UNAUTHORIZED_BAND_2_ACTION",
+      "rollbackClass": "SAFE_HOLD_REQUIRED",
+      "externalEffect": 0
+    },
+    {
+      "capability": "DIRECT_STATE_BYPASS",
+      "rollbackClass": "SAFE_HOLD_REQUIRED",
+      "externalEffect": 0
+    },
+    {
+      "capability": "UNAUTHORIZED_EXTERNAL_ACTION",
+      "rollbackClass": "IRREVERSIBLE_REQUIRES_HUMAN_GATE",
+      "externalEffect": 0
+    },
+    {
+      "capability": "UNAVAILABLE_REQUIRED_CAPACITY",
+      "rollbackClass": "SAFE_HOLD_REQUIRED",
+      "externalEffect": 0
+    },
+    {
+      "capability": "UNSANITIZED_AUTHOR_FACING_ARTIFACT",
+      "rollbackClass": "SAFE_HOLD_REQUIRED",
+      "externalEffect": 0
+    }
+  ],
+  "rollbackSafeHold": "PASS"
+}

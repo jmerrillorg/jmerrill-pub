@@ -1,0 +1,11 @@
+{
+  "pass": true,
+  "firstSignature": "6e2c068cc063f8bb5931902fe9acc61e789a1be7465fdfde7ea1471cf5f5087f",
+  "secondSignature": "6e2c068cc063f8bb5931902fe9acc61e789a1be7465fdfde7ea1471cf5f5087f",
+  "duplicateWorks": 0,
+  "duplicateProjections": 0,
+  "duplicateProductionRecords": 0,
+  "duplicateDistributionRecords": 0,
+  "duplicateCommunications": 0,
+  "sameExecutionReplay": "SAME_AUTHORITY / NO NEW EFFECT"
+}

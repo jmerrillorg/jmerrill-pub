@@ -1,0 +1,10 @@
+{
+  "ok": true,
+  "failures": [],
+  "enterpriseWorkId": "jm1-dev-enterprise-work-j7j8-001",
+  "publishingProjection": "jm1-dev-work-projection-j7j8-001",
+  "domainRecordBinding": "jm1pub_title:jm1-dev-title-j7j8-001",
+  "legacyIdentifierPreservation": "PASS",
+  "domainStateRemainsPublishingOwned": true,
+  "executionLogLinkage": "PASS"
+}
