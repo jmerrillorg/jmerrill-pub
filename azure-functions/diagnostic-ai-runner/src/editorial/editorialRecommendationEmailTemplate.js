@@ -7,6 +7,12 @@
  */
 
 const crypto = require("node:crypto");
+const {
+  catalogPackage,
+  buildAuthorCenteredPackageRationale,
+  validatePackageRecommendation,
+  findInternalLanguage
+} = require("../author/authorCommunicationPreflight");
 
 const TEMPLATE_NAME = "EDITORIAL_RECOMMENDATION_LETTER";
 const TEMPLATE_VERSION = "1.1.0";
@@ -84,10 +90,11 @@ function recommendedServices(packageCode) {
 }
 
 function packageWhy({ packageCode, recommendation, projectTitle }) {
-  if (packageCode === "JMP-PKG-PRO") {
-    return `${recommendation.name} is the strongest fit because ${projectTitle} needs more than a quick publishing setup. It needs a fuller editorial and production path that can help the manuscript mature without losing its message.`;
-  }
-  return `${recommendation.name} is the strongest fit because it gives this manuscript a governed path from editorial review into the next publishing decision.`;
+  return buildAuthorCenteredPackageRationale({
+    packageCode,
+    packageName: recommendation.name,
+    projectTitle
+  });
 }
 
 function alternateText({ alternate }) {
@@ -111,8 +118,8 @@ function paragraph(value) {
 function buildHtmlEmail(input) {
   const authorFirstName = firstNameFrom(input.authorName);
   const projectTitle = normalizeString(input.projectTitle) || "your manuscript";
-  const recommendation = input.recommendedPackage || { name: "Professional Publishing Package", price: "$4,500" };
-  const alternate = input.alternatePackage || { name: "Starter Publishing Package", price: "$1,999" };
+  const recommendation = input.recommendedPackage || catalogPackage(input.packageCode || "JMP-PKG-PRO");
+  const alternate = input.alternatePackage || catalogPackage(input.alternatePackageCode || "JMP-PKG-STARTER");
   const summary = buildReviewSummary(input);
   const services = recommendedServices(input.packageCode);
   const replyHref = `mailto:${BRAND_EMAIL}?subject=${encodeURIComponent("My Publishing Package Selection")}`;
@@ -243,8 +250,8 @@ function buildHtmlEmail(input) {
 function buildPlainTextEmail(input) {
   const authorFirstName = firstNameFrom(input.authorName);
   const projectTitle = normalizeString(input.projectTitle) || "your manuscript";
-  const recommendation = input.recommendedPackage || { name: "Professional Publishing Package", price: "$4,500" };
-  const alternate = input.alternatePackage || { name: "Starter Publishing Package", price: "$1,999" };
+  const recommendation = input.recommendedPackage || catalogPackage(input.packageCode || "JMP-PKG-PRO");
+  const alternate = input.alternatePackage || catalogPackage(input.alternatePackageCode || "JMP-PKG-STARTER");
   const summary = buildReviewSummary(input);
   return [
     "J MERRILL PUBLISHING",
@@ -314,22 +321,37 @@ function validateRenderedEmail({ html, text, subject }) {
   if (!htmlBody.includes("Reply With My Selection")) blockers.push("CTA_MISSING");
   if (/Editorial Recommendation Letter for Untitled/i.test(subject)) blockers.push("PROVISIONAL_TITLE_IN_SUBJECT");
   if (/project fits naturally under/i.test(`${htmlBody}\n${textBody}`)) blockers.push("IMPRINT_LANGUAGE_IN_SUMMARY");
+  if (findInternalLanguage(`${htmlBody}\n${textBody}`).length) blockers.push("AUTHOR_FACING_INTERNAL_LANGUAGE");
+  if (!/\$\d[\d,]*(?:\.\d{2})?/.test(`${htmlBody}\n${textBody}`)) blockers.push("PACKAGE_PRICE_MISSING");
   return blockers.length === 0 ? { ok: true } : { ok: false, blockers };
 }
 
 function buildEditorialRecommendationEmail(input = {}) {
+  const primaryPackageCode = input.packageCode || input.recommendedPackage?.code || "JMP-PKG-PRO";
+  const alternatePackageCode = input.alternatePackageCode || input.alternatePackage?.code || "JMP-PKG-STARTER";
   const html = buildHtmlEmail(input);
   const text = buildPlainTextEmail(input);
   const validation = validateRenderedEmail({ html, text, subject: SUBJECT });
+  const packageValidation = validatePackageRecommendation({
+    primaryPackageCode,
+    alternatePackageCode,
+    rationale: packageWhy({
+      packageCode: primaryPackageCode,
+      recommendation: input.recommendedPackage || catalogPackage(primaryPackageCode),
+      projectTitle: normalizeString(input.projectTitle) || "your manuscript"
+    })
+  });
+  const blockers = [...(validation.blockers || []), ...(packageValidation.blockers || [])];
   return {
-    ok: validation.ok,
-    blockers: validation.blockers || [],
+    ok: blockers.length === 0,
+    blockers: [...new Set(blockers)],
     templateName: TEMPLATE_NAME,
     templateVersion: TEMPLATE_VERSION,
     subject: SUBJECT,
     html,
     text,
     preheader: PREHEADER,
+    priceAuthority: packageValidation.priceAuthority,
     checksums: {
       htmlSha256: checksum(html),
       textSha256: checksum(text)
