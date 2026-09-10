@@ -1,0 +1,52 @@
+{
+  "package": "MANUAL-PUBLISHING-OPERATIONS-RECOVERY-2026-08-05",
+  "corrected_on": "2026-08-06",
+  "priority_addendum_on": "2026-08-07",
+  "authority": "JM1 Publishing Enterprise Operating Manual v1.0 canonical on main",
+  "scope": "Manual Publishing operations recovery only",
+  "classification": "CORRECTED_TRUTHFUL_BOUNDARY_NOT_COMPLETED_RECOVERY",
+  "operational_truth": {
+    "before_you_were_born": "EDITORIAL_STATE_CONFIRMATION_REQUIRED / AUTHOR_FACING_INTERNAL_INFORMATION_EXPOSURE",
+    "naughty_tales": "DEVELOPMENTAL_EDIT_REQUIRED",
+    "the_generals_will_and_last_testament": "AUTHORITATIVE_DEV_EDIT_VALIDATION_REQUIRED",
+    "strategies_for_success": "MANUAL_FINAL_PRODUCTION / HARDCOVER_DESIGN_IN_PROGRESS"
+  },
+  "manual_title_priority": [
+    "Before You Were Born",
+    "Naughty Tales",
+    "The General's Will and Last Testament",
+    "Strategies For Success - parallel manual production"
+  ],
+  "readiness": {
+    "pr_431_completed_manual_recovery_package": false,
+    "naughty_tales_package_complete": false,
+    "generals_will_package_ready": false,
+    "before_you_were_born_author_decision_required": false,
+    "strategies_status_corrected": true
+  },
+  "mutations": {
+    "runtime_implementation": 0,
+    "schema_changes": 0,
+    "dataverse_mutations": 0,
+    "client_title_automation_thaw": 0,
+    "author_communications_sent": 0,
+    "business_central_changes": 0,
+    "agreement_language_changes": 0,
+    "catalog_changes": 0,
+    "website_deployment": 0,
+    "new_architecture": 0
+  },
+  "primary_outputs": [
+    "00-recovery-closeout.md",
+    "source-verification-and-title-state-correction.md",
+    "operational-register.csv",
+    "validation.md",
+    "priority-and-single-operator-routing-addendum.md",
+    "incidents/before-you-were-born-author-facing-internal-information-exposure.md",
+    "communications/naughty-tales-author-review-draft.md",
+    "communications/general-author-review-ready-draft.md",
+    "communications/before-you-were-born-corrective-communication-hold.md",
+    "communications/strategies-for-success-status-draft.md",
+    "checksums.sha256"
+  ]
+}
