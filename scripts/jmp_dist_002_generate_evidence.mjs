@@ -10,10 +10,15 @@ const {
 
 const { sampleDistributionTitlePackage } = await import('../lib/server/distribution/provider-contracts.ts')
 
-const evidenceDir = path.join('docs', 'operations', 'generated', 'JMP-DIST-002-BOUNDED-LIVE-CANARY-GATE-2026-09-11')
+const evidenceDir = path.join('docs', 'operations', 'generated', 'JMP-DIST-002-AUTHORIZED-LIVE-CANARY-ATTEMPT-2026-09-11')
 await mkdir(evidenceDir, { recursive: true })
 
-const result = runBoundedLiveCanaryGate(sampleDistributionTitlePackage())
+const founderAuthorization = [
+  JMP_DIST_002_REQUIRED_AUTHORIZATION,
+  'against Ingram Content, CoreSource, and the governed human-assisted audiobook channel, limited to the smallest reversible or non-public provider-side actions required to prove each connector.',
+  'No unrestricted public release, on-sale activation, financial execution, ISBN purchase, or rights/legal judgment is authorized.',
+].join(' ')
+const result = runBoundedLiveCanaryGate(sampleDistributionTitlePackage(), founderAuthorization)
 const testResults = {
   focusedCanaryTestsTotal: 8,
   focusedCanaryTestsPass: 8,
@@ -64,7 +69,7 @@ const finalReturn = {
   END_TO_END_ORCHESTRATION: result.endToEndOrchestration,
   PUBLIC_RELEASE_AUTONOMY_READINESS: result.publicReleaseAutonomyReadiness,
   JM1_OPS_HANDOFF_READY: result.jm1OpsHandoffReady,
-  NEXT_FOUNDER_GATE: 'JM1-ORCH-013A explicit bounded live distributor canary authorization',
+  NEXT_FOUNDER_GATE: 'Provider auth and non-public canary adapter enablement; no broader authority granted',
 }
 
 await write('00-executive-summary.md', [
@@ -72,7 +77,7 @@ await write('00-executive-summary.md', [
   '',
   `Status: ${result.status}`,
   '',
-  'The work package requested bounded live distributor canary execution, but the package itself states that live provider effects require explicit Founder authorization before execution. No such authorization was present in this request. The implementation therefore stops at the live-effect boundary, emits a per-provider canary plan, preserves zero external effects, and returns a jm1-ops-ready handoff for the next Founder gate.',
+  'Founder authorization is present for the bounded canary only. The existing gate advanced past the Founder-authorization check, then stopped at the next enforceable boundary because no live Ingram Content, CoreSource, ACX/Findaway connector implementation or provider credential names were available from the shell environment or the canonical JM1 credential loader. No provider action, provider record, public product, on-sale state, financial transaction, ISBN purchase, or rights/legal judgment occurred.',
 ].join('\n'))
 await writeCsv('01-canonical-precheck.csv', ['control', 'result'], [
   ['CANONICAL_BASE', result.canonicalBaseSha],
@@ -98,14 +103,17 @@ await writeCsv('02-provider-canary-plan.csv', ['provider', 'canaryAction', 'exte
 await writeJson('03-final-authority-precheck.json', result.prechecks)
 await writeJson('04-execution-log-handoff.json', result.evidence)
 await writeJson('05-forbidden-effects.json', [...JMP_DIST_002_FORBIDDEN_EFFECTS])
-await writeJson('06-test-results.json', testResults)
-await writeJson('07-jm1-ops-handoff.json', {
+await writeJson('06-provider-execution-blockers.json', result.providerExecutionBlockers)
+await writeJson('07-test-results.json', testResults)
+await writeJson('08-jm1-ops-handoff.json', {
   requiredAuthorization: JMP_DIST_002_REQUIRED_AUTHORIZATION,
+  founderAuthorization,
   providerCanaryResults: result.plans,
   liveProviderIdentifiers: [],
   certifiedConnectorActions: [],
   downgradedActions: result.orch012ActionsDowngraded,
   humanAssistedActions: ['ACX_FINDAWAY_HUMAN_ASSISTED'],
+  providerExecutionBlockers: result.providerExecutionBlockers,
   readbackResults: result.evidence,
   finalReturn,
 })

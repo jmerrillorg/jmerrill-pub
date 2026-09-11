@@ -83,20 +83,21 @@ export type CanaryExecutionEvidence = {
   submissionId: string | null
   productId: string | null
   result: 'BLOCKED'
-  status: 'FOUNDER_AUTHORIZATION_REQUIRED'
+  status: 'FOUNDER_AUTHORIZATION_REQUIRED' | 'PROVIDER_CONNECTOR_OR_AUTH_UNAVAILABLE'
   readback: 'NOT_ATTEMPTED_NO_EXTERNAL_ACTION'
   retryState: 'NOT_ATTEMPTED'
   rollbackState: 'NOT_APPLICABLE_NO_EXTERNAL_RECORD'
-  nextWork: 'REQUEST_EXPLICIT_FOUNDER_AUTHORIZATION'
+  nextWork: 'REQUEST_EXPLICIT_FOUNDER_AUTHORIZATION' | 'CONFIGURE_PROVIDER_AUTH_AND_NONPUBLIC_CANARY_ADAPTER'
 }
 
 export type CanaryRunResult = {
   status: 'JMP_DIST_002_BLOCKED'
-  founderAuthorization: 'MISSING'
+  founderAuthorization: 'MISSING' | 'PRESENT'
   canonicalBaseSha: string
   plans: CanaryPlan[]
   prechecks: Record<DistributionProvider, FinalAuthorityPrecheck>
   evidence: CanaryExecutionEvidence[]
+  providerExecutionBlockers: string[]
   orch012ActionsRevalidated: 18
   orch012ActionsStillCertified: 0
   orch012ActionsDowngraded: 18
@@ -171,20 +172,25 @@ export function finalAuthorityPrecheck(input: DistributionTitlePackage, provider
 
 export function runBoundedLiveCanaryGate(input: DistributionTitlePackage = sampleDistributionTitlePackage(), founderAuthorization?: string): CanaryRunResult {
   const plans = buildCanaryPlans()
+  const founderAuthorized = hasExplicitFounderAuthorization(founderAuthorization)
   const prechecks = Object.fromEntries(
     DISTRIBUTION_PROVIDER_IDS.map((provider) => [provider, finalAuthorityPrecheck(input, provider, founderAuthorization)]),
   ) as Record<DistributionProvider, FinalAuthorityPrecheck>
 
-  if (hasExplicitFounderAuthorization(founderAuthorization)) {
-    throw new Error('Live provider execution is intentionally not implemented in this safe pre-authorization runner.')
-  }
-
   return {
     status: 'JMP_DIST_002_BLOCKED',
-    founderAuthorization: 'MISSING',
+    founderAuthorization: founderAuthorized ? 'PRESENT' : 'MISSING',
     canonicalBaseSha: JMP_DIST_001_CANONICAL_BASE_SHA,
     plans,
     prechecks,
+    providerExecutionBlockers: founderAuthorized
+      ? [
+        'INGRAM_CONTENT_LIVE_CONNECTOR_NOT_IMPLEMENTED',
+        'CORESOURCE_LIVE_CONNECTOR_NOT_IMPLEMENTED',
+        'ACX_FINDAWAY_PROVIDER_READBACK_ADAPTER_NOT_IMPLEMENTED',
+        'PROVIDER_CREDENTIAL_NAMES_NOT_AVAILABLE_FROM_ENV_OR_CANONICAL_LOADER',
+      ]
+      : ['FOUNDER_AUTHORIZATION_REQUIRED'],
     evidence: DISTRIBUTION_PROVIDER_IDS.map((provider) => ({
       workItemId: `jmp-dist-002-${provider.toLowerCase()}`,
       enterpriseWorkId: input.workId,
@@ -197,11 +203,11 @@ export function runBoundedLiveCanaryGate(input: DistributionTitlePackage = sampl
       submissionId: null,
       productId: null,
       result: 'BLOCKED',
-      status: 'FOUNDER_AUTHORIZATION_REQUIRED',
+      status: founderAuthorized ? 'PROVIDER_CONNECTOR_OR_AUTH_UNAVAILABLE' : 'FOUNDER_AUTHORIZATION_REQUIRED',
       readback: 'NOT_ATTEMPTED_NO_EXTERNAL_ACTION',
       retryState: 'NOT_ATTEMPTED',
       rollbackState: 'NOT_APPLICABLE_NO_EXTERNAL_RECORD',
-      nextWork: 'REQUEST_EXPLICIT_FOUNDER_AUTHORIZATION',
+      nextWork: founderAuthorized ? 'CONFIGURE_PROVIDER_AUTH_AND_NONPUBLIC_CANARY_ADAPTER' : 'REQUEST_EXPLICIT_FOUNDER_AUTHORIZATION',
     })),
     orch012ActionsRevalidated: ORCH012_ACTION_MAP.length,
     orch012ActionsStillCertified: 0,

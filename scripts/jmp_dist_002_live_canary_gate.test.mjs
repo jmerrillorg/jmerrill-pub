@@ -101,9 +101,19 @@ test('forbidden public, financial, ISBN, and rights effects remain outside canar
   )
 })
 
-test('safe runner does not implement live provider execution even with authorization', () => {
-  assert.throws(
-    () => runBoundedLiveCanaryGate(sampleDistributionTitlePackage(), JMP_DIST_002_REQUIRED_AUTHORIZATION),
-    /Live provider execution is intentionally not implemented/,
-  )
+test('authorized canary attempt still blocks when provider connector/auth is unavailable', () => {
+  const result = runBoundedLiveCanaryGate(sampleDistributionTitlePackage(), JMP_DIST_002_REQUIRED_AUTHORIZATION)
+
+  assert.equal(result.status, 'JMP_DIST_002_BLOCKED')
+  assert.equal(result.founderAuthorization, 'PRESENT')
+  assert.equal(result.realProviderActions, 0)
+  assert.equal(result.realProviderRecordsCreated, 0)
+  assert.equal(result.realPublicProductsCreated, 0)
+  assert.equal(result.realOnSaleProducts, 0)
+  assert.equal(result.providerExecutionBlockers.includes('INGRAM_CONTENT_LIVE_CONNECTOR_NOT_IMPLEMENTED'), true)
+  assert.equal(result.providerExecutionBlockers.includes('PROVIDER_CREDENTIAL_NAMES_NOT_AVAILABLE_FROM_ENV_OR_CANONICAL_LOADER'), true)
+  for (const item of result.evidence) {
+    assert.equal(item.status, 'PROVIDER_CONNECTOR_OR_AUTH_UNAVAILABLE')
+    assert.equal(item.nextWork, 'CONFIGURE_PROVIDER_AUTH_AND_NONPUBLIC_CANARY_ADAPTER')
+  }
 })

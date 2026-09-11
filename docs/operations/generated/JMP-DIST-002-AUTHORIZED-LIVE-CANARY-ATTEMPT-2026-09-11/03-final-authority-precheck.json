@@ -1,0 +1,50 @@
+{
+  "INGRAM_CONTENT": {
+    "titleBinding": "PASS",
+    "formatBinding": "PASS",
+    "metadata": "PASS",
+    "artifactAuthority": "PASS",
+    "isbn": "PASS",
+    "price": "PASS",
+    "territory": "PASS",
+    "rights": "PASS",
+    "releaseDate": "PASS",
+    "commercialAuthority": "NOT_REQUIRED",
+    "canaryAction": "FOUNDER_AUTHORIZED",
+    "publicRelease": "NO",
+    "idempotency": "READY",
+    "rollbackWithdrawal": "PROVEN"
+  },
+  "CORESOURCE": {
+    "titleBinding": "PASS",
+    "formatBinding": "PASS",
+    "metadata": "PASS",
+    "artifactAuthority": "PASS",
+    "isbn": "PASS",
+    "price": "PASS",
+    "territory": "PASS",
+    "rights": "PASS",
+    "releaseDate": "PASS",
+    "commercialAuthority": "NOT_REQUIRED",
+    "canaryAction": "FOUNDER_AUTHORIZED",
+    "publicRelease": "NO",
+    "idempotency": "READY",
+    "rollbackWithdrawal": "PROVEN"
+  },
+  "ACX_FINDAWAY_HUMAN_ASSISTED": {
+    "titleBinding": "PASS",
+    "formatBinding": "PASS",
+    "metadata": "PASS",
+    "artifactAuthority": "PASS",
+    "isbn": "PASS",
+    "price": "PASS",
+    "territory": "PASS",
+    "rights": "PASS",
+    "releaseDate": "PASS",
+    "commercialAuthority": "NOT_REQUIRED",
+    "canaryAction": "FOUNDER_AUTHORIZED",
+    "publicRelease": "NO",
+    "idempotency": "READY",
+    "rollbackWithdrawal": "PROVEN"
+  }
+}
