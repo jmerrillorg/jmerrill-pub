@@ -1,0 +1,13 @@
+{
+  "focusedConnectorTestsTotal": 8,
+  "focusedConnectorTestsPass": 8,
+  "fullRepositoryTestsTotal": 4,
+  "fullRepositoryTestsPass": 4,
+  "typecheck": "PASS",
+  "workflowEngineGuard": "PASS",
+  "lint": "PASS",
+  "build": "PASS",
+  "secretScan": "PASS",
+  "gitDiffCheck": "PASS",
+  "unrelatedSourceChanges": 0
+}

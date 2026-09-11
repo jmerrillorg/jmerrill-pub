@@ -1,0 +1,4 @@
+"provider","liveCanaryRequired","reason"
+"INGRAM_CONTENT","YES","Authenticated provider draft/sandbox proof is still required before any live submission."
+"CORESOURCE","YES","Authenticated provider draft/sandbox proof is still required before any live submission."
+"ACX_FINDAWAY_HUMAN_ASSISTED","YES","Provider automation authority is human-assisted until API authority is proven."

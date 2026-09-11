@@ -1,0 +1,137 @@
+[
+  {
+    "provider": "INGRAM_CONTENT",
+    "idempotencyKey": "jmp-dist-001:ingram_content:jmp-title-quanishia-stage0-safe-proof:jmp-work-quanishia-stage0-safe-proof:first-edition:37cc187f",
+    "externalEffect": "NONE",
+    "submissionMode": "SAFE_CONTRACT_PROOF",
+    "title": "Quanishia Governed Stage 0 Distribution Contract Proof",
+    "imprint": "J Merrill Publishing, Inc.",
+    "formats": [
+      "PAPERBACK",
+      "HARDCOVER"
+    ],
+    "identifiers": {
+      "PAPERBACK": "9781961475001",
+      "HARDCOVER": "9781961475002"
+    },
+    "pricing": {
+      "PAPERBACK": {
+        "currency": "USD",
+        "amount": 19.99
+      },
+      "HARDCOVER": {
+        "currency": "USD",
+        "amount": 29.99
+      }
+    },
+    "assetAuthority": [
+      {
+        "role": "INTERIOR",
+        "sharePointDriveId": "drive-paperback-interior-v1",
+        "sharePointItemId": "item-paperback-interior-v1",
+        "sha256": "00f1515e00f1515e00f1515e00f1515e00f1515e00f1515e00f1515e00f1515e",
+        "version": "1.0.0"
+      },
+      {
+        "role": "COVER",
+        "sharePointDriveId": "drive-cover-v1",
+        "sharePointItemId": "item-cover-v1",
+        "sha256": "eb07b451eb07b451eb07b451eb07b451eb07b451eb07b451eb07b451eb07b451",
+        "version": "1.0.0"
+      },
+      {
+        "role": "SUPPLEMENTAL_METADATA",
+        "sharePointDriveId": "drive-metadata-v1",
+        "sharePointItemId": "item-metadata-v1",
+        "sha256": "a7b2b9d9a7b2b9d9a7b2b9d9a7b2b9d9a7b2b9d9a7b2b9d9a7b2b9d9a7b2b9d9",
+        "version": "1.0.0"
+      }
+    ]
+  },
+  {
+    "provider": "CORESOURCE",
+    "idempotencyKey": "jmp-dist-001:coresource:jmp-title-quanishia-stage0-safe-proof:jmp-work-quanishia-stage0-safe-proof:first-edition:91317e27",
+    "externalEffect": "NONE",
+    "submissionMode": "SAFE_CONTRACT_PROOF",
+    "title": "Quanishia Governed Stage 0 Distribution Contract Proof",
+    "imprint": "J Merrill Publishing, Inc.",
+    "formats": [
+      "EPUB"
+    ],
+    "identifiers": {
+      "EPUB": "9781961475003"
+    },
+    "pricing": {
+      "EPUB": {
+        "currency": "USD",
+        "amount": 9.99
+      }
+    },
+    "assetAuthority": [
+      {
+        "role": "EPUB",
+        "sharePointDriveId": "drive-epub-v1",
+        "sharePointItemId": "item-epub-v1",
+        "sha256": "a49227f0a49227f0a49227f0a49227f0a49227f0a49227f0a49227f0a49227f0",
+        "version": "1.0.0"
+      },
+      {
+        "role": "COVER",
+        "sharePointDriveId": "drive-cover-v1",
+        "sharePointItemId": "item-cover-v1",
+        "sha256": "eb07b451eb07b451eb07b451eb07b451eb07b451eb07b451eb07b451eb07b451",
+        "version": "1.0.0"
+      },
+      {
+        "role": "SUPPLEMENTAL_METADATA",
+        "sharePointDriveId": "drive-metadata-v1",
+        "sharePointItemId": "item-metadata-v1",
+        "sha256": "a7b2b9d9a7b2b9d9a7b2b9d9a7b2b9d9a7b2b9d9a7b2b9d9a7b2b9d9a7b2b9d9",
+        "version": "1.0.0"
+      }
+    ]
+  },
+  {
+    "provider": "ACX_FINDAWAY_HUMAN_ASSISTED",
+    "idempotencyKey": "jmp-dist-001:acx_findaway_human_assisted:jmp-title-quanishia-stage0-safe-proof:jmp-work-quanishia-stage0-safe-proof:first-edition:bb051c80",
+    "externalEffect": "NONE",
+    "submissionMode": "SAFE_CONTRACT_PROOF",
+    "title": "Quanishia Governed Stage 0 Distribution Contract Proof",
+    "imprint": "J Merrill Publishing, Inc.",
+    "formats": [
+      "AUDIOBOOK"
+    ],
+    "identifiers": {
+      "AUDIOBOOK": "9781961475004"
+    },
+    "pricing": {
+      "AUDIOBOOK": {
+        "currency": "USD",
+        "amount": 14.99
+      }
+    },
+    "assetAuthority": [
+      {
+        "role": "AUDIO_MASTER",
+        "sharePointDriveId": "drive-audio-master-v1",
+        "sharePointItemId": "item-audio-master-v1",
+        "sha256": "2636048f2636048f2636048f2636048f2636048f2636048f2636048f2636048f",
+        "version": "1.0.0"
+      },
+      {
+        "role": "COVER",
+        "sharePointDriveId": "drive-cover-v1",
+        "sharePointItemId": "item-cover-v1",
+        "sha256": "eb07b451eb07b451eb07b451eb07b451eb07b451eb07b451eb07b451eb07b451",
+        "version": "1.0.0"
+      },
+      {
+        "role": "SUPPLEMENTAL_METADATA",
+        "sharePointDriveId": "drive-metadata-v1",
+        "sharePointItemId": "item-metadata-v1",
+        "sha256": "a7b2b9d9a7b2b9d9a7b2b9d9a7b2b9d9a7b2b9d9a7b2b9d9a7b2b9d9a7b2b9d9",
+        "version": "1.0.0"
+      }
+    ]
+  }
+]
