@@ -1,0 +1,73 @@
+[
+  {
+    "provider": "INGRAM_CONTENT",
+    "accountStatus": "BLOCKED_CREDENTIAL_NOT_FOUND",
+    "authType": "UNKNOWN",
+    "tokenLifetime": "UNKNOWN",
+    "refreshModel": "UNKNOWN",
+    "serviceAccountSupported": "UNKNOWN",
+    "mfaInteractionRequired": "UNKNOWN",
+    "apiScope": "UNKNOWN",
+    "leastPrivilegeAvailable": "UNKNOWN",
+    "persistentSecretRequiredByProvider": "UNKNOWN",
+    "credentialReferenceName": null,
+    "adapterStatus": "FAIL",
+    "connectivity": "FAIL",
+    "canaryReady": "NO",
+    "canaryExecuted": "NO",
+    "providerRecordsCreated": 0,
+    "publicRelease": "NO",
+    "blockers": [
+      "CREDENTIAL_NOT_FOUND",
+      "LIVE_ADAPTER_NOT_ENABLED",
+      "CONNECTIVITY_NOT_PROVEN"
+    ]
+  },
+  {
+    "provider": "CORESOURCE",
+    "accountStatus": "BLOCKED_CREDENTIAL_NOT_FOUND",
+    "authType": "UNKNOWN",
+    "tokenLifetime": "UNKNOWN",
+    "refreshModel": "UNKNOWN",
+    "serviceAccountSupported": "UNKNOWN",
+    "mfaInteractionRequired": "UNKNOWN",
+    "apiScope": "UNKNOWN",
+    "leastPrivilegeAvailable": "UNKNOWN",
+    "persistentSecretRequiredByProvider": "UNKNOWN",
+    "credentialReferenceName": null,
+    "adapterStatus": "FAIL",
+    "connectivity": "FAIL",
+    "canaryReady": "NO",
+    "canaryExecuted": "NO",
+    "providerRecordsCreated": 0,
+    "publicRelease": "NO",
+    "blockers": [
+      "CREDENTIAL_NOT_FOUND",
+      "LIVE_ADAPTER_NOT_ENABLED",
+      "CONNECTIVITY_NOT_PROVEN"
+    ]
+  },
+  {
+    "provider": "ACX_FINDAWAY_HUMAN_ASSISTED",
+    "accountStatus": "BLOCKED_ACCOUNT_CONFIGURATION",
+    "authType": "HUMAN_ASSISTED",
+    "tokenLifetime": "NOT_APPLICABLE",
+    "refreshModel": "HUMAN_LOGIN",
+    "serviceAccountSupported": "NO",
+    "mfaInteractionRequired": "POSSIBLE",
+    "apiScope": "HUMAN_PROVIDER_UI_ONLY",
+    "leastPrivilegeAvailable": "UNKNOWN",
+    "persistentSecretRequiredByProvider": "UNKNOWN",
+    "credentialReferenceName": null,
+    "adapterStatus": "FAIL",
+    "connectivity": "FAIL",
+    "canaryReady": "NO",
+    "canaryExecuted": "NO",
+    "providerRecordsCreated": 0,
+    "publicRelease": "NO",
+    "blockers": [
+      "AUDIO_PROVIDER_ACCOUNT_REFERENCE_NOT_CONFIGURED",
+      "AUDIO_PROVIDER_READBACK_ADAPTER_NOT_PROVEN"
+    ]
+  }
+]

@@ -1,0 +1,17 @@
+{
+  "authorizedMaximumExecutionMode": "NONPUBLIC_CANARY",
+  "liveDistribution": "DENIED",
+  "publicRelease": "DENIED",
+  "requiredActionContextFields": [
+    "FOUNDER_AUTHORIZATION_ID",
+    "ORCH_ACTION_ID",
+    "WORK_ITEM_ID",
+    "ENTERPRISE_WORK_ID",
+    "WORK_PROJECTION_ID",
+    "TITLE_ID",
+    "FORMAT_ID",
+    "PROVIDER",
+    "EXECUTION_MODE",
+    "IDEMPOTENCY_KEY"
+  ]
+}
