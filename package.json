@@ -80,7 +80,8 @@
     "portfolio-automation-wave3-guard": "node --test scripts/jmp_portfolio_automation_controller.test.mjs scripts/jmp_portfolio_automation_wave2.test.mjs scripts/jmp_portfolio_automation_wave3.test.mjs",
     "portfolio-automation-wave3": "node scripts/jmp_portfolio_automation_wave3.mjs",
     "production-asset-registry-guard": "node --test scripts/jmp_production_asset_registry_guard.test.mjs",
-    "jmp-dist-001-provider-connectors-guard": "node --test scripts/jmp_dist_001_provider_connectors.test.mjs"
+    "jmp-dist-001-provider-connectors-guard": "node --test scripts/jmp_dist_001_provider_connectors.test.mjs",
+    "jmp-dist-002-live-canary-gate-guard": "node --test scripts/jmp_dist_002_live_canary_gate.test.mjs"
   },
   "dependencies": {
     "@azure/communication-email": "^1.1.0",

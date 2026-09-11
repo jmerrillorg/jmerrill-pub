@@ -1,0 +1,14 @@
+{
+  "focusedCanaryTestsTotal": 8,
+  "focusedCanaryTestsPass": 8,
+  "jmpDistConnectorGuard": "PASS",
+  "typecheck": "PASS",
+  "workflowEngineGuard": "PASS",
+  "lint": "PASS",
+  "build": "PASS",
+  "diagnosticFunctionTestsTotal": 2247,
+  "diagnosticFunctionTestsPass": 2247,
+  "secretScan": "PASS",
+  "gitDiffCheck": "PASS",
+  "unrelatedSourceChanges": 0
+}
