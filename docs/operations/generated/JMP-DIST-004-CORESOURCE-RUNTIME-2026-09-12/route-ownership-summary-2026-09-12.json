@@ -1,0 +1,12 @@
+{
+  "ACTIVE_WORKS": 122,
+  "ACTIVE_TITLE_FORMAT_UNITS": 267,
+  "CORESOURCE_PRESENT_UNITS": 137,
+  "ROUTES_CLASSIFIED": 267,
+  "UNCLASSIFIED_ROUTES": 0,
+  "CHANNEL_OWNERSHIP_ROWS": 267,
+  "UNCONTROLLED_DUPLICATE_CHANNEL_AUTHORITIES": 0,
+  "NORMALIZATION_CANDIDATES": 125,
+  "PROVIDER_READBACK_REQUIRED_UNITS": 267,
+  "NOTE": "All active public catalog title-format rows are assigned a current and target upstream classification. Provider-export-required is a classified evidence limitation for later normalization detail, not an unclassified route."
+}
