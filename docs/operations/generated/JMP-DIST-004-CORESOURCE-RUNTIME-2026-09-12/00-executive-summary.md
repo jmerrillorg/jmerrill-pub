@@ -23,12 +23,13 @@ Branch: `codex/jmp-dist004-coresource-runtime-sep11`
 - CoreSource authenticated dashboard observed for `J Merrill Publishing, Inc.`.
 - CoreSource dashboard observed counts: eBook `134`, Print `52`, Audio `5`, Number of Distributions `161`, failed title groups `17`, missing-content attention rows still visible.
 - CoreSource support ticket `#5862952` remains open with no provider response visible in the readback; publisher-side ticket messages request machine-ingestion, nonpublic-canary, CoreSource-to-LSI, and provider-record correction authority without authorizing uploads or retries.
+- CoreSource advanced search exposes `Is Distributable`, `Asset Status`, Sales Rights, Supply Terms, and Distribution search fields, but these do not prove a safe ingested nonpublic record or a no-public-effect canary path.
 - Lightning Source authenticated dashboard observed for `J Merrill Publishing, Inc. Account#: 6116305`.
-- Lightning Source recently added titles, upload/title-creation links, messages page, and global-distribution indicators are visible; this proves account access/readability and operability, not full finance/public-effect health.
+- Lightning Source titles, upload/title-creation links, messages page, order page, and global-distribution indicators are visible; no account-wide hold or finance warning surfaced in inspected pages.
 - IngramSpark account `9118734` was read back: authenticated dashboard, messages page, all-titles list with `239` rows, upload/title-creation links, global-distribution indicators, sales activity, and two account/title alerts.
 - ACX was read back: Jackie Smith profile, current project counts, and royalty-model enrollment prompt visible.
 - Amazon KDP was read back: authenticated Bookshelf, live/draft Kindle and print products, ASINs, pricing links, and direct create/link controls visible.
-- Barnes & Noble Press direct inventory was not reached because the provider stopped at an authentication code challenge.
+- Barnes & Noble Press was read back past authentication at the account/sales level: Welcome Jackie, sales reports, total paid units `10`, total royalty `$57.50`, and account navigation were visible; project rows did not deterministically render in the bounded pass.
 
 ## Boundary
 
@@ -48,8 +49,8 @@ DIST-004 is OPEN / ADVANCED.
 The repo now has the safe implementation spine required for UI-assisted CoreSource operations, but clean closure remains blocked by provider facts that must be proven outside code:
 
 - Exact CoreSource safe nondistributable/nonpublic field values.
-- Complete LSI and IngramSpark finance/payment health beyond dashboard/messages visibility.
-- Barnes & Noble direct read-only inventory after human authentication.
+- CoreSource provider answer on safe nonpublic ingestion and CoreSource-to-LSI public/on-sale effect.
+- B&N and KDP direct title exports or equivalent deterministic title-by-title inventory.
 - Every-title/every-format/every-channel ownership matrix.
 - CoreSource support ticket `#5862952` machine-ingestion response.
 
