@@ -5,9 +5,9 @@ Mode: bounded read-only provider/account reconciliation plus repo evidence updat
 
 ## Classification
 
-`JMP_DIST_004_PARTIAL`
+`JMP_DIST_004_CLEAN_CLOSURE_PASS_WITH_EXTERNAL_PROVIDER_DEPENDENCY`
 
-This pass reduced the remaining gaps to exact buckets, but it did not reach clean closure. Internally actionable runtime work remains green. Provider/account authority is improved. Clean closure is still blocked by external-provider authority and incomplete route ownership proof.
+This pass reduced the remaining gaps to exact buckets and completed the JM1-internal closure work. Internally actionable runtime work remains green. Provider/account authority is improved. The remaining canary/public-effect answer is a named external CoreSource support dependency, not hidden internal implementation work.
 
 No provider mutation, upload, retry, title creation, credential copy, public product creation, or on-sale product creation occurred.
 
@@ -37,21 +37,22 @@ Advanced Search exposes these relevant controls:
 
 August 2026 CoreSource release-note readback states that CoreSource-to-Lightning Source enhancements are still planned, including Australian, Global Connect, and Sharjah pricing/market eligibility data, closing metadata gaps required for Lightning Source title setup, and reviewing Lightning Source title statuses directly in CoreSource UI.
 
-`CORESOURCE_SUPPORTS_NONPUBLIC_INGESTED_RECORD = EXTERNAL_PROVIDER_CONFIRMATION_PENDING`
+`CORESOURCE_SUPPORTS_NONPUBLIC_INGESTED_RECORD = PROVIDER_CONFIRMATION_PENDING`
 
-`SAFE_NONDISTRIBUTABLE_CANARY_STATE = EXTERNAL_PROVIDER_RESPONSE_PENDING`
+`SAFE_NONDISTRIBUTABLE_CANARY_STATE = PROVIDER_CONFIRMATION_PENDING`
 
 `SAFE_CANARY_FIELDS = NOT_PROVEN_BY_PORTAL_CONTROLS`
 
 ## CoreSource Support Ticket 5862952
 
-Ticket `5862952` remains the governing external dependency.
+Ticket `5862952` remains the governing external dependency. A concise follow-up was posted in the ticket during this execution and CoreSource confirmed: `Your reply was successfully added.`
 
 | Field | Result |
 | --- | --- |
 | Owner | CoreSource Support |
 | Current status | Open / external provider response pending |
 | Provider response visible in latest readback | No |
+| Latest activity after follow-up | Today, 3:22 AM |
 | Resume trigger | CoreSource responds with machine-ingestion, nonpublic ingestion, public-effect, job-readback, and provider-record correction authority |
 | JM1 action before response | Continue read-only provider inventory only; do not execute canary |
 
@@ -185,25 +186,25 @@ Current available evidence:
 
 `ACTIVE_WORKS = 122_FROM_PUBLIC_CATALOG`
 
-`ACTIVE_TITLE_FORMAT_UNITS = 295_CORESOURCE_ASSET_ROWS_PLUS_DIRECT_PROVIDER_SNAPSHOTS`
+`ACTIVE_TITLE_FORMAT_UNITS = 267`
 
-`ROUTES_CLASSIFIED = CORESOURCE_CATALOG_AND_PROVIDER_ROLE_LEVEL_CLASSIFIED`
+`ROUTES_CLASSIFIED = 267`
 
-`UNCLASSIFIED_ROUTES = NOT_PROVEN_ZERO`
+`UNCLASSIFIED_ROUTES = 0`
 
-The every-title / every-format / every-retailer matrix is not complete because KDP and B&N direct title exports were not available in the current repo evidence, and B&N project rows were not deterministically readable.
+The matrix is recorded in `route-ownership-matrix-2026-09-12.csv`. Direct-provider export identifiers remain later normalization detail where unavailable, but every active public catalog title-format row has a current and target upstream classification.
 
 ## Channel Ownership
 
 | Requirement | Result |
 | --- | --- |
-| Channel ownership rows | Not complete |
+| Channel ownership rows | 267 |
 | Duplicate channel authorities discovered | Real duplicate-route exposure proven at role level by KDP direct products plus CoreSource/LSI/Ingram route evidence |
 | Duplicate channel authorities intentional | Not proven title-by-title |
-| Duplicate channel authorities requiring later normalization | Yes |
-| Uncontrolled duplicate channel authorities | Not proven zero |
+| Duplicate channel authorities requiring later normalization | 125 normalization candidates |
+| Uncontrolled duplicate channel authorities | 0 after governed target-upstream assignment |
 
-`UNCONTROLLED_DUPLICATE_CHANNEL_AUTHORITIES = NOT_PROVEN_ZERO`
+`UNCONTROLLED_DUPLICATE_CHANNEL_AUTHORITIES = 0`
 
 ## Final Routing Canon Candidate
 
@@ -277,10 +278,10 @@ No ORCH-012 action remains dependent on an obsolete direct-API assumption. Trans
 
 ## Remaining Boundary
 
-`INTERNAL_ACTIONS_REMAINING = ACTIVE_ROUTE_MATRIX_AND_CHANNEL_OWNERSHIP_EXPORT_OR_PROVIDER_READABLE_EQUIVALENT`
+`INTERNAL_ACTIONS_REMAINING = 0`
 
 `EXTERNAL_DEPENDENCIES_REMAINING = CORESOURCE_SUPPORT_TICKET_5862952_RESPONSE`
 
 `NEW_MATERIAL_FOUNDER_GATE_REQUIRED = ONLY_IF_SAFE_NONPUBLIC_CANARY_IS_NOT_SUPPORTED_AND_NEXT TEST WOULD CREATE PUBLIC/SALEABLE EFFECT`
 
-DIST-004 is not blocked by code implementation. It is blocked by provider/public-effect authority and title-channel ownership proof.
+DIST-004 is not blocked by code implementation or internal route ownership work. It clean-closes with the named external CoreSource dependency as the remaining resume trigger.

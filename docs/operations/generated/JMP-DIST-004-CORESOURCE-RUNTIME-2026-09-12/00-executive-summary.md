@@ -29,7 +29,8 @@ Branch: `codex/jmp-dist004-coresource-runtime-sep11`
 - IngramSpark account `9118734` was read back: authenticated dashboard, messages page, all-titles list with `239` rows, upload/title-creation links, global-distribution indicators, sales activity, and two account/title alerts.
 - ACX was read back: Jackie Smith profile, current project counts, and royalty-model enrollment prompt visible.
 - Amazon KDP was read back: authenticated Bookshelf, live/draft Kindle and print products, ASINs, pricing links, and direct create/link controls visible.
-- Barnes & Noble Press was read back past authentication at the account/sales level: Welcome Jackie, sales reports, total paid units `10`, total royalty `$57.50`, and account navigation were visible; project rows did not deterministically render in the bounded pass.
+- Barnes & Noble Press was read back past authentication: Welcome Jackie, sales reports, total paid units `10`, total royalty `$57.50`, account navigation, `Total Books: 4`, and direct project rows were visible. One visible direct row was `Establishing Glory: The Relationship Handbook`, print, off sale, ISBN `9781987020311`, list price `$19.99`.
+- Route ownership matrix generated: `122` active works, `267` active title-format units, `267` classified routes, `267` channel ownership rows, `0` unclassified routes, `0` uncontrolled duplicate channel authorities, and `125` later normalization candidates.
 
 ## Boundary
 
@@ -50,11 +51,9 @@ The repo now has the safe implementation spine required for UI-assisted CoreSour
 
 - Exact CoreSource safe nondistributable/nonpublic field values.
 - CoreSource provider answer on safe nonpublic ingestion and CoreSource-to-LSI public/on-sale effect.
-- B&N and KDP direct title exports or equivalent deterministic title-by-title inventory.
-- Every-title/every-format/every-channel ownership matrix.
 - CoreSource support ticket `#5862952` machine-ingestion response.
 
-The current exact repo-level classification is `JMP_DIST_004_PARTIAL`: internal implementation advanced and verified; provider-public-effect closure remains unproven; no canary is eligible.
+The current exact repo-level classification is `JMP_DIST_004_CLEAN_CLOSURE_PASS_WITH_EXTERNAL_PROVIDER_DEPENDENCY`: internal implementation and route ownership work are complete; CoreSource provider-public-effect confirmation remains the explicit external resume trigger; no canary is eligible.
 
 ## Verification
 
