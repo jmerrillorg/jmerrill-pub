@@ -1,3 +1,5 @@
+import { getDataverseRuntimeAccessToken, getPublisherRuntimeAuthMode } from '../publisher-runtime-auth'
+
 const STRIPE_API_BASE = 'https://api.stripe.com'
 
 export const PUBLISHING_BILLING_CONTINUATION_VERSION = 'PUBLISHING_FIRST_PAYMENT_BILLING_v1.0'
@@ -34,6 +36,7 @@ type DataverseConfig = {
   tenantId: string
   clientId: string
   clientSecret: string
+  authMode: 'LEGACY_CLIENT_CREDENTIAL' | 'MANAGED_IDENTITY'
 }
 
 type DataverseRow = Record<string, any>
@@ -458,31 +461,21 @@ function getDataverseConfig(): DataverseConfig | null {
   const tenantId = process.env.DATAVERSE_TENANT_ID || ''
   const clientId = process.env.DATAVERSE_CLIENT_ID || ''
   const clientSecret = process.env.DATAVERSE_CLIENT_SECRET || ''
-  if (!apiBase || !resourceUrl || !tenantId || !clientId || !clientSecret) return null
+  const authMode = getPublisherRuntimeAuthMode()
+  if (!apiBase || !resourceUrl) return null
+  if (authMode === 'LEGACY_CLIENT_CREDENTIAL' && (!tenantId || !clientId || !clientSecret)) return null
   return {
     apiBase: apiBase.replace(/\/$/, ''),
     resourceUrl: resourceUrl.replace(/\/$/, ''),
     tenantId,
     clientId,
     clientSecret,
+    authMode,
   }
 }
 
 async function getDataverseToken(config: DataverseConfig) {
-  const response = await fetch(`https://login.microsoftonline.com/${config.tenantId}/oauth2/v2.0/token`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: new URLSearchParams({
-      client_id: config.clientId,
-      client_secret: config.clientSecret,
-      scope: `${config.resourceUrl}/.default`,
-      grant_type: 'client_credentials',
-    }),
-  })
-  if (!response.ok) throw new Error(`dataverse_token_failed:${response.status}`)
-  const body = await response.json()
-  if (!body.access_token) throw new Error('dataverse_token_missing')
-  return body.access_token as string
+  return getDataverseRuntimeAccessToken(config.resourceUrl)
 }
 
 function getStripeSecret() {

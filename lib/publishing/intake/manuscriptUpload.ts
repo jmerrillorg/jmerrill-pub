@@ -1,5 +1,6 @@
 import type { NormalizedPublishingIntake } from './schema'
 import { createHash } from 'node:crypto'
+import { getGraphSharePointRuntimeAccessToken } from '@/lib/server/publisher-runtime-auth'
 
 export type ManuscriptUploadCandidate = {
   fileName: string
@@ -82,9 +83,6 @@ type ManuscriptUploadErrorCode =
   | 'unsafe_file_name'
 
 type GraphConfig = {
-  tenantId: string
-  clientId: string
-  clientSecret: string
   siteHostname: string
   sitePath: string
   driveName: string
@@ -358,9 +356,6 @@ export function buildSourceArtifactManifest(input: {
 
 function getGraphConfig(): { ok: true; value: GraphConfig } | { ok: false; missing: string[] } {
   const config = {
-    tenantId: process.env.SHAREPOINT_TENANT_ID || process.env.DATAVERSE_TENANT_ID,
-    clientId: process.env.SHAREPOINT_CLIENT_ID || process.env.DATAVERSE_CLIENT_ID,
-    clientSecret: process.env.SHAREPOINT_CLIENT_SECRET || process.env.DATAVERSE_CLIENT_SECRET,
     siteHostname: process.env.JOIN_WORKSPACE_SITE_HOSTNAME || 'jmerrillfoundation.sharepoint.com',
     sitePath: process.env.JOIN_WORKSPACE_SITE_PATH || '/sites/publishing',
     driveName: process.env.JOIN_WORKSPACE_DRIVE_NAME || 'Documents',
@@ -375,25 +370,8 @@ function getGraphConfig(): { ok: true; value: GraphConfig } | { ok: false; missi
   return { ok: true, value: config as GraphConfig }
 }
 
-async function getGraphAccessToken(config: GraphConfig) {
-  const response = await fetch(`https://login.microsoftonline.com/${config.tenantId}/oauth2/v2.0/token`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded',
-      Accept: 'application/json',
-    },
-    body: new URLSearchParams({
-      grant_type: 'client_credentials',
-      client_id: config.clientId,
-      client_secret: config.clientSecret,
-      scope: 'https://graph.microsoft.com/.default',
-    }),
-  })
-
-  const json = await response.json().catch(() => null)
-  const token = isRecord(json) && typeof json.access_token === 'string' ? json.access_token : ''
-  if (!response.ok || !token) throw new Error(`graph_token_failed:${response.status}`)
-  return token
+async function getGraphAccessToken() {
+  return getGraphSharePointRuntimeAccessToken()
 }
 
 async function getSite(token: string, config: GraphConfig): Promise<{ id: string }> {
@@ -422,7 +400,7 @@ async function ensureExistingInquiryWorkspaceContext(
   intake: ExistingIntakeWorkspaceInput,
   config: GraphConfig,
 ): Promise<InquiryWorkspaceContext> {
-  const token = await getGraphAccessToken(config)
+  const token = await getGraphAccessToken()
   const site = await getSite(token, config)
   const drive = await getDriveByName(token, site.id, config.driveName)
   const workspaceFolderName = buildWorkspaceFolderName(intake)

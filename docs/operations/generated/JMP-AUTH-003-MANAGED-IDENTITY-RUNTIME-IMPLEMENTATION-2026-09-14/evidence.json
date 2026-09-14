@@ -1,0 +1,58 @@
+{
+  "workPackage": "JMP-AUTH-003",
+  "generatedAt": "2026-09-14T09:39:01-04:00",
+  "classification": "JMP_AUTH_003_IMPLEMENTATION_PASS_CANARY_PENDING",
+  "repository": "jmerrill-pub",
+  "branch": "codex/jmp-auth-003-managed-identity-runtime",
+  "baseline": {
+    "originMain": "151f9650822ba95811d21f8a2e6f84abcc50ebc9",
+    "handoffStatedJm1OpsMain": "d6d30c14d16be85a3f32663c6f6729074d86a5cd"
+  },
+  "implementation": {
+    "runtimeSelector": true,
+    "defaultMode": "LEGACY_CLIENT_CREDENTIAL",
+    "managedIdentityMode": true,
+    "legacyRollbackMode": true,
+    "silentSecretFallback": false,
+    "dataverseRuntimePathsImplemented": true,
+    "graphSharePointRuntimePathsImplemented": true,
+    "mailAuthorityAdded": false,
+    "interactiveSignInChanged": false,
+    "githubOidcChanged": false
+  },
+  "negativeProof": {
+    "productionDeployments": 0,
+    "productionCutover": false,
+    "secretsRemoved": 0,
+    "historicalPublisherAppDeleted": false,
+    "publishingLifecycleBehaviorChanged": false,
+    "dataverseAuthorityBroadened": false,
+    "graphSharePointAuthorityBroadened": false
+  },
+  "validation": {
+    "rootInstall": "PASS",
+    "managedIdentityRuntimeGuard": "PASS",
+    "typeCheck": "PASS",
+    "workflowEngineGuard": "PASS",
+    "lint": "PASS_WITH_EXISTING_FONT_WARNING",
+    "build": "PASS",
+    "authorAuthGuard": "PASS",
+    "providerAuthGuard": "PASS",
+    "gitDiffCheck": "PASS",
+    "acsFunctionLint": "PASS",
+    "diagnosticFunctionLint": "PASS",
+    "acsFunctionTests": {
+      "status": "PASS",
+      "tests": 91
+    },
+    "diagnosticFunctionTests": {
+      "status": "PASS_AFTER_PACKAGE_DEPENDENCY_INSTALL",
+      "tests": 2268,
+      "suites": 452
+    }
+  },
+  "canary": {
+    "productionManagedIdentityCanary": "PENDING",
+    "reason": "No production deployment or app setting cutover was performed in this implementation run."
+  }
+}

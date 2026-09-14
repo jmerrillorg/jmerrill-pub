@@ -8,6 +8,7 @@ import type {
   EditorialSummaryRecord,
 } from './editorial-command'
 import { buildEditorialDashboardRollup } from './editorial-command'
+import { getDataverseRuntimeAccessToken, getPublisherRuntimeAuthMode } from '@/lib/server/publisher-runtime-auth'
 
 const DEFAULT_RESOURCE_URL = 'https://jm1hq.crm.dynamics.com'
 const ODATA_ANNOTATION = 'OData.Community.Display.V1.FormattedValue'
@@ -68,6 +69,7 @@ type DataverseConfig = {
   tenantId: string
   clientId: string
   clientSecret: string
+  authMode: 'LEGACY_CLIENT_CREDENTIAL' | 'MANAGED_IDENTITY'
 }
 
 function getDataverseConfig(): DataverseConfig | null {
@@ -80,8 +82,13 @@ function getDataverseConfig(): DataverseConfig | null {
   const tenantId = process.env.DATAVERSE_TENANT_ID?.trim() || ''
   const clientId = process.env.DATAVERSE_CLIENT_ID?.trim() || ''
   const clientSecret = process.env.DATAVERSE_CLIENT_SECRET?.trim() || ''
+  const authMode = getPublisherRuntimeAuthMode()
 
-  if (!tenantId || !clientId || !clientSecret) {
+  if (!resourceUrl || !webApiBaseUrl) {
+    return null
+  }
+
+  if (authMode === 'LEGACY_CLIENT_CREDENTIAL' && (!tenantId || !clientId || !clientSecret)) {
     return null
   }
 
@@ -91,6 +98,7 @@ function getDataverseConfig(): DataverseConfig | null {
     tenantId,
     clientId,
     clientSecret,
+    authMode,
   }
 }
 
@@ -316,29 +324,5 @@ function mapHealthStatus(label: string): EditorialStageRecord['healthStatus'] {
 }
 
 async function getBearerToken(config: DataverseConfig) {
-  const response = await fetch(`https://login.microsoftonline.com/${config.tenantId}/oauth2/v2.0/token`, {
-    method: 'POST',
-    headers: {
-      Accept: 'application/json',
-      'Content-Type': 'application/x-www-form-urlencoded',
-    },
-    body: new URLSearchParams({
-      grant_type: 'client_credentials',
-      client_id: config.clientId,
-      client_secret: config.clientSecret,
-      scope: `${config.resourceUrl}/.default`,
-    }),
-  })
-
-  const json = await response.json().catch(() => null)
-  const token =
-    json && typeof json === 'object' && 'access_token' in json && typeof json.access_token === 'string'
-      ? json.access_token
-      : ''
-
-  if (!response.ok || !token) {
-    throw new Error(`program003_dataverse_token_failed:${response.status}`)
-  }
-
-  return token
+  return getDataverseRuntimeAccessToken(config.resourceUrl)
 }
