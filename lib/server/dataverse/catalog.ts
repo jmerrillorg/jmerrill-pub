@@ -16,11 +16,13 @@ import {
   suppressesPersonalAuthorIdentity,
 } from '@/lib/catalog/public-author-identity'
 import { bookRetailerEnrichmentOverrides } from '@/data/book-retailer-enrichment-overrides'
+import { getDataverseRuntimeAccessToken, getPublisherRuntimeAuthMode } from '@/lib/server/publisher-runtime-auth'
 
 type DataverseCatalogConfig = {
   tenantId: string
   clientId: string
   clientSecret: string
+  authMode: 'LEGACY_CLIENT_CREDENTIAL' | 'MANAGED_IDENTITY'
   resourceUrl: string
   environmentUrl?: string
   webApiBaseUrl: string
@@ -603,6 +605,7 @@ function safeErrorDetails(error: unknown) {
 }
 
 function getCatalogConfig(): { ok: true; value: DataverseCatalogConfig } | { ok: false; missing: string[] } {
+  const authMode = getPublisherRuntimeAuthMode()
   const environmentUrl = cleanUrl(process.env.DATAVERSE_ENVIRONMENT_URL)
   const resourceUrl = cleanUrl(process.env.DATAVERSE_RESOURCE_URL || environmentUrl)
   const webApiBaseUrl = cleanUrl(
@@ -613,6 +616,7 @@ function getCatalogConfig(): { ok: true; value: DataverseCatalogConfig } | { ok:
     tenantId: process.env.DATAVERSE_TENANT_ID,
     clientId: process.env.DATAVERSE_CLIENT_ID,
     clientSecret: process.env.DATAVERSE_CLIENT_SECRET,
+    authMode,
     resourceUrl,
     environmentUrl,
     webApiBaseUrl,
@@ -624,18 +628,29 @@ function getCatalogConfig(): { ok: true; value: DataverseCatalogConfig } | { ok:
     contactEntitySet: process.env.DATAVERSE_CATALOG_CONTACT_ENTITY_SET || DEFAULT_ENTITY_SETS.contacts,
   }
 
-  const requiredConfig = {
-    tenantId: config.tenantId,
-    clientId: config.clientId,
-    clientSecret: config.clientSecret,
-    resourceUrl: config.resourceUrl,
-    webApiBaseUrl: config.webApiBaseUrl,
-    titleEntitySet: config.titleEntitySet,
-    assetEntitySet: config.assetEntitySet,
-    marketplaceEntitySet: config.marketplaceEntitySet,
-    editionEntitySet: config.editionEntitySet,
-    contactEntitySet: config.contactEntitySet,
-  }
+  const requiredConfig =
+    authMode === 'LEGACY_CLIENT_CREDENTIAL'
+      ? {
+          tenantId: config.tenantId,
+          clientId: config.clientId,
+          clientSecret: config.clientSecret,
+          resourceUrl: config.resourceUrl,
+          webApiBaseUrl: config.webApiBaseUrl,
+          titleEntitySet: config.titleEntitySet,
+          assetEntitySet: config.assetEntitySet,
+          marketplaceEntitySet: config.marketplaceEntitySet,
+          editionEntitySet: config.editionEntitySet,
+          contactEntitySet: config.contactEntitySet,
+        }
+      : {
+          resourceUrl: config.resourceUrl,
+          webApiBaseUrl: config.webApiBaseUrl,
+          titleEntitySet: config.titleEntitySet,
+          assetEntitySet: config.assetEntitySet,
+          marketplaceEntitySet: config.marketplaceEntitySet,
+          editionEntitySet: config.editionEntitySet,
+          contactEntitySet: config.contactEntitySet,
+        }
 
   const missing = Object.entries(requiredConfig)
     .filter(([, value]) => !value)
@@ -646,32 +661,7 @@ function getCatalogConfig(): { ok: true; value: DataverseCatalogConfig } | { ok:
 }
 
 async function getDataverseAccessToken(config: DataverseCatalogConfig) {
-  const response = await fetch(`https://login.microsoftonline.com/${config.tenantId}/oauth2/v2.0/token`, {
-    method: 'POST',
-    headers: {
-      Accept: 'application/json',
-      'Content-Type': 'application/x-www-form-urlencoded',
-    },
-    body: new URLSearchParams({
-      grant_type: 'client_credentials',
-      client_id: config.clientId,
-      client_secret: config.clientSecret,
-      scope: `${config.resourceUrl}/.default`,
-    }),
-    // Explicit, not inherited from the route segment's `dynamic` config: a
-    // token response must never be served from Next.js's fetch Data Cache.
-    // Every catalog read gets its own token request.
-    cache: 'no-store',
-  })
-
-  const json = await response.json().catch(() => null)
-  const token = isRecord(json) && typeof json.access_token === 'string' ? json.access_token : ''
-
-  if (!response.ok || !token) {
-    throw new Error(`dataverse_catalog_token_failed:${response.status}`)
-  }
-
-  return token
+  return getDataverseRuntimeAccessToken(config.resourceUrl)
 }
 
 async function dataverseGetCollection(

@@ -14,8 +14,7 @@ import {
   getDataverseServerConfig,
   stringValue,
 } from '@/lib/server/dataverse-server'
-
-const GRAPH_SCOPE = 'https://graph.microsoft.com/.default'
+import { getGraphSharePointRuntimeAccessToken } from '@/lib/server/publisher-runtime-auth'
 
 export async function GET(
   req: NextRequest,
@@ -116,34 +115,7 @@ export async function GET(
 }
 
 async function getGraphToken() {
-  const tenantId = process.env.GRAPH_TENANT_ID || process.env.SHAREPOINT_TENANT_ID
-  const clientId = process.env.GRAPH_CLIENT_ID || process.env.SHAREPOINT_CLIENT_ID
-  const clientSecret = process.env.GRAPH_CLIENT_SECRET || process.env.SHAREPOINT_CLIENT_SECRET
-
-  if (!tenantId || !clientId || !clientSecret) {
-    throw new Error('graph_config_missing')
-  }
-
-  const response = await fetch(`https://login.microsoftonline.com/${tenantId}/oauth2/v2.0/token`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded',
-      Accept: 'application/json',
-    },
-    body: new URLSearchParams({
-      grant_type: 'client_credentials',
-      client_id: clientId,
-      client_secret: clientSecret,
-      scope: GRAPH_SCOPE,
-    }),
-  })
-
-  const json = (await response.json().catch(() => null)) as { access_token?: string } | null
-  if (!response.ok || !json?.access_token) {
-    throw new Error(`graph_token_failed:${response.status}`)
-  }
-
-  return json.access_token
+  return getGraphSharePointRuntimeAccessToken()
 }
 
 function isGuid(value: string) {
