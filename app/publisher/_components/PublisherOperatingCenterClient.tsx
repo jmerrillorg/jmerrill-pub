@@ -295,6 +295,12 @@ export function PublisherOperatingCenterClient({ initialSnapshot, signedIn, oper
               Refresh
             </button>
             <a
+              href="/publisher/pipeline"
+              className="inline-flex min-h-[40px] items-center rounded-full border border-blue-400/30 px-4 text-[12px] font-semibold uppercase tracking-[0.08em] text-blue-200"
+            >
+              Publishing Pipeline
+            </a>
+            <a
               href="/author/portal?view=author"
               className="inline-flex min-h-[40px] items-center rounded-full border border-white/10 px-4 text-[12px] font-semibold uppercase tracking-[0.08em] text-white/60"
             >

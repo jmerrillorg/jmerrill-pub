@@ -1,0 +1,43 @@
+{
+  "package": "Publishing Pipeline - 16-Stage Executive Operating View",
+  "generatedAt": "2026-09-14",
+  "repository": "jmerrill-pub",
+  "baseline": "origin/main @ 151f9650",
+  "branch": "codex/publisher-pipeline-16-stage",
+  "status": "PASS",
+  "authoritativeLifecycleSource": "Dataverse-backed Publisher Operating Center snapshot and canonical lifecycle read model",
+  "operatingCenterRoute": "/publisher/operating-center",
+  "pipelineRoute": "/publisher/pipeline",
+  "pipelineApiRoute": "/api/publisher/pipeline",
+  "humanStages": [
+    "01 - Inquiry",
+    "02 - Intake",
+    "03 - Editorial Review",
+    "04 - Author Decision",
+    "05 - Agreement & Payment",
+    "06 - Onboarding",
+    "07 - Developmental Editing",
+    "08 - Line Editing",
+    "09 - Copyediting",
+    "10 - Proofreading",
+    "11 - Interior Layout",
+    "12 - Cover Design",
+    "13 - Production",
+    "14 - Distribution",
+    "15 - Publication",
+    "16 - Post-Publication"
+  ],
+  "templateStageExposed": false,
+  "localBrowserLifecycleStoreCreated": false,
+  "productionDeployment": false,
+  "externalSideEffects": 0,
+  "validations": {
+    "typeCheck": "PASS",
+    "lint": "PASS_WITH_EXISTING_FONT_WARNING",
+    "workflowEngineGuard": "PASS",
+    "publisherPipeline16StageGuard": "PASS",
+    "build": "PASS_WITH_EXISTING_FONT_WARNING",
+    "localRouteHead": "PASS_200",
+    "localApiUnauthenticatedHead": "PASS_401"
+  }
+}
