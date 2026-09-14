@@ -1,0 +1,6 @@
+CHECK,RESULT,EVIDENCE,ACTION
+ORIGIN_MAIN_BEFORE,PASS,ae9901103eb259c30ee8ec7a08de344052575cf5,Use current canonical main as the source authority.
+JMP_AUTH_001_LOCAL_COMMIT,FAIL_NOT_FOUND,8e8a53e2507497657cb474617ea9c26ee2a354d3,Do not promote unavailable local commit; canonicalize updated evidence in this package.
+JMP_AUTH_002_LOCAL_COMMIT,FAIL_NOT_FOUND,2445d933725e20a1f36038f4087cec59225069bd,Do not promote unavailable local commit; canonicalize updated evidence in this package.
+AUTH_EVIDENCE_RECONCILIATION,PASS_WITH_UPDATED_EVIDENCE,Live readback and current source scan reproduce the MTR-relevant auth state.,Proceed with evidence-only canonical package.
+UNRELATED_PATHS_INCLUDED,0,docs/operations/generated/JMP-AUTH-002A-CANONICAL-AUTH-PROOF-2026-09-14,Scope limited to generated auth proof evidence plus its generator.

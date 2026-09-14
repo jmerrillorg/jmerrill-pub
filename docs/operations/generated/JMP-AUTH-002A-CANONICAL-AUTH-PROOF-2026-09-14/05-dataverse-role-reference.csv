@@ -1,0 +1,21 @@
+ROLE_NAME,ROLE_ID,IS_MANAGED,ASSIGNED_BY_THIS_PACKAGE,PURPOSE
+JM1 Publishing Editorial Writeback - Core,53cf33ac-a07c-f111-ab0e-000d3a184b71,false,NO,Candidate/reference only for MTR least-privilege commissioning.
+JM1 Publishing Controlled Activation - Opportunity Update,5771caae-e46c-f111-ab0d-00224820105b,false,NO,Candidate/reference only for MTR least-privilege commissioning.
+JM1 Publishing Intake API - Workspace Writeback,c7c5364c-5476-f111-ab0f-00224820105b,false,NO,Candidate/reference only for MTR least-privilege commissioning.
+JM1 Agent — Publishing Triage,d42c0679-aa95-f111-8075-0022482e09a0,false,NO,Candidate/reference only for MTR least-privilege commissioning.
+JM1 Publishing Editorial Writeback - Core,a42b4f3b-047b-434a-ba7c-24177fae6311,false,NO,Candidate/reference only for MTR least-privilege commissioning.
+JM1 Publishing Diagnostic Runner - Least Privilege,f5698d18-59ea-48e7-baf7-25ed06e6e7d1,false,NO,Candidate/reference only for MTR least-privilege commissioning.
+Basic User,bc5f42c9-3e54-4726-b288-46333a07bdb1,false,NO,Candidate/reference only for MTR least-privilege commissioning.
+JM1 Publishing Controlled Activation - Opportunity Update,47b47d18-d6de-477b-9a45-49cb68f298a0,false,NO,Candidate/reference only for MTR least-privilege commissioning.
+JM1 Publishing Catalog Administrator,ba857855-c141-45a5-bb97-4f581598be63,false,NO,Candidate/reference only for MTR least-privilege commissioning.
+JM1 Agent — Publishing Diagnostic,7ca9b5f2-7d6f-4196-80bc-57fc90f5eaa6,false,NO,Candidate/reference only for MTR least-privilege commissioning.
+JM1 Publishing Catalog Administrator,64aa696d-a990-f111-8076-6045bd01daa8,true,NO,Candidate/reference only for MTR least-privilege commissioning.
+JM1 Publishing Operations,6faa696d-a990-f111-8076-6045bd01daa8,true,NO,Candidate/reference only for MTR least-privilege commissioning.
+JM1 Publishing Diagnostic Runner - Least Privilege,861a5e79-9b7c-f111-ab0f-6045bdd69435,false,NO,Candidate/reference only for MTR least-privilege commissioning.
+JM1 Publishing Operations,f0f14751-6ed1-459a-8e60-70a00543329f,false,NO,Candidate/reference only for MTR least-privilege commissioning.
+JM1 Agent — Publishing Diagnostic,4309e783-aa95-f111-8076-7c1e525b15c2,false,NO,Candidate/reference only for MTR least-privilege commissioning.
+JM1 Publishing Intake API - Create Only,bc7564a1-6b65-f111-a826-7c1e525b15c2,false,NO,Candidate/reference only for MTR least-privilege commissioning.
+Basic User,1d8ed1e7-e690-f011-b4cc-7c1e525b3eb3,true,NO,Candidate/reference only for MTR least-privilege commissioning.
+JM1 Publishing Intake API - Workspace Writeback,cc9842b8-badf-458d-9bb5-9e703b03181a,false,NO,Candidate/reference only for MTR least-privilege commissioning.
+JM1 Publishing Intake API - Create Only,1736da28-822c-41c4-afe5-c0903b716fca,false,NO,Candidate/reference only for MTR least-privilege commissioning.
+JM1 Agent — Publishing Triage,7db7dbc2-13d4-4ad2-b2d3-c4990775bbcb,false,NO,Candidate/reference only for MTR least-privilege commissioning.

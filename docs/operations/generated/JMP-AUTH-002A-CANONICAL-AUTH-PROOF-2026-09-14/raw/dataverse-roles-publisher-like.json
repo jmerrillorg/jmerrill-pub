@@ -1,0 +1,125 @@
+{
+  "@odata.context": "https://jm1hq.crm.dynamics.com/api/data/v9.2/$metadata#roles(roleid,name,ismanaged)",
+  "value": [
+    {
+      "@odata.etag": "W/\"47272333\"",
+      "ismanaged": false,
+      "name": "JM1 Publishing Editorial Writeback - Core",
+      "roleid": "53cf33ac-a07c-f111-ab0e-000d3a184b71"
+    },
+    {
+      "@odata.etag": "W/\"36463457\"",
+      "ismanaged": false,
+      "name": "JM1 Publishing Controlled Activation - Opportunity Update",
+      "roleid": "5771caae-e46c-f111-ab0d-00224820105b"
+    },
+    {
+      "@odata.etag": "W/\"38848477\"",
+      "ismanaged": false,
+      "name": "JM1 Publishing Intake API - Workspace Writeback",
+      "roleid": "c7c5364c-5476-f111-ab0f-00224820105b"
+    },
+    {
+      "@odata.etag": "W/\"44856430\"",
+      "ismanaged": false,
+      "name": "JM1 Agent \u2014 Publishing Triage",
+      "roleid": "d42c0679-aa95-f111-8075-0022482e09a0"
+    },
+    {
+      "@odata.etag": "W/\"37411968\"",
+      "ismanaged": false,
+      "name": "JM1 Publishing Editorial Writeback - Core",
+      "roleid": "a42b4f3b-047b-434a-ba7c-24177fae6311"
+    },
+    {
+      "@odata.etag": "W/\"37411435\"",
+      "ismanaged": false,
+      "name": "JM1 Publishing Diagnostic Runner - Least Privilege",
+      "roleid": "f5698d18-59ea-48e7-baf7-25ed06e6e7d1"
+    },
+    {
+      "@odata.etag": "W/\"21294253\"",
+      "ismanaged": false,
+      "name": "Basic User",
+      "roleid": "bc5f42c9-3e54-4726-b288-46333a07bdb1"
+    },
+    {
+      "@odata.etag": "W/\"34975513\"",
+      "ismanaged": false,
+      "name": "JM1 Publishing Controlled Activation - Opportunity Update",
+      "roleid": "47b47d18-d6de-477b-9a45-49cb68f298a0"
+    },
+    {
+      "@odata.etag": "W/\"42466966\"",
+      "ismanaged": false,
+      "name": "JM1 Publishing Catalog Administrator",
+      "roleid": "ba857855-c141-45a5-bb97-4f581598be63"
+    },
+    {
+      "@odata.etag": "W/\"44856493\"",
+      "ismanaged": false,
+      "name": "JM1 Agent \u2014 Publishing Diagnostic",
+      "roleid": "7ca9b5f2-7d6f-4196-80bc-57fc90f5eaa6"
+    },
+    {
+      "@odata.etag": "W/\"42466955\"",
+      "ismanaged": true,
+      "name": "JM1 Publishing Catalog Administrator",
+      "roleid": "64aa696d-a990-f111-8076-6045bd01daa8"
+    },
+    {
+      "@odata.etag": "W/\"42466985\"",
+      "ismanaged": true,
+      "name": "JM1 Publishing Operations",
+      "roleid": "6faa696d-a990-f111-8076-6045bd01daa8"
+    },
+    {
+      "@odata.etag": "W/\"51821580\"",
+      "ismanaged": false,
+      "name": "JM1 Publishing Diagnostic Runner - Least Privilege",
+      "roleid": "861a5e79-9b7c-f111-ab0f-6045bdd69435"
+    },
+    {
+      "@odata.etag": "W/\"42466996\"",
+      "ismanaged": false,
+      "name": "JM1 Publishing Operations",
+      "roleid": "f0f14751-6ed1-459a-8e60-70a00543329f"
+    },
+    {
+      "@odata.etag": "W/\"44856482\"",
+      "ismanaged": false,
+      "name": "JM1 Agent \u2014 Publishing Diagnostic",
+      "roleid": "4309e783-aa95-f111-8076-7c1e525b15c2"
+    },
+    {
+      "@odata.etag": "W/\"36453852\"",
+      "ismanaged": false,
+      "name": "JM1 Publishing Intake API - Create Only",
+      "roleid": "bc7564a1-6b65-f111-a826-7c1e525b15c2"
+    },
+    {
+      "@odata.etag": "W/\"51890272\"",
+      "ismanaged": true,
+      "name": "Basic User",
+      "roleid": "1d8ed1e7-e690-f011-b4cc-7c1e525b3eb3"
+    },
+    {
+      "@odata.etag": "W/\"36402357\"",
+      "ismanaged": false,
+      "name": "JM1 Publishing Intake API - Workspace Writeback",
+      "roleid": "cc9842b8-badf-458d-9bb5-9e703b03181a"
+    },
+    {
+      "@odata.etag": "W/\"32191540\"",
+      "ismanaged": false,
+      "name": "JM1 Publishing Intake API - Create Only",
+      "roleid": "1736da28-822c-41c4-afe5-c0903b716fca"
+    },
+    {
+      "@odata.etag": "W/\"44856442\"",
+      "ismanaged": false,
+      "name": "JM1 Agent \u2014 Publishing Triage",
+      "roleid": "7db7dbc2-13d4-4ad2-b2d3-c4990775bbcb"
+    }
+  ]
+}

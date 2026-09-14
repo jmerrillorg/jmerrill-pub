@@ -1,0 +1,4 @@
+{
+  "@odata.context": "https://jm1hq.crm.dynamics.com/api/data/v9.2/$metadata#systemusers(systemuserid,applicationid,azureactivedirectoryobjectid,fullname,isdisabled,accessmode)",
+  "value": []
+}

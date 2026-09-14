@@ -1,0 +1,62 @@
+{
+  "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#servicePrincipals/$entity",
+  "accountEnabled": true,
+  "addIns": [],
+  "alternativeNames": [
+    "isExplicit=False",
+    "/subscriptions/9ee13245-2303-4010-8b6d-35f7cbcfdc0e/resourcegroups/rg-jm1-web-prod-premium/providers/Microsoft.Web/sites/app-jm1-pub-prod-v2"
+  ],
+  "appDescription": null,
+  "appDisplayName": null,
+  "appId": "e7b7f038-4016-4a3a-93d8-cecd0eda9159",
+  "appOwnerOrganizationId": null,
+  "appRoleAssignmentRequired": false,
+  "appRoles": [],
+  "applicationTemplateId": null,
+  "createdByAppId": "ef5d5c69-a5df-46bb-acaf-426f161a21a2",
+  "createdDateTime": "2026-08-18T10:00:53Z",
+  "deletedDateTime": null,
+  "description": null,
+  "disabledByMicrosoftStatus": null,
+  "displayName": "app-jm1-pub-prod-v2",
+  "homepage": null,
+  "id": "ce363f5a-94f3-4ea9-9ba3-061404fca098",
+  "info": null,
+  "isDisabled": null,
+  "keyCredentials": [
+    {
+      "customKeyIdentifier": "898AE59A1D1FA57B69991988172BC0E599F2177D",
+      "displayName": "CN=e7b7f038-4016-4a3a-93d8-cecd0eda9159",
+      "endDateTime": "2026-11-16T09:55:00Z",
+      "key": null,
+      "keyId": "30dd2149-01b2-4a49-ae90-0341e6c953ec",
+      "startDateTime": "2026-08-18T09:55:00Z",
+      "type": "AsymmetricX509Cert",
+      "usage": "Verify"
+    }
+  ],
+  "loginUrl": null,
+  "logoutUrl": null,
+  "notes": null,
+  "notificationEmailAddresses": [],
+  "oauth2PermissionScopes": [],
+  "passwordCredentials": [],
+  "preferredSingleSignOnMode": null,
+  "preferredTokenSigningKeyThumbprint": null,
+  "replyUrls": [],
+  "resourceSpecificApplicationPermissions": [],
+  "samlSingleSignOnSettings": null,
+  "servicePrincipalNames": [
+    "e7b7f038-4016-4a3a-93d8-cecd0eda9159",
+    "https://identity.azure.net/9E9zosACKCTiJKRBHI5UXnd8v54cnBzZMyfC7iRoUOY="
+  ],
+  "servicePrincipalType": "ManagedIdentity",
+  "signInAudience": null,
+  "tags": [],
+  "tokenEncryptionKeyId": null,
+  "verifiedPublisher": {
+    "addedDateTime": null,
+    "displayName": null,
+    "verifiedPublisherId": null
+  }
+}

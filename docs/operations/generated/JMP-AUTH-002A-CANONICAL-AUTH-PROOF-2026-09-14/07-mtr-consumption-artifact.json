@@ -1,0 +1,34 @@
+{
+  "SOURCE_REPO": "jmerrill-pub",
+  "SOURCE_CANONICAL_COMMIT": "PENDING_POST_MERGE_GITHUB_READBACK",
+  "AUTH_PACKAGE": "JMP-AUTH-002A",
+  "UPSTREAM_AUTH_PACKAGE_CANONICALIZED": "JMP-AUTH-002",
+  "PRODUCTION_APP_SERVICE": "app-jm1-pub-prod-v2",
+  "MANAGED_IDENTITY_PRINCIPAL_ID": "ce363f5a-94f3-4ea9-9ba3-061404fca098",
+  "MANAGED_IDENTITY_CLIENT_ID": "e7b7f038-4016-4a3a-93d8-cecd0eda9159",
+  "DATAVERSE_APPLICATION_USER_REQUIRED": "YES",
+  "DATAVERSE_APPLICATION_USER_PRESENT": "NO",
+  "DATAVERSE_ROLE_REQUIREMENTS": "Use least-privilege from 04-dataverse-target-tables.csv and 05-dataverse-role-reference.csv; do not clone System Administrator.",
+  "GRAPH_APP_ROLES_REQUIRED": "Selected SharePoint/Graph application authority for Publishing site/drive only; no broad tenant mail.",
+  "GRAPH_APP_ROLES_PRESENT": 0,
+  "SHAREPOINT_SELECTED_GRANTS_REQUIRED": {
+    "siteId": "jmerrillfoundation.sharepoint.com,35fb0d98-bc68-4250-9d0d-8c07d68e4024,10208ad5-0028-48f0-9ffa-717812924835",
+    "siteUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing",
+    "drives": [
+      {
+        "id": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+        "name": "Documents",
+        "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents"
+      }
+    ]
+  },
+  "SHAREPOINT_SELECTED_GRANTS_PRESENT": 0,
+  "MAIL_AUTHORITY_REQUIRED": "NO_PROVEN_MAIL_AUTHORITY",
+  "OLD_INTERACTIVE_APP": "preserve",
+  "OLD_APP_ID": "7bd27a68-fda7-4330-9198-d493f2a0a5ef",
+  "OLD_SERVICE_PRINCIPAL_ID": "afd40155-c25d-4269-a35f-fc41f68ea5a2",
+  "OLD_PASSWORD_CREDENTIALS": 3,
+  "PRODUCTION_CALLER_REBIND_AUTHORIZED": "NO",
+  "PASSWORD_RETIREMENT_AUTHORIZED": "NO",
+  "NEXT_OWNER": "jm1-ops / MTR-ID-COMMISSION-002"
+}

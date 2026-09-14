@@ -1,0 +1,9 @@
+CONTROL,RESULT,EVIDENCE
+PRODUCTION_AUTH_MUTATIONS,0,Evidence-only package.
+PRODUCTION_CALLER_REBINDS,0,No source/runtime config change.
+DATAVERSE_ROLES_GRANTED,0,No Dataverse mutation.
+GRAPH_PERMISSIONS_GRANTED,0,No Graph app-role mutation.
+SHAREPOINT_SELECTED_GRANTS_CREATED,0,No SharePoint permission mutation.
+PASSWORD_CREDENTIALS_RETIRED,0,Old app passwordCredentials=3.
+OLD_INTERACTIVE_APP_MUTATED,NO,7bd27a68-fda7-4330-9198-d493f2a0a5ef
+SECRET_VALUES_IN_EVIDENCE,0,App settings redacted; no plaintext secret values stored.
