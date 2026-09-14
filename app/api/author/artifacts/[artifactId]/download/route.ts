@@ -19,11 +19,12 @@ const GRAPH_SCOPE = 'https://graph.microsoft.com/.default'
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { artifactId: string } },
+  { params }: { params: Promise<{ artifactId: string }> },
 ) {
   const access = requireAuthorAccess(req)
 
-  const artifactId = params.artifactId?.trim()
+  const { artifactId: rawArtifactId } = await params
+  const artifactId = rawArtifactId?.trim()
   if (!artifactId || !isGuid(artifactId)) {
     return NextResponse.json({ error: 'Artifact not found.' }, { status: 404 })
   }

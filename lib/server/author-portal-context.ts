@@ -296,7 +296,8 @@ export function requireAuthorAccess(req: NextRequest) {
 }
 
 export async function getAuthorPortalContextFromCookies(overrides?: ResolveOverrides) {
-  const session = readAuthorPortalSession(cookies().get(getAuthorPortalCookieName())?.value)
+  const cookieStore = await cookies()
+  const session = readAuthorPortalSession(cookieStore.get(getAuthorPortalCookieName())?.value)
   if (!session) return null
   return resolveAuthorPortalContext(session, overrides)
 }
