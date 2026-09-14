@@ -189,7 +189,7 @@ export default function JoinForm() {
     buildTimeSiteKey ? 'ready' : 'loading',
   )
   const turnstileRef = useRef<HTMLDivElement | null>(null)
-  const widgetIdRef = useRef<string>()
+  const widgetIdRef = useRef<string | undefined>(undefined)
 
   const allErrors = useMemo(() => validate(form, manuscriptFile), [form, manuscriptFile])
   const canSubmit = Object.keys(allErrors).length === 0 && status !== 'submitting' && verificationConfigStatus === 'ready'

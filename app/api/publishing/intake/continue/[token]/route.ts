@@ -11,13 +11,14 @@ export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
 type RouteContext = {
-  params: {
+  params: Promise<{
     token: string
-  }
+  }>
 }
 
 export async function GET(_req: Request, context: RouteContext) {
-  const token = verifyIntakeContinuationToken(context.params.token)
+  const params = await context.params
+  const token = verifyIntakeContinuationToken(params.token)
   if (!token.ok) {
     return NextResponse.json({ error: 'Continuation link is invalid or expired.', code: token.reason }, { status: 401 })
   }
@@ -37,7 +38,8 @@ export async function GET(_req: Request, context: RouteContext) {
 }
 
 export async function POST(req: Request, context: RouteContext) {
-  const token = verifyIntakeContinuationToken(context.params.token)
+  const params = await context.params
+  const token = verifyIntakeContinuationToken(params.token)
   if (!token.ok) {
     return NextResponse.json({ error: 'Continuation link is invalid or expired.', code: token.reason }, { status: 401 })
   }
