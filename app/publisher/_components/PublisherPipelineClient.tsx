@@ -5,7 +5,7 @@
 'use client'
 
 import { useMemo, useState, type ReactNode } from 'react'
-import { signIn, signOut } from 'next-auth/react'
+import { getProviders, signIn, signOut } from 'next-auth/react'
 
 import { PUBLISHER_OPERATING_CENTER_PROVIDER_ID } from '@/lib/author-durable-auth-shared'
 import type {
@@ -73,6 +73,15 @@ export function PublisherPipelineClient({ initialPipeline, signedIn, operatorEma
     }
   }
 
+  async function signInPublisher() {
+    const providers = await getProviders()
+    const providerId = providers?.[PUBLISHER_OPERATING_CENTER_PROVIDER_ID]
+      ? PUBLISHER_OPERATING_CENTER_PROVIDER_ID
+      : undefined
+
+    await signIn(providerId, { callbackUrl: '/publisher/pipeline' })
+  }
+
   if (!signedIn) {
     return (
       <main className="min-h-screen bg-[#080b12] text-white">
@@ -85,7 +94,7 @@ export function PublisherPipelineClient({ initialPipeline, signedIn, operatorEma
           <div className="mt-9">
             <button
               type="button"
-              onClick={() => void signIn(PUBLISHER_OPERATING_CENTER_PROVIDER_ID, { callbackUrl: '/publisher/pipeline' })}
+              onClick={() => void signInPublisher()}
               className="inline-flex min-h-[48px] items-center rounded-full bg-blue-500 px-6 text-[13px] font-semibold uppercase tracking-[0.08em] text-white shadow-[0_0_28px_rgba(30,144,255,0.35)]"
             >
               Sign in

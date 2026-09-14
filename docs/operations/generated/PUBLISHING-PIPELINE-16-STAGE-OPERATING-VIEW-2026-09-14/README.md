@@ -10,6 +10,7 @@ This evidence packet documents the new `/publisher/pipeline` human-facing title 
 - 03-ui-implementation-summary.md
 - 04-validation-readback.md
 - 05-rollback.md
+- 06-auth-preview-certification.md
 - evidence.json
 - checksums.sha256
 
@@ -18,6 +19,8 @@ This evidence packet documents the new `/publisher/pipeline` human-facing title 
 IMPLEMENTATION_STATUS =
 PASS
 
+AUTH_PREVIEW_STATUS =
+PORT_CORRECTED / AZURE_AUTH_NOT_CERTIFIED
+
 DEPLOYMENT_STATUS =
 NOT_DEPLOYED
-

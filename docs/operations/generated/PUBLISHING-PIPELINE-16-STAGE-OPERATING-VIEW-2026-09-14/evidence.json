@@ -4,7 +4,7 @@
   "repository": "jmerrill-pub",
   "baseline": "origin/main @ 151f9650",
   "branch": "codex/publisher-pipeline-16-stage",
-  "status": "PASS",
+  "status": "PASS_WITH_AUTH_PREVIEW_GATE",
   "authoritativeLifecycleSource": "Dataverse-backed Publisher Operating Center snapshot and canonical lifecycle read model",
   "operatingCenterRoute": "/publisher/operating-center",
   "pipelineRoute": "/publisher/pipeline",
@@ -36,8 +36,42 @@
     "lint": "PASS_WITH_EXISTING_FONT_WARNING",
     "workflowEngineGuard": "PASS",
     "publisherPipeline16StageGuard": "PASS",
+    "publisherRoutingPrecedenceGuard": "PASS",
     "build": "PASS_WITH_EXISTING_FONT_WARNING",
     "localRouteHead": "PASS_200",
-    "localApiUnauthenticatedHead": "PASS_401"
+    "localApiUnauthenticatedHead": "PASS_401",
+    "authCallbackResult": "PASS_SAME_PORT_AFTER_LOCAL_NEXTAUTH_URL",
+    "authSecret": "MISSING_IN_LOCAL_PREVIEW_ENV",
+    "azureAdLogin": "BLOCKED_LOCAL_PROVIDER_CONFIGURATION_ABSENT",
+    "pipelineAuthenticatedRender": "NOT_CERTIFIED",
+    "pipelineApiAuthenticated": "NOT_CERTIFIED"
+  },
+  "authPreview": {
+    "port": 3001,
+    "port3000Owner": "NONE",
+    "port3001Owner": "this worktree Next.js preview process",
+    "canonicalLocalPreview": "http://localhost:3001/publisher/pipeline",
+    "portDiscrepancyCause": "NextAuth selected localhost:3000 as the local auth base URL when the preview was running on port 3001 without an explicit NEXTAUTH_URL.",
+    "callbackResult": "PASS_SAME_PORT_AFTER_LOCAL_NEXTAUTH_URL",
+    "publisherProviderLocal": "ABSENT",
+    "authSecretLocal": "ABSENT",
+    "authSecretEffect": "development warns; production-built runtime fails closed until a valid AUTH_SECRET is configured.",
+    "azureAdLogin": "BLOCKED_LOCAL_PROVIDER_CONFIGURATION_ABSENT",
+    "pipelineAuthenticatedRender": "NOT_CERTIFIED",
+    "pipelineApiAuthenticated": "NOT_CERTIFIED",
+    "readyForDeploymentAuthorization": false,
+    "sourceCorrection": "Publisher sign-in now prefers the publisher provider when configured and falls back to same-port provider selection when absent; author Azure provider is hidden unless required OAuth settings are present.",
+    "sourceFilesChanged": [
+      "app/publisher/_components/PublisherPipelineClient.tsx",
+      "app/publisher/_components/PublisherOperatingCenterClient.tsx",
+      "lib/server/author-durable-auth.ts"
+    ],
+    "evidenceFilesChanged": [
+      "docs/operations/generated/PUBLISHING-PIPELINE-16-STAGE-OPERATING-VIEW-2026-09-14/00-executive-readout.md",
+      "docs/operations/generated/PUBLISHING-PIPELINE-16-STAGE-OPERATING-VIEW-2026-09-14/04-validation-readback.md",
+      "docs/operations/generated/PUBLISHING-PIPELINE-16-STAGE-OPERATING-VIEW-2026-09-14/06-auth-preview-certification.md",
+      "docs/operations/generated/PUBLISHING-PIPELINE-16-STAGE-OPERATING-VIEW-2026-09-14/README.md",
+      "docs/operations/generated/PUBLISHING-PIPELINE-16-STAGE-OPERATING-VIEW-2026-09-14/evidence.json"
+    ]
   }
 }
