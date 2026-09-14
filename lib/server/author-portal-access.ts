@@ -172,6 +172,119 @@ export function getAuthorPortalAccessDiagnostics() {
   }
 }
 
+export type AuthorWorkspaceEntitlementState =
+  | 'NOT_ELIGIBLE'
+  | 'PROVISIONING'
+  | 'INVITATION_PENDING'
+  | 'ACTIVE'
+  | 'ERROR'
+  | 'SUSPENDED'
+
+export type AuthorWorkspaceEntitlementEvaluation = {
+  state: AuthorWorkspaceEntitlementState
+  entitlementActive: boolean
+  matchingGrantCount: number
+  systemAttentionRequired: boolean
+  reason:
+    | 'JOINED_THE_FAMILY_NOT_CONFIRMED'
+    | 'WORKSPACE_NOT_ACTIVE'
+    | 'PORTAL_ENTITLEMENT_READY_FOR_ACTIVATION'
+    | 'PORTAL_ENTITLEMENT_BOUND_TO_AUTHOR'
+    | 'PORTAL_ENTITLEMENT_MISSING'
+    | 'PORTAL_ENTITLEMENT_SUSPENDED'
+}
+
+export function evaluateAuthorWorkspaceEntitlement({
+  joinedTheFamily,
+  workspaceStatus,
+  contactId,
+  contactEmail,
+  opportunityId,
+  titleId,
+  intakeReference,
+  grants = getAuthorPortalAccessGrants(),
+}: {
+  joinedTheFamily: boolean
+  workspaceStatus?: string | number | null
+  contactId?: string | null
+  contactEmail?: string | null
+  opportunityId?: string | null
+  titleId?: string | null
+  intakeReference?: string | null
+  grants?: AuthorPortalAccessGrant[]
+}): AuthorWorkspaceEntitlementEvaluation {
+  if (!joinedTheFamily) {
+    return {
+      state: 'NOT_ELIGIBLE',
+      entitlementActive: false,
+      matchingGrantCount: 0,
+      systemAttentionRequired: false,
+      reason: 'JOINED_THE_FAMILY_NOT_CONFIRMED',
+    }
+  }
+
+  if (!isWorkspaceOperationallyActive(workspaceStatus)) {
+    return {
+      state: 'PROVISIONING',
+      entitlementActive: false,
+      matchingGrantCount: 0,
+      systemAttentionRequired: false,
+      reason: 'WORKSPACE_NOT_ACTIVE',
+    }
+  }
+
+  const scopedGrants = grants.filter((grant) =>
+    grantMatchesAuthorScope(grant, {
+      contactId,
+      contactEmail,
+      opportunityId,
+      titleId,
+      intakeReference,
+    }),
+  )
+  const suspendedGrants = scopedGrants.filter((grant) => grant.revokedAt || isExpired(grant.expiresAt) || !isGrantActive(grant))
+  const activeGrants = scopedGrants.filter((grant) => isGrantActive(grant) && !isExpired(grant.expiresAt) && !grant.revokedAt)
+
+  if (activeGrants.length === 0) {
+    if (suspendedGrants.length > 0) {
+      return {
+        state: 'SUSPENDED',
+        entitlementActive: false,
+        matchingGrantCount: suspendedGrants.length,
+        systemAttentionRequired: true,
+        reason: 'PORTAL_ENTITLEMENT_SUSPENDED',
+      }
+    }
+
+    return {
+      state: 'ERROR',
+      entitlementActive: false,
+      matchingGrantCount: 0,
+      systemAttentionRequired: true,
+      reason: 'PORTAL_ENTITLEMENT_MISSING',
+    }
+  }
+
+  const boundGrant = activeGrants.find((grant) => Boolean(grant.externalUserIdentifier || grant.consumedAt))
+  if (boundGrant) {
+    return {
+      state: 'ACTIVE',
+      entitlementActive: true,
+      matchingGrantCount: activeGrants.length,
+      systemAttentionRequired: false,
+      reason: 'PORTAL_ENTITLEMENT_BOUND_TO_AUTHOR',
+    }
+  }
+
+  return {
+    state: 'INVITATION_PENDING',
+    entitlementActive: true,
+    matchingGrantCount: activeGrants.length,
+    systemAttentionRequired: false,
+    reason: 'PORTAL_ENTITLEMENT_READY_FOR_ACTIVATION',
+  }
+}
+
 export function resolveAuthorPortalAccessGrant({
   code,
   requestedReference,
@@ -493,6 +606,35 @@ function isExpired(value?: string) {
 function isGrantActive(grant: AuthorPortalAccessGrant) {
   const status = normalizeText(grant.status)
   return !status || status === 'active' || status === 'enabled' || status === 'issued'
+}
+
+function isWorkspaceOperationallyActive(value?: string | number | null) {
+  const normalized = normalizeText(String(value ?? ''))
+  return normalized === 'active' || normalized === '835512003' || normalized === 'workspace_active'
+}
+
+function grantMatchesAuthorScope(grant: AuthorPortalAccessGrant, input: {
+  contactId?: string | null
+  contactEmail?: string | null
+  opportunityId?: string | null
+  titleId?: string | null
+  intakeReference?: string | null
+}) {
+  const contactId = normalizeText(input.contactId || undefined)
+  const contactEmail = normalizeText(input.contactEmail || undefined)
+  const opportunityId = normalizeText(input.opportunityId || undefined)
+  const titleId = normalizeText(input.titleId || undefined)
+  const intakeReference = normalizeText(input.intakeReference || undefined)
+  const projectIds = grant.projectIds?.map((projectId) => normalizeText(projectId)).filter(Boolean) || []
+
+  const contactMatches = Boolean(contactId && normalizeText(grant.contactId) === contactId) ||
+    Boolean(contactEmail && normalizeText(grant.contactEmail) === contactEmail)
+  const scopeMatches =
+    Boolean(opportunityId && (normalizeText(grant.opportunityId) === opportunityId || projectIds.includes(opportunityId))) ||
+    Boolean(titleId && projectIds.includes(titleId)) ||
+    Boolean(intakeReference && (normalizeText(grant.intakeReference) === intakeReference || projectIds.includes(intakeReference)))
+
+  return contactMatches && scopeMatches
 }
 
 function signPortalPayload(payload: string) {
