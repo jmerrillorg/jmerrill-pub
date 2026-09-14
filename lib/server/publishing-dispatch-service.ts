@@ -1,4 +1,4 @@
-// Engine: Publishing Dispatch Service
+// Engine: Notification Engine
 // Reusable? Y
 // Stage-specific exception? N
 

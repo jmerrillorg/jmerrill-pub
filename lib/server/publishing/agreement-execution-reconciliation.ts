@@ -1,3 +1,7 @@
+// Engine: Stage Transition Engine
+// Reusable? Y
+// Stage-specific exception? N
+
 import { getDataverseRuntimeAccessToken, getPublisherRuntimeAuthMode } from '../publisher-runtime-auth'
 
 const EXECUTION_STATUS = {
