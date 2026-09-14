@@ -1,0 +1,64 @@
+{
+  "work_package": "JMP-AUTH-004",
+  "date": "2026-09-14",
+  "status": "JMP_AUTH_004_PRODUCTION_MI_CUTOVER_PASS_RETIREMENT_REVIEW_READY",
+  "repository": "jmerrill-pub",
+  "production_app_service": "app-jm1-pub-prod-v2",
+  "resource_group": "rg-jm1-web-prod-premium",
+  "tenant_id": "352d075e-8e17-4169-9f8e-22e6946ce66d",
+  "subscription_id": "9ee13245-2303-4010-8b6d-35f7cbcfdc0e",
+  "pr734": {
+    "url": "https://github.com/jmerrillorg/jmerrill-pub/pull/734",
+    "head_sha": "6460a65a1e7e09bf47b2a0c1e17a3d069a0f762a",
+    "merge_sha": "235339ccad0f213e248786ebee2f950bf7ef7a34",
+    "merged_at": "2026-09-14T20:52:49Z",
+    "verification": {
+      "workflow_engine_guard": "PASS",
+      "type_check": "PASS",
+      "runtime_guard": "PASS",
+      "runtime_guard_tests": 6,
+      "diff_check": "PASS",
+      "sensitive_literal_scan": "PASS"
+    }
+  },
+  "deployments": {
+    "pr734_deployment_run": "34895548620",
+    "pr734_deployment_result": "SUCCESS",
+    "current_production_deployment_run": "34896255878",
+    "current_production_sha": "28b2e6fd988c92d5b0045593d43a78b6aa97daac",
+    "current_production_deployment_result": "SUCCESS"
+  },
+  "managed_identity": {
+    "principal_id": "ce363f5a-94f3-4ea9-9ba3-061404fca098",
+    "client_id": "e7b7f038-4016-4a3a-93d8-cecd0eda9159",
+    "dataverse_application_user": "e0e307e1-2fb0-f111-aaac-000d3a14673b",
+    "graph_roles": [
+      "Sites.Selected"
+    ]
+  },
+  "cutover": {
+    "runtime_setting": "PUBLISHER_RUNTIME_AUTH_MODE",
+    "runtime_value": "MANAGED_IDENTITY",
+    "dataverse_auth": "MANAGED_IDENTITY",
+    "graph_sharepoint_auth": "MANAGED_IDENTITY",
+    "dataverse_canary": "PASS",
+    "graph_sharepoint_canary": "PASS",
+    "negative_proofs": "PASS",
+    "rollback_proof": "PASS",
+    "business_nonregression": "PASS_BOUNDED"
+  },
+  "credential_retirement": {
+    "credentials_retired": 0,
+    "old_publisher_interactive_password_credentials_before": 3,
+    "old_publisher_interactive_password_credentials_after": 3,
+    "old_publisher_interactive_app_required": true,
+    "credential_caller_mapping": "INDISTINGUISHABLE_AT_PER_PASSWORD_KEY_LEVEL",
+    "mtr_handoff_created": true
+  },
+  "impact": {
+    "author_impact": 0,
+    "client_impact": 0,
+    "external_communications": 0,
+    "production_interruption": "BRIEF_BOUNDED_RESTART_DURING_APPSETTING_CHANGES"
+  }
+}
