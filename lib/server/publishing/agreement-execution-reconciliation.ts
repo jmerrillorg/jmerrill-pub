@@ -1,3 +1,5 @@
+import { stage05OnboardingRequirementLabels } from './stage05-onboarding-readiness'
+
 const EXECUTION_STATUS = {
   SUCCESS: 835500001,
   FAILED: 835500002,
@@ -596,13 +598,7 @@ function compactArtifactReference(input: { artifactPath: string; checksum: strin
 }
 
 function onboardingRemainingItems() {
-  return [
-    'author profile confirmation',
-    'production preferences',
-    'metadata/positioning confirmation',
-    'royalty/payment setup confirmation',
-    'workspace access confirmation',
-  ]
+  return [...stage05OnboardingRequirementLabels]
 }
 
 function encodeODataString(value: string) {

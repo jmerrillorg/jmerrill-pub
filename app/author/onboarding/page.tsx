@@ -22,7 +22,7 @@ export default async function AuthorOnboardingPage() {
     <AuthorPortalShell
       eyebrow="Author onboarding"
       title="Complete author onboarding."
-      description="Confirm your author details, mailing address, and book information so we can prepare your publishing agreement."
+      description="Confirm or complete the information needed for your active publishing project. We will not ask you to re-enter details already captured in your agreement, payment record, or author profile."
     >
       <AuthorGate scope="portal">
         {onboardingAlreadyComplete ? (
@@ -53,7 +53,7 @@ export default async function AuthorOnboardingPage() {
             submitLabel="Submit onboarding"
             successTitle="Your onboarding intake has been received."
             successMessage="A notification has been sent to publishing@jmerrill.one. You can expect a follow-up within 1–2 business days."
-            successDetails={['Next step: complete Payment & Royalty Setup in your Author Workspace.']}
+            successDetails={['Royalty payout setup is tracked separately and is required before your first royalty payment, not before editorial work.']}
             successLink={{ href: '/author/portal', label: 'Return to Author Workspace' }}
             failureMessage="We could not submit your onboarding form at this time. Please try again or contact publishing@jmerrill.one."
           />

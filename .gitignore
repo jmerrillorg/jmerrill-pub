@@ -22,3 +22,7 @@ azure-functions/acs-email-relay/local.settings.*.json
 
 # Runtime bootstrap manifests are regenerated per execution context.
 .bootstrap/
+
+# App Service deployment packages and scratch extraction output are regenerated per release.
+.appservice-package/
+/tmp/
