@@ -13,6 +13,7 @@ import {
   type ManuscriptUploadCandidate,
   type StoredManuscriptArtifact,
 } from '@/lib/publishing/intake/manuscriptUpload'
+import { getGraphSharePointRuntimeAccessToken } from './publisher-runtime-auth'
 
 const EXECUTION_STATUS_SUCCESS = 835500001
 const BAND_LEVEL_1 = 835500000
@@ -230,28 +231,7 @@ async function fetchMailboxAttachment(input: {
 }
 
 async function getGraphAccessToken() {
-  const tenantId = process.env.GRAPH_TENANT_ID || process.env.SHAREPOINT_TENANT_ID || process.env.DATAVERSE_TENANT_ID
-  const clientId = process.env.GRAPH_CLIENT_ID || process.env.SHAREPOINT_CLIENT_ID || process.env.DATAVERSE_CLIENT_ID
-  const clientSecret = process.env.GRAPH_CLIENT_SECRET || process.env.SHAREPOINT_CLIENT_SECRET || process.env.DATAVERSE_CLIENT_SECRET
-  if (!tenantId || !clientId || !clientSecret) throw new Error('graph_configuration_missing')
-
-  const response = await fetch(`https://login.microsoftonline.com/${tenantId}/oauth2/v2.0/token`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded',
-      Accept: 'application/json',
-    },
-    body: new URLSearchParams({
-      grant_type: 'client_credentials',
-      client_id: clientId,
-      client_secret: clientSecret,
-      scope: 'https://graph.microsoft.com/.default',
-    }),
-  })
-  const json = await response.json().catch(() => null)
-  const token = isRecord(json) && typeof json.access_token === 'string' ? json.access_token : ''
-  if (!response.ok || !token) throw new Error(`graph_token_failed:${response.status}`)
-  return token
+  return getGraphSharePointRuntimeAccessToken()
 }
 
 async function graphFetch(token: string, path: string) {

@@ -1,4 +1,4 @@
-// Engine: Publishing Dispatch Service
+// Engine: Notification Engine
 // Reusable? Y
 // Stage-specific exception? N
 
@@ -38,6 +38,7 @@ import {
   derivePublishingLifecycleContext,
   type PublishingLifecycleContext,
 } from './publishing-lifecycle-context'
+import { getGraphSharePointRuntimeAccessToken } from './publisher-runtime-auth'
 
 const GATE_STATUS_READY_FOR_AUTHOR_RELEASE = 196650001
 const GATE_STATUS_AWAITING_AUTHOR_RESPONSE = 196650002
@@ -1016,32 +1017,7 @@ function requiredRolesFor(stageCode: AuthorReviewPackageType): AttachmentRole[] 
 }
 
 async function getGraphToken() {
-  const tenantId = process.env.GRAPH_TENANT_ID || process.env.SHAREPOINT_TENANT_ID
-  const clientId = process.env.GRAPH_CLIENT_ID || process.env.SHAREPOINT_CLIENT_ID
-  const clientSecret = process.env.GRAPH_CLIENT_SECRET || process.env.SHAREPOINT_CLIENT_SECRET
-
-  if (!tenantId || !clientId || !clientSecret) {
-    throw new Error('GRAPH_CONFIG_MISSING_FOR_PACKAGE_ATTACHMENT_MATERIALIZATION')
-  }
-
-  const response = await fetch(`https://login.microsoftonline.com/${tenantId}/oauth2/v2.0/token`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded',
-      Accept: 'application/json',
-    },
-    body: new URLSearchParams({
-      grant_type: 'client_credentials',
-      client_id: clientId,
-      client_secret: clientSecret,
-      scope: 'https://graph.microsoft.com/.default',
-    }),
-  })
-  const json = (await response.json().catch(() => null)) as { access_token?: string } | null
-  if (!response.ok || !json?.access_token) {
-    throw new Error(`GRAPH_TOKEN_FAILED_FOR_PACKAGE_ATTACHMENT_MATERIALIZATION:${response.status}`)
-  }
-  return json.access_token
+  return getGraphSharePointRuntimeAccessToken()
 }
 
 async function getTitle(config: DataverseServerConfig, titleId: string) {

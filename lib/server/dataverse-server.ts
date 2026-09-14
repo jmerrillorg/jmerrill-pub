@@ -1,3 +1,5 @@
+import { getDataverseRuntimeAccessToken, getPublisherRuntimeAuthMode } from './publisher-runtime-auth'
+
 const DEFAULT_RESOURCE_URL = 'https://jm1hq.crm.dynamics.com'
 const ODATA_ANNOTATION = 'OData.Community.Display.V1.FormattedValue'
 
@@ -5,6 +7,7 @@ export type DataverseServerConfig = {
   tenantId: string
   clientId: string
   clientSecret: string
+  authMode: 'LEGACY_CLIENT_CREDENTIAL' | 'MANAGED_IDENTITY'
   resourceUrl: string
   webApiBaseUrl: string
 }
@@ -12,6 +15,7 @@ export type DataverseServerConfig = {
 export type DataverseRow = Record<string, unknown>
 
 export function getDataverseServerConfig(): DataverseServerConfig | null {
+  const authMode = getPublisherRuntimeAuthMode()
   const resourceUrl = cleanUrl(process.env.DATAVERSE_RESOURCE_URL || DEFAULT_RESOURCE_URL)
   const baseUrl = cleanUrl(
     process.env.DATAVERSE_WEB_API_BASE_URL ||
@@ -23,11 +27,16 @@ export function getDataverseServerConfig(): DataverseServerConfig | null {
     tenantId: process.env.DATAVERSE_TENANT_ID?.trim() || '',
     clientId: process.env.DATAVERSE_CLIENT_ID?.trim() || '',
     clientSecret: process.env.DATAVERSE_CLIENT_SECRET?.trim() || '',
+    authMode,
     resourceUrl,
     webApiBaseUrl: baseUrl?.endsWith('/api/data/v9.2') ? baseUrl : `${baseUrl}/api/data/v9.2`,
   }
 
-  if (!config.tenantId || !config.clientId || !config.clientSecret || !config.resourceUrl || !config.webApiBaseUrl) {
+  const legacyMissing =
+    authMode === 'LEGACY_CLIENT_CREDENTIAL' &&
+    (!config.tenantId || !config.clientId || !config.clientSecret)
+
+  if (legacyMissing || !config.resourceUrl || !config.webApiBaseUrl) {
     return null
   }
 
@@ -150,31 +159,7 @@ function cleanUrl(value?: string) {
 }
 
 async function getDataverseAccessToken(config: DataverseServerConfig) {
-  const tokenUrl = `https://login.microsoftonline.com/${config.tenantId}/oauth2/v2.0/token`
-  const body = new URLSearchParams({
-    grant_type: 'client_credentials',
-    client_id: config.clientId,
-    client_secret: config.clientSecret,
-    scope: `${config.resourceUrl}/.default`,
-  })
-
-  const response = await fetch(tokenUrl, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded',
-      Accept: 'application/json',
-    },
-    body,
-  })
-
-  const json = await response.json().catch(() => null)
-  const token = json && typeof json === 'object' && 'access_token' in json ? String(json.access_token || '') : ''
-
-  if (!response.ok || !token) {
-    throw new Error(`dataverse_token_failed:${response.status}`)
-  }
-
-  return token
+  return getDataverseRuntimeAccessToken(config.resourceUrl)
 }
 
 async function safeResponseText(response: Response) {

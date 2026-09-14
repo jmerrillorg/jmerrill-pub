@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { NextResponse } from 'next/server'
+import { getPublisherRuntimeAuthMode, getPublisherRuntimeAuthReadback } from '@/lib/server/publisher-runtime-auth'
 
 export const dynamic = 'force-dynamic'
 
@@ -16,18 +17,6 @@ type DependencyHealth = {
 
 const CHECKS = {
   configuration: ['NODE_ENV'],
-  dataverse: [
-    'DATAVERSE_TENANT_ID',
-    'DATAVERSE_CLIENT_ID',
-    'DATAVERSE_CLIENT_SECRET',
-    'DATAVERSE_RESOURCE_URL',
-    'DATAVERSE_WEB_API_BASE_URL',
-  ],
-  graph: [
-    'SHAREPOINT_TENANT_ID',
-    'SHAREPOINT_CLIENT_ID',
-    'SHAREPOINT_CLIENT_SECRET',
-  ],
   acs: [
     'JM1_JOIN_INTERNAL_NOTIFICATION_RELAY_URL',
     'JM1_JOIN_INTERNAL_NOTIFICATION_RELAY_KEY',
@@ -50,7 +39,9 @@ const FORMER_AUTHOR_PORTAL_FALLBACK = 'jm1-author-portal-session'
 export async function GET() {
   const dependencies = Object.fromEntries(
     Object.entries(CHECKS).map(([name, keys]) => [name, dependencyHealth(keys)]),
-  ) as Record<keyof typeof CHECKS | 'relayHost', DependencyHealth>
+  ) as Record<string, DependencyHealth>
+  dependencies.dataverse = runtimeAuthDependencyHealth('dataverse')
+  dependencies.graph = runtimeAuthDependencyHealth('graph')
   dependencies.relayHost = await relayHostHealth()
 
   const paymentGate = String(process.env.JM1_STRIPE_COMMISSIONING_PAYMENT_ENABLED || '').toLowerCase() === 'true'
@@ -90,6 +81,48 @@ export async function GET() {
       'Cache-Control': 'no-store',
     },
   })
+}
+
+function runtimeAuthDependencyHealth(authority: 'dataverse' | 'graph'): DependencyHealth {
+  const mode = getPublisherRuntimeAuthMode()
+  const readback = getPublisherRuntimeAuthReadback()
+  if (mode === 'MANAGED_IDENTITY') {
+    const required = ['PUBLISHER_RUNTIME_AUTH_MODE', 'IDENTITY_ENDPOINT/MSI_ENDPOINT', 'IDENTITY_HEADER/MSI_SECRET']
+    const present = [
+      'PUBLISHER_RUNTIME_AUTH_MODE',
+      ...(readback.managedIdentityEndpointPresent ? ['IDENTITY_ENDPOINT/MSI_ENDPOINT'] : []),
+      ...(readback.managedIdentityHeaderPresent ? ['IDENTITY_HEADER/MSI_SECRET'] : []),
+    ]
+    const missing = required.filter((key) => !present.includes(key))
+    return {
+      status: missing.length === 0 ? 'ready' : 'degraded',
+      required,
+      present,
+      missing,
+      notes: [`runtime_auth_mode=${mode}`, `authority=${authority}`],
+    }
+  }
+
+  const required =
+    authority === 'dataverse'
+      ? ['DATAVERSE_TENANT_ID', 'DATAVERSE_CLIENT_ID', 'DATAVERSE_CLIENT_SECRET', 'DATAVERSE_RESOURCE_URL', 'DATAVERSE_WEB_API_BASE_URL']
+      : ['GRAPH_TENANT_ID/SHAREPOINT_TENANT_ID', 'GRAPH_CLIENT_ID/SHAREPOINT_CLIENT_ID', 'GRAPH_CLIENT_SECRET/SHAREPOINT_CLIENT_SECRET']
+  const present =
+    authority === 'dataverse'
+      ? required.filter((key) => Boolean(process.env[key]?.trim()))
+      : [
+          ...(process.env.GRAPH_TENANT_ID || process.env.SHAREPOINT_TENANT_ID ? ['GRAPH_TENANT_ID/SHAREPOINT_TENANT_ID'] : []),
+          ...(process.env.GRAPH_CLIENT_ID || process.env.SHAREPOINT_CLIENT_ID ? ['GRAPH_CLIENT_ID/SHAREPOINT_CLIENT_ID'] : []),
+          ...(process.env.GRAPH_CLIENT_SECRET || process.env.SHAREPOINT_CLIENT_SECRET ? ['GRAPH_CLIENT_SECRET/SHAREPOINT_CLIENT_SECRET'] : []),
+        ]
+  const missing = required.filter((key) => !present.includes(key))
+  return {
+    status: missing.length === 0 ? 'ready' : 'degraded',
+    required,
+    present,
+    missing,
+    notes: [`runtime_auth_mode=${mode}`, `authority=${authority}`],
+  }
 }
 
 function readPackagedReleaseSha() {
