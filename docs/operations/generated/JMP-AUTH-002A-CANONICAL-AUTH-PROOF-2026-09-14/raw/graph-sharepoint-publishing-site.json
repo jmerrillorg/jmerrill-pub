@@ -1,0 +1,7 @@
+{
+  "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#sites(id,displayName,webUrl,name)/$entity",
+  "displayName": "Publishing Team",
+  "id": "jmerrillfoundation.sharepoint.com,35fb0d98-bc68-4250-9d0d-8c07d68e4024,10208ad5-0028-48f0-9ffa-717812924835",
+  "name": "publishing",
+  "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing"
+}

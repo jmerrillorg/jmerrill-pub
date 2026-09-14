@@ -1,0 +1,11 @@
+{
+  "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#drives(id,name,webUrl,driveType)",
+  "value": [
+    {
+      "driveType": "documentLibrary",
+      "id": "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
+      "name": "Documents",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents"
+    }
+  ]
+}

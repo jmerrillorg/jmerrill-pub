@@ -1,0 +1,13 @@
+TABLE,ENTITY_SET,OWNERSHIP,REQUIRED_FOR_RUNTIME,MINIMUM_AUTHORITY_REFERENCE
+jm1_publishingintake,jm1_publishingintakes,UserOwned,YES_FROM_SOURCE_SCAN,Use least-privilege role in MTR commissioning; do not clone System Administrator.
+jm1_executionlog,jm1_executionlogs,UserOwned,YES_FROM_SOURCE_SCAN,Use least-privilege role in MTR commissioning; do not clone System Administrator.
+jm1pub_title,jm1pub_titles,UserOwned,YES_FROM_SOURCE_SCAN,Use least-privilege role in MTR commissioning; do not clone System Administrator.
+jm1pub_publishingasset,jm1pub_publishingassets,UserOwned,YES_FROM_SOURCE_SCAN,Use least-privilege role in MTR commissioning; do not clone System Administrator.
+jm1pub_editorialstage,jm1pub_editorialstages,UserOwned,YES_FROM_SOURCE_SCAN,Use least-privilege role in MTR commissioning; do not clone System Administrator.
+jm1pub_editorialapprovalgate,jm1pub_editorialapprovalgates,OrganizationOwned,YES_FROM_SOURCE_SCAN,Use least-privilege role in MTR commissioning; do not clone System Administrator.
+jm1pub_editorialartifact,jm1pub_editorialartifacts,OrganizationOwned,YES_FROM_SOURCE_SCAN,Use least-privilege role in MTR commissioning; do not clone System Administrator.
+jm1pub_editorialdiagnostic,jm1pub_editorialdiagnostics,UserOwned,YES_FROM_SOURCE_SCAN,Use least-privilege role in MTR commissioning; do not clone System Administrator.
+contact,contacts,UserOwned,YES_FROM_SOURCE_SCAN,Use least-privilege role in MTR commissioning; do not clone System Administrator.
+opportunity,opportunities,UserOwned,YES_FROM_SOURCE_SCAN,Use least-privilege role in MTR commissioning; do not clone System Administrator.
+jm1_productionproject,jm1_productionprojects,UserOwned,YES_FROM_SOURCE_SCAN,Use least-privilege role in MTR commissioning; do not clone System Administrator.
+jm1_productiontask,jm1_productiontasks,UserOwned,YES_FROM_SOURCE_SCAN,Use least-privilege role in MTR commissioning; do not clone System Administrator.

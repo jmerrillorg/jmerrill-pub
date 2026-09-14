@@ -1,0 +1,33 @@
+{
+  "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#sites('jmerrillfoundation.sharepoint.com%2C35fb0d98-bc68-4250-9d0d-8c07d68e4024%2C10208ad5-0028-48f0-9ffa-717812924835')/lists(id,name,displayName,webUrl)",
+  "value": [
+    {
+      "@odata.etag": "\"11b27cfc-ef5f-439e-b485-6bb6a767977f,14\"",
+      "displayName": "CompanyList-006e2221-e1df-45c0-8753-83a98de5ecf1",
+      "id": "11b27cfc-ef5f-439e-b485-6bb6a767977f",
+      "name": "CompanyList006e2221e1df45c0875383a98de5ecf1",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Lists/CompanyList006e2221e1df45c0875383a98de5ecf1"
+    },
+    {
+      "@odata.etag": "\"f9f1f466-e5f6-42a7-9af5-a03e26efdb1e,50\"",
+      "displayName": "Documents",
+      "id": "f9f1f466-e5f6-42a7-9af5-a03e26efdb1e",
+      "name": "Shared Documents",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents"
+    },
+    {
+      "@odata.etag": "\"167c84f9-5978-49a9-b1d7-aa4f5a2ff06c,5\"",
+      "displayName": "List",
+      "id": "167c84f9-5978-49a9-b1d7-aa4f5a2ff06c",
+      "name": "List",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/Lists/List"
+    },
+    {
+      "@odata.etag": "\"bbd90a5c-96c8-456e-a0d5-cb085d993493,0\"",
+      "displayName": "Web Template Extensions",
+      "id": "bbd90a5c-96c8-456e-a0d5-cb085d993493",
+      "name": "wte",
+      "webUrl": "https://jmerrillfoundation.sharepoint.com/sites/publishing/_catalogs/wte"
+    }
+  ]
+}

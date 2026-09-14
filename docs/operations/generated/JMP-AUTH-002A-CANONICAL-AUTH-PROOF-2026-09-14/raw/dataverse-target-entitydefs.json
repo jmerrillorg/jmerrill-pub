@@ -1,0 +1,88 @@
+{
+  "value": [
+    {
+      "@odata.context": "https://jm1hq.crm.dynamics.com/api/data/v9.2/$metadata#EntityDefinitions(LogicalName,EntitySetName,OwnershipType)/$entity",
+      "EntitySetName": "jm1_publishingintakes",
+      "LogicalName": "jm1_publishingintake",
+      "MetadataId": "833ec7bc-4dc8-f011-bbd2-7ced8d1f5f90",
+      "OwnershipType": "UserOwned"
+    },
+    {
+      "@odata.context": "https://jm1hq.crm.dynamics.com/api/data/v9.2/$metadata#EntityDefinitions(LogicalName,EntitySetName,OwnershipType)/$entity",
+      "EntitySetName": "jm1_executionlogs",
+      "LogicalName": "jm1_executionlog",
+      "MetadataId": "821e850c-7957-446e-a9e2-ce90644b12c5",
+      "OwnershipType": "UserOwned"
+    },
+    {
+      "@odata.context": "https://jm1hq.crm.dynamics.com/api/data/v9.2/$metadata#EntityDefinitions(LogicalName,EntitySetName,OwnershipType)/$entity",
+      "EntitySetName": "jm1pub_titles",
+      "LogicalName": "jm1pub_title",
+      "MetadataId": "6c68b5ec-6191-f011-b4cc-7c1e525b3eb3",
+      "OwnershipType": "UserOwned"
+    },
+    {
+      "@odata.context": "https://jm1hq.crm.dynamics.com/api/data/v9.2/$metadata#EntityDefinitions(LogicalName,EntitySetName,OwnershipType)/$entity",
+      "EntitySetName": "jm1pub_publishingassets",
+      "LogicalName": "jm1pub_publishingasset",
+      "MetadataId": "9bffacfa-c27a-f111-ab0f-7c1e525b15c2",
+      "OwnershipType": "UserOwned"
+    },
+    {
+      "@odata.context": "https://jm1hq.crm.dynamics.com/api/data/v9.2/$metadata#EntityDefinitions(LogicalName,EntitySetName,OwnershipType)/$entity",
+      "EntitySetName": "jm1pub_editorialstages",
+      "LogicalName": "jm1pub_editorialstage",
+      "MetadataId": "214dac3b-ef6b-f111-a826-6045bdd69738",
+      "OwnershipType": "UserOwned"
+    },
+    {
+      "@odata.context": "https://jm1hq.crm.dynamics.com/api/data/v9.2/$metadata#EntityDefinitions(LogicalName,EntitySetName,OwnershipType)/$entity",
+      "EntitySetName": "jm1pub_editorialapprovalgates",
+      "LogicalName": "jm1pub_editorialapprovalgate",
+      "MetadataId": "9c0fbb14-d47a-f111-ab0f-6045bdd69678",
+      "OwnershipType": "OrganizationOwned"
+    },
+    {
+      "@odata.context": "https://jm1hq.crm.dynamics.com/api/data/v9.2/$metadata#EntityDefinitions(LogicalName,EntitySetName,OwnershipType)/$entity",
+      "EntitySetName": "jm1pub_editorialartifacts",
+      "LogicalName": "jm1pub_editorialartifact",
+      "MetadataId": "b13296fc-d37a-f111-ab0f-6045bdd69435",
+      "OwnershipType": "OrganizationOwned"
+    },
+    {
+      "@odata.context": "https://jm1hq.crm.dynamics.com/api/data/v9.2/$metadata#EntityDefinitions(LogicalName,EntitySetName,OwnershipType)/$entity",
+      "EntitySetName": "jm1pub_editorialdiagnostics",
+      "LogicalName": "jm1pub_editorialdiagnostic",
+      "MetadataId": "8d2160aa-a7aa-44d3-a307-836c04a8d458",
+      "OwnershipType": "UserOwned"
+    },
+    {
+      "@odata.context": "https://jm1hq.crm.dynamics.com/api/data/v9.2/$metadata#EntityDefinitions(LogicalName,EntitySetName,OwnershipType)/$entity",
+      "EntitySetName": "contacts",
+      "LogicalName": "contact",
+      "MetadataId": "608861bc-50a4-4c5f-a02c-21fe1943e2cf",
+      "OwnershipType": "UserOwned"
+    },
+    {
+      "@odata.context": "https://jm1hq.crm.dynamics.com/api/data/v9.2/$metadata#EntityDefinitions(LogicalName,EntitySetName,OwnershipType)/$entity",
+      "EntitySetName": "opportunities",
+      "LogicalName": "opportunity",
+      "MetadataId": "30b0cd7e-0081-42e1-9a48-688442277fae",
+      "OwnershipType": "UserOwned"
+    },
+    {
+      "@odata.context": "https://jm1hq.crm.dynamics.com/api/data/v9.2/$metadata#EntityDefinitions(LogicalName,EntitySetName,OwnershipType)/$entity",
+      "EntitySetName": "jm1_productionprojects",
+      "LogicalName": "jm1_productionproject",
+      "MetadataId": "5374a4de-0596-f011-b4cb-7c1e525b3865",
+      "OwnershipType": "UserOwned"
+    },
+    {
+      "@odata.context": "https://jm1hq.crm.dynamics.com/api/data/v9.2/$metadata#EntityDefinitions(LogicalName,EntitySetName,OwnershipType)/$entity",
+      "EntitySetName": "jm1_productiontasks",
+      "LogicalName": "jm1_productiontask",
+      "MetadataId": "e2abb10e-e0c9-f011-bbd3-7c1e52485c79",
+      "OwnershipType": "UserOwned"
+    }
+  ]
+}

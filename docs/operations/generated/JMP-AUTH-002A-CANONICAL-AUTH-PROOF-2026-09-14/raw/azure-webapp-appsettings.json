@@ -1,0 +1,317 @@
+[
+  {
+    "name": "WEBSITE_HTTPLOGGING_RETENTION_DAYS",
+    "slotSetting": false,
+    "value": "3"
+  },
+  {
+    "name": "NODE_ENV",
+    "slotSetting": false,
+    "value": "production"
+  },
+  {
+    "name": "SCM_DO_BUILD_DURING_DEPLOYMENT",
+    "slotSetting": false,
+    "value": "false"
+  },
+  {
+    "name": "ENABLE_ORYX_BUILD",
+    "slotSetting": false,
+    "value": "false"
+  },
+  {
+    "name": "WEBSITE_RUN_FROM_PACKAGE",
+    "slotSetting": false,
+    "value": "1"
+  },
+  {
+    "name": "WEBSITE_SKIP_NODE_MODULES_TAR",
+    "slotSetting": false,
+    "value": "1"
+  },
+  {
+    "name": "WEBSITE_NODE_DEFAULT_VERSION",
+    "slotSetting": false,
+    "value": "~24"
+  },
+  {
+    "name": "JM1_ENVIRONMENT",
+    "slotSetting": false,
+    "value": "production"
+  },
+  {
+    "name": "JM1_RELEASE_SHA",
+    "slotSetting": false,
+    "value": "fabbe8877d1f7eb4178f25f95694f2a94a05c02c"
+  },
+  {
+    "name": "NEXTAUTH_URL",
+    "slotSetting": true,
+    "value": "https://jmerrill.pub"
+  },
+  {
+    "name": "APPLICATIONINSIGHTS_CONNECTION_STRING",
+    "slotSetting": false,
+    "value": "REDACTED"
+  },
+  {
+    "name": "DATAVERSE_ENVIRONMENT_URL",
+    "slotSetting": true,
+    "value": "https://jm1hq.crm.dynamics.com"
+  },
+  {
+    "name": "DATAVERSE_RESOURCE_URL",
+    "slotSetting": true,
+    "value": "https://jm1hq.crm.dynamics.com"
+  },
+  {
+    "name": "DATAVERSE_WEB_API_BASE_URL",
+    "slotSetting": true,
+    "value": "https://jm1hq.crm.dynamics.com/api/data/v9.2"
+  },
+  {
+    "name": "DATAVERSE_PUBLISHING_INTAKE_ENTITY_SET",
+    "slotSetting": false,
+    "value": "jm1_publishingintakes"
+  },
+  {
+    "name": "JOIN_WORKSPACE_SITE_HOSTNAME",
+    "slotSetting": false,
+    "value": "jmerrillfoundation.sharepoint.com"
+  },
+  {
+    "name": "JOIN_WORKSPACE_SITE_PATH",
+    "slotSetting": false,
+    "value": "/sites/publishing"
+  },
+  {
+    "name": "JOIN_WORKSPACE_DRIVE_NAME",
+    "slotSetting": false,
+    "value": "Documents"
+  },
+  {
+    "name": "JOIN_WORKSPACE_INQUIRY_ROOT",
+    "slotSetting": false,
+    "value": "01_Pre-Pipeline/00_Inquiry"
+  },
+  {
+    "name": "INTAKE_ALLOWED_ORIGINS",
+    "slotSetting": false,
+    "value": "https://jmerrill.pub,https://www.jmerrill.pub"
+  },
+  {
+    "name": "INTAKE_RATE_LIMIT_ENABLED",
+    "slotSetting": false,
+    "value": "true"
+  },
+  {
+    "name": "INTAKE_DEADLETTER_QUEUE_NAME",
+    "slotSetting": false,
+    "value": "jm1-pub-intake-deadletter-prod"
+  },
+  {
+    "name": "JM1_STRIPE_MODE",
+    "slotSetting": false,
+    "value": "live"
+  },
+  {
+    "name": "JM1_STRIPE_CONNECT_ENABLED",
+    "slotSetting": false,
+    "value": "true"
+  },
+  {
+    "name": "JM1_STRIPE_COMMISSIONING_PAYMENT_ENABLED",
+    "slotSetting": false,
+    "value": "false"
+  },
+  {
+    "name": "JM1_DIAGNOSTIC_RUNNER_URL",
+    "slotSetting": false,
+    "value": "https://func-jm1-diagnostic-ai-runner.azurewebsites.net"
+  },
+  {
+    "name": "WEBSITE_WARMUP_PATH",
+    "slotSetting": true,
+    "value": "/api/health"
+  },
+  {
+    "name": "WEBSITE_WARMUP_STATUSES",
+    "slotSetting": false,
+    "value": "200"
+  },
+  {
+    "name": "AUTHOR_OPERATING_CENTER_CLIENT_ID",
+    "slotSetting": false,
+    "value": "0ba5e9e1-9e8b-4646-8547-85b8e36623f1"
+  },
+  {
+    "name": "AUTHOR_OPERATING_CENTER_TENANT_ID",
+    "slotSetting": false,
+    "value": "b2f9cca1-74da-41ef-987c-a5e015013be0"
+  },
+  {
+    "name": "AUTHOR_OPERATING_CENTER_AUTH_MODE",
+    "slotSetting": false,
+    "value": "external-id-local"
+  },
+  {
+    "name": "AUTHOR_OPERATING_CENTER_ISSUER",
+    "slotSetting": false,
+    "value": "https://b2f9cca1-74da-41ef-987c-a5e015013be0.ciamlogin.com/b2f9cca1-74da-41ef-987c-a5e015013be0/v2.0"
+  },
+  {
+    "name": "PUBLISHER_OPERATING_CENTER_CLIENT_ID",
+    "slotSetting": false,
+    "value": "7bd27a68-fda7-4330-9198-d493f2a0a5ef"
+  },
+  {
+    "name": "PUBLISHER_OPERATING_CENTER_TENANT_ID",
+    "slotSetting": false,
+    "value": "352d075e-8e17-4169-9f8e-22e6946ce66d"
+  },
+  {
+    "name": "PUBLISHER_OPERATING_CENTER_ALLOWED_EMAILS",
+    "slotSetting": false,
+    "value": "jm1-admin@jmerrill.one"
+  },
+  {
+    "name": "PUBLISHER_OPERATING_CENTER_ALLOWED_OBJECT_IDS",
+    "slotSetting": false,
+    "value": "9750d862-2024-42bc-9707-f84b325dfb19"
+  },
+  {
+    "name": "AUTHOR_PORTAL_ACCESS_REGISTRY_JSON",
+    "slotSetting": true,
+    "value": "KEYVAULT_REFERENCE_REDACTED"
+  },
+  {
+    "name": "AUTHOR_PORTAL_MASTER_ACCESS_CODE",
+    "slotSetting": false,
+    "value": "KEYVAULT_REFERENCE_REDACTED"
+  },
+  {
+    "name": "AUTHOR_PORTAL_ACCESS_CODE_PEPPER",
+    "slotSetting": false,
+    "value": "KEYVAULT_REFERENCE_REDACTED"
+  },
+  {
+    "name": "AUTHOR_PORTAL_SESSION_SECRET",
+    "slotSetting": false,
+    "value": "KEYVAULT_REFERENCE_REDACTED"
+  },
+  {
+    "name": "AUTH_SECRET",
+    "slotSetting": false,
+    "value": "KEYVAULT_REFERENCE_REDACTED"
+  },
+  {
+    "name": "NEXTAUTH_SECRET",
+    "slotSetting": false,
+    "value": "KEYVAULT_REFERENCE_REDACTED"
+  },
+  {
+    "name": "DATAVERSE_TENANT_ID",
+    "slotSetting": true,
+    "value": "KEYVAULT_REFERENCE_REDACTED"
+  },
+  {
+    "name": "DATAVERSE_CLIENT_ID",
+    "slotSetting": true,
+    "value": "KEYVAULT_REFERENCE_REDACTED"
+  },
+  {
+    "name": "DATAVERSE_CLIENT_SECRET",
+    "slotSetting": true,
+    "value": "KEYVAULT_REFERENCE_REDACTED"
+  },
+  {
+    "name": "SHAREPOINT_TENANT_ID",
+    "slotSetting": false,
+    "value": "KEYVAULT_REFERENCE_REDACTED"
+  },
+  {
+    "name": "SHAREPOINT_CLIENT_ID",
+    "slotSetting": false,
+    "value": "KEYVAULT_REFERENCE_REDACTED"
+  },
+  {
+    "name": "SHAREPOINT_CLIENT_SECRET",
+    "slotSetting": false,
+    "value": "KEYVAULT_REFERENCE_REDACTED"
+  },
+  {
+    "name": "TURNSTILE_SITE_KEY",
+    "slotSetting": false,
+    "value": "KEYVAULT_REFERENCE_REDACTED"
+  },
+  {
+    "name": "NEXT_PUBLIC_TURNSTILE_SITE_KEY",
+    "slotSetting": false,
+    "value": "KEYVAULT_REFERENCE_REDACTED"
+  },
+  {
+    "name": "TURNSTILE_SECRET_KEY",
+    "slotSetting": false,
+    "value": "KEYVAULT_REFERENCE_REDACTED"
+  },
+  {
+    "name": "AZURE_STORAGE_CONNECTION_STRING",
+    "slotSetting": false,
+    "value": "KEYVAULT_REFERENCE_REDACTED"
+  },
+  {
+    "name": "JM1_JOIN_INTERNAL_NOTIFICATION_RELAY_URL",
+    "slotSetting": false,
+    "value": "KEYVAULT_REFERENCE_REDACTED"
+  },
+  {
+    "name": "JM1_JOIN_INTERNAL_NOTIFICATION_RELAY_KEY",
+    "slotSetting": false,
+    "value": "KEYVAULT_REFERENCE_REDACTED"
+  },
+  {
+    "name": "STRIPE_CONNECT_SECRET_KEY",
+    "slotSetting": false,
+    "value": "KEYVAULT_REFERENCE_REDACTED"
+  },
+  {
+    "name": "STRIPE_CHECKOUT_SECRET_KEY",
+    "slotSetting": false,
+    "value": "KEYVAULT_REFERENCE_REDACTED"
+  },
+  {
+    "name": "STRIPE_WEBHOOK_SECRET",
+    "slotSetting": false,
+    "value": "KEYVAULT_REFERENCE_REDACTED"
+  },
+  {
+    "name": "JM1_ORCHESTRATION_WORKER_KEY",
+    "slotSetting": false,
+    "value": "KEYVAULT_REFERENCE_REDACTED"
+  },
+  {
+    "name": "JM1_DIAGNOSTIC_RUNNER_KEY",
+    "slotSetting": false,
+    "value": "KEYVAULT_REFERENCE_REDACTED"
+  },
+  {
+    "name": "AUTHOR_OPERATING_CENTER_CLIENT_SECRET",
+    "slotSetting": false,
+    "value": "KEYVAULT_REFERENCE_REDACTED"
+  },
+  {
+    "name": "PUBLISHER_OPERATING_CENTER_CLIENT_SECRET",
+    "slotSetting": false,
+    "value": "KEYVAULT_REFERENCE_REDACTED"
+  },
+  {
+    "name": "JM1_PAYMENT_EVENT_RECOVERY_KEY",
+    "slotSetting": false,
+    "value": "KEYVAULT_REFERENCE_REDACTED"
+  },
+  {
+    "name": "AUTHOR_CONNECT_ENROLLMENT_TOKEN_SECRET",
+    "slotSetting": false,
+    "value": "KEYVAULT_REFERENCE_REDACTED"
+  }
+]

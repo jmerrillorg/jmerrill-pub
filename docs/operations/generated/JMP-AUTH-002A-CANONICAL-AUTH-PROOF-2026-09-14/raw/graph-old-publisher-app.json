@@ -1,0 +1,101 @@
+{
+  "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#applications(id,appId,displayName,passwordCredentials,keyCredentials,requiredResourceAccess,web,spa,publicClient)/$entity",
+  "appId": "7bd27a68-fda7-4330-9198-d493f2a0a5ef",
+  "displayName": "JM1 Publisher Operating Center",
+  "id": "41049585-dc3d-405b-8ac3-b052fb236386",
+  "keyCredentials": [],
+  "passwordCredentials": [
+    {
+      "customKeyIdentifier": null,
+      "displayName": "jmerrill-pub-20260715",
+      "endDateTime": "2027-07-15T08:07:24Z",
+      "hint": "80A",
+      "keyId": "4afb2f1a-28d7-4d38-b30d-097fbce863f3",
+      "secretText": null,
+      "startDateTime": "2026-07-15T08:07:24Z"
+    },
+    {
+      "customKeyIdentifier": null,
+      "displayName": "jmerrill-pub-20260818-rotation",
+      "endDateTime": "2027-08-18T09:52:28Z",
+      "hint": "vBZ",
+      "keyId": "ee63b16f-c8b1-4237-8a35-c893a27d86a5",
+      "secretText": null,
+      "startDateTime": "2026-08-18T09:52:28Z"
+    },
+    {
+      "customKeyIdentifier": null,
+      "displayName": "jmerrill-pub-20260818-rotation",
+      "endDateTime": "2027-08-18T09:52:36Z",
+      "hint": "5lY",
+      "keyId": "d5194bee-6eac-4631-af19-9edc485a23fe",
+      "secretText": null,
+      "startDateTime": "2026-08-18T09:52:36Z"
+    }
+  ],
+  "publicClient": {
+    "redirectUris": []
+  },
+  "requiredResourceAccess": [
+    {
+      "resourceAccess": [
+        {
+          "id": "e1fe6dd8-ba31-4d61-89e7-88639da4683d",
+          "type": "Scope"
+        },
+        {
+          "id": "37f7f235-527c-4136-accd-4a02d197296e",
+          "type": "Scope"
+        },
+        {
+          "id": "14dad69e-099b-42c9-810b-d002981feec1",
+          "type": "Scope"
+        },
+        {
+          "id": "64a6cdd6-aab1-4aac-94b8-3cd815ab5dd3",
+          "type": "Scope"
+        },
+        {
+          "id": "7427e0e9-2fba-42fe-b0c0-848c9e6a8182",
+          "type": "Scope"
+        }
+      ],
+      "resourceAppId": "00000003-0000-0000-c000-000000000000"
+    }
+  ],
+  "spa": {
+    "redirectUris": []
+  },
+  "web": {
+    "homePageUrl": null,
+    "implicitGrantSettings": {
+      "enableAccessTokenIssuance": false,
+      "enableIdTokenIssuance": false
+    },
+    "logoutUrl": null,
+    "redirectUriSettings": [
+      {
+        "index": null,
+        "uri": "http://localhost:3000/api/auth/callback/jm1-publisher-operating-center"
+      },
+      {
+        "index": null,
+        "uri": "https://jmerrill.pub/api/auth/callback/jm1-publisher-operating-center"
+      },
+      {
+        "index": null,
+        "uri": "https://jmerrill.one/api/auth/callback/azure-ad"
+      },
+      {
+        "index": null,
+        "uri": "https://app-jm1-pub-prod-v2-staging.azurewebsites.net/api/auth/callback/jm1-publisher-operating-center"
+      }
+    ],
+    "redirectUris": [
+      "http://localhost:3000/api/auth/callback/jm1-publisher-operating-center",
+      "https://jmerrill.pub/api/auth/callback/jm1-publisher-operating-center",
+      "https://jmerrill.one/api/auth/callback/azure-ad",
+      "https://app-jm1-pub-prod-v2-staging.azurewebsites.net/api/auth/callback/jm1-publisher-operating-center"
+    ]
+  }
+}

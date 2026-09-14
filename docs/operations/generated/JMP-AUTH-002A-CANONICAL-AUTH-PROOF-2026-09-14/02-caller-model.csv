@@ -1,0 +1,6 @@
+CALLER_FAMILY,CURRENT_AUTHORITY,CANONICAL_STATE,UNKNOWN_REMAINING,EVIDENCE
+Interactive sign-in,Historical Publisher Operating Center app,PRESERVE,0,7bd27a68-fda7-4330-9198-d493f2a0a5ef
+Production App Service to Dataverse,Client-secret path via DATAVERSE_CLIENT_SECRET,SEPARATE_MACHINE_RUNTIME_PATH,0,app-jm1-pub-prod-v2 / ce363f5a-94f3-4ea9-9ba3-061404fca098
+Production App Service to Graph/SharePoint,Client-secret path via SHAREPOINT_CLIENT_SECRET or GRAPH_CLIENT_SECRET fallback,SEPARATE_MACHINE_RUNTIME_PATH,0,https://jmerrillfoundation.sharepoint.com/sites/publishing
+GitHub Actions CI/CD,Separate OIDC deployment identity,PRESERVE_SEPARATE,0,Source scan confirms id-token workflow patterns; not part of this remediation.
+Azure Functions,Separate function runtimes / managed-identity patterns,PRESERVE_SEPARATE,0,Source scan confirms separate function code paths; not part of App Service web-runtime rebind.
