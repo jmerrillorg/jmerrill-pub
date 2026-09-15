@@ -1,0 +1,14 @@
+# Prospective Backlist Baselines
+
+Last Verified: 2026-08-26T23:10:00Z
+
+| Title | Current Truth | Block 09 Baseline | Recovered Evidence | Historical Unknown | Current Action | Final Disposition |
+| --- | --- | --- | --- | --- | --- | --- |
+| A Year Walking With Him | Not present in active title readback. | NOT_CONFIRMED | No governed publication/distribution artifact recovered in this pass. | Historical author, publication/distribution, contract, artifact, and financial history remain unknown. | Legacy source review only; no current production action. | RECOVERY_REQUIRED / HISTORICAL_EVIDENCE_PARTIAL |
+| God Got Me | Not present in active title readback. | PRESENT_OR_RECOVERABLE per prior bounded package. | Prior bounded evidence reports governed OneDrive artifact evidence. | Current title row, contract authority, and financial history not confirmed in this pass. | Legacy source review; establish prospective Block 09 baseline when exact artifact and author authority are confirmed. | RECOVERY_REQUIRED / HISTORICAL_EVIDENCE_PARTIAL |
+| Lucky Ducky | Not present in active title readback. | NOT_CONFIRMED | No governed publication/distribution artifact recovered in this pass. | Historical author, publication/distribution, contract, artifact, and financial history remain unknown. | Legacy source review only; no current production action. | RECOVERY_REQUIRED / HISTORICAL_EVIDENCE_PARTIAL |
+| Beyond Your Eyes | Not present in active title readback. | NOT_CONFIRMED | No governed publication/distribution artifact recovered in this pass. | Historical author, publication/distribution, contract, artifact, and financial history remain unknown. | Legacy source review only; no current production action. | RECOVERY_REQUIRED / HISTORICAL_EVIDENCE_PARTIAL |
+| A Walk Home With God | Not present in active title readback. | PRESENT_OR_RECOVERABLE per prior bounded package. | Prior bounded evidence reports OneDrive contract DOCX/PDF and governed OneDrive artifact evidence. | Current title row, exact publication baseline, and full financial history not confirmed in this pass. | Legacy source review; establish prospective Block 09 baseline when exact current author/title authority is confirmed. | RECOVERY_REQUIRED / HISTORICAL_EVIDENCE_PARTIAL |
+| Inner Peace Through Life's Storms | Active row exists for KD Heard and is classified POST_PUBLICATION / TERMINAL in PR #652 evidence. | PRESENT_OR_RECOVERABLE per prior bounded package. | Prior bounded evidence reports governed OneDrive artifact evidence. | Contract evidence not confirmed in this pass. | No live production action. Preserve stewardship/history; separate legal/legacy review if contract authority is needed. | HISTORICAL_ONLY / POST_PUBLICATION_STEWARDSHIP |
+
+No legal/terminal state was invented for any backlist title.
