@@ -1,0 +1,16 @@
+{
+  "ok": true,
+  "artifactId": "f29e9aab-1085-f111-ab0f-00224820105b",
+  "oldSha": "93a75018adaaa63d7aa864879826b46dea5b7929ae31e35b86731dd66d69d796",
+  "newSha": "0d9ff1b6cf700a1decff16e4c5c442307c037101f0280b8937e9f84cc878d599",
+  "logId": "dcf6179b-06a0-f111-b8dc-000d3a14673b",
+  "readback": {
+    "@odata.context": "https://jm1hq.crm.dynamics.com/api/data/v9.2/$metadata#jm1pub_editorialartifacts(jm1pub_editorialartifactid,jm1pub_filename,jm1pub_sha256,jm1pub_notes)/$entity",
+    "@odata.etag": "W/\"49054967\"",
+    "jm1pub_notes": "Checksum metadata repaired after Graph and local governed OneDrive byte hash matched 0d9ff1b6cf700a1decff16e4c5c442307c037101f0280b8937e9f84cc878d599; prior stale Dataverse checksum 93a75018adaaa63d7aa864879826b46dea5b7929ae31e35b86731dd66d69d796. Repair source: Long Watch Line runtime SOURCE_CHECKSUM_MISMATCH, 2026-08-24.",
+    "jm1pub_editorialartifactid": "f29e9aab-1085-f111-ab0f-00224820105b",
+    "jm1pub_filename": "2026-08-15-Developmental-Editing-The-Long-Watch-Developmentally-Edited-Manuscript.docx",
+    "_organizationid_value": "9dafb403-b493-f011-a700-000d3a106f37",
+    "jm1pub_sha256": "0d9ff1b6cf700a1decff16e4c5c442307c037101f0280b8937e9f84cc878d599"
+  }
+}
