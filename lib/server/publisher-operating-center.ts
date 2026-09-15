@@ -28,6 +28,10 @@ import {
   type ReviewArtifact,
 } from './human-review-artifact-readiness'
 import {
+  summarizeAutomationCapabilities,
+  wholeCanaryReadback,
+} from '../publishing/automation-capability-registry.mjs'
+import {
   canonicalPublisherLifecycleStages,
   canonicalStageIdForPublisherState,
   projectCanonicalPublisherLifecycle,
@@ -716,6 +720,20 @@ export type PublisherRoyaltyReviewQueue = {
 export type PublisherOperatingCenterSnapshot = {
   generatedAt: string
   status: 'core-live' | 'unavailable'
+  automationHealth: {
+    RegistryVersion: string
+    TotalCapabilities: number
+    P0Capabilities: number
+    P1Capabilities: number
+    ProductionStatusCounts: Record<string, number>
+    PriorityCounts: Record<string, number>
+    UnknownCapabilityDispositions: number
+    P0MissingMigrations: number
+    P1UnownedMissingMigrations: number
+    JackieAsEventBus: 'YES' | 'NO'
+    WholeFirstBreak: string
+    WholeCanary: Record<string, string>
+  }
   operator: {
     role: 'Publisher'
     authorization: 'Internal Entra workforce allowlist'
@@ -781,11 +799,18 @@ export type PublisherOperatingCenterSnapshot = {
 type DataverseRow = Record<string, unknown>
 
 export async function buildPublisherOperatingCenterSnapshot(): Promise<PublisherOperatingCenterSnapshot> {
+  const automationCapabilitySummary = summarizeAutomationCapabilities()
+  const automationHealth = {
+    ...automationCapabilitySummary,
+    JackieAsEventBus: (automationCapabilitySummary.JackieAsEventBus === 'YES' ? 'YES' : 'NO') as 'YES' | 'NO',
+    WholeCanary: wholeCanaryReadback(),
+  }
   const config = getDataverseServerConfig()
   if (!config) {
     return {
       generatedAt: new Date().toISOString(),
       status: 'unavailable',
+      automationHealth,
       operator: {
         role: 'Publisher',
         authorization: 'Internal Entra workforce allowlist',
@@ -869,6 +894,7 @@ export async function buildPublisherOperatingCenterSnapshot(): Promise<Publisher
   return {
     generatedAt: today.generatedAt,
     status: 'core-live',
+    automationHealth,
     operator: {
       role: 'Publisher',
       authorization: 'Internal Entra workforce allowlist',
