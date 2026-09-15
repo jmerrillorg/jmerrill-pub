@@ -38,4 +38,3 @@ No diagnostic tables, remediation controls, execution controls, or queues were r
 ## Screenshots
 
 Authenticated live screenshots were not captured in this package because the route is protected by the existing Publisher Operating Center sign-in boundary. The production build confirms the route compiles and is included in the app route manifest.
-

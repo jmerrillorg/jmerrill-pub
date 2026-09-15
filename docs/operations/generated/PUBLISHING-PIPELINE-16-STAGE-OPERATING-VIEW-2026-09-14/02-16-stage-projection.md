@@ -53,4 +53,3 @@ The counts are computed at runtime from the live authenticated Operating Center 
 - waitingOnSystem
 - blocked
 - exceptions
-

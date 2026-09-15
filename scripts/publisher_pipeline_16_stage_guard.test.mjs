@@ -58,4 +58,3 @@ test('Pipeline and Operating Center link to each other', () => {
   assert.match(client, /href="\/publisher\/operating-center"/)
   assert.match(operatingCenterClient, /href="\/publisher\/pipeline"/)
 })
-

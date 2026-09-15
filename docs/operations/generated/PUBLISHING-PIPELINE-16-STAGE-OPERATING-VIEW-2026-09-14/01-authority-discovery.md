@@ -83,4 +83,3 @@ DISPOSITION =
 FORENSIC_REFERENCE_ONLY
 
 The standalone HTML mini-app preserves the useful visual concept of a horizontal kanban board, but it is not treated as lifecycle authority and was not copied as a data store.
-

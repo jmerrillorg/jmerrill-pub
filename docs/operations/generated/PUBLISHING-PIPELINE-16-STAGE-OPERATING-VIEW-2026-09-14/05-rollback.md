@@ -13,4 +13,3 @@ To revert the implementation, remove:
 - the `/publisher/pipeline` link added to app/publisher/_components/PublisherOperatingCenterClient.tsx
 
 No Dataverse, SharePoint, Azure, Microsoft 365, email, or production state rollback is required.
-
