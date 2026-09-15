@@ -2016,6 +2016,7 @@ function formatDateTime(value: string) {
   if (!value) return 'not generated'
   try {
     return new Intl.DateTimeFormat('en-US', {
+      timeZone: 'America/New_York',
       month: 'short',
       day: 'numeric',
       hour: 'numeric',
