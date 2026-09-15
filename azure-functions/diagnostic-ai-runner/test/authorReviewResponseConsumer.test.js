@@ -14,6 +14,7 @@ const {
   findOpenPackageSelectionDiagnostics,
   packageSelectionSubjectProbes,
   processPackageSelectionReply,
+  processPaymentElectionReply,
   stableIdempotencyKey,
   stablePackageSelectionIdempotencyKey,
   validateAuthorIdentity,
@@ -68,6 +69,24 @@ function createReply(overrides = {}) {
     subject: "Re: Proofreading Review Package - The Intentional Leader",
     receivedDateTime: "2026-07-19T20:08:00Z",
     bodyText: "I approve!",
+    ...overrides
+  };
+}
+
+function createPaymentElectionRequest(overrides = {}) {
+  return {
+    actionRequestId: "payment-election-request-Whole",
+    title: "Whole",
+    authorName: "Jacqueline Fly",
+    opportunityId: "11111111-1111-4111-8111-111111111111",
+    diagnosticId: "48cd0d86-f595-f111-8076-6045bdd69435",
+    intakeReferenceCode: "JMP-INT-202609-WHOLE",
+    authorEmailCandidates: ["jacqueline@example.com"],
+    subjectContains: "Whole — Choose Your Payment Option",
+    afterIso: "2026-09-15T18:11:35Z",
+    contractedTotalUsd: 1999.00,
+    communicationEvidence: "BOUND_TO_ACTION_REQUEST",
+    paymentRequestCreated: false,
     ...overrides
   };
 }
@@ -190,6 +209,100 @@ test("package-selection replies are processed by the shared five-minute inbound 
   assert.equal(result.packageSelectionResults[0].offerPreview.liveActions.sendsAuthorEmail, false);
   assert.equal(result.packageSelectionResults[0].responsePreview.liveAutoSendEnabled, false);
   assert.ok(client.calls.patched.some((call) => call.entitySet === "jm1pub_editorialdiagnostics"));
+});
+
+test("payment-election replies are processed by the shared five-minute inbound consumer", async () => {
+  const client = createMockClient();
+  const request = createPaymentElectionRequest();
+  const captures = [];
+  const result = await runAuthorReviewResponseConsumer(
+    { maxGates: 1, maxPackageSelections: 1, maxPaymentElections: 1 },
+    {
+      client,
+      findGates: async () => [],
+      findPackageSelectionDiagnostics: async () => [],
+      findPaymentElectionActionRequests: async () => [request],
+      readPaymentElectionReply: async () => ({
+        ...createReply({
+          inboundMessageId: "whole-payment-election-001",
+          internetMessageId: "<whole-payment-election-001@example.com>",
+          senderAddress: "jacqueline@example.com",
+          subject: "Re: Whole — Choose Your Payment Option",
+          receivedDateTime: "2026-09-15T19:11:35Z",
+          bodyText: "Let's do 12-pay."
+        })
+      }),
+      writePaymentOptionCapture: async (input) => {
+        captures.push(input);
+        return { ok: true, executionLogId: "capture-log" };
+      }
+    }
+  );
+
+  assert.equal(result.processed, 1);
+  assert.equal(result.paymentElectionResults[0].outcome, "PAYMENT_ELECTION_SELECTED");
+  assert.equal(result.paymentElectionResults[0].selectedPaymentOption, "12_PAY");
+  assert.equal(result.paymentElectionResults[0].paymentRequestCreated, false);
+  assert.equal(captures.length, 1);
+  assert.equal(captures[0].opportunityPayload.jm1_m6selectedpaymentoption, "12_PAY");
+  assert.ok(client.calls.created.some((call) => call.payload.jm1_actiontype === "PAYMENT_SCHEDULE_GENERATED"));
+  assert.ok(client.calls.created.some((call) => call.payload.jm1_actiontype === "PAYMENT_REQUEST_ORCHESTRATION_READY"));
+  assert.ok(client.calls.created.some((call) => /alternateOptionRequestsCreated=0/.test(call.payload.jm1_actiondescription)));
+});
+
+test("ambiguous payment-election reply creates clarification state without capture or payment request", async () => {
+  const client = createMockClient();
+  let captured = false;
+  const result = await processPaymentElectionReply(
+    client,
+    createPaymentElectionRequest(),
+    {
+      readPaymentElectionReply: async () => ({
+        ...createReply({
+          inboundMessageId: "whole-payment-election-ambiguous",
+          internetMessageId: "<whole-payment-election-ambiguous@example.com>",
+          senderAddress: "jacqueline@example.com",
+          subject: "Re: Whole — Choose Your Payment Option",
+          bodyText: "Maybe 12-pay, or maybe 8-pay."
+        })
+      }),
+      writePaymentOptionCapture: async () => {
+        captured = true;
+        return { ok: true };
+      }
+    },
+    "TEST"
+  );
+
+  assert.equal(result.outcome, "PAYMENT_ELECTION_CLARIFICATION_REQUIRED");
+  assert.equal(result.paymentRequestCreated, false);
+  assert.equal(captured, false);
+  assert.ok(client.calls.created.some((call) => call.payload.jm1_actiontype === "PAYMENT_ELECTION_CLARIFICATION_REQUIRED"));
+  assert.ok(!client.calls.created.some((call) => call.payload.jm1_actiontype === "PAYMENT_REQUEST_ORCHESTRATION_READY"));
+});
+
+test("payment-election replay is idempotent by action request and inbound message identity", async () => {
+  const client = createMockClient({ existingLog: { jm1_executionlogid: "existing-payment-election" } });
+  const result = await processPaymentElectionReply(
+    client,
+    createPaymentElectionRequest(),
+    {
+      readPaymentElectionReply: async () => ({
+        ...createReply({
+          inboundMessageId: "whole-payment-election-replay",
+          internetMessageId: "<whole-payment-election-replay@example.com>",
+          senderAddress: "jacqueline@example.com",
+          subject: "Re: Whole — Choose Your Payment Option",
+          bodyText: "Full pay."
+        })
+      })
+    },
+    "TEST"
+  );
+
+  assert.equal(result.outcome, "IDEMPOTENT");
+  assert.equal(client.calls.created.length, 0);
+  assert.equal(client.calls.patched.length, 0);
 });
 
 test("package-selection discovery recovers stale draft rows from durable send evidence", async () => {

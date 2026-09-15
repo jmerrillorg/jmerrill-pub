@@ -13,6 +13,19 @@ const {
   buildOfferPreview,
   renderPaymentOptionsResponsePreview
 } = require("../author/packageAcceptancePaymentOptions");
+const {
+  PAYMENT_ELECTION_ACTION_TYPE,
+  PAYMENT_ELECTION_CLOSED_ACTION_TYPE,
+  PAYMENT_ELECTION_CLARIFICATION_ACTION_TYPE,
+  PAYMENT_ELECTION_EXCEPTION_ACTION_TYPE,
+  PAYMENT_ELECTION_SCHEDULE_ACTION_TYPE,
+  PAYMENT_ELECTION_REQUEST_ACTION_TYPE,
+  classifyPaymentElectionIntent,
+  buildPaymentSchedule,
+  stablePaymentElectionReplyKey,
+  validatePaymentElectionRequestIdentity
+} = require("../author/paymentElectionActionRequest");
+const { writeMilestone6PaymentOptionCapture } = require("../author/milestone6PaymentOptionCaptureWriter");
 const { createHash } = require("node:crypto");
 
 const EXECUTION_STATUS = { SUCCESS: 835500001, FAILED: 835500002 };
@@ -463,12 +476,236 @@ async function writePackageStateLog(client, { state, diagnosticId, inboundMessag
   });
 }
 
+async function writePaymentElectionStateLog(client, { state, requestId, inboundMessageId, idempotencyKey, description, failed = false }) {
+  return writeLog(client, {
+    actionType: `PAYMENT_ELECTION_MESSAGE_${state}`,
+    name: `PAYMENT_ELECTION_MESSAGE_${state} - ${requestId}`,
+    description:
+      `${description} State=${state}; inboundMessageId=${inboundMessageId}; monitoredMailbox=${PUBLISHING_MAILBOX}; ` +
+      `Idempotency: ${idempotencyKey}.`,
+    sourceEntity: "jm1_executionlog",
+    sourceRecordId: requestId,
+    failed
+  });
+}
+
 function durableInboundMessageId(reply) {
   return (
     normalizeString(reply.internetMessageId) ||
     normalizeString(reply.inboundMessageId) ||
     `${normalizeString(reply.senderAddress).toLowerCase() || "unknown"}:${normalizeString(reply.receivedDateTime) || "unknown"}`
   );
+}
+
+async function findOpenPaymentElectionActionRequests(client, maxRequests) {
+  const rows = await client.list("jm1_executionlogs", {
+    $select: "jm1_executionlogid,jm1_name,jm1_actiontype,jm1_actiondescription,jm1_sourcerecordid,createdon",
+    $filter: `jm1_actiontype eq '${PAYMENT_ELECTION_ACTION_TYPE}'`,
+    $orderby: "createdon desc",
+    $top: String(Math.min(Math.max(Number(maxRequests || 10), 1), 25))
+  });
+  return rows
+    .filter((row) => row.actionRequestId || row.jm1_actiontype === PAYMENT_ELECTION_ACTION_TYPE)
+    .filter((row) => !/status=(CLOSED|COMPLETED|CANCELLED)/i.test(normalizeString(row.jm1_actiondescription)))
+    .slice(0, Math.min(Math.max(Number(maxRequests || 10), 1), 25));
+}
+
+function parsePaymentElectionActionRequest(row = {}) {
+  if (row.actionRequestId || row.subjectContains || row.contractedTotalUsd) return row;
+  const description = normalizeString(row.jm1_actiondescription);
+  const pick = (name) => description.match(new RegExp(`${name}=([^;]+)`, "i"))?.[1]?.trim() || "";
+  return {
+    actionRequestId: normalizeString(row.jm1_executionlogid || row.jm1_sourcerecordid || row.jm1_name),
+    sourceEntity: "jm1_executionlog",
+    sourceRecordId: normalizeString(row.jm1_executionlogid || row.jm1_sourcerecordid),
+    title: pick("title"),
+    authorName: pick("author"),
+    opportunityId: pick("opportunityId"),
+    diagnosticId: pick("diagnosticId"),
+    intakeReferenceCode: pick("intakeReferenceCode"),
+    authorEmailCandidates: pick("authorEmail") ? [pick("authorEmail")] : [],
+    subjectContains: pick("subject") || "Choose Your Payment Option",
+    afterIso: pick("requestSentAt") || normalizeString(row.createdon) || "2026-01-01T00:00:00Z",
+    contractedTotalUsd: Number(pick("contractedTotalUsd")),
+    paymentPolicyVersion: pick("paymentPolicyVersion"),
+    communicationEvidence: pick("communicationEvidence"),
+    paymentRequestCreated: /paymentRequestCreated=(YES|true)/i.test(description)
+  };
+}
+
+function paymentElectionRequestId(request) {
+  return normalizeString(request.actionRequestId || request.id || request.jm1_executionlogid || request.jm1_sourcerecordid || request.jm1_name);
+}
+
+async function processPaymentElectionReply(client, rawRequest, deps, triggerSource) {
+  const request = parsePaymentElectionActionRequest(rawRequest);
+  const requestId = paymentElectionRequestId(request);
+  if (!requestId) return { actionRequestId: "", outcome: "PAYMENT_ELECTION_ACTION_REQUEST_ID_MISSING" };
+  if (!captureEnabled()) return { actionRequestId: requestId, outcome: "CAPTURE_DISABLED", detail: "JM1_AUTHOR_RESPONSE_CAPTURE_DISABLED" };
+  if (request.paymentRequestCreated === true) {
+    return { actionRequestId: requestId, outcome: "PAYMENT_REQUEST_ALREADY_CREATED", detail: "No duplicate payment request action taken" };
+  }
+
+  const subjectContains = normalizeString(request.subjectContains) || "Choose Your Payment Option";
+  const afterIso = normalizeString(request.afterIso || request.communicationSentAt) || "2026-01-01T00:00:00Z";
+  const reply = await (deps.readPaymentElectionReply || deps.readReply || readPublishingMailboxReply)({ subjectContains, afterIso }, deps);
+  if (!reply.ok || !reply.found) return { actionRequestId: requestId, outcome: "NO_PAYMENT_ELECTION_REPLY_FOUND", detail: reply.reason || reply.code || "no_match" };
+
+  const identity = validatePaymentElectionRequestIdentity(request, reply);
+  if (!identity.ok) {
+    const logId = await writeLog(client, {
+      actionType: PAYMENT_ELECTION_EXCEPTION_ACTION_TYPE,
+      name: `${PAYMENT_ELECTION_EXCEPTION_ACTION_TYPE} - ${requestId}`,
+      description: `Payment-election reply ingestion failed identity validation; reason=${identity.reason}; trigger=${triggerSource}; paymentRequestCreated=0.`,
+      sourceEntity: "jm1_executionlog",
+      sourceRecordId: requestId,
+      failed: true
+    });
+    return { actionRequestId: requestId, outcome: "AUTHOR_PAYMENT_ELECTION_INGESTION_FAILED", detail: identity.reason, executionLogIds: [logId] };
+  }
+
+  const inboundMessageId = durableInboundMessageId(reply);
+  const idempotencyKey = stablePaymentElectionReplyKey(request, inboundMessageId);
+  const existing = await findAnyExecutionLog(
+    client,
+    [
+      "PAYMENT_ELECTION_MESSAGE_COMPLETED",
+      PAYMENT_ELECTION_CLOSED_ACTION_TYPE,
+      PAYMENT_ELECTION_CLARIFICATION_ACTION_TYPE,
+      PAYMENT_ELECTION_SCHEDULE_ACTION_TYPE,
+      PAYMENT_ELECTION_REQUEST_ACTION_TYPE,
+      "MILESTONE_6_PAYMENT_OPTION_CAPTURED"
+    ],
+    idempotencyKey
+  );
+  if (existing) return { actionRequestId: requestId, outcome: "IDEMPOTENT", detail: "payment_election_reply_already_processed", executionLogIds: [existing.jm1_executionlogid] };
+
+  const receivedAt = normalizeString(reply.receivedDateTime) || new Date().toISOString();
+  const discoveredLog = await writePaymentElectionStateLog(client, {
+    state: RESPONSE_STATES.DISCOVERED,
+    requestId,
+    inboundMessageId,
+    idempotencyKey,
+    description: `Payment-election author response discovered by ${triggerSource}; internetMessageId=${reply.internetMessageId || "unknown"}; conversation=${reply.conversationId || "unknown"}.`
+  });
+  const classified = classifyPaymentElectionIntent(reply.bodyText || "");
+  const classifiedLog = await writePaymentElectionStateLog(client, {
+    state: RESPONSE_STATES.CLASSIFIED,
+    requestId,
+    inboundMessageId,
+    idempotencyKey,
+    description: `Payment-election response classified as ${classified.classification}; selectedOption=${classified.selectedPaymentOption || "none"}; guessedPaymentElection=0.`,
+    failed: !classified.ok
+  });
+
+  if (!classified.ok) {
+    const clarificationLog = await writeLog(client, {
+      actionType: PAYMENT_ELECTION_CLARIFICATION_ACTION_TYPE,
+      name: `${PAYMENT_ELECTION_CLARIFICATION_ACTION_TYPE} - ${requestId}`,
+      description: `Author payment-election reply requires clarification; reason=${classified.reason}; selectedOption=none; guessedPaymentElection=0; paymentRequestCreated=0; Idempotency: ${idempotencyKey}.`,
+      sourceEntity: "jm1_executionlog",
+      sourceRecordId: requestId,
+      failed: true
+    });
+    return {
+      actionRequestId: requestId,
+      outcome: "PAYMENT_ELECTION_CLARIFICATION_REQUIRED",
+      detail: classified.reason,
+      selectedPaymentOption: null,
+      paymentRequestCreated: false,
+      executionLogIds: [discoveredLog, classifiedLog, clarificationLog]
+    };
+  }
+
+  const schedule = buildPaymentSchedule({
+    contractedTotalUsd: request.contractedTotalUsd,
+    paymentOptionCode: classified.selectedPaymentOption,
+    paymentPolicyVersion: request.paymentPolicyVersion
+  });
+  if (!schedule.ok) {
+    const exceptionLog = await writeLog(client, {
+      actionType: PAYMENT_ELECTION_EXCEPTION_ACTION_TYPE,
+      name: `${PAYMENT_ELECTION_EXCEPTION_ACTION_TYPE} - ${requestId}`,
+      description: `Author payment-election ingestion failed during schedule generation; reason=${schedule.reason}; selectedOption=${classified.selectedPaymentOption}; paymentRequestCreated=0; Idempotency: ${idempotencyKey}.`,
+      sourceEntity: "jm1_executionlog",
+      sourceRecordId: requestId,
+      failed: true
+    });
+    return { actionRequestId: requestId, outcome: "AUTHOR_PAYMENT_ELECTION_INGESTION_FAILED", detail: schedule.reason, executionLogIds: [discoveredLog, classifiedLog, exceptionLog] };
+  }
+
+  const capturePayload = {
+    jm1_m6paymentoptionselectionstatus: "PAYMENT_OPTION_SELECTED",
+    jm1_m6selectedpaymentoption: classified.selectedPaymentOption,
+    jm1_m6selectedinstallmentcount: schedule.paymentCount,
+    jm1_m6selectedpaymentamount: schedule.firstPaymentAmountUsd,
+    jm1_m6selectedpaymenttotal: schedule.totalDueUsd,
+    jm1_m6paymentselectionsource: compactDecisionSource(inboundMessageId),
+    jm1_m6paymentselectionreceivedon: receivedAt,
+    jm1_m6paymentselectionthreadsubject: normalizeString(reply.subject).slice(0, 200),
+    jm1_m6paymentselectionevidencelog: idempotencyKey
+  };
+  const writer = deps.writePaymentOptionCapture || writeMilestone6PaymentOptionCapture;
+  const capture = await writer({
+    diagnosticId: request.diagnosticId,
+    intakeReferenceCode: request.intakeReferenceCode,
+    opportunityId: request.opportunityId,
+    opportunityPayload: capturePayload
+  }, deps);
+  if (!capture.ok) {
+    const exceptionLog = await writeLog(client, {
+      actionType: PAYMENT_ELECTION_EXCEPTION_ACTION_TYPE,
+      name: `${PAYMENT_ELECTION_EXCEPTION_ACTION_TYPE} - ${requestId}`,
+      description: `Author payment-election ingestion failed during governed capture; reason=${capture.reason || capture.code}; selectedOption=${classified.selectedPaymentOption}; paymentRequestCreated=0; Idempotency: ${idempotencyKey}.`,
+      sourceEntity: "jm1_executionlog",
+      sourceRecordId: requestId,
+      failed: true
+    });
+    return { actionRequestId: requestId, outcome: "AUTHOR_PAYMENT_ELECTION_INGESTION_FAILED", detail: capture.reason || capture.code, executionLogIds: [discoveredLog, classifiedLog, exceptionLog] };
+  }
+
+  const scheduleLog = await writeLog(client, {
+    actionType: PAYMENT_ELECTION_SCHEDULE_ACTION_TYPE,
+    name: `${PAYMENT_ELECTION_SCHEDULE_ACTION_TYPE} - ${requestId}`,
+    description:
+      `Payment schedule generated for selectedOption=${classified.selectedPaymentOption}; contractedTotal=${schedule.contractedTotalFormatted}; ` +
+      `paymentCount=${schedule.paymentCount}; totalDue=${schedule.totalDueFormatted}; selectedPlanOnly=YES; sevenPaymentRequestsCreated=0; Idempotency: ${idempotencyKey}.`,
+    sourceEntity: "jm1_executionlog",
+    sourceRecordId: requestId
+  });
+  const requestReadyLog = await writeLog(client, {
+    actionType: PAYMENT_ELECTION_REQUEST_ACTION_TYPE,
+    name: `${PAYMENT_ELECTION_REQUEST_ACTION_TYPE} - ${requestId}`,
+    description:
+      `Payment request orchestration is ready for selectedOption=${classified.selectedPaymentOption}; create exactly one corresponding payment request under payment authority; ` +
+      `paymentRequestCreated=0; alternateOptionRequestsCreated=0; Idempotency: ${idempotencyKey}.`,
+    sourceEntity: "jm1_executionlog",
+    sourceRecordId: requestId
+  });
+  const closedLog = await writeLog(client, {
+    actionType: PAYMENT_ELECTION_CLOSED_ACTION_TYPE,
+    name: `${PAYMENT_ELECTION_CLOSED_ACTION_TYPE} - ${requestId}`,
+    description: `Payment-election action request closed by governed author reply; selectedOption=${classified.selectedPaymentOption}; received=${receivedAt}; status=CLOSED; Idempotency: ${idempotencyKey}.`,
+    sourceEntity: "jm1_executionlog",
+    sourceRecordId: requestId
+  });
+  const completedLog = await writePaymentElectionStateLog(client, {
+    state: RESPONSE_STATES.COMPLETED,
+    requestId,
+    inboundMessageId,
+    idempotencyKey,
+    description: "Payment-election response capture completed; schedule generated; no payment was marked received and no alternate payment requests were created."
+  });
+
+  return {
+    actionRequestId: requestId,
+    outcome: "PAYMENT_ELECTION_SELECTED",
+    selectedPaymentOption: classified.selectedPaymentOption,
+    schedule,
+    capture,
+    paymentRequestCreated: false,
+    executionLogIds: [discoveredLog, classifiedLog, scheduleLog, requestReadyLog, closedLog, completedLog]
+  };
 }
 
 function compactDecisionSource(inboundMessageId) {
@@ -1103,13 +1340,16 @@ async function runAuthorReviewResponseConsumer(input = {}, deps = {}) {
   const packageSelectionResults = [];
   const packageDeps = { ...deps, targetDiagnosticId };
   for (const diagnostic of packageDiagnostics) packageSelectionResults.push(await processPackageSelectionReply(client, diagnostic, packageDeps, triggerSource));
+  const paymentElectionRequests = await (deps.findPaymentElectionActionRequests || findOpenPaymentElectionActionRequests)(client, input.maxPaymentElections || 10);
+  const paymentElectionResults = [];
+  for (const request of paymentElectionRequests) paymentElectionResults.push(await processPaymentElectionReply(client, request, deps, triggerSource));
   return {
     runtimeName: "JM1 Author Review Response Consumer",
     deploymentEnvironment: "func-jm1-diagnostic-ai-runner",
     triggerType: "Azure Functions timer",
     schedule: "0 */5 * * * *",
     monitoredMailbox: PUBLISHING_MAILBOX,
-    queue: "publishing@jmerrill.one Inbox plus open Dataverse author-review gates and Stage 0 package-selection responses",
+    queue: "publishing@jmerrill.one Inbox plus open Dataverse author-review gates, Stage 0 package-selection responses, and payment-election action requests",
     identity: "func-jm1-diagnostic-ai-runner application identity",
     retryPolicy: "Azure Functions host retry plus idempotent Dataverse response records",
     timeout: "10 minutes host timeout target",
@@ -1120,10 +1360,13 @@ async function runAuthorReviewResponseConsumer(input = {}, deps = {}) {
       "APPROVED_WITH_CORRECTIONS_PERSISTED",
       "CHANGES_REQUESTED_PERSISTED",
       "QUESTIONS_REQUIRING_REVIEW_PERSISTED"
-    ].includes(r.outcome)).length + packageSelectionResults.filter((r) => r.outcome === "PACKAGE_SELECTED").length,
-    idempotent: [...results, ...packageSelectionResults].filter((r) => r.outcome === "IDEMPOTENT").length,
+    ].includes(r.outcome)).length +
+      packageSelectionResults.filter((r) => r.outcome === "PACKAGE_SELECTED").length +
+      paymentElectionResults.filter((r) => r.outcome === "PAYMENT_ELECTION_SELECTED").length,
+    idempotent: [...results, ...packageSelectionResults, ...paymentElectionResults].filter((r) => r.outcome === "IDEMPOTENT").length,
     results,
-    packageSelectionResults
+    packageSelectionResults,
+    paymentElectionResults
   };
 }
 
@@ -1140,8 +1383,11 @@ module.exports = {
   validateAuthorIdentity,
   validateReplyCorrelation,
   findOpenPackageSelectionDiagnostics,
+  findOpenPaymentElectionActionRequests,
   packageSelectionSubjectProbes,
   processPackageSelectionReply,
+  parsePaymentElectionActionRequest,
+  processPaymentElectionReply,
   evaluateAcknowledgementPolicy,
   DECISION
 };
