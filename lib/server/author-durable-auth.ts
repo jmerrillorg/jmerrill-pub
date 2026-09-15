@@ -293,6 +293,8 @@ function buildAuthorIdentityProvider() {
   const issuer = getOptionalEnv('AUTHOR_OPERATING_CENTER_ISSUER')
   const wellKnown = getOptionalEnv('AUTHOR_OPERATING_CENTER_WELLKNOWN')
 
+  if (!clientId || !clientSecret || !tenantId) return null
+
   const useExternalIdLocalAccount =
     authMode === 'external-id-local' ||
     issuer.includes('ciamlogin.com')
@@ -438,17 +440,30 @@ export const authorAuthOptions: NextAuthOptions = {
       )
     },
     async jwt({ token, account, profile, user }) {
+      const publisherIdentity = getAuthorizedPublisherIdentity({
+        profile: profile as Record<string, unknown> | undefined,
+        user,
+        token: token as { email?: unknown; oid?: unknown; sub?: unknown },
+      })
+      if (publisherIdentity?.email) {
+        token.email = publisherIdentity.email
+        token.role = 'publisher'
+        token.provider = token.provider || PUBLISHER_OPERATING_CENTER_PROVIDER_ID
+        if (publisherIdentity.objectId) token.publisherObjectId = publisherIdentity.objectId
+        return token
+      }
+
       if (account?.provider === PUBLISHER_OPERATING_CENTER_PROVIDER_ID) {
-        const publisherIdentity = getAuthorizedPublisherIdentity({
+        const publisherProviderIdentity = getAuthorizedPublisherIdentity({
           profile: profile as Record<string, unknown> | undefined,
           user,
           token: token as { email?: unknown; oid?: unknown; sub?: unknown },
         })
-        if (publisherIdentity?.email) {
-          token.email = publisherIdentity.email
+        if (publisherProviderIdentity?.email) {
+          token.email = publisherProviderIdentity.email
           token.role = 'publisher'
           token.provider = PUBLISHER_OPERATING_CENTER_PROVIDER_ID
-          if (publisherIdentity.objectId) token.publisherObjectId = publisherIdentity.objectId
+          if (publisherProviderIdentity.objectId) token.publisherObjectId = publisherProviderIdentity.objectId
         }
         return token
       }
@@ -480,19 +495,6 @@ export const authorAuthOptions: NextAuthOptions = {
           token.provider = AUTHOR_EMAIL_OTP_PROVIDER_ID
           token.authorContactId = contactId
         }
-        return token
-      }
-
-      const publisherIdentity = getAuthorizedPublisherIdentity({
-        profile: profile as Record<string, unknown> | undefined,
-        user,
-        token: token as { email?: unknown; oid?: unknown; sub?: unknown },
-      })
-      if (publisherIdentity?.email) {
-        token.email = publisherIdentity.email
-        token.role = 'publisher'
-        token.provider = token.provider || PUBLISHER_OPERATING_CENTER_PROVIDER_ID
-        if (publisherIdentity.objectId) token.publisherObjectId = publisherIdentity.objectId
         return token
       }
 
