@@ -71,10 +71,14 @@ test('V1/V2 automation registry covers every required P0 capability with no unkn
 
 test('Whole canary remains blocked at payment election and never creates payment request before author selection', () => {
   const canary = wholeCanaryReadback()
-  assert.equal(canary.CurrentState, 'AGREEMENT_EXECUTED_PAYMENT_OPTION_PENDING')
+  assert.equal(canary.CurrentState, 'WAITING_ON_AUTHOR_PAYMENT_OPTION_SELECTION')
+  assert.equal(canary.PaymentElectionActionRequest, 'OPEN')
+  assert.equal(canary.CommunicationEvidence, 'BOUND_TO_ACTION_REQUEST')
   assert.equal(canary.PaymentElection, 'PENDING_AUTHOR_SELECTION')
   assert.equal(canary.PaymentRequestCreated, 'NO')
-  assert.equal(canary.FirstBreak, 'PAYMENT_ELECTION_TRIGGER_NOT_DURABLY_BOUND_AFTER_AGREEMENT_COMPLETION')
+  assert.equal(canary.FirstBreak, 'REPAIRED_TO_GOVERNED_ACTION_REQUEST_AND_REPLY_INGESTION')
+  assert.equal(canary.RequiredNextAutomationCapability, 'PROCESS_AUTHOR_PAYMENT_OPTION_SELECTION')
+  assert.equal(canary.AutomationStatus, 'COMMISSIONING')
 })
 
 test('automation graph preserves durable source to notification chain', () => {

@@ -52,6 +52,16 @@ describe("classifyPublishingReply — payment-option selections", () => {
     assert.equal(classifyPublishingReply("I'd rather pay in full.").classification, CLASSIFICATION.SINGLE);
   });
 
+  test('"full pay" and hyphenated pay options classify as governed options', () => {
+    assert.equal(classifyPublishingReply("Full pay works").classification, CLASSIFICATION.SINGLE);
+    assert.equal(classifyPublishingReply("2-pay please").classification, CLASSIFICATION.TWO_PAYMENTS);
+    assert.equal(classifyPublishingReply("4-pay is best").classification, CLASSIFICATION.FOUR_PAYMENTS);
+    assert.equal(classifyPublishingReply("8-pay please").classification, CLASSIFICATION.EIGHT_PAYMENTS);
+    assert.equal(classifyPublishingReply("12-pay").classification, CLASSIFICATION.TWELVE_PAYMENTS);
+    assert.equal(classifyPublishingReply("18-pay").classification, CLASSIFICATION.EIGHTEEN_PAYMENTS);
+    assert.equal(classifyPublishingReply("24-pay").classification, CLASSIFICATION.TWENTY_FOUR_PAYMENTS);
+  });
+
   test("12 is not misclassified as 2 (word-boundary correctness)", () => {
     assert.equal(classifyPublishingReply("12 payments please").classification, CLASSIFICATION.TWELVE_PAYMENTS);
     assert.notEqual(classifyPublishingReply("12 payments please").classification, CLASSIFICATION.TWO_PAYMENTS);
@@ -83,6 +93,13 @@ describe("classifyPublishingReply — call/question/hold", () => {
 describe("classifyPublishingReply — unclear / fallback", () => {
   test("an unclear reply with no recognizable signal classifies as UNCLASSIFIED", () => {
     assert.equal(classifyPublishingReply("Thanks for the info!").classification, CLASSIFICATION.UNCLASSIFIED);
+  });
+
+  test("soft or generic payment-plan language classifies as UNCLASSIFIED", () => {
+    assert.equal(classifyPublishingReply("installments").classification, CLASSIFICATION.UNCLASSIFIED);
+    assert.equal(classifyPublishingReply("maybe 12").classification, CLASSIFICATION.UNCLASSIFIED);
+    assert.equal(classifyPublishingReply("either 8 or 12").classification, CLASSIFICATION.UNCLASSIFIED);
+    assert.equal(classifyPublishingReply("not sure, probably 4-pay").classification, CLASSIFICATION.UNCLASSIFIED);
   });
 
   test("empty string classifies as UNCLASSIFIED", () => {

@@ -25,20 +25,22 @@ const CLASSIFICATION = Object.freeze({
 // Checked in this order — an explicit payment-option selection takes
 // precedence over incidental call/question/hold language in the same reply.
 const PAYMENT_OPTION_PATTERNS = [
-  { classification: CLASSIFICATION.TWENTY_FOUR_PAYMENTS, patterns: [/\b24\s*payments?\b/i, /\btwenty[\s-]?four\s*payments?\b/i, /\b24\s*months?\b/i] },
-  { classification: CLASSIFICATION.EIGHTEEN_PAYMENTS, patterns: [/\b18\s*payments?\b/i, /\beighteen\s*payments?\b/i, /\b18\s*months?\b/i] },
-  { classification: CLASSIFICATION.TWELVE_PAYMENTS, patterns: [/\b12\s*payments?\b/i, /\btwelve\s*payments?\b/i, /\b12\s*months?\b/i] },
-  { classification: CLASSIFICATION.EIGHT_PAYMENTS, patterns: [/\b8\s*payments?\b/i, /\beight\s*payments?\b/i] },
-  { classification: CLASSIFICATION.FOUR_PAYMENTS, patterns: [/\b4\s*payments?\b/i, /\bfour\s*payments?\b/i] },
-  { classification: CLASSIFICATION.TWO_PAYMENTS, patterns: [/\b2\s*payments?\b/i, /\btwo\s*payments?\b/i] },
+  { classification: CLASSIFICATION.TWENTY_FOUR_PAYMENTS, patterns: [/\b24\s*[- ]?\s*(pay|payments?|month|months?)\b/i, /\btwenty[\s-]?four\s*[- ]?\s*(pay|payments?|month|months?)\b/i] },
+  { classification: CLASSIFICATION.EIGHTEEN_PAYMENTS, patterns: [/\b18\s*[- ]?\s*(pay|payments?|month|months?)\b/i, /\beighteen\s*[- ]?\s*(pay|payments?|month|months?)\b/i] },
+  { classification: CLASSIFICATION.TWELVE_PAYMENTS, patterns: [/\b12\s*[- ]?\s*(pay|payments?|month|months?)\b/i, /\btwelve\s*[- ]?\s*(pay|payments?|month|months?)\b/i] },
+  { classification: CLASSIFICATION.EIGHT_PAYMENTS, patterns: [/\b8\s*[- ]?\s*(pay|payments?)\b/i, /\beight\s*[- ]?\s*(pay|payments?)\b/i] },
+  { classification: CLASSIFICATION.FOUR_PAYMENTS, patterns: [/\b4\s*[- ]?\s*(pay|payments?)\b/i, /\bfour\s*[- ]?\s*(pay|payments?)\b/i] },
+  { classification: CLASSIFICATION.TWO_PAYMENTS, patterns: [/\b2\s*[- ]?\s*(pay|payments?)\b/i, /\btwo\s*[- ]?\s*(pay|payments?)\b/i] },
   {
     classification: CLASSIFICATION.SINGLE,
-    patterns: [/\bsingle\s*payment\b/i, /\bone\s*payment\b/i, /\b1\s*payment\b/i, /\bpay(ing)?\s*in\s*full\b/i, /\bfull\s*payment\b/i]
+    patterns: [/\bsingle\s*payment\b/i, /\bone\s*payment\b/i, /\b1\s*payment\b/i, /\bpay(ing)?\s*in\s*full\b/i, /\bfull\s*(pay|payment)\b/i]
   }
 ];
 
 const CALL_REQUEST_PATTERN = /\b(call|schedule|talk|phone|meeting|discuss|chat)\b/i;
 const HOLD_PATTERN = /\b(hold|pause|not\s*ready|need\s*more\s*time|decline|not\s*at\s*this\s*time|think\s*it\s*over)\b/i;
+const UNCERTAIN_SELECTION_PATTERN = /\b(maybe|might|possibly|probably|not\s*sure|unsure|thinking\s+about|leaning\s+toward|either|or|recommend|what\s+do\s+you\s+recommend)\b/i;
+const GENERIC_INSTALLMENT_PATTERN = /\b(installments?|payment\s*plan|monthly\s*plan)\b/i;
 
 // Lines matching any of these mark the start of quoted/prior thread content
 // (the original outbound email, an earlier reply, or a mail-client quote
@@ -113,6 +115,10 @@ function classifyPublishingReply(replyText) {
     patterns.some((p) => p.test(isolated))
   );
 
+  if (matchedOptions.length > 0 && UNCERTAIN_SELECTION_PATTERN.test(isolated)) {
+    return { classification: CLASSIFICATION.UNCLASSIFIED };
+  }
+
   if (matchedOptions.length === 1) {
     return { classification: matchedOptions[0].classification };
   }
@@ -123,6 +129,10 @@ function classifyPublishingReply(replyText) {
 
   if (CALL_REQUEST_PATTERN.test(isolated)) {
     return { classification: CLASSIFICATION.CALL_REQUESTED };
+  }
+
+  if (GENERIC_INSTALLMENT_PATTERN.test(isolated)) {
+    return { classification: CLASSIFICATION.UNCLASSIFIED };
   }
 
   if (HOLD_PATTERN.test(isolated)) {
