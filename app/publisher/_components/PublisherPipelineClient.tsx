@@ -360,6 +360,7 @@ function ReconciliationCard({
       <h3 className="text-[13px] font-semibold leading-5 text-white">{card.title}</h3>
       <p className="mt-1 text-[12px] text-white/50">{card.author}</p>
       <p className="mt-3 text-[12px] leading-5 text-rose-100">{card.reason || card.nextAction}</p>
+      <p className="mt-2 text-[11px] leading-5 text-white/55">{card.ambiguityReason}</p>
       <p className="mt-2 font-mono text-[10px] uppercase tracking-[0.12em] text-white/35">
         Attempted: {card.attemptedStage || 'unresolved'}
       </p>
@@ -406,6 +407,17 @@ function DetailPanel({ card }: { card: HumanPipelineCard | HumanPipelineReconcil
           <MiniFact label="Blocker" value={card.blocker || 'None recorded'} />
           <MiniFact label="Target" value={card.targetDate || 'No target date surfaced'} />
         </DetailBlock>
+
+        {isReconciliation && (
+          <DetailBlock title="Reconciliation">
+            <MiniFact label="Why Here" value={(card as HumanPipelineReconciliationCard).ambiguityReason} />
+            <MiniFact label="Evidence" value={(card as HumanPipelineReconciliationCard).evidenceAuthority} />
+            <MiniFact label="Resolution" value={(card as HumanPipelineReconciliationCard).resolutionClass} />
+            <MiniFact label="Missing" value={(card as HumanPipelineReconciliationCard).missingEvidence} />
+            <MiniFact label="Repair" value={(card as HumanPipelineReconciliationCard).proposedRepair} />
+            <MiniFact label="Automation" value={(card as HumanPipelineReconciliationCard).safeToAutomate} />
+          </DetailBlock>
+        )}
 
         <DetailBlock title="Title Facts">
           <MiniFact label="Imprint" value={card.imprint} />

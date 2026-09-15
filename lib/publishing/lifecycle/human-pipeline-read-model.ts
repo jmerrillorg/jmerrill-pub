@@ -53,6 +53,12 @@ export type HumanPipelineCard = {
 
 export type HumanPipelineReconciliationCard = Omit<HumanPipelineCard, 'stageId' | 'stageLabel' | 'confidence'> & {
   attemptedStage: string
+  ambiguityReason: string
+  evidenceAuthority: string
+  resolutionClass: string
+  proposedRepair: string
+  missingEvidence: string
+  safeToAutomate: string
   confidence: 'RECONCILIATION_REQUIRED'
 }
 
@@ -172,6 +178,12 @@ function projectHumanPipelineCard(
     return {
       ...base,
       attemptedStage: readable(card.canonicalLifecycle.titleLifecycleStage.label),
+      ambiguityReason: ambiguityReasonFor(card),
+      evidenceAuthority: evidenceAuthorityFor(card),
+      resolutionClass: resolutionClassFor(card),
+      proposedRepair: proposedRepairFor(card),
+      missingEvidence: missingEvidenceFor(card),
+      safeToAutomate: safeToAutomateFor(card),
       confidence: 'RECONCILIATION_REQUIRED',
     }
   }
@@ -297,4 +309,119 @@ function firstUseful(values: Array<string | undefined | null>, fallback: string)
 function readable(value: string | undefined | null) {
   if (!value) return ''
   return value.replaceAll('_', ' ').replace(/\s+/g, ' ').trim()
+}
+
+function ambiguityReasonFor(card: PublisherTitleOperatingCard) {
+  const lifecycle = card.canonicalLifecycle
+  const authority = lifecycle.canonicalAuthority
+
+  if (
+    authority.classification === 'DUPLICATE_RECORD' &&
+    authority.currentAuthorityRelationship === 'NONCURRENT_REFERENCE_ONLY'
+  ) {
+    return 'DUPLICATE_HISTORICAL_RECORD_REFERENCE'
+  }
+
+  if (lifecycle.canonicalMappingStatus === 'CANONICAL_MAPPING_CONFLICT') return 'CONFLICTING_STAGE_EVIDENCE'
+  if (lifecycle.stageTruth.blockingTransition === 'LIFECYCLE_MAPPING') return 'MISSING_CANONICAL_STAGE_EVENT'
+  if (lifecycle.stageTruth.artifactAuthorityRequired === 'YES') return 'MISSING_REQUIRED_ARTIFACT'
+  if (
+    /format|paperback|hardcover|ebook|audio/i.test(
+      `${lifecycle.waitingTruth.waitingReason} ${lifecycle.stageTruth.blockingEvidence}`,
+    )
+  ) {
+    return 'FORMAT_LEVEL_VS_WORK_LEVEL_CONFLICT'
+  }
+
+  return 'OTHER_EXACT_GOVERNED_REASON'
+}
+
+function evidenceAuthorityFor(card: PublisherTitleOperatingCard) {
+  const lifecycle = card.canonicalLifecycle
+  const references = card.technical.evidenceReferences.filter(Boolean)
+  return firstUseful([
+    references.join('; '),
+    lifecycle.canonicalAuthority.sourceAuthority,
+    lifecycle.artifactTruth.authoritySource,
+    lifecycle.stageTruth.blockingEvidence,
+  ], 'Publisher Operating Center projection input')
+}
+
+function resolutionClassFor(card: PublisherTitleOperatingCard) {
+  const lifecycle = card.canonicalLifecycle
+  const authority = lifecycle.canonicalAuthority
+  const text = `${card.title} ${card.author} ${card.blocker} ${lifecycle.waitingTruth.waitingReason} ${lifecycle.waitingTruth.requiredNextAction}`
+
+  if (
+    authority.classification === 'DUPLICATE_RECORD' &&
+    authority.currentAuthorityRelationship === 'NONCURRENT_REFERENCE_ONLY'
+  ) {
+    return 'TRUE_DATA_DEFECT'
+  }
+
+  if (lifecycle.waitingTruth.broadWaitingOwner === 'External') return 'EXTERNAL_DEPENDENCY'
+  if (/decision|payment|identity hold|title hold|approved|Jackie|founder/i.test(text)) {
+    return 'HUMAN_BUSINESS_DECISION_REQUIRED'
+  }
+  if (lifecycle.stageTruth.blockingTransition === 'LIFECYCLE_MAPPING') return 'GOVERNED_EVENT_BACKFILL_REQUIRED'
+  return 'DETERMINISTIC_REPAIR'
+}
+
+function proposedRepairFor(card: PublisherTitleOperatingCard) {
+  const lifecycle = card.canonicalLifecycle
+  const authority = lifecycle.canonicalAuthority
+
+  if (
+    authority.classification === 'DUPLICATE_RECORD' &&
+    authority.currentAuthorityRelationship === 'NONCURRENT_REFERENCE_ONLY'
+  ) {
+    return 'Suppress or archive noncurrent duplicate reference; do not create a lifecycle event.'
+  }
+
+  if (resolutionClassFor(card) === 'HUMAN_BUSINESS_DECISION_REQUIRED') {
+    return 'Prepare a compact founder decision packet from the governed evidence.'
+  }
+
+  if (resolutionClassFor(card) === 'GOVERNED_EVENT_BACKFILL_REQUIRED') {
+    return 'Backfill only if governed historical evidence proves the event, title, sequence, and authority.'
+  }
+
+  if (resolutionClassFor(card) === 'EXTERNAL_DEPENDENCY') {
+    return 'Wait for the external/provider evidence source before placement.'
+  }
+
+  return card.nextAction || lifecycle.nextGovernedAction.action || 'Repair the projection/read-model mapping.'
+}
+
+function missingEvidenceFor(card: PublisherTitleOperatingCard) {
+  const lifecycle = card.canonicalLifecycle
+  const authority = lifecycle.canonicalAuthority
+
+  if (
+    authority.classification === 'DUPLICATE_RECORD' &&
+    authority.currentAuthorityRelationship === 'NONCURRENT_REFERENCE_ONLY'
+  ) {
+    return 'None for active lifecycle placement; record is noncurrent.'
+  }
+
+  return firstUseful([
+    lifecycle.stageTruth.blockingEvidence,
+    lifecycle.waitingTruth.exceptionReason,
+    lifecycle.artifactTruth.exceptionReason,
+  ], 'Governed stage evidence is incomplete.')
+}
+
+function safeToAutomateFor(card: PublisherTitleOperatingCard) {
+  const lifecycle = card.canonicalLifecycle
+  const authority = lifecycle.canonicalAuthority
+
+  if (
+    authority.classification === 'DUPLICATE_RECORD' &&
+    authority.currentAuthorityRelationship === 'NONCURRENT_REFERENCE_ONLY'
+  ) {
+    return 'YES_READ_MODEL_SUPPRESSION_ONLY'
+  }
+
+  if (resolutionClassFor(card) === 'DETERMINISTIC_REPAIR') return 'YES_PROJECTION_REPAIR_ONLY'
+  return 'NO'
 }
