@@ -54,6 +54,17 @@ test('Ambiguous title state is surfaced for reconciliation instead of silently p
   assert.match(client, /Titles not silently placed/)
 })
 
+test('Reconciliation cards expose reason, evidence, repair class, and automation safety', () => {
+  assert.match(model, /ambiguityReason:/)
+  assert.match(model, /evidenceAuthority:/)
+  assert.match(model, /resolutionClass:/)
+  assert.match(model, /safeToAutomate:/)
+  assert.match(client, /Why Here/)
+  assert.match(client, /Evidence/)
+  assert.match(client, /Resolution/)
+  assert.match(client, /Automation/)
+})
+
 test('Pipeline and Operating Center link to each other', () => {
   assert.match(client, /href="\/publisher\/operating-center"/)
   assert.match(operatingCenterClient, /href="\/publisher\/pipeline"/)
