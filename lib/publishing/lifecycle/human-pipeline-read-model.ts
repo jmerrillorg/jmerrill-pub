@@ -1,4 +1,9 @@
 import type { PublisherTitleOperatingCard } from '@/lib/server/publisher-operating-center'
+import {
+  NONCURRENT_HISTORICAL_REFERENCES,
+  isKnownNoncurrentHistoricalReferenceId,
+  type NoncurrentHistoricalReference,
+} from './noncurrent-historical-reference-registry'
 
 export type HumanPipelineStageId =
   | '01_INQUIRY'
@@ -70,10 +75,12 @@ export type HumanPipelineView = {
   stages: HumanPipelineStage[]
   cards: HumanPipelineCard[]
   reconciliationRequired: HumanPipelineReconciliationCard[]
+  suppressedHistoricalReferences: NoncurrentHistoricalReference[]
   summary: {
     totalTitles: number
     placedTitles: number
     reconciliationRequired: number
+    suppressedHistoricalReferences: number
     needsJackie: number
     waitingOnAuthor: number
     waitingOnSystem: number
@@ -107,9 +114,13 @@ export function buildHumanPublishingPipelineView(
 ): HumanPipelineView {
   const liveCards = cards.filter((card) => card.liveClassification === 'LIVE')
   const projected = liveCards.map(projectHumanPipelineCard)
-  const placed = projected.filter((item): item is HumanPipelineCard => item.confidence !== 'RECONCILIATION_REQUIRED')
-  const reconciliationRequired = projected.filter(
+  const currentProjected = projected.filter((item) => !isSuppressedHistoricalReference(item))
+  const placed = currentProjected.filter((item): item is HumanPipelineCard => item.confidence !== 'RECONCILIATION_REQUIRED')
+  const reconciliationRequired = currentProjected.filter(
     (item): item is HumanPipelineReconciliationCard => item.confidence === 'RECONCILIATION_REQUIRED',
+  )
+  const suppressedHistoricalReferences = NONCURRENT_HISTORICAL_REFERENCES.filter((reference) =>
+    projected.some((item) => item.key === reference.WorkId),
   )
 
   return {
@@ -121,10 +132,12 @@ export function buildHumanPublishingPipelineView(
     stages: HUMAN_PUBLISHING_PIPELINE_STAGES,
     cards: placed,
     reconciliationRequired,
+    suppressedHistoricalReferences,
     summary: {
       totalTitles: liveCards.length,
       placedTitles: placed.length,
       reconciliationRequired: reconciliationRequired.length,
+      suppressedHistoricalReferences: suppressedHistoricalReferences.length,
       needsJackie: placed.filter((card) => card.waitingOn === 'Jackie').length,
       waitingOnAuthor: placed.filter((card) => card.waitingOn === 'Author').length,
       waitingOnSystem: placed.filter((card) => card.waitingOn === 'System').length,
@@ -132,6 +145,19 @@ export function buildHumanPublishingPipelineView(
       exceptions: placed.filter((card) => card.attention === 'Exception').length + reconciliationRequired.length,
     },
   }
+}
+
+export function isSuppressedHistoricalReference(
+  card: HumanPipelineCard | HumanPipelineReconciliationCard,
+) {
+  return (
+    isKnownNoncurrentHistoricalReferenceId(card.key) &&
+    card.confidence === 'RECONCILIATION_REQUIRED' &&
+    'resolutionClass' in card &&
+    card.resolutionClass === 'TRUE_DATA_DEFECT' &&
+    card.ambiguityReason === 'DUPLICATE_HISTORICAL_RECORD_REFERENCE' &&
+    card.safeToAutomate === 'YES_READ_MODEL_SUPPRESSION_ONLY'
+  )
 }
 
 function stage(

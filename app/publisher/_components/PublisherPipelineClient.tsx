@@ -151,7 +151,7 @@ export function PublisherPipelineClient({ initialPipeline, signedIn, operatorEma
 
         {pipeline && (
           <>
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4 2xl:grid-cols-8">
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5 2xl:grid-cols-9">
               <Summary label="Active titles" value={pipeline.summary.totalTitles} />
               <Summary label="Placed" value={pipeline.summary.placedTitles} />
               <Summary label="Needs Jackie" value={pipeline.summary.needsJackie} tone="amber" />
@@ -160,6 +160,7 @@ export function PublisherPipelineClient({ initialPipeline, signedIn, operatorEma
               <Summary label="Blocked" value={pipeline.summary.blocked} tone="amber" />
               <Summary label="Exceptions" value={pipeline.summary.exceptions} tone="rose" />
               <Summary label="Reconcile" value={pipeline.summary.reconciliationRequired} tone="rose" />
+              <Summary label="Historical refs" value={pipeline.summary.suppressedHistoricalReferences} />
             </div>
 
             <div className="mt-5 flex flex-col gap-3 border border-white/10 bg-white/[0.035] p-4 lg:flex-row lg:items-center lg:justify-between">
@@ -282,6 +283,26 @@ export function PublisherPipelineClient({ initialPipeline, signedIn, operatorEma
                           selected={selected?.key === card.key}
                           onSelect={() => setSelectedKey(card.key)}
                         />
+                      ))}
+                    </div>
+                  </section>
+                )}
+                {pipeline.suppressedHistoricalReferences.length > 0 && (
+                  <section className="mt-4 border border-white/10 bg-white/[0.03] p-4">
+                    <div className="flex items-center justify-between gap-3">
+                      <div>
+                        <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-white/40">Historical</p>
+                        <h2 className="mt-1 text-xl font-semibold">Archived duplicate references</h2>
+                      </div>
+                      <Badge label={String(pipeline.suppressedHistoricalReferences.length)} tone="neutral" />
+                    </div>
+                    <div className="mt-4 grid gap-2 md:grid-cols-2 xl:grid-cols-3">
+                      {pipeline.suppressedHistoricalReferences.map((item) => (
+                        <div key={item.WorkId} className="border border-white/10 bg-black/20 p-3">
+                          <h3 className="text-[13px] font-semibold leading-5 text-white">{item.Title}</h3>
+                          <p className="mt-1 text-[12px] text-white/50">{item.Author}</p>
+                          <p className="mt-3 text-[11px] leading-5 text-white/45">{item.ReferenceId} preserved as historical evidence.</p>
+                        </div>
                       ))}
                     </div>
                   </section>
