@@ -130,10 +130,10 @@ export async function getPublicCatalogTitleBySlug(slug: string): Promise<Catalog
     const related = await loadRelatedCatalogData(config, token, titleRows)
     const summaries = projectPublicCatalogTitles(titleRows.map((row) => buildTitleSummary(row, related)).filter((title) => title.title))
     const summary = summaries.find((title) => title.slug === slug || title.id === slug)
-    if (!summary) return null
+    if (!summary) return resolveRepositoryPublicCatalogTitleBySlug(slug)
 
     const row = titleRows.find((item) => stringField(item, 'jm1pub_titleid') === summary.id)
-    if (!row) return null
+    if (!row) return resolveRepositoryPublicCatalogTitleBySlug(slug)
     const relatedTitles = summaries
       .filter((title) => title.id !== summary.id && title.certifiedImprint === summary.certifiedImprint)
       .slice(0, 4)
@@ -152,6 +152,28 @@ export async function getPublicCatalogTitleBySlug(slug: string): Promise<Catalog
       relatedTitles,
     }
   })
+}
+
+export function resolveRepositoryPublicCatalogTitleBySlug(slug: string): CatalogTitleDetail | null {
+  const titles = repositoryPublicCatalogTitles()
+  const summary = titles.find((title) => title.slug === slug || title.id === slug)
+  if (!summary) return null
+
+  return {
+    ...summary,
+    longDescription: summary.shortDescription,
+    series: '',
+    seriesOrder: null,
+    keywords: buildKeywords(summary),
+    marketplaceIdentifiers: summary.purchaseLinks.map((link) => ({
+      marketplace: link.retailer,
+      identifier: '',
+      status: link.marketplaceStatus,
+    })),
+    relatedTitles: titles
+      .filter((title) => title.id !== summary.id && title.certifiedImprint === summary.certifiedImprint)
+      .slice(0, 4),
+  }
 }
 
 export async function listPublicAuthors(): Promise<CatalogReadResult<CatalogAuthorSummary[]>> {

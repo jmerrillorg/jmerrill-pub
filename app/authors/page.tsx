@@ -5,7 +5,9 @@ import { PageSection } from '@/components/site/PageSection'
 import { AuthorCard } from '@/components/content/AuthorCard'
 import { BookCard } from '@/components/content/BookCard'
 import { CTASection } from '@/components/content/CTASection'
+import { FeaturedAuthorPromotion } from '@/components/content/FeaturedAuthorPromotion'
 import { NewsletterSignup } from '@/components/content/NewsletterSignup'
+import { getCurrentFeaturedAuthorExperience, resolveFeaturedAuthorTitle } from '@/data/author-experience'
 import { catalogAuthorToCardRecord, catalogTitleToBookCardRecord } from '@/lib/catalog/display'
 import { listPublicAuthors, listPublicCatalogTitles } from '@/lib/server/dataverse/catalog'
 
@@ -49,6 +51,13 @@ export default async function AuthorsPage() {
   ])
   const authors = authorsResult.ok ? authorsResult.data : []
   const featuredTitles = titlesResult.ok ? titlesResult.data.slice(0, 4) : []
+  const currentFeaturedAuthor = getCurrentFeaturedAuthorExperience()
+  const currentFeaturedAuthorRecord = currentFeaturedAuthor
+    ? authors.find((author) => author.slug === currentFeaturedAuthor.slug) || null
+    : null
+  const currentFeaturedTitle = currentFeaturedAuthor && titlesResult.ok
+    ? resolveFeaturedAuthorTitle(currentFeaturedAuthor, titlesResult.data)
+    : null
   const unavailable = !authorsResult.ok
 
   return (
@@ -69,6 +78,15 @@ export default async function AuthorsPage() {
           { label: 'Explore the Books', href: '/books' },
         ]}
       />
+
+      {currentFeaturedAuthor && currentFeaturedAuthorRecord && currentFeaturedTitle ? (
+        <FeaturedAuthorPromotion
+          featured={currentFeaturedAuthor}
+          author={currentFeaturedAuthorRecord}
+          title={currentFeaturedTitle}
+          compact
+        />
+      ) : null}
 
       <PageSection
         eyebrow="The People Behind The Books"
