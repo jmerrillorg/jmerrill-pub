@@ -85,7 +85,8 @@
     "jmp-dist-002-live-canary-gate-guard": "node --test scripts/jmp_dist_002_live_canary_gate.test.mjs",
     "jmp-dist-003-provider-auth-guard": "node --test scripts/jmp_dist_003_provider_auth_guard.test.mjs",
     "jmp-auth-003-managed-identity-runtime-guard": "node --test scripts/jmp_auth_003_managed_identity_runtime.test.mjs",
-    "jmp-v1v2-automation-capability-registry-guard": "node --test scripts/jmp_v1v2_automation_capability_registry.test.mjs"
+    "jmp-v1v2-automation-capability-registry-guard": "node --test scripts/jmp_v1v2_automation_capability_registry.test.mjs",
+    "royalty-mapping-decision-governance-guard": "node --test scripts/royalty_mapping_decision_governance.test.mjs"
   },
   "dependencies": {
     "@azure/communication-email": "^1.1.0",

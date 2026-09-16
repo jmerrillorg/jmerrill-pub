@@ -222,6 +222,49 @@ export function PublisherOperatingCenterClient({ initialSnapshot, signedIn, oper
     await refresh()
   }
 
+  async function submitRoyaltyDecision(input: {
+    packageId: string
+    decisionType: string
+    canonicalWorkId?: string
+    formatAssetId?: string
+    rightsholderId?: string
+    royaltyProfileId?: string
+    outOfScopeReason?: string
+    deferReason?: string
+    evidenceNeeded?: string
+  }) {
+    setActionState({
+      itemKey: `royalty-decision:${input.packageId}`,
+      status: 'running',
+      message: 'Recording governed royalty decision...',
+    })
+
+    const response = await fetch('/api/publisher/operating-center/actions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: 'record_royalty_mapping_decision',
+        royaltyDecision: input,
+      }),
+    })
+    const payload = (await response.json().catch(() => null)) as { error?: string; status?: string } | null
+    if (!response.ok) {
+      setActionState({
+        itemKey: `royalty-decision:${input.packageId}`,
+        status: 'error',
+        message: payload?.error || 'Royalty decision was not recorded.',
+      })
+      return
+    }
+
+    setActionState({
+      itemKey: `royalty-decision:${input.packageId}`,
+      status: 'complete',
+      message: 'Royalty decision recorded. Author visibility and payments remain off.',
+    })
+    await refresh()
+  }
+
   async function runAuthorResponseAction(item: PublisherAuthorResponseQueueItem, actionId: string) {
     setActionState({
       itemKey: `${item.key}:${actionId}`,
@@ -786,7 +829,12 @@ export function PublisherOperatingCenterClient({ initialSnapshot, signedIn, oper
                 </div>
                 <div className="mt-4 grid gap-3 lg:grid-cols-2">
                   {snapshot.royalties.decisionPackages.slice(0, 8).map((decisionPackage) => (
-                    <RoyaltyDecisionPackageView key={decisionPackage.packageKey} decisionPackage={decisionPackage} />
+                    <RoyaltyDecisionPackageView
+                      key={decisionPackage.packageKey}
+                      decisionPackage={decisionPackage}
+                      actionState={actionState}
+                      submitRoyaltyDecision={submitRoyaltyDecision}
+                    />
                   ))}
                 </div>
                 {snapshot.royalties.decisionPackages.length > 8 && (
@@ -1175,9 +1223,36 @@ function RoyaltyDecisionCardView({
 
 function RoyaltyDecisionPackageView({
   decisionPackage,
+  actionState,
+  submitRoyaltyDecision,
 }: {
   decisionPackage: PublisherOperatingCenterSnapshot['royalties']['decisionPackages'][number]
+  actionState: ActionState
+  submitRoyaltyDecision: (input: {
+    packageId: string
+    decisionType: string
+    canonicalWorkId?: string
+    formatAssetId?: string
+    rightsholderId?: string
+    royaltyProfileId?: string
+    outOfScopeReason?: string
+    deferReason?: string
+    evidenceNeeded?: string
+  }) => Promise<void>
 }) {
+  const [decisionType, setDecisionType] = useState('DEFER')
+  const [canonicalWorkId, setCanonicalWorkId] = useState('')
+  const [formatAssetId, setFormatAssetId] = useState('')
+  const [rightsholderId, setRightsholderId] = useState('')
+  const [royaltyProfileId, setRoyaltyProfileId] = useState('')
+  const [outOfScopeReason, setOutOfScopeReason] = useState('NOT_JM1')
+  const [deferReason, setDeferReason] = useState('Insufficient governed mapping evidence')
+  const [evidenceNeeded, setEvidenceNeeded] = useState('')
+  const actionKey = `royalty-decision:${decisionPackage.packageKey}`
+  const mappingDecision = decisionType === 'APPROVE_MAPPING' || decisionType === 'CORRECT_MAPPING'
+  const outOfScopeDecision = decisionType === 'OUT_OF_SCOPE'
+  const deferDecision = decisionType === 'DEFER'
+
   return (
     <article className="border border-white/10 bg-black/15 p-4">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
@@ -1205,7 +1280,112 @@ function RoyaltyDecisionPackageView({
         <Info label="Recommended decision" value={decisionPackage.recommendedDecision} />
         <Info label="Reusable impact" value={decisionPackage.reusableMappingImpact} />
       </div>
+      <form
+        className="mt-4 grid gap-3 border border-white/10 bg-[#071323] p-3"
+        onSubmit={(event) => {
+          event.preventDefault()
+          void submitRoyaltyDecision({
+            packageId: decisionPackage.packageKey,
+            decisionType,
+            canonicalWorkId,
+            formatAssetId,
+            rightsholderId,
+            royaltyProfileId,
+            outOfScopeReason,
+            deferReason,
+            evidenceNeeded,
+          })
+        }}
+      >
+        <label className="text-[12px] text-white/55">
+          <span className="mb-1 block font-mono text-[10px] uppercase tracking-[0.12em] text-white/35">
+            Decision
+          </span>
+          <select
+            value={decisionType}
+            onChange={(event) => setDecisionType(event.target.value)}
+            className="min-h-[40px] w-full border border-white/10 bg-black/25 px-3 text-white"
+          >
+            <option value="APPROVE_MAPPING">APPROVE_MAPPING</option>
+            <option value="CORRECT_MAPPING">CORRECT_MAPPING</option>
+            <option value="OUT_OF_SCOPE">OUT_OF_SCOPE</option>
+            <option value="DEFER">DEFER</option>
+          </select>
+        </label>
+        {mappingDecision && (
+          <div className="grid gap-2 lg:grid-cols-2">
+            <RoyaltyDecisionInput label="Canonical work" value={canonicalWorkId} onChange={setCanonicalWorkId} />
+            <RoyaltyDecisionInput label="Format asset" value={formatAssetId} onChange={setFormatAssetId} />
+            <RoyaltyDecisionInput label="Rightsholder" value={rightsholderId} onChange={setRightsholderId} />
+            <RoyaltyDecisionInput label="Royalty profile" value={royaltyProfileId} onChange={setRoyaltyProfileId} />
+          </div>
+        )}
+        {outOfScopeDecision && (
+          <label className="text-[12px] text-white/55">
+            <span className="mb-1 block font-mono text-[10px] uppercase tracking-[0.12em] text-white/35">
+              Governed reason
+            </span>
+            <select
+              value={outOfScopeReason}
+              onChange={(event) => setOutOfScopeReason(event.target.value)}
+              className="min-h-[40px] w-full border border-white/10 bg-black/25 px-3 text-white"
+            >
+              <option value="NOT_JM1">NOT_JM1</option>
+              <option value="DUPLICATE_SOURCE_ROW">DUPLICATE_SOURCE_ROW</option>
+              <option value="NONPAYABLE_SOURCE">NONPAYABLE_SOURCE</option>
+              <option value="UNSUPPORTED_RIGHT">UNSUPPORTED_RIGHT</option>
+              <option value="OTHER_GOVERNED_REASON">OTHER_GOVERNED_REASON</option>
+            </select>
+          </label>
+        )}
+        {deferDecision && (
+          <div className="grid gap-2">
+            <RoyaltyDecisionInput label="Defer reason" value={deferReason} onChange={setDeferReason} />
+            <RoyaltyDecisionInput label="Evidence needed" value={evidenceNeeded} onChange={setEvidenceNeeded} />
+          </div>
+        )}
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-[11px] leading-5 text-white/45">
+            Decisions persist as governed royalty events. They do not release author statements, create payments, or change
+            contract rates.
+          </p>
+          <button
+            type="submit"
+            disabled={actionState.itemKey === actionKey && actionState.status === 'running'}
+            className="min-h-[36px] shrink-0 rounded-full bg-blue-500 px-4 text-[11px] font-semibold uppercase tracking-[0.08em] text-white disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {actionState.itemKey === actionKey && actionState.status === 'running' ? 'Saving...' : 'Save Decision'}
+          </button>
+        </div>
+        {actionState.itemKey === actionKey && actionState.message && (
+          <p className={`text-[12px] ${actionState.status === 'error' ? 'text-red-100' : 'text-blue-100'}`}>
+            {actionState.message}
+          </p>
+        )}
+      </form>
     </article>
+  )
+}
+
+function RoyaltyDecisionInput({
+  label,
+  value,
+  onChange,
+}: {
+  label: string
+  value: string
+  onChange: (value: string) => void
+}) {
+  return (
+    <label className="text-[12px] text-white/55">
+      <span className="mb-1 block font-mono text-[10px] uppercase tracking-[0.12em] text-white/35">{label}</span>
+      <input
+        value={value}
+        onChange={(event) => onChange(event.target.value)}
+        placeholder="Governed value resolved by server"
+        className="min-h-[40px] w-full border border-white/10 bg-black/25 px-3 text-white"
+      />
+    </label>
   )
 }
 
