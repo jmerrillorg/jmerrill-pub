@@ -7,6 +7,7 @@ const books = JSON.parse(await readFile(new URL('data/books.json', root), 'utf8'
 const titleAuthorOverridesSource = await readFile(new URL('data/title-author-overrides.ts', root), 'utf8')
 const authorAliasesSource = await readFile(new URL('data/author-name-to-master-name.ts', root), 'utf8')
 const catalogSource = await readFile(new URL('lib/server/dataverse/catalog.ts', root), 'utf8')
+const authorRouteSource = await readFile(new URL('app/authors/[slug]/page.tsx', root), 'utf8')
 
 const titleAuthorOverrides = objectLiteralFromSource(titleAuthorOverridesSource, 'titleAuthorOverrides')
 const authorAliases = objectLiteralFromSource(authorAliasesSource, 'authorNameToMasterName')
@@ -39,6 +40,12 @@ test('P0 public author route fallback is wired into the Dataverse catalog resolv
   assert.match(catalogSource, /mergeRepositoryAuthorSummaries\(buildAuthorSummaries\(contactRows, titles\)\)/)
   assert.match(catalogSource, /if \(!summary\) return resolveRepositoryPublicAuthorBySlug\(slug\)/)
   assert.match(catalogSource, /export function resolveRepositoryPublicAuthorBySlug/)
+})
+
+test('public author route awaits dynamic params before resolving the slug', () => {
+  assert.match(authorRouteSource, /type Props = \{ params: Promise<\{ slug: string \}> \}/)
+  assert.match(authorRouteSource, /const \{ slug \} = await params/)
+  assert.doesNotMatch(authorRouteSource, /params\.slug/)
 })
 
 test('known production author URLs resolve to governed repository catalog identities and titles', () => {

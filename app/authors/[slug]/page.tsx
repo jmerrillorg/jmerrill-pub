@@ -8,7 +8,7 @@ import { catalogTitleToBookCardRecord } from '@/lib/catalog/display'
 import { isSuppressedPublicAuthorSlug } from '@/lib/catalog/public-author-identity'
 import { getPublicAuthorBySlug } from '@/lib/server/dataverse/catalog'
 
-type Props = { params: { slug: string } }
+type Props = { params: Promise<{ slug: string }> }
 
 export const dynamic = 'force-dynamic'
 
@@ -37,9 +37,10 @@ function AuthorUnavailable() {
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  if (isSuppressedPublicAuthorSlug(params.slug)) return { title: 'Authors' }
+  const { slug } = await params
+  if (isSuppressedPublicAuthorSlug(slug)) return { title: 'Authors' }
 
-  const result = await getPublicAuthorBySlug(params.slug)
+  const result = await getPublicAuthorBySlug(slug)
   if (!result.ok) return { title: 'Author Profile Temporarily Unavailable' }
   if (!result.data) return { title: 'Author Not Found' }
 
@@ -60,9 +61,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function AuthorProfilePage({ params }: Props) {
-  if (isSuppressedPublicAuthorSlug(params.slug)) redirect('/authors')
+  const { slug } = await params
+  if (isSuppressedPublicAuthorSlug(slug)) redirect('/authors')
 
-  const result = await getPublicAuthorBySlug(params.slug)
+  const result = await getPublicAuthorBySlug(slug)
   if (!result.ok) return <AuthorUnavailable />
   if (!result.data) notFound()
 
