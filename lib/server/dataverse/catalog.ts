@@ -196,7 +196,10 @@ export async function getPublicAuthorBySlug(slug: string): Promise<CatalogReadRe
     const summary = summaries.find((author) => author.slug === slug)
     if (!summary) return resolveRepositoryPublicAuthorBySlug(slug)
 
-    const authorTitles = titles.filter((title) => title.authors.some((author) => author.slug === summary.slug))
+    const authorTitles = mergeCatalogTitleSummaries(
+      titles.filter((title) => title.authors.some((author) => author.slug === summary.slug)),
+      repositoryAuthorTitles(summary.slug),
+    )
     const contact = contactRows.find((row) => {
       const publicSlug = stringField(row, 'jm1pub_publicslug') || slugify(stringField(row, 'fullname'))
       return publicSlug === summary.slug
@@ -209,7 +212,7 @@ export async function getPublicAuthorBySlug(slug: string): Promise<CatalogReadRe
         ? [stringField(contact, 'address1_city'), stringField(contact, 'address1_stateorprovince')].filter(Boolean).join(', ')
         : '',
       specialties: summary.genres,
-      titles: authorTitles.length ? authorTitles : repositoryAuthorTitles(summary.slug),
+      titles: authorTitles,
     }
   })
 }
@@ -471,6 +474,15 @@ function repositoryAuthorSummaries(): CatalogAuthorSummary[] {
 
 function repositoryAuthorTitles(slug: string): CatalogTitleSummary[] {
   return repositoryPublicCatalogTitles().filter((title) => title.authors.some((author) => author.slug === slug))
+}
+
+function mergeCatalogTitleSummaries(primary: CatalogTitleSummary[], fallback: CatalogTitleSummary[]): CatalogTitleSummary[] {
+  const bySlug = new Map(primary.map((title) => [title.slug || title.id, title]))
+  for (const title of fallback) {
+    const key = title.slug || title.id
+    if (!bySlug.has(key)) bySlug.set(key, title)
+  }
+  return Array.from(bySlug.values())
 }
 
 function repositoryPublicCatalogTitles(): CatalogTitleSummary[] {

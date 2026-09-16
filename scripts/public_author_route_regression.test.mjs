@@ -39,6 +39,7 @@ const expectedAuthorRoutes = {
 test('P0 public author route fallback is wired into the Dataverse catalog resolver', () => {
   assert.match(catalogSource, /mergeRepositoryAuthorSummaries\(buildAuthorSummaries\(contactRows, titles\)\)/)
   assert.match(catalogSource, /if \(!summary\) return resolveRepositoryPublicAuthorBySlug\(slug\)/)
+  assert.match(catalogSource, /const authorTitles = mergeCatalogTitleSummaries\(/)
   assert.match(catalogSource, /export function resolveRepositoryPublicAuthorBySlug/)
 })
 
