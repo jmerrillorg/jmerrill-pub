@@ -10,7 +10,6 @@ import type {
   CatalogTitleSummary,
   PublishingMarketingAuthority,
 } from '@/lib/catalog/types'
-import rawBooks from '@/data/books.json'
 import { authorNameToMasterName } from '@/data/author-name-to-master-name'
 import { projectPublicCatalogTitles } from '@/lib/catalog/public-projection'
 import {
@@ -20,6 +19,9 @@ import {
 import { titleAuthorOverrides } from '@/data/title-author-overrides'
 import { bookRetailerEnrichmentOverrides } from '@/data/book-retailer-enrichment-overrides'
 import { getDataverseRuntimeAccessToken, getPublisherRuntimeAuthMode } from '@/lib/server/publisher-runtime-auth'
+import { readFileSync } from 'node:fs'
+import { join } from 'node:path'
+import { cwd } from 'node:process'
 
 type DataverseCatalogConfig = {
   tenantId: string
@@ -37,7 +39,23 @@ type DataverseCatalogConfig = {
 }
 
 type DataverseRecord = Record<string, unknown>
-type RepositoryCatalogBook = (typeof rawBooks)[number]
+type RepositoryCatalogBook = {
+  id?: unknown
+  title?: unknown
+  author?: unknown
+  genre?: unknown
+  imprint?: unknown
+  formats?: unknown
+  format?: unknown
+  purchaseUrl?: unknown
+  retailerUrl?: unknown
+  coverUrl?: unknown
+  description?: unknown
+  isbn?: unknown
+  isbn13?: unknown
+  year?: unknown
+  [key: string]: unknown
+}
 
 const DEFAULT_ENTITY_SETS = {
   titles: 'jm1pub_titles',
@@ -509,16 +527,22 @@ function mergeCatalogTitleSummaries(primary: CatalogTitleSummary[], fallback: Ca
 
 function repositoryPublicCatalogTitles(): CatalogTitleSummary[] {
   return projectPublicCatalogTitles(
-    rawBooks
+    loadRepositoryCatalogBooks()
       .map(repositoryBookToTitleSummary)
       .filter((title) => title.title && title.authorDisplayName && title.authors.length),
   )
 }
 
+function loadRepositoryCatalogBooks(): RepositoryCatalogBook[] {
+  const raw = readFileSync(join(cwd(), 'data/books.json'), 'utf8')
+  const parsed = JSON.parse(raw)
+  return Array.isArray(parsed) ? parsed : []
+}
+
 function repositoryBookToTitleSummary(book: RepositoryCatalogBook): CatalogTitleSummary {
   const title = cleanString(book.title)
   const slug = cleanString(book.id) || slugify(title)
-  const authorName = normalizeRepositoryAuthorName(titleAuthorOverrides[slug] || book.author)
+  const authorName = normalizeRepositoryAuthorName(titleAuthorOverrides[slug] || cleanString(book.author))
   const authorSlug = slugify(authorName)
   const genre = cleanString(book.genre) || 'General Interest'
   const imprint = normalizeRepositoryImprint(cleanString(book.imprint), genre)
