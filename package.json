@@ -17,6 +17,7 @@
     "catalog-source-guard": "node scripts/check-catalog-runtime-source.mjs",
     "public-catalog-projection-guard": "node --test scripts/public_catalog_projection.test.mjs",
     "public-author-route-guard": "node --test scripts/public_author_route_regression.test.mjs",
+    "kimberly-enhanced-author-guard": "node --test scripts/kimberly_enhanced_author_experience.test.mjs",
     "public-author-privacy-guard": "node --test scripts/public_author_privacy_guard.test.mjs",
     "catalog-reconciliation-final-guard": "node scripts/catalog_reconciliation_final_guard.mjs",
     "catalog-authority-contract-guard": "node --test scripts/publishing_catalog_authority_contract.test.mjs",

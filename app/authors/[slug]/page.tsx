@@ -4,6 +4,8 @@ import Image from 'next/image'
 import { notFound, redirect } from 'next/navigation'
 import { CTASection } from '@/components/content/CTASection'
 import { BookCard } from '@/components/content/BookCard'
+import { EnhancedAuthorProfile } from '@/components/content/EnhancedAuthorProfile'
+import { getEnhancedAuthorExperience, getFeaturedAuthorExperience, getFeaturedAuthorRuntimeState, resolveFeaturedAuthorTitle } from '@/data/author-experience'
 import { catalogTitleToBookCardRecord } from '@/lib/catalog/display'
 import { isSuppressedPublicAuthorSlug } from '@/lib/catalog/public-author-identity'
 import { getPublicAuthorBySlug } from '@/lib/server/dataverse/catalog'
@@ -43,6 +45,28 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const result = await getPublicAuthorBySlug(slug)
   if (!result.ok) return { title: 'Author Profile Temporarily Unavailable' }
   if (!result.data) return { title: 'Author Not Found' }
+  const enhancedExperience = getEnhancedAuthorExperience(result.data.slug)
+  const featuredTitle = enhancedExperience ? resolveFeaturedAuthorTitle(enhancedExperience, result.data.titles) : null
+  if (enhancedExperience && featuredTitle) {
+    return {
+      title: `${result.data.name} | ${enhancedExperience.featuredTitleDisplay}`,
+      description: enhancedExperience.heroDeck,
+      alternates: {
+        canonical: `/authors/${result.data.slug}`,
+      },
+      openGraph: {
+        title: `${result.data.name} | J Merrill Publishing Author`,
+        description: enhancedExperience.heroDeck,
+        type: 'profile',
+        url: `/authors/${result.data.slug}`,
+        images: featuredTitle.coverUrl
+          ? [{ url: featuredTitle.coverUrl, alt: enhancedExperience.featuredTitleDisplay }]
+          : result.data.photoUrl
+            ? [{ url: result.data.photoUrl, alt: result.data.name }]
+            : undefined,
+      },
+    }
+  }
 
   return {
     title: result.data.name,
@@ -69,6 +93,54 @@ export default async function AuthorProfilePage({ params }: Props) {
   if (!result.data) notFound()
 
   const author = result.data
+  const enhancedExperience = getEnhancedAuthorExperience(author.slug)
+  const enhancedFeaturedTitle = enhancedExperience ? resolveFeaturedAuthorTitle(enhancedExperience, author.titles) : null
+  const featuredAuthorExperience = getFeaturedAuthorExperience(author.slug)
+  if (enhancedExperience && enhancedFeaturedTitle && featuredAuthorExperience) {
+    return (
+      <>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              '@context': 'https://schema.org',
+              '@type': 'Person',
+              name: author.name,
+              url: `https://jmerrill.pub/authors/${author.slug}`,
+              image: author.photoUrl || undefined,
+              description: enhancedExperience.heroDeck,
+              worksFor: {
+                '@type': 'Organization',
+                name: 'J Merrill Publishing',
+                url: 'https://jmerrill.pub',
+              },
+              subjectOf: [
+                {
+                  '@type': 'Book',
+                  name: enhancedExperience.featuredTitleDisplay,
+                  url: `https://jmerrill.pub/books/${enhancedFeaturedTitle.slug || enhancedFeaturedTitle.id}`,
+                },
+                ...author.titles
+                  .filter((title) => title.id !== enhancedFeaturedTitle.id)
+                  .map((title) => ({
+                    '@type': 'Book',
+                    name: title.title,
+                    url: `https://jmerrill.pub/books/${title.slug || title.id}`,
+                  })),
+              ],
+            }),
+          }}
+        />
+        <EnhancedAuthorProfile
+          author={author}
+          experience={enhancedExperience}
+          featuredTitle={enhancedFeaturedTitle}
+          featuredState={getFeaturedAuthorRuntimeState(featuredAuthorExperience)}
+        />
+      </>
+    )
+  }
+
   const structuredData = {
     '@context': 'https://schema.org',
     '@type': 'Person',
