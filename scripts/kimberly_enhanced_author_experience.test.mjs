@@ -5,8 +5,10 @@ import test from 'node:test'
 const root = new URL('../', import.meta.url)
 const books = JSON.parse(await readFile(new URL('data/books.json', root), 'utf8'))
 const authorPageSource = await readFile(new URL('app/authors/[slug]/page.tsx', root), 'utf8')
+const bookPageSource = await readFile(new URL('app/books/[id]/page.tsx', root), 'utf8')
 const authorsIndexSource = await readFile(new URL('app/authors/page.tsx', root), 'utf8')
 const homeSource = await readFile(new URL('components/home/ModularHomePage.tsx', root), 'utf8')
+const catalogSource = await readFile(new URL('lib/server/dataverse/catalog.ts', root), 'utf8')
 
 const {
   enhancedAuthorExperiences,
@@ -60,6 +62,14 @@ test('Kimberly enhanced author experience is configured without creating a paral
   assert.match(authorPageSource, /getEnhancedAuthorExperience\(author\.slug\)/)
   assert.match(authorPageSource, /<EnhancedAuthorProfile/)
   assert.doesNotMatch(authorPageSource, /if \(slug === ['"]kimberly-reeder['"]\)/)
+})
+
+test('featured book route uses the canonical dynamic params and repository fallback model', () => {
+  assert.match(bookPageSource, /type Props = \{ params: Promise<\{ id: string \}> \}/)
+  assert.match(bookPageSource, /const \{ id \} = await params/)
+  assert.doesNotMatch(bookPageSource, /params\.id/)
+  assert.match(catalogSource, /resolveRepositoryPublicCatalogTitleBySlug\(slug\)/)
+  assert.match(catalogSource, /export function resolveRepositoryPublicCatalogTitleBySlug/)
 })
 
 test('Featured Author November 2026 configuration references governed author and title authority', () => {

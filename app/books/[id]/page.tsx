@@ -10,7 +10,7 @@ import type { CatalogTitleDetail } from '@/lib/catalog/types'
 import { getPublicCatalogTitleBySlug } from '@/lib/server/dataverse/catalog'
 import { getImprintStrategyByLabel } from '@/data/imprints'
 
-type Props = { params: { id: string } }
+type Props = { params: Promise<{ id: string }> }
 
 export const dynamic = 'force-dynamic'
 
@@ -62,7 +62,8 @@ function CatalogUnavailable() {
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const result = await getPublicCatalogTitleBySlug(params.id)
+  const { id } = await params
+  const result = await getPublicCatalogTitleBySlug(id)
   if (!result.ok) {
     return {
       title: 'Book Catalog Temporarily Unavailable',
@@ -89,7 +90,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function BookPage({ params }: Props) {
-  const result = await getPublicCatalogTitleBySlug(params.id)
+  const { id } = await params
+  const result = await getPublicCatalogTitleBySlug(id)
   if (!result.ok) return <CatalogUnavailable />
   if (!result.data) notFound()
 
