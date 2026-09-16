@@ -10,11 +10,14 @@ import type {
   CatalogTitleSummary,
   PublishingMarketingAuthority,
 } from '@/lib/catalog/types'
+import rawBooks from '@/data/books.json'
+import { authorNameToMasterName } from '@/data/author-name-to-master-name'
 import { projectPublicCatalogTitles } from '@/lib/catalog/public-projection'
 import {
   resolvePublicAuthorIdentity,
   suppressesPersonalAuthorIdentity,
 } from '@/lib/catalog/public-author-identity'
+import { titleAuthorOverrides } from '@/data/title-author-overrides'
 import { bookRetailerEnrichmentOverrides } from '@/data/book-retailer-enrichment-overrides'
 import { getDataverseRuntimeAccessToken, getPublisherRuntimeAuthMode } from '@/lib/server/publisher-runtime-auth'
 
@@ -34,6 +37,7 @@ type DataverseCatalogConfig = {
 }
 
 type DataverseRecord = Record<string, unknown>
+type RepositoryCatalogBook = (typeof rawBooks)[number]
 
 const DEFAULT_ENTITY_SETS = {
   titles: 'jm1pub_titles',
@@ -167,7 +171,7 @@ export async function listPublicAuthors(): Promise<CatalogReadResult<CatalogAuth
 
     const related = await loadRelatedCatalogData(config, token, titleRows)
     const titles = projectPublicCatalogTitles(titleRows.map((row) => buildTitleSummary(row, related)).filter((title) => title.title))
-    return buildAuthorSummaries(contactRows, titles)
+    return mergeRepositoryAuthorSummaries(buildAuthorSummaries(contactRows, titles))
   })
 }
 
@@ -188,9 +192,9 @@ export async function getPublicAuthorBySlug(slug: string): Promise<CatalogReadRe
 
     const related = await loadRelatedCatalogData(config, token, titleRows)
     const titles = projectPublicCatalogTitles(titleRows.map((row) => buildTitleSummary(row, related)).filter((title) => title.title))
-    const summaries = buildAuthorSummaries(contactRows, titles)
+    const summaries = mergeRepositoryAuthorSummaries(buildAuthorSummaries(contactRows, titles))
     const summary = summaries.find((author) => author.slug === slug)
-    if (!summary) return null
+    if (!summary) return resolveRepositoryPublicAuthorBySlug(slug)
 
     const authorTitles = titles.filter((title) => title.authors.some((author) => author.slug === summary.slug))
     const contact = contactRows.find((row) => {
@@ -205,9 +209,22 @@ export async function getPublicAuthorBySlug(slug: string): Promise<CatalogReadRe
         ? [stringField(contact, 'address1_city'), stringField(contact, 'address1_stateorprovince')].filter(Boolean).join(', ')
         : '',
       specialties: summary.genres,
-      titles: authorTitles,
+      titles: authorTitles.length ? authorTitles : repositoryAuthorTitles(summary.slug),
     }
   })
+}
+
+export function resolveRepositoryPublicAuthorBySlug(slug: string): CatalogAuthorDetail | null {
+  const summary = repositoryAuthorSummaries().find((author) => author.slug === slug)
+  if (!summary) return null
+
+  return {
+    ...summary,
+    longBio: summary.shortBio,
+    location: '',
+    specialties: summary.genres,
+    titles: repositoryAuthorTitles(summary.slug),
+  }
 }
 
 export async function listTitlesByCertifiedImprint(imprint: string): Promise<CatalogReadResult<CatalogTitleSummary[]>> {
@@ -399,6 +416,127 @@ function buildAuthorSummaries(contactRows: DataverseRecord[], titles: CatalogTit
   return Array.from(bySlug.values())
     .filter((author) => author.titleCount > 0)
     .sort((a, b) => a.name.localeCompare(b.name))
+}
+
+function mergeRepositoryAuthorSummaries(authors: CatalogAuthorSummary[]): CatalogAuthorSummary[] {
+  const bySlug = new Map(authors.map((author) => [author.slug, { ...author }]))
+
+  for (const fallback of repositoryAuthorSummaries()) {
+    const current = bySlug.get(fallback.slug)
+    if (!current) {
+      bySlug.set(fallback.slug, fallback)
+      continue
+    }
+
+    bySlug.set(fallback.slug, {
+      ...current,
+      titleCount: Math.max(current.titleCount, fallback.titleCount),
+      genres: Array.from(new Set([...current.genres, ...fallback.genres].filter(Boolean))).sort(),
+      imprints: Array.from(new Set([...current.imprints, ...fallback.imprints].filter(Boolean))).sort(),
+      shortBio: current.shortBio || fallback.shortBio,
+      photoUrl: current.photoUrl || fallback.photoUrl,
+      contactId: current.contactId || fallback.contactId,
+    })
+  }
+
+  return Array.from(bySlug.values())
+    .filter((author) => author.titleCount > 0)
+    .sort((a, b) => a.name.localeCompare(b.name))
+}
+
+function repositoryAuthorSummaries(): CatalogAuthorSummary[] {
+  const bySlug = new Map<string, CatalogAuthorSummary>()
+
+  for (const title of repositoryPublicCatalogTitles()) {
+    for (const author of title.authors) {
+      const current = bySlug.get(author.slug) || {
+        contactId: author.contactId,
+        slug: author.slug,
+        name: author.name,
+        shortBio: 'J Merrill Publishing author family.',
+        photoUrl: '',
+        titleCount: 0,
+        genres: [],
+        imprints: [],
+      }
+      current.titleCount += 1
+      current.genres = Array.from(new Set([...current.genres, title.genre].filter(Boolean))).sort()
+      current.imprints = Array.from(new Set([...current.imprints, title.certifiedImprint].filter(Boolean))).sort()
+      bySlug.set(author.slug, current)
+    }
+  }
+
+  return Array.from(bySlug.values())
+}
+
+function repositoryAuthorTitles(slug: string): CatalogTitleSummary[] {
+  return repositoryPublicCatalogTitles().filter((title) => title.authors.some((author) => author.slug === slug))
+}
+
+function repositoryPublicCatalogTitles(): CatalogTitleSummary[] {
+  return projectPublicCatalogTitles(
+    rawBooks
+      .map(repositoryBookToTitleSummary)
+      .filter((title) => title.title && title.authorDisplayName && title.authors.length),
+  )
+}
+
+function repositoryBookToTitleSummary(book: RepositoryCatalogBook): CatalogTitleSummary {
+  const title = cleanString(book.title)
+  const slug = cleanString(book.id) || slugify(title)
+  const authorName = normalizeRepositoryAuthorName(titleAuthorOverrides[slug] || book.author)
+  const authorSlug = slugify(authorName)
+  const genre = cleanString(book.genre) || 'General Interest'
+  const imprint = normalizeRepositoryImprint(cleanString(book.imprint), genre)
+  const formats = normalizeRepositoryFormats(book)
+  const enrichment = bookRetailerEnrichmentOverrides[slug] || {}
+  const releaseDate = cleanString(enrichment.releaseDate)
+  const year = numberFromValue(book.year)
+  const coverUrl = cleanString(book.coverUrl) || cleanString(enrichment.retailerCoverUrl)
+  const shortDescription =
+    cleanString(book.description) ||
+    cleanString(enrichment.retailerDescription) ||
+    `${title} is listed in the J Merrill Publishing public catalog.`
+
+  return {
+    id: slug,
+    slug,
+    title,
+    subtitle: cleanString(enrichment.subtitle),
+    authorDisplayName: authorName,
+    authors: authorName
+      ? [
+          {
+            contactId: '',
+            slug: authorSlug,
+            name: authorName,
+            role: 'Author',
+            primary: true,
+          },
+        ]
+      : [],
+    certifiedImprint: imprint,
+    genre,
+    publicationStatus: 'Published',
+    releaseDate,
+    displayYear: releaseDate ? releaseDate.slice(0, 4) : year ? String(year) : 'Catalog',
+    formats,
+    primaryIsbn: cleanString(book.isbn) || firstIsbn(book),
+    isbnByFormat: repositoryFormatIsbns(book),
+    coverUrl,
+    shortDescription,
+    purchaseLinks: cleanString(book.purchaseUrl)
+      ? [
+          {
+            retailer: 'Publisher',
+            label: 'Buy Direct',
+            href: cleanString(book.purchaseUrl),
+            marketplaceStatus: 'Catalog',
+          },
+        ]
+      : [],
+    marketplaceStatus: cleanString(enrichment.retailerMatchStatus),
+  }
 }
 
 async function loadRelatedCatalogData(
@@ -771,6 +909,68 @@ function mapMarketplaceLink(row: DataverseRecord): CatalogPurchaseLink {
       stringField(row, 'jm1pub_marketplacestatus@OData.Community.Display.V1.FormattedValue') ||
       stringField(row, 'jm1pub_marketplacestatus'),
   }
+}
+
+function normalizeRepositoryAuthorName(value: string) {
+  const cleaned = cleanString(value)
+  return authorNameToMasterName[cleaned] || cleaned
+}
+
+function normalizeRepositoryImprint(value: string, genre: string) {
+  if (value === 'J Merrill Publishing' || value === 'JM Little' || value === 'JM Verse' || value === 'JM Signature' || value === 'JM Works') {
+    return value
+  }
+  if (value === 'J Merrill Kids' || genre === "Children's") return 'JM Little'
+  if (genre === 'Poetry') return 'JM Verse'
+  if (value === 'J Merrill Faith' || value === 'J Merrill Voices' || value === 'J Merrill Lit') return 'JM Works'
+  return 'J Merrill Publishing'
+}
+
+function normalizeRepositoryFormats(book: RepositoryCatalogBook): CatalogFormat[] {
+  const rawFormats = Array.isArray(book.formats) && book.formats.length
+    ? book.formats
+    : book.format
+      ? [book.format]
+      : ['Paperback']
+  const formats = rawFormats.map((format) => normalizeFormat(String(format))).filter(Boolean)
+  return Array.from(new Set(formats.length ? formats : ['Other']))
+}
+
+function repositoryFormatIsbns(book: RepositoryCatalogBook): CatalogFormatIsbn[] {
+  return [
+    ['Paperback', book.isbn_pb],
+    ['Hardcover', book.isbn_hc],
+    ['eBook', book.isbn_eb],
+    ['Audiobook', book.isbn_audio],
+  ].reduce<CatalogFormatIsbn[]>((items, [format, isbn]) => {
+    const value = cleanString(isbn)
+    if (value) {
+      items.push({
+        format: format as CatalogFormat,
+        isbn: value,
+        assetId: '',
+        assetStatus: 'Catalog',
+      })
+    }
+    return items
+  }, [])
+}
+
+function firstIsbn(book: RepositoryCatalogBook) {
+  return repositoryFormatIsbns(book)[0]?.isbn || ''
+}
+
+function numberFromValue(value: unknown) {
+  if (typeof value === 'number' && Number.isFinite(value)) return value
+  if (typeof value === 'string') {
+    const parsed = Number(value)
+    if (Number.isFinite(parsed)) return parsed
+  }
+  return null
+}
+
+function cleanString(value: unknown) {
+  return typeof value === 'string' ? value.trim() : ''
 }
 
 function normalizeFormats(items: CatalogFormatIsbn[]): CatalogFormat[] {
