@@ -20,6 +20,7 @@ import {
   verifyPublisherManuscript,
   type PublisherActionId,
 } from '@/lib/server/publisher-operating-center'
+import { recordRoyaltyMappingDecision, type RoyaltyDecisionType } from '@/lib/server/royalty-decision-governance'
 
 export const runtime = 'nodejs'
 
@@ -33,6 +34,7 @@ const SUPPORTED_ACTIONS: PublisherActionId[] = [
   'begin_interior_layout',
   'begin_cover_design',
   'review_royalty_statement',
+  'record_royalty_mapping_decision',
   'send_proofreading_notification',
   'process_proofreading_approval',
   'view_thread',
@@ -61,6 +63,19 @@ export async function POST(req: Request) {
     gateId?: string
     titleId?: string
     decisionKey?: string
+    royaltyDecision?: {
+      packageId?: string
+      decisionType?: RoyaltyDecisionType
+      evidenceVersion?: string
+      canonicalWorkId?: string
+      formatAssetId?: string
+      rightsholderId?: string
+      royaltyProfileId?: string
+      outOfScopeReason?: string
+      deferReason?: string
+      evidenceNeeded?: string
+      supersedesDecisionId?: string
+    }
     approvalEvent?: ApprovalTransitionPayload
     adminReplay?: {
       originalEventId?: string
@@ -157,6 +172,27 @@ export async function POST(req: Request) {
           action: publisherAction,
         })
         break
+      case 'record_royalty_mapping_decision': {
+        const decision = body.royaltyDecision
+        if (!decision?.packageId || !decision.decisionType) {
+          return NextResponse.json({ error: 'Royalty package id and decision type are required.' }, { status: 400 })
+        }
+        result = await recordRoyaltyMappingDecision({
+          packageId: decision.packageId,
+          decisionType: decision.decisionType,
+          operatorEmail: session.user.email,
+          evidenceVersion: decision.evidenceVersion,
+          canonicalWorkId: decision.canonicalWorkId,
+          formatAssetId: decision.formatAssetId,
+          rightsholderId: decision.rightsholderId,
+          royaltyProfileId: decision.royaltyProfileId,
+          outOfScopeReason: decision.outOfScopeReason,
+          deferReason: decision.deferReason,
+          evidenceNeeded: decision.evidenceNeeded,
+          supersedesDecisionId: decision.supersedesDecisionId,
+        })
+        break
+      }
       case 'notify_jackie_action_required': {
         if (!body.titleId) return NextResponse.json({ error: 'Title id is required.' }, { status: 400 })
         const snapshot = await buildPublisherOperatingCenterSnapshot()

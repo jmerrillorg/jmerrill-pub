@@ -73,6 +73,7 @@ export type PublisherActionId =
   | 'begin_interior_layout'
   | 'begin_cover_design'
   | 'review_royalty_statement'
+  | 'record_royalty_mapping_decision'
   | 'send_proofreading_notification'
   | 'process_proofreading_approval'
   | 'view_thread'
@@ -5275,6 +5276,8 @@ function publisherActionToEvent(action: PublisherActionId) {
       return 'COVER_CREATIVE_BRIEF_STARTED'
     case 'review_royalty_statement':
       return 'ROYALTY_DRAFT_STATEMENT_REVIEW_REQUESTED'
+    case 'record_royalty_mapping_decision':
+      return 'ROYALTY_MAPPING_DECISION_RECORDED'
     case 'view_thread':
       return 'AUTHOR_RESPONSE_THREAD_VIEWED'
     case 'confirm_classification':
