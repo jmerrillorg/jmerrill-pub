@@ -1,0 +1,16 @@
+{
+  "status": "PASS",
+  "solutionName": "JMP_PublishingV2_TransitionParity",
+  "version": "1.0.0.4",
+  "unmanaged": {
+    "name": "JMP_PublishingV2_TransitionParity_1_0_0_4_unmanaged.zip",
+    "bytes": 17271,
+    "sha256": "1b52f5f7d705e0e1276615e2e75c2264bc3d1953d99aeb00809345a2d8f122de"
+  },
+  "managed": {
+    "name": "JMP_PublishingV2_TransitionParity_1_0_0_4_managed.zip",
+    "bytes": 17269,
+    "sha256": "4a0decdab264f84dcaa433ef5f262796b5b9c593048648303d9f1c3fd89ecb1a"
+  },
+  "exportedAt": "2026-09-17T21:38:18.022Z"
+}

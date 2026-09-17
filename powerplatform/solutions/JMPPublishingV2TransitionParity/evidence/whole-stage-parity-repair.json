@@ -1,0 +1,31 @@
+{
+  "status": "PASS",
+  "target": "JM1-Test",
+  "authorityComponent": "jmpv2_RequestTransitionV2 / plugin.V2RequestTransitionPlugin",
+  "authorityAssemblyVersion": "1.0.0.3",
+  "authorityPatchVersion": "1.0.0.4",
+  "executionMode": "IDEMPOTENT_REPLAY_WITH_TRANSACTIONAL_ENGAGEMENT_PROJECTION",
+  "transitionExecutionId": "phase1b-transition-b999517e-90df-47c9-9497-0e02bcc0b85f",
+  "transitionExecutedAt": "2026-09-17T21:41:54.308Z",
+  "engagementId": "0038ee51-27a9-f111-aaab-70a8a59b112b",
+  "lifecycleId": "0238ee51-27a9-f111-aaab-70a8a59b112b",
+  "beforeEngagementStage": "05_AGREEMENT_PAYMENT",
+  "afterEngagementStage": "06_ONBOARDING",
+  "lifecycleStage": "06_ONBOARDING",
+  "workspaceStage": "06_ONBOARDING",
+  "workspacePath": "01_Pipeline_A-Z/06 - Onboarding/Fly, Jackuline - Whole",
+  "workspaceItemId": "01DF3SEQMAUJPNMVSYYNAJHWCYEFSEVLLO",
+  "activeEngagements": 1,
+  "transitionEvents": 1,
+  "stage06Instances": 1,
+  "activeWorkspaceFolders": 1,
+  "duplicateEngagementCreated": false,
+  "duplicateWorkspaceCreated": false,
+  "workspaceMoved": false,
+  "result": {
+    "accepted": true,
+    "replay": true,
+    "reasonCode": "ELIGIBLE",
+    "currentStage": "06_ONBOARDING"
+  }
+}

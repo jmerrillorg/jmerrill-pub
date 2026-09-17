@@ -1,0 +1,15 @@
+{
+  "status": "PASS",
+  "target": "JM1-Test",
+  "solutionName": "JMP_PublishingV2_TransitionParity",
+  "version": "1.0.0.4",
+  "managedArtifact": "JMP_PublishingV2_TransitionParity_1_0_0_4_managed.zip",
+  "managedArtifactSha256": "4a0decdab264f84dcaa433ef5f262796b5b9c593048648303d9f1c3fd89ecb1a",
+  "importOperationId": "814d973c-e0b2-f111-aaac-70a8a59b112b",
+  "solutionId": "d1340c1a-95dc-4c58-9414-d07ef3c60aa7",
+  "solutionComponentRows": 15,
+  "assemblyIdentity": "plugin, Version=1.0.0.3, PublicKeyToken=fffbe8b3d67a6cc0",
+  "assemblySha256": "cb3943db3b4706dfc943dfe00d9527a390833d5eddb6a2a9890b412f9f100ada",
+  "completedAt": "2026-09-17T21:40:47Z",
+  "productionDeployments": 0
+}

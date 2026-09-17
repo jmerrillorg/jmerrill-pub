@@ -22,10 +22,12 @@ async function request(route) {
 const who = await request("WhoAmI()");
 const userRoles = (await request(`systemusers(${who.UserId})/systemuserroles_association?$select=name`)).value;
 const existingEntities = (await request("EntityDefinitions?$select=LogicalName&$filter=LogicalName eq 'jmpv2_onboardingrecord' or LogicalName eq 'jmpv2_onboardingcompletionevent' or LogicalName eq 'jmpv2_authorprofile' or LogicalName eq 'jmpv2_onboardingitem' or LogicalName eq 'jmpv2_workspaceprovisioning' or LogicalName eq 'jmpv2_payoutreadiness' or LogicalName eq 'jmpv2_publishingengagement' or LogicalName eq 'jmpv2_lifecycleinstance' or LogicalName eq 'jmpv2_authoraccess'" )).value.map((row) => row.LogicalName);
+const onboardingAttributes = (await request("EntityDefinitions(LogicalName='jmpv2_onboardingrecord')/Attributes?$select=LogicalName")).value.map((row) => row.LogicalName);
 const packageEntries = execFileSync("unzip", ["-Z1", managed], { encoding: "utf8" }).trim().split("\n");
 const source = readFileSync(path.join(root, "plugin", "Phase6OnboardingAuthorityPlugin.cs"), "utf8");
 const packageBytes = readFileSync(managed);
 const requiredExisting = ["jmpv2_onboardingrecord", "jmpv2_onboardingcompletionevent", "jmpv2_authorprofile", "jmpv2_onboardingitem", "jmpv2_workspaceprovisioning", "jmpv2_payoutreadiness", "jmpv2_publishingengagement", "jmpv2_lifecycleinstance"];
+const requiredOnboardingAttributes = ["jmpv2_authorprofileid", "jmpv2_policyversion", "jmpv2_recordversion"];
 const checks = {
   targetEnvironment: String(who.OrganizationId).toLowerCase() === expectedOrganizationId.toLowerCase(),
   managedPackageReadable: packageEntries.includes("solution.xml") && packageEntries.includes("customizations.xml"),
@@ -34,6 +36,7 @@ const checks = {
   pluginIncluded: packageEntries.some((entry) => entry.endsWith("jmpv2phase6onboarding.dll")),
   authorAccessIncluded: packageEntries.includes("environmentvariabledefinitions/jmpv2_Phase6OnboardingCommandEnabled/environmentvariabledefinition.xml") && readFileSync(path.join(root, "src", "Other", "Solution.xml"), "utf8").includes("jmpv2_authoraccess"),
   baseDependenciesPresent: requiredExisting.every((name) => existingEntities.includes(name)),
+  onboardingRecordRuntimeSchema: requiredOnboardingAttributes.every((name) => onboardingAttributes.includes(name)),
   missingAuthorAccessCoveredByPackage: !existingEntities.includes("jmpv2_authoraccess"),
   environmentVariableResolvable: packageEntries.includes("environmentvariabledefinitions/jmpv2_Phase6OnboardingCommandEnabled/environmentvariablevalues.json"),
   securityRoleBinding: userRoles.some((role) => role.name === "System Administrator"),
