@@ -1,6 +1,6 @@
 "use strict";
 
-const CALLER_REGISTRY_VERSION = "JM1-RELAY-CALLERS-v1.0.0";
+const CALLER_REGISTRY_VERSION = "JM1-RELAY-CALLERS-v1.1.0";
 
 const BRAND_ALIASES = Object.freeze({
   PUBLISHING: "JMP",
@@ -19,6 +19,7 @@ const CALLERS = Object.freeze([
     application: "J Merrill Publishing production web runtime",
     canonicalRepo: "jmerrillorg/jmerrill-pub",
     authorizedBrands: ["JMP"],
+    authorizedTemplates: ["*"],
     status: "ACTIVE",
     lastProven: null
   }),
@@ -31,6 +32,7 @@ const CALLERS = Object.freeze([
     application: "J Merrill Publishing diagnostic and editorial runtime",
     canonicalRepo: "jmerrillorg/jmerrill-pub",
     authorizedBrands: ["JMP"],
+    authorizedTemplates: ["PUBLISHING.PAYMENT_ELECTION_REQUIRED"],
     status: "ACTIVE",
     lastProven: null
   }),
@@ -43,6 +45,7 @@ const CALLERS = Object.freeze([
     application: "Known Publishing relay consumers pending JM1-COMMS-002A adoption",
     canonicalRepo: "jmerrillorg/jmerrill-pub",
     authorizedBrands: ["JMP"],
+    authorizedTemplates: ["*"],
     status: "LEGACY_COMPATIBILITY",
     lastProven: null
   })
@@ -52,8 +55,13 @@ function caller(value) {
   return Object.freeze({
     registryVersion: CALLER_REGISTRY_VERSION,
     ...value,
-    authorizedBrands: Object.freeze(value.authorizedBrands.map(normalizeBrand))
+    authorizedBrands: Object.freeze(value.authorizedBrands.map(normalizeBrand)),
+    authorizedTemplates: Object.freeze((value.authorizedTemplates || []).map(normalizeTemplate))
   });
+}
+
+function normalizeTemplate(value) {
+  return String(value || "").trim().toUpperCase().replace(/[\s-]+/g, "_");
 }
 
 function normalizeBrand(value) {
@@ -84,6 +92,16 @@ function authorizeCallerForBrand(callerRecord, brand) {
   return { ok: true, caller: callerRecord, brand: normalizedBrand };
 }
 
+function authorizeCallerForTemplate(callerRecord, templateId) {
+  if (!callerRecord) return { ok: false, reason: "UNKNOWN_CALLER" };
+  const normalizedTemplate = normalizeTemplate(templateId);
+  if (!normalizedTemplate) return { ok: false, reason: "TEMPLATE_ID_REQUIRED" };
+  if (!callerRecord.authorizedTemplates.includes("*") && !callerRecord.authorizedTemplates.includes(normalizedTemplate)) {
+    return { ok: false, reason: "CALLER_TEMPLATE_NOT_AUTHORIZED", templateId: normalizedTemplate };
+  }
+  return { ok: true, caller: callerRecord, templateId: normalizedTemplate };
+}
+
 function listCallers() {
   return [...CALLERS];
 }
@@ -91,6 +109,7 @@ function listCallers() {
 module.exports = {
   CALLER_REGISTRY_VERSION,
   authorizeCallerForBrand,
+  authorizeCallerForTemplate,
   findCallerByObjectId,
   getLegacyCaller,
   listCallers,

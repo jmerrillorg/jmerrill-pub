@@ -96,6 +96,22 @@ function createLedger(tableClient) {
         conflict.safeCode = "IDEMPOTENCY_KEY_CONFLICT";
         throw conflict;
       }
+      if (existing.deliveryState === DELIVERY_STATE.FAILED) {
+        const retry = {
+          partitionKey,
+          rowKey,
+          deliveryState: DELIVERY_STATE.RESERVED,
+          failureClass: "",
+          updatedAt: now
+        };
+        try {
+          await tableClient.updateEntity(retry, "Merge", existing.etag ? { etag: existing.etag } : undefined);
+          return { kind: "RETRY_RESERVED", entity: { ...existing, ...retry } };
+        } catch (retryError) {
+          if (Number(retryError?.statusCode) !== 412) throw retryError;
+          return { kind: "REPLAY", entity: await tableClient.getEntity(partitionKey, rowKey) };
+        }
+      }
       return { kind: "REPLAY", entity: existing };
     }
   }

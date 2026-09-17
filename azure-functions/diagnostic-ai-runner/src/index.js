@@ -32,6 +32,7 @@ require("./functions/runOp000TrackAAdoption");
 require("./functions/runOp000TrackBAdoption");
 require("./functions/runPackageSelectionCommercialContinuation");
 require("./functions/runPaymentOptionCommercialContinuation");
+require("./functions/runPaymentElectionCommunicationConsumer");
 require("./functions/runPreContractEditorialReview");
 require("./functions/runPublisherRecommendationAction");
 require("./functions/runPublisherReviewDecision");
