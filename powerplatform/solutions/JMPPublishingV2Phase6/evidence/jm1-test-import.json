@@ -1,0 +1,17 @@
+{
+  "status": "PASS",
+  "target": "JM1-Test",
+  "solutionName": "JMP_PublishingV2_Phase6_Portable",
+  "version": "1.1.0.0",
+  "managedArtifact": "JMP_PublishingV2_Phase6_Portable_1_1_0_0_managed.zip",
+  "managedArtifactSha256": "24eab263b57044dc5a6f0926e11e6a7c51e2dcd4a8b7354c9e730a12b5b1de16",
+  "artifactChecksumParity": "PASS",
+  "importOperationId": "908eefac-e0b2-f111-aaac-70a8a59b112b",
+  "publishOperationId": "e515cb1c-e1b2-f111-aaac-70a8a59b112b",
+  "solutionId": "62349b86-3be4-4904-9275-4cb55226c51f",
+  "solutionComponentRows": 49,
+  "canonicalRegisteredComponentCount": 47,
+  "importResult": "PASS",
+  "installedOn": "2026-09-17T21:43:15Z",
+  "productionDeployments": 0
+}

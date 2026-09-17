@@ -1,0 +1,41 @@
+{
+  "status": "FAIL",
+  "target": "JM1-Test",
+  "certificationStartedAt": "2026-09-17T21:46:20Z",
+  "passedReadbacks": {
+    "customApiPresent": true,
+    "requestParameters": 26,
+    "responseProperties": 12,
+    "pluginAssemblyPresent": true,
+    "pluginTypePresent": true,
+    "guardStepsActive": 3,
+    "authorAccessTablePresent": true,
+    "environmentVariableResolvedTrueBeforeCertification": true,
+    "artifactChecksumParity": true
+  },
+  "failure": {
+    "phase": "SYNTHETIC_ACTIVATION",
+    "error": "jmpv2_OnboardingRecord entity does not contain attribute jmpv2_recordversion",
+    "classification": "INCOMPLETE_MANAGED_SCHEMA",
+    "requiredOnboardingRecordAttributesMissingInTest": [
+      "jmpv2_authorprofileid",
+      "jmpv2_policyversion",
+      "jmpv2_recordversion"
+    ]
+  },
+  "failSafeRollback": {
+    "environmentVariable": "jmpv2_Phase6OnboardingCommandEnabled",
+    "currentValue": "false",
+    "disabledAt": "2026-09-17T21:48:07.224Z"
+  },
+  "wholeReadback": {
+    "engagementStage": "06_ONBOARDING",
+    "onboardingRecords": 0,
+    "authorAccessRecords": 0,
+    "workspaceProvisioningRecords": 0,
+    "authorProfiles": 0,
+    "onboardingCommandExecuted": false,
+    "authorCommunicationsSent": 0
+  },
+  "nextGate": "Create and authorize a schema-complete Phase 6 managed patch containing the three missing onboarding-record attributes and author-profile relationship, re-enable Test, and rerun certification before Whole onboarding."
+}

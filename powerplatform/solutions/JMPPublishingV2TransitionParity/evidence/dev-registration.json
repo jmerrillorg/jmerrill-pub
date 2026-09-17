@@ -1,0 +1,18 @@
+{
+  "status": "PASS",
+  "environment": "JM1-Dev",
+  "organizationId": "579864ae-44cc-f011-95c7-000d3a37fe06",
+  "solutionName": "JMP_PublishingV2_TransitionParity",
+  "version": "1.0.0.4",
+  "assemblyIdentity": "plugin, Version=1.0.0.3, PublicKeyToken=fffbe8b3d67a6cc0",
+  "dllSha256": "cb3943db3b4706dfc943dfe00d9527a390833d5eddb6a2a9890b412f9f100ada",
+  "componentCount": 15,
+  "requestParameters": 8,
+  "responseProperties": 5,
+  "registeredStepsVerified": [
+    "CustomApi 'jmpv2_RequestTransition' implementation",
+    "CustomApi 'jmpv2_RequestTransitionV2' implementation",
+    "JMP V2 Deny Direct Lifecycle State Update"
+  ],
+  "completedAt": "2026-09-17T21:37:50.790Z"
+}

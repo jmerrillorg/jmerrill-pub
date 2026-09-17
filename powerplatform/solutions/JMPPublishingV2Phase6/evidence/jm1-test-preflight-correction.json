@@ -1,0 +1,15 @@
+{
+  "status": "CORRECTED_FAIL",
+  "supersedes": "jm1-test-preflight.json",
+  "reason": "The original preflight verified table presence but did not verify every onboarding-record column required by the plugin runtime.",
+  "target": "JM1-Test",
+  "missingRequiredOnboardingRecordAttributes": [
+    "jmpv2_authorprofileid",
+    "jmpv2_policyversion",
+    "jmpv2_recordversion"
+  ],
+  "correctiveAction": "Preflight now includes onboardingRecordRuntimeSchema and fails unless all three attributes are present.",
+  "commandCertification": "FAIL",
+  "wholeOnboardingExecuted": false,
+  "recordedAt": "2026-09-17T21:48:07.224Z"
+}

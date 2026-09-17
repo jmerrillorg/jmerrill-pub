@@ -35,4 +35,4 @@ There is no environment URL, organization ID, title identity, or Dev-only execut
 
 Run `node scripts/build-plugin.mjs` with the governed signing-key path configured, then register/export through the supplied scripts. The `src` directory is the unpacked canonical solution source. Generated Dev regression, export, Test preflight, and Whole stage-parity evidence is stored under `evidence`.
 
-JM1-Test deployment is intentionally held while Whole's lifecycle stage (`06_ONBOARDING`) and engagement projection (`05_AGREEMENT_PAYMENT`) disagree. The direct repair attempt was rejected by the existing transition-authority guard, so the managed package has not been imported to JM1-Test.
+JM1-Test imported version `1.1.0.0` after Whole's stage parity was repaired. Command certification then failed closed because the target onboarding-record schema lacked `jmpv2_authorprofileid`, `jmpv2_policyversion`, and `jmpv2_recordversion`. The Test environment switch was returned to `false`; Whole onboarding was not executed. A schema-complete successor patch is required before recertification.
