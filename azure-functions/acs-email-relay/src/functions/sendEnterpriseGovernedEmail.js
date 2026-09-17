@@ -2,7 +2,7 @@ const { app } = require("@azure/functions");
 const { EmailClient } = require("@azure/communication-email");
 const { DefaultAzureCredential } = require("@azure/identity");
 const { authenticateCaller } = require("../security/callerAuthentication");
-const { authorizeCallerForBrand, normalizeBrand } = require("../policy/callerRegistry");
+const { authorizeCallerForBrand, authorizeCallerForTemplate, normalizeBrand } = require("../policy/callerRegistry");
 const { DELIVERY_STATE, getMessageLedger } = require("../state/messageLedger");
 const { renderTemplate } = require("../templates/renderer");
 const { isGovernedNamespace } = require("../templates/templateRegistry");
@@ -316,6 +316,11 @@ app.http("send-enterprise-governed-email", {
       context.warn(`Enterprise ACS relay caller authorization denied: ${authorization.reason}; caller=${authentication.caller.callerId}; brand=${validation.value.brand}`);
       return unauthorized(body, authorization.reason, 403);
     }
+    const templateAuthorization = authorizeCallerForTemplate(authentication.caller, validation.value.templateId);
+    if (!templateAuthorization.ok) {
+      context.warn(`Enterprise ACS relay template authorization denied: ${templateAuthorization.reason}; caller=${authentication.caller.callerId}; template=${validation.value.templateId}`);
+      return unauthorized(body, templateAuthorization.reason, 403);
+    }
 
     let reservation;
     let providerAccepted = false;
@@ -389,7 +394,7 @@ app.http("send-enterprise-governed-email", {
       });
     } catch (error) {
       const code = safeErrorCode(error);
-      if (reservation?.kind === "RESERVED" && !providerAccepted) {
+      if (["RESERVED", "RETRY_RESERVED"].includes(reservation?.kind) && !providerAccepted) {
         try {
           await getMessageLedger().recordFailure(reservation.entity, code);
         } catch (ledgerError) {

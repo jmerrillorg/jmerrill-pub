@@ -92,11 +92,13 @@ test("same idempotency key cannot be reused for different rendered content", asy
   );
 });
 
-test("failed sends remain durable and fail closed", async () => {
+test("failed sends remain durable and can be atomically re-reserved with the same message identity", async () => {
   const ledger = createLedger(new MemoryTableClient());
   const first = await ledger.reserve(effect());
   await ledger.recordFailure(first.entity, "ACS_SEND_FAILED");
-  const replay = await ledger.reserve(effect());
-  assert.equal(replay.entity.deliveryState, DELIVERY_STATE.FAILED);
-  assert.equal(replay.entity.failureClass, "ACS_SEND_FAILED");
+  const retry = await ledger.reserve(effect());
+  assert.equal(retry.kind, "RETRY_RESERVED");
+  assert.equal(retry.entity.jm1MessageId, first.entity.jm1MessageId);
+  assert.equal(retry.entity.deliveryState, DELIVERY_STATE.RESERVED);
+  assert.equal(retry.entity.failureClass, "");
 });

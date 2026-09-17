@@ -194,6 +194,10 @@ jobs:
             --settings \
               JM1_RELEASE_SHA="$GITHUB_SHA" \
               JM1_PRODUCTION_RELEASE_SHA="$GITHUB_SHA" \
+              JM1_PAYMENT_ELECTION_COMMUNICATION_ENABLED="true" \
+              JM1_PAYMENT_ELECTION_COMMUNICATION_MAX_REQUESTS="10" \
+              JM1_ENTERPRISE_RELAY_URL="https://func-jm1-acs-email-relay.azurewebsites.net" \
+              JM1_ENTERPRISE_RELAY_AUDIENCE="api://84530e9b-2842-4ca6-8fe6-1a11eed051d1" \
             --output none
           az functionapp restart \
             --name "$FUNCTION_APP_NAME" \

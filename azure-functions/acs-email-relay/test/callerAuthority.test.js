@@ -5,6 +5,7 @@ const assert = require("node:assert/strict");
 const {
   CALLER_REGISTRY_VERSION,
   authorizeCallerForBrand,
+  authorizeCallerForTemplate,
   findCallerByObjectId,
   getLegacyCaller,
   listCallers
@@ -24,7 +25,7 @@ function principalHeader(objectId) {
 }
 
 test("caller registry is versioned and contains no implicit all-brand grant", () => {
-  assert.equal(CALLER_REGISTRY_VERSION, "JM1-RELAY-CALLERS-v1.0.0");
+  assert.equal(CALLER_REGISTRY_VERSION, "JM1-RELAY-CALLERS-v1.1.0");
   assert.ok(listCallers().length >= 3);
   assert.equal(listCallers().some((caller) => caller.authorizedBrands.includes("ALL_BRANDS")), false);
 });
@@ -73,4 +74,10 @@ test("legacy shared key remains an explicit Publishing-only compatibility caller
 test("registry lookup rejects missing and unknown object IDs", () => {
   assert.equal(findCallerByObjectId(""), null);
   assert.equal(findCallerByObjectId("00000000-0000-0000-0000-000000000002"), null);
+});
+
+test("diagnostic runner is limited to the payment-election template namespace", () => {
+  const runner = findCallerByObjectId("e8c51a80-bdb0-46fa-b398-9109719d6427");
+  assert.equal(authorizeCallerForTemplate(runner, "PUBLISHING.PAYMENT_ELECTION_REQUIRED").ok, true);
+  assert.equal(authorizeCallerForTemplate(runner, "PUBLISHING.UNRELATED_MESSAGE").reason, "CALLER_TEMPLATE_NOT_AUTHORIZED");
 });

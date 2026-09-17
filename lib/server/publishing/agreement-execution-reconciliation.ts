@@ -38,6 +38,9 @@ const AUTHOR_PORTAL_STATUS = {
   ACTIVE: 835512003,
 } as const
 
+const PAYMENT_ELECTION_ACTION_TYPE = 'PAYMENT_ELECTION_ACTION_REQUEST_OPEN'
+const PAYMENT_ELECTION_COMMUNICATION_AUTHORITY = 'JM1_COMMS_002A'
+
 type DataverseConfig = {
   apiBase: string
   resourceUrl: string
@@ -91,6 +94,13 @@ export async function processPublishingAgreementExecuted(input: PublishingAgreem
   await patchContactAuthorFlag(config, token, contactId)
 
   const agreementLog = await logAgreementExecutedOnce(config, token, normalized, contract.contractId)
+  const paymentElectionActionRequest = await ensurePaymentElectionActionRequest(
+    config,
+    token,
+    normalized,
+    opportunity,
+    contract.contractId,
+  )
   const joined = await reconcileJoinedFamily(config, token, normalized, opportunity, contract.contractId)
   const referral = await reconcileReferral(config, token, normalized, opportunity)
   const notification = await sendJoinedFamilyNotificationOnce(config, token, normalized, opportunity, joined)
@@ -105,6 +115,7 @@ export async function processPublishingAgreementExecuted(input: PublishingAgreem
     contractId: contract.contractId,
     contractCreated: contract.created,
     agreementLogId: agreementLog.jm1_executionlogid || null,
+    paymentElectionActionRequest,
     joinedTheFamily: joined.joinedTheFamily,
     joinedTheFamilyOn: joined.joinedTheFamilyOn,
     joinedFamilyLogId: joined.joinedFamilyLogId,
@@ -129,6 +140,70 @@ export async function processPublishingAgreementExecuted(input: PublishingAgreem
       clearsFinalDeliveryPaymentGate: false,
       postsBusinessCentral: false,
     },
+  }
+}
+
+async function ensurePaymentElectionActionRequest(
+  config: DataverseConfig,
+  token: string,
+  input: ReturnType<typeof normalizeAgreementInput> & { ok: true },
+  opportunity: DataverseRow,
+  agreementId: string,
+) {
+  const selectedOption = normalizeString(opportunity.jm1_m6selectedpaymentoption)
+  const selectedCount = Number(opportunity.jm1_m6selectedinstallmentcount || 0)
+  const selectionStatus = normalizeString(opportunity.jm1_m6paymentoptionselectionstatus).toUpperCase()
+  if (selectedOption || selectedCount > 0 || selectionStatus === 'PAYMENT_OPTION_SELECTED') {
+    return { required: false, created: false, reason: 'PAYMENT_OPTION_ALREADY_SELECTED' }
+  }
+
+  if (!Number.isFinite(input.packageFee) || Number(input.packageFee) <= 0) {
+    return { required: true, created: false, reason: 'CONTRACTED_TOTAL_INVALID' }
+  }
+
+  const idempotencyKey = `payment-election-required:${input.opportunityId}:${input.checksum}`
+  const existing = await findExecutionLogByIdempotency(config, token, PAYMENT_ELECTION_ACTION_TYPE, idempotencyKey)
+  if (existing) {
+    return {
+      required: true,
+      created: false,
+      actionRequestId: existing.jm1_executionlogid || null,
+      idempotencyKey,
+    }
+  }
+
+  const created = await postExecutionLog(config, token, {
+    name: `PAYMENT-ELECTION-REQUIRED-${input.opportunityId}-${input.checksum.slice(0, 12)}`,
+    actionType: PAYMENT_ELECTION_ACTION_TYPE,
+    description: [
+      'status=OPEN',
+      'currentRequirement=YES',
+      `communicationAuthority=${PAYMENT_ELECTION_COMMUNICATION_AUTHORITY}`,
+      'communicationState=COMMUNICATION_PENDING',
+      `title=${actionField(titleName(opportunity, input))}`,
+      `opportunityId=${input.opportunityId}`,
+      `agreementId=${agreementId}`,
+      `agreementVersion=${actionField(input.agreementType)}`,
+      `agreementChecksum=${input.checksum}`,
+      `contractedTotalUsd=${Number(input.packageFee).toFixed(2)}`,
+      `packageName=${actionField(input.packageCode || normalizeString(opportunity.jm1_m6authorselectedpackagecode) || 'Publishing Package')}`,
+      `paymentPolicyVersion=${actionField(input.paymentPolicy)}`,
+      'paymentOptionSelected=NO',
+      'paymentRequestCreated=NO',
+      'historicalReplayAllowed=NO',
+      `correlationId=${idempotencyKey}`,
+      `Idempotency: ${idempotencyKey}`,
+    ].join('; '),
+    sourceEntity: 'opportunity',
+    sourceRecordId: input.opportunityId,
+    completedAt: input.executedOn,
+  })
+
+  return {
+    required: true,
+    created: true,
+    actionRequestId: created.jm1_executionlogid || null,
+    idempotencyKey,
   }
 }
 
@@ -479,7 +554,7 @@ async function getOpportunity(config: DataverseConfig, token: string, opportunit
   return dataverseRequest(
     config,
     token,
-    `opportunities(${opportunityId})?$select=opportunityid,name,jm1pub_projecttitle,jm1pub_packagerecommended,jm1_m6authorselectedpackagecode,jm1_m6selectedpaymentamount,jm1_m6selectedpaymenttotal,jm1_m6selectedinstallmentcount,jm1_m6selectedpaymentoption,jm1pub_contractstatus,jm1_m6agreementpreparationstatus,jm1_m6authorportalstatus,jm1_m6onboardingstatus,jm1_m6firstpaymentstatus,jm1_m6firstpaymentconfirmedon,_parentcontactid_value,_customerid_value`,
+    `opportunities(${opportunityId})?$select=opportunityid,name,jm1pub_projecttitle,jm1pub_packagerecommended,jm1_m6authorselectedpackagecode,jm1_m6selectedpaymentamount,jm1_m6selectedpaymenttotal,jm1_m6selectedinstallmentcount,jm1_m6selectedpaymentoption,jm1_m6paymentoptionselectionstatus,jm1pub_contractstatus,jm1_m6agreementpreparationstatus,jm1_m6authorportalstatus,jm1_m6onboardingstatus,jm1_m6firstpaymentstatus,jm1_m6firstpaymentconfirmedon,_parentcontactid_value,_customerid_value`,
   )
 }
 
@@ -548,6 +623,16 @@ async function findExecutionLog(config: DataverseConfig, token: string, name: st
   return Array.isArray(result.value) && result.value.length > 0 ? result.value[0] : null
 }
 
+async function findExecutionLogByIdempotency(config: DataverseConfig, token: string, actionType: string, idempotencyKey: string) {
+  const filter = `jm1_actiontype eq '${encodeODataString(actionType)}' and contains(jm1_actiondescription,'${encodeODataString(idempotencyKey)}')`
+  const result = await dataverseRequest(
+    config,
+    token,
+    `jm1_executionlogs?$select=jm1_executionlogid,jm1_name,jm1_actiontype,createdon&$filter=${encodeURIComponent(filter)}&$orderby=createdon desc&$top=1`,
+  )
+  return Array.isArray(result.value) && result.value.length > 0 ? result.value[0] : null
+}
+
 async function logOnce(config: DataverseConfig, token: string, input: Parameters<typeof postExecutionLog>[2]) {
   const existing = await findExecutionLog(config, token, input.name, input.actionType)
   if (existing) return null
@@ -604,6 +689,10 @@ function onboardingRemainingItems() {
 
 function encodeODataString(value: string) {
   return normalizeString(value).replace(/'/g, "''")
+}
+
+function actionField(value: unknown) {
+  return normalizeString(value).replace(/[;=]/g, ' ').replace(/\s+/g, ' ').slice(0, 180)
 }
 
 function blocked(reason: string, extra: Record<string, unknown> = {}) {
