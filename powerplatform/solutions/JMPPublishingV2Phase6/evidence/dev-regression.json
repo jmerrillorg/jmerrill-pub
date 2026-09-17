@@ -1,0 +1,343 @@
+{
+  "status": "PASS",
+  "runId": "PHASE6-1789675151413-2913a378",
+  "environment": "JM1-Dev",
+  "organizationId": "579864ae-44cc-f011-95c7-000d3a37fe06",
+  "testsTotal": 38,
+  "testsPass": 38,
+  "testsFail": 0,
+  "results": [
+    {
+      "number": 1,
+      "name": "JM1-Dev environment guard",
+      "status": "PASS",
+      "detail": "579864ae-44cc-f011-95c7-000d3a37fe06"
+    },
+    {
+      "number": 2,
+      "name": "UNKNOWN_AUTHOR and UNKNOWN_ENGAGEMENT fail closed",
+      "status": "PASS",
+      "detail": {
+        "unknownAuthor": "UNKNOWN_AUTHOR",
+        "unknownEngagement": "UNKNOWN_ENGAGEMENT"
+      }
+    },
+    {
+      "number": 3,
+      "name": "AUTHOR_PROFILE_CREATE",
+      "status": "PASS",
+      "detail": {
+        "authorProfileKey": "profile-1f063b08-5892-4b8f-ac83-bce10aae2bb3"
+      }
+    },
+    {
+      "number": 4,
+      "name": "AUTHOR_PROFILE_REUSE across titles",
+      "status": "PASS",
+      "detail": {
+        "profile": "profile-1f063b08-5892-4b8f-ac83-bce10aae2bb3",
+        "titles": 2
+      }
+    },
+    {
+      "number": 5,
+      "name": "DUPLICATE_PROFILE_DENIAL",
+      "status": "PASS",
+      "detail": {
+        "profiles": 1
+      }
+    },
+    {
+      "number": 6,
+      "name": "TITLE_ENGAGEMENT_CORRELATION",
+      "status": "PASS",
+      "detail": {
+        "@odata.etag": "W/\"7280638\"",
+        "jmpv2_engagementid": "76691141-d2b2-f111-aaac-6045bd01d436",
+        "jmpv2_titleid": "fb9a3bf4-9d90-46a8-9765-b1f2903ffab4",
+        "jmpv2_onboardingrecordid": "92af654a-d2b2-f111-aaac-000d3a30bedf",
+        "_jmpv2_authorprofileid_value": "91af654a-d2b2-f111-aaac-000d3a30bedf"
+      }
+    },
+    {
+      "number": 7,
+      "name": "ONBOARDING_RECORD_CREATE",
+      "status": "PASS",
+      "detail": "onboarding-cbd7db76-fc92-41c0-b136-57a48c14b3a9"
+    },
+    {
+      "number": 8,
+      "name": "ONBOARDING_RECORD_IDEMPOTENCY",
+      "status": "PASS",
+      "detail": {
+        "reason": "ONBOARDING_REPLAY",
+        "records": 1
+      }
+    },
+    {
+      "number": 9,
+      "name": "REQUIRED_ITEM_PENDING",
+      "status": "PASS",
+      "detail": "ITEM_RECORDED"
+    },
+    {
+      "number": 10,
+      "name": "REQUIRED_ITEM_COMPLETE",
+      "status": "PASS",
+      "detail": "ITEM_RECORDED"
+    },
+    {
+      "number": 11,
+      "name": "OPTIONAL_ITEM_PENDING",
+      "status": "PASS",
+      "detail": "ITEM_RECORDED"
+    },
+    {
+      "number": 12,
+      "name": "OPTIONAL_ITEM_COMPLETE",
+      "status": "PASS",
+      "detail": "ITEM_RECORDED"
+    },
+    {
+      "number": 13,
+      "name": "ITEM_REOPEN",
+      "status": "PASS",
+      "detail": "ITEM_REOPENED"
+    },
+    {
+      "number": 14,
+      "name": "ITEM_DUPLICATE_DENIAL",
+      "status": "PASS",
+      "detail": "IDEMPOTENT_REPLAY"
+    },
+    {
+      "number": 15,
+      "name": "ITEM_EVIDENCE_BINDING",
+      "status": "PASS",
+      "detail": {
+        "@odata.etag": "W/\"7280666\"",
+        "jmpv2_evidenceengagementid": "76691141-d2b2-f111-aaac-6045bd01d436",
+        "jmpv2_evidencechecksum": "0532018263446433469480bac5ab768a7e036aee50f3ea63cd5f77b48ac19a87",
+        "_jmpv2_onboardingrecordid_value": "92af654a-d2b2-f111-aaac-000d3a30bedf",
+        "jmpv2_onboardingitemid": "4c1ffe48-d2b2-f111-aaac-6045bd01daa8",
+        "jmpv2_evidencereference": "PHASE6-1789675151413-2913a378:bio"
+      }
+    },
+    {
+      "number": 16,
+      "name": "MISSING_REQUIRED_ITEM blocks completeness",
+      "status": "PASS",
+      "detail": "ONBOARDING_INCOMPLETE"
+    },
+    {
+      "number": 17,
+      "name": "WORKSPACE_PROVISION_REQUIRED",
+      "status": "PASS",
+      "detail": "WORKSPACE_RECORDED"
+    },
+    {
+      "number": 18,
+      "name": "WORKSPACE_ALREADY_EXISTS",
+      "status": "PASS",
+      "detail": "WORKSPACE_RECORDED"
+    },
+    {
+      "number": 19,
+      "name": "WORKSPACE_PROVISIONED",
+      "status": "PASS",
+      "detail": "WORKSPACE_RECORDED"
+    },
+    {
+      "number": 20,
+      "name": "WORKSPACE_IDEMPOTENT_REPLAY",
+      "status": "PASS",
+      "detail": "WORKSPACE_REPLAY"
+    },
+    {
+      "number": 21,
+      "name": "WORKSPACE_AUTHORITY_BINDING",
+      "status": "PASS",
+      "detail": {
+        "@odata.etag": "W/\"7280680\"",
+        "jmpv2_workspacepath": "/01_Pipeline_A-Z/PHASE6-1789675151413-2913a378",
+        "_jmpv2_onboardingrecordid_value": "92af654a-d2b2-f111-aaac-000d3a30bedf",
+        "jmpv2_canonicalroot": "/01_Pipeline_A-Z",
+        "jmpv2_workspaceitemid": "PHASE6-1789675151413-2913a378-item",
+        "jmpv2_onboardingkey": "onboarding-cbd7db76-fc92-41c0-b136-57a48c14b3a9",
+        "jmpv2_workspaceprovisioningid": "eaebb74f-d2b2-f111-aaac-6045bd01daa8"
+      }
+    },
+    {
+      "number": 22,
+      "name": "DUPLICATE_WORKSPACE_DENIAL",
+      "status": "PASS",
+      "detail": "DUPLICATE_WORKSPACE"
+    },
+    {
+      "number": 23,
+      "name": "AUTHOR_ACCESS_NOT_READY",
+      "status": "PASS",
+      "detail": {
+        "record": "ACCESS_RECORDED",
+        "eligibilityBlocked": true
+      }
+    },
+    {
+      "number": 24,
+      "name": "AUTHOR_ACCESS_READY",
+      "status": "PASS",
+      "detail": "ACCESS_RECORDED"
+    },
+    {
+      "number": 25,
+      "name": "ACCESS_EVIDENCE_BOUND",
+      "status": "PASS",
+      "detail": {
+        "@odata.etag": "W/\"7280685\"",
+        "jmpv2_evidencechecksum": "a0561fd649cdb6baa784055f051bad796ea0afef17fca38219549deeba4e8c1a",
+        "_jmpv2_onboardingrecordid_value": "92af654a-d2b2-f111-aaac-000d3a30bedf",
+        "jmpv2_onboardingkey": "onboarding-cbd7db76-fc92-41c0-b136-57a48c14b3a9",
+        "jmpv2_authoraccessid": "5a013b4b-d2b2-f111-aaac-6045bd01d436",
+        "jmpv2_evidencereference": "PHASE6-1789675151413-2913a378:access"
+      }
+    },
+    {
+      "number": 26,
+      "name": "ACCESS_RETRY_IDEMPOTENT",
+      "status": "PASS",
+      "detail": "ACCESS_REPLAY"
+    },
+    {
+      "number": 27,
+      "name": "PAYOUT_REQUIRED_AND_NOT_READY",
+      "status": "PASS",
+      "detail": {
+        "record": "PAYOUT_RECORDED",
+        "eligibilityBlocked": true
+      }
+    },
+    {
+      "number": 28,
+      "name": "PAYOUT_REQUIRED_AND_READY",
+      "status": "PASS",
+      "detail": "PAYOUT_RECORDED"
+    },
+    {
+      "number": 29,
+      "name": "PAYOUT_NOT_REQUIRED",
+      "status": "PASS",
+      "detail": "PAYOUT_RECORDED"
+    },
+    {
+      "number": 30,
+      "name": "PAYOUT_EVIDENCE_BINDING",
+      "status": "PASS",
+      "detail": {
+        "@odata.etag": "W/\"7280690\"",
+        "jmpv2_requirement": "REQUIRED",
+        "jmpv2_payoutreadinessid": "96782c51-d2b2-f111-aaac-000d3a30bedf",
+        "_jmpv2_onboardingrecordid_value": "92af654a-d2b2-f111-aaac-000d3a30bedf",
+        "jmpv2_relationshipstatus": "READY",
+        "jmpv2_onboardingkey": "onboarding-cbd7db76-fc92-41c0-b136-57a48c14b3a9",
+        "jmpv2_evidencereference": "PHASE6-1789675151413-2913a378:payout"
+      }
+    },
+    {
+      "number": 31,
+      "name": "DIRECT_COMPLETION_WRITE denied",
+      "status": "PASS",
+      "detail": "DENIED"
+    },
+    {
+      "number": 32,
+      "name": "CROSS_ENGAGEMENT_EVIDENCE fails atomically",
+      "status": "PASS",
+      "detail": "CROSS_ENGAGEMENT_EVIDENCE"
+    },
+    {
+      "number": 33,
+      "name": "STALE_VERSION concurrency denial",
+      "status": "PASS",
+      "detail": "STALE_VERSION"
+    },
+    {
+      "number": 34,
+      "name": "NEGATIVE_EXECUTIONS leave no partial authority",
+      "status": "PASS",
+      "detail": "ATOMIC"
+    },
+    {
+      "number": 35,
+      "name": "ONBOARDING_COMPLETE is server-derived",
+      "status": "PASS",
+      "detail": {
+        "@odata.context": "https://org52409ff2.crm.dynamics.com/api/data/v9.2/$metadata#Microsoft.Dynamics.CRM.jmpv2_ExecuteOnboardingCommandResponse",
+        "Accepted": true,
+        "Replay": false,
+        "OnboardingKey": null,
+        "RequiredItemsSatisfied": true,
+        "AuthorAccessReady": true,
+        "AuthorProfileKey": null,
+        "WorkspaceReady": true,
+        "OnboardingComplete": true,
+        "Eligible06To07": true,
+        "ReasonCode": "ONBOARDING_COMPLETE",
+        "RecordVersion": null,
+        "PayoutSatisfied": true,
+        "completionEvidence": {
+          "@odata.etag": "W/\"7280696\"",
+          "jmpv2_completionstatus": "DERIVED_COMPLETE",
+          "jmpv2_evidencechecksum": "ec98b53a9e2a08d5ca7d5f9b6a726179375158bc4f8a520c06e067a381bee082",
+          "_jmpv2_onboardingrecordid_value": "92af654a-d2b2-f111-aaac-000d3a30bedf",
+          "jmpv2_onboardingcompletioneventid": "99782c51-d2b2-f111-aaac-000d3a30bedf"
+        }
+      }
+    },
+    {
+      "number": 36,
+      "name": "06_TO_07_ELIGIBILITY is YES without transition",
+      "status": "PASS",
+      "detail": {
+        "eligible": true
+      }
+    },
+    {
+      "number": 37,
+      "name": "DIRECT_06_TO_07_WRITE denied",
+      "status": "PASS",
+      "detail": "DENIED"
+    },
+    {
+      "number": 38,
+      "name": "NO downstream, real-title, royalty, or communication side effects",
+      "status": "PASS",
+      "detail": {
+        "transitions06To07": 0,
+        "stage07Records": 0,
+        "developmentalArtifacts": 0,
+        "royaltyLedgers": 0,
+        "royaltyStatements": 0,
+        "royaltyPayments": 0,
+        "realTitleMutations": 0,
+        "authorCommunications": 0
+      }
+    }
+  ],
+  "authorityReadback": {
+    "authorProfileRuntime": true,
+    "onboardingRuntime": true,
+    "onboardingItemRuntime": true,
+    "workspaceProvisioning": true,
+    "authorAccess": true,
+    "payoutReadiness": true,
+    "onboardingCompletenessDerivation": true,
+    "directCompletionWriteDenial": true,
+    "eligible06To07": true,
+    "transitions06To07Executed": 0,
+    "stage07RecordsCreated": 0,
+    "developmentalEditingExecutions": 0,
+    "realTitleMutations": 0,
+    "authorCommunicationsSent": 0
+  },
+  "completedAt": "2026-09-17T19:59:46.254Z"
+}

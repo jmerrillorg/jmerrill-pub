@@ -1,0 +1,11 @@
+<customapiresponseproperty uniquename="AuthorAccessReady">
+  <description default="AuthorAccessReady">
+    <label description="AuthorAccessReady" languagecode="1033" />
+  </description>
+  <displayname default="AuthorAccessReady">
+    <label description="AuthorAccessReady" languagecode="1033" />
+  </displayname>
+  <iscustomizable>1</iscustomizable>
+  <name>AuthorAccessReady</name>
+  <type>0</type>
+</customapiresponseproperty>

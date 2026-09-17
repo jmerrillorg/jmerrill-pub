@@ -1,0 +1,62 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Entity xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <Name LocalizedName="V2 Onboarding Record" OriginalName="V2 Onboarding Record">jmpv2_OnboardingRecord</Name>
+  <EntityInfo>
+    <entity Name="jmpv2_OnboardingRecord">
+      <attributes>
+        <attribute PhysicalName="jmpv2_OnboardingKey">
+          <Type>nvarchar</Type>
+          <Name>jmpv2_onboardingkey</Name>
+          <LogicalName>jmpv2_onboardingkey</LogicalName>
+          <RequiredLevel>required</RequiredLevel>
+          <DisplayMask>PrimaryName|ValidForAdvancedFind|ValidForForm|ValidForGrid|RequiredForForm</DisplayMask>
+          <ImeMode>auto</ImeMode>
+          <ValidForUpdateApi>1</ValidForUpdateApi>
+          <ValidForReadApi>1</ValidForReadApi>
+          <ValidForCreateApi>1</ValidForCreateApi>
+          <IsCustomField>1</IsCustomField>
+          <IsAuditEnabled>1</IsAuditEnabled>
+          <IsSecured>0</IsSecured>
+          <IntroducedVersion>1.0.0.0</IntroducedVersion>
+          <IsCustomizable>1</IsCustomizable>
+          <IsRenameable>1</IsRenameable>
+          <CanModifySearchSettings>1</CanModifySearchSettings>
+          <CanModifyRequirementLevelSettings>1</CanModifyRequirementLevelSettings>
+          <CanModifyAdditionalSettings>1</CanModifyAdditionalSettings>
+          <SourceType>0</SourceType>
+          <IsGlobalFilterEnabled>0</IsGlobalFilterEnabled>
+          <IsSortableEnabled>0</IsSortableEnabled>
+          <CanModifyGlobalFilterSettings>1</CanModifyGlobalFilterSettings>
+          <CanModifyIsSortableSettings>1</CanModifyIsSortableSettings>
+          <IsDataSourceSecret>0</IsDataSourceSecret>
+          <AutoNumberFormat></AutoNumberFormat>
+          <IsSearchable>1</IsSearchable>
+          <IsFilterable>0</IsFilterable>
+          <IsRetrievable>1</IsRetrievable>
+          <IsLocalizable>0</IsLocalizable>
+          <Format>text</Format>
+          <MaxLength>160</MaxLength>
+          <Length>320</Length>
+          <displaynames>
+            <displayname description="Onboarding Key" languagecode="1033" />
+          </displaynames>
+        </attribute>
+      </attributes>
+      <EntityKeys>
+        <EntityKey>
+          <Name>jmpv2_onboardingrecord_authoritykey</Name>
+          <LogicalName>jmpv2_onboardingrecord_authoritykey</LogicalName>
+          <IntroducedVersion>1.0.4.0</IntroducedVersion>
+          <IsCustomizable>0</IsCustomizable>
+          <EntityKeyAttributes>
+            <AttributeName>jmpv2_onboardingkey</AttributeName>
+          </EntityKeyAttributes>
+          <displaynames>
+            <displayname description="jmpv2_onboardingrecord_authoritykey" languagecode="1033" />
+          </displaynames>
+        </EntityKey>
+      </EntityKeys>
+    </entity>
+  </EntityInfo>
+  <RibbonDiffXml />
+</Entity>

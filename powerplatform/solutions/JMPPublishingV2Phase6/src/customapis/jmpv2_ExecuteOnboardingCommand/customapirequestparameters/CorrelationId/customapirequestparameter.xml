@@ -1,0 +1,12 @@
+<customapirequestparameter uniquename="CorrelationId">
+  <description default="CorrelationId">
+    <label description="CorrelationId" languagecode="1033" />
+  </description>
+  <displayname default="CorrelationId">
+    <label description="CorrelationId" languagecode="1033" />
+  </displayname>
+  <iscustomizable>1</iscustomizable>
+  <isoptional>1</isoptional>
+  <name>CorrelationId</name>
+  <type>10</type>
+</customapirequestparameter>

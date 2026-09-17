@@ -1,0 +1,11 @@
+<customapiresponseproperty uniquename="RecordVersion">
+  <description default="RecordVersion">
+    <label description="RecordVersion" languagecode="1033" />
+  </description>
+  <displayname default="RecordVersion">
+    <label description="RecordVersion" languagecode="1033" />
+  </displayname>
+  <iscustomizable>1</iscustomizable>
+  <name>RecordVersion</name>
+  <type>7</type>
+</customapiresponseproperty>

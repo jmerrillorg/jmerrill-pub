@@ -1,0 +1,17 @@
+{
+  "status": "PASS",
+  "solutionName": "JMP_PublishingV2_Phase6_Portable",
+  "version": "1.1.0.0",
+  "sourceOrganizationId": "579864ae-44cc-f011-95c7-000d3a37fe06",
+  "unmanaged": {
+    "name": "JMP_PublishingV2_Phase6_Portable_1_1_0_0_unmanaged.zip",
+    "bytes": 40155,
+    "sha256": "daf9c8e65058fc05c9e50f3bba88f822482c336779ef92f6d6dfba3720425511"
+  },
+  "managed": {
+    "name": "JMP_PublishingV2_Phase6_Portable_1_1_0_0_managed.zip",
+    "bytes": 40134,
+    "sha256": "24eab263b57044dc5a6f0926e11e6a7c51e2dcd4a8b7354c9e730a12b5b1de16"
+  },
+  "exportedAt": "2026-09-17T20:03:41.687Z"
+}

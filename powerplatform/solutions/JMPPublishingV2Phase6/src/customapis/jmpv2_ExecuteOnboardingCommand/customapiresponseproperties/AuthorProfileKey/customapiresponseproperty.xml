@@ -1,0 +1,11 @@
+<customapiresponseproperty uniquename="AuthorProfileKey">
+  <description default="AuthorProfileKey">
+    <label description="AuthorProfileKey" languagecode="1033" />
+  </description>
+  <displayname default="AuthorProfileKey">
+    <label description="AuthorProfileKey" languagecode="1033" />
+  </displayname>
+  <iscustomizable>1</iscustomizable>
+  <name>AuthorProfileKey</name>
+  <type>10</type>
+</customapiresponseproperty>

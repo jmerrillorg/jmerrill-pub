@@ -1,0 +1,12 @@
+<customapirequestparameter uniquename="Actor">
+  <description default="Actor">
+    <label description="Actor" languagecode="1033" />
+  </description>
+  <displayname default="Actor">
+    <label description="Actor" languagecode="1033" />
+  </displayname>
+  <iscustomizable>1</iscustomizable>
+  <isoptional>1</isoptional>
+  <name>Actor</name>
+  <type>10</type>
+</customapirequestparameter>

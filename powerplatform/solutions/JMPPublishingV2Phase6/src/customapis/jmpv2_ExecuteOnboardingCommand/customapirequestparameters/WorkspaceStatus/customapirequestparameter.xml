@@ -1,0 +1,12 @@
+<customapirequestparameter uniquename="WorkspaceStatus">
+  <description default="WorkspaceStatus">
+    <label description="WorkspaceStatus" languagecode="1033" />
+  </description>
+  <displayname default="WorkspaceStatus">
+    <label description="WorkspaceStatus" languagecode="1033" />
+  </displayname>
+  <iscustomizable>1</iscustomizable>
+  <isoptional>1</isoptional>
+  <name>WorkspaceStatus</name>
+  <type>10</type>
+</customapirequestparameter>

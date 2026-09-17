@@ -1,0 +1,18 @@
+<customapi uniquename="jmpv2_ExecuteOnboardingCommand">
+  <allowedcustomprocessingsteptype>0</allowedcustomprocessingsteptype>
+  <bindingtype>0</bindingtype>
+  <description default="Server-authoritative Phase 6 onboarding command and 06-to-07 eligibility derivation.">
+    <label description="Server-authoritative Phase 6 onboarding command and 06-to-07 eligibility derivation." languagecode="1033" />
+  </description>
+  <displayname default="JMP V2 Execute Onboarding Command">
+    <label description="JMP V2 Execute Onboarding Command" languagecode="1033" />
+  </displayname>
+  <iscustomizable>1</iscustomizable>
+  <isfunction>0</isfunction>
+  <isprivate>0</isprivate>
+  <name>jmpv2_ExecuteOnboardingCommand</name>
+  <plugintypeid>
+    <plugintypeexportkey>f5f014cc-efab-f111-aaac-6045bd01db55</plugintypeexportkey>
+  </plugintypeid>
+  <workflowsdkstepenabled>0</workflowsdkstepenabled>
+</customapi>

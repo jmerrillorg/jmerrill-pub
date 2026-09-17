@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<SdkMessageProcessingStep Name="JMP V2 Phase6 Deny Direct Completion Update" SdkMessageProcessingStepId="{f397d0e4-efab-f111-aaab-000d3a30bedf}" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <SdkMessageId>20bebb1b-ea3e-db11-86a7-000a3a5473e8</SdkMessageId>
+  <PluginTypeName>Jmp.Publishing.V2.Phase6.Phase6CompletionWriteGuardPlugin, jmpv2phase6onboarding, Version=1.0.0.0, Culture=neutral, PublicKeyToken=fffbe8b3d67a6cc0</PluginTypeName>
+  <PluginTypeId>425653d2-efab-f111-aaac-6045bd01db55</PluginTypeId>
+  <PrimaryEntity>jmpv2_onboardingcompletionevent</PrimaryEntity>
+  <AsyncAutoDelete>0</AsyncAutoDelete>
+  <Description>Deny direct Phase 6 completion authority writes.</Description>
+  <FilteringAttributes></FilteringAttributes>
+  <InvocationSource>1</InvocationSource>
+  <Mode>0</Mode>
+  <Rank>1</Rank>
+  <EventHandlerTypeCode>4602</EventHandlerTypeCode>
+  <Stage>20</Stage>
+  <IsCustomizable>1</IsCustomizable>
+  <IsHidden>0</IsHidden>
+  <SupportedDeployment>0</SupportedDeployment>
+  <IntroducedVersion>1.0.4.0</IntroducedVersion>
+  <SdkMessageProcessingStepImages />
+</SdkMessageProcessingStep>

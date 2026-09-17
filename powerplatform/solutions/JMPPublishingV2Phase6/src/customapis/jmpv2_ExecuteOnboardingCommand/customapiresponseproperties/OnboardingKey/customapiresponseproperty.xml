@@ -1,0 +1,11 @@
+<customapiresponseproperty uniquename="OnboardingKey">
+  <description default="OnboardingKey">
+    <label description="OnboardingKey" languagecode="1033" />
+  </description>
+  <displayname default="OnboardingKey">
+    <label description="OnboardingKey" languagecode="1033" />
+  </displayname>
+  <iscustomizable>1</iscustomizable>
+  <name>OnboardingKey</name>
+  <type>10</type>
+</customapiresponseproperty>

@@ -1,0 +1,11 @@
+<customapiresponseproperty uniquename="RequiredItemsSatisfied">
+  <description default="RequiredItemsSatisfied">
+    <label description="RequiredItemsSatisfied" languagecode="1033" />
+  </description>
+  <displayname default="RequiredItemsSatisfied">
+    <label description="RequiredItemsSatisfied" languagecode="1033" />
+  </displayname>
+  <iscustomizable>1</iscustomizable>
+  <name>RequiredItemsSatisfied</name>
+  <type>0</type>
+</customapiresponseproperty>

@@ -1,0 +1,12 @@
+<customapirequestparameter uniquename="PayoutRequired">
+  <description default="PayoutRequired">
+    <label description="PayoutRequired" languagecode="1033" />
+  </description>
+  <displayname default="PayoutRequired">
+    <label description="PayoutRequired" languagecode="1033" />
+  </displayname>
+  <iscustomizable>1</iscustomizable>
+  <isoptional>1</isoptional>
+  <name>PayoutRequired</name>
+  <type>10</type>
+</customapirequestparameter>
