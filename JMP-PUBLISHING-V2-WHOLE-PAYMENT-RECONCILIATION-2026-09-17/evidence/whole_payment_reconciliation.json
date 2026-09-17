@@ -1,0 +1,82 @@
+{
+  "status": "PASS_PAYMENT_RECONCILED_STAGE_HELD_BY_EXECUTED_AGREEMENT_GATE",
+  "startedAt": "2026-09-17T02:08:31.766Z",
+  "completedAt": "2026-09-17T02:08:33.380Z",
+  "authority": {
+    "author": "Jackuline Fly",
+    "title": "Whole",
+    "package": "Starter",
+    "engagementId": "0038ee51-27a9-f111-aaab-70a8a59b112b",
+    "stripeInvoiceId": "in_1UGHtWJCiOVFpgYurkA4KOl6",
+    "stripeInvoiceNumber": "AF63A5E8-0001",
+    "stripePaymentIntentId": "pi_3UGHtfJCiOVFpgYu1zhhFjhM",
+    "amountReceivedUsd": "1999.00",
+    "balanceDueUsd": "0.00",
+    "paidAt": "2026-09-16T19:22:18Z"
+  },
+  "preChecks": {
+    "uatAuthority": true,
+    "authorIdentity": true,
+    "titleIdentity": true,
+    "engagementIdentity": true,
+    "starterPackage": true,
+    "currentStage": true,
+    "onePaymentRequirement": true,
+    "stripeInvoiceBinding": true,
+    "stripeMetadataBinding": true,
+    "stripePaymentParity": true,
+    "noDuplicatePaymentBinding": true,
+    "canonicalWorkspaceBinding": true
+  },
+  "payment": {
+    "status": "PAID",
+    "gate": "SATISFIED",
+    "evidenceId": "21fac5a6-3cb2-f111-aaac-70a8a5b27793",
+    "evidenceCreatedByThisRun": false,
+    "evidenceCountForBinding": 1,
+    "duplicatePaymentBinding": "NO",
+    "followUpRequired": "NO"
+  },
+  "contract": {
+    "finalAgreementStatus": "SENT",
+    "agreementExecutionCount": 0,
+    "status": "SENT_NOT_EXECUTED"
+  },
+  "pipeline": {
+    "currentStage": "05_AGREEMENT_PAYMENT",
+    "nextStage": "06_ONBOARDING",
+    "advancementExecuted": "NO",
+    "blocker": "EXECUTED_AGREEMENT_EVIDENCE_REQUIRED",
+    "joinedFamilyRecordsCreated": 0,
+    "onboardingRecordsCreated": 0,
+    "transitionsCreated": 0
+  },
+  "workspace": {
+    "canonicalPath": "01_Pipeline_A-Z/05 - Agreement & Payment/Fly, Jackuline - Whole",
+    "canonicalItemId": "01DF3SEQMAUJPNMVSYYNAJHWCYEFSEVLLO",
+    "moved": "NO",
+    "duplicateWorkspaceCreatedByThisRun": "NO",
+    "preExistingLegacyDuplicateDetected": "YES / 01 - Inquiry/Fly, Jackuline - Whole"
+  },
+  "automation": {
+    "paymentEventDetectedAutomatically": "NO",
+    "paymentTitleCorrelationAutomatic": "NO",
+    "paymentGateClearedAutomatically": "NO",
+    "pipelineAdvancementTriggeredAutomatically": "NO",
+    "systemDefectRecorded": "YES",
+    "defect": "Stripe invoice.paid was not ingested/correlated into Dataverse; no payment evidence, gate update, or transition existed before founder-directed reconciliation.",
+    "reconciliationEventId": "5b7a1e85-beaf-4884-8c81-a8746b57671e",
+    "defectEventId": "8e3bc9f7-17d3-44ae-847c-108736047a7c"
+  },
+  "negativeProof": {
+    "paymentRemindersSent": 0,
+    "failedPaymentNoticesSent": 0,
+    "invoicesCreated": 0,
+    "paymentRequestsCreated": 0,
+    "authorCommunicationsSent": 0,
+    "workspaceMoves": 0,
+    "duplicateWorkspacesCreated": 0,
+    "unauthorizedStageTransitions": 0
+  },
+  "nextTitleAction": "Obtain and bind completed Adobe agreement evidence for Jackuline Fly; then run Stage 05 to Stage 06 eligibility and reconcile the pre-existing Stage 01 duplicate workspace before any physical move."
+}
