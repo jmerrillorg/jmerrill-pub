@@ -1,0 +1,62 @@
+{
+  "capturedAt": "2026-09-17",
+  "scope": "JM1-Test pre-deployment readback only",
+  "dev": {
+    "environmentUrl": "https://org52409ff2.crm.dynamics.com",
+    "organizationId": "579864ae-44cc-f011-95c7-000d3a37fe06",
+    "commandPresent": true,
+    "command": "jmpv2_ExecuteOnboardingCommand",
+    "customApiId": "2cdca2d2-efab-f111-aaac-6045bd01daa8",
+    "assembly": "jmpv2phase6onboarding",
+    "assemblyVersion": "1.0.0.0",
+    "assemblySha256": "e444757d0cf074fc47eb0d9d397fe194cdf57e26de43dc56c630e001adb7354b",
+    "sourceSha256": "06c3a4501028d4999c29d223fb4d049460bc178a073b3bc0ff92f0109d567f52",
+    "owner": "JM1 Admin",
+    "ownerAccount": "jm1-admin@jmerrill.one",
+    "inputs": 26,
+    "outputs": 12,
+    "guardSteps": 3,
+    "environmentGuard": "JM1_DEV_REQUIRED"
+  },
+  "jm1Test": {
+    "environmentUrl": "https://jm1test.crm.dynamics.com",
+    "organizationId": "bb7a9d9e-8e73-f111-b27b-000d3a31ff17",
+    "solution": "JMP_PublishingV2",
+    "solutionVersion": "1.0.4.0",
+    "solutionManaged": true,
+    "commandPresent": false,
+    "phase6AssemblyPresent": false,
+    "phase6PluginTypePresent": false,
+    "phase6GuardStepsPresent": false,
+    "authorAccessTablePresent": false,
+    "otherPhase6AuthorityTablesPresent": 6,
+    "dependenciesReady": false,
+    "securityBindingReady": false
+  },
+  "whole": {
+    "author": "Jackuline Fly",
+    "title": "Whole",
+    "package": "Starter Publishing Package",
+    "packagePrice": "1999",
+    "engagementId": "0038ee51-27a9-f111-aaab-70a8a59b112b",
+    "lifecycleId": "0238ee51-27a9-f111-aaab-70a8a59b112b",
+    "engagementStage": "05_AGREEMENT_PAYMENT",
+    "lifecycleStage": "06_ONBOARDING",
+    "lifecycleVersion": 2,
+    "onboardingRecords": 0,
+    "workspaceProvisioningRecords": 0,
+    "completionEvents": 0
+  },
+  "result": {
+    "preDeploymentGate": "FAIL",
+    "commissioned": false,
+    "deploymentId": null,
+    "commandValidation": "NOT_RUN",
+    "wholeOnboardingExecuted": false,
+    "wholeWorkspaceBinding": "NOT_EVALUATED",
+    "duplicateWorkspaceCreated": false,
+    "authorCommunicationRequired": false,
+    "productionDeployments": 0,
+    "phase7SystemCommissioning": "HELD"
+  }
+}
