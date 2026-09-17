@@ -1,6 +1,9 @@
 const { app } = require("@azure/functions");
 const { EmailClient } = require("@azure/communication-email");
 const { DefaultAzureCredential } = require("@azure/identity");
+const { authenticateCaller } = require("../security/callerAuthentication");
+const { authorizeCallerForBrand, normalizeBrand } = require("../policy/callerRegistry");
+const { DELIVERY_STATE, getMessageLedger } = require("../state/messageLedger");
 const {
   getSenderProfile,
   validateMessageIdentity,
@@ -103,11 +106,11 @@ function humanReview(reason, payload = {}) {
   });
 }
 
-function unauthorized(payload = {}) {
-  return response(401, {
+function unauthorized(payload = {}, reason = "UNAUTHORIZED", status = 401) {
+  return response(status, {
     accepted: false,
     code: "UNAUTHORIZED",
-    reason: "UNAUTHORIZED",
+    reason,
     sourceRecord: normalizeText(payload.sourceRecord || payload.correlationId)
   });
 }
@@ -122,30 +125,47 @@ function serverError(code, payload = {}) {
   });
 }
 
-function verifyRelayKey(request) {
-  const expected = process.env.JM1_RELAY_API_KEY;
-  const actual = request.headers.get("x-jm1-relay-key") || request.headers.get("X-JM1-Relay-Key");
-  return Boolean(expected && actual && actual === expected);
-}
-
 function validateEnterprisePayload(payload = {}) {
-  const brand = normalizeEnum(payload.brand);
+  const brand = normalizeBrand(payload.brand);
   const profileResult = getSenderProfile(brand);
   if (!profileResult.ok) return { ok: false, reason: profileResult.reason };
   const profile = profileResult.profile;
 
-  const senderAddress = normalizeEmail(payload.senderAddress || payload.from || profile.acsFrom);
-  const replyTo = normalizeEmail(payload.replyTo || profile.replyTo);
-  const cc = normalizeRecipients(payload.cc);
-  const to = normalizeRecipients(payload.to || payload.recipients?.to);
+  const suppliedSender = normalizeEmail(payload.senderAddress || payload.from);
+  const suppliedReplyTo = normalizeEmail(payload.replyTo);
+  const suppliedCc = normalizeRecipients(payload.cc);
+  if (suppliedSender && suppliedSender !== profile.acsFrom) return { ok: false, reason: "CALLER_FROM_OVERRIDE_DENIED" };
+  if (suppliedReplyTo && suppliedReplyTo !== profile.replyTo) return { ok: false, reason: "CALLER_REPLY_TO_OVERRIDE_DENIED" };
+  if (suppliedCc.some((recipient) => recipient.address !== profile.ccAddress)) {
+    return { ok: false, reason: "CALLER_CC_OVERRIDE_DENIED" };
+  }
+
+  const senderAddress = profile.acsFrom;
+  const replyTo = profile.replyTo;
+  const cc = profile.ccRequired && profile.ccAddress
+    ? [{ address: profile.ccAddress, displayName: profile.organizationDisplayName }]
+    : [];
+  const to = normalizeRecipients(payload.recipient || payload.to || payload.recipients?.to);
   const subject = normalizeText(payload.subject);
   const plainText = normalizeBody(payload.plainText || payload.text || payload.bodyText);
   const html = normalizeHtml(payload.html || payload.htmlBody);
   const messageType = normalizeEnum(payload.messageType || payload.communicationType || "ROUTINE");
   const riskClassification = normalizeEnum(payload.riskClassification || payload.risk || "ROUTINE");
   const sourceRecord = normalizeText(payload.sourceRecord || payload.correlationId || payload.eventId);
+  const businessObjectType = normalizeEnum(payload.businessObjectType);
+  const businessObjectId = normalizeText(payload.businessObjectId);
+  const correlationId = normalizeText(payload.correlationId);
+  const templateId = normalizeEnum(payload.templateId || payload.templateName);
+  const templateVersion = normalizeText(payload.templateVersion);
+  const idempotencyKey = normalizeText(payload.idempotencyKey);
 
   if (to.length === 0 || to.some((recipient) => !isValidEmail(recipient.address))) return { ok: false, reason: "ACS_RECIPIENT_INVALID" };
+  if (!businessObjectType) return { ok: false, reason: "BUSINESS_OBJECT_TYPE_REQUIRED" };
+  if (!businessObjectId) return { ok: false, reason: "BUSINESS_OBJECT_ID_REQUIRED" };
+  if (!correlationId) return { ok: false, reason: "CORRELATION_ID_REQUIRED" };
+  if (!templateId) return { ok: false, reason: "TEMPLATE_ID_REQUIRED" };
+  if (!templateVersion) return { ok: false, reason: "TEMPLATE_VERSION_REQUIRED" };
+  if (!idempotencyKey) return { ok: false, reason: "IDEMPOTENCY_KEY_REQUIRED" };
   if (!subject) return { ok: false, reason: "ACS_SUBJECT_REQUIRED" };
   if (!plainText) return { ok: false, reason: "ACS_PLAIN_TEXT_REQUIRED" };
   if (!html || !/^<!doctype html>/i.test(html)) return { ok: false, reason: "ACS_HTML_REQUIRED" };
@@ -202,7 +222,13 @@ function validateEnterprisePayload(payload = {}) {
       html,
       messageType,
       riskClassification,
-      sourceRecord
+      sourceRecord,
+      businessObjectType,
+      businessObjectId,
+      correlationId,
+      templateId,
+      templateVersion,
+      idempotencyKey
     }
   };
 }
@@ -251,7 +277,8 @@ app.http("send-enterprise-governed-email", {
   route: "send-enterprise-governed-email",
   handler: async (request, context) => {
     let body = {};
-    if (!verifyRelayKey(request)) return unauthorized(body);
+    const authentication = authenticateCaller(request);
+    if (!authentication.ok) return unauthorized(body, authentication.reason, authentication.reason === "UNKNOWN_CALLER" ? 403 : 401);
 
     try {
       body = await request.json();
@@ -266,26 +293,120 @@ app.http("send-enterprise-governed-email", {
       return validationError(validation.reason, body);
     }
 
+    const authorization = authorizeCallerForBrand(authentication.caller, validation.value.brand);
+    if (!authorization.ok) {
+      context.warn(`Enterprise ACS relay caller authorization denied: ${authorization.reason}; caller=${authentication.caller.callerId}; brand=${validation.value.brand}`);
+      return unauthorized(body, authorization.reason, 403);
+    }
+
+    let reservation;
+    let providerAccepted = false;
     try {
+      reservation = await getMessageLedger().reserve({
+        callerId: authentication.caller.callerId,
+        brand: validation.value.brand,
+        businessObjectType: validation.value.businessObjectType,
+        businessObjectId: validation.value.businessObjectId,
+        correlationId: validation.value.correlationId,
+        recipients: validation.value.to.map((recipient) => recipient.address),
+        communicationPurpose: validation.value.messageType,
+        templateId: validation.value.templateId,
+        templateVersion: validation.value.templateVersion,
+        idempotencyKey: validation.value.idempotencyKey,
+        systemSender: validation.value.senderAddress,
+        brandCc: validation.value.cc.map((recipient) => recipient.address),
+        replyTo: validation.value.replyTo
+      });
+
+      if (reservation.kind === "REPLAY") {
+        const prior = reservation.entity;
+        if (prior.deliveryState === DELIVERY_STATE.FAILED) {
+          return response(409, {
+            accepted: false,
+            replay: true,
+            code: "PRIOR_SEND_FAILED_CLOSED",
+            jm1MessageId: prior.jm1MessageId,
+            deliveryState: prior.deliveryState,
+            failureClass: prior.failureClass
+          });
+        }
+        return response(prior.deliveryState === DELIVERY_STATE.ACCEPTED ? 200 : 202, {
+          accepted: prior.deliveryState === DELIVERY_STATE.ACCEPTED,
+          replay: true,
+          inProgress: prior.deliveryState === DELIVERY_STATE.RESERVED,
+          jm1MessageId: prior.jm1MessageId,
+          providerMessageId: prior.providerMessageId || undefined,
+          deliveryState: prior.deliveryState,
+          acceptedAt: prior.acceptedAt || undefined
+        });
+      }
+
       const email = buildEnterpriseEmail(validation.value);
       const providerMessageId = await sendAcsMessage(email);
-      context.info(`Enterprise ACS relay accepted send; brand=${validation.value.brand}; source=${validation.value.sourceRecord}`);
+      providerAccepted = true;
+      const trace = await getMessageLedger().recordAccepted(reservation.entity, providerMessageId);
+      context.info(`Enterprise ACS relay accepted send; caller=${authentication.caller.callerId}; brand=${validation.value.brand}; jm1MessageId=${trace.jm1MessageId}`);
       return response(202, {
         accepted: true,
+        replay: false,
+        jm1MessageId: trace.jm1MessageId,
         messageType: validation.value.messageType,
         brand: validation.value.brand,
         senderAddress: validation.value.senderAddress,
+        brandCc: validation.value.cc.map((recipient) => recipient.address),
         replyTo: validation.value.replyTo,
         replyMailboxAuthority: validation.value.profile.replyMailboxAuthority,
+        callerId: authentication.caller.callerId,
+        callerAuthModel: authentication.authModel,
         provider: ACS_PROVIDER_NAME,
         providerMessageId,
+        deliveryState: DELIVERY_STATE.ACCEPTED,
+        acceptedAt: trace.acceptedAt,
         sourceRecord: validation.value.sourceRecord
       });
     } catch (error) {
       const code = safeErrorCode(error);
-      context.error(`Enterprise ACS relay send failed: ${code}; brand=${validation.value.brand}; source=${validation.value.sourceRecord}`);
+      if (reservation?.kind === "RESERVED" && !providerAccepted) {
+        try {
+          await getMessageLedger().recordFailure(reservation.entity, code);
+        } catch (ledgerError) {
+          context.error(`Enterprise ACS relay trace failure: ${safeErrorCode(ledgerError)}; jm1MessageId=${reservation.entity.jm1MessageId}`);
+        }
+      }
+      context.error(`Enterprise ACS relay send failed: ${code}; caller=${authentication.caller.callerId}; brand=${validation.value.brand}`);
       return serverError(code, body);
     }
+  }
+});
+
+app.http("relay-authority-probe", {
+  methods: ["POST"],
+  authLevel: "anonymous",
+  route: "relay-authority-probe",
+  handler: async (request) => {
+    const authentication = authenticateCaller(request);
+    if (!authentication.ok) return unauthorized({}, authentication.reason, authentication.reason === "UNKNOWN_CALLER" ? 403 : 401);
+    let body = {};
+    try {
+      body = await request.json();
+    } catch (_error) {
+      return validationError("INVALID_JSON", body);
+    }
+    const brand = normalizeBrand(body.brand);
+    const profile = getSenderProfile(brand);
+    if (!profile.ok) return validationError(profile.reason, body);
+    const authorization = authorizeCallerForBrand(authentication.caller, brand);
+    if (!authorization.ok) return unauthorized(body, authorization.reason, 403);
+    return response(200, {
+      authorized: true,
+      noSend: true,
+      callerId: authentication.caller.callerId,
+      callerAuthModel: authentication.authModel,
+      brand,
+      senderAddress: profile.profile.acsFrom,
+      brandCc: profile.profile.ccAddress,
+      replyTo: profile.profile.replyTo
+    });
   }
 });
 

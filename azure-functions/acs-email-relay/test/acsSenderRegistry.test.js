@@ -92,6 +92,20 @@ test("Publishing message identity requires archive copy", () => {
   );
 });
 
+test("all resolved brand mailboxes are mandatory visibility copies", () => {
+  for (const [brand, from, replyTo, cc] of [
+    ["JM1", "one@email.jmerrill.one", "one@jmerrill.one", "info@jmerrill.one"],
+    ["JMF", "financial@email.jmerrill.one", "financial@jmerrill.one", "financial@jmerrill.one"],
+    ["JMFN", "foundation@email.jmerrill.one", "foundation@jmerrill.one", "foundation@jmerrill.one"],
+    ["JMPRODUCTIONS", "productions@email.jmerrill.one", "productions@jmerrill.one", "productions@jmerrill.one"],
+    ["AIC", "aic@email.agapeic.org", "aic@agapeic.org", "aic@agapeic.org"],
+    ["JSJ", "jackie@email.jackiesmithjr.com", "jackie@jmerrill.one", "jackie@jmerrill.one"]
+  ]) {
+    assert.equal(validateMessageIdentity({ brand, from, replyTo, cc: [cc] }).ok, true, brand);
+    assert.equal(validateMessageIdentity({ brand, from, replyTo, cc: [] }).reason, "ACS_CC_ARCHIVE_MISSING", brand);
+  }
+});
+
 test("duplicate signature is denied", () => {
   const duplicate = [
     "The Publishing Team",
@@ -127,7 +141,8 @@ test("JSJ sender identity is governed by the Jackie Smith Jr. personal brand dom
   assert.equal(validateMessageIdentity({
     brand: "JSJ",
     from: "jackie@email.jackiesmithjr.com",
-    replyTo: "jackie@jmerrill.one"
+    replyTo: "jackie@jmerrill.one",
+    cc: ["jackie@jmerrill.one"]
   }).ok, true);
 
   for (const from of [
