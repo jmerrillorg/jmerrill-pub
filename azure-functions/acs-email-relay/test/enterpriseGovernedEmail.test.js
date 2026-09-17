@@ -58,6 +58,26 @@ function validPayload(overrides = {}) {
   };
 }
 
+function governedPublishingPayload(overrides = {}) {
+  return validPayload({
+    brand: "PUBLISHING",
+    to: "jm1-admin@jmerrill.one",
+    subject: undefined,
+    plainText: undefined,
+    html: undefined,
+    templateId: "PUBLISHING.PAYMENT_ELECTION_REQUIRED",
+    templateVersion: "1.0.0",
+    templateData: {
+      authorFirstName: "Avery",
+      projectTitle: "A New Beginning",
+      packageName: "Starter Publishing Package",
+      baseAmountCents: 199900,
+      options: [{ code: "FULL_PAY", paymentAmountsCents: [199900], totalBeforeTaxCents: 199900 }]
+    },
+    ...overrides
+  });
+}
+
 function routeRequest(body, headers = {}) {
   const normalized = new Map(Object.entries(headers).map(([key, value]) => [key.toLowerCase(), value]));
   return {
@@ -89,6 +109,23 @@ test("JM1 uses ACS sender with public alias reply-to and info mailbox authority"
   assert.equal(email.senderAddress, "one@email.jmerrill.one");
   assert.equal(email.replyTo[0].address, "one@jmerrill.one");
   assert.equal(email.recipients.cc[0].address, "info@jmerrill.one");
+});
+
+test("active governed template derives subject and multipart bodies server-side", () => {
+  const { validateEnterprisePayload } = loadEnterpriseRelayModule();
+  const result = validateEnterprisePayload(governedPublishingPayload());
+  assert.equal(result.ok, true);
+  assert.equal(result.value.subject, "Your Publishing Payment Options for A New Beginning");
+  assert.match(result.value.html, /J Merrill Publishing/);
+  assert.match(result.value.plainText, /Starter Publishing Package/);
+  assert.equal(result.value.renderMetadata.brandTokenVersion, "PUBLISHING-EMAIL-v1.0.0");
+});
+
+test("governed template rejects caller-authored subject and body overrides", () => {
+  const { validateEnterprisePayload } = loadEnterpriseRelayModule();
+  const result = validateEnterprisePayload(governedPublishingPayload({ subject: "Override" }));
+  assert.equal(result.ok, false);
+  assert.equal(result.reason, "CALLER_TEMPLATE_CONTENT_OVERRIDE_DENIED");
 });
 
 test("decided brands resolve to their own ACS sender and reply authority", () => {

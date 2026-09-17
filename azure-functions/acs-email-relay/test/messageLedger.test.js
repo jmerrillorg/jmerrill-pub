@@ -38,6 +38,10 @@ function effect(overrides = {}) {
     communicationPurpose: "AUTHOR_UPDATE",
     templateId: "JMP_AUTHOR_UPDATE",
     templateVersion: "1.0",
+    rendererVersion: "JM1-EMAIL-RENDERER-v1.0.0",
+    brandTokenVersion: "PUBLISHING-EMAIL-v1.0.0",
+    htmlSha256: "a".repeat(64),
+    plainTextSha256: "b".repeat(64),
     idempotencyKey: "title-123-author-update-v1",
     systemSender: "publishing@email.jmerrill.one",
     brandCc: ["publishing@jmerrill.one"],
@@ -75,6 +79,15 @@ test("same idempotency key cannot be reused for a different communication effect
   await ledger.reserve(effect());
   await assert.rejects(
     ledger.reserve(effect({ recipients: ["different@example.com"] })),
+    (error) => error.safeCode === "IDEMPOTENCY_KEY_CONFLICT"
+  );
+});
+
+test("same idempotency key cannot be reused for different rendered content", async () => {
+  const ledger = createLedger(new MemoryTableClient());
+  await ledger.reserve(effect());
+  await assert.rejects(
+    ledger.reserve(effect({ htmlSha256: "c".repeat(64) })),
     (error) => error.safeCode === "IDEMPOTENCY_KEY_CONFLICT"
   );
 });

@@ -29,7 +29,11 @@ function createFingerprint(input) {
     recipients: [...(input.recipients || [])].map((value) => clean(value).toLowerCase()).sort(),
     communicationPurpose: clean(input.communicationPurpose),
     templateId: clean(input.templateId),
-    templateVersion: clean(input.templateVersion)
+    templateVersion: clean(input.templateVersion),
+    rendererVersion: clean(input.rendererVersion),
+    brandTokenVersion: clean(input.brandTokenVersion),
+    htmlSha256: clean(input.htmlSha256),
+    plainTextSha256: clean(input.plainTextSha256)
   }));
 }
 
@@ -65,6 +69,10 @@ function createLedger(tableClient) {
       correlationId: clean(input.correlationId),
       templateId: clean(input.templateId),
       templateVersion: clean(input.templateVersion),
+      rendererVersion: clean(input.rendererVersion),
+      brandTokenVersion: clean(input.brandTokenVersion),
+      htmlSha256: clean(input.htmlSha256),
+      plainTextSha256: clean(input.plainTextSha256),
       systemSender: clean(input.systemSender),
       recipient: clean((input.recipients || []).join(","), 2048),
       brandCc: clean((input.brandCc || []).join(","), 2048),
