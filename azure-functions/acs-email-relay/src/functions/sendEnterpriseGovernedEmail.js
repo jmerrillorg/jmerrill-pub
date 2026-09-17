@@ -4,6 +4,8 @@ const { DefaultAzureCredential } = require("@azure/identity");
 const { authenticateCaller } = require("../security/callerAuthentication");
 const { authorizeCallerForBrand, normalizeBrand } = require("../policy/callerRegistry");
 const { DELIVERY_STATE, getMessageLedger } = require("../state/messageLedger");
+const { renderTemplate } = require("../templates/renderer");
+const { isGovernedNamespace } = require("../templates/templateRegistry");
 const {
   getSenderProfile,
   validateMessageIdentity,
@@ -146,9 +148,9 @@ function validateEnterprisePayload(payload = {}) {
     ? [{ address: profile.ccAddress, displayName: profile.organizationDisplayName }]
     : [];
   const to = normalizeRecipients(payload.recipient || payload.to || payload.recipients?.to);
-  const subject = normalizeText(payload.subject);
-  const plainText = normalizeBody(payload.plainText || payload.text || payload.bodyText);
-  const html = normalizeHtml(payload.html || payload.htmlBody);
+  let subject = normalizeText(payload.subject);
+  let plainText = normalizeBody(payload.plainText || payload.text || payload.bodyText);
+  let html = normalizeHtml(payload.html || payload.htmlBody);
   const messageType = normalizeEnum(payload.messageType || payload.communicationType || "ROUTINE");
   const riskClassification = normalizeEnum(payload.riskClassification || payload.risk || "ROUTINE");
   const sourceRecord = normalizeText(payload.sourceRecord || payload.correlationId || payload.eventId);
@@ -158,6 +160,7 @@ function validateEnterprisePayload(payload = {}) {
   const templateId = normalizeEnum(payload.templateId || payload.templateName);
   const templateVersion = normalizeText(payload.templateVersion);
   const idempotencyKey = normalizeText(payload.idempotencyKey);
+  let renderMetadata = null;
 
   if (to.length === 0 || to.some((recipient) => !isValidEmail(recipient.address))) return { ok: false, reason: "ACS_RECIPIENT_INVALID" };
   if (!businessObjectType) return { ok: false, reason: "BUSINESS_OBJECT_TYPE_REQUIRED" };
@@ -166,6 +169,20 @@ function validateEnterprisePayload(payload = {}) {
   if (!templateId) return { ok: false, reason: "TEMPLATE_ID_REQUIRED" };
   if (!templateVersion) return { ok: false, reason: "TEMPLATE_VERSION_REQUIRED" };
   if (!idempotencyKey) return { ok: false, reason: "IDEMPOTENCY_KEY_REQUIRED" };
+
+  if (isGovernedNamespace(templateId)) {
+    if (subject || plainText || html) return { ok: false, reason: "CALLER_TEMPLATE_CONTENT_OVERRIDE_DENIED" };
+    const rendered = renderTemplate({ templateId, templateVersion, data: payload.templateData });
+    if (!rendered.ok) return { ok: false, reason: rendered.reason };
+    if (brand !== "JMP" || rendered.value.metadata.brandId !== "PUBLISHING") {
+      return { ok: false, reason: "TEMPLATE_BRAND_MISMATCH" };
+    }
+    subject = rendered.value.subject;
+    plainText = rendered.value.plainText;
+    html = rendered.value.html;
+    renderMetadata = rendered.value.metadata;
+  }
+
   if (!subject) return { ok: false, reason: "ACS_SUBJECT_REQUIRED" };
   if (!plainText) return { ok: false, reason: "ACS_PLAIN_TEXT_REQUIRED" };
   if (!html || !/^<!doctype html>/i.test(html)) return { ok: false, reason: "ACS_HTML_REQUIRED" };
@@ -228,7 +245,8 @@ function validateEnterprisePayload(payload = {}) {
       correlationId,
       templateId,
       templateVersion,
-      idempotencyKey
+      idempotencyKey,
+      renderMetadata
     }
   };
 }
@@ -312,6 +330,10 @@ app.http("send-enterprise-governed-email", {
         communicationPurpose: validation.value.messageType,
         templateId: validation.value.templateId,
         templateVersion: validation.value.templateVersion,
+        rendererVersion: validation.value.renderMetadata?.rendererVersion,
+        brandTokenVersion: validation.value.renderMetadata?.brandTokenVersion,
+        htmlSha256: validation.value.renderMetadata?.htmlSha256,
+        plainTextSha256: validation.value.renderMetadata?.plainTextSha256,
         idempotencyKey: validation.value.idempotencyKey,
         systemSender: validation.value.senderAddress,
         brandCc: validation.value.cc.map((recipient) => recipient.address),
@@ -362,7 +384,8 @@ app.http("send-enterprise-governed-email", {
         providerMessageId,
         deliveryState: DELIVERY_STATE.ACCEPTED,
         acceptedAt: trace.acceptedAt,
-        sourceRecord: validation.value.sourceRecord
+        sourceRecord: validation.value.sourceRecord,
+        renderMetadata: validation.value.renderMetadata || undefined
       });
     } catch (error) {
       const code = safeErrorCode(error);

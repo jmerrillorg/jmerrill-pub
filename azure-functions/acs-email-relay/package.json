@@ -9,7 +9,7 @@
   },
   "scripts": {
     "start": "func start",
-    "lint": "node --check src/functions/sendAuthorAcknowledgment.js src/functions/sendAgreementPackage.js src/functions/sendEnterpriseGovernedEmail.js src/policy/canonPolicyLayer.js src/policy/acsSenderRegistry.js src/policy/callerRegistry.js src/security/callerAuthentication.js src/state/messageLedger.js",
+    "lint": "node --check src/functions/sendAuthorAcknowledgment.js src/functions/sendAgreementPackage.js src/functions/sendEnterpriseGovernedEmail.js src/functions/previewEnterpriseTemplate.js src/policy/canonPolicyLayer.js src/policy/acsSenderRegistry.js src/policy/callerRegistry.js src/security/callerAuthentication.js src/state/messageLedger.js src/templates/brandRegistry.js src/templates/templateRegistry.js src/templates/renderer.js",
     "test": "node --test",
     "test:node-guard": "node -e \"if (parseInt(process.version.split('.')[0].slice(1)) !== 22) { console.error('Node 22 required, got ' + process.version); process.exit(1); } console.log('Node version OK:', process.version);\""
   },
