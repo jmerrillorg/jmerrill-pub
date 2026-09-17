@@ -161,7 +161,6 @@ jobs:
             --name "$FUNCTION_APP_NAME" \
             --client-id "$RELAY_AUTH_CLIENT_ID" \
             --tenant-id "$RELAY_AUTH_TENANT_ID" \
-            --issuer "https://login.microsoftonline.com/${RELAY_AUTH_TENANT_ID}/v2.0" \
             --allowed-token-audiences "api://${RELAY_AUTH_CLIENT_ID}" \
             --yes \
             -o none
