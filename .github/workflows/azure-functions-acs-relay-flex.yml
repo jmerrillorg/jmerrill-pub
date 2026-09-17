@@ -151,7 +151,7 @@ jobs:
           az functionapp update \
             --resource-group "$AZURE_RESOURCE_GROUP" \
             --name "$FUNCTION_APP_NAME" \
-            --https-only true \
+            --set httpsOnly=true \
             -o none
 
           az extension add --name authV2 --upgrade -o none
