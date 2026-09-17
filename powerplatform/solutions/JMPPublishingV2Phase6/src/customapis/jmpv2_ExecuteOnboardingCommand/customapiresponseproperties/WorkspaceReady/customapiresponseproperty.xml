@@ -1,0 +1,11 @@
+<customapiresponseproperty uniquename="WorkspaceReady">
+  <description default="WorkspaceReady">
+    <label description="WorkspaceReady" languagecode="1033" />
+  </description>
+  <displayname default="WorkspaceReady">
+    <label description="WorkspaceReady" languagecode="1033" />
+  </displayname>
+  <iscustomizable>1</iscustomizable>
+  <name>WorkspaceReady</name>
+  <type>0</type>
+</customapiresponseproperty>

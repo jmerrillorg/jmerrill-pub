@@ -1,0 +1,12 @@
+<customapirequestparameter uniquename="WorkspacePath">
+  <description default="WorkspacePath">
+    <label description="WorkspacePath" languagecode="1033" />
+  </description>
+  <displayname default="WorkspacePath">
+    <label description="WorkspacePath" languagecode="1033" />
+  </displayname>
+  <iscustomizable>1</iscustomizable>
+  <isoptional>1</isoptional>
+  <name>WorkspacePath</name>
+  <type>10</type>
+</customapirequestparameter>

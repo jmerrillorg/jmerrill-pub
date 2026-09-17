@@ -1,0 +1,37 @@
+{
+  "status": "BLOCKED",
+  "environment": "JM1-Test",
+  "author": "Jackuline Fly",
+  "title": "Whole",
+  "engagementId": "0038ee51-27a9-f111-aaab-70a8a59b112b",
+  "lifecycleId": "0238ee51-27a9-f111-aaab-70a8a59b112b",
+  "lifecycleKey": "legacy-lifecycle-b1ed3978-829b-4f48-a289-4d9257b21a95",
+  "workspace": "01_Pipeline_A-Z/06 - Onboarding/Fly, Jackuline - Whole",
+  "agreement": "EXECUTED",
+  "payment": "PAID",
+  "lifecycleStage": "06_ONBOARDING",
+  "engagementStage": "05_AGREEMENT_PAYMENT",
+  "expectedStage": "06_ONBOARDING",
+  "rootCauseClassification": "MISSING_TRANSACTIONAL_UPDATE",
+  "rootCause": "The governed 05-to-06 transition updated the lifecycle and emitted its transition evidence, but the transition plugin did not update the publishing-engagement stage projection in the same transaction.",
+  "repairAttempt": {
+    "type": "MINIMUM_IDEMPOTENT_ENGAGEMENT_STAGE_PROJECTION_UPDATE",
+    "result": "REJECTED",
+    "error": "DIRECT_LEGACY_ACTIVATION_AUTHORITY_WRITE_DENIED",
+    "governanceInterpretation": "A direct engagement-stage write is not authorized. Repair must execute through governed transition authority or an explicitly approved parity-repair path."
+  },
+  "sideEffects": {
+    "engagementRowsUpdated": 0,
+    "workspaceMoves": 0,
+    "workspacesCreated": 0,
+    "onboardingRecordsCreated": 0,
+    "executionEventsCreated": 0,
+    "authorCommunicationsSent": 0,
+    "productionDeployments": 0
+  },
+  "stageParityGuardRequired": true,
+  "proposedPhase6Guard": "The governed stage transition must update lifecycle stage and engagement-stage projection in one transaction, then assert physical workspace, lifecycle, and engagement parity before reporting success.",
+  "jm1TestDeploymentAuthorized": false,
+  "phase7SystemCommissioning": "HELD",
+  "recordedAt": "2026-09-17T20:10:00.000Z"
+}

@@ -1,0 +1,11 @@
+<customapiresponseproperty uniquename="PayoutSatisfied">
+  <description default="PayoutSatisfied">
+    <label description="PayoutSatisfied" languagecode="1033" />
+  </description>
+  <displayname default="PayoutSatisfied">
+    <label description="PayoutSatisfied" languagecode="1033" />
+  </displayname>
+  <iscustomizable>1</iscustomizable>
+  <name>PayoutSatisfied</name>
+  <type>0</type>
+</customapiresponseproperty>

@@ -1,0 +1,11 @@
+<customapiresponseproperty uniquename="Eligible06To07">
+  <description default="Eligible06To07">
+    <label description="Eligible06To07" languagecode="1033" />
+  </description>
+  <displayname default="Eligible06To07">
+    <label description="Eligible06To07" languagecode="1033" />
+  </displayname>
+  <iscustomizable>1</iscustomizable>
+  <name>Eligible06To07</name>
+  <type>0</type>
+</customapiresponseproperty>

@@ -1,0 +1,11 @@
+<customapiresponseproperty uniquename="OnboardingComplete">
+  <description default="OnboardingComplete">
+    <label description="OnboardingComplete" languagecode="1033" />
+  </description>
+  <displayname default="OnboardingComplete">
+    <label description="OnboardingComplete" languagecode="1033" />
+  </displayname>
+  <iscustomizable>1</iscustomizable>
+  <name>OnboardingComplete</name>
+  <type>0</type>
+</customapiresponseproperty>

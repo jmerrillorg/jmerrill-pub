@@ -1,0 +1,12 @@
+<customapirequestparameter uniquename="Classification">
+  <description default="Classification">
+    <label description="Classification" languagecode="1033" />
+  </description>
+  <displayname default="Classification">
+    <label description="Classification" languagecode="1033" />
+  </displayname>
+  <iscustomizable>1</iscustomizable>
+  <isoptional>1</isoptional>
+  <name>Classification</name>
+  <type>10</type>
+</customapirequestparameter>

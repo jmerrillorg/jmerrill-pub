@@ -1,0 +1,12 @@
+<customapirequestparameter uniquename="PolicyVersion">
+  <description default="PolicyVersion">
+    <label description="PolicyVersion" languagecode="1033" />
+  </description>
+  <displayname default="PolicyVersion">
+    <label description="PolicyVersion" languagecode="1033" />
+  </displayname>
+  <iscustomizable>1</iscustomizable>
+  <isoptional>1</isoptional>
+  <name>PolicyVersion</name>
+  <type>10</type>
+</customapirequestparameter>

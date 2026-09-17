@@ -1,0 +1,26 @@
+{
+  "status": "PASS",
+  "target": "JM1-Test",
+  "organizationId": "bb7a9d9e-8e73-f111-b27b-000d3a31ff17",
+  "managedArtifact": "JMP_PublishingV2_Phase6_Portable_1_1_0_0_managed.zip",
+  "managedArtifactSha256": "24eab263b57044dc5a6f0926e11e6a7c51e2dcd4a8b7354c9e730a12b5b1de16",
+  "checks": {
+    "targetEnvironment": true,
+    "managedPackageReadable": true,
+    "commandIncluded": true,
+    "contractIncluded": true,
+    "pluginIncluded": true,
+    "authorAccessIncluded": true,
+    "baseDependenciesPresent": true,
+    "missingAuthorAccessCoveredByPackage": true,
+    "environmentVariableResolvable": true,
+    "securityRoleBinding": true,
+    "portableSource": true,
+    "noPhase7": true
+  },
+  "dependenciesPresentOrIncluded": true,
+  "rollbackPackage": "READY — isolated managed solution can be removed without replacing JMP_PublishingV2 1.0.4.0",
+  "productionDependency": false,
+  "deploymentExecuted": false,
+  "completedAt": "2026-09-17T20:08:21.002Z"
+}
