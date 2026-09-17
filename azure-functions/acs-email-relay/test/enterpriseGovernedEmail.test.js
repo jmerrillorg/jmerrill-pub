@@ -48,7 +48,32 @@ function validPayload(overrides = {}) {
     plainText: "Good day. We are sending this because your requested update is ready. Reply if you need help.",
     html: "<!doctype html><html><body><p>Good day.</p><p>We are sending this because your requested update is ready.</p><p>Reply if you need help.</p><p>J Merrill One</p></body></html>",
     sourceRecord: "SYNTHETIC-JM1-ACS-001",
+    businessObjectType: "SYNTHETIC_PROOF",
+    businessObjectId: "SYNTHETIC-JM1-ACS-001",
+    correlationId: "COMMS-001A1-SYNTHETIC-001",
+    templateId: "JM1_SYNTHETIC_UPDATE",
+    templateVersion: "1.0",
+    idempotencyKey: "COMMS-001A1-SYNTHETIC-001-JM1",
     ...overrides
+  };
+}
+
+function routeRequest(body, headers = {}) {
+  const normalized = new Map(Object.entries(headers).map(([key, value]) => [key.toLowerCase(), value]));
+  return {
+    headers: { get: (name) => normalized.get(String(name).toLowerCase()) || null },
+    json: async () => body
+  };
+}
+
+function workloadHeaders(objectId) {
+  const principal = Buffer.from(JSON.stringify({
+    auth_typ: "aad",
+    claims: [{ typ: "oid", val: objectId }]
+  })).toString("base64");
+  return {
+    "x-ms-client-principal-id": objectId,
+    "x-ms-client-principal": principal
   };
 }
 
@@ -63,6 +88,7 @@ test("JM1 uses ACS sender with public alias reply-to and info mailbox authority"
   const email = buildEnterpriseEmail(result.value);
   assert.equal(email.senderAddress, "one@email.jmerrill.one");
   assert.equal(email.replyTo[0].address, "one@jmerrill.one");
+  assert.equal(email.recipients.cc[0].address, "info@jmerrill.one");
 });
 
 test("decided brands resolve to their own ACS sender and reply authority", () => {
@@ -75,10 +101,7 @@ test("decided brands resolve to their own ACS sender and reply authority", () =>
     ["AIC", "aic@email.agapeic.org", "aic@agapeic.org"],
     ["JSJ", "jackie@email.jackiesmithjr.com", "jackie@jmerrill.one"]
   ]) {
-    const result = validateEnterprisePayload(validPayload({
-      brand,
-      cc: brand === "JMP" ? ["publishing@jmerrill.one"] : []
-    }));
+    const result = validateEnterprisePayload(validPayload({ brand }));
     assert.equal(result.ok, true, brand);
     assert.equal(result.value.senderAddress, sender);
     assert.equal(result.value.replyTo, replyTo);
@@ -92,7 +115,7 @@ test("wrong brand sender fails closed instead of falling back to Publishing", ()
     senderAddress: "publishing@email.jmerrill.one"
   }));
   assert.equal(result.ok, false);
-  assert.equal(result.reason, "ACS_BRAND_SENDER_MISMATCH");
+  assert.equal(result.reason, "CALLER_FROM_OVERRIDE_DENIED");
 });
 
 test("AIC routine service communication uses governed sender and reply path", () => {
@@ -129,7 +152,7 @@ test("AIC cannot use another JM1 brand sender", () => {
       replyTo: "aic@agapeic.org"
     }));
     assert.equal(result.ok, false);
-    assert.equal(result.reason, "ACS_BRAND_SENDER_MISMATCH");
+    assert.equal(result.reason, "CALLER_FROM_OVERRIDE_DENIED");
   }
 });
 
@@ -163,7 +186,7 @@ test("JSJ cannot borrow enterprise, divisional, or AIC sender domains", () => {
       replyTo: "jackie@jmerrill.one"
     }));
     assert.equal(result.ok, false, senderAddress);
-    assert.equal(result.reason, "ACS_BRAND_SENDER_MISMATCH");
+    assert.equal(result.reason, "CALLER_FROM_OVERRIDE_DENIED");
   }
 });
 
@@ -177,7 +200,7 @@ test("Other contexts cannot use the JSJ personal-brand sender", () => {
       cc: brand === "JMP" ? ["publishing@jmerrill.one"] : []
     }));
     assert.equal(result.ok, false, brand);
-    assert.equal(result.reason, "ACS_BRAND_SENDER_MISMATCH");
+    assert.equal(result.reason, "CALLER_FROM_OVERRIDE_DENIED");
   }
 });
 
@@ -221,17 +244,76 @@ test("AIC sensitive pastoral, legal, or financial context requires human review"
   assert.equal(result.reason, "HUMAN_REVIEW_REQUIRED_AIC_SENSITIVE_CONTEXT");
 });
 
-test("Publishing requires visibility CC on the shared relay", () => {
+test("every resolved brand derives its mandatory visibility CC server-side", () => {
   const { validateEnterprisePayload } = loadEnterpriseRelayModule();
-  const missing = validateEnterprisePayload(validPayload({ brand: "JMP" }));
-  assert.equal(missing.ok, false);
-  assert.equal(missing.reason, "ACS_CC_ARCHIVE_MISSING");
+  for (const [brand, expectedCc] of [
+    ["JM1", "info@jmerrill.one"],
+    ["JMP", "publishing@jmerrill.one"],
+    ["JMF", "financial@jmerrill.one"],
+    ["JMFN", "foundation@jmerrill.one"],
+    ["JMPRODUCTIONS", "productions@jmerrill.one"],
+    ["AIC", "aic@agapeic.org"],
+    ["JSJ", "jackie@jmerrill.one"]
+  ]) {
+    const result = validateEnterprisePayload(validPayload({ brand }));
+    assert.equal(result.ok, true, brand);
+    assert.equal(result.value.cc[0].address, expectedCc, brand);
+  }
+});
 
-  const present = validateEnterprisePayload(validPayload({
-    brand: "JMP",
-    cc: ["publishing@jmerrill.one"]
-  }));
-  assert.equal(present.ok, true);
+test("caller cannot override From, Reply-To, or brand CC", () => {
+  const { validateEnterprisePayload } = loadEnterpriseRelayModule();
+  assert.equal(validateEnterprisePayload(validPayload({ from: "publishing@email.jmerrill.one" })).reason, "CALLER_FROM_OVERRIDE_DENIED");
+  assert.equal(validateEnterprisePayload(validPayload({ replyTo: "publishing@jmerrill.one" })).reason, "CALLER_REPLY_TO_OVERRIDE_DENIED");
+  assert.equal(validateEnterprisePayload(validPayload({ cc: ["publishing@jmerrill.one"] })).reason, "CALLER_CC_OVERRIDE_DENIED");
+});
+
+test("authority probe denies anonymous, unknown, and cross-brand callers without sending", async () => {
+  const { routes } = loadEnterpriseRelayModule();
+  const handler = routes["relay-authority-probe"].handler;
+  delete process.env.JM1_RELAY_API_KEY;
+  const anonymous = await handler(routeRequest({ brand: "JMP" }));
+  assert.equal(anonymous.status, 401);
+
+  const unknownId = "00000000-0000-0000-0000-000000000001";
+  const unknown = await handler(routeRequest({ brand: "JMP" }, workloadHeaders(unknownId)));
+  assert.equal(unknown.status, 403);
+  assert.equal(unknown.jsonBody.reason, "UNKNOWN_CALLER");
+
+  const publishingId = "ce363f5a-94f3-4ea9-9ba3-061404fca098";
+  const crossBrand = await handler(routeRequest({ brand: "JMF" }, workloadHeaders(publishingId)));
+  assert.equal(crossBrand.status, 403);
+  assert.equal(crossBrand.jsonBody.reason, "CALLER_BRAND_NOT_AUTHORIZED");
+});
+
+test("authority probe attributes a Publishing workload identity and derives brand identity", async () => {
+  const { routes } = loadEnterpriseRelayModule();
+  const handler = routes["relay-authority-probe"].handler;
+  const publishingId = "ce363f5a-94f3-4ea9-9ba3-061404fca098";
+  const result = await handler(routeRequest({ brand: "PUBLISHING" }, workloadHeaders(publishingId)));
+  assert.equal(result.status, 200);
+  assert.equal(result.jsonBody.authorized, true);
+  assert.equal(result.jsonBody.noSend, true);
+  assert.equal(result.jsonBody.callerId, "publishing-web-prod");
+  assert.equal(result.jsonBody.senderAddress, "publishing@email.jmerrill.one");
+  assert.equal(result.jsonBody.brandCc, "publishing@jmerrill.one");
+  assert.equal(result.jsonBody.replyTo, "publishing@jmerrill.one");
+});
+
+test("durable trace contract fields are mandatory", () => {
+  const { validateEnterprisePayload } = loadEnterpriseRelayModule();
+  for (const [field, reason] of [
+    ["businessObjectType", "BUSINESS_OBJECT_TYPE_REQUIRED"],
+    ["businessObjectId", "BUSINESS_OBJECT_ID_REQUIRED"],
+    ["correlationId", "CORRELATION_ID_REQUIRED"],
+    ["templateId", "TEMPLATE_ID_REQUIRED"],
+    ["templateVersion", "TEMPLATE_VERSION_REQUIRED"],
+    ["idempotencyKey", "IDEMPOTENCY_KEY_REQUIRED"]
+  ]) {
+    const result = validateEnterprisePayload(validPayload({ [field]: "" }));
+    assert.equal(result.ok, false, field);
+    assert.equal(result.reason, reason, field);
+  }
 });
 
 test("Human-First policy blocks internal runtime language and duplicate signatures", () => {

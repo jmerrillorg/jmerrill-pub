@@ -24,6 +24,8 @@ env:
   FUNCTION_APP_WORKING_DIR: azure-functions/acs-email-relay
   PACKAGE_STORAGE_ACCOUNT: stjm1acsrelay
   PACKAGE_CONTAINER: function-releases
+  RELAY_AUTH_CLIENT_ID: 84530e9b-2842-4ca6-8fe6-1a11eed051d1
+  RELAY_AUTH_TENANT_ID: 352d075e-8e17-4169-9f8e-22e6946ce66d
 
 jobs:
   validate-and-deploy:
@@ -103,6 +105,12 @@ jobs:
             --account-key "$account_key" \
             -o none
 
+          az storage table create \
+            --account-name "$PACKAGE_STORAGE_ACCOUNT" \
+            --name JM1RelayMessages \
+            --account-key "$account_key" \
+            -o none
+
           package_url=$(az storage blob url \
             --account-name "$PACKAGE_STORAGE_ACCOUNT" \
             --container-name "$PACKAGE_CONTAINER" \
@@ -131,12 +139,40 @@ jobs:
               "WEBSITE_USE_PLACEHOLDER=0" \
               "JM1_RELEASE_SHA=${{ github.sha }}" \
               "JM1_PRODUCTION_RELEASE_SHA=${{ github.sha }}" \
+              "JM1_MESSAGE_TABLE_NAME=JM1RelayMessages" \
             -o none
 
           az functionapp config set \
             --resource-group "$AZURE_RESOURCE_GROUP" \
             --name "$FUNCTION_APP_NAME" \
             --linux-fx-version "Node|22" \
+            -o none
+
+          az functionapp update \
+            --resource-group "$AZURE_RESOURCE_GROUP" \
+            --name "$FUNCTION_APP_NAME" \
+            --https-only true \
+            -o none
+
+          az extension add --name authV2 --upgrade -o none
+
+          az webapp auth microsoft update \
+            --resource-group "$AZURE_RESOURCE_GROUP" \
+            --name "$FUNCTION_APP_NAME" \
+            --client-id "$RELAY_AUTH_CLIENT_ID" \
+            --tenant-id "$RELAY_AUTH_TENANT_ID" \
+            --issuer "https://login.microsoftonline.com/${RELAY_AUTH_TENANT_ID}/v2.0" \
+            --allowed-token-audiences "api://${RELAY_AUTH_CLIENT_ID}" \
+            --yes \
+            -o none
+
+          az webapp auth update \
+            --resource-group "$AZURE_RESOURCE_GROUP" \
+            --name "$FUNCTION_APP_NAME" \
+            --enabled true \
+            --unauthenticated-client-action AllowAnonymous \
+            --require-https true \
+            --enable-token-store false \
             -o none
 
           az functionapp restart \
@@ -174,6 +210,42 @@ jobs:
             exit 1
           fi
           echo "Runtime proof: $runtime — PASS"
+
+      - name: Verify workload identity authentication boundary
+        run: |
+          auth_enabled=$(az webapp auth show \
+            --resource-group "$AZURE_RESOURCE_GROUP" \
+            --name "$FUNCTION_APP_NAME" \
+            --query "properties.platform.enabled" -o tsv)
+          auth_client=$(az webapp auth show \
+            --resource-group "$AZURE_RESOURCE_GROUP" \
+            --name "$FUNCTION_APP_NAME" \
+            --query "properties.identityProviders.azureActiveDirectory.registration.clientId" -o tsv)
+
+          if [ "$auth_enabled" != "true" ] || [ "$auth_client" != "$RELAY_AUTH_CLIENT_ID" ]; then
+            echo "FATAL: Relay workload identity authentication is not commissioned"
+            exit 1
+          fi
+
+          echo "Workload identity authentication boundary: PASS"
+
+      - name: Verify durable message authority
+        run: |
+          account_key=$(az storage account keys list \
+            --resource-group "$AZURE_RESOURCE_GROUP" \
+            --account-name "$PACKAGE_STORAGE_ACCOUNT" \
+            --query "[0].value" \
+            -o tsv)
+          table_exists=$(az storage table exists \
+            --account-name "$PACKAGE_STORAGE_ACCOUNT" \
+            --name JM1RelayMessages \
+            --account-key "$account_key" \
+            --query exists -o tsv)
+          if [ "$table_exists" != "true" ]; then
+            echo "FATAL: Durable relay message table is missing"
+            exit 1
+          fi
+          echo "Durable message authority: PASS"
 
       - name: Host and route health check
         run: |
