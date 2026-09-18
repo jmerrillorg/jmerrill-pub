@@ -1,0 +1,31 @@
+{
+  "incident": "SEPT18_DEVELOPMENTAL_COMMUNICATION_AND_ARTIFACT_GATE",
+  "pullRequest": 763,
+  "deployedSha": "2da446def764cc8f3d9b95121a3def1f4bfd8f29",
+  "deployments": {
+    "acsRelay": "PASS",
+    "diagnosticRunner": "PASS",
+    "publishingWebPolicy": "PASS"
+  },
+  "productionReadback": {
+    "diagnosticRunnerState": "Running",
+    "diagnosticRunnerHealth": "ready",
+    "diagnosticRunnerRelease": "2da446def764cc8f3d9b95121a3def1f4bfd8f29",
+    "acsRelayRelease": "2da446def764cc8f3d9b95121a3def1f4bfd8f29"
+  },
+  "deployedPackageReplay": {
+    "sourceChecksumMatchesMain": true,
+    "exactIndomitableReviewOnlyReplay": "PASS_FAIL_CLOSED",
+    "incompleteReplayRelayCalls": 0,
+    "completeSystemRender": "PASS",
+    "template": "DEVELOPMENTAL_EDITORIAL_REVIEW_READY_V2",
+    "artifactCompleteness": "PASS",
+    "senderCanon": "PASS",
+    "titleAuthorBinding": "PASS",
+    "authorCommunicationsSent": 0
+  },
+  "clientRecovery": "PASS",
+  "systemRepair": "PASS",
+  "regressionProof": "PASS",
+  "incidentClosure": "PASS"
+}
