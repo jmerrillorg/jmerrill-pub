@@ -18,7 +18,7 @@ const {
 } = require("./editorialCadenceAuthorPackageSender");
 
 const POLICY_VERSION = "JMP Editorial Cadence Doctrine v1.0";
-const CONSUMER_VERSION = "editorial-cadence-release-consumer:v1.0.0";
+const CONSUMER_VERSION = "editorial-cadence-release-consumer:v1.1.0";
 
 const STAGE_BASELINE_BUSINESS_DAYS = {
   EDITORIAL_REVIEW: 2,
@@ -593,9 +593,22 @@ async function processCadenceLog(client, cadenceLog, now, correlationId, deps = 
         completionLog,
         artifacts,
         schedule
-      }, deps);
+      }, { ...deps, client });
     } catch (err) {
       sendResult = { status: "BLOCKED", blockers: [err?.safeCode || err?.message || "SEND_EXCEPTION"] };
+    }
+    if (sendResult.status === "ALREADY_DELIVERED") {
+      return {
+        status: "ALREADY_RELEASED",
+        stageId,
+        title: titleName(title),
+        packageId: packageInfo.packageId,
+        schedule,
+        persisted,
+        mailboxCorrelation,
+        sendResult,
+        sentActionType: "SEMANTIC_COMMUNICATION_IDEMPOTENCY"
+      };
     }
     if (sendResult.status !== "SENT") {
       const blocked = await recordCadenceSendBlocked(client, stage, title, packageInfo, schedule, sendResult.blockers || [sendResult.status || "SEND_FAILED"], correlationId);
