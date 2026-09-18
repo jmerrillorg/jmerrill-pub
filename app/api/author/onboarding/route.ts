@@ -18,26 +18,18 @@ import {
   resolveOption,
   w9StatusOptions,
 } from '@/lib/publishing/onboarding-production-options'
-import { requireAuthorAccess } from '@/lib/server/author-access'
+import { requireAuthorAccess, getAuthorPortalContextFromContactId } from '@/lib/server/author-portal-context'
 import { writeAuthorOnboardingDataverseFallback } from '@/lib/server/author-onboarding-dataverse'
-import { hasConfirmedNotificationDelivery, submitWebsiteForm, type Jm1PubInternalClassification } from '@/lib/server/form-integrations'
+import { submitWebsiteForm, type Jm1PubInternalClassification } from '@/lib/server/form-integrations'
 import { cleanString, missingFields, requiredFieldsResponse } from '@/lib/server/form-validation'
+import { isWholeOnboardingContact, WHOLE_ONBOARDING_CONTINUITY } from '@/lib/server/whole-onboarding-continuity'
 
 export async function POST(req: NextRequest) {
   try {
-    const unauthorized = requireAuthorAccess(req)
-    if (unauthorized) return unauthorized
+    const access = requireAuthorAccess(req)
+    if ('unauthorized' in access) return access.unauthorized
 
     const onboardingFlowUrl = process.env.POWER_AUTOMATE_AUTHOR_ONBOARDING_URL
-    if (!onboardingFlowUrl) {
-      return NextResponse.json(
-        {
-          ok: false,
-          error: 'Author onboarding integration is not configured.',
-        },
-        { status: 500 },
-      )
-    }
 
     const body = await req.json()
     const required = [
@@ -64,19 +56,32 @@ export async function POST(req: NextRequest) {
     const missing = missingFields(body, required)
     if (missing.length) return requiredFieldsResponse(missing)
 
-    const legalName = cleanString(body.legalName)
+    const continuityApplies = isWholeOnboardingContact(access.session.contactId, access.session.contactEmail)
+    const authority = continuityApplies
+      ? await getAuthorPortalContextFromContactId(WHOLE_ONBOARDING_CONTINUITY.contactId, {
+          titleId: WHOLE_ONBOARDING_CONTINUITY.titleId,
+        })
+      : null
+    if (continuityApplies && !isWholeAuthority(authority)) {
+      return NextResponse.json(
+        { error: 'Your governed author and title relationship could not be verified. Please contact publishing@jmerrill.one.' },
+        { status: 409 },
+      )
+    }
+
+    const legalName = continuityApplies ? WHOLE_ONBOARDING_CONTINUITY.authorName : cleanString(body.legalName)
     const { firstName, lastName } = splitName(legalName)
-    const email = cleanString(body.email)
+    const email = continuityApplies ? WHOLE_ONBOARDING_CONTINUITY.authorEmail : cleanString(body.email)
     const genreOption = resolveOption(genreOptions, cleanString(body.genre))
     const genreKey = genreOption.key
     const genre = genreOption.label
-    const bookTitle = cleanString(body.bookTitle)
+    const bookTitle = continuityApplies ? WHOLE_ONBOARDING_CONTINUITY.title : cleanString(body.bookTitle)
     const subtitle = cleanString(body.subtitle)
     const manuscriptStatusOption = resolveOption(manuscriptStatusOptions, cleanString(body.manuscriptStatus))
     const manuscriptStatusKey = manuscriptStatusOption.key
     const manuscriptStatus = manuscriptStatusOption.label
     const recipient = 'publishing@jmerrill.one'
-    const packageConfirmation = cleanString(body.packageConfirmation)
+    const packageConfirmation = continuityApplies ? WHOLE_ONBOARDING_CONTINUITY.packageCode : cleanString(body.packageConfirmation)
     const audiobookInterestOption = resolveOption(audiobookInterestOptions, cleanString(body.audiobookInterest))
     const audiobookInterestKey = audiobookInterestOption.key
     const audiobookInterest = audiobookInterestOption.label
@@ -221,7 +226,19 @@ export async function POST(req: NextRequest) {
       divisionNumber: '01',
       route: '/author/onboarding',
       recipient,
-      accessCodeUsed: true,
+      authenticatedSessionUsed: true,
+      governedAuthority: continuityApplies
+        ? {
+            policyVersion: WHOLE_ONBOARDING_CONTINUITY.policyVersion,
+            contactId: WHOLE_ONBOARDING_CONTINUITY.contactId,
+            authorProfileId: authority?.relationship.authorProfileId,
+            titleId: WHOLE_ONBOARDING_CONTINUITY.titleId,
+            engagementId: WHOLE_ONBOARDING_CONTINUITY.engagementId,
+            lifecycleId: WHOLE_ONBOARDING_CONTINUITY.lifecycleId,
+            packageCode: WHOLE_ONBOARDING_CONTINUITY.packageCode,
+            lifecycleStage: WHOLE_ONBOARDING_CONTINUITY.lifecycleStage,
+          }
+        : undefined,
       dataverseTarget: {
         primaryTable: 'jm1pub_authoronboarding',
         relatedTitleTable: 'jm1pub_title',
@@ -234,7 +251,7 @@ export async function POST(req: NextRequest) {
       message,
       rawFormData: body,
 
-      authorName: cleanString(body.authorName),
+      authorName: continuityApplies ? WHOLE_ONBOARDING_CONTINUITY.authorName : cleanString(body.authorName),
       legalName,
       penName: cleanString(body.penName),
       preferredName: cleanString(body.preferredName),
@@ -343,13 +360,13 @@ export async function POST(req: NextRequest) {
       route: '/author/onboarding',
       source: 'private-author-onboarding',
       subject: `Author onboarding submitted: ${payload.authorName}`,
-      routeSpecificFlowUrl: onboardingFlowUrl,
+      routeSpecificFlowUrl: onboardingFlowUrl || undefined,
       payload,
       notificationPreview: `${payload.authorName} submitted author onboarding for "${payload.bookTitle}".`,
       internalClassification: deriveInternalClassification(genreKey),
     })
 
-    if (!hasConfirmedNotificationDelivery(integration)) {
+    if (integration.ingestion.status !== 'sent') {
       const fallback = await writeAuthorOnboardingDataverseFallback(payload, integration.ingestion.detail)
       if (fallback.status === 'success') {
         return NextResponse.json({
@@ -382,6 +399,14 @@ export async function POST(req: NextRequest) {
       { status: 500 },
     )
   }
+}
+
+function isWholeAuthority(authority: Awaited<ReturnType<typeof getAuthorPortalContextFromContactId>>) {
+  if (!authority) return false
+  return authority.author.contactId?.toLowerCase() === WHOLE_ONBOARDING_CONTINUITY.contactId &&
+    authority.author.email.toLowerCase() === WHOLE_ONBOARDING_CONTINUITY.authorEmail &&
+    authority.currentProject.titleId?.toLowerCase() === WHOLE_ONBOARDING_CONTINUITY.titleId &&
+    authority.currentProject.title === WHOLE_ONBOARDING_CONTINUITY.title
 }
 
 function asBoolean(value: unknown) {

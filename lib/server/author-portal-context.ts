@@ -141,6 +141,7 @@ export type AuthorPortalContext = {
     }
   }
   relationship: {
+    authorProfileId?: string
     classificationStatus: 'Invited Project Relationship' | 'Grandfathered' | 'Grandfathered - Activated'
     activationStatus: 'pending_validation' | 'validated' | 'activated'
     operationalHealthStatus: 'activated' | 'verified' | 'healthy'
@@ -160,6 +161,7 @@ export type AuthorPortalContext = {
   selectedProjectKey: string
   tasks: {
     authorProfileRequired: boolean
+    onboardingSubmissionComplete: boolean
     paymentRoyaltyRequired: boolean
     formatSelectionRequired: boolean
   }
@@ -462,6 +464,13 @@ export async function resolveAuthorPortalContext(
           : []
 
     const relationshipBackedTitles = await getRelationshipBackedTitles(config, contact)
+    const contactId = dataverseLookupId(contact || {}, 'contactid')
+    const authorProfile = contactId
+      ? await dataverseFirst(config, 'jm1_authorprofiles', {
+          $select: 'jm1_authorprofileid,_jm1_contact_value,jm1_isactiveauthor,statecode,statuscode',
+          $filter: `_jm1_contact_value eq ${contactId} and statecode eq 0`,
+        })
+      : null
 
     const projects = await buildProjectSummaries(config, {
       requestedReference,
@@ -475,6 +484,9 @@ export async function resolveAuthorPortalContext(
     })
 
     const currentProject = selectCurrentProject(projects, overrides, requestedReference) || projects[0] || buildFallbackProject(session, requestedReference)
+    const onboardingSubmissionComplete = contactId && currentProject.titleId
+      ? await hasCompletedOnboardingSubmission(config, contactId, currentProject.titleId)
+      : false
 
     const isReturningAuthor =
       Boolean(contact) &&
@@ -512,6 +524,7 @@ export async function resolveAuthorPortalContext(
       contractSatisfied,
       currentProjectState: currentProject.workspaceState,
       currentAgreementPreparationStatus: currentProject.agreementPreparationStatusInternal,
+      onboardingSubmissionComplete,
     })
 
     return {
@@ -534,6 +547,7 @@ export async function resolveAuthorPortalContext(
         marketingProfile: buildMarketingProfile(contact || {}),
       },
       relationship: {
+        authorProfileId: dataverseLookupId(authorProfile || {}, 'jm1_authorprofileid') || undefined,
         classificationStatus: isReturningAuthor
           ? relationshipActivated
             ? 'Grandfathered - Activated'
@@ -1324,6 +1338,7 @@ function buildDevelopmentFallbackContext(session: AuthorPortalSession, overrides
       },
     },
     relationship: {
+      authorProfileId: undefined,
       classificationStatus: 'Grandfathered - Activated',
       activationStatus: 'activated',
       operationalHealthStatus: 'activated',
@@ -1339,6 +1354,7 @@ function buildDevelopmentFallbackContext(session: AuthorPortalSession, overrides
     selectedProjectKey: currentProject.key,
     tasks: {
       authorProfileRequired: false,
+      onboardingSubmissionComplete: false,
       paymentRoyaltyRequired: false,
       formatSelectionRequired: false,
     },
@@ -1366,6 +1382,23 @@ async function getRelationshipBackedTitles(
   const fullName = stringValue(contact?.fullname)
   if (!contactId || !fullName) return []
 
+  const directlyBoundTitles = await dataverseList(config, 'jm1pub_titles', {
+    $select:
+      'jm1pub_titleid,jm1pub_titlename,jm1pub_authorname,jm1pub_authordisplayname,jm1pub_slug,_jm1_primaryauthor_value',
+    $filter: `_jm1_primaryauthor_value eq ${contactId}`,
+    $orderby: 'jm1pub_titlename asc',
+    $top: '50',
+  })
+
+  if (directlyBoundTitles.length > 0) {
+    return directlyBoundTitles.map((title) => ({
+      titleId: dataverseLookupId(title, 'jm1pub_titleid'),
+      title: stringValue(title.jm1pub_titlename),
+      authorName:
+        stringValue(title.jm1pub_authordisplayname) || stringValue(title.jm1pub_authorname) || fullName,
+    }))
+  }
+
   const relationships = await dataverseList(config, 'jm1_relationships', {
     $select: 'jm1_relationshipid,_jm1_fromcontact_value,jm1_relationshiptype,jm1_status',
     $filter: `_jm1_fromcontact_value eq ${contactId}`,
@@ -1388,6 +1421,30 @@ async function getRelationshipBackedTitles(
     authorName:
       stringValue(title.jm1pub_authordisplayname) || stringValue(title.jm1pub_authorname) || fullName,
   }))
+}
+
+async function hasCompletedOnboardingSubmission(
+  config: NonNullable<ReturnType<typeof getDataverseServerConfig>>,
+  contactId: string,
+  titleId: string,
+) {
+  const submissions = await dataverseList(config, 'jm1pub_submissions', {
+    $select: 'jm1pub_submissionid,jm1pub_rawpayload',
+    $filter: `_jm1pub_linkedcontact_value eq ${contactId} and jm1pub_formtype eq 'author-onboarding'`,
+    $orderby: 'createdon desc',
+    $top: '10',
+  })
+
+  return submissions.some((submission) => {
+    const rawPayload = stringValue(submission.jm1pub_rawpayload)
+    if (!rawPayload) return false
+    try {
+      const parsed = JSON.parse(rawPayload) as { governedAuthority?: { titleId?: string } }
+      return parsed.governedAuthority?.titleId?.toLowerCase() === titleId.toLowerCase()
+    } catch {
+      return false
+    }
+  })
 }
 
 function deriveTitleFromOpportunityName(value: string) {

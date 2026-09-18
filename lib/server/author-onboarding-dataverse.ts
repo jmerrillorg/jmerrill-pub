@@ -1,3 +1,5 @@
+import { createHash } from 'node:crypto'
+
 import { getDataverseRuntimeAccessToken, getPublisherRuntimeAuthMode } from './publisher-runtime-auth'
 
 const EXECUTION_STATUS = {
@@ -65,10 +67,12 @@ export async function writeAuthorOnboardingDataverseFallback(
   try {
     const token = await getDataverseToken(config)
     const submittedAt = new Date().toISOString()
+    const submissionId = deterministicGuid(buildSubmissionIdentity(payload))
+    const executionLogId = deterministicGuid(`execution:${submissionId}`)
     const submissionPayload = buildSubmissionPayload(payload, submittedAt)
-    const submission = await postDataverseRecord(config, token, 'jm1pub_submissions', submissionPayload)
-    const executionLog = await postDataverseRecord(config, token, 'jm1_executionlogs', {
-      jm1_name: `AUTHOR-ONBOARDING-${submission.id || submittedAt}`,
+    const submission = await upsertDataverseRecord(config, token, 'jm1pub_submissions', submissionId, submissionPayload)
+    const executionLog = await upsertDataverseRecord(config, token, 'jm1_executionlogs', executionLogId, {
+      jm1_name: `AUTHOR-ONBOARDING-${submissionId}`,
       jm1_actiondescription:
         'Author onboarding submitted through website Dataverse fallback after Power Automate onboarding ingestion failed. No payment, contract, royalty, production, distribution, or workspace movement action was performed.',
       jm1_actiontype: 'AUTHOR_ONBOARDING_SUBMITTED',
@@ -78,7 +82,7 @@ export async function writeAuthorOnboardingDataverseFallback(
       jm1_startedon: submittedAt,
       jm1_completedon: new Date().toISOString(),
       jm1_sourceentity: 'jm1pub_submission',
-      jm1_sourcerecordid: submission.id,
+      jm1_sourcerecordid: submissionId,
       jm1_errordetail: safeDetail(failureDetail),
     })
 
@@ -86,7 +90,9 @@ export async function writeAuthorOnboardingDataverseFallback(
       status: 'success',
       submissionId: submission.id,
       executionLogId: executionLog.id,
-      detail: 'Author onboarding was written directly to Dataverse after route-specific Power Automate ingestion failed.',
+      detail: submission.replay
+        ? 'The existing governed author onboarding submission was returned without creating a duplicate.'
+        : 'Author onboarding was written directly to Dataverse after route-specific Power Automate ingestion was unavailable.',
     }
   } catch (error) {
     return {
@@ -100,6 +106,7 @@ export async function writeAuthorOnboardingDataverseFallback(
 
 function buildSubmissionPayload(payload: Record<string, any>, submittedAt: string) {
   const genreValue = GENRE_OPTIONS[String(payload.genreKey || '').toLowerCase()] || GENRE_OPTIONS.other
+  const authority = payload.governedAuthority || {}
 
   return removeNullish({
     jm1pub_submissionname: `${stringValue(payload.authorName)} - ${stringValue(payload.bookTitle)}`.slice(0, 200),
@@ -126,7 +133,28 @@ function buildSubmissionPayload(payload: Record<string, any>, submittedAt: strin
     jm1pub_timezone: stringValue(payload.timezone || payload.author?.timezone),
     jm1pub_wordcount: stringValue(payload.estimatedWords || payload.book?.estimatedWords),
     jm1pub_workflowstage: WORKFLOW_STAGE_AUTHOR_ONBOARDING,
+    jm1pub_rawpayload: JSON.stringify(payload),
+    ...(authority.contactId
+      ? { 'jm1pub_LinkedContact@odata.bind': `/contacts(${authority.contactId})` }
+      : {}),
   })
+}
+
+function buildSubmissionIdentity(payload: Record<string, any>) {
+  const authority = payload.governedAuthority || {}
+  return [
+    authority.policyVersion || 'AUTHOR_ONBOARDING_CONTINUITY_V1',
+    authority.contactId || payload.email || '',
+    authority.titleId || payload.bookTitle || '',
+    authority.engagementId || '',
+  ].join(':').toLowerCase()
+}
+
+function deterministicGuid(value: string) {
+  const hex = createHash('sha256').update(value, 'utf8').digest('hex').slice(0, 32).split('')
+  hex[12] = '5'
+  hex[16] = ((Number.parseInt(hex[16], 16) & 0x3) | 0x8).toString(16)
+  return `${hex.slice(0, 8).join('')}-${hex.slice(8, 12).join('')}-${hex.slice(12, 16).join('')}-${hex.slice(16, 20).join('')}-${hex.slice(20, 32).join('')}`
 }
 
 function getDataverseConfig(): DataverseConfig | null {
@@ -157,26 +185,34 @@ async function getDataverseToken(config: DataverseConfig) {
   return getDataverseRuntimeAccessToken(config.resourceUrl)
 }
 
-async function postDataverseRecord(config: DataverseConfig, token: string, entitySet: string, payload: Record<string, unknown>) {
-  const response = await fetch(`${config.apiBase}/${entitySet}`, {
-    method: 'POST',
+async function upsertDataverseRecord(
+  config: DataverseConfig,
+  token: string,
+  entitySet: string,
+  id: string,
+  payload: Record<string, unknown>,
+) {
+  const response = await fetch(`${config.apiBase}/${entitySet}(${id})`, {
+    method: 'PATCH',
     headers: {
       Authorization: `Bearer ${token}`,
       'Content-Type': 'application/json',
       Accept: 'application/json',
+      'If-None-Match': '*',
       Prefer: 'return=representation',
     },
     body: JSON.stringify(payload),
   })
 
+  if (response.status === 412) return { id, replay: true }
   const body = await response.json().catch(() => ({}))
   if (!response.ok) {
     const message = body?.error?.message || `dataverse_write_failed:${response.status}`
     throw new Error(message)
   }
-
   return {
-    id: body.jm1pub_submissionid || body.jm1_executionlogid || null,
+    id: body.jm1pub_submissionid || body.jm1_executionlogid || id,
+    replay: false,
   }
 }
 
