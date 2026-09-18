@@ -69,6 +69,15 @@ function createCommercialEligibilityAuditStore(options = {}) {
     return writeOnce(`reviews/${envelope.classificationId}/${key}.json`, { ...envelope, reviewId: key });
   }
 
+  async function savePolicyDenial(envelope) {
+    const key = digest(JSON.stringify([
+      envelope.classificationId,
+      envelope.effectDecision?.REQUESTED_EFFECT,
+      envelope.effectDecision?.DECISION
+    ]));
+    return writeOnce(`policy-denials/${envelope.classificationId}/${key}.json`, { ...envelope, denialId: key });
+  }
+
   async function saveFailure(event) {
     return writeOnce(`failures/${new Date().toISOString().replace(/[:.]/g, "-")}-${randomUUID()}.json`, event);
   }
@@ -88,7 +97,7 @@ function createCommercialEligibilityAuditStore(options = {}) {
     return records;
   }
 
-  return { list, readPreparation, saveFailure, savePreparation, saveReview };
+  return { list, readPreparation, saveFailure, savePolicyDenial, savePreparation, saveReview };
 }
 
 module.exports = { createCommercialEligibilityAuditStore };

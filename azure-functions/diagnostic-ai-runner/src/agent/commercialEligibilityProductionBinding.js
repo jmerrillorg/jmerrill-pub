@@ -45,7 +45,20 @@ function createCommercialEligibilityProductionBinding(options = {}) {
       businessEffects: 0
     };
     const persisted = await audit.savePreparation(envelope);
-    return { ...persisted.value, idempotentReplay: !persisted.created, auditReference: persisted.blobName };
+    let effectAuditReference = null;
+    if (result.EFFECT_DECISION) {
+      const denial = await audit.savePolicyDenial({
+        schemaVersion: "JM1-AGENTIC-004A-POLICY-DENIAL-v1",
+        event: "COMMERCIAL_ELIGIBILITY_EFFECT_DENIED",
+        storedAt: clock(),
+        classificationId: result.PREPARED_CLASSIFICATION.CLASSIFICATION_ID,
+        effectDecision: result.EFFECT_DECISION,
+        identity: IDENTITY,
+        businessEffects: 0
+      });
+      effectAuditReference = denial.blobName;
+    }
+    return { ...persisted.value, idempotentReplay: !persisted.created, auditReference: persisted.blobName, effectAuditReference };
   }
 
   async function review(input = {}) {
@@ -124,6 +137,36 @@ function createCommercialEligibilityProductionBinding(options = {}) {
           BUSINESS_EFFECTS: 0
         };
       });
+    const telemetry = records.reduce((summary, item) => {
+      const event = item.record?.event;
+      if (event === "COMMERCIAL_ELIGIBILITY_PREPARED") summary.PRODUCTION_RUNS += 1;
+      if (event === "COMMERCIAL_ELIGIBILITY_REVIEWED") {
+        summary.HUMAN_REVIEWS += 1;
+        if (item.record?.review?.REVIEW_ACTION === "CORRECT") summary.HUMAN_CORRECTIONS += 1;
+        if (item.record?.review?.REVIEW_ACTION === "DEFER") summary.HUMAN_DEFERRALS += 1;
+        if (item.record?.review?.REVIEW_STATUS === "STALE") summary.STALE_INVALIDATIONS += 1;
+      }
+      if (event === "COMMERCIAL_ELIGIBILITY_EFFECT_DENIED") {
+        summary.POLICY_DENIALS += 1;
+        summary.EFFECT_DENIALS += 1;
+      }
+      if (event === "COMMERCIAL_ELIGIBILITY_AUDIT_FAILURE") summary.AUDIT_FAILURES += 1;
+      if (event === "COMMERCIAL_ELIGIBILITY_IDENTITY_FAILURE") summary.IDENTITY_FAILURES += 1;
+      return summary;
+    }, {
+      PRODUCTION_RUNS: 0,
+      HUMAN_REVIEWS: 0,
+      HUMAN_CORRECTIONS: 0,
+      HUMAN_DEFERRALS: 0,
+      STALE_INVALIDATIONS: 0,
+      POLICY_DENIALS: 0,
+      EFFECT_DENIALS: 0,
+      CLASSIFICATION_FAILURES: 0,
+      AUDIT_FAILURES: 0,
+      IDENTITY_FAILURES: 0
+    });
+    telemetry.SUCCESSFUL_CLASSIFICATIONS = classifications.filter((item) => !["INSUFFICIENT_EVIDENCE", "STALE_OR_CONFLICTING_STATE"].includes(item.CLASSIFICATION)).length;
+    telemetry.INSUFFICIENT_EVIDENCE_RESULTS = classifications.filter((item) => item.CLASSIFICATION === "INSUFFICIENT_EVIDENCE").length;
     return {
       CAPABILITY_ID,
       CAPABILITY_VERSION,
@@ -134,7 +177,8 @@ function createCommercialEligibilityProductionBinding(options = {}) {
       DOWNSTREAM_EFFECT_AUTHORITY: "NONE",
       AUDIT_DURABILITY: "PRODUCTION_BOUND",
       records,
-      classifications
+      classifications,
+      telemetry
     };
   }
 
