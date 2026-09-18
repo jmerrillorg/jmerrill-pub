@@ -38,7 +38,9 @@ The exact Indomitable title, stage, gate, contact, package, author, and intake r
 - Complete governed fixture: system-generated V2 conversational copy; both semantic roles present; title, stage, author, and version parity passed; sender canon passed.
 - Manual composition was not used as proof.
 
-This is source and regression proof only. Production deployment and post-deployment non-sending system replay remain required before incident closure.
+The repaired source merged through PR #763 at `2da446def764cc8f3d9b95121a3def1f4bfd8f29`. The ACS relay, diagnostic runner, and Publishing web policy deployment workflows completed successfully. Both Function Apps report that SHA as `JM1_RELEASE_SHA` and `JM1_PRODUCTION_RELEASE_SHA`.
+
+The immutable diagnostic deployment artifact was then replayed without a live relay call. Its sender source checksum matched `origin/main`. The review-only Indomitable state failed closed with zero relay calls, and the complete governed fixture produced `DEVELOPMENTAL_EDITORIAL_REVIEW_READY_V2` with artifact completeness, sender canon, and title/author binding all passing.
 
 ## Verification
 
@@ -49,15 +51,19 @@ This is source and regression proof only. Production deployment and post-deploym
 | Human-first Developmental scaffolding policy regression | PASS |
 | JavaScript syntax checks | PASS |
 | Broader author communication guard | 10 PASS / 1 unrelated pre-existing binary-check expectation failure under the local dependency shim |
-| Production deployment | NOT PERFORMED |
+| PR / merge SHA | #763 / `2da446def764cc8f3d9b95121a3def1f4bfd8f29` |
+| ACS relay deployment and health | PASS |
+| Diagnostic runner deployment and health | PASS |
+| Publishing web policy deployment and health | PASS |
+| Post-deployment non-sending replay | PASS |
 | Author communications | 0 |
 
 ## Current Classification
 
 `CLIENT_RECOVERY_STATUS = PASS`
 
-`SYSTEM_REPAIR_STATUS = SYSTEM_REPAIRED_NOT_COMMISSIONED`
+`SYSTEM_REPAIR_STATUS = COMMISSIONED`
 
-`INCIDENT_CLOSURE = FAIL`
+`INCIDENT_CLOSURE = PASS`
 
-The closure gate is merge, deployment of both affected Functions applications, and a post-deployment non-sending replay/readback.
+The September 18 Developmental communication/artifact-gate incident is fully closed. The separate bypass defects in the intervention audit remain open on their own authority.
