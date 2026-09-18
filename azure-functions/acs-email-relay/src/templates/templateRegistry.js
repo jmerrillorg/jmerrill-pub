@@ -33,6 +33,23 @@ const TEMPLATE_REGISTRY = Object.freeze([
     status: ACTIVE
   }),
   template({
+    templateId: "PUBLISHING.AUTHOR_ONBOARDING_V1",
+    templateVersion: "1.0.0",
+    brandId: "PUBLISHING",
+    purpose: "Invite an eligible author to the governed author onboarding experience.",
+    subject: "Begin Author Onboarding for {{projectTitle}}",
+    preheader: "Your secure author onboarding is ready.",
+    dataSchema: {
+      authorFirstName: "required safe text",
+      projectTitle: "required safe text",
+      onboardingUrl: "required governed HTTPS onboarding URL"
+    },
+    ctaSchema: "Begin Author Onboarding",
+    contentAuthority: "AUTHOR_ONBOARDING_V1",
+    designTokenVersion: "PUBLISHING-EMAIL-v1.0.0",
+    status: ACTIVE
+  }),
+  template({
     templateId: "PUBLISHING.PAYMENT_REQUEST_READY",
     templateVersion: "1.0.0",
     brandId: "PUBLISHING",

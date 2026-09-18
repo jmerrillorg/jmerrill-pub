@@ -363,6 +363,7 @@ export function buildPortalTaskState({
   contractSatisfied,
   currentProjectState,
   currentAgreementPreparationStatus,
+  onboardingSubmissionComplete = false,
 }: {
   relationshipProfileComplete: boolean
   relationshipStripeComplete: boolean
@@ -370,6 +371,7 @@ export function buildPortalTaskState({
   relationshipPayoutComplete: boolean
   contractSatisfied: boolean
   currentAgreementPreparationStatus?: string
+  onboardingSubmissionComplete?: boolean
   currentProjectState:
     | 'pre_contract_setup'
     | 'awaiting_governed_action'
@@ -402,6 +404,7 @@ export function buildPortalTaskState({
 
   return {
     authorProfileRequired,
+    onboardingSubmissionComplete,
     paymentRoyaltyRequired,
     formatSelectionRequired,
   }

@@ -50,7 +50,7 @@ export const AUTHOR_FACING_COMMUNICATION_RENDER_MATRIX = [
   { communicationType: 'editorial review', templateName: 'EDITORIAL_RECOMMENDATION_LETTER_V1', renderMode: AUTHOR_FACING_RENDER_MODES.canonicalHtml, state: 'ACTIVE_GOVERNED' },
   { communicationType: 'decision request', templateName: 'AUTHOR_DECISION_REQUEST_V1', renderMode: AUTHOR_FACING_RENDER_MODES.canonicalHtml, state: 'PLANNED_GOVERNED' },
   { communicationType: 'correction/revision', templateName: 'AUTHOR_CORRECTION_REQUEST_V1', renderMode: AUTHOR_FACING_RENDER_MODES.canonicalHtml, state: 'PLANNED_GOVERNED' },
-  { communicationType: 'onboarding', templateName: 'AUTHOR_ONBOARDING_V1', renderMode: AUTHOR_FACING_RENDER_MODES.canonicalHtml, state: 'PLANNED_GOVERNED' },
+  { communicationType: 'onboarding', templateName: 'AUTHOR_ONBOARDING_V1', renderMode: AUTHOR_FACING_RENDER_MODES.canonicalHtml, state: 'ACTIVE_GOVERNED' },
   { communicationType: 'production update', templateName: 'AUTHOR_PRODUCTION_UPDATE_V1', renderMode: AUTHOR_FACING_RENDER_MODES.canonicalHtml, state: 'PLANNED_GOVERNED' },
   { communicationType: 'distribution/release', templateName: 'AUTHOR_DISTRIBUTION_RELEASE_UPDATE_V1', renderMode: AUTHOR_FACING_RENDER_MODES.canonicalHtml, state: 'PLANNED_GOVERNED' },
   { communicationType: 'launch', templateName: 'AUTHOR_LAUNCH_COMMUNICATION_V1', renderMode: AUTHOR_FACING_RENDER_MODES.canonicalHtml, state: 'PLANNED_GOVERNED' },
@@ -335,6 +335,39 @@ export function renderCoverReviewAuthorCommunication(input: {
     ],
     supportNote: 'If anything is unclear, reply to this email and the Publishing Team will help.',
     operationalNote: 'This message does not approve publication, change your publishing agreement, or start a review period by itself.',
+  })
+}
+
+export function renderAuthorOnboardingInvitation(input: {
+  authorName: string
+  titleName: string
+  onboardingUrl: string
+}): RenderedAuthorCommunication {
+  return renderAuthorCommunicationEmail({
+    templateName: 'AUTHOR_ONBOARDING_V1',
+    templateVersion: '1.0.0',
+    subject: `Begin Author Onboarding for ${input.titleName}`,
+    authorName: input.authorName,
+    titleName: input.titleName,
+    preheader: `Your secure author onboarding for ${input.titleName} is ready.`,
+    why: `Your publishing agreement and payment for ${input.titleName} are complete, so you can now begin author onboarding.`,
+    completed: [
+      'Your publishing agreement is complete.',
+      'Your Starter package payment is complete.',
+      `Your ${input.titleName} project is ready for onboarding.`,
+    ],
+    meaning: 'Onboarding gives the Publishing Team the author, book, and production details needed to begin the next part of your publishing journey.',
+    authorAction: 'Open the secure onboarding page, sign in with this email address, request your one-time code, and complete the form for this title.',
+    primaryActionLabel: 'Begin Author Onboarding',
+    primaryActionUrl: input.onboardingUrl,
+    packageInventory: ['Secure author onboarding form', 'Starter package production preferences'],
+    nextSteps: [
+      'Sign in with the email address that received this invitation.',
+      'Complete and submit the onboarding form for this title.',
+      'The Publishing Team will review your information and confirm the next step.',
+    ],
+    supportNote: 'If you have any trouble signing in or completing the form, reply to this email and the Publishing Team will help.',
+    operationalNote: 'Submitting onboarding does not approve publication or move your project beyond onboarding by itself.',
   })
 }
 

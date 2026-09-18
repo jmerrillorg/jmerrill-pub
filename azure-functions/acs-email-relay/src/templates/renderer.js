@@ -201,6 +201,42 @@ function renderPaymentElection(template, brand, data) {
   return { subject, preheader: template.preheader, html, plainText: text };
 }
 
+function validateAuthorOnboardingData(data) {
+  if (!data || typeof data !== "object" || Array.isArray(data)) return { ok: false, reason: "TEMPLATE_DATA_INVALID" };
+  const allowed = new Set(["authorFirstName", "projectTitle", "onboardingUrl"]);
+  if (Object.keys(data).some((key) => !allowed.has(key))) return { ok: false, reason: "TEMPLATE_DATA_UNEXPECTED_FIELD" };
+  const authorFirstName = safeText(data.authorFirstName, "authorFirstName", 80);
+  if (!authorFirstName.ok) return authorFirstName;
+  const projectTitle = safeText(data.projectTitle, "projectTitle", 160);
+  if (!projectTitle.ok) return projectTitle;
+  let onboardingUrl;
+  try {
+    onboardingUrl = new URL(String(data.onboardingUrl || ""));
+  } catch {
+    return { ok: false, reason: "TEMPLATE_DATA_ONBOARDINGURL_INVALID" };
+  }
+  if (onboardingUrl.protocol !== "https:" || onboardingUrl.hostname !== "jmerrill.pub" || onboardingUrl.pathname !== "/author/onboarding") {
+    return { ok: false, reason: "TEMPLATE_DATA_ONBOARDINGURL_INVALID" };
+  }
+  return { ok: true, value: { authorFirstName: authorFirstName.value, projectTitle: projectTitle.value, onboardingUrl: onboardingUrl.toString() } };
+}
+
+function renderAuthorOnboarding(template, brand, data) {
+  const tokens = brand.tokens;
+  const subject = template.subject.replace("{{projectTitle}}", data.projectTitle);
+  const plainText = [
+    `Good day, ${data.authorFirstName},`, "",
+    `Your publishing agreement and payment for ${data.projectTitle} are complete, so you can now begin author onboarding.`, "",
+    "Use the secure onboarding page below. Sign in with the email address that received this invitation, request your one-time code, and complete the form for this title.", "",
+    data.onboardingUrl, "",
+    "After you submit the form, the Publishing Team will review your information and confirm the next step.", "",
+    "If you have any trouble signing in or completing the form, reply to this email and the Publishing Team will help.", "",
+    "Warm regards,", "", brand.signatureName, brand.footer, brand.publicUrl
+  ].join("\n");
+  const html = `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escapeHtml(subject)}</title></head><body style="margin:0;padding:0;background:${tokens["surface.muted"]};font-family:${tokens["font.stack"]};color:${tokens["text.primary"]};"><div style="display:none;max-height:0;overflow:hidden;opacity:0;color:transparent;">${escapeHtml(template.preheader)}</div><table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;background:${tokens["surface.muted"]};"><tr><td align="center" style="padding:24px 12px;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;max-width:600px;background:${tokens["surface.background"]};border:1px solid ${tokens["border.subtle"]};"><tr><td style="padding:24px 28px;border-top:6px solid ${tokens["brand.primary"]};text-align:center;"><a href="${brand.publicUrl}" style="text-decoration:none;"><img src="${brand.logo.url}" width="96" height="96" alt="${escapeHtml(brand.logo.alt)}" style="display:inline-block;width:96px;height:96px;border:0;object-fit:contain;"></a></td></tr><tr><td style="padding:4px 28px 28px;"><h1 style="margin:0 0 20px;font-size:26px;line-height:1.25;">Begin Author Onboarding</h1><p style="margin:0 0 16px;font-size:16px;line-height:1.6;">Good day, ${escapeHtml(data.authorFirstName)},</p><p style="margin:0 0 16px;font-size:16px;line-height:1.6;">Your publishing agreement and payment for <strong>${escapeHtml(data.projectTitle)}</strong> are complete, so you can now begin author onboarding.</p><p style="margin:0 0 22px;font-size:16px;line-height:1.6;">Sign in with the email address that received this invitation, request your one-time code, and complete the form for this title.</p><p style="margin:0 0 24px;text-align:center;"><a href="${escapeHtml(data.onboardingUrl)}" style="display:inline-block;background:${tokens["action.primary.background"]};color:${tokens["action.primary.text"]};padding:13px 22px;text-decoration:none;font-weight:700;">Begin Author Onboarding</a></p><p style="margin:0 0 18px;font-size:16px;line-height:1.6;">After you submit the form, the Publishing Team will review your information and confirm the next step.</p><p style="margin:0;font-size:16px;line-height:1.6;">Warm regards,<br><br><strong>${escapeHtml(brand.signatureName)}</strong></p></td></tr><tr><td style="padding:20px 28px;background:${tokens["footer.background"]};color:${tokens["footer.text"]};text-align:center;font-size:13px;line-height:1.6;">J Merrill Publishing | <a href="${brand.publicUrl}" style="color:${tokens["footer.text"]};">jmerrill.pub</a> | <a href="mailto:publishing@jmerrill.one" style="color:${tokens["footer.text"]};">publishing@jmerrill.one</a></td></tr></table></td></tr></table></body></html>`;
+  return { subject, preheader: template.preheader, html, plainText };
+}
+
 function renderTemplate(input = {}) {
   const template = findTemplate(input.templateId, input.templateVersion);
   if (!template) return { ok: false, reason: isGovernedNamespace(input.templateId) ? "TEMPLATE_VERSION_UNKNOWN" : "TEMPLATE_NOT_GOVERNED" };
@@ -212,11 +248,15 @@ function renderTemplate(input = {}) {
   let validated;
   if (template.templateId === "PUBLISHING.PAYMENT_ELECTION_REQUIRED") {
     validated = validatePaymentElectionData(input.data);
+  } else if (template.templateId === "PUBLISHING.AUTHOR_ONBOARDING_V1") {
+    validated = validateAuthorOnboardingData(input.data);
   } else {
     return { ok: false, reason: "TEMPLATE_RENDERER_NOT_IMPLEMENTED" };
   }
   if (!validated.ok) return validated;
-  const output = renderPaymentElection(template, brandResult.profile, validated.value);
+  const output = template.templateId === "PUBLISHING.AUTHOR_ONBOARDING_V1"
+    ? renderAuthorOnboarding(template, brandResult.profile, validated.value)
+    : renderPaymentElection(template, brandResult.profile, validated.value);
   return {
     ok: true,
     value: {

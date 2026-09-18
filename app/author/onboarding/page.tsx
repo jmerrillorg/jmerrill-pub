@@ -16,7 +16,7 @@ export const metadata: Metadata = {
 
 export default async function AuthorOnboardingPage() {
   const context = await getAuthorPortalContextFromCookies()
-  const onboardingAlreadyComplete = Boolean(context && !context.tasks.authorProfileRequired)
+  const onboardingAlreadyComplete = Boolean(context?.tasks.onboardingSubmissionComplete)
 
   return (
     <AuthorPortalShell

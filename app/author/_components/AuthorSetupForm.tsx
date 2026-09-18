@@ -139,7 +139,6 @@ export function AuthorSetupForm({
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'x-author-access-code': sessionStorage.getItem('jmp-author-portal-access-code') || sessionStorage.getItem('jmp-author-onboarding-access-code') || '',
         },
         body: JSON.stringify(values),
       })
