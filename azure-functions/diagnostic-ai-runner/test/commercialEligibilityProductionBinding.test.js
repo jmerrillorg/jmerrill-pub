@@ -29,6 +29,7 @@ function liveState(version = "dv-state-v1") {
 function memoryAudit() {
   let preparation;
   const reviews = new Map();
+  const denials = new Map();
   return {
     async savePreparation(value) {
       if (preparation) return { value: preparation, created: false, blobName: "preparation.json" };
@@ -42,7 +43,19 @@ function memoryAudit() {
       reviews.set(key, value);
       return { value, created: true, blobName: "review.json" };
     },
-    async list() { return [{ name: "preparation.json" }, ...[...reviews.values()].map((_, index) => ({ name: `review-${index}.json` }))]; }
+    async savePolicyDenial(value) {
+      const key = value.effectDecision.REQUESTED_EFFECT;
+      if (denials.has(key)) return { value: denials.get(key), created: false, blobName: `denial-${key}.json` };
+      denials.set(key, value);
+      return { value, created: true, blobName: `denial-${key}.json` };
+    },
+    async list() {
+      return [
+        ...(preparation ? [{ name: "preparation.json", record: preparation }] : []),
+        ...[...reviews.values()].map((record, index) => ({ name: `review-${index}.json`, record })),
+        ...[...denials.values()].map((record, index) => ({ name: `denial-${index}.json`, record }))
+      ];
+    }
   };
 }
 
@@ -128,5 +141,17 @@ describe("commercial eligibility production binding", () => {
     process.env.JM1_AGENTIC_COMMERCIAL_ELIGIBILITY_A2_ENABLED = "false";
     const binding = createCommercialEligibilityProductionBinding({ readState: async () => liveState(), audit: memoryAudit() });
     await assert.rejects(binding.prepare({}), (error) => error.safeCode === "A2_BINDING_DISABLED");
+  });
+
+  test("effect denial is durably audited and idempotent", async () => {
+    const audit = memoryAudit();
+    const binding = createCommercialEligibilityProductionBinding({ readState: async () => liveState(), audit, clock: () => "2026-09-18T14:05:00.000Z" });
+    const first = await binding.prepare({ opportunityId: liveState().WORK_ID, titleId: liveState().TITLE_ID, requestedEffect: "STRIPE.INVOICE_CREATE" });
+    const replay = await binding.prepare({ opportunityId: liveState().WORK_ID, titleId: liveState().TITLE_ID, requestedEffect: "STRIPE.INVOICE_CREATE" });
+    assert.equal(first.effectDecision.DECISION, "DENIED_FINANCIAL_EFFECT_NOT_AUTHORIZED");
+    assert.equal(first.effectAuditReference, replay.effectAuditReference);
+    const supervision = await binding.supervision();
+    assert.equal(supervision.telemetry.POLICY_DENIALS, 1);
+    assert.equal(supervision.telemetry.EFFECT_DENIALS, 1);
   });
 });
