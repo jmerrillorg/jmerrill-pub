@@ -1,5 +1,7 @@
 "use strict";
 
+const { ManagedIdentityCredential } = require("@azure/identity");
+
 const {
   CAPABILITY_ID,
   CAPABILITY_VERSION,
@@ -18,11 +20,34 @@ function ensureEnabled() {
   if (clean(process.env.JM1_AGENTIC_COMMERCIAL_ELIGIBILITY_A2_ENABLED).toLowerCase() !== "true") {
     throw Object.assign(new Error("Production A2 binding is disabled."), { safeCode: "A2_BINDING_DISABLED" });
   }
+  if (
+    clean(process.env.JM1_AGENTIC_COMMERCIAL_ELIGIBILITY_REQUIRE_DEDICATED_IDENTITY).toLowerCase() === "true" &&
+    !clean(process.env.JM1_AGENTIC_COMMERCIAL_ELIGIBILITY_CLIENT_ID)
+  ) {
+    throw Object.assign(new Error("Dedicated A2 identity is required."), { safeCode: "A2_DEDICATED_IDENTITY_REQUIRED" });
+  }
+}
+
+function createCapabilityCredential(options = {}) {
+  if (options.credential) return options.credential;
+  const clientId = clean(options.clientId || process.env.JM1_AGENTIC_COMMERCIAL_ELIGIBILITY_CLIENT_ID);
+  return clientId ? new ManagedIdentityCredential(clientId) : null;
 }
 
 function createCommercialEligibilityProductionBinding(options = {}) {
-  const readState = options.readState || createCommercialEligibilityDataverseReader(options.dataverse);
-  const audit = options.audit || createCommercialEligibilityAuditStore(options.storage);
+  const credential = createCapabilityCredential(options);
+  const dataverseOptions = { ...(options.dataverse || {}) };
+  if (credential && !dataverseOptions.getToken) {
+    dataverseOptions.getToken = async (resourceUrl) => {
+      const token = await credential.getToken(`${resourceUrl}/.default`);
+      if (!token?.token) throw Object.assign(new Error("Dedicated identity token acquisition failed."), { safeCode: "A2_IDENTITY_TOKEN_FAILED" });
+      return token.token;
+    };
+  }
+  const storageOptions = { ...(options.storage || {}) };
+  if (credential && !storageOptions.credential) storageOptions.credential = credential;
+  const readState = options.readState || createCommercialEligibilityDataverseReader(dataverseOptions);
+  const audit = options.audit || createCommercialEligibilityAuditStore(storageOptions);
   const clock = options.clock || (() => new Date().toISOString());
 
   async function prepare(input = {}) {
@@ -105,17 +130,56 @@ function createCommercialEligibilityProductionBinding(options = {}) {
     return { ...persisted.value, idempotentReplay: !persisted.created, auditReference: persisted.blobName };
   }
 
+  async function proveStaleReview(input = {}) {
+    ensureEnabled();
+    const existing = await audit.readPreparation(input.classificationId);
+    const proofStateVersion = `${existing.prepared.INPUT_STATE_REFERENCE}:CONTROLLED_STALE_POLICY_PROOF`;
+    const traces = [];
+    const capability = createCommercialEligibilityCapability({ auditSink: async (trace) => traces.push(trace), clock });
+    const result = await capability.review({
+      prepared: existing.prepared,
+      currentStateVersion: proofStateVersion,
+      decision: "ACCEPT",
+      reviewer: "policy-harness/non-human",
+      reviewedAt: clock(),
+      reason: "Controlled version-mismatch proof; not a human disposition."
+    });
+    if (result.REVIEW_STATUS !== "STALE" || result.FINAL_REVIEWED_CLASSIFICATION !== null) {
+      throw Object.assign(new Error("Stale policy did not fail closed."), { safeCode: "A2_STALE_POLICY_PROOF_FAILED" });
+    }
+    const envelope = {
+      schemaVersion: "JM1-AGENTIC-004B-STALE-PROOF-v1",
+      event: "COMMERCIAL_ELIGIBILITY_STALE_POLICY_PROOF",
+      storedAt: clock(),
+      classificationId: existing.prepared.CLASSIFICATION_ID,
+      preparedStateVersion: existing.prepared.INPUT_STATE_REFERENCE,
+      proofStateVersion,
+      policyHarness: "NON_HUMAN_VERSION_MISMATCH",
+      result,
+      trace: traces[0],
+      reviewMutation: 0,
+      downstreamEffectAuthority: "NONE",
+      businessEffects: 0
+    };
+    const persisted = await audit.saveStaleProof(envelope);
+    return { ...persisted.value, idempotentReplay: !persisted.created, auditReference: persisted.blobName };
+  }
+
   async function supervision() {
     ensureEnabled();
     const records = await audit.list(200);
     const reviewsByClassification = new Map();
     const denialsByClassification = new Map();
+    const staleProofsByClassification = new Map();
     for (const item of records) {
       const record = item.record || {};
       if (record.event === "COMMERCIAL_ELIGIBILITY_EFFECT_DENIED" && record.classificationId) {
         const denials = denialsByClassification.get(record.classificationId) || [];
         denials.push(record.effectDecision);
         denialsByClassification.set(record.classificationId, denials);
+      }
+      if (record.event === "COMMERCIAL_ELIGIBILITY_STALE_POLICY_PROOF" && record.classificationId) {
+        staleProofsByClassification.set(record.classificationId, item);
       }
       if (record.event !== "COMMERCIAL_ELIGIBILITY_REVIEWED" || !record.classificationId) continue;
       const current = reviewsByClassification.get(record.classificationId);
@@ -132,6 +196,7 @@ function createCommercialEligibilityProductionBinding(options = {}) {
           TITLE_ID: prepared.TITLE_ID,
           CLASSIFICATION: prepared.CLASSIFICATION,
           CLASSIFICATION_CONFIDENCE: prepared.CLASSIFICATION_CONFIDENCE,
+          IDENTITY: item.record.identity || prepared.IDENTITY || null,
           INPUT_STATE_REFERENCE: prepared.INPUT_STATE_REFERENCE,
           EVIDENCE_REFERENCES: prepared.EVIDENCE_REFERENCES,
           MISSING_EVIDENCE: prepared.MISSING_EVIDENCE,
@@ -144,6 +209,7 @@ function createCommercialEligibilityProductionBinding(options = {}) {
           HUMAN_CORRECTION: latestReview?.review?.HUMAN_CORRECTION || null,
           FINAL_REVIEWED_CLASSIFICATION: latestReview?.review?.FINAL_REVIEWED_CLASSIFICATION || null,
           STALE_STATUS: latestReview?.review?.STALE_STATUS || "NOT_REVIEWED",
+          STALE_POLICY_PROOF: staleProofsByClassification.has(prepared.CLASSIFICATION_ID) ? "PASS" : "NOT_EXECUTED",
           ERROR: null,
           UNAUTHORIZED_EFFECTS: denialsByClassification.get(prepared.CLASSIFICATION_ID) || [],
           BUSINESS_EFFECTS: 0
@@ -162,6 +228,7 @@ function createCommercialEligibilityProductionBinding(options = {}) {
         summary.POLICY_DENIALS += 1;
         summary.EFFECT_DENIALS += 1;
       }
+      if (event === "COMMERCIAL_ELIGIBILITY_STALE_POLICY_PROOF") summary.STALE_INVALIDATIONS += 1;
       if (event === "COMMERCIAL_ELIGIBILITY_AUDIT_FAILURE") summary.AUDIT_FAILURES += 1;
       if (event === "COMMERCIAL_ELIGIBILITY_IDENTITY_FAILURE") summary.IDENTITY_FAILURES += 1;
       return summary;
@@ -194,7 +261,7 @@ function createCommercialEligibilityProductionBinding(options = {}) {
     };
   }
 
-  return { prepare, review, supervision };
+  return { prepare, proveStaleReview, review, supervision };
 }
 
-module.exports = { createCommercialEligibilityProductionBinding };
+module.exports = { createCapabilityCredential, createCommercialEligibilityProductionBinding };

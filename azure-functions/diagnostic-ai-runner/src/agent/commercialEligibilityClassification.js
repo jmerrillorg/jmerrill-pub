@@ -3,9 +3,9 @@
 const { createHash } = require("node:crypto");
 
 const CAPABILITY_ID = "PUBLISHING.COMMERCIAL_ELIGIBILITY_CLASSIFICATION";
-const CAPABILITY_VERSION = "JM1-PUBLISHING-COMMERCIAL-ELIGIBILITY-v1.0.0";
-const REGISTRY_VERSION = "JM1-AGENT-CAPABILITY-REGISTRY-v1.2.0";
-const IDENTITY = "func-jm1-diagnostic-ai-runner/system-assigned";
+const CAPABILITY_VERSION = "JM1-PUBLISHING-COMMERCIAL-ELIGIBILITY-v1.1.0";
+const REGISTRY_VERSION = "JM1-AGENT-CAPABILITY-REGISTRY-v1.4.0";
+const IDENTITY = "id-jm1-pub-commercial-eligibility-a2/user-assigned";
 
 const CLASSIFICATIONS = Object.freeze([
   "NOT_COMMERCIALLY_ELIGIBLE",

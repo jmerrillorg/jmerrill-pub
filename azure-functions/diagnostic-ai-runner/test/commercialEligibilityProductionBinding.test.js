@@ -30,6 +30,7 @@ function memoryAudit() {
   let preparation;
   const reviews = new Map();
   const denials = new Map();
+  const staleProofs = new Map();
   return {
     async savePreparation(value) {
       if (preparation) return { value: preparation, created: false, blobName: "preparation.json" };
@@ -49,11 +50,18 @@ function memoryAudit() {
       denials.set(key, value);
       return { value, created: true, blobName: `denial-${key}.json` };
     },
+    async saveStaleProof(value) {
+      const key = value.classificationId;
+      if (staleProofs.has(key)) return { value: staleProofs.get(key), created: false, blobName: `stale-${key}.json` };
+      staleProofs.set(key, value);
+      return { value, created: true, blobName: `stale-${key}.json` };
+    },
     async list() {
       return [
         ...(preparation ? [{ name: "preparation.json", record: preparation }] : []),
         ...[...reviews.values()].map((record, index) => ({ name: `review-${index}.json`, record })),
-        ...[...denials.values()].map((record, index) => ({ name: `denial-${index}.json`, record }))
+        ...[...denials.values()].map((record, index) => ({ name: `denial-${index}.json`, record })),
+        ...[...staleProofs.values()].map((record, index) => ({ name: `stale-${index}.json`, record }))
       ];
     }
   };
@@ -114,6 +122,21 @@ describe("commercial eligibility production binding", () => {
     assert.equal(reviewed.preparedExpired, true);
     assert.equal(reviewed.review.REVIEW_STATUS, "STALE");
     assert.equal(reviewed.review.FINAL_REVIEWED_CLASSIFICATION, null);
+  });
+
+  test("non-human policy harness proves stale denial without creating a human review", async () => {
+    const audit = memoryAudit();
+    const binding = createCommercialEligibilityProductionBinding({ readState: async () => liveState(), audit, clock: () => "2026-09-18T14:05:00.000Z" });
+    const prepared = await binding.prepare({ opportunityId: liveState().WORK_ID, titleId: liveState().TITLE_ID });
+    const proof = await binding.proveStaleReview({ classificationId: prepared.prepared.CLASSIFICATION_ID });
+    assert.equal(proof.result.REVIEW_STATUS, "STALE");
+    assert.equal(proof.result.FINAL_REVIEWED_CLASSIFICATION, null);
+    assert.equal(proof.reviewMutation, 0);
+    assert.equal(proof.businessEffects, 0);
+    const supervision = await binding.supervision();
+    assert.equal(supervision.telemetry.HUMAN_REVIEWS, 0);
+    assert.equal(supervision.telemetry.STALE_INVALIDATIONS, 1);
+    assert.equal(supervision.classifications[0].STALE_POLICY_PROOF, "PASS");
   });
 
   test("human correction preserves machine result and remains no-effect", async () => {

@@ -40,6 +40,9 @@ app.http("commercial-eligibility-a2", {
       if (request.method === "POST" && action === "review") {
         return { status: 200, jsonBody: { ok: true, result: await binding.review(body) } };
       }
+      if (request.method === "POST" && action === "stale-proof") {
+        return { status: 200, jsonBody: { ok: true, result: await binding.proveStaleReview(body) } };
+      }
       return { status: 404, jsonBody: { ok: false, code: "A2_ACTION_NOT_FOUND" } };
     } catch (error) {
       return responseForError(error, context);
