@@ -197,6 +197,8 @@ jobs:
               JM1_PAYMENT_ELECTION_COMMUNICATION_ENABLED="true" \
               JM1_PAYMENT_ELECTION_COMMUNICATION_MAX_REQUESTS="10" \
               JM1_AGENTIC_COMMERCIAL_ELIGIBILITY_A2_ENABLED="true" \
+              JM1_AGENTIC_COMMERCIAL_ELIGIBILITY_REQUIRE_DEDICATED_IDENTITY="true" \
+              JM1_AGENTIC_COMMERCIAL_ELIGIBILITY_CLIENT_ID="3efbbd32-9972-4d82-aac8-b70f97890684" \
               JM1_AGENTIC_AUDIT_BLOB_SERVICE_URL="https://stjm1diagrunner.blob.core.windows.net" \
               JM1_AGENTIC_AUDIT_CONTAINER="agentic-audit" \
               JM1_AGENTIC_AUDIT_PREFIX="publishing/commercial-eligibility/v1" \
