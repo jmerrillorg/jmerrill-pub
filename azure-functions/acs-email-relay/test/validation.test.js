@@ -3,6 +3,7 @@ const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const path = require("node:path");
 const vm = require("node:vm");
+const { createHash } = require("node:crypto");
 
 function loadRelayModule() {
   process.env.ACS_EMAIL_SENDER = "publishing@email.jmerrill.one";
@@ -410,6 +411,79 @@ function validFinalDevelopmentalReviewPayload(overrides = {}) {
         name: "The General’s Will and Last Testament - Editorial Working Version - Jackie Restoration.docx",
         contentType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
         contentInBase64: Buffer.from("author-safe revised manuscript").toString("base64")
+      }
+    ],
+    ...overrides
+  });
+}
+
+function validDevelopmentalV2Payload(overrides = {}) {
+  const manuscriptBytes = Buffer.from("governed manuscript bytes");
+  const reviewBytes = Buffer.from("governed review bytes");
+  const body = [
+    "Good day Quanisha,",
+    "",
+    "We're writing to let you know that the Developmental Editing work for Indomitable is ready for your review.",
+    "",
+    "We've attached Indomitable - Edited Manuscript.docx together with Indomitable - Editorial Review.pdf. Please read both files and reply directly with Approved, Approved with corrections, or your questions.",
+    "",
+    "Optional Author Operating Center access: https://jmerrill.pub/author/portal?action=review-package",
+    "",
+    "Once we receive your response, the Publishing Team will record your decision and continue with the next approved step.",
+    "",
+    "With care,",
+    "The Publishing Team",
+    "J Merrill Publishing, Inc."
+  ].join("\n");
+  const htmlBody = `<!doctype html><html><body><table><tr><td>J MERRILL PUBLISHING</td></tr></table><p>A Division of J Merrill One</p><p>Helping Authors Help Themselves.</p><p>Good day Quanisha,</p><p>We're writing to let you know that the Developmental Editing work for <strong>Indomitable</strong> is ready for your review.</p><p>We've attached the edited manuscript together with the editorial review. Please reply with Approved, Approved with corrections, or your questions.</p><a href="https://jmerrill.pub/author/portal?action=review-package" style="display:inline-block;background:#1D4ED8;">View in Author Operating Center</a><p>Once we receive your response, the Publishing Team will continue with the next approved step.</p><p>The Publishing Team<br>J Merrill Publishing, Inc.</p></body></html>`;
+  return validAuthorResponsePayload({
+    authorName: "Quanisha Dockery",
+    projectTitle: "Indomitable",
+    subject: "Developmental Editing Materials - Indomitable",
+    body,
+    htmlBody,
+    templateName: "DEVELOPMENTAL_EDITORIAL_REVIEW_READY_V2",
+    templateVersion: "2.0.0",
+    templateMetadata: {
+      htmlSha256: createHash("sha256").update(htmlBody).digest("hex"),
+      textSha256: createHash("sha256").update(body).digest("hex"),
+      qualityGate: "PASS",
+      renderer: "JM1 Enterprise Communication Renderer",
+      rendererVersion: "2.0.0",
+      renderMode: "CANONICAL_HTML",
+      renderTemplateGuard: "PASS"
+    },
+    artifactManifest: {
+      packageId: "pkg-indomitable-developmental-editing-v2",
+      packageVersion: "v2",
+      titleId: "fd577d2b-01a0-f111-b8dc-000d3a14673b",
+      stageId: "0f587d2b-01a0-f111-b8dc-000d3a14673b",
+      authorContactId: "5bb796dc-cd95-f111-8076-7c1e525b15c2",
+      titleBinding: "PASS",
+      authorBinding: "PASS",
+      stageBinding: "PASS",
+      versionParity: "PASS",
+      devReviewStatus: "COMPLETE",
+      devEditedManuscriptStatus: "COMPLETE",
+      devPackageComplete: true,
+      requiredRoles: ["editedManuscript", "reviewInstructions"]
+    },
+    attachments: [
+      {
+        name: "Indomitable - Edited Manuscript.docx",
+        contentType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        contentInBase64: manuscriptBytes.toString("base64"),
+        sha256: createHash("sha256").update(manuscriptBytes).digest("hex"),
+        role: "editedManuscript",
+        artifactId: "manuscript-artifact"
+      },
+      {
+        name: "Indomitable - Editorial Review.pdf",
+        contentType: "application/pdf",
+        contentInBase64: reviewBytes.toString("base64"),
+        sha256: createHash("sha256").update(reviewBytes).digest("hex"),
+        role: "reviewInstructions",
+        artifactId: "review-artifact"
       }
     ],
     ...overrides
@@ -832,6 +906,47 @@ test("approved author-review package rejects attachment checksum mismatch", () =
       ]
     })),
     "AUTHOR_REVIEW_ATTACHMENT_CHECKSUM_MISMATCH"
+  );
+});
+
+test("Developmental V2 accepts only a complete typed package and preserves canonical identity", () => {
+  const { validateApprovedAuthorResponsePayload, buildApprovedAuthorResponseEmail } = loadRelayModule();
+  const result = validateApprovedAuthorResponsePayload(validDevelopmentalV2Payload());
+
+  assert.equal(result.ok, true);
+  assert.equal(result.value.artifactManifest.devPackageComplete, true);
+  assert.deepEqual(Array.from(result.value.attachments, (item) => item.role).sort(), ["editedManuscript", "reviewInstructions"]);
+  const email = buildApprovedAuthorResponseEmail(result.value);
+  assert.equal(email.senderAddress, "publishing@email.jmerrill.one");
+  assert.equal(email.replyTo[0].address, "publishing@jmerrill.one");
+  assert.equal(email.recipients.cc[0].address, "publishing@jmerrill.one");
+  assert.equal(email.attachments.length, 2);
+});
+
+test("Developmental V2 rejects review-only packages and unproven bindings", () => {
+  const { validateApprovedAuthorResponsePayload } = loadRelayModule();
+  const base = validDevelopmentalV2Payload();
+
+  assertRejected(
+    validateApprovedAuthorResponsePayload(validDevelopmentalV2Payload({ attachments: [base.attachments[1]] })),
+    "DEVELOPMENTAL_ATTACHMENT_SET_INVALID"
+  );
+  assertRejected(
+    validateApprovedAuthorResponsePayload(validDevelopmentalV2Payload({
+      artifactManifest: { ...base.artifactManifest, titleBinding: "FAIL" }
+    })),
+    "DEVELOPMENTAL_TITLEBINDING_INVALID"
+  );
+});
+
+test("Developmental V2 rejects the superseded checklist/card email structure", () => {
+  const { validateApprovedAuthorResponsePayload } = loadRelayModule();
+  const base = validDevelopmentalV2Payload();
+  assertRejected(
+    validateApprovedAuthorResponsePayload(validDevelopmentalV2Payload({
+      body: `${base.body}\n\nWhy you are receiving this\nWhat happens next`
+    })),
+    "AUTHOR_REVIEW_REJECTED_CHECKLIST_SCAFFOLDING"
   );
 });
 

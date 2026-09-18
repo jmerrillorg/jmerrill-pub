@@ -31,6 +31,7 @@ const PAYMENT_INTERNAL_NOTIFICATION_TYPE = "PUBLISHING_PAYMENT_RECEIVED";
 const JOINED_FAMILY_INTERNAL_NOTIFICATION_TYPE = "PUBLISHING_JOINED_THE_FAMILY";
 const APPROVED_AUTHOR_RESPONSE_TYPE = "APPROVED_AUTHOR_RESPONSE";
 const AUTHOR_REVIEW_PACKAGE_TEMPLATE = "AUTHOR_REVIEW_PACKAGE_NOTIFICATION_V1";
+const DEVELOPMENTAL_REVIEW_PACKAGE_TEMPLATE = "DEVELOPMENTAL_EDITORIAL_REVIEW_READY_V2";
 const FINAL_DEVELOPMENTAL_REVIEW_TEMPLATE = "AUTHOR_FINAL_DEVELOPMENTAL_REVIEW_V1";
 const PACKAGE_ACCEPTANCE_TEMPLATE = "PACKAGE_ACCEPTANCE_PAYMENT_OPTIONS_V1";
 const CANONICAL_AUTHOR_RENDERER = "JM1 Enterprise Communication Renderer";
@@ -867,7 +868,7 @@ function validateApprovedAuthorResponsePayload(payload = {}) {
     return { ok: false, reason: "EDITORIAL_RECOMMENDATION_HTML_REQUIRED" };
   }
 
-  if ([AUTHOR_REVIEW_PACKAGE_TEMPLATE, FINAL_DEVELOPMENTAL_REVIEW_TEMPLATE].includes(normalizeText(payload.templateName))) {
+  if ([AUTHOR_REVIEW_PACKAGE_TEMPLATE, DEVELOPMENTAL_REVIEW_PACKAGE_TEMPLATE, FINAL_DEVELOPMENTAL_REVIEW_TEMPLATE].includes(normalizeText(payload.templateName))) {
     if (!htmlBody) {
       return { ok: false, reason: "AUTHOR_REVIEW_PACKAGE_HTML_REQUIRED" };
     }
@@ -882,6 +883,10 @@ function validateApprovedAuthorResponsePayload(payload = {}) {
     }
     if (!attachments.ok) {
       return { ok: false, reason: attachments.reason };
+    }
+    if (normalizeText(payload.templateName) === DEVELOPMENTAL_REVIEW_PACKAGE_TEMPLATE) {
+      const manifestValidation = validateDevelopmentalArtifactManifest(payload.artifactManifest, attachments.value);
+      if (!manifestValidation.ok) return manifestValidation;
     }
   }
 
@@ -945,6 +950,7 @@ function validateApprovedAuthorResponsePayload(payload = {}) {
         renderTemplateGuard: normalizeText(payload.templateMetadata.renderTemplateGuard)
       } : null,
       attachments: attachments.ok ? attachments.value : [],
+      artifactManifest: normalizeText(payload.templateName) === DEVELOPMENTAL_REVIEW_PACKAGE_TEMPLATE ? payload.artifactManifest : null,
       approvedBy: normalizeText(payload.approvedBy),
       approvedOn: normalizeText(payload.approvedOn),
       internalVisibilityMailbox: INTERNAL_VISIBILITY_MAILBOX,
@@ -1013,6 +1019,7 @@ function validateCanonicalAuthorReviewHtmlPayload(payload = {}) {
   const text = normalizeBody(payload.body);
   const templateName = normalizeText(payload.templateName);
   const replyOnly = templateName === FINAL_DEVELOPMENTAL_REVIEW_TEMPLATE;
+  const conversationalDevelopmental = templateName === DEVELOPMENTAL_REVIEW_PACKAGE_TEMPLATE;
   const metadata = payload.templateMetadata && typeof payload.templateMetadata === "object" ? payload.templateMetadata : null;
 
   if (!metadata) {
@@ -1077,6 +1084,10 @@ function validateCanonicalAuthorReviewHtmlPayload(payload = {}) {
 
   if (!/\b(next|once we receive|after approval|the Publishing Team will)\b/i.test(text)) {
     return { ok: false, reason: "AUTHOR_REVIEW_PACKAGE_NEXT_STEP_REQUIRED" };
+  }
+
+  if (conversationalDevelopmental && /\b(Why you are receiving this|What has been completed|What(?:'|&#39;|’)?s attached|What we need from you|How to respond|What happens next)\b/i.test(`${html}\n${text}`)) {
+    return { ok: false, reason: "AUTHOR_REVIEW_REJECTED_CHECKLIST_SCAFFOLDING" };
   }
 
   if (canonicalPublishingFooterCount(html) > 1 || canonicalPublishingFooterCount(text) > 1) {
@@ -1359,6 +1370,8 @@ function normalizeAuthorReviewAttachments(value) {
     const contentType = normalizeText(attachment.contentType);
     const contentInBase64 = safeTrim(attachment.contentInBase64);
     const sha256 = normalizeText(attachment.sha256).toLowerCase();
+    const role = normalizeText(attachment.role);
+    const artifactId = normalizeText(attachment.artifactId);
     if (!name) return { ok: false, reason: "AUTHOR_REVIEW_ATTACHMENT_NAME_MISSING" };
     if (!contentType) return { ok: false, reason: "AUTHOR_REVIEW_ATTACHMENT_CONTENT_TYPE_MISSING" };
     if (!contentInBase64) return { ok: false, reason: "AUTHOR_REVIEW_ATTACHMENT_CONTENT_MISSING" };
@@ -1369,7 +1382,7 @@ function normalizeAuthorReviewAttachments(value) {
       if (actualSha256 !== sha256) return { ok: false, reason: "AUTHOR_REVIEW_ATTACHMENT_CHECKSUM_MISMATCH" };
     }
     totalBytes += bytes.byteLength;
-    normalized.push({ name, contentType, contentInBase64, sha256 });
+    normalized.push({ name, contentType, contentInBase64, sha256, role, artifactId });
   }
 
   if (totalBytes > 20 * 1024 * 1024) {
@@ -1377,6 +1390,37 @@ function normalizeAuthorReviewAttachments(value) {
   }
 
   return { ok: true, value: normalized };
+}
+
+function validateDevelopmentalArtifactManifest(value, attachments) {
+  if (!value || typeof value !== "object" || Array.isArray(value)) {
+    return { ok: false, reason: "DEVELOPMENTAL_ARTIFACT_MANIFEST_REQUIRED" };
+  }
+  for (const field of ["packageId", "packageVersion", "titleId", "stageId", "authorContactId"]) {
+    if (!normalizeText(value[field])) return { ok: false, reason: `DEVELOPMENTAL_${field.toUpperCase()}_REQUIRED` };
+  }
+  for (const [field, required] of [
+    ["titleBinding", "PASS"],
+    ["authorBinding", "PASS"],
+    ["stageBinding", "PASS"],
+    ["versionParity", "PASS"],
+    ["devReviewStatus", "COMPLETE"],
+    ["devEditedManuscriptStatus", "COMPLETE"]
+  ]) {
+    if (normalizeText(value[field]) !== required) return { ok: false, reason: `DEVELOPMENTAL_${field.toUpperCase()}_INVALID` };
+  }
+  if (value.devPackageComplete !== true) return { ok: false, reason: "DEVELOPMENTAL_PACKAGE_INCOMPLETE" };
+  const roles = attachments.map((attachment) => normalizeText(attachment.role)).filter(Boolean);
+  if (attachments.length !== 2 || roles.length !== 2 || new Set(roles).size !== 2) {
+    return { ok: false, reason: "DEVELOPMENTAL_ATTACHMENT_SET_INVALID" };
+  }
+  for (const role of ["editedManuscript", "reviewInstructions"]) {
+    if (!roles.includes(role)) return { ok: false, reason: `DEVELOPMENTAL_REQUIRED_ATTACHMENT_MISSING:${role}` };
+  }
+  if (attachments.some((attachment) => !attachment.artifactId || !attachment.sha256)) {
+    return { ok: false, reason: "DEVELOPMENTAL_ATTACHMENT_AUTHORITY_INCOMPLETE" };
+  }
+  return { ok: true };
 }
 
 async function sendAcsMessage(message) {

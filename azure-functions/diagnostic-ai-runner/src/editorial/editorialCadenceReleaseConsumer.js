@@ -128,7 +128,7 @@ async function listStageArtifacts(client, titleId, stageId) {
   if (!titleId) return [];
   return client.list("jm1pub_editorialartifacts", {
     $select:
-      "jm1pub_editorialartifactid,jm1pub_editorialartifactname,jm1pub_filename,jm1pub_artifacttype,jm1pub_artifactstatus,jm1pub_visibility,jm1pub_sha256,jm1pub_repositorypath,jm1pub_repositorydriveid,jm1pub_repositoryitemid,jm1pub_filesizebytes,jm1pub_iscurrentapproved,jm1pub_supersededon,_jm1pub_titleid_value,_jm1pub_editorialstageid_value,createdon,modifiedon",
+      "jm1pub_editorialartifactid,jm1pub_editorialartifactname,jm1pub_filename,jm1pub_artifacttype,jm1pub_artifactstatus,jm1pub_visibility,jm1pub_versionlabel,jm1pub_sha256,jm1pub_repositorypath,jm1pub_repositorydriveid,jm1pub_repositoryitemid,jm1pub_filesizebytes,jm1pub_iscurrentapproved,jm1pub_supersededon,_jm1pub_titleid_value,_jm1pub_editorialstageid_value,createdon,modifiedon",
     $filter: `_jm1pub_titleid_value eq ${titleId} and _jm1pub_editorialstageid_value eq ${stageId}`,
     $orderby: "modifiedon desc",
     $top: "50"
@@ -567,6 +567,8 @@ async function processCadenceLog(client, cadenceLog, now, correlationId, deps = 
     const artifacts = await listStageArtifacts(client, stage._jm1pub_titleid_value, stageId);
     const validationBlockers = validateDueSendInput({
       stage,
+      titleId: stage._jm1pub_titleid_value,
+      title,
       titleName: titleName(title),
       gate,
       contact,
@@ -582,6 +584,7 @@ async function processCadenceLog(client, cadenceLog, now, correlationId, deps = 
       sendResult = await sendCadenceAuthorReviewPackage({
         stage,
         titleId: stage._jm1pub_titleid_value,
+        title,
         titleName: titleName(title),
         authorName: authorName(stage, title, contact),
         contact,
