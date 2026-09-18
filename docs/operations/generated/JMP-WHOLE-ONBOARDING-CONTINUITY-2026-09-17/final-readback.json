@@ -1,0 +1,98 @@
+{
+  "status": "PASS",
+  "scope": "Jackuline Fly / Whole bounded production onboarding continuity",
+  "canonicalMainSha": "0f560d8d131eb7010b74e0a35b7d90796cbc5023",
+  "webAppReleaseSha": "122898ec14ed7aa4149933314a503d87dbc40cae",
+  "webAppHealth": "ready",
+  "relayDeploymentRun": 35294307428,
+  "relayDeploymentStatus": "success",
+  "author": {
+    "name": "Jackuline Fly",
+    "email": "jackie2doreen@att.net",
+    "contactId": "106a78d0-fb9a-f111-b8dc-6045bdd69738",
+    "isAuthor": true,
+    "contactRecordVersion": 53067354,
+    "duplicateContactCreated": false
+  },
+  "authorProfile": {
+    "id": "28e62257-d045-5e10-a15d-d1c9268cf426",
+    "activeCount": 1,
+    "policyVersion": "AUTHOR_ONBOARDING_CONTINUITY_V1",
+    "recordVersion": 53067356,
+    "duplicateCreated": false
+  },
+  "title": {
+    "name": "Whole",
+    "id": "daf8180f-85a3-f111-b8de-000d3a14673b",
+    "stage": "06_ONBOARDING",
+    "stageValue": 100000006,
+    "authorContactId": "106a78d0-fb9a-f111-b8dc-6045bdd69738",
+    "binding": "PASS",
+    "duplicateCreated": false
+  },
+  "phase6Authority": {
+    "engagementId": "0038ee51-27a9-f111-aaab-70a8a59b112b",
+    "lifecycleId": "0238ee51-27a9-f111-aaab-70a8a59b112b",
+    "engagementStage": "06_ONBOARDING",
+    "lifecycleStage": "06_ONBOARDING",
+    "workspaceStage": "06_ONBOARDING",
+    "workspacePath": "01_Pipeline_A-Z/06 - Onboarding/Fly, Jackuline - Whole",
+    "stageParity": "PASS",
+    "workspaceMoved": false,
+    "duplicateEngagementCreated": false,
+    "duplicateWorkspaceCreated": false
+  },
+  "access": {
+    "model": "EMAIL_OTP",
+    "recordId": "8ecdb76a-7922-5d5e-b4ce-2dd20e18a541",
+    "activeCount": 1,
+    "issuedAt": "2026-09-18T01:14:01Z",
+    "bypassCreated": false,
+    "otpEligibility": "PASS"
+  },
+  "submission": {
+    "writePath": "authenticated /api/author/onboarding to governed ingestion with deterministic Dataverse fallback",
+    "idempotency": "deterministic submission GUID plus If-None-Match create-only replay",
+    "state": "NOT_STARTED",
+    "currentCount": 0,
+    "duplicateProtection": "PASS"
+  },
+  "template": {
+    "id": "AUTHOR_ONBOARDING_V1",
+    "relayId": "PUBLISHING.AUTHOR_ONBOARDING_V1",
+    "version": "1.0.0",
+    "state": "ACTIVE_GOVERNED",
+    "preview": "PASS",
+    "previewNoSend": true,
+    "htmlSha256": "de038658ddb6ec17c1a84295c1ce22e6e64264ef6f1375b2e676f72650c11342",
+    "plainTextSha256": "4ac3c1b0efd259a827865a2733e709cebbe293191090c6721db9f475cdcd3efa"
+  },
+  "invitation": {
+    "sent": true,
+    "acceptedAt": "2026-09-18T01:15:43.256Z",
+    "recipient": "jackie2doreen@att.net",
+    "sender": "publishing@email.jmerrill.one",
+    "replyTo": "publishing@jmerrill.one",
+    "cc": [
+      "publishing@jmerrill.one"
+    ],
+    "communicationRecordId": "47d3ee52-1d17-4fad-9bdb-6d8fe847fcd6",
+    "trackingRecordId": "9ca947e3-11d2-52a3-8b04-c452df8b563c",
+    "correlationId": "WHOLE-ONBOARDING-CONTINUITY-20260917",
+    "idempotencyKey": "WHOLE-AUTHOR-ONBOARDING-V1-daf8180f-85a3-f111-b8de-000d3a14673b",
+    "deliveryState": "ACCEPTED",
+    "replayProof": "PASS",
+    "invitationCount": 1
+  },
+  "tests": {
+    "focusedAppAndRelayTests": "45/45 PASS",
+    "fullRelayTests": "119/119 PASS",
+    "typeCheck": "PASS",
+    "lint": "PASS_WITH_ONE_PREEXISTING_WARNING",
+    "build": "PASS"
+  },
+  "wholeSystemTracking": "PASS",
+  "continuityStateAdoptableByCommand": true,
+  "phase7SystemCommissioning": "HELD",
+  "nextGate": "JACKULINE ONBOARDING SUBMISSION"
+}
