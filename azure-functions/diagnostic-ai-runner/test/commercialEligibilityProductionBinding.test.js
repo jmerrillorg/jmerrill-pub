@@ -149,9 +149,11 @@ describe("commercial eligibility production binding", () => {
     const first = await binding.prepare({ opportunityId: liveState().WORK_ID, titleId: liveState().TITLE_ID, requestedEffect: "STRIPE.INVOICE_CREATE" });
     const replay = await binding.prepare({ opportunityId: liveState().WORK_ID, titleId: liveState().TITLE_ID, requestedEffect: "STRIPE.INVOICE_CREATE" });
     assert.equal(first.effectDecision.DECISION, "DENIED_FINANCIAL_EFFECT_NOT_AUTHORIZED");
+    assert.equal(replay.effectDecision.DECISION, "DENIED_FINANCIAL_EFFECT_NOT_AUTHORIZED");
     assert.equal(first.effectAuditReference, replay.effectAuditReference);
     const supervision = await binding.supervision();
     assert.equal(supervision.telemetry.POLICY_DENIALS, 1);
     assert.equal(supervision.telemetry.EFFECT_DENIALS, 1);
+    assert.equal(supervision.classifications[0].UNAUTHORIZED_EFFECTS[0].REQUESTED_EFFECT, "STRIPE.INVOICE_CREATE");
   });
 });

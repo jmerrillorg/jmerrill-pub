@@ -58,7 +58,13 @@ function createCommercialEligibilityProductionBinding(options = {}) {
       });
       effectAuditReference = denial.blobName;
     }
-    return { ...persisted.value, idempotentReplay: !persisted.created, auditReference: persisted.blobName, effectAuditReference };
+    return {
+      ...persisted.value,
+      effectDecision: result.EFFECT_DECISION,
+      idempotentReplay: !persisted.created,
+      auditReference: persisted.blobName,
+      effectAuditReference
+    };
   }
 
   async function review(input = {}) {
@@ -103,8 +109,14 @@ function createCommercialEligibilityProductionBinding(options = {}) {
     ensureEnabled();
     const records = await audit.list(200);
     const reviewsByClassification = new Map();
+    const denialsByClassification = new Map();
     for (const item of records) {
       const record = item.record || {};
+      if (record.event === "COMMERCIAL_ELIGIBILITY_EFFECT_DENIED" && record.classificationId) {
+        const denials = denialsByClassification.get(record.classificationId) || [];
+        denials.push(record.effectDecision);
+        denialsByClassification.set(record.classificationId, denials);
+      }
       if (record.event !== "COMMERCIAL_ELIGIBILITY_REVIEWED" || !record.classificationId) continue;
       const current = reviewsByClassification.get(record.classificationId);
       if (!current || String(record.storedAt) > String(current.record?.storedAt)) reviewsByClassification.set(record.classificationId, item);
@@ -133,7 +145,7 @@ function createCommercialEligibilityProductionBinding(options = {}) {
           FINAL_REVIEWED_CLASSIFICATION: latestReview?.review?.FINAL_REVIEWED_CLASSIFICATION || null,
           STALE_STATUS: latestReview?.review?.STALE_STATUS || "NOT_REVIEWED",
           ERROR: null,
-          UNAUTHORIZED_EFFECTS: item.record.effectDecision ? [item.record.effectDecision] : [],
+          UNAUTHORIZED_EFFECTS: denialsByClassification.get(prepared.CLASSIFICATION_ID) || [],
           BUSINESS_EFFECTS: 0
         };
       });
