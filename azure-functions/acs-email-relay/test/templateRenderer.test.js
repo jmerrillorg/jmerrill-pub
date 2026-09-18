@@ -63,10 +63,12 @@ test("Publishing text, table header, CTA, links, and footer meet WCAG AA contras
   assert.ok(contrast(profile.tokens["footer.text"], profile.tokens["footer.background"]) >= 4.5);
 });
 
-test("registry activates only copy-authorized Publishing payment election v1", () => {
+test("registry activates only copy-authorized Publishing templates", () => {
   const active = listTemplates().filter((entry) => entry.status === "ACTIVE");
-  assert.equal(active.length, 1);
-  assert.equal(active[0].templateId, "PUBLISHING.PAYMENT_ELECTION_REQUIRED");
+  assert.deepEqual(
+    active.map((entry) => entry.templateId).sort(),
+    ["PUBLISHING.AUTHOR_ONBOARDING_V1", "PUBLISHING.PAYMENT_ELECTION_REQUIRED"]
+  );
   assert.equal(findTemplate("PUBLISHING.PAYMENT_REQUEST_READY", "1.0.0").status, "BLOCKED_BY_COPY_AUTHORITY");
 });
 
