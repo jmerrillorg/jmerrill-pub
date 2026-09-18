@@ -196,6 +196,10 @@ jobs:
               JM1_PRODUCTION_RELEASE_SHA="$GITHUB_SHA" \
               JM1_PAYMENT_ELECTION_COMMUNICATION_ENABLED="true" \
               JM1_PAYMENT_ELECTION_COMMUNICATION_MAX_REQUESTS="10" \
+              JM1_AGENTIC_COMMERCIAL_ELIGIBILITY_A2_ENABLED="true" \
+              JM1_AGENTIC_AUDIT_BLOB_SERVICE_URL="https://stjm1diagrunner.blob.core.windows.net" \
+              JM1_AGENTIC_AUDIT_CONTAINER="agentic-audit" \
+              JM1_AGENTIC_AUDIT_PREFIX="publishing/commercial-eligibility/v1" \
               JM1_ENTERPRISE_RELAY_URL="https://func-jm1-acs-email-relay.azurewebsites.net" \
               JM1_ENTERPRISE_RELAY_AUDIENCE="api://84530e9b-2842-4ca6-8fe6-1a11eed051d1" \
             --output none

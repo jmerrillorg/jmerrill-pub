@@ -64,6 +64,7 @@ const CERTIFIED_ARTIFACT_PROJECTION_PATH =
 let certifiedProjectionItemsCache: PublisherTodayItem[] | null = null
 
 export type PublisherActionId =
+  | 'review_commercial_eligibility'
   | 'review_intake'
   | 'verify_manuscript'
   | 'initialize_editorial_review'
@@ -795,6 +796,90 @@ export type PublisherOperatingCenterSnapshot = {
   royalties: PublisherRoyaltyReviewQueue
   today: PublisherTodaySnapshot
   titleOperatingView: PublisherTitleOperatingView
+  agenticSupervision: PublisherAgenticSupervision
+}
+
+export type PublisherAgenticSupervision = {
+  status: 'operational' | 'unavailable'
+  capabilityId: string
+  autonomyLevel: 'A2' | 'NOT_ACTIVE'
+  downstreamEffectAuthority: 'NONE'
+  identity: string
+  auditDurability: string
+  error?: string
+  records: Array<{
+    name: string
+    createdOn?: string | null
+    lastModified?: string | null
+    record: Record<string, unknown>
+  }>
+  classifications: Array<Record<string, unknown>>
+}
+
+function commercialEligibilityRunnerUrl(action: 'supervision' | 'review') {
+  const base = process.env.JM1_DIAGNOSTIC_RUNNER_URL?.trim().replace(/\/+$/, '') ||
+    'https://func-jm1-diagnostic-ai-runner.azurewebsites.net'
+  return `${base}/api/commercial-eligibility-a2/${action}`
+}
+
+async function commercialEligibilityRequest(action: 'supervision' | 'review', body?: Record<string, unknown>) {
+  const runnerKey = process.env.JM1_DIAGNOSTIC_RUNNER_KEY?.trim()
+  if (!runnerKey) throw new Error('diagnostic_runner_key_missing')
+  const response = await fetch(commercialEligibilityRunnerUrl(action), {
+    method: body ? 'POST' : 'GET',
+    cache: 'no-store',
+    headers: {
+      'x-jm1-diagnostic-runner-key': runnerKey,
+      ...(body ? { 'Content-Type': 'application/json' } : {}),
+    },
+    body: body ? JSON.stringify(body) : undefined,
+  })
+  const payload = await response.json().catch(() => null) as Record<string, unknown> | null
+  if (!response.ok) throw new Error(stringValue(payload?.code) || `commercial_eligibility_http_${response.status}`)
+  return payload || {}
+}
+
+async function readCommercialEligibilitySupervision(): Promise<PublisherAgenticSupervision> {
+  try {
+    const payload = await commercialEligibilityRequest('supervision')
+    const supervision = (payload.supervision || {}) as Record<string, unknown>
+    return {
+      status: 'operational',
+      capabilityId: stringValue(supervision.CAPABILITY_ID),
+      autonomyLevel: supervision.ACTIVE_AUTONOMY_LEVEL === 'A2' ? 'A2' : 'NOT_ACTIVE',
+      downstreamEffectAuthority: 'NONE',
+      identity: stringValue(supervision.IDENTITY),
+      auditDurability: stringValue(supervision.AUDIT_DURABILITY),
+      records: Array.isArray(supervision.records)
+        ? supervision.records.filter((record): record is PublisherAgenticSupervision['records'][number] => Boolean(record && typeof record === 'object'))
+        : [],
+      classifications: Array.isArray(supervision.classifications)
+        ? supervision.classifications.filter((record): record is Record<string, unknown> => Boolean(record && typeof record === 'object'))
+        : [],
+    }
+  } catch (error) {
+    return {
+      status: 'unavailable',
+      capabilityId: 'PUBLISHING.COMMERCIAL_ELIGIBILITY_CLASSIFICATION',
+      autonomyLevel: 'NOT_ACTIVE',
+      downstreamEffectAuthority: 'NONE',
+      identity: 'func-jm1-diagnostic-ai-runner/system-assigned',
+      auditDurability: 'UNAVAILABLE',
+      error: error instanceof Error ? error.message : 'supervision_unavailable',
+      records: [],
+      classifications: [],
+    }
+  }
+}
+
+export async function reviewCommercialEligibilityClassification(input: {
+  classificationId: string
+  reviewer: string
+  decision: 'ACCEPT' | 'REJECT' | 'CORRECT' | 'DEFER'
+  correction?: string
+  reason?: string
+}) {
+  return commercialEligibilityRequest('review', input)
 }
 
 type DataverseRow = Record<string, unknown>
@@ -806,6 +891,7 @@ export async function buildPublisherOperatingCenterSnapshot(): Promise<Publisher
     JackieAsEventBus: (automationCapabilitySummary.JackieAsEventBus === 'YES' ? 'YES' : 'NO') as 'YES' | 'NO',
     WholeCanary: wholeCanaryReadback(),
   }
+  const agenticSupervision = await readCommercialEligibilitySupervision()
   const config = getDataverseServerConfig()
   if (!config) {
     return {
@@ -837,6 +923,7 @@ export async function buildPublisherOperatingCenterSnapshot(): Promise<Publisher
       royalties: readRoyaltyReviewQueue(),
       today: emptyPublisherToday(),
       titleOperatingView: emptyTitleOperatingView(),
+      agenticSupervision,
     }
   }
 
@@ -919,6 +1006,7 @@ export async function buildPublisherOperatingCenterSnapshot(): Promise<Publisher
     royalties: readRoyaltyReviewQueue(),
     today,
     titleOperatingView,
+    agenticSupervision,
   }
 }
 
