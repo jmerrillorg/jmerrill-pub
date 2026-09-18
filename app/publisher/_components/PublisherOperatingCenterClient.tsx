@@ -42,6 +42,7 @@ export function PublisherOperatingCenterClient({ initialSnapshot, signedIn, oper
   const [boardView, setBoardView] = useState('pipeline')
   const [includeTestRecords, setIncludeTestRecords] = useState(false)
   const [selectedTitleKey, setSelectedTitleKey] = useState<string | null>(null)
+  const [commercialCorrections, setCommercialCorrections] = useState<Record<string, string>>({})
   const [royaltyImport, setRoyaltyImport] = useState({
     sourceSystem: 'KDP',
     reportingMonth: '2026-06',
@@ -299,6 +300,30 @@ export function PublisherOperatingCenterClient({ initialSnapshot, signedIn, oper
     await refresh()
   }
 
+  async function reviewCommercialEligibility(
+    classificationId: string,
+    decision: 'ACCEPT' | 'REJECT' | 'CORRECT' | 'DEFER',
+    correction?: string,
+  ) {
+    const itemKey = `commercial-eligibility:${classificationId}`
+    setActionState({ itemKey, status: 'running', message: `Recording ${decision.toLowerCase()} review...` })
+    const response = await fetch('/api/publisher/operating-center/actions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: 'review_commercial_eligibility',
+        commercialEligibilityReview: { classificationId, decision, correction },
+      }),
+    })
+    const payload = (await response.json().catch(() => null)) as { error?: string } | null
+    if (!response.ok) {
+      setActionState({ itemKey, status: 'error', message: payload?.error || 'The classification review was not recorded.' })
+      return
+    }
+    setActionState({ itemKey, status: 'complete', message: 'Review recorded. No downstream action was authorized.' })
+    await refresh()
+  }
+
   if (!signedIn) {
     return (
       <main className="min-h-screen bg-[#080b12] text-white">
@@ -441,6 +466,95 @@ export function PublisherOperatingCenterClient({ initialSnapshot, signedIn, oper
 
         {snapshot && (
           <section className="mt-6 grid gap-5">
+            <section id="agentic-supervision" className="border border-white/10 bg-white/[0.035] p-5">
+              <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
+                <div>
+                  <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-blue-300">Supervised preparation</p>
+                  <h2 className="mt-2 text-2xl font-semibold">Commercial eligibility review</h2>
+                  <p className="mt-2 text-[13px] leading-6 text-white/55">
+                    Deterministic A2 classifications from authoritative Publishing state. Reviews never send communications or execute financial or lifecycle actions.
+                  </p>
+                </div>
+                <Badge
+                  label={snapshot.agenticSupervision.status === 'operational' ? 'A2 read / prepare' : 'Unavailable'}
+                  tone={snapshot.agenticSupervision.status === 'operational' ? 'blue' : 'amber'}
+                />
+              </div>
+              <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                <MiniFact label="Identity" value={snapshot.agenticSupervision.identity || 'Unavailable'} />
+                <MiniFact label="Audit" value={snapshot.agenticSupervision.auditDurability} />
+                <MiniFact label="Effect authority" value={snapshot.agenticSupervision.downstreamEffectAuthority} />
+                <MiniFact label="Records" value={String(snapshot.agenticSupervision.records.length)} />
+              </div>
+              <div className="mt-5 grid gap-3">
+                {snapshot.agenticSupervision.classifications
+                  .map((prepared) => {
+                    const classificationId = String(prepared.CLASSIFICATION_ID || '')
+                    const pending = prepared.REVIEW_STATUS === 'PENDING'
+                    return (
+                      <div key={classificationId} className="border border-white/10 bg-black/20 p-4">
+                        <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+                          <div>
+                            <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-white/40">{classificationId}</p>
+                            <p className="mt-2 text-[15px] font-semibold">{String(prepared.CLASSIFICATION || 'Unknown')}</p>
+                            <p className="mt-1 text-[12px] text-white/45">
+                              State {String(prepared.INPUT_STATE_REFERENCE || 'Unavailable')} · {String(prepared.CLASSIFICATION_CONFIDENCE || 'Unknown')} · {String(prepared.REVIEW_STATUS || 'PENDING')}
+                            </p>
+                          </div>
+                          {pending && classificationId && (
+                            <div className="flex flex-wrap gap-2">
+                              {(['ACCEPT', 'REJECT', 'DEFER'] as const).map((decision) => (
+                                <button
+                                  key={decision}
+                                  type="button"
+                                  disabled={actionState.status === 'running'}
+                                  onClick={() => void reviewCommercialEligibility(classificationId, decision)}
+                                  className="min-h-[38px] border border-blue-400/30 px-3 text-[11px] font-semibold text-blue-100 disabled:opacity-50"
+                                >
+                                  {decision}
+                                </button>
+                              ))}
+                              <select
+                                aria-label="Corrected commercial classification"
+                                value={commercialCorrections[classificationId] || ''}
+                                onChange={(event) => setCommercialCorrections((current) => ({ ...current, [classificationId]: event.target.value }))}
+                                className="min-h-[38px] border border-white/15 bg-[#080b12] px-3 text-[11px] text-white"
+                              >
+                                <option value="">Correction...</option>
+                                {[
+                                  'NOT_COMMERCIALLY_ELIGIBLE',
+                                  'AGREEMENT_REQUIRED',
+                                  'AGREEMENT_COMPLETE_PAYMENT_ELECTION_REQUIRED',
+                                  'WAITING_ON_AUTHOR_PAYMENT_ELECTION',
+                                  'PAYMENT_ELECTION_RECEIVED_REVIEW_REQUIRED',
+                                  'PAYMENT_REQUEST_PREPARATION_ELIGIBLE',
+                                  'PAYMENT_REQUEST_ALREADY_EXISTS',
+                                  'PAYMENT_PENDING',
+                                  'PAYMENT_CONFIRMED',
+                                  'COMMERCIAL_EXCEPTION_REVIEW_REQUIRED',
+                                  'STALE_OR_CONFLICTING_STATE',
+                                  'INSUFFICIENT_EVIDENCE',
+                                ].map((classification) => <option key={classification} value={classification}>{classification}</option>)}
+                              </select>
+                              <button
+                                type="button"
+                                disabled={actionState.status === 'running' || !commercialCorrections[classificationId]}
+                                onClick={() => void reviewCommercialEligibility(classificationId, 'CORRECT', commercialCorrections[classificationId])}
+                                className="min-h-[38px] border border-blue-400/30 px-3 text-[11px] font-semibold text-blue-100 disabled:opacity-50"
+                              >
+                                CORRECT
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )
+                  })}
+                {snapshot.agenticSupervision.classifications.length === 0 && (
+                  <p className="border border-dashed border-white/10 p-4 text-[13px] text-white/45">No prepared production classification is awaiting review.</p>
+                )}
+              </div>
+            </section>
             <TodaySection
               id="waiting-jackie"
               title="Waiting for Jackie"

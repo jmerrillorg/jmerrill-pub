@@ -59,7 +59,13 @@ function stableValue(value) {
 }
 
 function classificationId(state) {
-  const stableJson = JSON.stringify(stableValue(state));
+  const stableJson = JSON.stringify(stableValue({
+    WORK_ID: text(state?.WORK_ID),
+    TITLE_ID: text(state?.TITLE_ID),
+    AUTHORITATIVE_STATE_VERSION: text(state?.AUTHORITATIVE_STATE_VERSION),
+    CAPABILITY_ID,
+    CAPABILITY_VERSION
+  }));
   return `commercial-eligibility-${createHash("sha256")
     .update(`${CAPABILITY_VERSION}:${stableJson}`)
     .digest("hex")

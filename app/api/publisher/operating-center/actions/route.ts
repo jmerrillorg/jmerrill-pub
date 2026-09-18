@@ -17,6 +17,7 @@ import {
   logPublisherRoyaltyDecisionReview,
   logPublisherTitleScopedAction,
   placePublisherEvidenceHold,
+  reviewCommercialEligibilityClassification,
   verifyPublisherManuscript,
   type PublisherActionId,
 } from '@/lib/server/publisher-operating-center'
@@ -49,6 +50,7 @@ const SUPPORTED_ACTIONS: PublisherActionId[] = [
   'remove_evidence_hold',
   'retry_failed_operation',
   'notify_jackie_action_required',
+  'review_commercial_eligibility',
 ]
 
 export async function POST(req: Request) {
@@ -77,6 +79,12 @@ export async function POST(req: Request) {
       supersedesDecisionId?: string
     }
     approvalEvent?: ApprovalTransitionPayload
+    commercialEligibilityReview?: {
+      classificationId?: string
+      decision?: 'ACCEPT' | 'REJECT' | 'CORRECT' | 'DEFER'
+      correction?: string
+      reason?: string
+    }
     adminReplay?: {
       originalEventId?: string
       reason?: string
@@ -91,6 +99,20 @@ export async function POST(req: Request) {
   try {
     let result: unknown
     switch (publisherAction) {
+      case 'review_commercial_eligibility': {
+        const review = body.commercialEligibilityReview
+        if (!review?.classificationId || !review.decision) {
+          return NextResponse.json({ error: 'Classification id and review decision are required.' }, { status: 400 })
+        }
+        result = await reviewCommercialEligibilityClassification({
+          classificationId: review.classificationId,
+          reviewer: session.user.email,
+          decision: review.decision,
+          correction: review.correction,
+          reason: review.reason,
+        })
+        break
+      }
       case 'review_intake':
         if (!body.intakeId) return NextResponse.json({ error: 'Intake id is required.' }, { status: 400 })
         result = await initializePublisherIntakeReview({

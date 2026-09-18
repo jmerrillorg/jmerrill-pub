@@ -44,5 +44,6 @@ require("./functions/runPublishingInboundSubscriptionManager");
 require("./functions/runPublishingMailboxReplyCheck");
 require("./functions/runPublishingMailboxAttachmentReadback");
 require("./functions/runEnterpriseMailboxReadbackHealth");
+require("./functions/runCommercialEligibilityA2");
 require("./functions/runStage0Diagnostic");
 require("./functions/signNowWebhook");
