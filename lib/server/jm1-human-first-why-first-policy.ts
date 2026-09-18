@@ -125,8 +125,13 @@ export function assertHumanFirstWhyFirst(input: HumanFirstPolicyInput): HumanFir
     return result('HUMAN_REVIEW_REQUIRED', violations, ['HIGH_RISK_OUTPUT_REQUIRES_RECORDED_HUMAN_REVIEW', ...warnings], evidence)
   }
 
-  const headingCount = (content.match(/\b(Why you are receiving this|What(?:'|&#39;)s attached|What we need from you|How to respond|What happens next)\b/gi) || []).length
-  if (headingCount >= 5) warnings.push('TEMPLATE_SCAFFOLDING_PRESENT_REVIEW_FOR_BLOAT')
+  const rejectedScaffolding = /\b(Why you are receiving this|What has been completed|What(?:'|&#39;|’)?s attached|What we need from you|How to respond|What happens next)\b/gi
+  const headingCount = (content.match(rejectedScaffolding) || []).length
+  const developmentalAuthorReview =
+    input.riskClass?.toUpperCase() === 'AUTHOR_REVIEW' &&
+    /developmental/i.test(`${input.communicationType || ''} ${input.eventOrTrigger || ''} ${input.whyContext || ''}`)
+  if (developmentalAuthorReview && headingCount > 0) violations.push('REJECTED_CHECKLIST_SCAFFOLDING')
+  else if (headingCount >= 5) warnings.push('TEMPLATE_SCAFFOLDING_PRESENT_REVIEW_FOR_BLOAT')
 
   if (violations.length) return result('DENY', violations, warnings, evidence)
   if (warnings.length) return result('ALLOW_WITH_WARNING', [], warnings, evidence)

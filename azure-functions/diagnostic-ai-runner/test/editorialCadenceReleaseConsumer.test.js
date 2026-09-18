@@ -53,6 +53,7 @@ function makeClient(overrides = {}) {
       jm1pub_editorialartifactid: "artifact-edited-manuscript",
       jm1pub_editorialartifactname: "Developmentally Edited Manuscript - Developmental Editing - Before You Were Born",
       jm1pub_filename: "Before You Were Born - Developmentally Edited Manuscript.docx",
+      jm1pub_versionlabel: "v1",
       jm1pub_artifactstatus: 196650002,
       jm1pub_visibility: 196650000,
       "jm1pub_visibility@OData.Community.Display.V1.FormattedValue": "Author Facing",
@@ -68,6 +69,7 @@ function makeClient(overrides = {}) {
       jm1pub_editorialartifactid: "artifact-review-instructions",
       jm1pub_editorialartifactname: "Developmental Review Instructions - Developmental Editing - Before You Were Born",
       jm1pub_filename: "Before You Were Born - Review Instructions.txt",
+      jm1pub_versionlabel: "v1",
       jm1pub_artifactstatus: 196650002,
       jm1pub_visibility: 196650000,
       "jm1pub_visibility@OData.Community.Display.V1.FormattedValue": "Author Facing",
@@ -285,8 +287,11 @@ test("due package with no canonical or mailbox delivery evidence sends once thro
   assert.equal(deps.sends[0].authorEmail, "sean@example.com");
   assert.equal(deps.sends[0].internalVisibilityMailbox, "publishing@jmerrill.one");
   assert.deepEqual(deps.sends[0].cc, ["publishing@jmerrill.one"]);
-  assert.equal(deps.sends[0].templateName, "AUTHOR_REVIEW_PACKAGE_NOTIFICATION_V1");
+  assert.equal(deps.sends[0].templateName, "DEVELOPMENTAL_EDITORIAL_REVIEW_READY_V2");
   assert.equal(deps.sends[0].attachments.length, 2);
+  assert.equal(deps.sends[0].artifactManifest.devPackageComplete, true);
+  assert.equal(deps.sends[0].artifactManifest.versionParity, "PASS");
+  assert.doesNotMatch(`${deps.sends[0].body}\n${deps.sends[0].htmlBody}`, /Why you are receiving this|What has been completed|What's attached|What we need from you|How to respond|What happens next/i);
   const stageRead = client.calls.listed.find((call) => call.entitySet === "jm1pub_editorialstages");
   assert.match(stageRead.query.$select, /jm1pub_intakereference/);
   assert.match(stageRead.query.$select, /jm1pub_publishingintakereference/);
@@ -314,7 +319,7 @@ test("due package with missing contact fails closed as ambiguous and does not se
   assert.equal(result.nonSendable, 1);
   assert.equal(result.dueSystemAttention, 0);
   assert.equal(result.results[0].status, "AMBIGUOUS");
-  assert.deepEqual(result.results[0].blockers, ["CONTACT_MISSING", "AUTHOR_EMAIL_MISSING"]);
+  assert.deepEqual(result.results[0].blockers, ["CONTACT_MISSING", "AUTHOR_EMAIL_MISSING", "AUTHOR_BINDING_MISMATCH"]);
   assert.equal(deps.sends.length, 0);
   assert.ok(client.calls.created.some((call) => call.payload.jm1_actiontype === "PACKAGE_CADENCE_RELEASE_SEND_BLOCKED"));
 });

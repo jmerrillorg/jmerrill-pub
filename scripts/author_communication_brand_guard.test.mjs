@@ -161,6 +161,29 @@ test('human-first policy denies internal runtime language and wrong Publishing s
   assert.ok(result.violations.includes('INTERNAL_TERM_MANIFEST'))
 })
 
+test('human-first policy denies rejected checklist scaffolding for Developmental author review', () => {
+  const result = humanFirst.assertHumanFirstWhyFirst({
+    division: 'Publishing',
+    brand: 'publishing',
+    recipientName: 'Quanisha Dockery',
+    recipientRelationship: 'author',
+    communicationType: 'Developmental Editing author review',
+    eventOrTrigger: 'Developmental package ready',
+    whyContext: 'Developmental Editing work is ready for author review',
+    actionRequired: 'Review and reply',
+    jm1NextStep: 'Record the author decision',
+    content: 'Why you are receiving this\nYour Developmental Editing package is ready.\nWhat happens next\nWe record your reply.',
+    channel: 'EMAIL',
+    sender: 'publishing@email.jmerrill.one',
+    replyTo: 'publishing@jmerrill.one',
+    cc: ['publishing@jmerrill.one'],
+    riskClass: 'AUTHOR_REVIEW',
+  })
+
+  assert.equal(result.decision, 'DENY')
+  assert.ok(result.violations.includes('REJECTED_CHECKLIST_SCAFFOLDING'))
+})
+
 test('author package notification copy uses the shared brand renderer', () => {
   const copy = engine.buildAuthorReviewNotificationCopy({
     stageCode: 'INTERIOR_LAYOUT_REVIEW',

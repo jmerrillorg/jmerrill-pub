@@ -5,6 +5,7 @@ const { DefaultAzureCredential } = require("@azure/identity");
 
 const APPROVED_MESSAGE_TYPE = "APPROVED_AUTHOR_RESPONSE";
 const AUTHOR_REVIEW_PACKAGE_TEMPLATE = "AUTHOR_REVIEW_PACKAGE_NOTIFICATION_V1";
+const DEVELOPMENTAL_REVIEW_PACKAGE_TEMPLATE = "DEVELOPMENTAL_EDITORIAL_REVIEW_READY_V2";
 const CANONICAL_RENDERER = "JM1 Enterprise Communication Renderer";
 const CANONICAL_RENDER_MODE = "CANONICAL_HTML";
 const TRANSACTIONAL_FROM = "publishing@email.jmerrill.one";
@@ -25,6 +26,16 @@ function normalizeLower(value) {
 
 function sha256(value) {
   return createHash("sha256").update(value).digest("hex");
+}
+
+function normalizeId(value) {
+  return normalizeLower(value).replace(/[{}]/g, "");
+}
+
+function packageVersion(packageInfo) {
+  const explicit = normalizeString(packageInfo?.version || packageInfo?.versionLabel);
+  if (explicit) return explicit.toLowerCase();
+  return normalizeString(packageInfo?.packageId).match(/(?:^|[-_])(v\d+(?:\.\d+)*)$/i)?.[1]?.toLowerCase() || "";
 }
 
 function escapeHtml(value) {
@@ -213,6 +224,24 @@ async function materializeAttachments(input, deps = {}) {
   const artifactIds = selected.map(({ artifact }) => normalizeString(artifact.jm1pub_editorialartifactid)).filter(Boolean);
   if (new Set(artifactIds).size !== artifactIds.length) throw Object.assign(new Error("AUTHOR_ATTACHMENT_ROLE_COLLISION"), { safeCode: "AUTHOR_ATTACHMENT_ROLE_COLLISION" });
 
+  const expectedTitleId = normalizeId(input.titleId);
+  const expectedStageId = normalizeId(input.stageId);
+  const expectedVersion = packageVersion(input.packageInfo);
+  for (const { role, artifact } of selected) {
+    if (!expectedTitleId || normalizeId(artifact?._jm1pub_titleid_value) !== expectedTitleId) {
+      throw Object.assign(new Error(`ATTACHMENT_TITLE_BINDING_MISMATCH:${role}`), { safeCode: `ATTACHMENT_TITLE_BINDING_MISMATCH:${role}` });
+    }
+    if (!expectedStageId || normalizeId(artifact?._jm1pub_editorialstageid_value) !== expectedStageId) {
+      throw Object.assign(new Error(`ATTACHMENT_STAGE_BINDING_MISMATCH:${role}`), { safeCode: `ATTACHMENT_STAGE_BINDING_MISMATCH:${role}` });
+    }
+    if (stageCodeForNotification(input.stageCode) === "DEVELOPMENTAL_EDITING_REVIEW") {
+      const artifactVersion = normalizeLower(artifact?.jm1pub_versionlabel);
+      if (!expectedVersion || !artifactVersion || artifactVersion !== expectedVersion) {
+        throw Object.assign(new Error(`ATTACHMENT_VERSION_PARITY_FAILED:${role}`), { safeCode: `ATTACHMENT_VERSION_PARITY_FAILED:${role}` });
+      }
+    }
+  }
+
   const attachments = [];
   for (const { role, artifact } of selected) {
     const sourceName = normalizeString(artifact.jm1pub_filename || artifact.jm1pub_editorialartifactname) || `${role}.bin`;
@@ -255,9 +284,65 @@ function renderReviewCopy(input) {
   const label = stageLabel(input.stageCode);
   const title = normalizeString(input.titleName) || "your book";
   const author = normalizeString(input.authorName) || "Author";
+  const authorFirstName = author.split(/\s+/)[0] || "Author";
   const actionUrl = buildAuthorResponseUrl(input);
   const packageInventory = input.attachments.map((attachment) => attachment.name);
+  const developmental = stageCodeForNotification(input.stageCode) === "DEVELOPMENTAL_EDITING_REVIEW";
   const subject = `${label} Materials - ${title}`;
+  if (developmental) {
+    const reviewName = input.attachments.find((attachment) => attachment.role === "reviewInstructions")?.name;
+    const manuscriptName = input.attachments.find((attachment) => attachment.role === "editedManuscript")?.name;
+    if (!reviewName || !manuscriptName) {
+      throw Object.assign(new Error("DEVELOPMENTAL_PACKAGE_INCOMPLETE"), { safeCode: "DEVELOPMENTAL_PACKAGE_INCOMPLETE" });
+    }
+    const text = [
+      `Good day ${authorFirstName},`,
+      "",
+      `We're writing to let you know that the Developmental Editing work for ${title} is ready for your review.`,
+      "",
+      `We've attached ${manuscriptName} together with ${reviewName}. Please read both files and reply directly to publishing@jmerrill.one with Approved, Approved with corrections, or any questions you would like us to address.`,
+      "",
+      `You may also view the materials in your Author Operating Center: ${actionUrl}`,
+      "",
+      "Once we receive your response, the Publishing Team will record your decision and either address your corrections or continue the book to its next approved step.",
+      "",
+      "With care,",
+      "The Publishing Team",
+      "J Merrill Publishing, Inc."
+    ].join("\n");
+    const html = `<!doctype html>
+<html><body style="margin:0;padding:0;background:#f7f8fb;font-family:Arial,Helvetica,sans-serif;color:#111827;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f7f8fb;padding:24px 0;"><tr><td align="center">
+<table role="presentation" width="680" cellpadding="0" cellspacing="0" style="width:680px;max-width:100%;background:#ffffff;border:1px solid #d9e0ea;">
+<tr><td style="background:#111827;color:#ffffff;padding:24px 28px;"><strong>J MERRILL PUBLISHING</strong><br><span style="font-size:13px;">A Division of J Merrill One</span><br><span style="font-size:13px;">Helping Authors Help Themselves.</span></td></tr>
+<tr><td style="padding:28px;">
+<p>Good day ${escapeHtml(authorFirstName)},</p>
+<p>We're writing to let you know that the Developmental Editing work for <strong>${escapeHtml(title)}</strong> is ready for your review.</p>
+<p>We've attached <strong>${escapeHtml(manuscriptName)}</strong> together with <strong>${escapeHtml(reviewName)}</strong>. Please read both files and reply directly to <a href="mailto:publishing@jmerrill.one">publishing@jmerrill.one</a> with Approved, Approved with corrections, or any questions you would like us to address.</p>
+<p><a href="${escapeHtml(actionUrl)}" style="display:inline-block;background:#1f4ed8;color:#ffffff;text-decoration:none;padding:12px 18px;border-radius:4px;font-weight:bold;">View in Author Operating Center</a></p>
+<p>Once we receive your response, the Publishing Team will record your decision and either address your corrections or continue the book to its next approved step.</p>
+<p>With care,<br>The Publishing Team<br>J Merrill Publishing, Inc.</p>
+</td></tr></table></td></tr></table>
+</body></html>`;
+    return {
+      subject,
+      body: text,
+      htmlBody: html,
+      templateName: DEVELOPMENTAL_REVIEW_PACKAGE_TEMPLATE,
+      templateVersion: "2.0.0",
+      templateMetadata: {
+        htmlSha256: sha256(html),
+        textSha256: sha256(text),
+        qualityGate: "PASS",
+        brandSystem: "J Merrill Publishing",
+        enterpriseStandard: "JM1 Enterprise Communication Standard v1.0",
+        renderer: CANONICAL_RENDERER,
+        rendererVersion: "2.0.0",
+        renderMode: CANONICAL_RENDER_MODE,
+        renderTemplateGuard: "PASS"
+      }
+    };
+  }
   const text = [
     `Good day ${author},`,
     "",
@@ -358,6 +443,14 @@ function validateDueSendInput(input) {
   if (!canonicalIntakeReference(input.stage)) blockers.push("CANONICAL_INTAKE_REFERENCE_MISSING");
   if (!normalizeString(input.contact?.contactid)) blockers.push("CONTACT_MISSING");
   if (!normalizeString(input.contact?.emailaddress1)) blockers.push("AUTHOR_EMAIL_MISSING");
+  const titleId = normalizeId(input.titleId);
+  const stageId = normalizeId(input.stage?.jm1pub_editorialstageid);
+  const contactId = normalizeId(input.contact?.contactid);
+  if (!titleId || normalizeId(input.title?.jm1pub_titleid) !== titleId || normalizeId(input.stage?._jm1pub_titleid_value) !== titleId || normalizeId(input.gate?._jm1pub_titleid_value) !== titleId) {
+    blockers.push("TITLE_BINDING_MISMATCH");
+  }
+  if (!stageId || normalizeId(input.gate?._jm1pub_editorialstageid_value) !== stageId) blockers.push("STAGE_BINDING_MISMATCH");
+  if (!contactId || normalizeId(input.stage?._jm1pub_contactid_value) !== contactId) blockers.push("AUTHOR_BINDING_MISMATCH");
   if (!/QA READY_INTERNAL|PACKAGE_QA_COMPLETED|QA[_ ]COMPLETE|QA PASSED/i.test(`${input.completionLog?.jm1_actiondescription || ""} ${input.stage?.jm1pub_internaloperationalsummary || ""}`)) {
     blockers.push("QA_VALIDATION_MISSING");
   }
@@ -371,7 +464,10 @@ async function sendCadenceAuthorReviewPackage(input, deps = {}) {
   const attachments = await materializeAttachments({
     stageCode: input.schedule.stageCode,
     artifacts: input.artifacts,
-    titleName: input.titleName
+    titleName: input.titleName,
+    titleId: input.titleId,
+    stageId: input.stage.jm1pub_editorialstageid,
+    packageInfo: input.packageInfo
   }, deps);
   const copy = renderReviewCopy({
     stageCode: input.schedule.stageCode,
@@ -383,6 +479,22 @@ async function sendCadenceAuthorReviewPackage(input, deps = {}) {
     gateId: input.gate.jm1pub_editorialapprovalgateid,
     attachments
   });
+  const developmental = stageCodeForNotification(input.schedule.stageCode) === "DEVELOPMENTAL_EDITING_REVIEW";
+  const artifactManifest = developmental ? {
+    packageId: input.packageInfo.packageId,
+    packageVersion: packageVersion(input.packageInfo),
+    titleId: normalizeId(input.titleId),
+    stageId: normalizeId(input.stage.jm1pub_editorialstageid),
+    authorContactId: normalizeId(input.contact.contactid),
+    titleBinding: "PASS",
+    authorBinding: "PASS",
+    stageBinding: "PASS",
+    versionParity: "PASS",
+    devReviewStatus: "COMPLETE",
+    devEditedManuscriptStatus: "COMPLETE",
+    devPackageComplete: true,
+    requiredRoles: ["editedManuscript", "reviewInstructions"]
+  } : undefined;
   const payload = {
     messageType: APPROVED_MESSAGE_TYPE,
     diagnosticId: input.gate.jm1pub_editorialapprovalgateid,
@@ -398,6 +510,7 @@ async function sendCadenceAuthorReviewPackage(input, deps = {}) {
     templateVersion: copy.templateVersion,
     templateMetadata: copy.templateMetadata,
     attachments,
+    artifactManifest,
     approvedBy: SYSTEM_OPERATOR,
     approvedOn: new Date().toISOString(),
     internalVisibilityMailbox: PUBLISHING_MAILBOX,
@@ -441,6 +554,7 @@ async function sendCadenceAuthorReviewPackage(input, deps = {}) {
 
 module.exports = {
   AUTHOR_REVIEW_PACKAGE_TEMPLATE,
+  DEVELOPMENTAL_REVIEW_PACKAGE_TEMPLATE,
   CANONICAL_RENDERER,
   CANONICAL_RENDER_MODE,
   PUBLISHING_MAILBOX,
