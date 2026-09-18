@@ -2,6 +2,7 @@ const { app } = require("@azure/functions");
 const { EmailClient } = require("@azure/communication-email");
 const { DefaultAzureCredential } = require("@azure/identity");
 const { createHash } = require("node:crypto");
+const { executeApprovedAuthorResponse } = require("../state/approvedAuthorDelivery");
 const {
   assertPolicyAllows,
   resolveCommunicationAuthority
@@ -1743,21 +1744,36 @@ app.http("send-approved-author-response", {
     }
 
     try {
-      const providerMessageId = await sendAcsMessage(buildApprovedAuthorResponseEmail(validation.value));
+      const result = await executeApprovedAuthorResponse(validation.value, {
+        replyTo: INTERNAL_VISIBILITY_MAILBOX,
+        systemSender: AUTHOR_RESPONSE_SENDER,
+        buildMessage: buildApprovedAuthorResponseEmail,
+        sendMessage: sendAcsMessage
+      });
+      if (result.status === "AMBIGUOUS_SEND_STATE") {
+        return {
+          status: 409,
+          jsonBody: { accepted: false, code: result.status, ...result }
+        };
+      }
       context.info(`ACS relay accepted approved author response; reference=${validation.value.intakeReferenceCode}`);
 
       return {
-        status: 202,
+        status: result.status === "ALREADY_DELIVERED" ? 200 : 202,
         jsonBody: {
           accepted: true,
           messageType: APPROVED_AUTHOR_RESPONSE_TYPE,
-          deliveryStatus: AUTHOR_RESPONSE_SENT,
+          deliveryStatus: result.status === "ALREADY_DELIVERED" ? "ALREADY_DELIVERED" : AUTHOR_RESPONSE_SENT,
           recipient: validation.value.authorEmail,
           internalVisibilityMailbox: INTERNAL_VISIBILITY_MAILBOX,
           intakeReferenceCode: validation.value.intakeReferenceCode,
           diagnosticId: validation.value.diagnosticId,
           provider: ACS_PROVIDER_NAME,
-          providerMessageId
+          providerMessageId: result.providerMessageId,
+          communicationRecordId: result.communicationRecordId,
+          sentAt: result.sentAt,
+          semanticIdempotencyKey: result.semanticIdempotencyKey,
+          artifactChecksums: result.artifactChecksums
         }
       };
     } catch (error) {
@@ -1767,3 +1783,7 @@ app.http("send-approved-author-response", {
     }
   }
 });
+
+module.exports = {
+  validateApprovedAuthorResponsePayload
+};

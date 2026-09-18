@@ -2,6 +2,10 @@
 
 const { createHash } = require("node:crypto");
 const { DefaultAzureCredential } = require("@azure/identity");
+const {
+  markCommunicationSent,
+  reserveCommunicationIntent
+} = require("./communicationIntentStore");
 
 const APPROVED_MESSAGE_TYPE = "APPROVED_AUTHOR_RESPONSE";
 const AUTHOR_REVIEW_PACKAGE_TEMPLATE = "AUTHOR_REVIEW_PACKAGE_NOTIFICATION_V1";
@@ -521,7 +525,47 @@ async function sendCadenceAuthorReviewPackage(input, deps = {}) {
     bcc: []
   };
 
-  if (typeof deps.sendRelay === "function") return deps.sendRelay(payload);
+  const intentInput = {
+    titleId: normalizeId(input.titleId),
+    titleName: input.titleName,
+    authorId: normalizeId(input.contact.contactid),
+    communicationType: copy.templateName,
+    workstream: normalizeId(input.stage.jm1pub_editorialstageid),
+    recipient: payload.authorEmail,
+    attachments
+  };
+  const reserve = deps.reserveCommunicationIntent
+    ? await deps.reserveCommunicationIntent(intentInput)
+    : deps.client
+      ? await reserveCommunicationIntent(deps.client, intentInput)
+      : { status: "RESERVED", semanticIdempotencyKey: "unit-test-no-store", communicationRecordId: "unit-test-no-store" };
+  if (reserve.status === "ALREADY_DELIVERED" || reserve.status === "AMBIGUOUS_SEND_STATE") {
+    return {
+      status: reserve.status,
+      communicationRecordId: reserve.communicationRecordId,
+      sentAt: reserve.sentAt,
+      semanticIdempotencyKey: reserve.semanticIdempotencyKey,
+      recipient: reserve.recipient,
+      attachmentChecksums: reserve.artifactChecksums
+    };
+  }
+  payload.idempotencyKey = reserve.semanticIdempotencyKey;
+  payload.communicationRecordId = reserve.communicationRecordId;
+
+  if (typeof deps.sendRelay === "function") {
+    const result = await deps.sendRelay(payload);
+    if ((result.status === "SENT" || result.status === "ALREADY_DELIVERED") && deps.client) {
+      await markCommunicationSent(deps.client, {
+        ...intentInput,
+        semanticIdempotencyKey: reserve.semanticIdempotencyKey,
+        communicationRecordId: reserve.communicationRecordId,
+        providerMessageId: result.providerMessageId,
+        sentAt: result.sentAt,
+        artifactChecksums: attachments.map((attachment) => attachment.sha256)
+      });
+    }
+    return { ...result, semanticIdempotencyKey: reserve.semanticIdempotencyKey, communicationRecordId: reserve.communicationRecordId };
+  }
 
   const relayUrl = normalizeString(process.env.JM1_AUTHOR_RESPONSE_SEND_RELAY_URL || process.env.JM1_JOIN_INTERNAL_NOTIFICATION_RELAY_URL || RELAY_FALLBACK_URL).replace(/\/$/, "");
   const relayKey = process.env.JM1_AUTHOR_RESPONSE_SEND_RELAY_KEY || process.env.JM1_RELAY_API_KEY || process.env.JM1_JOIN_INTERNAL_NOTIFICATION_RELAY_KEY;
@@ -539,9 +583,23 @@ async function sendCadenceAuthorReviewPackage(input, deps = {}) {
   if (!response.ok || (!body?.accepted && !body?.providerMessageId)) {
     return { status: "FAILED", blockers: [`RELAY_SEND_FAILED:${body?.reason || body?.code || response.status}`], relayResponse: body };
   }
+  const status = body.deliveryStatus === "ALREADY_DELIVERED" ? "ALREADY_DELIVERED" : "SENT";
+  if (deps.client) {
+    await markCommunicationSent(deps.client, {
+      ...intentInput,
+      semanticIdempotencyKey: reserve.semanticIdempotencyKey,
+      communicationRecordId: body.communicationRecordId || reserve.communicationRecordId,
+      providerMessageId: body.providerMessageId,
+      sentAt: body.sentAt,
+      artifactChecksums: attachments.map((attachment) => attachment.sha256)
+    });
+  }
   return {
-    status: "SENT",
+    status,
     providerMessageId: body.providerMessageId || "accepted-without-provider-message-id",
+    communicationRecordId: body.communicationRecordId || reserve.communicationRecordId,
+    sentAt: body.sentAt,
+    semanticIdempotencyKey: reserve.semanticIdempotencyKey,
     relayResponse: body,
     attachmentCount: attachments.length,
     attachmentChecksums: attachments.map((attachment) => `${attachment.role}:${attachment.sha256}`),
