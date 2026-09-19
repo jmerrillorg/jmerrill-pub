@@ -1,0 +1,11 @@
+change,source,target,result
+add full Phase 6 table,jmpv2_authorprofile,portable solution 1.2.0.0,PASS
+complete partial table,jmpv2_onboardingrecord,portable solution 1.2.0.0,PASS
+add full Phase 6 table,jmpv2_onboardingitem,portable solution 1.2.0.0,PASS
+add full Phase 6 table,jmpv2_workspaceprovisioning,portable solution 1.2.0.0,PASS
+preserve existing full table,jmpv2_authoraccess,portable solution 1.2.0.0,PASS
+add full Phase 6 table,jmpv2_payoutreadiness,portable solution 1.2.0.0,PASS
+add full Phase 6 table,jmpv2_onboardingcompletionevent,portable solution 1.2.0.0,PASS
+preserve plug-in behavior,jmpv2phase6onboarding,portable solution 1.2.0.0,PASS
+preserve Phase 7 exclusion,solution manifest,portable solution 1.2.0.0,PASS
+import managed update,1.2.0.0,JM1-Test,PASS

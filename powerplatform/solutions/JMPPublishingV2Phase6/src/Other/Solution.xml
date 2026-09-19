@@ -8,7 +8,7 @@
     <Descriptions>
       <Description description="Portable Phase 6 onboarding command, guard steps, configuration, and author-access authority." languagecode="1033" />
     </Descriptions>
-    <Version>1.1.0.0</Version>
+    <Version>1.2.0.0</Version>
     <Managed>0</Managed>
     <Publisher>
       <UniqueName>JMPPublishingV2</UniqueName>
@@ -81,25 +81,17 @@
     </Publisher>
     <RootComponents>
       <RootComponent type="1" schemaName="jmpv2_authoraccess" behavior="0" />
-      <RootComponent type="1" schemaName="jmpv2_onboardingrecord" behavior="2" />
+      <RootComponent type="1" schemaName="jmpv2_authorprofile" behavior="0" />
+      <RootComponent type="1" schemaName="jmpv2_onboardingcompletionevent" behavior="0" />
+      <RootComponent type="1" schemaName="jmpv2_onboardingitem" behavior="0" />
+      <RootComponent type="1" schemaName="jmpv2_onboardingrecord" behavior="0" />
+      <RootComponent type="1" schemaName="jmpv2_payoutreadiness" behavior="0" />
+      <RootComponent type="1" schemaName="jmpv2_workspaceprovisioning" behavior="0" />
       <RootComponent type="91" id="{499ac0d0-efab-f111-aaac-6045bd01d436}" schemaName="jmpv2phase6onboarding, Version=1.0.0.0, Culture=neutral, PublicKeyToken=fffbe8b3d67a6cc0" behavior="0" />
       <RootComponent type="92" id="{a44166ea-efab-f111-aaac-6045bd01daa8}" behavior="0" />
       <RootComponent type="92" id="{f097d0e4-efab-f111-aaab-000d3a30bedf}" behavior="0" />
       <RootComponent type="92" id="{f397d0e4-efab-f111-aaab-000d3a30bedf}" behavior="0" />
     </RootComponents>
-    <MissingDependencies>
-      <MissingDependency>
-        <Required type="1" schemaName="jmpv2_onboardingcompletionevent" displayName="V2 Onboarding Completion Event" solution="Active" />
-        <Dependent type="92" displayName="Deny direct Phase 6 completion authority writes." id="{f097d0e4-efab-f111-aaab-000d3a30bedf}" />
-      </MissingDependency>
-      <MissingDependency>
-        <Required type="1" schemaName="jmpv2_onboardingcompletionevent" displayName="V2 Onboarding Completion Event" solution="Active" />
-        <Dependent type="92" displayName="Deny direct Phase 6 completion authority writes." id="{f397d0e4-efab-f111-aaab-000d3a30bedf}" />
-      </MissingDependency>
-      <MissingDependency>
-        <Required type="1" schemaName="jmpv2_onboardingrecord" displayName="V2 Onboarding Record" solution="Active" />
-        <Dependent type="1" schemaName="jmpv2_onboardingrecord" displayName="V2 Onboarding Record" />
-      </MissingDependency>
-    </MissingDependencies>
+    <MissingDependencies />
   </SolutionManifest>
 </ImportExportXml>

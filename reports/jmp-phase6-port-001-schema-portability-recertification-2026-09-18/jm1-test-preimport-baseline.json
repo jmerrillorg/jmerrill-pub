@@ -1,0 +1,29 @@
+{
+  "capturedFrom": "JM1-Test readbacks before managed update and certification",
+  "environment": "JM1-Test",
+  "environmentType": "Sandbox",
+  "environmentId": "251b8f38-5cea-e329-b9b2-3d34ba47dd1e",
+  "organizationId": "bb7a9d9e-8e73-f111-b27b-000d3a31ff17",
+  "production": false,
+  "solutionVersion": "1.1.0.0",
+  "environmentVariableValue": "false",
+  "missingRuntimeColumns": 20,
+  "existingRecordsBeforeCertification": {
+    "jmpv2_authorprofiles": 0,
+    "jmpv2_onboardingrecords": 0,
+    "jmpv2_onboardingitems": 0,
+    "jmpv2_workspaceprovisionings": 1,
+    "jmpv2_authoraccesses": 0,
+    "jmpv2_payoutreadinesses": 0,
+    "jmpv2_onboardingcompletionevents": 0,
+    "jmpv2_publishingengagements": 7,
+    "jmpv2_lifecycleinstances": 8
+  },
+  "whole": {
+    "engagementId": "0038ee51-27a9-f111-aaab-70a8a59b112b",
+    "author": "Jackuline Fly",
+    "title": "Whole",
+    "stage": "06_ONBOARDING",
+    "modifiedOn": "2026-09-17T21:41:54Z"
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "status": "PASS",
+  "solutionVersion": "1.2.0.0",
+  "solutionId": "62349b86-3be4-4904-9275-4cb55226c51f",
+  "solutionComponentRows": 52,
+  "componentTypes": {
+    "tables": 7,
+    "pluginAssemblies": 1,
+    "sdkMessageProcessingSteps": 3,
+    "environmentVariableDefinitions": 1,
+    "environmentVariableValues": 1,
+    "customApis": 1,
+    "customApiRequestParameters": 26,
+    "customApiResponseProperties": 12
+  },
+  "missingDependencies": 0,
+  "missingRuntimeColumnsAfterImport": 0,
+  "unmanagedPhase6PatchRequired": false
+}

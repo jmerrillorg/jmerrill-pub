@@ -1,0 +1,4 @@
+environment,principal,role,purpose,assessment,mutation_by_packet
+JM1-Test,jm1-admin authenticated operator,System Administrator,readback and synthetic certification,EXISTING_OVERBROAD_OPERATOR,NO
+JM1-Test,JMP JM1-INFRA-PAM-Automation,System Administrator,solution import identity,EXISTING_OVERBROAD_SHARED_IDENTITY,NO
+JM1-Test,Phase 6 runtime,none dedicated,production runtime least privilege,UNRESOLVED,NO

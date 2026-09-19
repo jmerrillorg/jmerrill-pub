@@ -1,0 +1,18 @@
+{
+  "status": "FAIL_PROMOTION_GATE",
+  "tests": [
+    {"test": "unknown author", "result": "PASS", "proof": "UNKNOWN_AUTHOR"},
+    {"test": "unknown engagement or missing state", "result": "PASS", "proof": "UNKNOWN_ENGAGEMENT"},
+    {"test": "expired invitation/OTP", "result": "PASS", "proof": "expired challenge returns null and status expired"},
+    {"test": "duplicate submission", "result": "PASS", "proof": "deterministic GUID + If-None-Match replay contract"},
+    {"test": "missing required item", "result": "PASS", "proof": "ONBOARDING_INCOMPLETE"},
+    {"test": "cross-engagement evidence", "result": "PASS", "proof": "CROSS_ENGAGEMENT_EVIDENCE with atomic no-write"},
+    {"test": "unauthorized caller", "result": "PASS", "proof": "live UNAUTHORIZED_ONBOARDING_COMMAND"},
+    {"test": "replayed request", "result": "PASS", "proof": "ONBOARDING_REPLAY and one record"},
+    {"test": "stale record version", "result": "PASS", "proof": "STALE_VERSION"},
+    {"test": "wrong title for valid engagement", "result": "FAIL", "proof": "live probe returned Accepted=true ReasonCode=ONBOARDING_REPLAY"},
+    {"test": "JM1-Test fixture affects production", "result": "PASS", "proof": "production mutations and effects remain zero"}
+  ],
+  "blockingDefect": "ACTIVATE does not compare supplied TitleId and CanonicalContactId with the engagement's canonical title and author IDs before replay/create.",
+  "repairConstraint": "A corrected strongly named plug-in build requires the governed signing key; no replacement key may be generated."
+}

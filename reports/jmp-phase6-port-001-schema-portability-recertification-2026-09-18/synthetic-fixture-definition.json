@@ -1,0 +1,25 @@
+{
+  "classification": "PHASE6_SYNTHETIC_TEST_ONLY",
+  "runId": "PHASE6-1789782306888-e06b2df1",
+  "environment": "JM1-Test",
+  "privacy": "No real author data; email uses example.invalid",
+  "fixtures": [
+    "primary Stage 06 engagement",
+    "second-title Stage 06 engagement sharing the synthetic author",
+    "unknown-author/engagement negative fixture"
+  ],
+  "createdAuthorityRecords": {
+    "authorProfiles": 1,
+    "onboardingRecords": 2,
+    "onboardingItems": 2,
+    "workspaceProvisioningRecords": 2,
+    "authorAccessRecords": 1,
+    "payoutReadinessRecords": 2,
+    "completionEvents": 1,
+    "publishingEngagements": 3,
+    "lifecycleInstances": 3
+  },
+  "realTitleMutations": 0,
+  "communications": 0,
+  "financialEffects": 0
+}

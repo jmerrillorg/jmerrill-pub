@@ -1,0 +1,56 @@
+{
+  "status": "PARTIAL",
+  "generatedAt": "2026-09-19T01:55:00Z",
+  "target": {
+    "name": "JM1-Test",
+    "type": "Sandbox",
+    "organizationId": "bb7a9d9e-8e73-f111-b27b-000d3a31ff17"
+  },
+  "artifact": {
+    "name": "JMP_PublishingV2_Phase6_Portable_1_2_0_0_managed.zip",
+    "sha256": "7b8176738e64c19afbad5c8b92560c231772a95ddc698fe30bc69a4dc97c96e7",
+    "zipIntegrity": "PASS"
+  },
+  "validation": {
+    "exactTargetNonproduction": "PASS",
+    "portableDependenciesComplete": "PASS",
+    "managedImport": "PASS",
+    "unmanagedPatchRequired": "NO",
+    "environmentConfiguration": "PASS",
+    "syntheticFixtureOnly": "PASS",
+    "canonicalPhase6Tests": "38/38 PASS",
+    "supplementalAuthorExperienceTests": "18/18 PASS",
+    "negativeTests": "FAIL - wrong-title activation replay accepted",
+    "duplicateProtection": "PASS",
+    "productionIsolation": "PASS",
+    "wholeUntouched": "PASS",
+    "stripeIngestionUntouched": "PASS",
+    "secretValuesCaptured": 0,
+    "gitDiffCheck": "PASS"
+  },
+  "productionPromotionReady": false,
+  "productionImportAuthorized": false,
+  "fileHashes": {
+    "00-executive-summary.md": "19bd586315618b06d2ba75a7757423dc0f30feda5aa670de1018222bf14487dc",
+    "phase6-authority-index.json": "85c7f50c953368f6d0d1d226ca50ad5561c8418de029f673bc130e0f03def8b9",
+    "current-solution-inventory.csv": "57c01eae9db2912d2f9fad89c918f97a94456123cd006818dfeba48c7a569858",
+    "schema-dependency-inventory.csv": "dd14c82b211ec09dd9068f0e3817f283abfe4e9932c8f63c16d638c5b0a381e9",
+    "missing-component-register.csv": "fe899478d0ed034e19abd8a65547f7568fa7a8fe1b73e02cbe8de7dfbbbc9429",
+    "solution-change-register.csv": "e9862fabdbc5b18e013eb1b7fa751eb911bb88adadd143c096005a125488c761",
+    "environment-variable-readback.csv": "4a3cef2bf11abc8da1edc5189a6f6d54ec1246e7cf325cdbbb4bdbdff1369ea0",
+    "connection-reference-readback.csv": "05778db8b773e274cc75f127922434468ea398561407a3cd2da9ccb5cc317d0c",
+    "security-role-readback.csv": "e6d5dcf72859df4606f046c1077556fe78e0534d7ab55e55f4aff7ac0c639bae",
+    "application-user-readback.md": "aa5bbde3075599dfeed09829964eb719050dc659dc06354aa537e01a467bfb15",
+    "jm1-test-preimport-baseline.json": "c4679ffda8010bcb0c136e5c1d29e60d9a08372fbcb6c20034a79d82227e7c34",
+    "solution-import-result.json": "396bb11bdadf24065c2cec6afd02f0cb8d99cec3dbfbc25a82bb18aa87a14193",
+    "managed-component-readback.json": "284ff9d508f856e09205dbc4e4b7ab7328c3535d41eb8c72bf932c734214a2c9",
+    "synthetic-fixture-definition.json": "27595dd917a8a7b4feb755f1375244d15bdd1020b2c7e3355251f38bd794b550",
+    "recertification-results.json": "ae861af42bbcc03867d3c15374ae17a36984ea549310fe8c30925fabdfc2755b",
+    "negative-tests.json": "6e061140d5388a67fdf83bca0dc9a2030776bcb5af059c94154a075cc2e109fc",
+    "human-first-gate-proof.md": "502999cebb266a359f5c59ddcb6700783c30f86f4abd5453f50a562d838569bf",
+    "stage-transition-proof.md": "ff0f467318a9dc2194cf9ff35c74af9073c94ead6d9b9854b478d59053c824f0",
+    "production-isolation-proof.json": "e3fa1de1543b5b781500a5b545a53b1437246cb3208acfa0f5eb9164ea02562c",
+    "production-promotion-readiness.md": "614e6d6dc4ac645979c5b4ec3229ea49dc93558bb6618af5a5ff8dd15391415c",
+    "next-packet-recommendation.md": "4061e3138e5c19aa7541a8b95830702d02569197b276318955a78c2e4d8a9a91"
+  }
+}

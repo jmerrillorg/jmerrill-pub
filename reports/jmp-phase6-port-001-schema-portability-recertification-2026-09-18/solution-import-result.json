@@ -1,0 +1,16 @@
+{
+  "status": "PASS",
+  "target": "JM1-Test",
+  "environmentType": "Sandbox",
+  "solution": "JMP_PublishingV2_Phase6_Portable",
+  "action": "UPDATE",
+  "fromVersion": "1.1.0.0",
+  "toVersion": "1.2.0.0",
+  "managed": true,
+  "artifactSha256": "7b8176738e64c19afbad5c8b92560c231772a95ddc698fe30bc69a4dc97c96e7",
+  "importOperationId": "ac7b04f7-cab3-f111-aaac-70a8a59b112b",
+  "publishOperationId": "462c6596-cbb3-f111-aaac-70a8a59b112b",
+  "importCompleted": true,
+  "publishCompleted": true,
+  "productionImport": false
+}

@@ -1,0 +1,18 @@
+component_type,logical_name,display_name,purpose,source_environment,solution_membership,managed_portability_status,dependencies,runtime_required,missing_from_1_2
+table,jmpv2_authorprofile,V2 Author Profile,canonical author identity reuse,JM1-Dev,JMP_PublishingV2_Phase6_Portable,MANAGED_PORTABLE,base ownership schema,YES,NO
+table,jmpv2_onboardingrecord,V2 Onboarding Record,engagement-scoped onboarding authority and optimistic version,JM1-Dev,JMP_PublishingV2_Phase6_Portable,MANAGED_PORTABLE,jmpv2_authorprofile,YES,NO
+table,jmpv2_onboardingitem,V2 Onboarding Item,required and optional evidence state,JM1-Dev,JMP_PublishingV2_Phase6_Portable,MANAGED_PORTABLE,jmpv2_onboardingrecord,YES,NO
+table,jmpv2_workspaceprovisioning,V2 Workspace Provisioning,workspace readiness evidence,JM1-Dev,JMP_PublishingV2_Phase6_Portable,MANAGED_PORTABLE,jmpv2_onboardingrecord,YES,NO
+table,jmpv2_authoraccess,V2 Author Access,author-access readiness evidence,JM1-Dev,JMP_PublishingV2_Phase6_Portable,MANAGED_PORTABLE,jmpv2_onboardingrecord,YES,NO
+table,jmpv2_payoutreadiness,V2 Payout Readiness,payout prerequisite state,JM1-Dev,JMP_PublishingV2_Phase6_Portable,MANAGED_PORTABLE,jmpv2_onboardingrecord,YES,NO
+table,jmpv2_onboardingcompletionevent,V2 Onboarding Completion Event,server-derived completion audit,JM1-Dev,JMP_PublishingV2_Phase6_Portable,MANAGED_PORTABLE,jmpv2_onboardingrecord,YES,NO
+table,jmpv2_publishingengagement,V2 Publishing Engagement,canonical title-author engagement and Stage 06 projection,JM1-Dev,JMP_PublishingV2 base,EXTERNAL_MANAGED_DEPENDENCY,JMP_PublishingV2,YES,NO
+table,jmpv2_lifecycleinstance,V2 Lifecycle Instance,canonical lifecycle stage and transition authority,JM1-Dev,JMP_PublishingV2 base,EXTERNAL_MANAGED_DEPENDENCY,JMP_PublishingV2,YES,NO
+columns,jmpv2_authorprofile.*,Phase 6 author profile columns,identity activation and correlation,JM1-Dev,JMP_PublishingV2_Phase6_Portable,89 custom columns across seven owned tables,table roots,YES,NO
+relationships,jmpv2_phase6_*,Six deterministic Phase 6 relationships,lookup binding with Restrict delete,JM1-Dev,JMP_PublishingV2_Phase6_Portable,MANAGED_PORTABLE,seven owned tables,YES,NO
+alternate_keys,phase6_authority_keys,Seven table authority keys,duplicate prevention and exact replay identity,JM1-Dev,JMP_PublishingV2_Phase6_Portable,MANAGED_PORTABLE,primary authority key columns,YES,NO
+choices,none,None,plug-in contract uses stable text values not Dataverse choices,JM1-Dev,not applicable,NOT_APPLICABLE,none,NO,NO
+environment_variable,jmpv2_Phase6OnboardingCommandEnabled,Phase 6 Onboarding Command Enabled,fail-closed per-environment enablement,JM1-Dev,JMP_PublishingV2_Phase6_Portable,MANAGED_PORTABLE,current value binding,YES,NO
+connection_reference,none,None,no connector-bound flow is in the portable command,JM1-Dev,not applicable,NOT_APPLICABLE,none,NO,NO
+custom_api,jmpv2_ExecuteOnboardingCommand,Execute Onboarding Command,deterministic Phase 6 command boundary,JM1-Dev,JMP_PublishingV2_Phase6_Portable,MANAGED_PORTABLE,plug-in assembly and 38 contract children,YES,NO
+plugin_assembly,jmpv2phase6onboarding,Phase 6 authority plug-in,command and direct-write guards,JM1-Dev,JMP_PublishingV2_Phase6_Portable,MANAGED_PORTABLE,governed strong-name signing key,YES,NO
