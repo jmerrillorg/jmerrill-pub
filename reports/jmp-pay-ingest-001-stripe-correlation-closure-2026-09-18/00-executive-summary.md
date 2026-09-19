@@ -14,4 +14,6 @@ This packet establishes a bounded correlation contract without a new subsystem o
 
 The historical Whole payment was the one confirmed valid event that required founder/manual correlation. It was already reconciled before this packet; this work made no production business-state remediation and created no financial effect.
 
+Application PR #771 merged at `8e3e501c548ab313c5946a3231443cbc21a59364`. GitHub Actions run `35411996671` deployed that exact SHA to the Publishing Premium App Service and passed its health probe. Three independent post-deployment health reads returned `ready` at the same release SHA; the webhook route remained available and correctly rejected GET with HTTP 405.
+
 Accounting boundaries remain unchanged: Stripe is payment processing authority, Dataverse is Publishing operational authority, QBO is current accounting authority during Movement 4, and Business Central remains the target accounting authority.
