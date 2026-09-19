@@ -1,5 +1,5 @@
 {
-  "status": "SOURCE_VALIDATION_PASS",
+  "status": "PRODUCTION_VALIDATION_PASS",
   "canonicalMainRefreshed": true,
   "cleanWorktreeUsed": true,
   "dirtyPrimaryMutations": 0,
@@ -17,6 +17,10 @@
   "lint": "PASS_WITH_PREEXISTING_FONT_WARNING",
   "build": "PASS_WITH_PREEXISTING_TRACE_WARNINGS",
   "gitDiffCheck": "PASS",
+  "canonicalMerge": "PASS_8e3e501c548ab313c5946a3231443cbc21a59364",
+  "deployment": "PASS_RUN_35411996671",
+  "productionHealth": "READY_3_OF_3",
+  "productionReleaseSha": "8e3e501c548ab313c5946a3231443cbc21a59364",
   "financialEffects": 0,
   "communicationsSent": 0,
   "businessContinuityInterruption": 0
