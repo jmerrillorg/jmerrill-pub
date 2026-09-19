@@ -124,6 +124,28 @@ describe("commercial eligibility production binding", () => {
     assert.equal(reviewed.review.FINAL_REVIEWED_CLASSIFICATION, null);
   });
 
+  test("review accepts a fresh authoritative reread of an immutable preparation", async () => {
+    const audit = memoryAudit();
+    let stateExpiresAt = "2026-09-18T14:15:00.000Z";
+    let now = "2026-09-18T14:05:00.000Z";
+    const binding = createCommercialEligibilityProductionBinding({
+      readState: async () => ({ ...liveState(), STATE_EXPIRES_AT: stateExpiresAt }),
+      audit,
+      clock: () => now
+    });
+    const prepared = await binding.prepare({ opportunityId: liveState().WORK_ID, titleId: liveState().TITLE_ID });
+    now = "2026-09-19T12:00:00.000Z";
+    stateExpiresAt = "2026-09-19T12:15:00.000Z";
+    const reviewed = await binding.review({
+      classificationId: prepared.prepared.CLASSIFICATION_ID,
+      reviewer: "publisher@example.test",
+      decision: "ACCEPT"
+    });
+    assert.equal(reviewed.preparedExpired, false);
+    assert.equal(reviewed.review.REVIEW_STATUS, "COMPLETED");
+    assert.equal(reviewed.review.STALE_STATUS, "CURRENT");
+  });
+
   test("non-human policy harness proves stale denial without creating a human review", async () => {
     const audit = memoryAudit();
     const binding = createCommercialEligibilityProductionBinding({ readState: async () => liveState(), audit, clock: () => "2026-09-18T14:05:00.000Z" });

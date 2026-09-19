@@ -96,9 +96,9 @@ function createCommercialEligibilityProductionBinding(options = {}) {
     ensureEnabled();
     const existing = await audit.readPreparation(input.classificationId);
     const current = await readState(existing.workBinding);
-    const preparedExpiresAt = Date.parse(existing.authoritativeState?.STATE_EXPIRES_AT || "");
-    const preparedExpired = Number.isFinite(preparedExpiresAt) && preparedExpiresAt <= Date.parse(clock());
-    const reviewStateVersion = preparedExpired
+    const currentReadExpiresAt = Date.parse(current.STATE_EXPIRES_AT || "");
+    const currentReadExpired = Number.isFinite(currentReadExpiresAt) && currentReadExpiresAt <= Date.parse(clock());
+    const reviewStateVersion = currentReadExpired
       ? `${current.AUTHORITATIVE_STATE_VERSION}:PREPARATION_EXPIRED`
       : current.AUTHORITATIVE_STATE_VERSION;
     const traces = [];
@@ -120,7 +120,8 @@ function createCommercialEligibilityProductionBinding(options = {}) {
       workBinding: existing.workBinding,
       preparedStateVersion: existing.prepared.INPUT_STATE_REFERENCE,
       currentStateVersion: reviewStateVersion,
-      preparedExpired,
+      preparedExpired: currentReadExpired,
+      currentReadExpired,
       review: reviewResult,
       trace: traces[0],
       downstreamEffectAuthority: "NONE",
