@@ -12,6 +12,7 @@ namespace Jmp.Publishing.V2.Phase6
         private const string Actor = "phase6-authorized-actor";
         private const string Authority = "V2_ONBOARDING_AUTHORITY";
         private const string EnabledEnvironmentVariable = "jmpv2_Phase6OnboardingCommandEnabled";
+        private const string AllowedCallerEnvironmentVariable = "jmpv2_Phase6AllowedCallerSystemUserId";
 
         public void Execute(IServiceProvider provider)
         {
@@ -20,6 +21,7 @@ namespace Jmp.Publishing.V2.Phase6
             var service = factory.CreateOrganizationService(context.UserId);
             var c = Read(context);
             if (!EnvironmentEnabled(service)) { Output(context, false, "PHASE6_ENVIRONMENT_NOT_ENABLED", false, false); return; }
+            if (!CallerAuthorized(service, context)) { Output(context, false, "UNAUTHORIZED_CALLER", false, false); return; }
             if (c.Actor != Actor || c.AuthorityContext != Authority) { Output(context, false, "UNAUTHORIZED_ONBOARDING_COMMAND", false, false); return; }
             try
             {
@@ -229,14 +231,25 @@ namespace Jmp.Publishing.V2.Phase6
         }
         private static bool EnvironmentEnabled(IOrganizationService s)
         {
+            return string.Equals(EnvironmentValue(s, EnabledEnvironmentVariable), "true", StringComparison.OrdinalIgnoreCase);
+        }
+        private static bool CallerAuthorized(IOrganizationService s, IPluginExecutionContext x)
+        {
+            var configured = EnvironmentValue(s, AllowedCallerEnvironmentVariable);
+            if (!Guid.TryParse(configured, out var allowedCaller)) return false;
+            var caller = x.InitiatingUserId == Guid.Empty ? x.UserId : x.InitiatingUserId;
+            return caller == allowedCaller && x.UserId == allowedCaller;
+        }
+        private static string EnvironmentValue(IOrganizationService s, string schemaName)
+        {
             var definitionQuery = new QueryExpression("environmentvariabledefinition")
             {
                 ColumnSet = new ColumnSet("environmentvariabledefinitionid", "defaultvalue"),
                 TopCount = 1
             };
-            definitionQuery.Criteria.AddCondition("schemaname", ConditionOperator.Equal, EnabledEnvironmentVariable);
+            definitionQuery.Criteria.AddCondition("schemaname", ConditionOperator.Equal, schemaName);
             var definition = s.RetrieveMultiple(definitionQuery).Entities.FirstOrDefault();
-            if (definition == null) return false;
+            if (definition == null) return null;
 
             var valueQuery = new QueryExpression("environmentvariablevalue")
             {
@@ -246,8 +259,7 @@ namespace Jmp.Publishing.V2.Phase6
             valueQuery.Criteria.AddCondition("environmentvariabledefinitionid", ConditionOperator.Equal, definition.Id);
             valueQuery.AddOrder("createdon", OrderType.Descending);
             var current = s.RetrieveMultiple(valueQuery).Entities.FirstOrDefault()?.GetAttributeValue<string>("value");
-            var effective = string.IsNullOrWhiteSpace(current) ? definition.GetAttributeValue<string>("defaultvalue") : current;
-            return string.Equals(effective, "true", StringComparison.OrdinalIgnoreCase);
+            return string.IsNullOrWhiteSpace(current) ? definition.GetAttributeValue<string>("defaultvalue") : current;
         }
         private static bool CheckVersion(IPluginExecutionContext x, Command c, Entity o) { var v = o.GetAttributeValue<int?>("jmpv2_recordversion") ?? 1; if (c.ExpectedVersion != v) { Output(x, false, "STALE_VERSION", false, false); return false; } x.OutputParameters["RecordVersion"] = v + 1; return true; }
         private static void Bump(IOrganizationService s, Entity o) { var e = new Entity("jmpv2_onboardingrecord", o.Id); e["jmpv2_recordversion"] = (o.GetAttributeValue<int?>("jmpv2_recordversion") ?? 1) + 1; s.Update(e); }

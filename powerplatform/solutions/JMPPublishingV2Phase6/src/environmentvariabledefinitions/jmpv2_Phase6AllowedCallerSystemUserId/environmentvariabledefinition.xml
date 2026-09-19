@@ -1,0 +1,14 @@
+<environmentvariabledefinition schemaname="jmpv2_Phase6AllowedCallerSystemUserId">
+  <defaultvalue></defaultvalue>
+  <description default="Dataverse application-user ID authorized to invoke the Phase 6 onboarding command in this environment.">
+    <label description="Dataverse application-user ID authorized to invoke the Phase 6 onboarding command in this environment." languagecode="1033" />
+  </description>
+  <displayname default="JMP V2 Phase 6 Allowed Caller System User ID">
+    <label description="JMP V2 Phase 6 Allowed Caller System User ID" languagecode="1033" />
+  </displayname>
+  <introducedversion>1.2.0.0</introducedversion>
+  <iscustomizable>1</iscustomizable>
+  <isrequired>0</isrequired>
+  <secretstore>0</secretstore>
+  <type>100000000</type>
+</environmentvariabledefinition>
