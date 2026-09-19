@@ -22,7 +22,8 @@ The portable solution is `JMP_PublishingV2_Phase6_Portable`, version `1.2.0.0`. 
 - Caller default: blank / fail closed
 - Request authority: Entra workload token validated by Dataverse, exact Dataverse application-user binding, server-side engagement/author/title/lifecycle correlation, and durable idempotency
 - Runtime role: `JMP Phase 6 Onboarding Runtime`; no delete, assign, share, schema-administration, or security-administration privilege
-- Contract labels remain `phase6-authorized-actor` and `V2_ONBOARDING_AUTHORITY`.
+- Custom API execution privilege: `prvCreatejmpv2_OnboardingRecord`, granted by the dedicated Phase 6 runtime role
+- Contract labels `phase6-authorized-actor` and `V2_ONBOARDING_AUTHORITY` remain defense-in-depth command checks, not authentication credentials.
 
 There is no environment URL, organization ID, title identity, or Dev-only execution branch in the plugin source.
 

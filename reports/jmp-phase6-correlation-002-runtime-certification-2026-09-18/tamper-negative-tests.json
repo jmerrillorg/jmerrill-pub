@@ -1,14 +1,15 @@
 {
-  "status": "BLOCKED_NO_SIGNED_REQUEST_CONTRACT",
-  "cases": [
-    {"case": "modified signed title", "result": "NOT_EXECUTED"},
-    {"case": "modified signed author", "result": "NOT_EXECUTED"},
-    {"case": "modified signed engagement", "result": "NOT_EXECUTED"},
-    {"case": "expired signed authority", "result": "NOT_EXECUTED"},
-    {"case": "invalid signature", "result": "NOT_EXECUTED"},
-    {"case": "wrong signing key", "result": "NOT_EXECUTED"},
-    {"case": "missing required signed claim", "result": "NOT_EXECUTED"}
+  "status": "NOT_APPLICABLE_CUSTOM_SIGNATURE_NOT_SELECTED",
+  "authorityModel": "ENTRA_CALLER_TOKEN_PLUS_SERVER_SIDE_CORRELATION",
+  "tokenIntegrityAuthority": "MICROSOFT_ENTRA_AND_DATAVERSE",
+  "equivalentNegativeCases": [
+    {"case": "modified title claim", "expected": "TITLE_ENGAGEMENT_MISMATCH", "result": "PREPARED_NOT_DEPLOYED"},
+    {"case": "modified author claim", "expected": "AUTHOR_ENGAGEMENT_MISMATCH", "result": "PREPARED_NOT_DEPLOYED"},
+    {"case": "modified engagement claim", "expected": "UNKNOWN_ENGAGEMENT_OR_RELATIONSHIP_MISMATCH", "result": "PREPARED_NOT_DEPLOYED"},
+    {"case": "cross-engagement lifecycle", "expected": "WORK_ENGAGEMENT_MISMATCH", "result": "PREPARED_NOT_DEPLOYED"},
+    {"case": "stale state", "expected": "STALE_VERSION_OR_STAGE_DENIAL", "result": "PREPARED_NOT_DEPLOYED"},
+    {"case": "unauthorized caller", "expected": "DATAVERSE_EXECUTE_PRIVILEGE_DENIAL", "result": "SOURCE_PREPARED_NOT_DEPLOYED"}
   ],
-  "effects": 0,
-  "reason": "Current API has no cryptographic request-signing inputs or verifier."
+  "customSignatureCasesFabricated": 0,
+  "effects": 0
 }

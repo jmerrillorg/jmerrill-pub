@@ -1,13 +1,13 @@
 # Target Security Role
 
-Proposed role name: `JM1 Publishing Phase 6 Onboarding Runtime`
+Role name: `JMP Phase 6 Onboarding Runtime - JM1-Test`
 
-Status: DESIGNED / NOT COMMISSIONED
+Status: COMMISSIONED IN JM1-TEST / LIVE CALL PROOF PENDING
 
 The role is limited to the privileges in `minimum-privilege-matrix.csv`. Delete, assign, share, security-role administration, customization, solution import, unrelated brand, financial, royalty, provider, and communication privileges are excluded.
 
-Identity decision: `DEDICATED_PHASE6_APPLICATION_USER_REQUIRED`.
+Identity decision: `SUITABLE_REUSE — EXISTING UAT MANAGED IDENTITY`.
 
-This does not authorize a new Entra application. The application user should bind to the actual nonproduction Phase 6 runtime identity once that caller and host are established. The existing shared automation identity cannot demonstrate effective least privilege while System Administrator remains attached, and its other workloads make removal unsafe. The production publishing App Service managed identity must not be repurposed as a JM1-Test caller merely to satisfy certification.
+No Entra application was created. The role is assigned to the existing system-assigned managed identity of `func-jm1-publishing-inbound-uat` through dedicated Dataverse application user `c8b4a60b-1ab4-f111-aaac-70a8a59b112b`. The existing shared automation identity remains untouched, and the production Publishing App Service identity was not repurposed.
 
-The role should be transported by the governed solution path, assigned in JM1-Test, and proven through calls made by that identity. An administrator running the suite cannot substitute for runtime proof.
+Live readback shows 41 effective privileges: global read only for the exact correlation/platform metadata and basic-scope create/write/append for Phase 6-owned records. The role has no delete, assign, share, role administration, customization, solution import, unrelated-brand, financial, royalty, provider, or communication privilege. A post-deployment call made by this managed identity is still required; an administrator running the suite cannot substitute for runtime proof.

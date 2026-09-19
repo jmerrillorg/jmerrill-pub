@@ -1,5 +1,5 @@
 {
-  "status": "BLOCKED",
+  "status": "PARTIAL_BLOCKED_ASSEMBLY_SIGNING",
   "priorManagedRuntime": {
     "version": "1.2.0.0",
     "runId": "PHASE6-1789782306888-e06b2df1",
@@ -7,21 +7,45 @@
     "passed": 38,
     "failed": 0
   },
+  "requestAuthority": {
+    "model": "ENTRA_CALLER_TOKEN_PLUS_SERVER_SIDE_CORRELATION",
+    "customSignedRequestRequired": false,
+    "customApiExecutePrivilege": "prvCreatejmpv2_OnboardingRecord",
+    "sourcePrepared": true,
+    "deployed": false
+  },
+  "caller": {
+    "runtime": "func-jm1-publishing-inbound-uat",
+    "identityType": "SYSTEM_ASSIGNED_MANAGED_IDENTITY",
+    "applicationId": "2c9c1fc3-5733-4a64-b4e2-9a3cef50d470",
+    "dataverseApplicationUser": "c8b4a60b-1ab4-f111-aaac-70a8a59b112b",
+    "leastPrivilegeRole": "JMP Phase 6 Onboarding Runtime - JM1-Test",
+    "effectivePrivileges": 41,
+    "systemAdministrator": false,
+    "liveTokenProof": "PENDING"
+  },
   "correctedSource": {
-    "sourceSha256": "2fad92868f66375e50fe761b1179bcc5dc933a1dbde7033978e39f54ee58b862",
-    "regressionScriptSha256": "11c9c16c38f3c569cf58479d885a63ab8ebf5e82d622f272c1e0c2a187c05940",
+    "pluginSourceSha256": "296c2e1fa8b620bed85f22b8b277c0eba0724639eda37e8bb6743203bea467dc",
+    "regressionScriptSha256": "900d6b2d06c35541f11cca6d51f7c8057440f7d759f5e0cf883e3eb9d870ce52",
+    "customApiDefinitionSha256": "9efc3e3e219516fba95a743aafce400f4ce2d0291ea623269b0788b8974fe85c",
     "nodeSyntax": "PASS",
     "unsignedCompile": "PASS",
-    "portabilityTests": "4/4 PASS",
+    "portabilityTests": "7/7 PASS",
     "preparedRegressionTests": 42,
-    "signedBuild": "NOT_EXECUTED",
+    "signedBuild": "BLOCKED_EXISTING_STRONG_NAME_KEY_UNAVAILABLE",
     "jm1TestDeployment": "NOT_EXECUTED",
     "jm1TestFullSuite": "NOT_EXECUTED",
     "leastPrivilegeCallerSuite": "NOT_EXECUTED"
   },
   "blockers": [
-    "Governed Phase 6 strong-name key path unavailable",
-    "No governed signed-request contract",
-    "No isolated actual Phase 6 runtime caller in JM1-Test"
+    "Existing governed Phase 6 strong-name assembly key is unavailable through JMP_PHASE6_SIGNING_KEY_PATH",
+    "Corrected managed solution is not deployed to JM1-Test",
+    "Managed-identity live token and full post-change suite are not yet proven"
+  ],
+  "resolvedBlockers": [
+    "Request authority model selected without custom signing protocol",
+    "Actual JM1-Test caller positively identified",
+    "Dedicated Dataverse application user commissioned",
+    "Least-privilege role assigned with no System Administrator dependency"
   ]
 }

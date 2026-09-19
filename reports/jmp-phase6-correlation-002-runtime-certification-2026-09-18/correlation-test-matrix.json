@@ -13,5 +13,5 @@
   "preparedRegressionCases": 42,
   "nodeSyntax": "PASS",
   "unsignedSourceCompile": "PASS",
-  "portabilityGuard": "4/4 PASS"
+  "portabilityGuard": "7/7 PASS"
 }

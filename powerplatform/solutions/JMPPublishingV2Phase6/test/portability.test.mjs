@@ -8,6 +8,7 @@ const buildScript = readFileSync(new URL("../scripts/build-plugin.mjs", import.m
 const solution = readFileSync(new URL("../src/Other/Solution.xml", import.meta.url), "utf8");
 const runtimeRole = readFileSync(new URL("../src/Roles/JMP Phase 6 Onboarding Runtime.xml", import.meta.url), "utf8");
 const callerVariable = readFileSync(new URL("../src/environmentvariabledefinitions/jmpv2_Phase6AllowedCallerSystemUserId/environmentvariabledefinition.xml", import.meta.url), "utf8");
+const customApi = readFileSync(new URL("../src/customapis/jmpv2_ExecuteOnboardingCommand/customapi.xml", import.meta.url), "utf8");
 
 test("command uses fail-closed environment configuration without environment identity coupling", () => {
   assert.match(source, /jmpv2_Phase6OnboardingCommandEnabled/);
@@ -33,6 +34,11 @@ test("authenticated Dataverse caller is authority and payload identity cannot su
   assert.match(source, /CallerAuthorized\(service, context\)/);
   assert.match(source, /EnvironmentValue\(s, AllowedCallerEnvironmentVariable\)/);
   assert.doesNotMatch(source, /AllowedCaller.*Actor|AllowedCaller.*AuthorityContext/);
+});
+
+test("Custom API execution is bound to the least-privilege Phase 6 role grant", () => {
+  assert.match(customApi, /<executeprivilegename>prvCreatejmpv2_OnboardingRecord<\/executeprivilegename>/);
+  assert.doesNotMatch(customApi, /prvWriteSystemUser|prvWriteRole|prvPublishCustomization|prvImportSolution/);
 });
 
 test("portable assembly preserves Dataverse identity and versions the file build", () => {

@@ -10,16 +10,19 @@ Passing gates:
 - exact durable-ID correlation source correction prepared;
 - local source compilation and portability guard;
 - human-first source boundary preserved;
-- production isolation.
+- production isolation;
+- native Entra token trust model selected;
+- actual UAT caller identity established;
+- dedicated Dataverse application user established;
+- least-privilege role assigned with no System Administrator dependency.
 
 Open gates:
 
 - governed strong-name key availability;
-- signed request-claim contract and tamper denial;
+- managed Custom API execute-privilege update;
 - corrected managed runtime deployment to JM1-Test;
 - live wrong-title, wrong-author, wrong-engagement, replay, tamper, and stale-state matrix;
-- isolated real Phase 6 runtime caller;
-- least-privilege role commissioning and effective privilege readback;
+- managed-identity token acquisition and invocation proof;
 - full corrected-runtime recertification.
 
 Production import remains unauthorized.
