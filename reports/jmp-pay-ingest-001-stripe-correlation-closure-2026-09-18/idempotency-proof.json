@@ -1,0 +1,11 @@
+{
+  "sameEventReplay": "PASS_NO_DUPLICATE_EFFECT",
+  "semanticDuplicateEvent": "PASS_NO_DUPLICATE_EFFECT",
+  "providerRetry": "PASS_DURABLE_HASHED_BINDING_REUSED",
+  "processRestart": "PASS_DATAVERSE_BACKED",
+  "commercialEffectKey": "INITIAL-PAYMENT-CONFIRMED-{opportunityId}-INITIAL",
+  "providerBindingKey": "STRIPE-PAYMENT-BINDING-{sha256(providerIdentifier)[0:32]}",
+  "testSuite": "scripts/jmp_pay_ingest_001_stripe_correlation.test.mjs",
+  "focusedTestsPassed": 26,
+  "duplicateCommercialEffectsExpected": 0
+}

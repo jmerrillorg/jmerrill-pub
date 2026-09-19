@@ -11,7 +11,11 @@ import {
   verifyStripeWebhook,
 } from '@/lib/server/stripe/author-workspace-webhook'
 import { syncConnectAccountStatusByAccountId } from '@/lib/server/stripe/author-workspace-stripe'
-import { processPublishingPaymentSuccess, type PublishingPaymentSuccess } from '@/lib/server/stripe/publishing-payment-event'
+import {
+  processPublishingPaymentSuccess,
+  recordPublishingPaymentException,
+  type PublishingPaymentSuccess,
+} from '@/lib/server/stripe/publishing-payment-event'
 
 export const runtime = 'nodejs'
 
@@ -67,13 +71,24 @@ export async function POST(req: NextRequest) {
       eventType: safeEvent.eventType,
       customerId: safeEvent.customerId,
       invoiceId: safeEvent.invoiceId,
+      invoiceNumber: safeEvent.invoiceNumber,
       paymentIntentId: safeEvent.paymentIntentId,
       chargeId: safeEvent.chargeId,
       subscriptionId: safeEvent.subscriptionId,
+      opportunityId: safeEvent.correlation.opportunityId,
+      engagementId: safeEvent.correlation.engagementId,
+      titleId: safeEvent.correlation.titleId,
+      paymentRequestId: safeEvent.correlation.paymentRequestId,
+      actionRequestId: safeEvent.correlation.actionRequestId,
+      agreementId: safeEvent.correlation.agreementId,
+      invalidMetadataKeys: safeEvent.correlation.invalidMetadataKeys,
       created: safeEvent.created,
       source: 'STRIPE_WEBHOOK',
     }
     const result = await processPublishingPaymentSuccess(paymentSuccess)
+    if (!result.ok) {
+      await recordPublishingPaymentException(paymentSuccess, result.reason).catch(() => null)
+    }
     const status = result.ok ? 200 : 422
     return NextResponse.json({ received: true, processed: result.ok, result }, { status })
   }

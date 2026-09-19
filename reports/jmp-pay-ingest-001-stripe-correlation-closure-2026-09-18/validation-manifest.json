@@ -1,0 +1,23 @@
+{
+  "status": "SOURCE_VALIDATION_PASS",
+  "canonicalMainRefreshed": true,
+  "cleanWorktreeUsed": true,
+  "dirtyPrimaryMutations": 0,
+  "stripeSignatureVerificationPreserved": true,
+  "deterministicCorrelation": true,
+  "ambiguousCorrelationFailsClosed": true,
+  "missingCorrelationFailsClosed": true,
+  "amountOnlyIdentity": false,
+  "emailOnlyIdentity": false,
+  "titleGuessing": false,
+  "schemaReused": true,
+  "newCustomSubsystem": false,
+  "focusedTests": { "passed": 26, "failed": 0 },
+  "typeCheck": "PASS",
+  "lint": "PASS_WITH_PREEXISTING_FONT_WARNING",
+  "build": "PASS_WITH_PREEXISTING_TRACE_WARNINGS",
+  "gitDiffCheck": "PASS",
+  "financialEffects": 0,
+  "communicationsSent": 0,
+  "businessContinuityInterruption": 0
+}

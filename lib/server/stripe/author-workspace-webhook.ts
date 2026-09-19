@@ -7,6 +7,7 @@ import {
   COMMISSIONING_STANDARD_AMOUNT_CENTS,
   COMMISSIONING_TITLE,
 } from './author-workspace-stripe'
+import { extractStripePaymentCorrelation } from './publishing-payment-correlation'
 
 export type StripeWebhookVerification =
   | { ok: true; event: StripeWebhookEvent }
@@ -33,6 +34,7 @@ type StripeWebhookObject = {
   invoice?: string
   latest_charge?: string | { id?: string; paid?: boolean; status?: string; amount?: number; created?: number }
   metadata?: Record<string, string>
+  number?: string
   payment_intent?: string
   payment_status?: string
   subscription?: string
@@ -156,6 +158,7 @@ export function classifyPublishingPaymentSuccessEvent(event: StripeWebhookEvent)
         : object.object === 'invoice'
           ? object.id || null
           : null,
+      invoiceNumber: object.object === 'invoice' && typeof object.number === 'string' ? object.number : null,
       paymentIntentId: typeof object.payment_intent === 'string'
         ? object.payment_intent
         : object.object === 'payment_intent'
@@ -166,7 +169,7 @@ export function classifyPublishingPaymentSuccessEvent(event: StripeWebhookEvent)
         : latestCharge?.id || (object.object === 'charge' ? object.id || null : null),
       subscriptionId: typeof object.subscription === 'string' ? object.subscription : null,
       created: event.created || null,
-      metadata: object.metadata || {},
+      correlation: extractStripePaymentCorrelation(object.metadata),
     },
   }
 }

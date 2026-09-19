@@ -1,0 +1,13 @@
+{
+  "ambiguousCorrelation": "PASS_ZERO_EFFECT",
+  "missingCorrelation": "PASS_ZERO_EFFECT",
+  "conflictingDirectAndDurableAuthority": "PASS_ZERO_EFFECT",
+  "invalidMetadataGuid": "PASS_ZERO_EFFECT",
+  "wrongTitleText": "NOT_AN_IDENTITY_INPUT",
+  "wrongAuthorOrEmail": "NOT_AN_IDENTITY_INPUT",
+  "amountOnlyMatch": "DENIED_AS_IDENTITY",
+  "customerOnlyMatch": "DENIED_AS_TITLE_IDENTITY",
+  "unverifiedWebhook": "DENIED",
+  "rawProviderIdInBindingDescription": false,
+  "status": "PASS"
+}

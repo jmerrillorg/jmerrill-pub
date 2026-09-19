@@ -1,0 +1,9 @@
+{
+  "candidates": [],
+  "historicalWholePayment": {
+    "status": "already_manually_reconciled",
+    "additionalMutationAuthorized": false,
+    "actionTakenByThisPacket": "none"
+  },
+  "productionRemediationsApplied": 0
+}
