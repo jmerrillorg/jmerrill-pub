@@ -1,0 +1,36 @@
+{
+  "status": "PASS",
+  "packet": "JMP-PHASE6-PROD-001",
+  "classification": "PREPARED_READY_FOR_SEPARATE_EXECUTION_AUTHORITY",
+  "preparedAt": "2026-09-19T12:30:00Z",
+  "sourcePr": 773,
+  "certifiedPrHead": "00bafc25c8219ff43ca49a468ef0d76b08597283",
+  "solutionVersion": "1.2.0.0",
+  "managedPackageSha256": "d7f31234005a51d40bf611e5a8bf3fd5252b3b9955934d2fa78bf10d4da8eb19",
+  "productionImportAuthorized": false,
+  "productionMutations": 0,
+  "wholeMutations": 0,
+  "requiredExecutionAuthority": "EXPLICIT_JMP_PHASE6_PROD_001_PRODUCTION_IMPORT_AUTHORITY",
+  "files": [
+    {
+      "path": "00-execution-contract.md",
+      "sha256": "778dddd5e6cb904cad52eaa6555efebd208c7b75f5f8498b2c46cf3ced678f5e"
+    },
+    {
+      "path": "01-preflight-and-rollout.md",
+      "sha256": "dc018e68541759d976b8c349acb79026276c6a25f3109c00fa2e33504f6b07c6"
+    },
+    {
+      "path": "02-rollback-contract.md",
+      "sha256": "2796cdc58dc8c6833c7c3b2ca67327c83acd516d17500d8928701aa0accd4381"
+    },
+    {
+      "path": "03-production-readback-contract.md",
+      "sha256": "d065373bd861f965be8f0f03b629175bc1cee7edb04597999e658b1bc56cf580"
+    },
+    {
+      "path": "04-authority-and-risk-register.md",
+      "sha256": "7013e8ec7a8d90aea0c24307108d886f301fd4234388fc89a19f07eb22ab7b73"
+    }
+  ]
+}

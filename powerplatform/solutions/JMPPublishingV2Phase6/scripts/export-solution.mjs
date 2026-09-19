@@ -22,7 +22,7 @@ async function exportSolution(managed) {
   const text = await response.text();
   if (!response.ok) throw new Error(`ExportSolution ${managed} ${response.status}: ${text.slice(0, 1200)}`);
   const bytes = Buffer.from(JSON.parse(text).ExportSolutionFile, "base64");
-  const name = `${solutionName}_1_1_0_0_${managed ? "managed" : "unmanaged"}.zip`;
+  const name = `${solutionName}_1_2_0_0_${managed ? "managed" : "unmanaged"}.zip`;
   const file = path.join(artifacts, name);
   writeFileSync(file, bytes);
   return { name, bytes: bytes.length, sha256: createHash("sha256").update(bytes).digest("hex") };
@@ -34,7 +34,7 @@ const who = await fetch(`${base}/WhoAmI()`, { headers: { Authorization: `Bearer 
 const result = {
   status: "PASS",
   solutionName,
-  version: "1.1.0.0",
+  version: "1.2.0.0",
   sourceOrganizationId: who.OrganizationId,
   unmanaged: await exportSolution(false),
   managed: await exportSolution(true),

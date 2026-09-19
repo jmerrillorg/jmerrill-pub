@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Role id="{2f957237-1ab4-f111-aaac-70a8a59b112b}" name="JMP Phase 6 Onboarding Runtime" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <IsCustomizable>1</IsCustomizable>
+  <IsAutoAssigned>0</IsAutoAssigned>
+  <RolePrivileges>
+    <RolePrivilege name="prvAppendjmpv2_AuthorAccess" level="Basic" />
+    <RolePrivilege name="prvAppendjmpv2_AuthorProfile" level="Basic" />
+    <RolePrivilege name="prvAppendjmpv2_OnboardingCompletionEvent" level="Basic" />
+    <RolePrivilege name="prvAppendjmpv2_OnboardingItem" level="Basic" />
+    <RolePrivilege name="prvAppendjmpv2_OnboardingRecord" level="Basic" />
+    <RolePrivilege name="prvAppendjmpv2_PayoutReadiness" level="Basic" />
+    <RolePrivilege name="prvAppendjmpv2_WorkspaceProvisioning" level="Basic" />
+    <RolePrivilege name="prvAppendToContact" level="Global" />
+    <RolePrivilege name="prvAppendTojmpv2_AuthorProfile" level="Basic" />
+    <RolePrivilege name="prvAppendTojmpv2_OnboardingRecord" level="Basic" />
+    <RolePrivilege name="prvCreatejmpv2_AuthorAccess" level="Basic" />
+    <RolePrivilege name="prvCreatejmpv2_AuthorProfile" level="Basic" />
+    <RolePrivilege name="prvCreatejmpv2_OnboardingCompletionEvent" level="Basic" />
+    <RolePrivilege name="prvCreatejmpv2_OnboardingItem" level="Basic" />
+    <RolePrivilege name="prvCreatejmpv2_OnboardingRecord" level="Basic" />
+    <RolePrivilege name="prvCreatejmpv2_PayoutReadiness" level="Basic" />
+    <RolePrivilege name="prvCreatejmpv2_WorkspaceProvisioning" level="Basic" />
+    <RolePrivilege name="prvReadBusinessUnit" level="Global" />
+    <RolePrivilege name="prvReadContact" level="Global" />
+    <RolePrivilege name="prvReadEnvironmentVariableDefinition" level="Global" />
+    <RolePrivilege name="prvReadjm1pub_Title" level="Global" />
+    <RolePrivilege name="prvReadjmpv2_AuthorAccess" level="Global" />
+    <RolePrivilege name="prvReadjmpv2_AuthorProfile" level="Global" />
+    <RolePrivilege name="prvReadjmpv2_LifecycleInstance" level="Global" />
+    <RolePrivilege name="prvReadjmpv2_OnboardingCompletionEvent" level="Global" />
+    <RolePrivilege name="prvReadjmpv2_OnboardingItem" level="Global" />
+    <RolePrivilege name="prvReadjmpv2_OnboardingRecord" level="Global" />
+    <RolePrivilege name="prvReadjmpv2_PayoutReadiness" level="Global" />
+    <RolePrivilege name="prvReadjmpv2_PublishingEngagement" level="Global" />
+    <RolePrivilege name="prvReadjmpv2_WorkspaceProvisioning" level="Global" />
+    <RolePrivilege name="prvReadOrganization" level="Global" />
+    <RolePrivilege name="prvReadPluginAssembly" level="Global" />
+    <RolePrivilege name="prvReadPluginType" level="Global" />
+    <RolePrivilege name="prvReadSdkMessage" level="Global" />
+    <RolePrivilege name="prvReadSdkMessageProcessingStep" level="Global" />
+    <RolePrivilege name="prvReadSdkMessageProcessingStepImage" level="Global" />
+    <RolePrivilege name="prvWritejmpv2_AuthorAccess" level="Basic" />
+    <RolePrivilege name="prvWritejmpv2_OnboardingItem" level="Basic" />
+    <RolePrivilege name="prvWritejmpv2_OnboardingRecord" level="Basic" />
+    <RolePrivilege name="prvWritejmpv2_PayoutReadiness" level="Basic" />
+    <RolePrivilege name="prvWritejmpv2_WorkspaceProvisioning" level="Basic" />
+  </RolePrivileges>
+</Role>

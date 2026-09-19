@@ -1,0 +1,24 @@
+{
+  "status": "PARTIAL",
+  "canonicalMainAtStart": "e562bd40db4571d4f3b7255ca7d4ac55902b4c55",
+  "solution": "JMP_PublishingV2_Phase6_Portable",
+  "sourceAuthorities": [
+    "powerplatform/solutions/JMPPublishingV2Phase6/README.md",
+    "powerplatform/solutions/JMPPublishingV2Phase6/plugin/Phase6OnboardingAuthorityPlugin.cs",
+    "powerplatform/solutions/JMPPublishingV2Phase6/test/dev-regression.mjs",
+    "powerplatform/solutions/JMPPublishingV2Phase6/test/portability.test.mjs",
+    "powerplatform/solutions/JMPPublishingV2Phase6/evidence/jm1-test-command-certification-failure.json",
+    "docs/operations/generated/JMP-PUBLISHING-V2-WHOLE-STAGE-PARITY-PHASE6-COMMISSIONING-2026-09-17/00-executive-readout.md",
+    "docs/governance/publishing/PUB-STD-Onboarding-First-Production-Authority.md",
+    "scripts/whole_onboarding_continuity.test.mjs",
+    "scripts/author_email_otp_login.test.mjs"
+  ],
+  "businessContract": {
+    "authorizedActor": "phase6-authorized-actor",
+    "authorityContext": "V2_ONBOARDING_AUTHORITY",
+    "currentStage": "06_ONBOARDING",
+    "completion": "required items + workspace + author access + payout readiness",
+    "nextStage": "07_DEVELOPMENTAL_EDITING eligibility only",
+    "automaticTransitionAuthority": "NONE"
+  }
+}

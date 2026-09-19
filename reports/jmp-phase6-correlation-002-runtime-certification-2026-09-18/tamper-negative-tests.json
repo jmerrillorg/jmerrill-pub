@@ -1,0 +1,15 @@
+{
+  "status": "NOT_APPLICABLE_CUSTOM_SIGNATURE_NOT_SELECTED",
+  "authorityModel": "ENTRA_CALLER_TOKEN_PLUS_SERVER_SIDE_CORRELATION",
+  "tokenIntegrityAuthority": "MICROSOFT_ENTRA_AND_DATAVERSE",
+  "equivalentNegativeCases": [
+    {"case": "modified title claim", "expected": "TITLE_ENGAGEMENT_MISMATCH", "result": "PREPARED_NOT_DEPLOYED"},
+    {"case": "modified author claim", "expected": "AUTHOR_ENGAGEMENT_MISMATCH", "result": "PREPARED_NOT_DEPLOYED"},
+    {"case": "modified engagement claim", "expected": "UNKNOWN_ENGAGEMENT_OR_RELATIONSHIP_MISMATCH", "result": "PREPARED_NOT_DEPLOYED"},
+    {"case": "cross-engagement lifecycle", "expected": "WORK_ENGAGEMENT_MISMATCH", "result": "PREPARED_NOT_DEPLOYED"},
+    {"case": "stale state", "expected": "STALE_VERSION_OR_STAGE_DENIAL", "result": "PREPARED_NOT_DEPLOYED"},
+    {"case": "unauthorized caller", "expected": "DATAVERSE_EXECUTE_PRIVILEGE_DENIAL", "result": "SOURCE_PREPARED_NOT_DEPLOYED"}
+  ],
+  "customSignatureCasesFabricated": 0,
+  "effects": 0
+}

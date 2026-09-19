@@ -1,0 +1,25 @@
+{
+  "status": "PASS",
+  "unauthorizedCaller": {
+    "accepted": false,
+    "reasonCode": "UNAUTHORIZED_CALLER",
+    "replay": false
+  },
+  "invalidBearer": {
+    "httpStatus": 401,
+    "result": "DENY"
+  },
+  "expiredBearer": {
+    "httpStatus": 401,
+    "result": "DENY"
+  },
+  "missingRouteCredential": {
+    "httpStatus": 401,
+    "result": "DENY"
+  },
+  "nonSyntheticClassification": {
+    "httpStatus": 400,
+    "code": "SYNTHETIC_CLASSIFICATION_REQUIRED",
+    "result": "DENY"
+  }
+}

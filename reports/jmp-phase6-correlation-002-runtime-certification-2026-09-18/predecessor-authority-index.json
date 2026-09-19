@@ -1,0 +1,17 @@
+{
+  "workPackage": "JMP-PHASE6-CORRELATION-002",
+  "predecessor": "JMP-PHASE6-PORT-001",
+  "predecessorStatus": "PARTIAL — MANAGED SCHEMA CERTIFIED / PRODUCTION PROMOTION BLOCKED",
+  "canonicalMainAtStart": "e562bd40db4571d4f3b7255ca7d4ac55902b4c55",
+  "applicationPr": 773,
+  "applicationPrStatus": "OPEN",
+  "applicationPrHead": "d866d939e7a354648b173eae4445f889a60ebddc",
+  "rebaseRequired": false,
+  "managedSolutionVersion": "1.2.0.0",
+  "managedArtifactSha256": "7b8176738e64c19afbad5c8b92560c231772a95ddc698fe30bc69a4dc97c96e7",
+  "managedSchemaPortability": "PASS",
+  "priorCanonicalSuite": "38/38 PASS",
+  "priorRunId": "PHASE6-1789782306888-e06b2df1",
+  "targetEnvironment": "JM1-Test",
+  "targetEnvironmentType": "Sandbox"
+}

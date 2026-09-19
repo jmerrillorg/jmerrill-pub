@@ -1,0 +1,40 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<savedqueries xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <savedquery>
+    <IsCustomizable>1</IsCustomizable>
+    <CanBeDeleted>0</CanBeDeleted>
+    <isquickfindquery>1</isquickfindquery>
+    <isprivate>0</isprivate>
+    <isdefault>1</isdefault>
+    <savedqueryid>{b8a1be44-b727-4c8f-9c0a-3373a37b5af6}</savedqueryid>
+    <layoutxml>
+      <grid name="resultset" jump="jmpv2_completionkey" select="1" icon="1" preview="1">
+        <row name="result" id="jmpv2_onboardingcompletioneventid">
+          <cell name="jmpv2_completionkey" width="300" />
+          <cell name="createdon" width="125" />
+        </row>
+      </grid>
+    </layoutxml>
+    <querytype>4</querytype>
+    <fetchxml>
+      <fetch version="1.0" mapping="logical">
+        <entity name="jmpv2_onboardingcompletionevent">
+          <attribute name="jmpv2_onboardingcompletioneventid" />
+          <attribute name="jmpv2_completionkey" />
+          <attribute name="createdon" />
+          <order attribute="jmpv2_completionkey" descending="false" />
+          <filter type="and">
+            <condition attribute="statecode" operator="eq" value="0" />
+          </filter>
+          <filter type="or" isquickfindfields="1">
+            <condition attribute="jmpv2_completionkey" operator="like" value="{0}" />
+          </filter>
+        </entity>
+      </fetch>
+    </fetchxml>
+    <IntroducedVersion>1.0.0.0</IntroducedVersion>
+    <LocalizedNames>
+      <LocalizedName description="Quick Find Active V2 Onboarding Completion Events" languagecode="1033" />
+    </LocalizedNames>
+  </savedquery>
+</savedqueries>

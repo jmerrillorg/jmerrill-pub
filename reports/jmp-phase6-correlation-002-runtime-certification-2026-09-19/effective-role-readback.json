@@ -1,0 +1,196 @@
+{
+  "roleId": "2f957237-1ab4-f111-aaac-70a8a59b112b",
+  "roleName": "JMP Phase 6 Onboarding Runtime",
+  "effectivePrivilegeCount": 45,
+  "privileges": [
+    {
+      "name": "prvReadSdkMessage",
+      "depth": "Global"
+    },
+    {
+      "name": "prvReadSdkMessageProcessingStep",
+      "depth": "Global"
+    },
+    {
+      "name": "prvReadSdkMessageProcessingStepImage",
+      "depth": "Global"
+    },
+    {
+      "name": "prvReadPluginType",
+      "depth": "Global"
+    },
+    {
+      "name": "prvReadPluginAssembly",
+      "depth": "Global"
+    },
+    {
+      "name": "prvReadOrganization",
+      "depth": "Global"
+    },
+    {
+      "name": "prvReadBusinessUnit",
+      "depth": "Global"
+    },
+    {
+      "name": "prvReadContact",
+      "depth": "Global"
+    },
+    {
+      "name": "prvAppendToContact",
+      "depth": "Global"
+    },
+    {
+      "name": "prvReadjm1pub_Title",
+      "depth": "Global"
+    },
+    {
+      "name": "prvReadjmpv2_PublishingEngagement",
+      "depth": "Global"
+    },
+    {
+      "name": "prvReadjmpv2_LifecycleInstance",
+      "depth": "Global"
+    },
+    {
+      "name": "prvReadjmpv2_AuthorProfile",
+      "depth": "Global"
+    },
+    {
+      "name": "prvReadjmpv2_OnboardingRecord",
+      "depth": "Global"
+    },
+    {
+      "name": "prvReadjmpv2_OnboardingItem",
+      "depth": "Global"
+    },
+    {
+      "name": "prvReadjmpv2_WorkspaceProvisioning",
+      "depth": "Global"
+    },
+    {
+      "name": "prvReadjmpv2_AuthorAccess",
+      "depth": "Global"
+    },
+    {
+      "name": "prvReadjmpv2_PayoutReadiness",
+      "depth": "Global"
+    },
+    {
+      "name": "prvReadjmpv2_OnboardingCompletionEvent",
+      "depth": "Global"
+    },
+    {
+      "name": "prvReadEnvironmentVariableDefinition",
+      "depth": "Global"
+    },
+    {
+      "name": "prvCreatejmpv2_AuthorProfile",
+      "depth": "Basic"
+    },
+    {
+      "name": "prvAppendjmpv2_AuthorProfile",
+      "depth": "Basic"
+    },
+    {
+      "name": "prvAppendTojmpv2_AuthorProfile",
+      "depth": "Basic"
+    },
+    {
+      "name": "prvCreatejmpv2_OnboardingRecord",
+      "depth": "Basic"
+    },
+    {
+      "name": "prvWritejmpv2_OnboardingRecord",
+      "depth": "Basic"
+    },
+    {
+      "name": "prvAppendjmpv2_OnboardingRecord",
+      "depth": "Basic"
+    },
+    {
+      "name": "prvAppendTojmpv2_OnboardingRecord",
+      "depth": "Basic"
+    },
+    {
+      "name": "prvCreatejmpv2_OnboardingItem",
+      "depth": "Basic"
+    },
+    {
+      "name": "prvWritejmpv2_OnboardingItem",
+      "depth": "Basic"
+    },
+    {
+      "name": "prvAppendjmpv2_OnboardingItem",
+      "depth": "Basic"
+    },
+    {
+      "name": "prvCreatejmpv2_WorkspaceProvisioning",
+      "depth": "Basic"
+    },
+    {
+      "name": "prvWritejmpv2_WorkspaceProvisioning",
+      "depth": "Basic"
+    },
+    {
+      "name": "prvAppendjmpv2_WorkspaceProvisioning",
+      "depth": "Basic"
+    },
+    {
+      "name": "prvCreatejmpv2_AuthorAccess",
+      "depth": "Basic"
+    },
+    {
+      "name": "prvWritejmpv2_AuthorAccess",
+      "depth": "Basic"
+    },
+    {
+      "name": "prvAppendjmpv2_AuthorAccess",
+      "depth": "Basic"
+    },
+    {
+      "name": "prvCreatejmpv2_PayoutReadiness",
+      "depth": "Basic"
+    },
+    {
+      "name": "prvWritejmpv2_PayoutReadiness",
+      "depth": "Basic"
+    },
+    {
+      "name": "prvAppendjmpv2_PayoutReadiness",
+      "depth": "Basic"
+    },
+    {
+      "name": "prvCreatejmpv2_OnboardingCompletionEvent",
+      "depth": "Basic"
+    },
+    {
+      "name": "prvAppendjmpv2_OnboardingCompletionEvent",
+      "depth": "Basic"
+    },
+    {
+      "name": "prvCreateSharePointData",
+      "depth": "Global"
+    },
+    {
+      "name": "prvReadSharePointData",
+      "depth": "Global"
+    },
+    {
+      "name": "prvReadSharePointDocument",
+      "depth": "Global"
+    },
+    {
+      "name": "prvWriteSharePointData",
+      "depth": "Global"
+    }
+  ],
+  "prohibited": {
+    "delete": 0,
+    "assign": 0,
+    "share": 0,
+    "securityAdministration": 0,
+    "solutionImport": 0,
+    "unrelatedBrand": 0
+  },
+  "status": "PASS"
+}

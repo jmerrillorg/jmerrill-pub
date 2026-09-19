@@ -1,0 +1,13 @@
+TABLE,CREATE,READ,WRITE,DELETE,APPEND,APPEND_TO,ASSIGN,SHARE,SCOPE,WHY_REQUIRED
+contact,NO,YES,NO,NO,NO,YES,NO,NO,Organization,"Resolve canonical author and support profile relationship"
+jm1pub_title,NO,YES,NO,NO,NO,NO,NO,NO,Organization,"Resolve canonical title"
+jmpv2_publishingengagement,NO,YES,NO,NO,NO,NO,NO,NO,Organization,"Verify authoritative engagement/author/title/lifecycle tuple"
+jmpv2_lifecycleinstance,NO,YES,NO,NO,NO,NO,NO,NO,Organization,"Verify Stage 06 lifecycle authority"
+jmpv2_authorprofile,YES,YES,NO,NO,YES,YES,NO,NO,"Create/User; Read/Organization","Create or reuse canonical author profile"
+jmpv2_onboardingrecord,YES,YES,YES,NO,YES,YES,NO,NO,"Create+Write/User; Read/Organization","Create and update bounded onboarding state; grants API execution"
+jmpv2_onboardingitem,YES,YES,YES,NO,YES,NO,NO,NO,"Create+Write/User; Read/Organization","Maintain onboarding requirements"
+jmpv2_workspaceprovisioning,YES,YES,YES,NO,YES,NO,NO,NO,"Create+Write/User; Read/Organization","Maintain workspace readiness"
+jmpv2_authoraccess,YES,YES,YES,NO,YES,NO,NO,NO,"Create+Write/User; Read/Organization","Maintain author access readiness"
+jmpv2_payoutreadiness,YES,YES,YES,NO,YES,NO,NO,NO,"Create+Write/User; Read/Organization","Maintain payout readiness"
+jmpv2_onboardingcompletionevent,YES,YES,NO,NO,YES,NO,NO,NO,"Create/User; Read/Organization","Create server-derived completion evidence"
+environmentvariabledefinition,NO,YES,NO,NO,NO,NO,NO,NO,Organization,"Resolve fail-closed environment and caller bindings"

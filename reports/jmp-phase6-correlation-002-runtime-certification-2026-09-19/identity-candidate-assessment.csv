@@ -1,0 +1,6 @@
+candidate,classification,reason,selected
+func-jm1-publishing-inbound-uat,SUITABLE_REUSE,"Existing Publishing UAT Function with system-assigned managed identity and isolated JM1-Test application user",YES
+JMP JM1-INFRA-PAM-Automation,SHARED_TOO_BROAD,"Shared application user retains System Administrator for unrelated workloads",NO
+GitHub OIDC deployment identity,WRONG_PURPOSE,"Deployment identity is not the Phase 6 runtime caller",NO
+Publishing production managed identities,WRONG_ENVIRONMENT,"Production identities are outside the JM1-Test boundary",NO
+New Entra application,NOT_REQUIRED,"Existing UAT managed identity is attributable and secretless",NO

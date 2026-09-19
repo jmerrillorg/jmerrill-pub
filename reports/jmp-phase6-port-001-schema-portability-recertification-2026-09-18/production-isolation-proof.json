@@ -1,0 +1,23 @@
+{
+  "status": "PASS",
+  "targetEnvironment": "JM1-Test",
+  "targetType": "Sandbox",
+  "productionSolutionImports": 0,
+  "wholeMutations": 0,
+  "productionAuthorMutations": 0,
+  "productionTitleMutations": 0,
+  "productionOpportunityMutations": 0,
+  "productionOnboardingSubmissions": 0,
+  "productionDataverseBusinessMutations": 0,
+  "productionEmailsSent": 0,
+  "authorEmailsSent": 0,
+  "paymentEffects": 0,
+  "stripeMutations": 0,
+  "bcWrites": 0,
+  "qboMutations": 0,
+  "financialEffects": 0,
+  "businessContinuityInterruption": 0,
+  "phase7Executions": 0,
+  "wholeStageReadback": "06_ONBOARDING",
+  "wholeModifiedOn": "2026-09-17T21:41:54Z"
+}

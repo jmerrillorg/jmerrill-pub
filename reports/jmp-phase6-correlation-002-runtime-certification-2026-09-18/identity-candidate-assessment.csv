@@ -1,0 +1,6 @@
+candidate,classification,reason,selected
+func-jm1-publishing-inbound-uat,SUITABLE_REUSE,"Existing Publishing UAT Azure Function; system-assigned managed identity; dedicated JM1-Test application user and narrow Phase 6 role",YES
+JMP JM1-INFRA-PAM-Automation,SHARED_TOO_BROAD,"Shared application identity with System Administrator and unrelated workload dependencies",NO
+func-jm1-diagnostic-ai-runner,WRONG_ENVIRONMENT,"Production-oriented diagnostic runtime identity is registered in JM1-Core, not the isolated JM1-Test Phase 6 caller",NO
+Publishing production App Service identity,WRONG_ENVIRONMENT,"Production identity must not be repurposed for JM1-Test certification",NO
+New Entra application,NOT_REQUIRED,"Existing system-assigned managed identity is suitable and avoids a new credential or app registration",NO

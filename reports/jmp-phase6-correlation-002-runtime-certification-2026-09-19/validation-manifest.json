@@ -1,0 +1,111 @@
+{
+  "status": "PASS",
+  "workPackage": "JMP-PHASE6-CORRELATION-002-CLOSURE",
+  "evidenceDate": "2026-09-19",
+  "canonicalMain": "e562bd40db4571d4f3b7255ca7d4ac55902b4c55",
+  "applicationPr": 773,
+  "targetEnvironment": "JM1-Test",
+  "managedSolutionVersion": "1.2.0.0",
+  "managedPackageSha256": "d7f31234005a51d40bf611e5a8bf3fd5252b3b9955934d2fa78bf10d4da8eb19",
+  "validations": {
+    "portabilityTests": "7_OF_7_PASS",
+    "certificationClientTests": "3_OF_3_PASS",
+    "functionLint": "PASS",
+    "functionSuites": "455_PASS",
+    "functionTests": "2344_PASS_0_FAIL",
+    "livePhase6Tests": "42_OF_42_PASS",
+    "newNegativeTests": "12_PASS",
+    "managedIdentityInvocation": "PASS",
+    "customApiExecutePrivilege": "PASS",
+    "effectiveRole": "45_PRIVILEGES_NO_DELETE_ASSIGN_SHARE_OR_ADMIN",
+    "humanFirst": "PASS",
+    "productionIsolation": "PASS",
+    "wholeMutations": 0
+  },
+  "files": [
+    {
+      "path": "00-executive-summary.md",
+      "sha256": "4a37825f08bd5e483e12f23a66d881a0f97c29389ef84f77acab51834651212a"
+    },
+    {
+      "path": "application-user-readback.json",
+      "sha256": "f8cf452d13f8913385c1139f4054f4b4f196eed389383e8a7cbdc0c0b288927f"
+    },
+    {
+      "path": "application-user-readback.md",
+      "sha256": "1b70acdf0d67867e255405d6a5e28092dcbd9fbe9e0e45f50fa89510026aa6f1"
+    },
+    {
+      "path": "caller-runtime-readback.json",
+      "sha256": "a0ff31c9852447ae9822cb62288d0684f6907709814411ed96ca73b987835f2e"
+    },
+    {
+      "path": "cross-brand-access-proof.md",
+      "sha256": "8d0469581babcff8b0e173574e05846c231a583d99751a5f49ff03cd7e2a6a14"
+    },
+    {
+      "path": "custom-api-readback.json",
+      "sha256": "28473fed70c794fff2428d5f3dafb50eec23088d6021899f496962fbfee74209"
+    },
+    {
+      "path": "deployment-readback.json",
+      "sha256": "80b1ff0953ce8719c26d15a93d646d0884db6e6152ab761b5d98665e4a3e068b"
+    },
+    {
+      "path": "effective-role-readback.json",
+      "sha256": "afa30e05775ffaa0a64cce46c8b8a83d0a1ccab1f7e2cd962a9e234eb9b2af8a"
+    },
+    {
+      "path": "full-recertification.json",
+      "sha256": "57473fe0a354cd35ea0fa5d2b6638f620c61c265a7ebe5619490f510573e6e71"
+    },
+    {
+      "path": "human-first-proof.md",
+      "sha256": "a74dc1682ae190a226cf871deab321c00ea2a2199479e1afd64f5c7e6785cff0"
+    },
+    {
+      "path": "identity-candidate-assessment.csv",
+      "sha256": "7950b463391d4cd5c7e36fa10c3b7837593f664ae999a878ee879e69df7d98db"
+    },
+    {
+      "path": "live-negative-tests.json",
+      "sha256": "a14e0fd43f73f73b72dc6d0828409d0844c3d5ad8ad4bd9a93ea713ec2e80eac"
+    },
+    {
+      "path": "minimum-privilege-matrix.csv",
+      "sha256": "0a182754ff2952b78eaa3b85f2278e3e36af8cf3ca4d838716ce2c3b29d03040"
+    },
+    {
+      "path": "production-isolation-proof.json",
+      "sha256": "a14a85301c91dc3fe63bdf835bbd81d88501f6a7e0167fcacb90790a005f73f0"
+    },
+    {
+      "path": "production-promotion-readiness.md",
+      "sha256": "65285c7ecec31b59df15ef281a76e19f40fcb743ef9fb3bab62b26535e414b5f"
+    },
+    {
+      "path": "request-authority-decision.md",
+      "sha256": "de4c3dc6ad0c47f7c051744de4199a16bb8146addaae53ce701084c8e46187ad"
+    },
+    {
+      "path": "signed-request-contract.md",
+      "sha256": "014b85fb24eaeb08e411f50affeea60cbf8301150dca61c2caed7c5da49994ec"
+    },
+    {
+      "path": "signing-key-purpose-readback.md",
+      "sha256": "d709ccd130ce029f866c1be78e0ca57039488c0f7e7b4e27c7b1b406a6ba288d"
+    },
+    {
+      "path": "token-boundary-live-proof.json",
+      "sha256": "6ef595063bf1cf1f6fbca07593a3ae50f44a68add8fa0967596b02588cfc3ca4"
+    },
+    {
+      "path": "trust-authority-inventory.md",
+      "sha256": "9f6b6a3cea3055ae06d52b97f6509cb93353bae62eb02173ed90f8795ec900f0"
+    },
+    {
+      "path": "wrong-title-live-proof.json",
+      "sha256": "9552231bd41c2558843a213c492aafb5121fe2cfa00d758163f7dbe0ec988c4f"
+    }
+  ]
+}

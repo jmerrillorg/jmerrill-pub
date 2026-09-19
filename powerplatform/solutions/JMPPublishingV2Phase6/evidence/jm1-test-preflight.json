@@ -2,19 +2,29 @@
   "status": "PASS",
   "target": "JM1-Test",
   "organizationId": "bb7a9d9e-8e73-f111-b27b-000d3a31ff17",
-  "managedArtifact": "JMP_PublishingV2_Phase6_Portable_1_1_0_0_managed.zip",
-  "managedArtifactSha256": "24eab263b57044dc5a6f0926e11e6a7c51e2dcd4a8b7354c9e730a12b5b1de16",
+  "managedArtifact": "JMP_PublishingV2_Phase6_Portable_1_2_0_0_managed.zip",
+  "managedArtifactSha256": "7b8176738e64c19afbad5c8b92560c231772a95ddc698fe30bc69a4dc97c96e7",
+  "managedRootTables": [
+    "jmpv2_authorprofile",
+    "jmpv2_onboardingrecord",
+    "jmpv2_onboardingitem",
+    "jmpv2_workspaceprovisioning",
+    "jmpv2_authoraccess",
+    "jmpv2_payoutreadiness",
+    "jmpv2_onboardingcompletionevent"
+  ],
+  "currentTargetMissingRuntimeSchema": [],
   "checks": {
     "targetEnvironment": true,
     "managedPackageReadable": true,
     "commandIncluded": true,
     "contractIncluded": true,
     "pluginIncluded": true,
-    "authorAccessIncluded": true,
+    "phase6TablesIncluded": true,
     "baseDependenciesPresent": true,
-    "missingAuthorAccessCoveredByPackage": true,
+    "currentTargetRuntimeSchemaKnown": true,
     "environmentVariableResolvable": true,
-    "securityRoleBinding": true,
+    "deploymentCallerAuthorized": true,
     "portableSource": true,
     "noPhase7": true
   },
@@ -22,5 +32,5 @@
   "rollbackPackage": "READY — isolated managed solution can be removed without replacing JMP_PublishingV2 1.0.4.0",
   "productionDependency": false,
   "deploymentExecuted": false,
-  "completedAt": "2026-09-17T20:08:21.002Z"
+  "completedAt": "2026-09-19T01:44:59.174Z"
 }

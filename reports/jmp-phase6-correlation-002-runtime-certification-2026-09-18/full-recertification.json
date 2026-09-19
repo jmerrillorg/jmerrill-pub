@@ -1,0 +1,8 @@
+{
+  "status": "BLOCKED",
+  "priorBaseline": "38_OF_38_PASS",
+  "requiredPostChangeBaseline": "38_OF_38_PLUS_NEW_NEGATIVE_TESTS",
+  "postChangeTestsExecuted": 0,
+  "blocker": "EXISTING_GOVERNED_STRONG_NAME_KEY_UNAVAILABLE",
+  "productionPromotionReady": false
+}

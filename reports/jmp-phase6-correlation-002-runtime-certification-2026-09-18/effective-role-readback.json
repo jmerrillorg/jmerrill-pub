@@ -1,0 +1,22 @@
+{
+  "roleId": "2f957237-1ab4-f111-aaac-70a8a59b112b",
+  "roleName": "JMP Phase 6 Onboarding Runtime - JM1-Test",
+  "isManaged": false,
+  "effectivePrivilegeCount": 41,
+  "depths": {
+    "globalRead": 20,
+    "basicCreateWriteAppend": 21
+  },
+  "prohibited": {
+    "delete": 0,
+    "assign": 0,
+    "share": 0,
+    "securityAdministration": 0,
+    "customization": 0,
+    "solutionImport": 0,
+    "unrelatedBrand": 0,
+    "financial": 0,
+    "communication": 0
+  },
+  "status": "LEAST_PRIVILEGE_CONFIGURATION_PASS_LIVE_CALL_PENDING"
+}

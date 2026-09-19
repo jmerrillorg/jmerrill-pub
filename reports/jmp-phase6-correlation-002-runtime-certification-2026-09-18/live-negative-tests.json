@@ -1,0 +1,8 @@
+{
+  "status": "NOT_EXECUTED",
+  "authorityModel": "ENTRA_CALLER_TOKEN_PLUS_SERVER_SIDE_CORRELATION",
+  "preparedCases": 13,
+  "reason": "Corrected managed runtime is not deployed",
+  "productionEffects": 0,
+  "wholeMutations": 0
+}

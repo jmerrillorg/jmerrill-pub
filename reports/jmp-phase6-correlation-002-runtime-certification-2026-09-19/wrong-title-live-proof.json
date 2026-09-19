@@ -1,0 +1,12 @@
+{
+  "status": "PASS",
+  "runId": "PHASE6-SYNTHETIC-1789820163035-e094e79c",
+  "case": {
+    "number": 4,
+    "name": "WRONG_TITLE_DENIAL",
+    "status": "PASS",
+    "detail": "TITLE_ENGAGEMENT_MISMATCH"
+  },
+  "businessMutations": 0,
+  "wholeMutations": 0
+}

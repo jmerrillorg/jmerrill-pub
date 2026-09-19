@@ -7,6 +7,7 @@
   <displayname default="JMP V2 Execute Onboarding Command">
     <label description="JMP V2 Execute Onboarding Command" languagecode="1033" />
   </displayname>
+  <executeprivilegename>prvCreatejmpv2_OnboardingRecord</executeprivilegename>
   <iscustomizable>1</iscustomizable>
   <isfunction>0</isfunction>
   <isprivate>0</isprivate>

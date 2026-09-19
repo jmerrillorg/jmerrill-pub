@@ -1,5 +1,5 @@
 import { execFileSync } from "node:child_process";
-import { existsSync } from "node:fs";
+import { copyFileSync, existsSync, mkdirSync } from "node:fs";
 import path from "node:path";
 
 const root = path.resolve(import.meta.dirname, "..");
@@ -17,3 +17,13 @@ execFileSync("dotnet", [
   "Release",
   `-p:JMP_PHASE6_SIGNING_KEY_PATH=${signingKey}`,
 ], { stdio: "inherit" });
+
+const builtAssembly = path.join(root, "plugin", "bin", "Release", "net462", "jmpv2phase6onboarding.dll");
+const solutionAssemblyDirectory = path.join(
+  root,
+  "src",
+  "PluginAssemblies",
+  "jmpv2phase6onboarding-499AC0D0-EFAB-F111-AAAC-6045BD01D436",
+);
+mkdirSync(solutionAssemblyDirectory, { recursive: true });
+copyFileSync(builtAssembly, path.join(solutionAssemblyDirectory, "jmpv2phase6onboarding.dll"));

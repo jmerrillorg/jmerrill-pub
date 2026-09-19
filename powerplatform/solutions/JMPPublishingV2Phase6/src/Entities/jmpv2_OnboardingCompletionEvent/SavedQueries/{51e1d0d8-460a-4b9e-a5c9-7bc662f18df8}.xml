@@ -1,0 +1,37 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<savedqueries xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <savedquery>
+    <IsCustomizable>1</IsCustomizable>
+    <CanBeDeleted>0</CanBeDeleted>
+    <isquickfindquery>0</isquickfindquery>
+    <isprivate>0</isprivate>
+    <isdefault>1</isdefault>
+    <savedqueryid>{51e1d0d8-460a-4b9e-a5c9-7bc662f18df8}</savedqueryid>
+    <layoutxml>
+      <grid name="jmpv2_onboardingcompletionevents" jump="jmpv2_completionkey" select="1" icon="1" preview="1">
+        <row name="jmpv2_onboardingcompletionevent" id="jmpv2_onboardingcompletioneventid">
+          <cell name="jmpv2_completionkey" width="300" />
+          <cell name="createdon" width="125" />
+        </row>
+      </grid>
+    </layoutxml>
+    <querytype>2</querytype>
+    <fetchxml>
+      <fetch version="1.0" mapping="logical">
+        <entity name="jmpv2_onboardingcompletionevent">
+          <attribute name="jmpv2_onboardingcompletioneventid" />
+          <attribute name="jmpv2_completionkey" />
+          <attribute name="createdon" />
+          <order attribute="jmpv2_completionkey" descending="false" />
+          <filter type="and">
+            <condition attribute="statecode" operator="eq" value="0" />
+          </filter>
+        </entity>
+      </fetch>
+    </fetchxml>
+    <IntroducedVersion>1.0.0.0</IntroducedVersion>
+    <LocalizedNames>
+      <LocalizedName description="V2 Onboarding Completion Event Associated View" languagecode="1033" />
+    </LocalizedNames>
+  </savedquery>
+</savedqueries>

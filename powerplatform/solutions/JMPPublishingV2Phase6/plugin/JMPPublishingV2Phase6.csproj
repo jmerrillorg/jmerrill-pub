@@ -6,7 +6,7 @@
     <AssemblyName>jmpv2phase6onboarding</AssemblyName>
     <RootNamespace>Jmp.Publishing.V2.Phase6</RootNamespace>
     <AssemblyVersion>1.0.0.0</AssemblyVersion>
-    <FileVersion>1.1.0.0</FileVersion>
+    <FileVersion>1.2.0.0</FileVersion>
     <Deterministic>true</Deterministic>
     <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
   </PropertyGroup>

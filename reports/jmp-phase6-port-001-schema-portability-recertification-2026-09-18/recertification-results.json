@@ -1,0 +1,32 @@
+{
+  "status": "PASS_WITH_SEPARATE_PROMOTION_BLOCKER",
+  "managedSolution": {
+    "version": "1.2.0.0",
+    "import": "PASS",
+    "runtimeSchema": "PASS",
+    "unmanagedPatchRequired": false
+  },
+  "canonicalPhase6Suite": {
+    "runId": "PHASE6-1789782306888-e06b2df1",
+    "total": 38,
+    "passed": 38,
+    "failed": 0,
+    "evidence": "powerplatform/solutions/JMPPublishingV2Phase6/evidence/jm1-test-regression-1.2.0.0.json"
+  },
+  "supplementalAuthorExperienceGuards": {
+    "total": 18,
+    "passed": 18,
+    "failed": 0,
+    "coverage": [
+      "governed onboarding route",
+      "contact and title binding",
+      "deterministic submission identity",
+      "submission replay protection",
+      "valid and expired OTP behavior",
+      "invitation renderer URL authority"
+    ]
+  },
+  "phase7Executions": 0,
+  "automaticTransitions": 0,
+  "realTitleMutations": 0
+}
