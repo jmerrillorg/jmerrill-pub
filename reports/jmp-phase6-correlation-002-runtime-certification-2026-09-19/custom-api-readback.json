@@ -1,0 +1,1 @@
+{"@odata.context":"https://jm1test.crm.dynamics.com/api/data/v9.2/$metadata#customapis(uniquename,executeprivilegename)","value":[{"@odata.etag":"W/\"5152238\"","uniquename":"jmpv2_ExecuteOnboardingCommand","customapiid":"964e0bc6-0e7b-4ebb-a74e-5b35b7547252","executeprivilegename":"prvCreatejmpv2_OnboardingRecord"}]}

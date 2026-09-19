@@ -1,0 +1,79 @@
+{
+  "status": "PASS",
+  "authorityModel": "ENTRA_CALLER_TOKEN_PLUS_SERVER_SIDE_CORRELATION",
+  "runId": "PHASE6-SYNTHETIC-1789820163035-e094e79c",
+  "tests": [
+    {
+      "number": 4,
+      "name": "WRONG_TITLE_DENIAL",
+      "status": "PASS",
+      "detail": "TITLE_ENGAGEMENT_MISMATCH"
+    },
+    {
+      "number": 5,
+      "name": "WRONG_AUTHOR_DENIAL",
+      "status": "PASS",
+      "detail": "AUTHOR_ENGAGEMENT_MISMATCH"
+    },
+    {
+      "number": 6,
+      "name": "WRONG_ENGAGEMENT_DENIAL",
+      "status": "PASS",
+      "detail": "TITLE_ENGAGEMENT_MISMATCH"
+    },
+    {
+      "number": 7,
+      "name": "CROSS_ENGAGEMENT_LIFECYCLE_DENIAL",
+      "status": "PASS",
+      "detail": "WORK_ENGAGEMENT_MISMATCH"
+    },
+    {
+      "number": 12,
+      "name": "ONBOARDING_RECORD_IDEMPOTENCY",
+      "status": "PASS",
+      "detail": {
+        "reason": "ONBOARDING_REPLAY",
+        "records": 1
+      }
+    },
+    {
+      "number": 36,
+      "name": "CROSS_ENGAGEMENT_EVIDENCE fails atomically",
+      "status": "PASS",
+      "detail": "CROSS_ENGAGEMENT_EVIDENCE"
+    },
+    {
+      "number": 37,
+      "name": "STALE_VERSION concurrency denial",
+      "status": "PASS",
+      "detail": "STALE_VERSION"
+    }
+  ],
+  "tokenBoundary": {
+    "status": "PASS",
+    "unauthorizedCaller": {
+      "accepted": false,
+      "reasonCode": "UNAUTHORIZED_CALLER",
+      "replay": false
+    },
+    "invalidBearer": {
+      "httpStatus": 401,
+      "result": "DENY"
+    },
+    "expiredBearer": {
+      "httpStatus": 401,
+      "result": "DENY"
+    },
+    "missingRouteCredential": {
+      "httpStatus": 401,
+      "result": "DENY"
+    },
+    "nonSyntheticClassification": {
+      "httpStatus": 400,
+      "code": "SYNTHETIC_CLASSIFICATION_REQUIRED",
+      "result": "DENY"
+    }
+  },
+  "businessMutations": 0,
+  "wholeMutations": 0
+}

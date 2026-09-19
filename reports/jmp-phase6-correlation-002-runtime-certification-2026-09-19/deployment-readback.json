@@ -1,0 +1,20 @@
+{
+  "status": "PASS",
+  "solution": "JMP_PublishingV2_Phase6_Portable",
+  "version": "1.2.0.0",
+  "signedAssemblySha256": "b2b7018b9668db2ec2e6c8264d4a2486b39e7cc283c70ad06b78a065caa21775",
+  "managedPackageSha256": "d7f31234005a51d40bf611e5a8bf3fd5252b3b9955934d2fa78bf10d4da8eb19",
+  "jm1Dev": {
+    "importOperationId": "40a850b7-21b4-f111-aaac-6045bd01d436",
+    "publishOperationId": "f3028380-22b4-f111-aaac-6045bd01d436"
+  },
+  "jm1Test": {
+    "organizationId": "bb7a9d9e-8e73-f111-b27b-000d3a31ff17",
+    "importOperationId": "b9b421dd-22b4-f111-aaac-70a8a59b112b",
+    "publishOperationId": "dbd08cbb-23b4-f111-aaac-70a8a59b112b",
+    "customApiExecutePrivilege": "prvCreatejmpv2_OnboardingRecord"
+  },
+  "productionDeployments": 0,
+  "productionSolutionImports": 0,
+  "wholeMutations": 0
+}

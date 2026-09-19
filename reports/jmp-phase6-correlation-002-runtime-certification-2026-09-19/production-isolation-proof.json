@@ -1,0 +1,19 @@
+{
+  "status": "PASS",
+  "targetEnvironment": "JM1-Test",
+  "productionDeployments": 0,
+  "productionSolutionImports": 0,
+  "productionSecurityRoleMutations": 0,
+  "productionApplicationUserMutations": 0,
+  "productionAuthorMutations": 0,
+  "productionTitleMutations": 0,
+  "productionStageMutations": 0,
+  "productionOnboardingSubmissions": 0,
+  "productionEmailsSent": 0,
+  "wholeMutations": 0,
+  "stripeMutations": 0,
+  "businessCentralWrites": 0,
+  "qboMutations": 0,
+  "financialEffects": 0,
+  "businessContinuityInterruption": 0
+}

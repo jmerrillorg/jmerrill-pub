@@ -1,0 +1,30 @@
+{
+  "status": "PASS",
+  "observedAt": "2026-09-19T12:18:00Z",
+  "environment": "JM1-Test",
+  "runtime": {
+    "name": "func-jm1-publishing-inbound-uat",
+    "resourceGroup": "rg-jm1-ai",
+    "host": "func-jm1-publishing-inbound-uat.azurewebsites.net",
+    "environmentClass": "UAT_NONPRODUCTION",
+    "certificationRoute": "/api/phase6/onboarding/certification-command",
+    "syntheticOnly": true
+  },
+  "entraIdentity": {
+    "type": "SystemAssigned",
+    "applicationId": "2c9c1fc3-5733-4a64-b4e2-9a3cef50d470",
+    "principalId": "fd1939f0-8767-4402-af5b-25d9f53de21a",
+    "tenantId": "352d075e-8e17-4169-9f8e-22e6946ce66d"
+  },
+  "dataverse": {
+    "applicationUser": "JMP Phase 6 func-jm1-publishing-inbound-uat",
+    "systemUserId": "c8b4a60b-1ab4-f111-aaac-70a8a59b112b",
+    "enabled": true,
+    "accessMode": 4,
+    "role": "JMP Phase 6 Onboarding Runtime",
+    "systemAdministrator": false
+  },
+  "tokenAcquisition": "PASS",
+  "customApiInvocation": "PASS",
+  "fullLiveSuite": "42_OF_42_PASS"
+}
