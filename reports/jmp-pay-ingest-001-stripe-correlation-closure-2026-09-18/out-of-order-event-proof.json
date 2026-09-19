@@ -1,0 +1,14 @@
+{
+  "invoiceBeforePaymentIntent": "same Opportunity INITIAL obligation key",
+  "paymentIntentBeforeInvoice": "same Opportunity INITIAL obligation key",
+  "chargeAfterInvoice": "existing payment effect reused",
+  "alreadyPaidOpportunity": "no status rewrite; gate recomputation remains independently authoritative",
+  "stateRegression": false,
+  "proof": [
+    "canonicalInitialPaymentEffectKey is independent of Stripe event/object identity",
+    "Opportunity is re-read for every event",
+    "PAID_CONFIRMED is never replaced with a lesser state",
+    "agreement authority is evaluated separately"
+  ],
+  "status": "PASS"
+}

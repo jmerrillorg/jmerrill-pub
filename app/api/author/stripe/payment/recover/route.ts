@@ -32,14 +32,18 @@ export async function POST(req: NextRequest) {
 
   try {
     const livePayment = await retrieveStripePaymentIntent(paymentIntentId)
+    const correctedOpportunityId = typeof body?.opportunityId === 'string' ? body.opportunityId.trim() : ''
+    const correctionReason = typeof body?.correctionReason === 'string' ? body.correctionReason.trim() : ''
+    const manualCorrectionRequested = Boolean(correctedOpportunityId)
+    if (manualCorrectionRequested && (body?.confirmBinding !== true || !correctionReason)) {
+      return NextResponse.json({ ok: false, code: 'GOVERNED_BINDING_CONFIRMATION_REQUIRED' }, { status: 400 })
+    }
     const result = await processPublishingPaymentSuccess({
       ...livePayment,
-      invoiceId: typeof body?.invoiceId === 'string' ? body.invoiceId.trim() || livePayment.invoiceId : livePayment.invoiceId,
-      invoiceNumber: typeof body?.invoiceNumber === 'string' ? body.invoiceNumber.trim() : null,
-      customerId: typeof body?.customerId === 'string' ? body.customerId.trim() || livePayment.customerId : livePayment.customerId,
-      subscriptionId: typeof body?.subscriptionId === 'string' ? body.subscriptionId.trim() : null,
-      subscriptionScheduleId: typeof body?.subscriptionScheduleId === 'string' ? body.subscriptionScheduleId.trim() : null,
-      source: 'STRIPE_LIVE_RECOVERY',
+      opportunityId: correctedOpportunityId || livePayment.opportunityId,
+      manualCorrectionConfirmed: manualCorrectionRequested,
+      correctionReason: manualCorrectionRequested ? correctionReason : null,
+      source: manualCorrectionRequested ? 'GOVERNED_MANUAL_CORRECTION' : 'STRIPE_LIVE_RECOVERY',
     })
     return NextResponse.json({ ok: result.ok, result }, { status: result.ok ? 200 : 422 })
   } catch (error: any) {

@@ -1,0 +1,15 @@
+{
+  "eventReceived": "webhook response and execution audit",
+  "signatureValid": "processing occurs only after verifyStripeWebhook succeeds",
+  "correlationResult": "success authority or safe blocked reason",
+  "businessAuthoritySelected": "Opportunity source record and correlationAuthority",
+  "idempotencyResult": "paymentUpdated plus existing semantic log behavior",
+  "effectAttempted": "liveActions response",
+  "effectResult": "payment/join/notification result",
+  "exceptionReason": "PUBLISHING_PAYMENT_CORRELATION_BLOCKED execution log",
+  "secretsLogged": false,
+  "cardDataLogged": false,
+  "unnecessaryPiiAdded": false,
+  "rawStripeIdentifierInDurableBindingDescription": false,
+  "status": "PASS"
+}

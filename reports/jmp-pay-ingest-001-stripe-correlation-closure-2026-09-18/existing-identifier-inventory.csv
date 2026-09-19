@@ -1,0 +1,15 @@
+identifier,already_exists,authority,use_in_contract
+Stripe event ID,YES,Stripe,exception audit and delivery identity
+PaymentIntent ID,YES,Stripe,provider-object durable binding
+Checkout Session ID,YES,Stripe,classification evidence; not title identity alone
+Invoice ID / number,YES,Stripe,provider-object durable binding
+Charge ID,YES,Stripe,provider-object durable binding
+Subscription / schedule ID,YES,Stripe,provider-object durable binding
+jm1_opportunity_id,YES,Publishing billing metadata,primary direct business identity
+jm1_engagement_id,YES,existing Whole metadata,allow-listed supporting business identity
+jm1_title_id / jm1_work_id,YES,Publishing metadata convention,allow-listed supporting identity
+jm1_payment_request_id,YES,governed request convention,allow-listed commercial obligation identity
+jm1_action_request_id,YES,governed action convention,allow-listed action identity
+jm1_agreement_id,YES,governed agreement convention,allow-listed supporting identity
+Dataverse execution-log source record,YES,Dataverse,durable Opportunity authority
+New identifier namespace,NO,N/A,not required

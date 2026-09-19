@@ -1,0 +1,18 @@
+{
+  "repository": "jmerrillorg/jmerrill-pub",
+  "canonicalBranch": "main",
+  "canonicalMainAtStart": "5d58b8cd80b7358a60947396d78738f6fbe5785e",
+  "webProductionHost": "https://jmerrill.pub",
+  "webDeployedShaAtStart": "10397a3ef403f696d4be10c4a9d72487291c0f94",
+  "functionDeployedShaAtStart": "5d58b8cd80b7358a60947396d78738f6fbe5785e",
+  "executionWorktree": "/Users/jmerrillone/.codex/worktrees/jmp-pay-ingest-001/jmerrill-pub",
+  "dirtyPrimaryWorktree": "/Volumes/UsersExternal/Developer/jmerrill-pub",
+  "dirtyPrimaryWorktreeMutations": 0,
+  "runtimeAffected": "Publishing Premium App Service only",
+  "accountingAuthority": {
+    "stripe": "current payment processing authority",
+    "dataverse": "Publishing commercial and lifecycle operational authority",
+    "qbo": "current accounting authority during Movement 4",
+    "businessCentral": "target accounting authority"
+  }
+}

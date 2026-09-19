@@ -3,6 +3,13 @@
 // Stage-specific exception? N
 
 import { getDataverseRuntimeAccessToken, getPublisherRuntimeAuthMode } from '../publisher-runtime-auth'
+import {
+  canonicalInitialPaymentEffectKey,
+  extractStripePaymentCorrelation,
+  normalizeGuid,
+  selectOpportunityCorrelation,
+  stripePaymentBindingName,
+} from './publishing-payment-correlation'
 
 const STRIPE_API_BASE = 'https://api.stripe.com'
 
@@ -59,6 +66,15 @@ export type PublishingPaymentSuccess = {
   created?: number | null
   paidAt?: string | null
   source?: string | null
+  opportunityId?: string | null
+  engagementId?: string | null
+  titleId?: string | null
+  paymentRequestId?: string | null
+  actionRequestId?: string | null
+  agreementId?: string | null
+  invalidMetadataKeys?: string[]
+  manualCorrectionConfirmed?: boolean
+  correctionReason?: string | null
 }
 
 type DataverseRow = Record<string, any>
@@ -97,6 +113,7 @@ export async function retrieveStripePaymentIntent(paymentIntentId: string): Prom
     created: typeof latestCharge?.created === 'number' ? latestCharge.created : body.created || null,
     paidAt: isoFromStripeSeconds(typeof latestCharge?.created === 'number' ? latestCharge.created : body.created),
     source: 'STRIPE_LIVE_READBACK',
+    ...extractStripePaymentCorrelation(body.metadata),
   }
 }
 
@@ -110,6 +127,16 @@ export async function processPublishingPaymentSuccess(input: PublishingPaymentSu
   if (!config) return blocked('DATAVERSE_CONFIG_MISSING')
   const token = await getDataverseToken(config)
   const payment = normalizePayment(input)
+  if (payment.invalidMetadataKeys.length > 0) {
+    return blocked('PAYMENT_CORRELATION_METADATA_INVALID', {
+      invalidMetadataKeys: payment.invalidMetadataKeys,
+    })
+  }
+  if (payment.source === 'GOVERNED_MANUAL_CORRECTION') {
+    if (!payment.manualCorrectionConfirmed || !payment.correctionReason || !normalizeGuid(payment.opportunityId)) {
+      return blocked('PAYMENT_MANUAL_CORRECTION_AUTHORITY_INVALID')
+    }
+  }
   const opportunityLookup = await findOpportunityForPayment(config, token, payment)
   if (!opportunityLookup.ok) return opportunityLookup
 
@@ -124,21 +151,30 @@ export async function processPublishingPaymentSuccess(input: PublishingPaymentSu
     })
   }
 
-  const idempotencyName = buildPaymentIdempotencyName(opportunityId, payment)
-  const existingPaymentLog = await findExecutionLog(config, token, idempotencyName, 'PUBLISHING_INITIAL_PAYMENT_CONFIRMED')
+  await persistPaymentBindings(config, token, opportunityId, payment)
+
+  const idempotencyName = canonicalInitialPaymentEffectKey(opportunityId)
+  const existingPaymentLog = await findExecutionLogForSource(
+    config,
+    token,
+    opportunityId,
+    'PUBLISHING_INITIAL_PAYMENT_CONFIRMED',
+  )
   let paymentLogId = existingPaymentLog?.jm1_executionlogid || null
   let paymentUpdated = false
   if (!existingPaymentLog) {
-    await dataverseRequest(config, token, `opportunities(${opportunityId})`, {
-      method: 'PATCH',
-      headers: { Prefer: 'return=minimal' },
-      body: {
-        jm1_m6firstpaymentstatus: FIRST_PAYMENT_STATUS.PAID_CONFIRMED,
-        jm1_m6firstpaymentconfirmedon: payment.paidAt || new Date().toISOString(),
-        jm1_m6firstpaymentconfirmationsource: FIRST_PAYMENT_CONFIRMATION_SOURCE.STRIPE_LIVE_APPROVED,
-      },
-    })
-    paymentUpdated = true
+    if (Number(opportunity.jm1_m6firstpaymentstatus) !== FIRST_PAYMENT_STATUS.PAID_CONFIRMED) {
+      await dataverseRequest(config, token, `opportunities(${opportunityId})`, {
+        method: 'PATCH',
+        headers: { Prefer: 'return=minimal' },
+        body: {
+          jm1_m6firstpaymentstatus: FIRST_PAYMENT_STATUS.PAID_CONFIRMED,
+          jm1_m6firstpaymentconfirmedon: payment.paidAt || new Date().toISOString(),
+          jm1_m6firstpaymentconfirmationsource: FIRST_PAYMENT_CONFIRMATION_SOURCE.STRIPE_LIVE_APPROVED,
+        },
+      })
+      paymentUpdated = true
+    }
     const created = await postExecutionLog(config, token, {
       name: idempotencyName,
       actionType: 'PUBLISHING_INITIAL_PAYMENT_CONFIRMED',
@@ -215,7 +251,7 @@ export async function processPublishingPaymentSuccess(input: PublishingPaymentSu
   })
 
   return {
-    ok: true,
+    ok: true as const,
     code: 'PUBLISHING_PAYMENT_SUCCESS_PROCESSED',
     opportunityId,
     author: authorName(opportunity),
@@ -234,6 +270,7 @@ export async function processPublishingPaymentSuccess(input: PublishingPaymentSu
     joinedFamily,
     joinedFamilyState,
     joinedFamilyLogId,
+    correlationAuthority: opportunityLookup.authority,
     notification,
     liveActions: {
       updatesFirstPaymentStatus: paymentUpdated,
@@ -246,6 +283,33 @@ export async function processPublishingPaymentSuccess(input: PublishingPaymentSu
       startsProduction: false,
     },
   }
+}
+
+export async function recordPublishingPaymentException(input: PublishingPaymentSuccess, reason: string) {
+  const config = getDataverseConfig()
+  if (!config) return { created: false, code: 'DATAVERSE_CONFIG_MISSING' }
+  const token = await getDataverseToken(config)
+  const eventKey = normalizeString(input.eventId)
+    || normalizeString(input.paymentIntentId)
+    || normalizeString(input.invoiceId)
+    || normalizeString(input.chargeId)
+  if (!eventKey) return { created: false, code: 'PAYMENT_EXCEPTION_ID_MISSING' }
+  const name = `PUBLISHING-PAYMENT-BLOCKED-${eventKey}`.slice(0, 200)
+  const existing = await findExecutionLog(config, token, name, 'PUBLISHING_PAYMENT_CORRELATION_BLOCKED')
+  if (existing) return { created: false, code: 'PAYMENT_EXCEPTION_ALREADY_RECORDED', id: existing.jm1_executionlogid }
+  const created = await postExecutionLog(config, token, {
+    name,
+    actionType: 'PUBLISHING_PAYMENT_CORRELATION_BLOCKED',
+    description: [
+      `Verified Stripe payment event was denied before business-state mutation. Reason ${reason}.`,
+      `Event type ${normalizeString(input.eventType) || 'not provided'}; source ${normalizeString(input.source) || 'not provided'}.`,
+      'No title was selected, no payment state was changed, and no downstream effect was authorized.',
+    ].join(' '),
+    sourceEntity: 'stripe_event',
+    sourceRecordId: eventKey,
+    status: 'failed',
+  })
+  return { created: true, code: 'PAYMENT_EXCEPTION_RECORDED', id: created.jm1_executionlogid || null }
 }
 
 function normalizePayment(input: PublishingPaymentSuccess): Required<PublishingPaymentSuccess> {
@@ -265,6 +329,15 @@ function normalizePayment(input: PublishingPaymentSuccess): Required<PublishingP
     created,
     paidAt: input.paidAt || isoFromStripeSeconds(created) || new Date().toISOString(),
     source: input.source || 'STRIPE_WEBHOOK',
+    opportunityId: normalizeString(input.opportunityId) || null,
+    engagementId: normalizeString(input.engagementId) || null,
+    titleId: normalizeString(input.titleId) || null,
+    paymentRequestId: normalizeString(input.paymentRequestId) || null,
+    actionRequestId: normalizeString(input.actionRequestId) || null,
+    agreementId: normalizeString(input.agreementId) || null,
+    invalidMetadataKeys: Array.isArray(input.invalidMetadataKeys) ? input.invalidMetadataKeys : [],
+    manualCorrectionConfirmed: input.manualCorrectionConfirmed === true,
+    correctionReason: normalizeString(input.correctionReason) || null,
   }
 }
 
@@ -325,38 +398,85 @@ async function dataverseRequest(config: DataverseConfig, token: string, path: st
 }
 
 async function findOpportunityForPayment(config: DataverseConfig, token: string, payment: Required<PublishingPaymentSuccess>) {
-  const directOpportunityId = normalizeString((payment as any).opportunityId)
-  if (isGuid(directOpportunityId)) {
-    const opportunity = await getOpportunity(config, token, directOpportunityId)
-    if (!opportunity) return blocked('OPPORTUNITY_NOT_FOUND')
-    return { ok: true as const, opportunity }
-  }
-
   const fragments = [
     payment.invoiceId,
     payment.invoiceNumber,
-    payment.customerId,
     payment.subscriptionId,
     payment.subscriptionScheduleId,
     payment.paymentIntentId,
+    payment.chargeId,
+    payment.engagementId,
+    payment.titleId,
+    payment.paymentRequestId,
+    payment.actionRequestId,
+    payment.agreementId,
   ].map(normalizeString).filter(Boolean)
 
-  if (fragments.length === 0) return blocked('PAYMENT_CORRELATION_EVIDENCE_MISSING')
-  const filter = fragments
-    .map((fragment) => `contains(jm1_actiondescription,'${encodeODataString(fragment)}')`)
-    .join(' or ')
-  const result = await dataverseRequest(
-    config,
-    token,
-    `jm1_executionlogs?$select=jm1_executionlogid,jm1_name,jm1_actiontype,jm1_actiondescription,jm1_sourcerecordid,createdon&$filter=${encodeURIComponent(filter)}&$orderby=createdon desc&$top=10`,
-  )
-  const rows = Array.isArray(result.value) ? result.value : []
-  const candidate = rows.find((row: DataverseRow) => isGuid(normalizeString(row.jm1_sourcerecordid)))
-  const opportunityId = normalizeString(candidate?.jm1_sourcerecordid)
-  if (!opportunityId) return blocked('PAYMENT_OPPORTUNITY_CORRELATION_NOT_FOUND')
+  let rows: DataverseRow[] = []
+  if (fragments.length > 0) {
+    const bindingNames = fragments.map(stripePaymentBindingName)
+    const filter = fragments
+      .flatMap((fragment, index) => [
+        `jm1_name eq '${encodeODataString(bindingNames[index])}'`,
+        `contains(jm1_actiondescription,'${encodeODataString(fragment)}')`,
+      ])
+      .join(' or ')
+    const result = await dataverseRequest(
+      config,
+      token,
+      `jm1_executionlogs?$select=jm1_executionlogid,jm1_name,jm1_actiontype,jm1_actiondescription,jm1_sourcerecordid,createdon&$filter=${encodeURIComponent(filter)}&$orderby=createdon desc&$top=100`,
+    )
+    rows = Array.isArray(result.value) ? result.value : []
+  }
+
+  const selection = selectOpportunityCorrelation({
+    directOpportunityId: payment.opportunityId,
+    candidates: rows,
+  })
+  if (!selection.ok) {
+    return blocked(selection.reason, { candidateCount: selection.candidateIds.length })
+  }
+  const opportunityId = selection.opportunityId
   const opportunity = await getOpportunity(config, token, opportunityId)
   if (!opportunity) return blocked('OPPORTUNITY_NOT_FOUND')
-  return { ok: true as const, opportunity }
+  return { ok: true as const, opportunity, authority: selection.authority }
+}
+
+async function persistPaymentBindings(
+  config: DataverseConfig,
+  token: string,
+  opportunityId: string,
+  payment: Required<PublishingPaymentSuccess>,
+) {
+  const identifiers = [
+    ['invoice', payment.invoiceId],
+    ['invoice_number', payment.invoiceNumber],
+    ['payment_intent', payment.paymentIntentId],
+    ['charge', payment.chargeId],
+    ['subscription', payment.subscriptionId],
+    ['subscription_schedule', payment.subscriptionScheduleId],
+    ['engagement', payment.engagementId],
+    ['title', payment.titleId],
+    ['payment_request', payment.paymentRequestId],
+    ['action_request', payment.actionRequestId],
+    ['agreement', payment.agreementId],
+  ] as const
+
+  for (const [kind, rawValue] of identifiers) {
+    const value = normalizeString(rawValue)
+    if (!value) continue
+    const name = stripePaymentBindingName(value)
+    const existing = await findExecutionLog(config, token, name, 'PUBLISHING_PAYMENT_BUSINESS_BINDING')
+    if (existing) continue
+    await postExecutionLog(config, token, {
+      name,
+      actionType: 'PUBLISHING_PAYMENT_BUSINESS_BINDING',
+      description: `Durable one-way ${kind} binding recorded for the governed Publishing opportunity. Source ${payment.source}. The provider identifier is represented only by its SHA-256-derived binding key.`,
+      sourceEntity: 'opportunity',
+      sourceRecordId: opportunityId,
+      completedAt: payment.paidAt || undefined,
+    })
+  }
 }
 
 async function getOpportunity(config: DataverseConfig, token: string, opportunityId: string) {
@@ -416,6 +536,21 @@ async function findExecutionLog(config: DataverseConfig, token: string, name: st
     config,
     token,
     `jm1_executionlogs?$select=jm1_executionlogid,jm1_name,jm1_actiontype,createdon&$filter=${encodeURIComponent(filter)}&$top=1`,
+  )
+  return Array.isArray(result.value) && result.value.length > 0 ? result.value[0] : null
+}
+
+async function findExecutionLogForSource(
+  config: DataverseConfig,
+  token: string,
+  sourceRecordId: string,
+  actionType: string,
+) {
+  const filter = `jm1_sourcerecordid eq '${encodeODataString(sourceRecordId)}' and jm1_actiontype eq '${encodeODataString(actionType)}'`
+  const result = await dataverseRequest(
+    config,
+    token,
+    `jm1_executionlogs?$select=jm1_executionlogid,jm1_name,jm1_actiontype,createdon&$filter=${encodeURIComponent(filter)}&$orderby=createdon desc&$top=1`,
   )
   return Array.isArray(result.value) && result.value.length > 0 ? result.value[0] : null
 }
@@ -578,11 +713,6 @@ function getStripeSecret() {
   return secret
 }
 
-function buildPaymentIdempotencyName(opportunityId: string, payment: Required<PublishingPaymentSuccess>) {
-  const paymentKey = payment.paymentIntentId || payment.invoiceId || payment.chargeId || payment.eventId || payment.paidAt
-  return `INITIAL-PAYMENT-CONFIRMED-${opportunityId}-${paymentKey}`.slice(0, 200)
-}
-
 function encodeODataString(value: string) {
   return normalizeString(value).replace(/'/g, "''")
 }
@@ -593,10 +723,6 @@ function blocked(reason: string, extra: Record<string, unknown> = {}) {
 
 function normalizeString(value: unknown) {
   return typeof value === 'string' ? value.trim() : ''
-}
-
-function isGuid(value: string) {
-  return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value)
 }
 
 function centsFromDataverseMoney(value: unknown) {

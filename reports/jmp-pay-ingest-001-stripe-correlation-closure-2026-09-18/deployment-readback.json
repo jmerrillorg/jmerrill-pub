@@ -1,0 +1,11 @@
+{
+  "status": "PENDING_CANONICAL_PR_MERGE",
+  "affectedRuntime": "Publishing Premium App Service",
+  "deploymentWorkflow": ".github/workflows/azure-app-service-premium.yml",
+  "webHealthBefore": "ready",
+  "webDeployedShaBefore": "10397a3ef403f696d4be10c4a9d72487291c0f94",
+  "functionDeployedSha": "5d58b8cd80b7358a60947396d78738f6fbe5785e",
+  "functionDeploymentRequired": false,
+  "webhookGetProbe": 405,
+  "webhookGetProbeInterpretation": "route exists and correctly disallows GET"
+}

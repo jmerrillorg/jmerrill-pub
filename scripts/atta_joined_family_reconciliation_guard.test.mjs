@@ -31,7 +31,8 @@ test('duplicate agreement, payment, and reconciliation replay are idempotency gu
   assert.match(agreementRuntime, /JOINED-THE-FAMILY-\$\{input\.opportunityId\}/)
   assert.match(agreementRuntime, /WORKSPACE-PROVISIONING-\$\{input\.opportunityId\}/)
   assert.match(agreementRuntime, /AUTHOR-ONBOARDING-INITIATED-\$\{input\.opportunityId\}/)
-  assert.match(paymentRuntime, /buildPaymentIdempotencyName/)
+  assert.match(paymentRuntime, /canonicalInitialPaymentEffectKey/)
+  assert.match(paymentRuntime, /findExecutionLogForSource/)
   assert.match(paymentRuntime, /PAYMENT_NOTIFICATION_ALREADY_SENT/)
 })
 
