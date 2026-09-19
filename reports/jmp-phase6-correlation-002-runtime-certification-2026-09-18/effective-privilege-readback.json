@@ -1,0 +1,19 @@
+{
+  "status": "FAIL_OVERBROAD_CURRENT_IDENTITY",
+  "applicationUser": "JMP JM1-INFRA-PAM-Automation",
+  "applicationId": "1e60cddf-dd28-4933-a927-dbc03bb89737",
+  "systemUserId": "c7796849-2fa9-f111-aaab-002248046451",
+  "directRoles": ["System Administrator"],
+  "teamMemberships": ["jm1test"],
+  "teamRoles": [],
+  "effectivePrivilegeCount": 7089,
+  "globalPrivilegeCount": 7047,
+  "deletePrivilegeCount": 960,
+  "assignPrivilegeCount": 667,
+  "sharePrivilegeCount": 642,
+  "securityRoleAdministration": true,
+  "targetRoleAssigned": false,
+  "systemAdminBefore": true,
+  "systemAdminAfter": true,
+  "jm1TestMutations": 0
+}

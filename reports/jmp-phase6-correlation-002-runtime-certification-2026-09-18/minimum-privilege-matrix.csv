@@ -1,0 +1,14 @@
+TABLE,CREATE,READ,WRITE,DELETE,APPEND,APPEND_TO,ASSIGN,SHARE,SCOPE,WHY_REQUIRED
+contact,NO,YES,NO,NO,NO,YES,NO,NO,Organization,Resolve the canonical author and permit governed profile relationship
+jm1pub_title,NO,YES,NO,NO,NO,NO,NO,NO,Organization,Resolve the canonical title
+jmpv2_publishingengagement,NO,YES,NO,NO,NO,NO,NO,NO,Organization,Read the authoritative engagement-author-title-lifecycle tuple
+jmpv2_lifecycleinstance,NO,YES,NO,NO,NO,NO,NO,NO,Organization,Verify current Stage 06 lifecycle authority
+jmpv2_authorprofile,YES,YES,NO,NO,YES,YES,NO,NO,Create/User; Read+AppendTo/Organization,Create or reuse one canonical author profile and support onboarding lookup
+jmpv2_onboardingrecord,YES,YES,YES,NO,YES,YES,NO,NO,Create+Write/User; Read+AppendTo/Organization,Create and update onboarding state and parent child records
+jmpv2_onboardingitem,YES,YES,YES,NO,YES,NO,NO,NO,User,Create update and read requirement items linked to onboarding
+jmpv2_workspaceprovisioning,YES,YES,YES,NO,YES,NO,NO,NO,User,Create update and read workspace readiness linked to onboarding
+jmpv2_authoraccess,YES,YES,YES,NO,YES,NO,NO,NO,User,Create update and read access readiness linked to onboarding
+jmpv2_payoutreadiness,YES,YES,YES,NO,YES,NO,NO,NO,User,Create update and read payout readiness linked to onboarding
+jmpv2_onboardingcompletionevent,YES,YES,NO,NO,YES,NO,NO,NO,User,Create and read server-derived completion evidence linked to onboarding
+environmentvariabledefinition,NO,YES,NO,NO,NO,NO,NO,NO,Organization,Resolve fail-closed Phase 6 environment gate
+environmentvariablevalue,NO,YES,NO,NO,NO,NO,NO,NO,Organization,Resolve current fail-closed Phase 6 environment gate value

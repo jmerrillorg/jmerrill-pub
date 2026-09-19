@@ -1,0 +1,24 @@
+{
+  "status": "PASS",
+  "workPackage": "JMP-PHASE6-CORRELATION-002",
+  "evidenceDate": "2026-09-18",
+  "files": [
+    {"path": "00-executive-summary.md", "sha256": "fbbf38e82cde4e95ddd5d68f7a1d6e8b0fab84f01b721da809b05094fdb9f336"},
+    {"path": "predecessor-authority-index.json", "sha256": "621f2a894d91f8ac543bf9142e5227bd59c82a7b97ba91bef76fc22cd6f36a5b"},
+    {"path": "wrong-title-defect-reproduction.json", "sha256": "ecfa17813407b37d5f7bab7b8da2176729fdf6382cd16ada3cadc919e0699406"},
+    {"path": "correlation-authority-contract.md", "sha256": "f4c3c2e651c92e6714c52bb94c9197ecada0a5f8ada29f88fc206f5d8e280cfc"},
+    {"path": "signed-claim-contract.md", "sha256": "af7424fc36697ca52d99e5ab894c064352846e18f326c12958e098e0573b8178"},
+    {"path": "tamper-negative-tests.json", "sha256": "7d4b4ff6391b5fdae1f2d83a55b0e1d723eeb53d17184ea2f13f9195abc1019c"},
+    {"path": "correlation-test-matrix.json", "sha256": "13a3dd9312f9113cb2709456d29c3f29c73056cd48f1e1888d31a0a9c29a1c49"},
+    {"path": "current-application-user-readback.md", "sha256": "11259b936ddc0be9a3b34555c0d2b0a6e4c8d73d319693fae638fff7f9ca0803"},
+    {"path": "minimum-privilege-matrix.csv", "sha256": "f4963fa5f80838e0411803d7cc9982c13bf182fec093bfbf1d807ec79ab72c09"},
+    {"path": "target-security-role.md", "sha256": "b84a8c6a41a00ea9490c8f279eb281afb11d14f9ebfb0117712e9b68f2c50fcd"},
+    {"path": "effective-privilege-readback.json", "sha256": "f54fe3e2a84e69f9ca23acffbff785a51169f4f2a09213499cbe55a48ec10cfe"},
+    {"path": "cross-brand-denial-proof.md", "sha256": "134c887371173cf94de41bad96d55562b7fa98ba65843a6df93693ad86b841ec"},
+    {"path": "phase6-recertification.json", "sha256": "055695b3b32c4986fd6a20bef9f283a07187f56d3c9db89ba4c4748b82074b06"},
+    {"path": "human-first-proof.md", "sha256": "1eccc1dd9499765c2c89fbc6f1dc20ca37f1ba9a581dd8a18011caaafe5c90f9"},
+    {"path": "production-isolation-proof.json", "sha256": "a7944f07433ea4baff5b29bcda551efb4e328f28b75f3dd2e26bc776bb2e0f35"},
+    {"path": "production-promotion-readiness.md", "sha256": "bf9412331507a816a5c3af6695ed8cc9659e1dd5ad6d56e360109412400cfa5d"},
+    {"path": "next-packet-recommendation.md", "sha256": "6f32f02643cb174f0f06d72803956de1ecd74f69361c40cd78512b95cfd5ed2d"}
+  ]
+}

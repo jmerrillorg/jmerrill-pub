@@ -1,0 +1,14 @@
+{
+  "status": "BLOCKED_NO_SIGNED_REQUEST_CONTRACT",
+  "cases": [
+    {"case": "modified signed title", "result": "NOT_EXECUTED"},
+    {"case": "modified signed author", "result": "NOT_EXECUTED"},
+    {"case": "modified signed engagement", "result": "NOT_EXECUTED"},
+    {"case": "expired signed authority", "result": "NOT_EXECUTED"},
+    {"case": "invalid signature", "result": "NOT_EXECUTED"},
+    {"case": "wrong signing key", "result": "NOT_EXECUTED"},
+    {"case": "missing required signed claim", "result": "NOT_EXECUTED"}
+  ],
+  "effects": 0,
+  "reason": "Current API has no cryptographic request-signing inputs or verifier."
+}

@@ -27,3 +27,13 @@ test("portable assembly preserves Dataverse identity and versions the file build
   assert.match(project, /<Deterministic>true<\/Deterministic>/);
   assert.match(project, /JMP_PHASE6_SIGNING_KEY_PATH/);
 });
+
+test("engagement, author, title, and lifecycle correlation fails closed on durable identifiers", () => {
+  assert.match(source, /ValidateCorrelation/);
+  assert.match(source, /AUTHOR_ENGAGEMENT_MISMATCH/);
+  assert.match(source, /TITLE_ENGAGEMENT_MISMATCH/);
+  assert.match(source, /WORK_ENGAGEMENT_MISMATCH/);
+  assert.match(source, /TryRetrieve\(s, "contact", authorId/);
+  assert.match(source, /TryRetrieve\(s, "jm1pub_title", titleId/);
+  assert.doesNotMatch(source, /new Entity\("jmpv2_publishingengagement", engagementId\)/);
+});

@@ -42,25 +42,8 @@ namespace Jmp.Publishing.V2.Phase6
         private static void Activate(IOrganizationService s, IPluginExecutionContext x, Command c)
         {
             if (!Guid.TryParse(c.EngagementId, out var engagementId)) { Output(x, false, "UNKNOWN_ENGAGEMENT", false, false); return; }
-            var engagement = TryRetrieve(s, "jmpv2_publishingengagement", engagementId, "jmpv2_lifecycleinstanceid");
-            if (engagement == null && c.IdempotencyKey.StartsWith("PHASE6-SYNTHETIC-ACTIVATE-", StringComparison.Ordinal))
-            {
-                engagement = new Entity("jmpv2_publishingengagement", engagementId);
-                engagement["jmpv2_engagementkey"] = "phase6-engagement-" + engagementId;
-                engagement["jmpv2_canonicaltitleid"] = c.TitleId;
-                engagement["jmpv2_canonicalauthorid"] = c.CanonicalContactId;
-                engagement["jmpv2_canonicaltitlename"] = "Phase 6 Synthetic Title";
-                engagement["jmpv2_canonicalauthorname"] = c.AuthorName;
-                engagement["jmpv2_originsystem"] = "PHASE6_SYNTHETIC_TEST_ONLY";
-                engagement["jmpv2_currentstage"] = "06_ONBOARDING";
-                engagement["jmpv2_testclassification"] = c.TestClassification;
-                s.Create(engagement);
-            }
-            if (engagement == null) { Output(x, false, "UNKNOWN_ENGAGEMENT", false, false); return; }
-            if (!Guid.TryParse(c.LifecycleId, out var lifecycleId)) { Output(x, false, "UNKNOWN_LIFECYCLE", false, false); return; }
-            var lifecycle = TryRetrieve(s, "jmpv2_lifecycleinstance", lifecycleId, "jmpv2_currentstagecode");
-            if (lifecycle == null || lifecycle.GetAttributeValue<string>("jmpv2_currentstagecode") != "06_ONBOARDING") { Output(x, false, "ENGAGEMENT_NOT_AT_STAGE_06", false, false); return; }
-            if (string.IsNullOrWhiteSpace(c.CanonicalContactId)) { Output(x, false, "UNKNOWN_AUTHOR", false, false); return; }
+            var engagement = TryRetrieve(s, "jmpv2_publishingengagement", engagementId, "jmpv2_canonicalauthorid", "jmpv2_canonicaltitleid", "jmpv2_lifecycleinstanceid", "jmpv2_currentstage");
+            if (!ValidateCorrelation(s, x, c, engagement)) return;
 
             var profile = One(s, "jmpv2_authorprofile", "jmpv2_canonicalcontactid", c.CanonicalContactId, "jmpv2_authorprofilekey");
             bool replay = false;
@@ -220,8 +203,29 @@ namespace Jmp.Publishing.V2.Phase6
 
         private static Entity RequireOnboarding(IOrganizationService s, IPluginExecutionContext x, Command c)
         {
-            var o = One(s, "jmpv2_onboardingrecord", "jmpv2_engagementid", c.EngagementId, "jmpv2_onboardingkey", "jmpv2_engagementid", "jmpv2_authorprofilekey", "jmpv2_titleid", "jmpv2_recordversion");
-            if (o == null) Output(x, false, "UNKNOWN_ENGAGEMENT", false, false); return o;
+            if (!Guid.TryParse(c.EngagementId, out var engagementId)) { Output(x, false, "UNKNOWN_ENGAGEMENT", false, false); return null; }
+            var engagement = TryRetrieve(s, "jmpv2_publishingengagement", engagementId, "jmpv2_canonicalauthorid", "jmpv2_canonicaltitleid", "jmpv2_lifecycleinstanceid", "jmpv2_currentstage");
+            if (!ValidateCorrelation(s, x, c, engagement)) return null;
+            var o = One(s, "jmpv2_onboardingrecord", "jmpv2_engagementid", c.EngagementId, "jmpv2_onboardingkey", "jmpv2_engagementid", "jmpv2_authorprofilekey", "jmpv2_canonicalcontactid", "jmpv2_titleid", "jmpv2_lifecycleid", "jmpv2_recordversion");
+            if (o == null) { Output(x, false, "UNKNOWN_ENGAGEMENT", false, false); return null; }
+            if (!SameId(o.GetAttributeValue<string>("jmpv2_canonicalcontactid"), c.CanonicalContactId)) { Output(x, false, "AUTHOR_ENGAGEMENT_MISMATCH", false, false); return null; }
+            if (!SameId(o.GetAttributeValue<string>("jmpv2_titleid"), c.TitleId)) { Output(x, false, "TITLE_ENGAGEMENT_MISMATCH", false, false); return null; }
+            if (!SameId(o.GetAttributeValue<string>("jmpv2_lifecycleid"), c.LifecycleId)) { Output(x, false, "WORK_ENGAGEMENT_MISMATCH", false, false); return null; }
+            return o;
+        }
+        private static bool ValidateCorrelation(IOrganizationService s, IPluginExecutionContext x, Command c, Entity engagement)
+        {
+            if (engagement == null) { Output(x, false, "UNKNOWN_ENGAGEMENT", false, false); return false; }
+            if (!Guid.TryParse(c.CanonicalContactId, out var authorId) || TryRetrieve(s, "contact", authorId, "contactid") == null) { Output(x, false, "UNKNOWN_AUTHOR", false, false); return false; }
+            if (!Guid.TryParse(c.TitleId, out var titleId) || TryRetrieve(s, "jm1pub_title", titleId, "jm1pub_titleid") == null) { Output(x, false, "UNKNOWN_TITLE", false, false); return false; }
+            if (!SameId(engagement.GetAttributeValue<string>("jmpv2_canonicalauthorid"), c.CanonicalContactId)) { Output(x, false, "AUTHOR_ENGAGEMENT_MISMATCH", false, false); return false; }
+            if (!SameId(engagement.GetAttributeValue<string>("jmpv2_canonicaltitleid"), c.TitleId)) { Output(x, false, "TITLE_ENGAGEMENT_MISMATCH", false, false); return false; }
+            if (!SameId(engagement.GetAttributeValue<string>("jmpv2_lifecycleinstanceid"), c.LifecycleId)) { Output(x, false, "WORK_ENGAGEMENT_MISMATCH", false, false); return false; }
+            if (!Guid.TryParse(c.LifecycleId, out var lifecycleId)) { Output(x, false, "UNKNOWN_LIFECYCLE", false, false); return false; }
+            var lifecycle = TryRetrieve(s, "jmpv2_lifecycleinstance", lifecycleId, "jmpv2_currentstagecode");
+            if (lifecycle == null) { Output(x, false, "UNKNOWN_LIFECYCLE", false, false); return false; }
+            if (engagement.GetAttributeValue<string>("jmpv2_currentstage") != "06_ONBOARDING" || lifecycle.GetAttributeValue<string>("jmpv2_currentstagecode") != "06_ONBOARDING") { Output(x, false, "ENGAGEMENT_NOT_AT_STAGE_06", false, false); return false; }
+            return true;
         }
         private static bool EnvironmentEnabled(IOrganizationService s)
         {
@@ -251,6 +255,7 @@ namespace Jmp.Publishing.V2.Phase6
         private static Entity TryRetrieve(IOrganizationService s, string name, Guid id, params string[] cols) { try { return s.Retrieve(name, id, new ColumnSet(cols)); } catch { return null; } }
         private static Entity One(IOrganizationService s, string name, string field, string value, params string[] cols) { if (string.IsNullOrWhiteSpace(value)) return null; var q = new QueryExpression(name) { ColumnSet = new ColumnSet(cols), TopCount = 1 }; q.Criteria.AddCondition(field, ConditionOperator.Equal, value); return s.RetrieveMultiple(q).Entities.FirstOrDefault(); }
         private static Entity[] All(IOrganizationService s, string name, string field, string value, params string[] cols) { var q = new QueryExpression(name) { ColumnSet = new ColumnSet(cols) }; q.Criteria.AddCondition(field, ConditionOperator.Equal, value); return s.RetrieveMultiple(q).Entities.ToArray(); }
+        private static bool SameId(string left, string right) => Guid.TryParse(left, out var l) && Guid.TryParse(right, out var r) && l == r;
         private static string Hash(string value) { using (var sha = SHA256.Create()) return BitConverter.ToString(sha.ComputeHash(Encoding.UTF8.GetBytes(value))).Replace("-", "").ToLowerInvariant(); }
         private static void Output(IPluginExecutionContext x, bool accepted, string reason, bool replay, bool complete) { x.OutputParameters["Accepted"] = accepted; x.OutputParameters["ReasonCode"] = reason; x.OutputParameters["Replay"] = replay; if (!x.OutputParameters.Contains("OnboardingComplete")) x.OutputParameters["OnboardingComplete"] = complete; if (!x.OutputParameters.Contains("Eligible06To07")) x.OutputParameters["Eligible06To07"] = false; }
         private static string S(IPluginExecutionContext x, string n) => x.InputParameters.Contains(n) ? Convert.ToString(x.InputParameters[n]) : "";

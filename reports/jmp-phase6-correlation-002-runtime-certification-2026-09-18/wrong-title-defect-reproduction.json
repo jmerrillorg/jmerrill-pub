@@ -1,0 +1,24 @@
+{
+  "status": "REPRODUCED",
+  "observedAtUtc": "2026-09-19T02:27:21Z",
+  "environment": "JM1-Test",
+  "testClassification": "PHASE6_SYNTHETIC_TEST_ONLY",
+  "engagementId": "e9ab96c0-cbb3-f111-aaac-70a8a5b27793",
+  "authorFixtureId": "5fffb1de-9c6c-49c6-a43f-351f7774f6a9",
+  "expectedTitleFixtureId": "88cf1771-4dc9-4573-af2a-0f88437fd5a4",
+  "wrongTitleFixtureId": "af1cfb8d-fdd6-4099-941f-0bb0d872ccf7",
+  "lifecycleId": "f7ab96c0-cbb3-f111-aaac-70a8a5b27793",
+  "requestSignaturePresent": false,
+  "authorityInputs": {
+    "actor": "phase6-authorized-actor",
+    "authorityContext": "V2_ONBOARDING_AUTHORITY"
+  },
+  "accepted": true,
+  "reasonCode": "ONBOARDING_REPLAY",
+  "replay": true,
+  "onboardingRecordVersionBefore": 13,
+  "onboardingRecordVersionAfter": 13,
+  "onboardingModifiedOnBefore": "2026-09-19T01:45:37Z",
+  "onboardingModifiedOnAfter": "2026-09-19T01:45:37Z",
+  "businessStateUnchanged": true
+}

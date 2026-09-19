@@ -1,0 +1,17 @@
+{
+  "status": "PARTIAL",
+  "sourceCorrection": "PREPARED_NOT_DEPLOYED",
+  "cases": [
+    {"case": "correct tuple", "expected": "PASS", "currentLive": "PASS_PRIOR_38_SUITE", "correctedRuntime": "NOT_EXECUTED"},
+    {"case": "wrong title", "expected": "DENY", "currentLive": "FAIL_ACCEPTED_ONBOARDING_REPLAY", "correctedRuntime": "NOT_EXECUTED"},
+    {"case": "wrong author", "expected": "DENY", "currentLive": "NOT_EXECUTED", "correctedRuntime": "NOT_EXECUTED"},
+    {"case": "wrong engagement", "expected": "DENY", "currentLive": "NOT_EXECUTED", "correctedRuntime": "NOT_EXECUTED"},
+    {"case": "cross-engagement lifecycle", "expected": "DENY", "currentLive": "NOT_EXECUTED", "correctedRuntime": "NOT_EXECUTED"},
+    {"case": "duplicate valid request", "expected": "IDEMPOTENT", "currentLive": "PASS_PRIOR_38_SUITE", "correctedRuntime": "NOT_EXECUTED"},
+    {"case": "stale state", "expected": "DENY", "currentLive": "PASS_PRIOR_38_SUITE", "correctedRuntime": "NOT_EXECUTED"}
+  ],
+  "preparedRegressionCases": 42,
+  "nodeSyntax": "PASS",
+  "unsignedSourceCompile": "PASS",
+  "portabilityGuard": "4/4 PASS"
+}

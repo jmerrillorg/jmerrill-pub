@@ -1,0 +1,27 @@
+{
+  "status": "BLOCKED",
+  "priorManagedRuntime": {
+    "version": "1.2.0.0",
+    "runId": "PHASE6-1789782306888-e06b2df1",
+    "tests": 38,
+    "passed": 38,
+    "failed": 0
+  },
+  "correctedSource": {
+    "sourceSha256": "2fad92868f66375e50fe761b1179bcc5dc933a1dbde7033978e39f54ee58b862",
+    "regressionScriptSha256": "11c9c16c38f3c569cf58479d885a63ab8ebf5e82d622f272c1e0c2a187c05940",
+    "nodeSyntax": "PASS",
+    "unsignedCompile": "PASS",
+    "portabilityTests": "4/4 PASS",
+    "preparedRegressionTests": 42,
+    "signedBuild": "NOT_EXECUTED",
+    "jm1TestDeployment": "NOT_EXECUTED",
+    "jm1TestFullSuite": "NOT_EXECUTED",
+    "leastPrivilegeCallerSuite": "NOT_EXECUTED"
+  },
+  "blockers": [
+    "Governed Phase 6 strong-name key path unavailable",
+    "No governed signed-request contract",
+    "No isolated actual Phase 6 runtime caller in JM1-Test"
+  ]
+}
