@@ -46,6 +46,7 @@ require("./functions/runPublishingMailboxReplyCheck");
 require("./functions/runPublishingMailboxAttachmentReadback");
 require("./functions/runEnterpriseMailboxReadbackHealth");
 require("./functions/runCommercialEligibilityA2");
+require("./functions/runStripeConnectReminderMonitor");
 if ((process.env.JM1_ENVIRONMENT || "").trim().toUpperCase() === "UAT") {
   require("./functions/runPhase6OnboardingCertification");
 }

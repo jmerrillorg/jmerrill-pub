@@ -547,18 +547,38 @@ export async function syncConnectAccountStatusByAccountId(
   accountId: string,
   account: StripeAccountObject,
   config: DataverseServerConfig | null = getDataverseServerConfig(),
+  options: { eventCreatedAt?: string } = {},
 ) {
   if (!config) throw new Error('dataverse_config_missing')
   if (!/^acct_[A-Za-z0-9]+$/.test(accountId)) throw new Error('stripe_account_id_invalid')
   const contacts = await dataverseList(config, 'contacts', {
-    $select: 'contactid,fullname,emailaddress1,jm1pub_stripeconnectedaccountid,statecode,statuscode',
+    $select: 'contactid,fullname,emailaddress1,jm1pub_stripeconnectedaccountid,jm1pub_stripelastverifiedat,statecode,statuscode',
     $filter: `jm1pub_stripeconnectedaccountid eq '${accountId}' and statecode eq 0`,
   })
   if (contacts.length !== 1) throw new Error(contacts.length === 0 ? 'stripe_connect_contact_link_missing' : 'stripe_connect_contact_link_ambiguous')
   const contactId = dataverseLookupId(contacts[0], 'contactid')
+  if (account.metadata?.jm1_contact_id && cleanGuid(account.metadata.jm1_contact_id) !== cleanGuid(contactId)) {
+    throw new Error('stripe_connect_contact_identity_mismatch')
+  }
+  const authorProfiles = await dataverseList(config, 'jm1_authorprofiles', {
+    $select: 'jm1_authorprofileid,_jm1_contact_value,statecode',
+    $filter: `_jm1_contact_value eq ${contactId} and statecode eq 0`,
+  })
+  if (authorProfiles.length !== 1) {
+    throw new Error(authorProfiles.length === 0 ? 'stripe_connect_author_relationship_missing' : 'stripe_connect_author_relationship_ambiguous')
+  }
+  const authorRelationshipId = dataverseLookupId(authorProfiles[0], 'jm1_authorprofileid')
+  if (account.metadata?.jm1_author_relationship_id && cleanGuid(account.metadata.jm1_author_relationship_id) !== cleanGuid(authorRelationshipId)) {
+    throw new Error('stripe_connect_author_relationship_mismatch')
+  }
+  const lastVerifiedAt = Date.parse(stringValue((contacts[0] as Record<string, unknown>).jm1pub_stripelastverifiedat))
+  const eventCreatedAt = Date.parse(options.eventCreatedAt || '')
+  if (Number.isFinite(lastVerifiedAt) && Number.isFinite(eventCreatedAt) && eventCreatedAt < lastVerifiedAt) {
+    throw new Error('stripe_connect_stale_event_denied')
+  }
   const identity: AuthorConnectIdentity = {
     contactId,
-    authorRelationshipId: account.metadata?.jm1_author_relationship_id || contactId,
+    authorRelationshipId,
     royaltyPayeeId: account.metadata?.jm1_royalty_payee_id || contactId,
     authorName: stringValue(contacts[0].fullname) || contactId,
     payeeName: stringValue(contacts[0].fullname) || contactId,

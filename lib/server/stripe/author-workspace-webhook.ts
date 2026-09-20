@@ -185,6 +185,7 @@ export function classifyStripeConnectAccountUpdateEvent(event: StripeWebhookEven
     safeEvent: {
       eventId: event.id || null,
       eventType,
+      createdAt: event.created ? new Date(event.created * 1000).toISOString() : '',
       accountId: object.id,
       detailsSubmitted: Boolean((object as any).details_submitted),
       payoutsEnabled: Boolean((object as any).payouts_enabled),
