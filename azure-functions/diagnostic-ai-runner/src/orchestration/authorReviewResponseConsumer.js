@@ -143,7 +143,8 @@ function createDataverseClient(config, deps = {}) {
     return cachedToken;
   }
   async function request(path, options = {}) {
-    const response = await fetch(`${config.apiBase}/${path.replace(/^\//, "")}`, {
+    const url = /^https:\/\//i.test(path) ? path : `${config.apiBase}/${path.replace(/^\//, "")}`;
+    const response = await fetch(url, {
       ...options,
       headers: {
         Authorization: `Bearer ${await token()}`,
@@ -167,8 +168,15 @@ function createDataverseClient(config, deps = {}) {
   }
   async function list(entitySet, query = {}) {
     const params = new URLSearchParams(query);
-    const { body } = await request(`${entitySet}?${params.toString()}`, { method: "GET", prefer: "odata.maxpagesize=50" });
-    return Array.isArray(body.value) ? body.value : [];
+    const requestedTop = Math.min(Math.max(Number(query.$top || 50), 1), 5000);
+    const rows = [];
+    let path = `${entitySet}?${params.toString()}`;
+    for (let page = 0; path && page < 100 && rows.length < requestedTop; page += 1) {
+      const { body } = await request(path, { method: "GET", prefer: "odata.maxpagesize=50" });
+      rows.push(...(Array.isArray(body.value) ? body.value : []));
+      path = typeof body["@odata.nextLink"] === "string" ? body["@odata.nextLink"] : "";
+    }
+    return rows.slice(0, requestedTop);
   }
   async function first(entitySet, query = {}) {
     const rows = await list(entitySet, { ...query, $top: "1" });
