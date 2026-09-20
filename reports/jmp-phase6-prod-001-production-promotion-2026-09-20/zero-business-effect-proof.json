@@ -1,16 +1,22 @@
 {
-  "solutionImports": 0,
-  "applicationUserMutations": 0,
-  "securityRoleMutations": 0,
-  "environmentVariableMutations": 0,
-  "deployments": 0,
-  "wholeMutations": 0,
-  "authorMutations": 0,
-  "titleMutations": 0,
-  "onboardingSubmissions": 0,
-  "stageTransitions": 0,
-  "emailsSent": 0,
-  "stripeMutations": 0,
-  "financialEffects": 0,
-  "businessContinuityInterruptions": 0
+  "authorizedTechnicalEffects": {
+    "managedSolutionImports": 1,
+    "boundedRuntimeDeployments": 1,
+    "dedicatedIdentityCreated": 1,
+    "applicationUserCreated": 1,
+    "roleAssignmentsCreatedThenRemoved": 1,
+    "rollbackExecuted": true
+  },
+  "prohibitedBusinessEffects": {
+    "wholeMutations": 0,
+    "realAuthorMutations": 0,
+    "realTitleMutations": 0,
+    "onboardingSubmissions": 0,
+    "stage07Transitions": 0,
+    "emailsSent": 0,
+    "stripeMutations": 0,
+    "financialEffects": 0,
+    "providerEffects": 0,
+    "businessContinuityInterruptions": 0
+  }
 }

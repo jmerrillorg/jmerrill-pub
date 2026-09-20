@@ -1,0 +1,12 @@
+{
+  "solution": "JMP_PublishingV2_Phase6_Portable",
+  "version": "1.2.0.0",
+  "managed": true,
+  "packageSha256": "d7f31234005a51d40bf611e5a8bf3fd5252b3b9955934d2fa78bf10d4da8eb19",
+  "importOperationId": "b099a169-bdb4-f111-aaac-7c1e525b15c2",
+  "importStatus": "PASS",
+  "publishOperationId": "2f04c891-beb4-f111-aaac-7c1e525b15c2",
+  "publishStatus": "PASS",
+  "installedOn": "2026-09-20T06:35:51Z",
+  "rollbackUninstallPerformed": false
+}

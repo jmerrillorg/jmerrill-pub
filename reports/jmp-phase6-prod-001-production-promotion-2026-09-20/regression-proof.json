@@ -1,0 +1,10 @@
+{
+  "lint": "PASS",
+  "functionSuites": 455,
+  "functionTests": 2347,
+  "functionFailures": 0,
+  "managedPackageChecksum": "PASS",
+  "productionHealthAfterRollback": "PASS",
+  "productionNegativeSuite": "NOT_RUN_SCHEMA_DEPENDENCY",
+  "overall": "PARTIAL_ROLLBACK_HEALTHY"
+}

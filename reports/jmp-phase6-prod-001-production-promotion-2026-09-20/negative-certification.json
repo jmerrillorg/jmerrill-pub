@@ -1,0 +1,14 @@
+{
+  "disabledCommandProof": "PASS",
+  "disabledCommandReason": "PHASE6_ENVIRONMENT_NOT_ENABLED",
+  "wrongTitleDenial": "NOT_EXECUTED_SCHEMA_DEPENDENCY",
+  "wrongAuthorDenial": "NOT_EXECUTED_SCHEMA_DEPENDENCY",
+  "wrongEngagementDenial": "NOT_EXECUTED_SCHEMA_DEPENDENCY",
+  "crossEngagementReplayDenial": "NOT_EXECUTED_SCHEMA_DEPENDENCY",
+  "invalidTokenDenial": "NOT_EXECUTED_SCHEMA_DEPENDENCY",
+  "expiredTokenDenial": "NOT_EXECUTED_SCHEMA_DEPENDENCY",
+  "unauthorizedCallerDenial": "NOT_EXECUTED_SCHEMA_DEPENDENCY",
+  "duplicateProtection": "PREDECESSOR_CERTIFIED_ONLY",
+  "idempotency": "PREDECESSOR_CERTIFIED_ONLY",
+  "productionBusinessMutations": 0
+}
