@@ -1,0 +1,15 @@
+{
+  "program": "JMP-PHASE6-PROD-001",
+  "status": "BLOCKED_PREIMPORT_CALLER_AUTHORITY",
+  "productionImportAuthorizedByPacket": true,
+  "preImportGatesPassed": false,
+  "failedGate": "ACTUAL_PRODUCTION_CALLER_AND_DEDICATED_LEAST_PRIVILEGE_BINDING",
+  "pr773Merged": true,
+  "canonicalMain": "843f2cba0a80f4caf53dce8011a50fad5e8e21cd",
+  "targetEnvironment": "JM1-Core",
+  "targetManagedSolutionVersion": "1.2.0.0",
+  "solutionImportExecuted": false,
+  "productionPromotionStatus": "NOT_EXECUTED_FAIL_CLOSED",
+  "businessEffects": 0,
+  "nextPacket": "JMP-PHASE6-PROD-CALLER-001"
+}

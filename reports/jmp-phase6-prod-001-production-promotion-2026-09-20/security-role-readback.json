@@ -1,0 +1,9 @@
+{
+  "targetRole": "JMP Phase 6 Onboarding Runtime",
+  "targetRolePresentBeforeImport": false,
+  "publishingWebApplicationUserRoleCount": 5,
+  "diagnosticFunctionApplicationUserRoleCount": 6,
+  "systemAdministratorOnCandidateIdentities": false,
+  "candidateHasOnlyTargetRole": false,
+  "leastPrivilegeGate": "FAIL_PREIMPORT"
+}

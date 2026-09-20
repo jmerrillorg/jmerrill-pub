@@ -1,0 +1,12 @@
+{
+  "pullRequest": 773,
+  "state": "MERGED",
+  "certifiedHead": "00bafc25c8219ff43ca49a468ef0d76b08597283",
+  "finalHead": "191fabe9516194a6f5a59b4872e72eb3891fa131",
+  "mergeSha": "0080546972efd7c2b9adebfcda09f005ea5c027a",
+  "canonicalMain": "843f2cba0a80f4caf53dce8011a50fad5e8e21cd",
+  "postCertificationChange": "production-promotion packet only",
+  "runtimeChangedAfterCertifiedHead": false,
+  "managedPackageChangedAfterCertifiedHead": false,
+  "ci": "PASS"
+}

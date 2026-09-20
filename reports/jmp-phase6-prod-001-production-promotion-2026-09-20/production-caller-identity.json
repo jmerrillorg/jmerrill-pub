@@ -1,0 +1,30 @@
+{
+  "status": "BLOCKED_NO_CERTIFIED_PRODUCTION_BOUND_CALLER",
+  "publishingWebRuntime": {
+    "name": "app-jm1-pub-prod-v2",
+    "host": "app-jm1-pub-prod-v2.azurewebsites.net",
+    "identityType": "SystemAssigned",
+    "entraApplicationId": "e7b7f038-4016-4a3a-93d8-cecd0eda9159",
+    "entraPrincipalId": "ce363f5a-94f3-4ea9-9ba3-061404fca098",
+    "dataverseApplicationUserId": "e0e307e1-2fb0-f111-aaac-000d3a14673b",
+    "enabled": true,
+    "roleCount": 5,
+    "systemAdministrator": false,
+    "dedicatedPhase6Identity": false,
+    "invokesCertifiedCustomApi": false
+  },
+  "diagnosticFunctionRuntime": {
+    "name": "func-jm1-diagnostic-ai-runner",
+    "identityType": "SystemAssigned, UserAssigned",
+    "systemAssignedEntraApplicationId": "dc8d1429-8c1b-473b-83ca-f9545fad8074",
+    "systemAssignedEntraPrincipalId": "e8c51a80-bdb0-46fa-b398-9109719d6427",
+    "dataverseApplicationUserId": "cb6e97e5-1d6a-f111-a826-000d3a9eacee",
+    "enabled": true,
+    "roleCount": 6,
+    "systemAdministrator": false,
+    "dedicatedPhase6Identity": false,
+    "productionPhase6ConfigurationPresent": false,
+    "certifiedClientEnvironmentBoundary": "UAT_ONLY"
+  },
+  "blockingCondition": "No production component both invokes the certified Custom API and runs as a dedicated least-privilege Phase 6 application user."
+}
