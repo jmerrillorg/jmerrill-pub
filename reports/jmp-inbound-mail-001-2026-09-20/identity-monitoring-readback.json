@@ -1,0 +1,34 @@
+{
+  "runtime": "func-jm1-diagnostic-ai-runner",
+  "identityModel": "MANAGED_IDENTITY",
+  "principalId": "e8c51a80-bdb0-46fa-b398-9109719d6427",
+  "clientSecretCreated": false,
+  "graphApplicationPermissions": [
+    "Mail.Read",
+    "Files.Read.All",
+    "Files.ReadWrite.All"
+  ],
+  "mailWritePermissionPresent": false,
+  "mailSendPermissionPresent": false,
+  "mailboxTargetInSource": "publishing@jmerrill.one/Inbox",
+  "exchangeApplicationAccessPolicyAuthority": "Previously confirmed in docs/operations/int-pub-005-payment-option-capture-schema.md",
+  "inboundPermissionAssessment": "PASS_NO_MAILBOX_WRITE_AUTHORITY",
+  "preExistingNonMailPermissionObservation": "Files.Read.All and Files.ReadWrite.All are broader than this inbound capability and remain outside this work package.",
+  "applicationInsights": {
+    "runtimeRequestsObserved": true,
+    "recoveryRequestStatus": 200,
+    "idempotentReplayRequestStatus": 200,
+    "healthRequestStatus": 200
+  },
+  "mailboxHealth": {
+    "status": "HEALTHY",
+    "graphSubscriptionStatus": "ACTIVE",
+    "deltaTokenStatus": "CURRENT",
+    "lastDeltaReconciliationAt": "2026-09-20T11:35:00.143Z",
+    "processingBacklog": 2481,
+    "failedMessageCount": 0,
+    "unclassifiedCount": 265,
+    "attachmentFailureCount": 0,
+    "noSilentDropStatus": "PASS"
+  }
+}

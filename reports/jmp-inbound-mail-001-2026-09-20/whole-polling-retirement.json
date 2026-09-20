@@ -1,0 +1,18 @@
+{
+  "automationId": "whole-onboarding-continuation",
+  "priorSchedule": "FREQ=HOURLY;INTERVAL=1",
+  "priorPurpose": "Poll for Jackuline Fly's governed Whole onboarding submission",
+  "retirementStatus": "DELETED",
+  "retiredAt": "2026-09-20",
+  "replacementCoverage": {
+    "submissionPath": "/author/onboarding",
+    "ingestion": "SYNCHRONOUS_POWER_AUTOMATE_WITH_IDEMPOTENT_DATAVERSE_FALLBACK",
+    "durability": "DATAVERSE_SUBMISSION_PLUS_EXECUTION_LOG",
+    "correlation": "CONTACT_TITLE_ENGAGEMENT_LIFECYCLE_AUTHORITY_TUPLE",
+    "runtimeMonitoring": "AZURE_APPLICATION_INSIGHTS",
+    "phase6Status": "COMMISSIONED",
+    "stage07Transition": "HUMAN_AUTHORIZED_ONLY"
+  },
+  "monitoringCoverageRemoved": false,
+  "codyHourlyMonitoringRequired": false
+}
