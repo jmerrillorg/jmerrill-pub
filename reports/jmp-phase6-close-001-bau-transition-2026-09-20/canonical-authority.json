@@ -1,0 +1,12 @@
+{
+  "workPackage": "JMP-PHASE6-CLOSE-001",
+  "repository": "jmerrillorg/jmerrill-pub",
+  "remote": "https://github.com/jmerrillorg/jmerrill-pub.git",
+  "defaultBranch": "main",
+  "canonicalMainBefore": "fd426a5fd0692f7889291bd0e2a8da453e800dd8",
+  "predecessorPullRequest": 777,
+  "predecessorMergeSha": "fd426a5fd0692f7889291bd0e2a8da453e800dd8",
+  "predecessorPresent": true,
+  "capturedAt": "2026-09-20T11:00:42Z",
+  "closureBranch": "codex/jmp-phase6-close-001"
+}

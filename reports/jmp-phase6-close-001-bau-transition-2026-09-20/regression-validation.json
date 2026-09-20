@@ -1,0 +1,11 @@
+{
+  "capturedAt": "2026-09-20T11:07:08Z",
+  "typecheck": "PASS",
+  "workflowGuard": "PASS",
+  "lint": "PASS",
+  "build": "PASS",
+  "buildAdvisories": ["Next.js middleware convention is deprecated", "Edge Runtime is deprecated", "Three existing broad dynamic file patterns may affect bundling performance"],
+  "functionSuites": {"status": "PASS", "suites": 456, "tests": 2366, "passed": 2366, "failed": 0},
+  "phase6FocusedTests": {"status": "PASS", "tests": 7, "passed": 7, "failed": 0},
+  "productionHealth": "PASS"
+}

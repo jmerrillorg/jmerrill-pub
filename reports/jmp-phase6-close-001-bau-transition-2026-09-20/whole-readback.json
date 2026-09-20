@@ -1,0 +1,15 @@
+{
+  "mode": "READ_ONLY",
+  "author": "Jackuline Fly",
+  "contactId": "106a78d0-fb9a-f111-b8dc-6045bdd69738",
+  "authorProfileId": "28e62257-d045-5e10-a15d-d1c9268cf426",
+  "title": "Whole",
+  "titleId": "daf8180f-85a3-f111-b8de-000d3a14673b",
+  "currentStage": "06_ONBOARDING",
+  "phase6Eligibility": "YES_CURRENTLY_IN_STAGE06",
+  "canonicalOnboardingSubmissionCount": 0,
+  "actionRequired": "Await Jackuline Fly's governed onboarding submission",
+  "waitingOn": "AUTHOR",
+  "engineeringDefect": false,
+  "wholeMutations": 0
+}

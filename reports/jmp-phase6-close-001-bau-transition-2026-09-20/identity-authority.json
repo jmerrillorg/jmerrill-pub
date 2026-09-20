@@ -1,0 +1,30 @@
+{
+  "status": "PASS",
+  "managedIdentity": {
+    "name": "id-jm1-publishing-phase6-prod",
+    "clientId": "239277b2-dd0f-4613-bca8-fe19cab98d5b",
+    "principalId": "e9f990bd-9418-4728-955f-16e640b1dc53",
+    "attachedTo": "func-jm1-diagnostic-ai-runner",
+    "status": "ACTIVE_REQUIRED"
+  },
+  "dataverseApplicationUser": {
+    "id": "f2872c88-bfb4-f111-aaac-000d3a14673b",
+    "enabled": true,
+    "roles": ["JMP Phase 6 Onboarding Runtime"],
+    "unrelatedRoleCount": 0,
+    "status": "ACTIVE_REQUIRED"
+  },
+  "runtimeRole": {
+    "id": "2f957237-1ab4-f111-aaac-70a8a59b112b",
+    "requiredPrivileges": 45,
+    "presentPrivileges": 45,
+    "systemAdministrator": false,
+    "systemCustomizer": false,
+    "deletePrivileges": 0,
+    "assignPrivileges": 0,
+    "sharePrivileges": 0
+  },
+  "allowedCallerBinding": "f2872c88-bfb4-f111-aaac-000d3a14673b",
+  "temporaryPhase6Privileges": 0,
+  "systemAdminDependency": false
+}

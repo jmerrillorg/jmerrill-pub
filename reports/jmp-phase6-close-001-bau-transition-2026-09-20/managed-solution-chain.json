@@ -1,0 +1,13 @@
+{
+  "environment": "JM1-Core",
+  "ownership": "UNAMBIGUOUS",
+  "unmanagedProductionExceptions": 0,
+  "chain": [
+    {"order": 1, "solution": "JMP_PublishingV2", "version": "1.0.4.0", "managed": true, "installedOn": "2026-09-20T07:20:07Z", "purpose": "required managed dependency schema"},
+    {"order": 2, "solution": "JMP_PublishingV2_Phase6_Portable", "version": "1.2.0.1", "managed": true, "packageSha256": "2bfce73d18d23ba6aaa8eaeff3da2268510465901f07640127d22fc0757db5b9", "purpose": "Phase 6 schema, command, guards, role, and environment bindings"},
+    {"order": 3, "authority": "JMP Phase 6 Onboarding Runtime", "requiredPrivileges": 45, "presentPrivileges": 45},
+    {"order": 4, "authority": "id-jm1-publishing-phase6-prod", "clientId": "239277b2-dd0f-4613-bca8-fe19cab98d5b"},
+    {"order": 5, "authority": "jmpv2_ExecuteOnboardingCommand", "enabled": true}
+  ],
+  "requiredManagedPackage": "powerplatform/solutions/JMPPublishingV2Phase6/artifacts/JMP_PublishingV2_Phase6_Portable_1_2_0_1_managed.zip"
+}

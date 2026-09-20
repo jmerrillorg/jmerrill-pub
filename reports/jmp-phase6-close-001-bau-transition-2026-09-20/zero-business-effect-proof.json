@@ -1,0 +1,14 @@
+{
+  "workPackage": "JMP-PHASE6-CLOSE-001",
+  "mode": "READ_VERIFY_REPORT_DOCUMENT",
+  "wholeMutations": 0,
+  "productionAuthorMutations": 0,
+  "productionTitleMutations": 0,
+  "productionOnboardingSubmissions": 0,
+  "productionEmailsSent": 0,
+  "stripeMutations": 0,
+  "financialEffects": 0,
+  "stage07Transitions": 0,
+  "phase7Invocations": 0,
+  "businessContinuityInterruptions": 0
+}
