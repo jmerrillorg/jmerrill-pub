@@ -1,0 +1,22 @@
+{
+  "authorizedTechnicalEffects": {
+    "managedSolutionImports": 1,
+    "boundedRuntimeDeployments": 1,
+    "dedicatedIdentityCreated": 1,
+    "applicationUserCreated": 1,
+    "roleAssignmentsCreatedThenRemoved": 1,
+    "rollbackExecuted": true
+  },
+  "prohibitedBusinessEffects": {
+    "wholeMutations": 0,
+    "realAuthorMutations": 0,
+    "realTitleMutations": 0,
+    "onboardingSubmissions": 0,
+    "stage07Transitions": 0,
+    "emailsSent": 0,
+    "stripeMutations": 0,
+    "financialEffects": 0,
+    "providerEffects": 0,
+    "businessContinuityInterruptions": 0
+  }
+}

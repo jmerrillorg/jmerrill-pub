@@ -1,0 +1,20 @@
+{
+  "solutionUniqueName": "JMP_PublishingV2_Phase6_Portable",
+  "solutionVersionBefore": "NOT_INSTALLED",
+  "conflictingNewerSolution": false,
+  "activeImportOperation": false,
+  "customApiPresent": false,
+  "environmentVariablesPresent": false,
+  "phase6RolePresent": false,
+  "tables": {
+    "jmpv2_authoraccess": false,
+    "jmpv2_authorprofile": false,
+    "jmpv2_onboardingcompletionevent": false,
+    "jmpv2_onboardingitem": false,
+    "jmpv2_onboardingrecord": false,
+    "jmpv2_payoutreadiness": false,
+    "jmpv2_workspaceprovisioning": false
+  },
+  "unexpectedSchemaDrift": false,
+  "baselineClassification": "CLEAN_FIRST_IMPORT_BASELINE"
+}

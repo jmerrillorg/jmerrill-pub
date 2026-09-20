@@ -1,0 +1,13 @@
+{
+  "resource": "func-jm1-diagnostic-ai-runner",
+  "identity": "id-jm1-publishing-phase6-prod",
+  "identityType": "UserAssignedManagedIdentity",
+  "entraApplicationId": "239277b2-dd0f-4613-bca8-fe19cab98d5b",
+  "entraPrincipalId": "e9f990bd-9418-4728-955f-16e640b1dc53",
+  "dataverseApplicationUserId": "f2872c88-bfb4-f111-aaac-000d3a14673b",
+  "secretless": true,
+  "commissioningResult": "ROLLED_BACK_SCHEMA_DEPENDENCY",
+  "currentlyAttachedToRuntime": false,
+  "currentDataverseRoleCount": 0,
+  "systemAdministrator": false
+}

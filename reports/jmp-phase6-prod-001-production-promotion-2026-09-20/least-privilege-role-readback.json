@@ -1,0 +1,16 @@
+{
+  "role": "JMP Phase 6 Onboarding Runtime",
+  "managedRoleId": "2f957237-1ab4-f111-aaac-70a8a59b112b",
+  "effectivePrivilegeCount": 43,
+  "certifiedJm1TestEffectivePrivilegeCount": 45,
+  "missingPrivileges": [
+    "prvReadjmpv2_PublishingEngagement",
+    "prvReadjmpv2_LifecycleInstance"
+  ],
+  "deletePrivileges": 0,
+  "assignPrivileges": 0,
+  "sharePrivileges": 0,
+  "systemAdministrator": false,
+  "systemCustomizer": false,
+  "result": "FAIL_MISSING_CORRELATION_DEPENDENCIES"
+}

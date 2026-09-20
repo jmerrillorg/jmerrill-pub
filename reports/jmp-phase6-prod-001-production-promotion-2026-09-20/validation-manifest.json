@@ -1,0 +1,18 @@
+{
+  "program": "JMP-PHASE6-PROD-001",
+  "status": "ROLLED_BACK_BLOCKED_PRODUCTION_SCHEMA_DEPENDENCY",
+  "canonicalMainAtStart": "843f2cba0a80f4caf53dce8011a50fad5e8e21cd",
+  "canonicalMainAfter": "aee2a0daced7bf3c5d0987cfa9d3ea7bb715a0bd",
+  "solutionImport": "PASS",
+  "managedSolutionVersion": "1.2.0.0",
+  "productionSchemaReadback": "FAIL_MISSING_AUTHORITATIVE_DEPENDENCIES",
+  "callerCommissioning": "ROLLED_BACK",
+  "leastPrivilege": "FAIL_MISSING_TWO_REQUIRED_PRIVILEGES",
+  "commandEnabledAfterRollback": false,
+  "callerBoundAfterRollback": false,
+  "runtimeRouteRegisteredAfterRollback": false,
+  "rollback": "PASS",
+  "productionBusinessMutations": 0,
+  "phase6ProductionStatus": "NOT_COMMISSIONED",
+  "nextPacket": "JMP-PHASE6-PROD-SCHEMA-DEPENDENCY-001"
+}

@@ -1,0 +1,10 @@
+{
+  "solutionVersionBefore": "NOT_INSTALLED",
+  "customApiPresentBefore": false,
+  "phase6TablesPresentBefore": 0,
+  "phase6EnvironmentVariablesPresentBefore": 0,
+  "phase6RolePresentBefore": false,
+  "activeImportOperationBefore": false,
+  "unexplainedProductionDrift": 0,
+  "classification": "CLEAN_FIRST_IMPORT_BASELINE"
+}

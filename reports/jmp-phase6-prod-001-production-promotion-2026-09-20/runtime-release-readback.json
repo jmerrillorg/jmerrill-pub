@@ -1,0 +1,12 @@
+{
+  "runtime": "func-jm1-diagnostic-ai-runner",
+  "deployedSourceSha": "000542f5ef3ea6aba0f02ac5f3d185815c57fc11",
+  "deploymentPackageSha256": "08aaf8a2f046aef871712282d0fed1261a75d1184402889210f3b4dac1ef74b3",
+  "artifactRunId": 35495319216,
+  "artifactValidation": "PASS",
+  "health": "PASS",
+  "node": "v22.23.2",
+  "phase6ProductionRouteRegisteredAfterRollback": false,
+  "phase6UatRouteRegisteredInProduction": false,
+  "productionCertificationEnabledAfterRollback": false
+}

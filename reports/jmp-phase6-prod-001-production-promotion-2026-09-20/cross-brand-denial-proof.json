@@ -1,0 +1,10 @@
+{
+  "configurationReadback": "PASS",
+  "financialPrivileges": 0,
+  "foundationPrivileges": 0,
+  "productionsPrivileges": 0,
+  "aicPrivileges": 0,
+  "securityAdministrationPrivileges": 0,
+  "runtimeProof": "NOT_EXECUTED_SCHEMA_DEPENDENCY",
+  "roleAssignmentAfterRollback": false
+}

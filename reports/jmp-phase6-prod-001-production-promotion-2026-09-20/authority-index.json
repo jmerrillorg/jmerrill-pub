@@ -1,0 +1,11 @@
+{
+  "workPackage": "JMP-PHASE6-PROD-001",
+  "founderAuthorization": "APPROVED_BOUNDED_PRODUCTION_PROMOTION",
+  "pr773MergeSha": "0080546972efd7c2b9adebfcda09f005ea5c027a",
+  "productionRuntimePr": 776,
+  "productionRuntimeMergeSha": "aee2a0daced7bf3c5d0987cfa9d3ea7bb715a0bd",
+  "deployedSourceSha": "000542f5ef3ea6aba0f02ac5f3d185815c57fc11",
+  "managedPackageSha256": "d7f31234005a51d40bf611e5a8bf3fd5252b3b9955934d2fa78bf10d4da8eb19",
+  "deploymentPackageSha256": "08aaf8a2f046aef871712282d0fed1261a75d1184402889210f3b4dac1ef74b3",
+  "requestAuthority": "ENTRA_CALLER_TOKEN_PLUS_SERVER_SIDE_CORRELATION"
+}

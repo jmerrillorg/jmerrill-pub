@@ -1,0 +1,15 @@
+{
+  "managedPackageSha256": "d7f31234005a51d40bf611e5a8bf3fd5252b3b9955934d2fa78bf10d4da8eb19",
+  "managedPackageChecksum": "PASS",
+  "postCertificationRuntimeDiff": "NONE",
+  "certificationClientTests": {
+    "passed": 3,
+    "failed": 0
+  },
+  "staticPortabilityTests": {
+    "passed": 7,
+    "failed": 0
+  },
+  "liveProductionRegression": "NOT_RUN_PREIMPORT_GATE_FAILED",
+  "fullRepositoryRegression": "NOT_RUN_PREIMPORT_GATE_FAILED"
+}
