@@ -6,7 +6,7 @@ const path = require("node:path");
 const test = require("node:test");
 
 const { ACTION_TYPES, POLICY_ID, classifyReminder, renderReminder } = require("../src/stripe/connectReminderPolicy");
-const { assertAccountBinding, runConnectReminderRuntime } = require("../src/stripe/connectReminderRuntime");
+const { assertAccountBinding, buildRows, runConnectReminderRuntime } = require("../src/stripe/connectReminderRuntime");
 const { isNoonEastern } = require("../src/functions/runStripeConnectReminderMonitor");
 const { createDataverseClient } = require("../src/orchestration/authorReviewResponseConsumer");
 
@@ -95,6 +95,16 @@ test("Dataverse reads follow server pagination so the full author estate is moni
   } finally {
     global.fetch = originalFetch;
   }
+});
+
+test("existing governed author-support overrides remain held after systemization", () => {
+  const rows = buildRows({
+    contacts: [{ contactid: "11111111-1111-1111-1111-111111111111", fullname: "Mildred Beard", jm1pub_stripeconnectedaccountid: "acct_support" }],
+    profiles: [{ jm1_authorprofileid: "22222222-2222-2222-2222-222222222222", _jm1_contact_value: "11111111-1111-1111-1111-111111111111" }],
+    logs: []
+  }, [{ id: "acct_support", requirements: { currently_due: ["external_account"], past_due: [] } }]);
+  assert.equal(rows[0].supportState, "ACTIVE_SUPPORT");
+  assert.equal(classifyReminder(rows[0], "2026-09-20T16:00:00Z").disposition, "SUPPORT_HOLD");
 });
 
 test("Function registration and webhook source preserve system and financial boundaries", () => {

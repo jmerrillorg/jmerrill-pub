@@ -7,6 +7,7 @@ const { ACTION_TYPES, POLICY_ID, classifyReminder, renderReminder } = require(".
 const MONEY_PATHS = ["/v1/charges", "/v1/payment_intents", "/v1/payouts", "/v1/refunds", "/v1/transfers", "/v1/invoices"];
 const CORRECTIVE_DAY0_EVENT = "CONNECT_CORRECTIVE_REISSUE";
 const EXECUTION_STATUS = Object.freeze({ SUCCESS: 835500001, FAILED: 835500002 });
+const SUPPORT_NAME_OVERRIDES = new Set(["j derrick johnson", "derrick johnson", "mildred beard"]);
 
 function config(env = process.env) {
   return {
@@ -126,8 +127,9 @@ function buildRows(source, accounts) {
     const account = stripe.get(accountId);
     const logs = source.logs.filter((item) => normalizeId(item.jm1_sourcerecordid) === contactId);
     const anchors = logs.filter((item) => item.jm1_actiontype === CORRECTIVE_DAY0_EVENT).sort(byCreated);
+    const authorName = clean(contact.fullname || profile.jm1_penname || profile.jm1_name) || contactId;
     return {
-      authorName: clean(contact.fullname || profile.jm1_penname || profile.jm1_name) || contactId,
+      authorName,
       authorEmail: normalizeEmail(contact.emailaddress1 || contact.emailaddress2 || contact.emailaddress3),
       contactId,
       authorRelationshipId: normalizeId(profile.jm1_authorprofileid),
@@ -135,7 +137,9 @@ function buildRows(source, accounts) {
       accountExists: Boolean(account?.id),
       state: accountUse.get(accountId)?.length > 1 ? "DUPLICATE_REVIEW" : classifyState(account),
       initialValidInvitationAt: anchors[0]?.createdon || "",
-      supportState: logs.some((item) => /STRIPE_CONNECT_SETUP_SUPPORT/i.test(`${item.jm1_actiontype || ""} ${item.jm1_actiondescription || ""}`)) ? "ACTIVE_SUPPORT" : "NONE",
+      supportState: logs.some((item) => /STRIPE_CONNECT_SETUP_SUPPORT/i.test(`${item.jm1_actiontype || ""} ${item.jm1_actiondescription || ""}`)) || SUPPORT_NAME_OVERRIDES.has(normalizeName(authorName))
+        ? "ACTIVE_SUPPORT"
+        : "NONE",
       reminderHistory: logs.map(reminderEvent).filter(Boolean)
     };
   }).filter((row) => row.contactId && row.authorRelationshipId);
@@ -296,6 +300,7 @@ function requireConfig(current) {
 }
 function byCreated(a, b) { return clean(a.createdon).localeCompare(clean(b.createdon)); }
 function normalizeEmail(value) { return clean(value).toLowerCase(); }
+function normalizeName(value) { return clean(value).toLowerCase().replace(/[^a-z0-9]+/g, " ").trim(); }
 function normalizeId(value) { return clean(value).replace(/[{}]/g, "").toLowerCase(); }
 function odata(value) { return clean(value).replace(/'/g, "''"); }
 function clean(value) { return typeof value === "string" ? value.trim() : ""; }
