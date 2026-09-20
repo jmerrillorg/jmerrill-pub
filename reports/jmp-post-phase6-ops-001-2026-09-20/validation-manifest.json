@@ -1,0 +1,32 @@
+{
+  "packet": "JMP-POST-PHASE6-OPS-001",
+  "generatedAt": "2026-09-20T13:00:43Z",
+  "canonicalMain": "24636a79d2336ac93b249f7f5cabab3eb9500780",
+  "worktree": {
+    "path": "/Volumes/UsersExternal/Developer/jmerrill-pub-post-phase6-ops-001",
+    "branch": "codex/jmp-post-phase6-ops-001",
+    "sourceWorktreeMutated": false
+  },
+  "checks": {
+    "iyorwueseSourceBinding": "PASS",
+    "iyorwueseWorkBinding": "HUMAN_REVIEW_REQUIRED",
+    "iyorwueseProductionMutations": 0,
+    "a2LiveAuthenticatedReadback": "PASS",
+    "a2Disposition": "PENDING_JACKIE",
+    "a3Authorized": false,
+    "openPrRows": 25,
+    "openPrDraftRows": 3,
+    "openPrLegacyUniqueReviewRows": 22,
+    "openPrReadyToMergeRows": 0,
+    "staleDeploymentRows": 12,
+    "staleDeploymentSafeToCancelRows": 12,
+    "deploymentApprovals": 0,
+    "deploymentCancellations": 0,
+    "runtimeDrift": "NO_REAL_RUNTIME_DRIFT",
+    "wholeCodyHeartbeat": "RETIRED",
+    "inboundMail": "SYSTEM_DRIVEN",
+    "remainingCodyProductionPolling": 1,
+    "phase7Authorized": false
+  },
+  "result": "PASS_WITH_PRESERVED_HUMAN_GATES_AND_ONE_SYSTEMIZATION_HANDOFF"
+}
