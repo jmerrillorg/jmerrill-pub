@@ -33,6 +33,10 @@ class InMemoryInboundEvidenceStore {
     return { record: message };
   }
 
+  async findMessageByEventId(eventId) {
+    return [...this.messages.values()].find((message) => message.inboundMessageEventId === eventId) || null;
+  }
+
   async upsertAttachment(attachment) {
     const key = `${attachment.messageEventId}:${attachment.graphAttachmentId || attachment.originalFilename}`;
     const existing = this.attachments.get(key);
@@ -46,6 +50,10 @@ class InMemoryInboundEvidenceStore {
     const key = `${attachment.messageEventId}:${attachment.graphAttachmentId || attachment.originalFilename}`;
     this.attachments.set(key, attachment);
     return { record: attachment };
+  }
+
+  async findAttachmentByEventId(eventId) {
+    return [...this.attachments.values()].find((attachment) => attachment.attachmentEventId === eventId) || null;
   }
 
   async preserveSourceAttachment(attachment, bytes) {
@@ -65,6 +73,10 @@ class InMemoryInboundEvidenceStore {
   async updateQueueItem(item) {
     this.queue.set(item.queueItemId, item);
     return { record: item };
+  }
+
+  async getQueueItem(id) {
+    return this.queue.get(id) || null;
   }
 
   async getCheckpoint(name) {

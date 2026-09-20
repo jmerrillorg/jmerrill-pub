@@ -118,7 +118,10 @@ async function processGraphMessage(graphMessage, options = {}) {
   messageEvidence.senderResolution = senderResolution.status;
   messageEvidence.senderIdentityType = senderResolution.identityType;
 
-  const correlation = correlateMessage(messageEvidence, senderResolution, authoritativeContext);
+  const correlation = correlateMessage({
+    ...messageEvidence,
+    bodyTextForCorrelation: graphMessage.body?.content || graphMessage.bodyPreview || ""
+  }, senderResolution, authoritativeContext);
   messageEvidence = applyCorrelation(messageEvidence, correlation);
 
   attachmentEvidence = attachmentEvidence.map((attachment) => ({
@@ -126,6 +129,10 @@ async function processGraphMessage(graphMessage, options = {}) {
     authorCandidate: senderResolution.authorId || null,
     authorBinding: senderResolution.status === "DETERMINISTIC" && senderResolution.identityType === "CONTACT" ? "PASS" : "HUMAN_REVIEW_REQUIRED",
     workBinding: correlation.status === "DETERMINISTIC" ? "PASS" : "HUMAN_REVIEW_REQUIRED",
+    engagementCandidate: correlation.engagementId || null,
+    stageCandidate: correlation.stageId || null,
+    placementAuthority: correlation.evidence || null,
+    placementStatus: correlation.status === "DETERMINISTIC" ? "GOVERNED_TITLE_PLACEMENT_BOUND" : "HUMAN_REVIEW_REQUIRED",
     titleCandidates: Array.isArray(correlation.candidates)
       ? correlation.candidates.map((candidate) => candidate.titleId).filter(Boolean)
       : correlation.titleId ? [correlation.titleId] : []
