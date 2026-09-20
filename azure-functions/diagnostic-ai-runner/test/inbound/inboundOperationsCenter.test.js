@@ -268,6 +268,7 @@ describe("Correlation and routing", () => {
     });
     assert.equal(correlation.status, "AMBIGUOUS");
     assert.equal(correlation.reviewRequired, true);
+    assert.equal(correlation.authorId, "author-1");
     assert.equal(correlation.candidates.length, 2);
   });
 

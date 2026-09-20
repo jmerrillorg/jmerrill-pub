@@ -50,6 +50,7 @@ function correlateMessage(messageEvidence, senderResolution = {}, context = {}) 
     return {
       status: "AMBIGUOUS",
       reviewRequired: true,
+      authorId: senderResolution.authorId || active[0].authorId || null,
       error: "CORRELATION_REVIEW_REQUIRED_MULTIPLE_ACTIVE_ENGAGEMENTS",
       evidence: "MULTIPLE_AUTHORITATIVE_AUTHOR_WORK_RELATIONSHIPS",
       candidates: active.map((e) => ({ authorId: e.authorId, titleId: e.titleId, engagementId: e.engagementId }))
