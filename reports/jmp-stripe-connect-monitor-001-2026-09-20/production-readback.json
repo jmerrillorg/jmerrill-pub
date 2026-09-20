@@ -1,0 +1,50 @@
+{
+  "workPackage": "JMP-STRIPE-CONNECT-MONITOR-001",
+  "status": "PRODUCTION_SYSTEMIZED_CLOSED",
+  "authoritativeStripeEvent": "account.updated",
+  "productionOwner": "func-jm1-diagnostic-ai-runner",
+  "releaseSha": "c845611a5db2bd7b36e410777c936f6451b2b837",
+  "deploymentRun": 35518296931,
+  "health": "PASS",
+  "fixtureCertification": {
+    "status": "PASS",
+    "eventDetection": "PASS",
+    "correlation": "PASS",
+    "stateUpdate": "PASS",
+    "reminderRouting": "PASS",
+    "resolutionStop": "PASS",
+    "duplicateProtection": "PASS",
+    "replayProtection": "PASS",
+    "staleEventDenial": "PASS",
+    "wrongAccountDenial": "PASS",
+    "wrongEngagementDenial": "PASS",
+    "communicationsSent": 0,
+    "financialEffects": 0,
+    "stripeMutations": 0
+  },
+  "liveReadOnlyCertification": {
+    "status": "PASS",
+    "monitored": 59,
+    "due": 35,
+    "completeStop": 6,
+    "supportHold": 2,
+    "failures": 0,
+    "effects": 0,
+    "financialEffects": 0,
+    "stripeMoneyMutations": 0
+  },
+  "runtime": {
+    "timerRegistered": true,
+    "certificationRouteRegistered": true,
+    "systemEnabled": true,
+    "maxSendsPerRun": 10,
+    "managedIdentity": true,
+    "keyVaultReferences": true,
+    "keyVaultSecretsUser": true
+  },
+  "continuity": {
+    "codyHeartbeatId": "jmp-stripe-connect-reminder-cadence",
+    "codyHeartbeatDeleted": true,
+    "codyContinuousProductionPolling": 0
+  }
+}
