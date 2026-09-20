@@ -51,6 +51,7 @@ function correlateMessage(messageEvidence, senderResolution = {}, context = {}) 
       status: "AMBIGUOUS",
       reviewRequired: true,
       error: "CORRELATION_REVIEW_REQUIRED_MULTIPLE_ACTIVE_ENGAGEMENTS",
+      evidence: "MULTIPLE_AUTHORITATIVE_AUTHOR_WORK_RELATIONSHIPS",
       candidates: active.map((e) => ({ authorId: e.authorId, titleId: e.titleId, engagementId: e.engagementId }))
     };
   }

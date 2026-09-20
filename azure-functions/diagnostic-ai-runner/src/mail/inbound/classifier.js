@@ -8,6 +8,16 @@ const { extensionFromName, normalizeLower, normalizeString } = require("./util")
 
 const RULES = [
   {
+    messageClass: MESSAGE_CLASS.AUTHOR_PRODUCTION_ASSET,
+    authority: CLASSIFICATION_AUTHORITY.REVIEW_REQUIRED,
+    confidence: 0.9,
+    manualReviewRequired: true,
+    test: ({ text, attachmentExtensions, sender }) =>
+      sender.identityType === "CONTACT" &&
+      /\b(map|illustration|image|artwork|diagram|production asset|preamble|front matter)\b/i.test(text) &&
+      attachmentExtensions.some((ext) => ["jpg", "jpeg", "png", "pdf", "docx"].includes(ext))
+  },
+  {
     messageClass: MESSAGE_CLASS.ROYALTY_REPORT,
     authority: CLASSIFICATION_AUTHORITY.DETERMINISTIC,
     confidence: 0.98,

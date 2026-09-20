@@ -1,5 +1,6 @@
 "use strict";
 
+const { createHash } = require("node:crypto");
 const { BlobServiceClient } = require("@azure/storage-blob");
 
 const DEFAULT_CONTAINER = "jm1-publishing-inbound-evidence";
@@ -66,6 +67,12 @@ class BlobInboundEvidenceStore {
     return `attachments/${messageId}/${attachmentId}.json`;
   }
 
+  sourceAttachmentPath(attachment) {
+    const messageId = encodePathPart(attachment.messageEventId);
+    const attachmentId = encodePathPart(attachment.graphAttachmentId || attachment.originalFilename);
+    return `source/${messageId}/${attachmentId}/${encodePathPart(attachment.originalFilename)}`;
+  }
+
   queuePath(id) {
     return `queue/${encodePathPart(id)}.json`;
   }
@@ -100,12 +107,44 @@ class BlobInboundEvidenceStore {
     return { created: true, record: attachment };
   }
 
+  async updateAttachment(attachment) {
+    await this.put(this.attachmentPath(attachment), attachment);
+    return { record: attachment };
+  }
+
+  async preserveSourceAttachment(attachment, bytes) {
+    await this.ensureReady();
+    const path = this.sourceAttachmentPath(attachment);
+    const blob = this.blob(path);
+    try {
+      await blob.upload(bytes, bytes.length, {
+        conditions: { ifNoneMatch: "*" },
+        blobHTTPHeaders: { blobContentType: attachment.mimeType || "application/octet-stream" },
+        metadata: { sha256: attachment.sha256 || "" }
+      });
+      return { created: true, path };
+    } catch (err) {
+      if (err.statusCode !== 409 && err.statusCode !== 412) throw err;
+      const existing = await blob.downloadToBuffer();
+      const existingHash = createHash("sha256").update(existing).digest("hex");
+      if (existingHash !== attachment.sha256) {
+        throw Object.assign(new Error("Preserved attachment hash mismatch"), { safeCode: "ATTACHMENT_SOURCE_HASH_MISMATCH" });
+      }
+      return { created: false, path };
+    }
+  }
+
   async upsertQueueItem(item) {
     const path = this.queuePath(item.queueItemId);
     const existing = await this.get(path);
     if (existing) return { created: false, record: existing };
     await this.put(path, item);
     return { created: true, record: item };
+  }
+
+  async updateQueueItem(item) {
+    await this.put(this.queuePath(item.queueItemId), item);
+    return { record: item };
   }
 
   async getCheckpoint(name) {

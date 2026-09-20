@@ -11,6 +11,7 @@
 const { app } = require("@azure/functions");
 const {
   createDefaultInboundEvidenceStore,
+  createDefaultInboundContextProvider,
   PublishingMailboxGraphClient,
   ingestNotification,
   validateClientState
@@ -61,6 +62,7 @@ app.http("run-publishing-inbound-notification", {
       const result = await ingestNotification(notification, {
         graphClient,
         store,
+        contextProvider: createDefaultInboundContextProvider(),
         clientStateValidator: (state) => validateClientState(state, expectedClientState())
       });
       results.push(result);

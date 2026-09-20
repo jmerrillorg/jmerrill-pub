@@ -18,6 +18,8 @@ function categoryForMessageClass(messageClass) {
       return QUEUE_CATEGORY.MANUSCRIPT_SUBMISSION;
     case MESSAGE_CLASS.MANUSCRIPT_REVISION:
       return QUEUE_CATEGORY.MANUSCRIPT_REVISION;
+    case MESSAGE_CLASS.AUTHOR_PRODUCTION_ASSET:
+      return QUEUE_CATEGORY.AUTHOR_PRODUCTION_ASSET;
     case MESSAGE_CLASS.COMMERCIAL_CONFIRMATION:
       return QUEUE_CATEGORY.COMMERCIAL_RESPONSE;
     case MESSAGE_CLASS.AGREEMENT_RESPONSE:
@@ -60,6 +62,7 @@ function buildQueueItem(messageEvidence, attachments = []) {
     confidence: messageEvidence.classificationConfidence,
     authorId: messageEvidence.authorId,
     titleId: messageEvidence.titleId,
+    titleCandidates: messageEvidence.correlationCandidates || [],
     stageId: messageEvidence.stageId,
     attachmentIndicator: attachments.length > 0,
     attachmentCount: attachments.length,

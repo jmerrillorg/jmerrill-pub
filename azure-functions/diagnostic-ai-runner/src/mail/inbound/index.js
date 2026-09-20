@@ -12,6 +12,7 @@ module.exports = {
   ...require("./blobEvidenceStore"),
   ...require("./defaultStore"),
   ...require("./graphClient"),
+  ...require("./contextProvider"),
   ...require("./subscriptionManager"),
   ...require("./processor"),
   ...require("./health")

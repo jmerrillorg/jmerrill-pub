@@ -9,6 +9,7 @@
 const { app } = require("@azure/functions");
 const {
   computeMailboxHealth,
+  createDefaultInboundContextProvider,
   createDefaultInboundEvidenceStore,
   PublishingMailboxGraphClient,
   runShadowWindow
@@ -95,7 +96,10 @@ app.http("run-publishing-inbound-shadow-run", {
       graphClient,
       store: createDefaultInboundEvidenceStore(),
       afterIso: body.afterIso || null,
-      top
+      top,
+      contextProvider: createDefaultInboundContextProvider(),
+      reprocessReviewRequired: body.reprocessReviewRequired === true,
+      targetInternetMessageId: body.targetInternetMessageId || null
     });
     context.info(`Publishing inbound shadow run completed; detected=${result.messagesDetected}; failed=${result.messagesFailed}`);
     return { status: 200, jsonBody: result };
