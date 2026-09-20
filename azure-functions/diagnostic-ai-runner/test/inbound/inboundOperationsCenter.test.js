@@ -11,6 +11,7 @@ const {
   buildSubscriptionPayload,
   classifyInboundMessage,
   computeMailboxHealth,
+  createDefaultInboundContextProvider,
   correlateMessage,
   ingestNotification,
   processGraphMessage,
@@ -197,6 +198,24 @@ describe("Sender resolution and classification", () => {
     assert.equal(classified.messageClass, MESSAGE_CLASS.AUTHOR_CLARIFICATION);
   });
 
+  test("classifies a known author's attached map as a production asset requiring review", () => {
+    const graphMessage = message({
+      subject: "The Map Of British Sofalia 1900 AD",
+      body: { content: "This map is for inclusion in the preamble of three novels." },
+      bodyPreview: "This map is for inclusion in the preamble of three novels.",
+      hasAttachments: true
+    });
+    const evidence = buildMessageEvidence(graphMessage);
+    const resolved = resolveSender(evidence, context);
+    const classified = classifyInboundMessage(
+      { ...evidence, bodyTextForClassification: graphMessage.body.content },
+      [{ originalFilename: "map.jpg" }],
+      resolved
+    );
+    assert.equal(classified.messageClass, MESSAGE_CLASS.AUTHOR_PRODUCTION_ASSET);
+    assert.equal(classified.manualReviewRequired, true);
+  });
+
   test("classifies approval but requires review", () => {
     const evidence = buildMessageEvidence(message({ body: { content: "I approve the edits." }, bodyPreview: "I approve the edits." }));
     const classified = classifyInboundMessage({ ...evidence, bodyTextForClassification: "I approve the edits." }, [], resolveSender(evidence, context));
@@ -249,6 +268,7 @@ describe("Correlation and routing", () => {
     });
     assert.equal(correlation.status, "AMBIGUOUS");
     assert.equal(correlation.reviewRequired, true);
+    assert.equal(correlation.candidates.length, 2);
   });
 
   test("standalone author email routes to review if unresolved", async () => {
@@ -334,6 +354,58 @@ describe("Processing, idempotency, and reconciliation", () => {
     assert.equal(result.attachments.length, 1);
     assert.equal(result.attachments[0].classification, "CSV");
     assert.ok(result.attachments[0].sha256);
+    assert.equal(result.attachments[0].originalSourcePreserved, true);
+    assert.equal(store.sourceAttachments.size, 1);
+  });
+
+  test("bounded replay upgrades review-required evidence without creating a duplicate", async () => {
+    const store = new InMemoryInboundEvidenceStore();
+    const graphMessage = message({
+      internetMessageHeaders: [],
+      subject: "The Map Of British Sofalia 1900 AD",
+      body: { content: "This map is for inclusion in the preamble of three novels." },
+      bodyPreview: "This map is for inclusion in the preamble of three novels.",
+      hasAttachments: true
+    });
+    const client = graphClient({
+      listAttachments: async () => ({ value: [{ id: "att-map", name: "map.jpg", contentType: "image/jpeg", size: 5 }] })
+    });
+    const first = await processGraphMessage(graphMessage, { graphClient: client, store });
+    assert.equal(first.messageEvent.classification, MESSAGE_CLASS.UNCLASSIFIED);
+
+    const second = await processGraphMessage(graphMessage, {
+      graphClient: client,
+      store,
+      context,
+      reprocessReviewRequired: true
+    });
+    assert.equal(second.idempotent, false);
+    assert.equal(second.messageEvent.classification, MESSAGE_CLASS.AUTHOR_PRODUCTION_ASSET);
+    assert.equal(second.messageEvent.detectedAt, first.messageEvent.detectedAt);
+    assert.ok(second.messageEvent.reprocessedAt);
+    assert.equal(second.messageEvent.recoveredInboundEvent, true);
+    assert.equal(store.messages.size, 1);
+    assert.equal(store.queue.size, 1);
+  });
+
+  test("shadow replay can select one exact Internet Message ID", async () => {
+    const target = message({ id: "target", internetMessageId: "<target@example.com>" });
+    const other = message({ id: "other", internetMessageId: "<other@example.com>" });
+    const client = graphClient({
+      listInboxMessagesSince: async () => ({ value: [other, target] })
+    });
+    const store = new InMemoryInboundEvidenceStore();
+    const result = await runShadowWindow({
+      graphClient: client,
+      store,
+      afterIso: "2026-09-07T00:00:00Z",
+      context,
+      targetInternetMessageId: "<TARGET@example.com>"
+    });
+    assert.equal(result.messagesInWindow, 2);
+    assert.equal(result.messagesSelected, 1);
+    assert.equal(result.results[0].messageEvent.graphMessageId, "target");
+    assert.equal(store.messages.size, 1);
   });
 
   test("attachment failure remains visible", async () => {
@@ -395,5 +467,31 @@ describe("Processing, idempotency, and reconciliation", () => {
     const health = computeMailboxHealth({ storeHealth: await store.getHealthSnapshot() });
     assert.equal(health.unclassifiedCount, 1);
     assert.equal(health.noSilentDropStatus, "PASS");
+  });
+});
+
+describe("Authoritative inbound context", () => {
+  test("loads an exact author contact and only primary-author title relationships", async () => {
+    const calls = [];
+    const provider = createDefaultInboundContextProvider({
+      apiBase: "https://example.crm.dynamics.com/api/data/v9.2",
+      resourceUrl: "https://example.crm.dynamics.com",
+      getToken: async () => "token",
+      fetchImpl: async (url) => {
+        calls.push(url);
+        if (url.includes("/contacts?")) {
+          return { ok: true, async json() { return { value: [{ contactid: "11111111-1111-1111-1111-111111111111", fullname: "Iyorwuese Hagher", emailaddress1: "hagher.hagher@ymail.com", jm1pub_isauthor: true, statecode: 0 }] }; } };
+        }
+        return { ok: true, async json() { return { value: [
+          { jm1pub_titleid: "22222222-2222-2222-2222-222222222222", jm1pub_titlename: "The Conquest of Azenga", jm1pub_stage: 100000013, statecode: 0 },
+          { jm1pub_titleid: "33333333-3333-3333-3333-333333333333", jm1pub_titlename: "A Portrait of Paradise", jm1pub_stage: 100000013, statecode: 0 }
+        ] }; } };
+      }
+    });
+    const result = await provider({ fromAddress: "hagher.hagher@ymail.com" });
+    assert.equal(result.contacts.length, 1);
+    assert.equal(result.authoritativeWorkCandidates.length, 2);
+    assert.ok(calls[1].includes("_jm1_primaryauthor_value"));
+    assert.equal(result.authoritativeWorkCandidates[0].relationshipAuthority, "JM1_PRIMARY_AUTHOR_LOOKUP");
   });
 });

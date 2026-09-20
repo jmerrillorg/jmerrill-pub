@@ -4,6 +4,7 @@ class InMemoryInboundEvidenceStore {
   constructor(seed = {}) {
     this.messages = new Map(seed.messages || []);
     this.attachments = new Map(seed.attachments || []);
+    this.sourceAttachments = new Map(seed.sourceAttachments || []);
     this.queue = new Map(seed.queue || []);
     this.checkpoints = new Map(seed.checkpoints || []);
     this.health = {
@@ -41,11 +42,29 @@ class InMemoryInboundEvidenceStore {
     return { created: true, record: attachment };
   }
 
+  async updateAttachment(attachment) {
+    const key = `${attachment.messageEventId}:${attachment.graphAttachmentId || attachment.originalFilename}`;
+    this.attachments.set(key, attachment);
+    return { record: attachment };
+  }
+
+  async preserveSourceAttachment(attachment, bytes) {
+    const key = `${attachment.messageEventId}:${attachment.graphAttachmentId || attachment.originalFilename}:source`;
+    if (this.sourceAttachments.has(key)) return { created: false, path: key };
+    this.sourceAttachments.set(key, Buffer.from(bytes));
+    return { created: true, path: key };
+  }
+
   async upsertQueueItem(item) {
     const existing = this.queue.get(item.queueItemId);
     if (existing) return { created: false, record: existing };
     this.queue.set(item.queueItemId, item);
     return { created: true, record: item };
+  }
+
+  async updateQueueItem(item) {
+    this.queue.set(item.queueItemId, item);
+    return { record: item };
   }
 
   async getCheckpoint(name) {

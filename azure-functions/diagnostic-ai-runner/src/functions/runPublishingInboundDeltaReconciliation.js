@@ -9,6 +9,7 @@
 const { app } = require("@azure/functions");
 const {
   createDefaultInboundEvidenceStore,
+  createDefaultInboundContextProvider,
   PublishingMailboxGraphClient,
   reconcileDelta
 } = require("../mail/inbound");
@@ -21,7 +22,11 @@ function verifyRunnerKey(request) {
 
 async function runReconciliation(context) {
   const graphClient = new PublishingMailboxGraphClient();
-  const result = await reconcileDelta({ graphClient, store: createDefaultInboundEvidenceStore() });
+  const result = await reconcileDelta({
+    graphClient,
+    store: createDefaultInboundEvidenceStore(),
+    contextProvider: createDefaultInboundContextProvider()
+  });
   context.info(`Publishing inbound delta reconciliation completed; detected=${result.messagesDetected}; ingested=${result.messagesIngested}; failed=${result.failed}`);
   return result;
 }
