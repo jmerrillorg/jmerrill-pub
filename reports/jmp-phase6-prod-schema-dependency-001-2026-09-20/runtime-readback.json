@@ -1,0 +1,14 @@
+{
+  "functionApp": "func-jm1-diagnostic-ai-runner",
+  "health": "PASS",
+  "node": "v22.23.2",
+  "releaseSha": "aee2a0daced7bf3c5d0987cfa9d3ea7bb715a0bd",
+  "dataverseResource": "https://jm1hq.crm.dynamics.com",
+  "productionManagedIdentityClientId": "239277b2-dd0f-4613-bca8-fe19cab98d5b",
+  "certificationRouteEnabled": true,
+  "certificationInvocationEnabled": true,
+  "unauthenticatedRouteProbe": {"httpStatus": 401, "code": "UNAUTHORIZED"},
+  "precommissionFailClosedProbe": {"accepted": false, "reason": "PHASE6_ENVIRONMENT_NOT_ENABLED"},
+  "phase6CommandEnabled": true,
+  "productionClientBinding": "PASS"
+}

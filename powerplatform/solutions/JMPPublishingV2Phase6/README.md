@@ -10,7 +10,7 @@ JM1-Test certification invokes the command through `func-jm1-publishing-inbound-
 
 The signing key is governed outside Git. Set `JMP_PHASE6_SIGNING_KEY_PATH` to the approved strong-name key before running `node scripts/build-plugin.mjs`.
 
-The portable solution is `JMP_PublishingV2_Phase6_Portable`, version `1.2.0.0`. It contains the seven Phase 6-owned tables and their relationship/key subcomponents, plugin assembly and two plugin types, Custom API and contract children, three synchronous guard steps, the two environment-variable definitions, and the least-privilege Phase 6 runtime role. It contains no Phase 7 component.
+The portable solution is `JMP_PublishingV2_Phase6_Portable`, version `1.2.0.1`. It contains the seven Phase 6-owned tables and their relationship/key subcomponents, plugin assembly and two plugin types, Custom API and contract children, three synchronous guard steps, the two environment-variable definitions, and the least-privilege Phase 6 runtime role. It contains no Phase 7 component. Version `1.2.0.1` refreshes the managed security-role layer after the authoritative base Publishing solution made the engagement and lifecycle tables available in downstream environments.
 
 ## Environment binding
 

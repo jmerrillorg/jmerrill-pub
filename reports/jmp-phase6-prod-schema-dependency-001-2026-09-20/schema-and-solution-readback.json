@@ -1,0 +1,45 @@
+{
+  "workPackage": "JMP-PHASE6-PROD-SCHEMA-DEPENDENCY-001",
+  "baseSolution": {
+    "uniqueName": "JMP_PublishingV2",
+    "version": "1.0.4.0",
+    "managed": true,
+    "publisher": "JMPPublishingV2",
+    "productionInstalledOn": "2026-09-20T07:20:07Z"
+  },
+  "phase6Solution": {
+    "uniqueName": "JMP_PublishingV2_Phase6_Portable",
+    "version": "1.2.0.1",
+    "managed": true,
+    "publisher": "JMPPublishingV2",
+    "packageSha256": "2bfce73d18d23ba6aaa8eaeff3da2268510465901f07640127d22fc0757db5b9",
+    "jm1TestImportOperation": "31170e49-ceb4-f111-aaac-70a8a59b112b",
+    "jm1TestPublishOperation": "39fa957d-ceb4-f111-aaac-70a8a59b112b",
+    "productionImportOperation": "35c4cf9f-ceb4-f111-aaac-6045bdd69738",
+    "productionPublishOperation": "d0be01b8-ceb4-f111-aaac-6045bdd69738"
+  },
+  "tables": [
+    {
+      "logicalName": "jmpv2_publishingengagement",
+      "metadataId": "038cb469-c756-4c8a-9f4e-277884e8f3a5",
+      "productionStatus": "PRESENT_MANAGED",
+      "customColumns": 21,
+      "oneToManyRelationships": 7,
+      "customManyToOneRelationships": 0,
+      "alternateKeys": 1,
+      "schemaMatchJm1Test": true
+    },
+    {
+      "logicalName": "jmpv2_lifecycleinstance",
+      "metadataId": "fd2f8110-800f-4d13-97a1-948e3e635178",
+      "productionStatus": "PRESENT_MANAGED",
+      "customColumns": 8,
+      "oneToManyRelationships": 7,
+      "customManyToOneRelationships": 0,
+      "alternateKeys": 0,
+      "schemaMatchJm1Test": true
+    }
+  ],
+  "schemaVariance": 0
+}
+

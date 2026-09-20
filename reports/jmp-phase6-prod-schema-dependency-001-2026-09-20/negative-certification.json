@@ -1,0 +1,21 @@
+{
+  "environment": "JM1-Core",
+  "resource": "https://jm1hq.crm.dynamics.com",
+  "testClassification": "PHASE6_PRODUCTION_NO_EFFECT",
+  "evidenceReference": "JMP-PHASE6-PROD-001",
+  "results": {
+    "wrongTitleDenial": {"status": "PASS", "reason": "UNKNOWN_ENGAGEMENT", "accepted": false},
+    "wrongAuthorDenial": {"status": "PASS", "reason": "UNKNOWN_ENGAGEMENT", "accepted": false},
+    "wrongEngagementDenial": {"status": "PASS", "reason": "UNKNOWN_ENGAGEMENT", "accepted": false},
+    "crossEngagementReplayDenial": {"status": "PASS", "reason": "UNKNOWN_ENGAGEMENT", "accepted": false},
+    "invalidTokenDenial": {"status": "PASS", "httpStatus": 401},
+    "expiredTokenDenial": {"status": "PASS", "httpStatus": 401},
+    "unauthorizedCallerDenial": {"status": "PASS", "reason": "UNAUTHORIZED_CALLER", "accepted": false},
+    "crossBrandAccessDenial": {"status": "PASS", "reason": "UNSUPPORTED_FIELD", "httpStatus": 400},
+    "financialMutationDenial": {"status": "PASS", "reason": "UNSUPPORTED_FIELD", "httpStatus": 400},
+    "duplicateProtection": {"status": "PASS", "firstReason": "UNKNOWN_ENGAGEMENT", "secondReason": "UNKNOWN_ENGAGEMENT"},
+    "idempotency": {"status": "PASS", "effectsFirst": 0, "effectsSecond": 0}
+  },
+  "note": "JM1-Core contained no Phase 6 engagement or lifecycle rows. Tuple probes therefore denied at the earliest authoritative engagement check and could not reach a later mismatch branch. The exact mismatch branches were already live-certified in JM1-Test; production certification proves the same promoted command fails closed and causes zero effects."
+}
+

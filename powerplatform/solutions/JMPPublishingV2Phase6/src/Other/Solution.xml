@@ -8,7 +8,7 @@
     <Descriptions>
       <Description description="Portable Phase 6 onboarding command, guard steps, configuration, and author-access authority." languagecode="1033" />
     </Descriptions>
-    <Version>1.2.0.0</Version>
+    <Version>1.2.0.1</Version>
     <Managed>0</Managed>
     <Publisher>
       <UniqueName>JMPPublishingV2</UniqueName>
