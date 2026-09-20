@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-import { updateCommissioningOpportunityPaymentStatus, writeSafeExecutionLog } from '@/lib/server/dataverse-execution-log'
+import { findSafeExecutionLogByName, updateCommissioningOpportunityPaymentStatus, writeSafeExecutionLog } from '@/lib/server/dataverse-execution-log'
 import {
   COMMISSIONING_REFERENCE,
 } from '@/lib/server/stripe/author-workspace-stripe'
@@ -34,13 +34,31 @@ export async function POST(req: NextRequest) {
     if (connectAccountUpdate.process) {
       const safeEvent = connectAccountUpdate.safeEvent
       if (!safeEvent) throw new Error('stripe_connect_safe_event_missing')
+      if (!safeEvent.eventId) {
+        await writeSafeFailureLog('STRIPE_CONNECT_WEBHOOK_DENIED', 'stripe_connect_event_id_missing').catch(() => null)
+        return NextResponse.json({ received: true, processed: false, code: 'stripe_connect_event_id_missing' }, { status: 422 })
+      }
+      const eventLogName = `STRIPE-CONNECT-EVENT-${safeEvent.eventId}`
+      const prior = await findSafeExecutionLogByName(eventLogName)
+      if (prior) {
+        return NextResponse.json({ received: true, processed: true, idempotent: true, code: 'stripe_connect_event_already_applied' })
+      }
       const account = verification.event.data?.object || {}
-      const readiness = await syncConnectAccountStatusByAccountId(safeEvent.accountId, account)
+      let readiness
+      try {
+        readiness = await syncConnectAccountStatusByAccountId(safeEvent.accountId, account, undefined, {
+          eventCreatedAt: safeEvent.createdAt,
+        })
+      } catch (error) {
+        const code = error instanceof Error ? error.message : 'stripe_connect_correlation_failed'
+        await writeSafeFailureLog('STRIPE_CONNECT_WEBHOOK_DENIED', code).catch(() => null)
+        return NextResponse.json({ received: true, processed: false, code }, { status: 422 })
+      }
       const executionLog = await writeSafeExecutionLog({
-        name: `STRIPE-CONNECT-STATUS-SYNC-${safeEvent.accountId}`,
-        actionType: 'STRIPE_CONNECT_STATUS_SYNCHRONIZED',
+        name: eventLogName,
+        actionType: 'STRIPE_CONNECT_WEBHOOK_APPLIED',
         description:
-          `Stripe account.updated synchronized safe Connect readiness fields. Account ${safeEvent.accountId}; readiness ${readiness.readiness}; requirements due count ${safeEvent.requirementsDue.length}. No payout, transfer, Business Central posting, royalty calculation, or Bill.com change occurred.`,
+          `Stripe account.updated synchronized safe Connect readiness fields. Event created ${safeEvent.createdAt}; readiness ${readiness.readiness}; requirements due count ${safeEvent.requirementsDue.length}. No payout, transfer, Business Central posting, royalty calculation, or Bill.com change occurred.`,
         sourceEntity: 'stripe_account',
         sourceRecordId: safeEvent.accountId,
       }).catch(() => ({ created: false, id: null, detail: 'execution_log_write_failed' }))

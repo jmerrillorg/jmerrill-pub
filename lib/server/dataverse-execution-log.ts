@@ -114,6 +114,26 @@ export async function writeSafeExecutionLog(input: ExecutionLogInput) {
   return { created: true, id: body.jm1_executionlogid || null, detail: 'Execution log written.' }
 }
 
+export async function findSafeExecutionLogByName(name: string) {
+  const config = getDataverseConfig()
+  if (!config) return null
+  const token = await getDataverseToken(config)
+  const escaped = name.replace(/'/g, "''").slice(0, 200)
+  const query = new URLSearchParams({
+    '$select': 'jm1_executionlogid,jm1_name,jm1_actiontype,jm1_sourcerecordid,createdon',
+    '$filter': `jm1_name eq '${escaped}'`,
+    '$orderby': 'createdon desc',
+    '$top': '1',
+  })
+  const response = await fetch(`${config.apiBase}/jm1_executionlogs?${query}`, {
+    headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' },
+    cache: 'no-store',
+  })
+  const body = await response.json().catch(() => ({}))
+  if (!response.ok) throw new Error(body?.error?.code || `dataverse_execution_log_lookup_failed:${response.status}`)
+  return Array.isArray(body.value) ? body.value[0] || null : null
+}
+
 function getDataverseConfig(): DataverseConfig | null {
   const apiBase =
     process.env.DATAVERSE_WEB_API_BASE_URL ||

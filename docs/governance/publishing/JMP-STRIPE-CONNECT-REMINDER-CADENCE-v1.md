@@ -40,6 +40,14 @@ Every reminder evaluation must:
 6. send at most one governed reminder stage;
 7. record reminder evidence without storing raw setup URLs.
 
+## Runtime Ownership
+
+Stripe `account.updated` is the authoritative readiness-change event. The production webhook must verify the Stripe signature, require a unique event ID, correlate the exact Connect account to one active Contact and one active Author Profile, deny stale or conflicting identity evidence, and persist the resulting Dataverse state.
+
+The Azure Functions Stripe Connect reminder monitor owns time-based Day 3, Day 7, and Day 14 evaluation. It runs under the existing production Function identity, reads current Stripe and Dataverse state immediately before any reminder, and uses the governed ACS relay. Human or conversational-agent polling is not part of the production path.
+
+Application Insights receives webhook, timer, correlation-denial, state-write, relay, and execution-failure telemetry through the existing app and Function logging paths. No separate monitoring stack is required.
+
 ## Reminder-Eligible States
 
 Automated reminders may be considered only for:
@@ -136,4 +144,3 @@ No raw secret setup URL may be stored in durable logs or evidence.
 Retries may recover failed delivery but must not create duplicate valid deliveries.
 
 Only one reminder may be sent to an author in a single execution cycle.
-
