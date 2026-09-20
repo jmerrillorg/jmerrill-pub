@@ -1,0 +1,42 @@
+{
+  "workPackage": "JMP-IYORWUESE-ASSET-PLACEMENT-001",
+  "status": "COMPLETE",
+  "author": "Iyorwuese Hagher",
+  "asset": "The Map Of British Sofalia 1900 AD",
+  "targetWork": "The General's Will and Last Testament",
+  "targetTitleId": "2d21ab5b-4d80-f111-ab0f-7c1e525b15c2",
+  "targetEngagementId": "JMP-INT-202607-DL2T20",
+  "currentStage": "Line Editing",
+  "currentStageId": "e698257d-ca9c-f111-b8dc-00224820105b",
+  "messageEventId": "inbound_message_event_4d123229d2d040d0ae4219997f401ace",
+  "attachmentEventId": "attachment_event_d33bd6727d9a016ac53a9b642cbecee7",
+  "attachmentSha256": "aa5b58159641b114f59cbb4cd156ecf4ad56a06be791d3c305b9305e3f21f7a6",
+  "sourceBytes": 525224,
+  "placedAt": "2026-09-20T14:18:34.247Z",
+  "placementAuthority": "FOUNDER_CURRENT_WORK_AUTHORITY",
+  "queueStatus": "ROUTED",
+  "idempotentReplay": "PASS",
+  "conquestExcluded": true,
+  "portraitExcluded": true,
+  "distributedTitleMutations": 0,
+  "binaryDuplicatesCreated": 0,
+  "lifecycleTransitions": 0,
+  "authorCommunicationsSent": 0,
+  "financialEffects": 0,
+  "providerEffects": 0,
+  "productionReleaseSha": "e3c50937aeb9d8dbcefc9429ab6e4a81d3ce2d0c",
+  "deploymentRun": 35515870760,
+  "regressionTests": {
+    "activeTitlePrioritization": "PASS",
+    "distributedTitleExclusion": "PASS",
+    "explicitPostReleaseReferenceOverride": "PASS",
+    "genuineAmbiguityHumanReview": "PASS",
+    "historicalAuthorshipDoesNotExpandCandidates": "PASS",
+    "productionEntrypointRegistration": "PASS"
+  },
+  "fullFunctionTestResult": {
+    "tests": 2379,
+    "passed": 2379,
+    "failed": 0
+  }
+}
