@@ -8,6 +8,7 @@ module.exports = {
   ...require("./classifier"),
   ...require("./correlator"),
   ...require("./queueProjection"),
+  ...require("./assetPlacement"),
   ...require("./evidenceStore"),
   ...require("./blobEvidenceStore"),
   ...require("./defaultStore"),

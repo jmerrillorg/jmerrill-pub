@@ -6,8 +6,11 @@ const {
   MESSAGE_CLASS,
   PROCESSING_STATUS,
   InMemoryInboundEvidenceStore,
+  FOUNDER_CURRENT_WORK_AUTHORITY,
+  applyAuthorizedAssetPlacement,
   buildAttachmentEvidence,
   buildMessageEvidence,
+  buildQueueItem,
   buildSubscriptionPayload,
   classifyInboundMessage,
   computeMailboxHealth,
@@ -272,6 +275,83 @@ describe("Correlation and routing", () => {
     assert.equal(correlation.candidates.length, 2);
   });
 
+  test("prioritizes one current active production movement over historical authorship", () => {
+    const evidence = buildMessageEvidence(message({
+      internetMessageHeaders: [],
+      subject: "The Map Of British Sofalia 1900 AD"
+    }));
+    const correlation = correlateMessage(evidence, resolveSender(evidence, context), {
+      activeEngagements: [{
+        authorEmail: "author@example.com",
+        authorId: "author-1",
+        titleId: "current-title",
+        title: "The General's Will and Last Testament",
+        engagementId: "JMP-INT-CURRENT",
+        stageId: "line-stage",
+        movementState: "CURRENT_ACTIVE"
+      }],
+      authoritativeWorkCandidates: [
+        { authorEmail: "author@example.com", authorId: "author-1", titleId: "current-title", title: "The General's Will and Last Testament", engagementId: "JMP-INT-CURRENT", stageId: "line-stage", movementState: "CURRENT_ACTIVE" },
+        { authorEmail: "author@example.com", authorId: "author-1", titleId: "distributed-title", title: "A Portrait of Paradise", movementState: "OUT_OF_MOVEMENT", postRelease: true }
+      ]
+    });
+    assert.equal(correlation.status, "DETERMINISTIC");
+    assert.equal(correlation.titleId, "current-title");
+    assert.equal(correlation.engagementId, "JMP-INT-CURRENT");
+    assert.equal(correlation.evidence, "SINGLE_CURRENT_ACTIVE_PRODUCTION_MOVEMENT");
+  });
+
+  test("excludes distributed titles when historical authorship is the only relationship", () => {
+    const evidence = buildMessageEvidence(message({ internetMessageHeaders: [], subject: "New production asset" }));
+    const correlation = correlateMessage(evidence, resolveSender(evidence, context), {
+      activeEngagements: [],
+      authoritativeWorkCandidates: [
+        { authorEmail: "author@example.com", authorId: "author-1", titleId: "conquest", title: "The Conquest of Azenga", movementState: "OUT_OF_MOVEMENT", postRelease: true },
+        { authorEmail: "author@example.com", authorId: "author-1", titleId: "portrait", title: "A Portrait of Paradise", movementState: "OUT_OF_MOVEMENT", postRelease: true }
+      ]
+    });
+    assert.equal(correlation.status, "UNRESOLVED");
+    assert.equal(correlation.evidence, "HISTORICAL_AUTHORSHIP_ONLY_EXCLUDED");
+    assert.deepEqual(correlation.candidates, []);
+    assert.equal(correlation.excludedCandidates.length, 2);
+  });
+
+  test("allows an explicit post-release title reference to override ordinary exclusion", () => {
+    const evidence = buildMessageEvidence(message({
+      internetMessageHeaders: [],
+      subject: "New map for A Portrait of Paradise"
+    }));
+    const correlation = correlateMessage(evidence, resolveSender(evidence, context), {
+      activeEngagements: [],
+      authoritativeWorkCandidates: [{
+        authorEmail: "author@example.com",
+        authorId: "author-1",
+        titleId: "portrait",
+        title: "A Portrait of Paradise",
+        movementState: "OUT_OF_MOVEMENT",
+        postRelease: true
+      }]
+    });
+    assert.equal(correlation.status, "DETERMINISTIC");
+    assert.equal(correlation.titleId, "portrait");
+    assert.equal(correlation.evidence, "EXPLICIT_POST_RELEASE_TITLE_REFERENCE");
+  });
+
+  test("keeps genuine multi-movement ambiguity in human review", () => {
+    const evidence = buildMessageEvidence(message({ internetMessageHeaders: [], subject: "New map" }));
+    const candidates = [
+      { authorEmail: "author@example.com", authorId: "author-1", titleId: "active-1", title: "First Current Work", engagementId: "engagement-1", movementState: "CURRENT_ACTIVE" },
+      { authorEmail: "author@example.com", authorId: "author-1", titleId: "active-2", title: "Second Current Work", engagementId: "engagement-2", movementState: "CURRENT_ACTIVE" }
+    ];
+    const correlation = correlateMessage(evidence, resolveSender(evidence, context), {
+      activeEngagements: candidates,
+      authoritativeWorkCandidates: candidates
+    });
+    assert.equal(correlation.status, "AMBIGUOUS");
+    assert.equal(correlation.reviewRequired, true);
+    assert.equal(correlation.candidates.length, 2);
+  });
+
   test("standalone author email routes to review if unresolved", async () => {
     const store = new InMemoryInboundEvidenceStore();
     const result = await processGraphMessage(message({ internetMessageHeaders: [], from: { emailAddress: { address: "new@example.com" } } }), { store });
@@ -280,6 +360,91 @@ describe("Correlation and routing", () => {
 });
 
 describe("Processing, idempotency, and reconciliation", () => {
+  async function placementFixture() {
+    const store = new InMemoryInboundEvidenceStore();
+    const messageEvidence = {
+      ...buildMessageEvidence(message({ subject: "The Map Of British Sofalia 1900 AD" })),
+      classification: MESSAGE_CLASS.AUTHOR_PRODUCTION_ASSET,
+      classificationConfidence: 0.99,
+      correlationStatus: "AMBIGUOUS",
+      processingStatus: PROCESSING_STATUS.REVIEW_REQUIRED,
+      manualReviewRequired: true
+    };
+    const attachment = {
+      ...buildAttachmentEvidence(messageEvidence, { id: "map-1", name: "map.jpg", contentType: "image/jpeg", size: 5 }, Buffer.from("hello")),
+      originalSourcePreserved: true,
+      sourceMessageBinding: "PASS",
+      processingStatus: PROCESSING_STATUS.REVIEW_REQUIRED
+    };
+    await store.upsertMessage(messageEvidence);
+    await store.upsertAttachment(attachment);
+    await store.upsertQueueItem(buildQueueItem(messageEvidence, [attachment]));
+    const input = {
+      confirmAuthorizedPlacement: true,
+      authority: FOUNDER_CURRENT_WORK_AUTHORITY,
+      messageEventId: messageEvidence.inboundMessageEventId,
+      attachmentEventId: attachment.attachmentEventId,
+      authorId: "author-1",
+      titleId: "title-current",
+      workId: "title-current",
+      engagementId: "JMP-INT-CURRENT",
+      stageId: "stage-current",
+      sha256: attachment.sha256
+    };
+    const contextProvider = async () => ({
+      activeEngagements: [{
+        authorId: "author-1",
+        titleId: "title-current",
+        workId: "title-current",
+        engagementId: "JMP-INT-CURRENT",
+        stageId: "stage-current",
+        movementState: "CURRENT_ACTIVE"
+      }]
+    });
+    return { store, messageEvidence, attachment, input, contextProvider };
+  }
+
+  test("applies an exact founder-authorized placement to existing evidence without duplicating the asset", async () => {
+    const fixture = await placementFixture();
+    const result = await applyAuthorizedAssetPlacement(fixture.input, fixture);
+    assert.equal(result.ok, true);
+    assert.equal(result.idempotent, false);
+    assert.equal(result.titleId, "title-current");
+    assert.equal(result.queueStatus, PROCESSING_STATUS.ROUTED);
+    assert.equal(fixture.store.messages.size, 1);
+    assert.equal(fixture.store.attachments.size, 1);
+    assert.equal(fixture.store.sourceAttachments.size, 0);
+    const updated = await fixture.store.findAttachmentByEventId(fixture.attachment.attachmentEventId);
+    assert.equal(updated.sha256, fixture.attachment.sha256);
+    assert.equal(updated.workBinding, "PASS");
+    assert.equal(updated.placementStatus, "PLACED");
+  });
+
+  test("authorized placement replay is idempotent", async () => {
+    const fixture = await placementFixture();
+    await applyAuthorizedAssetPlacement(fixture.input, fixture);
+    const replay = await applyAuthorizedAssetPlacement(fixture.input, fixture);
+    assert.equal(replay.idempotent, true);
+    assert.equal(fixture.store.messages.size, 1);
+    assert.equal(fixture.store.attachments.size, 1);
+  });
+
+  test("authorized placement rejects an attachment checksum mismatch", async () => {
+    const fixture = await placementFixture();
+    await assert.rejects(
+      () => applyAuthorizedAssetPlacement({ ...fixture.input, sha256: "bad" }, fixture),
+      (error) => error.safeCode === "ATTACHMENT_CHECKSUM_MISMATCH"
+    );
+  });
+
+  test("authorized placement rejects stale or incorrect movement authority", async () => {
+    const fixture = await placementFixture();
+    await assert.rejects(
+      () => applyAuthorizedAssetPlacement({ ...fixture.input, stageId: "wrong-stage" }, fixture),
+      (error) => error.safeCode === "CURRENT_MOVEMENT_AUTHORITY_MISMATCH"
+    );
+  });
+
   test("processes a message into evidence and queue item", async () => {
     const store = new InMemoryInboundEvidenceStore();
     const result = await processGraphMessage(message(), { store, context });
@@ -472,7 +637,7 @@ describe("Processing, idempotency, and reconciliation", () => {
 });
 
 describe("Authoritative inbound context", () => {
-  test("loads an exact author contact and only primary-author title relationships", async () => {
+  test("separates active editorial movement from distributed primary-author history", async () => {
     const calls = [];
     const provider = createDefaultInboundContextProvider({
       apiBase: "https://example.crm.dynamics.com/api/data/v9.2",
@@ -483,16 +648,32 @@ describe("Authoritative inbound context", () => {
         if (url.includes("/contacts?")) {
           return { ok: true, async json() { return { value: [{ contactid: "11111111-1111-1111-1111-111111111111", fullname: "Iyorwuese Hagher", emailaddress1: "hagher.hagher@ymail.com", jm1pub_isauthor: true, statecode: 0 }] }; } };
         }
+        if (url.includes("_jm1_primaryauthor_value")) {
+          return { ok: true, async json() { return { value: [
+            { jm1pub_titleid: "22222222-2222-2222-2222-222222222222", jm1pub_titlename: "The Conquest of Azenga", jm1pub_stage: 100000013, statecode: 0 },
+            { jm1pub_titleid: "33333333-3333-3333-3333-333333333333", jm1pub_titlename: "A Portrait of Paradise", jm1pub_stage: 100000013, statecode: 0 }
+          ] }; } };
+        }
+        if (url.includes("/jm1pub_editorialstages?")) {
+          return { ok: true, async json() { return { value: [
+            { jm1pub_editorialstageid: "44444444-4444-4444-4444-444444444444", jm1pub_name: "Line Editing - The General's Will and Last Testament", jm1pub_stagetype: 100000002, jm1pub_stagestatus: 100000001, _jm1pub_titleid_value: "55555555-5555-5555-5555-555555555555", _jm1pub_contactid_value: "11111111-1111-1111-1111-111111111111", statecode: 0 },
+            { jm1pub_editorialstageid: "66666666-6666-6666-6666-666666666666", jm1pub_name: "Developmental Editing - The General's Will and Last Testament", jm1pub_stagetype: 100000001, jm1pub_stagestatus: 100000002, jm1pub_intakereference: "JMP-INT-CURRENT", _jm1pub_titleid_value: "55555555-5555-5555-5555-555555555555", _jm1pub_contactid_value: "11111111-1111-1111-1111-111111111111", statecode: 0 }
+          ] }; } };
+        }
         return { ok: true, async json() { return { value: [
-          { jm1pub_titleid: "22222222-2222-2222-2222-222222222222", jm1pub_titlename: "The Conquest of Azenga", jm1pub_stage: 100000013, statecode: 0 },
-          { jm1pub_titleid: "33333333-3333-3333-3333-333333333333", jm1pub_titlename: "A Portrait of Paradise", jm1pub_stage: 100000013, statecode: 0 }
+          { jm1pub_titleid: "55555555-5555-5555-5555-555555555555", jm1pub_titlename: "The General's Will and Last Testament", jm1pub_stage: 100000006, statecode: 0 }
         ] }; } };
       }
     });
     const result = await provider({ fromAddress: "hagher.hagher@ymail.com" });
     assert.equal(result.contacts.length, 1);
-    assert.equal(result.authoritativeWorkCandidates.length, 2);
-    assert.ok(calls[1].includes("_jm1_primaryauthor_value"));
-    assert.equal(result.authoritativeWorkCandidates[0].relationshipAuthority, "JM1_PRIMARY_AUTHOR_LOOKUP");
+    assert.equal(result.activeEngagements.length, 1);
+    assert.equal(result.activeEngagements[0].titleId, "55555555-5555-5555-5555-555555555555");
+    assert.equal(result.activeEngagements[0].engagementId, "JMP-INT-CURRENT");
+    assert.equal(result.activeEngagements[0].relationshipAuthority, "JM1_ACTIVE_EDITORIAL_MOVEMENT");
+    assert.equal(result.historicalWorkCandidates.length, 2);
+    assert.ok(result.historicalWorkCandidates.every((candidate) => candidate.postRelease));
+    assert.ok(calls.some((url) => url.includes("_jm1_primaryauthor_value")));
+    assert.ok(calls.some((url) => url.includes("/jm1pub_editorialstages?")));
   });
 });

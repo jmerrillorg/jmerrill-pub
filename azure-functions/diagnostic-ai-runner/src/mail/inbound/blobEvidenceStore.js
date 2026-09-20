@@ -98,6 +98,11 @@ class BlobInboundEvidenceStore {
     return { record: message };
   }
 
+  async findMessageByEventId(eventId) {
+    const messages = await this.listPrefix("messages/");
+    return messages.find((message) => message.inboundMessageEventId === eventId) || null;
+  }
+
   async upsertAttachment(attachment) {
     const path = this.attachmentPath(attachment);
     const existing = await this.get(path);
@@ -110,6 +115,11 @@ class BlobInboundEvidenceStore {
   async updateAttachment(attachment) {
     await this.put(this.attachmentPath(attachment), attachment);
     return { record: attachment };
+  }
+
+  async findAttachmentByEventId(eventId) {
+    const attachments = await this.listPrefix("attachments/");
+    return attachments.find((attachment) => attachment.attachmentEventId === eventId) || null;
   }
 
   async preserveSourceAttachment(attachment, bytes) {
@@ -145,6 +155,10 @@ class BlobInboundEvidenceStore {
   async updateQueueItem(item) {
     await this.put(this.queuePath(item.queueItemId), item);
     return { record: item };
+  }
+
+  async getQueueItem(id) {
+    return this.get(this.queuePath(id));
   }
 
   async getCheckpoint(name) {
