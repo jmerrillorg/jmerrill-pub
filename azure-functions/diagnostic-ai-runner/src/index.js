@@ -40,6 +40,7 @@ require("./functions/runPublishingIntakeAutostartRecovery");
 require("./functions/runPublishingInboundDeltaReconciliation");
 require("./functions/runPublishingInboundNotification");
 require("./functions/runPublishingInboundReadback");
+require("./functions/runPublishingInboundAssetPlacement");
 require("./functions/runPublishingInboundSubscriptionManager");
 require("./functions/runPublishingMailboxReplyCheck");
 require("./functions/runPublishingMailboxAttachmentReadback");

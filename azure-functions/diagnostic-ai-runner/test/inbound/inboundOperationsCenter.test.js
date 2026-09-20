@@ -2,6 +2,7 @@
 
 const { describe, test } = require("node:test");
 const assert = require("node:assert/strict");
+const { readFileSync } = require("node:fs");
 const {
   MESSAGE_CLASS,
   PROCESSING_STATUS,
@@ -360,6 +361,14 @@ describe("Correlation and routing", () => {
 });
 
 describe("Processing, idempotency, and reconciliation", () => {
+  test("production entrypoint registers the bounded asset placement route", () => {
+    const entrypoint = readFileSync("src/index.js", "utf8");
+    const route = readFileSync("src/functions/runPublishingInboundAssetPlacement.js", "utf8");
+    assert.match(entrypoint, /runPublishingInboundAssetPlacement/);
+    assert.match(route, /publishing\/inbound\/asset-placement/);
+    assert.match(route, /JM1_DIAGNOSTIC_RUNNER_KEY/);
+  });
+
   async function placementFixture() {
     const store = new InMemoryInboundEvidenceStore();
     const messageEvidence = {
