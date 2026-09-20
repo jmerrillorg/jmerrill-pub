@@ -1,0 +1,30 @@
+{
+  "capturedAt": "2026-09-20T11:00:42Z",
+  "environment": "JM1-Core",
+  "phase6Status": "COMMISSIONED",
+  "schemaVariance": 0,
+  "commandAvailable": true,
+  "featureEnabled": true,
+  "productionClientBinding": "PASS",
+  "health": {
+    "publicSite": {"url": "https://jmerrill.pub", "httpStatus": 200},
+    "authorOnboarding": {"url": "https://jmerrill.pub/author/onboarding", "httpStatus": 200},
+    "publisherPipeline": {"url": "https://jmerrill.pub/publisher/pipeline", "httpStatus": 200},
+    "operatingCenter": {"url": "https://jmerrill.pub/publisher/operating-center", "httpStatus": 200},
+    "phase6Runtime": {"url": "https://func-jm1-diagnostic-ai-runner.azurewebsites.net/api/health", "httpStatus": 200, "status": "ready", "node": "v22.23.2", "releaseSha": "aee2a0daced7bf3c5d0987cfa9d3ea7bb715a0bd"},
+    "dataverseConnectivity": "PASS",
+    "stripeIngestion": "PASS_PER_JMP-PAY-INGEST-001",
+    "communicationsInfrastructure": "PASS",
+    "editorialRuntime": "PASS"
+  },
+  "applicationInsights24Hours": {
+    "diagnosticRunnerSampledRequests": 98,
+    "diagnosticRunnerFailedRequests": 0,
+    "diagnosticRunnerExceptions": 0,
+    "acsRelayRequests": 60,
+    "acsRelayFailedRequests": 0,
+    "acsRelayExceptions": 0
+  },
+  "productionHealth": "PASS",
+  "businessContinuity": "PASS"
+}

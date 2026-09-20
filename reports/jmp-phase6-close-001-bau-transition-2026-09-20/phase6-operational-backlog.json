@@ -1,0 +1,20 @@
+{
+  "capturedAt": "2026-09-20T11:00:42Z",
+  "scope": "Production-native managed Phase 6 records",
+  "activeRecords": 0,
+  "waitingHumanAction": 0,
+  "dataExceptions": 0,
+  "stuckRecords": 0,
+  "tableCounts": {
+    "jmpv2_publishingengagements": 0,
+    "jmpv2_lifecycleinstances": 0,
+    "jmpv2_authorprofiles": 0,
+    "jmpv2_onboardingrecords": 0,
+    "jmpv2_onboardingitems": 0,
+    "jmpv2_workspaceprovisionings": 0,
+    "jmpv2_authoraccesses": 0,
+    "jmpv2_payoutreadinesses": 0,
+    "jmpv2_onboardingcompletionevents": 0
+  },
+  "historicalContinuityRecords": [{"title": "Whole", "stage": "06_ONBOARDING", "state": "WAITING_ON_AUTHOR", "classification": "NORMAL_PUBLISHING_OPERATIONS_NOT_PHASE6_ENGINEERING_BACKLOG"}]
+}

@@ -1,0 +1,17 @@
+{
+  "status": "PASS",
+  "owner": "Publishing",
+  "engineeringOwner": "jmerrillorg/jmerrill-pub",
+  "runtimeTelemetry": {"platform": "Azure Application Insights", "retentionDays": 90, "requestFailureVisibility": true, "exceptionVisibility": true, "identityFailureVisibility": true},
+  "controls": [
+    {"risk": "managed solution or schema drift", "detection": "governed post-change solution/schema readback and Phase 6 regression certification", "response": "bounded remediation packet"},
+    {"risk": "application-user disablement or role drift", "detection": "application-user, role-count, and 45-privilege BAU readback; runtime authorization failures appear in Application Insights", "response": "bounded identity/security packet"},
+    {"risk": "managed-identity authentication failure", "detection": "runtime request failures and exceptions in Application Insights", "response": "bounded identity incident"},
+    {"risk": "command failure", "detection": "Application Insights request and exception telemetry", "response": "Publishing runtime incident"},
+    {"risk": "correlation denial, replay, or duplicate attempt", "detection": "command reason codes, durable idempotency result, and runtime telemetry", "response": "inspect authority tuple and preserve fail-closed state"},
+    {"risk": "automatic or unauthorized Stage 07 transition", "detection": "server-side completion guard, lifecycle audit, regression tests, and post-change readback", "response": "halt transition authority and open governed incident"}
+  ],
+  "notificationModel": "Existing Azure telemetry and repository/deployment controls; no redundant monitoring stack created",
+  "knownNonBlockingLimitation": "No dedicated Phase 6 Azure metric or scheduled-query alert rule exists; BAU drift checks are change-triggered and incident-triggered while runtime failures remain continuously visible.",
+  "wholeHeartbeatPreserved": true
+}

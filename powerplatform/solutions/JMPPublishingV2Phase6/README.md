@@ -44,4 +44,12 @@ There is no environment URL, organization ID, title identity, or Dev-only execut
 
 Run `node scripts/build-plugin.mjs` with the governed signing-key path configured, then register/export through the supplied scripts. The `src` directory is the unpacked canonical solution source. Generated Dev regression, export, Test preflight, and Whole stage-parity evidence is stored under `evidence`.
 
-JM1-Test imported version `1.1.0.0` after Whole's stage parity was repaired. Command certification then failed closed because the target onboarding-record schema lacked `jmpv2_authorprofileid`, `jmpv2_policyversion`, and `jmpv2_recordversion`. The Test environment switch was returned to `false`; Whole onboarding was not executed. Version `1.2.0.0` completes the managed Phase 6 table schema so recertification does not depend on environment-local fields.
+## Production operating status
+
+Phase 6 is commissioned in JM1-Core and operates under normal Publishing governance. Production uses the managed dependency solution `JMP_PublishingV2` version `1.0.4.0` and the managed Phase 6 solution `JMP_PublishingV2_Phase6_Portable` version `1.2.0.1`.
+
+The production command runs as the dedicated `id-jm1-publishing-phase6-prod` workload identity through the enabled Dataverse application user and the `JMP Phase 6 Onboarding Runtime` role. That role contains the 45 required privileges and no System Administrator, System Customizer, delete, assign, or share authority.
+
+Phase 6 completion establishes eligibility for Stage 07. It never authorizes or performs an automatic Stage 07 transition. Publishing operations retain the human approval boundary.
+
+JM1-Test remains the recertification environment. Preserve its managed solution, workload identity, application user, negative-test infrastructure, and the immutable `1.2.0.1` managed package. Production monitoring uses the existing Application Insights runtime telemetry, governed post-change configuration readback, and the BAU drift-response procedure recorded in `reports/jmp-phase6-close-001-bau-transition-2026-09-20/`. Phase 7 remains held until separately authorized.
