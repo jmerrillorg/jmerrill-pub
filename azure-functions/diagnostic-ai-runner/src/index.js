@@ -45,6 +45,14 @@ require("./functions/runPublishingMailboxReplyCheck");
 require("./functions/runPublishingMailboxAttachmentReadback");
 require("./functions/runEnterpriseMailboxReadbackHealth");
 require("./functions/runCommercialEligibilityA2");
-require("./functions/runPhase6OnboardingCertification");
+if ((process.env.JM1_ENVIRONMENT || "").trim().toUpperCase() === "UAT") {
+  require("./functions/runPhase6OnboardingCertification");
+}
+if (
+  (process.env.JM1_ENVIRONMENT || "").trim().toUpperCase() === "PRODUCTION" &&
+  (process.env.JMP_PHASE6_PRODUCTION_CERTIFICATION_ROUTE_ENABLED || "").trim().toLowerCase() === "true"
+) {
+  require("./functions/runPhase6ProductionCertification");
+}
 require("./functions/runStage0Diagnostic");
 require("./functions/signNowWebhook");
