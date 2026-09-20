@@ -1,0 +1,27 @@
+{
+  "status": "COMMISSIONED",
+  "mailbox": "publishing@jmerrill.one",
+  "eventPath": [
+    "Microsoft Graph Inbox change notification",
+    "run-publishing-inbound-notification",
+    "exact Dataverse sender and primary-author relationship resolution",
+    "classification and fail-closed correlation",
+    "immutable Blob message and attachment evidence",
+    "Publishing human-review queue"
+  ],
+  "recoveryPath": {
+    "mechanism": "Microsoft Graph delta reconciliation",
+    "schedule": "every five minutes",
+    "deltaTokenStatus": "CURRENT"
+  },
+  "subscriptionRenewal": {
+    "mechanism": "run-publishing-inbound-subscription-renewal",
+    "schedule": "every six hours",
+    "status": "ACTIVE",
+    "expiresAt": "2026-09-23T04:30:00.214Z"
+  },
+  "communicationEffect": "NONE_FROM_INGESTION",
+  "businessEffect": "NONE_FROM_INGESTION",
+  "productionReleaseSha": "f7d5442a583229863b2fcd085569f565f797bf64",
+  "deploymentRun": 35508177532
+}

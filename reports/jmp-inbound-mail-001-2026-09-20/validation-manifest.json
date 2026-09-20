@@ -1,0 +1,32 @@
+{
+  "program": "JMP-INBOUND-MAIL-001",
+  "status": "COMPLETE_WITH_GOVERNED_HUMAN_REVIEW",
+  "canonicalMainSha": "f7d5442a583229863b2fcd085569f565f797bf64",
+  "pullRequests": [779, 780],
+  "deploymentRuns": [35507804813, 35508177532],
+  "validation": {
+    "focusedInboundTests": {"passed": 42, "failed": 0},
+    "fullFunctionTests": {"passed": 2370, "failed": 0},
+    "typeCheck": "PASS",
+    "lint": "PASS_WITH_ONE_PRE_EXISTING_WARNING",
+    "workflowEngineGuard": "PASS",
+    "build": "PASS_WITH_PRE_EXISTING_WARNINGS",
+    "productionHealth": "PASS",
+    "eventDrivenDetection": "PASS",
+    "attachmentPreservation": "PASS",
+    "mailIdempotency": "PASS",
+    "unknownAuthorFailsClosed": "PASS_BY_REGRESSION_TEST",
+    "ambiguousTitleFailsClosed": "PASS_IN_PRODUCTION",
+    "failureTelemetry": "PASS",
+    "rawMailboxWriteAuthority": "ABSENT"
+  },
+  "productionMutations": {
+    "inboundEvidenceRecordUpdates": 1,
+    "sourceAttachmentObjectsPreserved": 1,
+    "reviewQueueItemUpdates": 1,
+    "businessStateMutations": 0,
+    "emailsSent": 0
+  },
+  "founderDecisionRequired": "Confirm the exact third governed novel/title relationship for the map before work placement or acknowledgment send.",
+  "wholeCodyPolling": "RETIRED"
+}

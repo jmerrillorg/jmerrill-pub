@@ -1,0 +1,61 @@
+{
+  "status": "REVIEW_REQUIRED",
+  "message": {
+    "eventId": "inbound_message_event_4d123229d2d040d0ae4219997f401ace",
+    "internetMessageId": "<278170109.745795.1789851124827@mail.yahoo.com>",
+    "subject": "The Map Of British Sofalia 1900 AD",
+    "sender": "hagher.hagher@ymail.com",
+    "receivedAt": "2026-09-19T20:53:15Z",
+    "originalDetectedAt": "2026-09-19T20:53:15.962Z",
+    "reprocessedAt": "2026-09-20T11:37:32.283Z",
+    "classification": "AUTHOR_PRODUCTION_ASSET",
+    "classificationAuthority": "REVIEW_REQUIRED",
+    "idempotentReplay": "PASS"
+  },
+  "author": {
+    "status": "PASS",
+    "contactId": "c8c8747e-6675-f111-ab0f-6045bdd69678",
+    "resolutionAuthority": "EXACT_DATAVERSE_EMAIL_MATCH"
+  },
+  "workCorrelation": {
+    "status": "AMBIGUOUS",
+    "reason": "MULTIPLE_AUTHORITATIVE_AUTHOR_WORK_RELATIONSHIPS_AND_THIRD_WORK_UNPROVEN",
+    "candidates": [
+      {
+        "titleId": "c44b00d4-c27a-f111-ab0f-00224820105b",
+        "title": "The Conquest of Azenga",
+        "authority": "JM1_PRIMARY_AUTHOR_LOOKUP"
+      },
+      {
+        "titleId": "c74b00d4-c27a-f111-ab0f-00224820105b",
+        "title": "A Portrait of Paradise",
+        "authority": "JM1_PRIMARY_AUTHOR_LOOKUP"
+      }
+    ],
+    "thirdWork": "UNRESOLVED_REQUIRES_HUMAN_AUTHORITY"
+  },
+  "attachment": {
+    "eventId": "attachment_event_d33bd6727d9a016ac53a9b642cbecee7",
+    "filename": "IMG-20250322-WA0009.jpg",
+    "mimeType": "image/jpeg",
+    "sizeBytes": 561495,
+    "sha256": "aa5b58159641b114f59cbb4cd156ecf4ad56a06be791d3c305b9305e3f21f7a6",
+    "sourceMessageBinding": "PASS",
+    "authorBinding": "PASS",
+    "workBinding": "HUMAN_REVIEW_REQUIRED",
+    "duplicateProtection": "PASS",
+    "originalSourcePreserved": true,
+    "embeddedContentExecuted": false,
+    "macroOpened": false
+  },
+  "effects": {
+    "authorCommunicationsSent": 0,
+    "titleLifecycleTransitions": 0,
+    "authorDecisionsCreated": 0,
+    "agreementsCreated": 0,
+    "paymentRequestsCreated": 0,
+    "royaltyEffects": 0,
+    "providerEffects": 0,
+    "dataverseBusinessStateMutations": 0
+  }
+}
