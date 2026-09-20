@@ -1,0 +1,24 @@
+{
+  "capturedAt": "2026-09-20T08:49:00Z",
+  "phase6Rows": {
+    "jmpv2_publishingengagements": 0,
+    "jmpv2_lifecycleinstances": 0,
+    "jmpv2_authorprofiles": 0,
+    "jmpv2_onboardingrecords": 0,
+    "jmpv2_onboardingitems": 0,
+    "jmpv2_workspaceprovisionings": 0,
+    "jmpv2_authoraccesses": 0,
+    "jmpv2_payoutreadinesses": 0,
+    "jmpv2_onboardingcompletionevents": 0
+  },
+  "automaticStage07Transitions": 0,
+  "wholeMutations": 0,
+  "productionAuthorMutations": 0,
+  "productionTitleMutations": 0,
+  "productionOnboardingSubmissions": 0,
+  "productionEmailsSent": 0,
+  "financialEffects": 0,
+  "businessContinuityInterruptions": 0,
+  "phase7Invocations": 0
+}
+

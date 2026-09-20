@@ -1,0 +1,34 @@
+{
+  "workPackage": "JMP-PHASE6-PROD-SCHEMA-DEPENDENCY-001",
+  "completedAt": "2026-09-20",
+  "source": {
+    "baseSha": "c0bec26e82cd36d8cf39226b4c072bc5d793b218",
+    "branch": "codex/jmp-phase6-schema-dependency"
+  },
+  "package": {
+    "path": "powerplatform/solutions/JMPPublishingV2Phase6/artifacts/JMP_PublishingV2_Phase6_Portable_1_2_0_1_managed.zip",
+    "sha256": "2bfce73d18d23ba6aaa8eaeff3da2268510465901f07640127d22fc0757db5b9"
+  },
+  "validation": {
+    "portableSolutionTests": {"passed": 7, "failed": 0},
+    "diagnosticRunnerFullSuite": {"tests": 2366, "suites": 456, "passed": 2366, "failed": 0},
+    "diagnosticRunnerLint": "PASS",
+    "jm1TestRolePrivileges": "45/45",
+    "productionRolePrivileges": "45/45",
+    "productionSchemaVariance": 0,
+    "productionNegativeCertification": "PASS",
+    "productionIdempotency": "PASS",
+    "humanFirstZeroEffect": "PASS"
+  },
+  "effects": {
+    "wholeMutations": 0,
+    "authorMutations": 0,
+    "titleMutations": 0,
+    "onboardingSubmissions": 0,
+    "emailsSent": 0,
+    "financialEffects": 0,
+    "businessContinuityInterruptions": 0,
+    "phase7Invocations": 0
+  },
+  "finalStatus": "COMMISSIONED"
+}
