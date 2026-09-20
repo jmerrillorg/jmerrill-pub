@@ -8,6 +8,7 @@ const test = require("node:test");
 const { ACTION_TYPES, POLICY_ID, classifyReminder, renderReminder } = require("../src/stripe/connectReminderPolicy");
 const { assertAccountBinding, runConnectReminderRuntime } = require("../src/stripe/connectReminderRuntime");
 const { isNoonEastern } = require("../src/functions/runStripeConnectReminderMonitor");
+const { createDataverseClient } = require("../src/orchestration/authorReviewResponseConsumer");
 
 function row(overrides = {}) {
   return {
@@ -68,6 +69,32 @@ test("hourly timer executes business evaluation only at noon Eastern", () => {
   assert.equal(isNoonEastern(new Date("2026-09-20T16:00:00Z")), true);
   assert.equal(isNoonEastern(new Date("2026-09-20T15:00:00Z")), false);
   assert.equal(isNoonEastern(new Date("2026-12-20T17:00:00Z")), true);
+});
+
+test("Dataverse reads follow server pagination so the full author estate is monitored", async () => {
+  const originalFetch = global.fetch;
+  const calls = [];
+  global.fetch = async (url) => {
+    calls.push(String(url));
+    const secondPage = String(url).includes("page=2");
+    return new Response(JSON.stringify(secondPage
+      ? { value: [{ id: 2 }] }
+      : { value: [{ id: 1 }], "@odata.nextLink": "https://example.crm.dynamics.com/api/data/v9.2/contacts?page=2" }), {
+      status: 200,
+      headers: { "content-type": "application/json" }
+    });
+  };
+  try {
+    const client = createDataverseClient(
+      { apiBase: "https://example.crm.dynamics.com/api/data/v9.2", resourceUrl: "https://example.crm.dynamics.com" },
+      { getToken: async () => "fixture-token" }
+    );
+    const rows = await client.list("contacts", { $top: "5000" });
+    assert.deepEqual(rows, [{ id: 1 }, { id: 2 }]);
+    assert.equal(calls.length, 2);
+  } finally {
+    global.fetch = originalFetch;
+  }
 });
 
 test("Function registration and webhook source preserve system and financial boundaries", () => {
