@@ -1,7 +1,7 @@
 {
   "program": "JMP-INBOUND-MAIL-001",
   "status": "COMPLETE_WITH_GOVERNED_HUMAN_REVIEW",
-  "canonicalMainSha": "f7d5442a583229863b2fcd085569f565f797bf64",
+  "productionReleaseSha": "f7d5442a583229863b2fcd085569f565f797bf64",
   "pullRequests": [779, 780],
   "deploymentRuns": [35507804813, 35508177532],
   "validation": {
