@@ -45,6 +45,7 @@ require("./functions/runPublishingInboundNotification");
 require("./functions/runPublishingInboundReadback");
 require("./functions/runPublishingInboundAssetPlacement");
 require("./functions/runIyorwueseMapContinuity");
+require("./functions/runOverdueCadenceRecovery");
 require("./functions/runPublishingInboundSubscriptionManager");
 require("./functions/runPublishingMailboxReplyCheck");
 require("./functions/runPublishingMailboxAttachmentReadback");

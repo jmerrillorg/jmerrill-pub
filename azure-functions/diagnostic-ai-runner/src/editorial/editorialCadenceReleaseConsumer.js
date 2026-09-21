@@ -340,12 +340,16 @@ async function latestPackageCompletionLog(client, stageId) {
     .sort((a, b) => new Date(a.createdon || 0).getTime() - new Date(b.createdon || 0).getTime())[0] || null;
 }
 
-function buildSchedule(stage, cadenceLog, completionLog, now) {
+function buildSchedule(stage, cadenceLog, completionLog, now, options = {}) {
   const stageCode = normalizeStageCode(stage);
   const baselineDays = STAGE_BASELINE_BUSINESS_DAYS[stageCode] || 2;
   const cadenceStartedAt = completionLog?.createdon || cadenceLog.createdon;
   const scheduledReleaseAt = addBusinessDays(cadenceStartedAt, baselineDays);
-  const due = new Date(now).getTime() >= new Date(scheduledReleaseAt).getTime();
+  const naturallyDue = new Date(now).getTime() >= new Date(scheduledReleaseAt).getTime();
+  const cadenceOverrideApplied = options.cadenceOverrideAuthorized === true
+    && Array.isArray(options.cadenceOverrideStageIds)
+    && options.cadenceOverrideStageIds.map(normalizeString).includes(normalizeString(stage?.jm1pub_editorialstageid));
+  const due = naturallyDue || cadenceOverrideApplied;
   return {
     stageCode,
     baselineDays,
@@ -353,7 +357,10 @@ function buildSchedule(stage, cadenceLog, completionLog, now) {
     earliestReleaseAt: scheduledReleaseAt,
     scheduledReleaseAt,
     remainingHoldDuration: remainingHoldDuration(scheduledReleaseAt, now),
-    due
+    due,
+    naturallyDue,
+    cadenceOverrideApplied,
+    cadenceOverrideAuthority: cadenceOverrideApplied ? normalizeString(options.cadenceOverrideAuthority) : null
   };
 }
 
@@ -371,6 +378,7 @@ async function persistSchedule(client, stage, title, gate, packageInfo, schedule
     `CADENCE_RELEASE_RUNTIME: ${schedule.due ? "READY_FOR_RELEASE" : "CADENCE_HOLD"}; ` +
     `policy ${POLICY_VERSION}; stage ${schedule.stageCode}; cadenceStartedAt ${schedule.cadenceStartedAt}; ` +
     `earliestReleaseAt ${schedule.earliestReleaseAt}; scheduledReleaseAt ${schedule.scheduledReleaseAt}; ` +
+    `cadenceOverrideApplied ${schedule.cadenceOverrideApplied ? "YES" : "NO"}; cadenceOverrideAuthority ${schedule.cadenceOverrideAuthority || "NONE"}; ` +
     `remainingHoldDuration ${schedule.remainingHoldDuration}; nextAutomaticAction AUTHOR_REVIEW_PACKAGE_RELEASE_AT_CADENCE_BOUNDARY; ` +
     `package ${packageInfo.packageId || "UNKNOWN"}; manifest ${packageInfo.manifestArtifactId || "UNKNOWN"}; ` +
     `checksum ${packageInfo.packageChecksum || "UNKNOWN"}; trigger ${CONSUMER_VERSION}; correlation ${correlationId}.`;
@@ -466,7 +474,8 @@ async function recordCadenceSent(client, stage, title, gate, packageInfo, schedu
     `Idempotency ${idempotencyKey}. CLASSIFICATION=TRUE_DUE_AND_UNSENT; DELIVERY_STATUS=SENT; ` +
     `providerMessageId=${sendResult.providerMessageId || "UNKNOWN"}; from=publishing@email.jmerrill.one; replyTo=${PUBLISHING_MAILBOX}; cc=${PUBLISHING_MAILBOX}; ` +
     `title=${titleName(title) || "UNKNOWN"}; gate=${gate?.jm1pub_editorialapprovalgateid || "UNKNOWN"}; package=${packageInfo.packageId || "UNKNOWN"}; ` +
-    `scheduledReleaseAt=${schedule.scheduledReleaseAt}; attachmentCount=${sendResult.attachmentCount || 0}; ` +
+    `scheduledReleaseAt=${schedule.scheduledReleaseAt}; cadenceOverrideApplied=${schedule.cadenceOverrideApplied ? "YES" : "NO"}; ` +
+    `cadenceOverrideAuthority=${schedule.cadenceOverrideAuthority || "NONE"}; attachmentCount=${sendResult.attachmentCount || 0}; ` +
     `checksums=${(sendResult.attachmentChecksums || []).join("|") || "UNKNOWN"}; correlation=${correlationId}.`;
   await Promise.all([
     client.patch("jm1pub_editorialapprovalgates", gate.jm1pub_editorialapprovalgateid, {
@@ -544,7 +553,7 @@ async function processCadenceLog(client, cadenceLog, now, correlationId, deps = 
     };
   }
 
-  const schedule = buildSchedule(stage, cadenceLog, completionLog, now);
+  const schedule = buildSchedule(stage, cadenceLog, completionLog, now, deps);
   if (!cadenceLogIsAuthorReleaseEligible(cadenceLog)) {
     const nonSendable = await recordCadenceNonSendable(client, stage, title, packageInfo, schedule, "CADENCE_NOT_AUTHOR_RELEASE_ELIGIBLE", correlationId);
     return { status: "AMBIGUOUS", reason: "CADENCE_NOT_AUTHOR_RELEASE_ELIGIBLE", stageId, title: titleName(title), packageId: packageInfo.packageId, schedule, nonSendable };
