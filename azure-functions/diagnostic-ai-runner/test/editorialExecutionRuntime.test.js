@@ -24,6 +24,7 @@ const {
   invokeSingleStageModelProvider,
   splitLineEditingSourceChunks,
   buildLineEditingChunkPrompt,
+  buildDevelopmentalEditingChunkPrompt,
   buildProofreadingCoverNote,
   buildChunkedDevelopmentalInvocation,
   validateDevelopmentalChunkOutput,
@@ -659,6 +660,27 @@ test("Developmental chunk validation rejects internal note classes in author-fac
 
   assert.equal(result.ok, false);
   assert.ok(result.failures.includes("AUTHOR_EXPERIENCE_PROJECTION_FAILED"));
+});
+
+test("Developmental retry prompt explicitly removes internal labels from every author-facing field", () => {
+  const prompt = JSON.parse(buildDevelopmentalEditingChunkPrompt({
+    stage: {
+      jm1pub_name: "Developmental Editing",
+      _jm1pub_titleid_value: "title-1",
+      "_jm1pub_titleid_value@OData.Community.Display.V1.FormattedValue": "Untitled"
+    },
+    sourceArtifact: { jm1pub_editorialartifactid: "artifact-1" },
+    chunkText: "Contents\nChapter One",
+    chunkIndex: 96,
+    chunkCount: 96,
+    totalWordCount: 82058,
+    schemaRetryAttempt: 1
+  }));
+
+  assert.match(prompt.authorExperienceRules.join(" "), /developmentalSummary, appliedChanges/);
+  assert.match(prompt.authorExperienceRules.join(" "), /internal classification label/);
+  assert.match(prompt.schemaRetryInstruction, /author-experience projection/);
+  assert.match(prompt.schemaRetryInstruction, /no internal classification labels/);
 });
 
 test("targeted editorial execution dry-run resolves exactly one Line stage/source without mutations", async () => {
