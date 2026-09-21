@@ -5,7 +5,8 @@ const test = require("node:test");
 const {
   DEVELOPMENTAL_REVIEW_PACKAGE_TEMPLATE,
   materializeAttachments,
-  sendCadenceAuthorReviewPackage
+  sendCadenceAuthorReviewPackage,
+  validateDevelopmentalContentTruth
 } = require("../src/editorial/editorialCadenceAuthorPackageSender");
 
 const titleId = "fd577d2b-01a0-f111-b8dc-000d3a14673b";
@@ -78,6 +79,40 @@ test("exact Indomitable review-only replay fails closed and makes no relay call"
   assert.equal(relayCalls, 0);
 });
 
+test("exact September 12 Atta review-only state blocks the false completed-package claim", async () => {
+  const regression = validateDevelopmentalContentTruth({
+    attachments: [{ role: "reviewInstructions", name: "Untitled - Developmental Editorial Review.pdf" }],
+    qa: "PASS",
+    versionParity: "PASS",
+    titleBinding: "PASS",
+    authorBinding: "PASS",
+    body: "Attached is the completed review package."
+  });
+
+  assert.deepEqual(regression, {
+    ok: false,
+    code: "DEVELOPMENTAL_COMPLETION_CLAIM_PROHIBITED",
+    devDeliveryComplete: false,
+    nextAction: "PRODUCE_REGISTER_QA_MISSING_DEVELOPMENTALLY_EDITED_MANUSCRIPT"
+  });
+
+  let relayCalls = 0;
+  const attaInput = {
+    ...input([artifact("reviewInstructions")]),
+    titleName: "Untitled",
+    authorName: "Atta Boateng",
+    contact: { contactid: contactId, emailaddress1: "atta@example.com" }
+  };
+  await assert.rejects(
+    sendCadenceAuthorReviewPackage(attaInput, {
+      downloadArtifact,
+      sendRelay: async () => { relayCalls += 1; }
+    }),
+    /REQUIRED_ATTACHMENT_MISSING:editedManuscript/
+  );
+  assert.equal(relayCalls, 0);
+});
+
 test("system renderer creates conversational Indomitable copy from a complete governed package", async () => {
   let payload;
   const result = await sendCadenceAuthorReviewPackage(input([
@@ -95,6 +130,10 @@ test("system renderer creates conversational Indomitable copy from a complete go
   assert.equal(payload.templateName, DEVELOPMENTAL_REVIEW_PACKAGE_TEMPLATE);
   assert.equal(payload.artifactManifest.devPackageComplete, true);
   assert.equal(payload.artifactManifest.versionParity, "PASS");
+  assert.deepEqual(payload.artifactManifest.artifacts, payload.communicationObservability.authorAttachmentManifest);
+  assert.deepEqual(payload.communicationObservability.authorAttachmentManifest, payload.communicationObservability.publishingCopyAttachmentManifest);
+  assert.deepEqual(payload.communicationObservability.authorAttachmentManifest, payload.communicationObservability.dataverseArtifactManifest);
+  assert.equal(payload.communicationObservability.from, "publishing@email.jmerrill.one");
   assert.deepEqual(payload.attachments.map((item) => item.role).sort(), ["editedManuscript", "reviewInstructions"]);
   assert.doesNotMatch(`${payload.body}\n${payload.htmlBody}`, /Why you are receiving this|What has been completed|What's attached|What we need from you|How to respond|What happens next/i);
   assert.match(payload.body, /We've attached .*Edited Manuscript.* together with .*Editorial Review/i);

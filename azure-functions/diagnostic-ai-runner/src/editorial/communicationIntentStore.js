@@ -20,6 +20,17 @@ function canonicalArtifacts(attachments = []) {
     .sort((left, right) => `${left.role}:${left.sha256}`.localeCompare(`${right.role}:${right.sha256}`));
 }
 
+function evidenceManifest(attachments = []) {
+  return attachments
+    .map((attachment) => ({
+      role: clean(attachment.role || "attachment"),
+      filename: String(attachment.name || attachment.filename || "").trim(),
+      version: String(attachment.version || "").trim(),
+      checksum: clean(attachment.sha256 || attachment.checksum)
+    }))
+    .sort((left, right) => `${left.role}:${left.filename}`.localeCompare(`${right.role}:${right.filename}`));
+}
+
 function buildCommunicationIdentity(input = {}) {
   const identity = {
     titleId: clean(input.titleId),
@@ -73,6 +84,7 @@ async function findIntentState(client, semantic) {
 
 async function reserveCommunicationIntent(client, input) {
   const semantic = buildCommunicationIdentity(input);
+  const manifest = evidenceManifest(input.attachments);
   const current = await findIntentState(client, semantic);
   if (current.status !== "AVAILABLE") {
     return {
@@ -88,7 +100,8 @@ async function reserveCommunicationIntent(client, input) {
     `Idempotency ${semantic.key}. DELIVERY_STATE=RESERVED; titleId=${semantic.identity.titleId}; ` +
     `authorId=${semantic.identity.authorId}; communicationType=${semantic.identity.communicationType}; ` +
     `workstream=${semantic.identity.workstream}; recipient=${semantic.identity.recipient}; ` +
-    `artifacts=${semantic.identity.artifacts.map((artifact) => `${artifact.role}:${artifact.sha256}`).join("|")}.`;
+    `artifacts=${semantic.identity.artifacts.map((artifact) => `${artifact.role}:${artifact.sha256}`).join("|")}; ` +
+    `artifactManifest=${JSON.stringify(manifest)}.`;
   const communicationRecordId = await writeLog(client, {
     name: `AUTHOR_COMMUNICATION_INTENT_RESERVED - ${input.titleName || semantic.identity.titleId}`,
     actionType: RESERVED_ACTION,
@@ -100,10 +113,16 @@ async function reserveCommunicationIntent(client, input) {
 }
 
 async function markCommunicationSent(client, input) {
+  const manifest = Array.isArray(input.artifactManifest) ? input.artifactManifest : [];
+  const observability = input.observability || {};
   const description =
     `Idempotency ${input.semanticIdempotencyKey}. DELIVERY_STATE=SENT; communicationRecordId=${input.communicationRecordId}; ` +
     `providerMessageId=${input.providerMessageId || "UNKNOWN"}; sentAt=${input.sentAt || new Date().toISOString()}; ` +
-    `recipient=${clean(input.recipient)}; artifacts=${(input.artifactChecksums || []).join("|")}.`;
+    `recipient=${clean(input.recipient)}; artifacts=${(input.artifactChecksums || []).join("|")}; ` +
+    `artifactManifest=${JSON.stringify(manifest)}; DATAVERSE_RECORD=PASS; ` +
+    `ACS_DELIVERY=${observability.acsDelivery || "UNPROVEN"}; ` +
+    `PUBLISHING_MAILBOX_COPY=${observability.publishingMailboxCopy || "UNPROVEN"}; ` +
+    `ATTACHMENT_PARITY=${observability.semanticAttachmentParity || "UNPROVEN"}.`;
   const sentRecordId = await writeLog(client, {
     name: `AUTHOR_COMMUNICATION_INTENT_SENT - ${input.titleName || input.titleId}`,
     actionType: SENT_ACTION,
@@ -119,6 +138,7 @@ module.exports = {
   SENT_ACTION,
   buildCommunicationIdentity,
   describesSameDelivery,
+  evidenceManifest,
   findIntentState,
   markCommunicationSent,
   reserveCommunicationIntent

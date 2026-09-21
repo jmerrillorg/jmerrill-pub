@@ -28,6 +28,8 @@ const PROVIDER = Object.freeze({
 
 const CONFIG_ERROR_CODE = "AUTHOR_RESPONSE_SEND_PROVIDER_CONFIG_FAILED";
 const APPROVED_INTERNAL_DOMAIN = "@jmerrill.one";
+const CANONICAL_SYSTEM_SENDER = "publishing@email.jmerrill.one";
+const CANONICAL_REPLY_TO = "publishing@jmerrill.one";
 
 function normalizeString(value) {
   return typeof value === "string" ? value.trim() : "";
@@ -64,6 +66,7 @@ function normalizeAuthorResponseAttachments(value) {
       contentInBase64,
       sha256: sha256 || null,
       role: normalizeString(attachment.role) || null,
+      version: normalizeString(attachment.version) || null,
       artifactId: normalizeString(attachment.artifactId) || null
     });
   }
@@ -73,7 +76,8 @@ function normalizeAuthorResponseAttachments(value) {
 function isAuthorReviewAttachmentRequiredTemplate(templateName) {
   return [
     "AUTHOR_REVIEW_PACKAGE_NOTIFICATION_V1",
-    "AUTHOR_FINAL_DEVELOPMENTAL_REVIEW_V1"
+    "AUTHOR_FINAL_DEVELOPMENTAL_REVIEW_V1",
+    "DEVELOPMENTAL_EDITORIAL_REVIEW_READY_V2"
   ].includes(normalizeString(templateName));
 }
 
@@ -136,8 +140,8 @@ function getAuthorResponseSendProviderConfig(env = process.env) {
   }
   if (!providerName) return { ok: false, enabled: true, reason: "AUTHOR_RESPONSE_SEND_PROVIDER_MISSING" };
   if (!Object.values(PROVIDER).includes(providerName)) return { ok: false, enabled: true, reason: "AUTHOR_RESPONSE_SEND_PROVIDER_UNSUPPORTED" };
-  if (!from || !isApprovedInternalAddress(from)) return { ok: false, enabled: true, reason: "AUTHOR_RESPONSE_SEND_FROM_INVALID" };
-  if (!replyTo || !isApprovedInternalAddress(replyTo)) return { ok: false, enabled: true, reason: "AUTHOR_RESPONSE_SEND_REPLY_TO_INVALID" };
+  if (from.toLowerCase() !== CANONICAL_SYSTEM_SENDER) return { ok: false, enabled: true, reason: "AUTHOR_RESPONSE_SEND_FROM_INVALID" };
+  if (replyTo.toLowerCase() !== CANONICAL_REPLY_TO) return { ok: false, enabled: true, reason: "AUTHOR_RESPONSE_SEND_REPLY_TO_INVALID" };
   if (providerName === PROVIDER.ACS_RELAY && !relayUrl) return { ok: false, enabled: true, reason: "AUTHOR_RESPONSE_SEND_RELAY_URL_MISSING" };
   if (providerName === PROVIDER.ACS_RELAY && !relayKeyConfigured) return { ok: false, enabled: true, reason: "AUTHOR_RESPONSE_SEND_RELAY_KEY_MISSING" };
 
@@ -185,6 +189,12 @@ async function postRelayJson(url, relayKey, payload) {
 
 function buildAuthorResponseRelayPayload(email) {
   const approval = email.sendApproval || {};
+  const attachmentManifest = (email.attachments || []).map((attachment) => ({
+    role: attachment.role,
+    filename: attachment.name,
+    version: attachment.version,
+    checksum: attachment.sha256
+  }));
   return {
     messageType: "APPROVED_AUTHOR_RESPONSE",
     diagnosticId: approval.diagnosticId,
@@ -203,13 +213,29 @@ function buildAuthorResponseRelayPayload(email) {
     internalVisibilityMailbox: INTERNAL_VISIBILITY_MAILBOX,
     futureSendRequiresInternalCopy: true,
     futureSendRequiresDataverseLog: true,
-    bcc: [INTERNAL_VISIBILITY_MAILBOX],
+    cc: [INTERNAL_VISIBILITY_MAILBOX],
+    bcc: [],
+    artifactManifest: approval.artifactManifest || null,
+    communicationObservability: {
+      from: email.from,
+      replyTo: email.replyTo,
+      cc: [INTERNAL_VISIBILITY_MAILBOX],
+      dataverseCommunicationRecordRequired: true,
+      publishingMailboxCopyRequired: true,
+      semanticAttachmentParityRequired: true,
+      authorAttachmentManifest: attachmentManifest,
+      publishingCopyAttachmentManifest: attachmentManifest,
+      dataverseArtifactManifest: attachmentManifest
+    },
     attachments: Array.isArray(email.attachments)
       ? email.attachments.map((attachment) => ({
         name: attachment.name,
         contentType: attachment.contentType,
         contentInBase64: attachment.contentInBase64,
-        sha256: attachment.sha256 || null
+        sha256: attachment.sha256 || null,
+        role: attachment.role || null,
+        version: attachment.version || null,
+        artifactId: attachment.artifactId || null
       }))
       : []
   };
@@ -249,8 +275,8 @@ function validateAuthorResponseSendInput(input = {}) {
   const approval = input.sendApproval;
   const authorEmail = normalizeString(approval.authorEmail);
   const to = Array.isArray(input.to) ? input.to.map(normalizeString).filter(Boolean) : [normalizeString(input.to || authorEmail)].filter(Boolean);
-  const cc = Array.isArray(input.cc) ? input.cc.map(normalizeString).filter(Boolean) : [normalizeString(input.cc)].filter(Boolean);
-  const bcc = Array.isArray(input.bcc) ? input.bcc.map(normalizeString).filter(Boolean) : [normalizeString(input.bcc || INTERNAL_VISIBILITY_MAILBOX)].filter(Boolean);
+  const cc = Array.isArray(input.cc) ? input.cc.map(normalizeString).filter(Boolean) : [normalizeString(input.cc || INTERNAL_VISIBILITY_MAILBOX)].filter(Boolean);
+  const bcc = Array.isArray(input.bcc) ? input.bcc.map(normalizeString).filter(Boolean) : [normalizeString(input.bcc)].filter(Boolean);
 
   if (approval.sendApproved !== true || normalizeString(approval.decision) !== "APPROVE_AUTHOR_SEND") {
     return { ok: false, reason: "AUTHOR_SEND_NOT_APPROVED" };
@@ -259,11 +285,8 @@ function validateAuthorResponseSendInput(input = {}) {
   if (to.length !== 1 || to[0].toLowerCase() !== authorEmail.toLowerCase()) {
     return { ok: false, reason: "AUTHOR_RECIPIENT_INVALID" };
   }
-  if (cc.length > 0 || !bcc.includes(INTERNAL_VISIBILITY_MAILBOX)) {
+  if (cc.length !== 1 || cc[0] !== INTERNAL_VISIBILITY_MAILBOX || bcc.length > 0) {
     return { ok: false, reason: "INTERNAL_VISIBILITY_REQUIRED" };
-  }
-  if (bcc.some((recipient) => recipient !== INTERNAL_VISIBILITY_MAILBOX)) {
-    return { ok: false, reason: "UNAPPROVED_RECIPIENT_PRESENT" };
   }
   if (to.concat(cc, bcc).some((recipient) => recipient.toLowerCase().endsWith("@jmerrill.pub"))) {
     return { ok: false, reason: "JMERRILL_PUB_MAILBOX_NOT_ALLOWED" };
@@ -277,6 +300,10 @@ function validateAuthorResponseSendInput(input = {}) {
   if (!attachmentValidation.ok) return { ok: false, reason: attachmentValidation.reason };
   if (isAuthorReviewAttachmentRequiredTemplate(approval.templateName) && attachmentValidation.attachments.length === 0) {
     return { ok: false, reason: "AUTHOR_REVIEW_ATTACHMENTS_MISSING" };
+  }
+  if (isAuthorReviewAttachmentRequiredTemplate(approval.templateName) && attachmentValidation.attachments.some((attachment) =>
+    !attachment.sha256 || !attachment.role || !attachment.version || !attachment.artifactId)) {
+    return { ok: false, reason: "AUTHOR_REVIEW_ATTACHMENT_AUTHORITY_INCOMPLETE" };
   }
   if (approval.internalVisibilityMailbox !== INTERNAL_VISIBILITY_MAILBOX) return { ok: false, reason: "INTERNAL_VISIBILITY_MAILBOX_INVALID" };
   if (approval.futureSendRequiresInternalCopy !== true) return { ok: false, reason: "FUTURE_INTERNAL_COPY_REQUIRED" };
@@ -304,8 +331,8 @@ function buildAuthorResponseEmail(input = {}, config = getAuthorResponseSendProv
     deliveryStatus: AUTHOR_RESPONSE_SEND_STATUS.PREPARED,
     email: {
       to: validation.to,
-      cc: [],
-      bcc: validation.bcc,
+      cc: validation.cc,
+      bcc: [],
       from: config.from,
       replyTo: config.replyTo,
       subject: input.sendApproval.draftSubject,

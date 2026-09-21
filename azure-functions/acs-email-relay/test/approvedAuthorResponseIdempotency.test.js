@@ -94,6 +94,13 @@ test("relay atomically accepts the first effect and returns the original deliver
   const first = await executeApprovedAuthorResponse(approvedValue(), deps);
   const replay = await executeApprovedAuthorResponse(approvedValue({ idempotencyKey: "different-caller-prefix" }), deps);
   assert.equal(first.status, "SENT");
+  assert.equal(first.providerStatus, "Succeeded");
+  assert.deepEqual(first.observability, {
+    acsDelivery: "PASS",
+    publishingMailboxCopy: "PASS",
+    semanticAttachmentParity: "PASS",
+    evidenceClass: "ACS_SUCCEEDED_SINGLE_ENVELOPE_WITH_CANONICAL_CC"
+  });
   assert.equal(replay.status, "ALREADY_DELIVERED");
   assert.equal(replay.communicationRecordId, "communication-record-1");
   assert.equal(replay.sentAt, "2026-09-18T09:00:13.000Z");
@@ -101,6 +108,17 @@ test("relay atomically accepts the first effect and returns the original deliver
   assert.equal(replay.recipient, "jaylonnastevette@gmail.com");
   assert.deepEqual(replay.artifactChecksums, ["097b042aeb30e9fde1e9381201049788cf6ba3fac1866fceb3f53298619d64fa"]);
   assert.equal(sends, 1);
+});
+
+test("provider acceptance without a Succeeded delivery receipt fails observability closed", async () => {
+  await assert.rejects(
+    executeApprovedAuthorResponse(approvedValue(), {
+      ledger: memoryLedger(),
+      buildMessage: (value) => value,
+      sendMessage: async () => ({ providerMessageId: "acs-pending", providerStatus: "Running" })
+    }),
+    (error) => error.safeCode === "ACS_DELIVERY_UNPROVEN"
+  );
 });
 
 test("an unresolved reservation fails closed and never invokes ACS", async () => {

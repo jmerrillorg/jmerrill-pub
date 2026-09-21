@@ -889,6 +889,8 @@ function validateApprovedAuthorResponsePayload(payload = {}) {
       const manifestValidation = validateDevelopmentalArtifactManifest(payload.artifactManifest, attachments.value);
       if (!manifestValidation.ok) return manifestValidation;
     }
+    const observabilityValidation = validateCommunicationObservability(payload.communicationObservability, attachments.value);
+    if (!observabilityValidation.ok) return observabilityValidation;
   }
 
   if (normalizeText(payload.templateName) === PACKAGE_ACCEPTANCE_TEMPLATE) {
@@ -952,6 +954,7 @@ function validateApprovedAuthorResponsePayload(payload = {}) {
       } : null,
       attachments: attachments.ok ? attachments.value : [],
       artifactManifest: normalizeText(payload.templateName) === DEVELOPMENTAL_REVIEW_PACKAGE_TEMPLATE ? payload.artifactManifest : null,
+      communicationObservability: payload.communicationObservability,
       approvedBy: normalizeText(payload.approvedBy),
       approvedOn: normalizeText(payload.approvedOn),
       internalVisibilityMailbox: INTERNAL_VISIBILITY_MAILBOX,
@@ -1383,7 +1386,7 @@ function normalizeAuthorReviewAttachments(value) {
       if (actualSha256 !== sha256) return { ok: false, reason: "AUTHOR_REVIEW_ATTACHMENT_CHECKSUM_MISMATCH" };
     }
     totalBytes += bytes.byteLength;
-    normalized.push({ name, contentType, contentInBase64, sha256, role, artifactId });
+    normalized.push({ name, contentType, contentInBase64, sha256, role, artifactId, version: normalizeText(attachment.version) });
   }
 
   if (totalBytes > 20 * 1024 * 1024) {
@@ -1391,6 +1394,38 @@ function normalizeAuthorReviewAttachments(value) {
   }
 
   return { ok: true, value: normalized };
+}
+
+function canonicalSemanticManifest(value = []) {
+  return value.map((item) => ({
+    role: normalizeText(item.role),
+    filename: normalizeText(item.filename || item.name),
+    version: normalizeText(item.version),
+    checksum: normalizeText(item.checksum || item.sha256).toLowerCase()
+  })).sort((left, right) => `${left.role}:${left.filename}`.localeCompare(`${right.role}:${right.filename}`));
+}
+
+function validateCommunicationObservability(value, attachments) {
+  if (!value || typeof value !== "object" || Array.isArray(value)) {
+    return { ok: false, reason: "COMMUNICATION_OBSERVABILITY_REQUIRED" };
+  }
+  if (normalizeText(value.from).toLowerCase() !== AUTHOR_RESPONSE_SENDER) return { ok: false, reason: "COMMUNICATION_OBSERVABILITY_SENDER_INVALID" };
+  if (normalizeText(value.replyTo).toLowerCase() !== INTERNAL_VISIBILITY_MAILBOX) return { ok: false, reason: "COMMUNICATION_OBSERVABILITY_REPLY_TO_INVALID" };
+  const copyRecipients = normalizeRecipients(value.cc);
+  if (copyRecipients.length !== 1 || copyRecipients[0] !== INTERNAL_VISIBILITY_MAILBOX) return { ok: false, reason: "COMMUNICATION_OBSERVABILITY_CC_INVALID" };
+  if (value.dataverseCommunicationRecordRequired !== true) return { ok: false, reason: "DATAVERSE_COMMUNICATION_RECORD_REQUIRED" };
+  if (value.publishingMailboxCopyRequired !== true) return { ok: false, reason: "PUBLISHING_MAILBOX_COPY_REQUIRED" };
+  if (value.semanticAttachmentParityRequired !== true) return { ok: false, reason: "SEMANTIC_ATTACHMENT_PARITY_REQUIRED" };
+
+  const expected = canonicalSemanticManifest(attachments);
+  for (const [field, reason] of [
+    ["authorAttachmentManifest", "AUTHOR_ATTACHMENT_MANIFEST_MISMATCH"],
+    ["publishingCopyAttachmentManifest", "PUBLISHING_COPY_ATTACHMENT_MANIFEST_MISMATCH"],
+    ["dataverseArtifactManifest", "DATAVERSE_ARTIFACT_MANIFEST_MISMATCH"]
+  ]) {
+    if (JSON.stringify(canonicalSemanticManifest(value[field])) !== JSON.stringify(expected)) return { ok: false, reason };
+  }
+  return { ok: true, manifest: expected };
 }
 
 function validateDevelopmentalArtifactManifest(value, attachments) {
@@ -1421,12 +1456,29 @@ function validateDevelopmentalArtifactManifest(value, attachments) {
   if (attachments.some((attachment) => !attachment.artifactId || !attachment.sha256)) {
     return { ok: false, reason: "DEVELOPMENTAL_ATTACHMENT_AUTHORITY_INCOMPLETE" };
   }
+  if (JSON.stringify(canonicalSemanticManifest(value.artifacts)) !== JSON.stringify(canonicalSemanticManifest(attachments))) {
+    return { ok: false, reason: "DEVELOPMENTAL_ARTIFACT_MANIFEST_PARITY_FAILED" };
+  }
   return { ok: true };
 }
 
 async function sendAcsMessage(message) {
+  const receipt = await sendAcsMessageWithReceipt(message);
+  return receipt.providerMessageId;
+}
+
+async function sendAcsMessageWithReceipt(message) {
   const poller = await getEmailClient().beginSend(message);
-  return getOperationId(poller);
+  if (!poller || typeof poller.pollUntilDone !== "function") {
+    throw Object.assign(new Error("ACS completion poller unavailable."), { safeCode: "ACS_DELIVERY_UNPROVEN" });
+  }
+  const result = await poller.pollUntilDone();
+  const providerStatus = normalizeText(result?.status);
+  const providerMessageId = normalizeText(result?.id || getOperationId(poller));
+  if (providerStatus !== "Succeeded" || !providerMessageId) {
+    throw Object.assign(new Error("ACS delivery did not reach Succeeded state."), { safeCode: "ACS_DELIVERY_UNPROVEN" });
+  }
+  return { providerMessageId, providerStatus };
 }
 
 function getOperationId(poller) {
@@ -1748,7 +1800,7 @@ app.http("send-approved-author-response", {
         replyTo: INTERNAL_VISIBILITY_MAILBOX,
         systemSender: AUTHOR_RESPONSE_SENDER,
         buildMessage: buildApprovedAuthorResponseEmail,
-        sendMessage: sendAcsMessage
+        sendMessage: sendAcsMessageWithReceipt
       });
       if (result.status === "AMBIGUOUS_SEND_STATE") {
         return {
@@ -1773,7 +1825,8 @@ app.http("send-approved-author-response", {
           communicationRecordId: result.communicationRecordId,
           sentAt: result.sentAt,
           semanticIdempotencyKey: result.semanticIdempotencyKey,
-          artifactChecksums: result.artifactChecksums
+          artifactChecksums: result.artifactChecksums,
+          observability: result.observability
         }
       };
     } catch (error) {
