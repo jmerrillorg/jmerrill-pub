@@ -235,7 +235,7 @@ async function sendAcknowledgment(bound, deps = {}) {
     return { status: reserve.status, communicationsSent: 0, duplicateAcknowledgment: "NO", sentAt: reserve.sentAt || null, providerMessageId: null };
   }
   const approval = {
-    diagnosticId: AUTHORITY.attachmentEventId,
+    diagnosticId: AUTHORITY.developmentalStageId,
     intakeReferenceCode: AUTHORITY.engagementId,
     authorEmail: AUTHORITY.recipient,
     authorName: AUTHORITY.authorName,

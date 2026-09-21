@@ -97,6 +97,7 @@ test("materializes the preserved map, binds canonical tracking, and sends one AC
   assert.equal(result.acknowledgmentSent, "YES");
   assert.equal(result.titleWaitState, "WAITING_ON_AUTHOR_EXACT_VERSION_REVIEW");
   assert.equal(fx.sends.length, 1);
+  assert.equal(fx.sends[0].input.sendApproval.diagnosticId, AUTHORITY.developmentalStageId);
   assert.equal(fx.sends[0].input.sendApproval.authorEmail, AUTHORITY.recipient);
   assert.deepEqual(fx.sends[0].input.cc, ["publishing@jmerrill.one"]);
   const artifact = fx.creates.find((entry) => entry.entitySet === "jm1pub_editorialartifacts").payload;
