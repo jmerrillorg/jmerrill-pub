@@ -2414,6 +2414,53 @@ async function resolveSourceGraphItem(sourceArtifact, stageCode) {
   return { item, driveId: resolvedDriveId, contentPath: `shares/${shareToken}/driveItem/content` };
 }
 
+function isCanonicalPipelineRepositoryPath(value) {
+  let path = normalizeString(value);
+  try {
+    path = decodeURIComponent(path);
+  } catch {
+    // Keep the original path when a provider URL contains malformed escapes.
+  }
+  return /\/01_Pipeline_A-Z\//i.test(path);
+}
+
+async function resolveEditorialOutputParent(client, stage, stageCode, sourceRef, deps = {}) {
+  const fallback = {
+    driveId: sourceRef.driveId,
+    parentId: normalizeString(sourceRef.item?.parentReference?.id),
+    authority: "SOURCE_PARENT"
+  };
+  const titleId = normalizeString(stage._jm1pub_titleid_value);
+  if (!titleId || typeof client?.list !== "function") return fallback;
+
+  const rows = await client.list("jm1pub_editorialartifacts", {
+    $select: "jm1pub_editorialartifactid,jm1pub_repositorydriveid,jm1pub_repositoryitemid,jm1pub_repositorypath,_jm1pub_editorialstageid_value,modifiedon",
+    $filter: `_jm1pub_titleid_value eq ${titleId} and jm1pub_repositorypath ne null`,
+    $orderby: "modifiedon desc",
+    $top: "100"
+  });
+  const anchors = rows.filter((row) => isCanonicalPipelineRepositoryPath(row.jm1pub_repositorypath));
+  anchors.sort((left, right) => {
+    const leftStage = normalizeString(left._jm1pub_editorialstageid_value) === normalizeString(stage.jm1pub_editorialstageid) ? 1 : 0;
+    const rightStage = normalizeString(right._jm1pub_editorialstageid_value) === normalizeString(stage.jm1pub_editorialstageid) ? 1 : 0;
+    return rightStage - leftStage;
+  });
+
+  const resolve = deps.resolveSourceGraphItem || resolveSourceGraphItem;
+  for (const anchor of anchors) {
+    try {
+      const resolved = await resolve(anchor, stageCode);
+      const parentId = normalizeString(resolved.item?.parentReference?.id);
+      if (resolved.driveId && parentId) {
+        return { driveId: resolved.driveId, parentId, authority: "CANONICAL_TITLE_WORKSPACE", anchorArtifactId: anchor.jm1pub_editorialartifactid };
+      }
+    } catch {
+      // Try the next current title-workspace anchor before falling back.
+    }
+  }
+  return fallback;
+}
+
 async function findExecutionLog(client, actionType, idempotencyKey) {
   const rows = await client.list("jm1_executionlogs", {
     $select: "jm1_executionlogid,jm1_actiontype,jm1_actiondescription,createdon",
@@ -3471,8 +3518,6 @@ async function materializeEditorialOutputs(
   options = {}
 ) {
   const sourceRef = await resolveSourceGraphItem(sourceArtifact, stageCode);
-  const driveId = sourceRef.driveId;
-  const sourceItem = sourceRef.item;
   const sourceBuffer = await graphRequest(sourceRef.contentPath).catch((error) => {
     throw Object.assign(error, {
       safeCode: `${stageCode}_BLOCKED — ${error.safeCode || "GRAPH_DOWNLOAD_FAILED"}`,
@@ -3486,7 +3531,9 @@ async function materializeEditorialOutputs(
       safeCode: `${stageCode}_BLOCKED — SOURCE_CHECKSUM_MISMATCH`
     });
   }
-  const parentId = normalizeString(sourceItem?.parentReference?.id);
+  const outputTarget = await resolveEditorialOutputParent(client, stage, stageCode, sourceRef);
+  const driveId = outputTarget.driveId;
+  const parentId = outputTarget.parentId;
   if (!parentId) {
     throw Object.assign(new Error("Source parent folder missing"), {
       safeCode: `${stageCode}_BLOCKED — SOURCE_PARENT_FOLDER_MISSING`
@@ -3643,6 +3690,9 @@ async function materializeEditorialOutputs(
       role: packageRoleForOutput(outputName),
       artifactId,
       itemId: uploaded.id,
+      driveId,
+      parentId,
+      repositoryAuthority: outputTarget.authority,
       filename: uploaded.name || filename,
       extension,
       contentType,
@@ -3956,15 +4006,22 @@ async function createPackageManifestArtifact(client, stage, stageCode, sourceArt
     artifacts: manifest.artifacts
   });
   const manifestBody = Buffer.from(JSON.stringify(manifest, null, 2), "utf8");
-  const driveId = normalizeString(sourceArtifact.jm1pub_repositorydriveid);
-  const itemId = normalizeString(sourceArtifact.jm1pub_repositoryitemid);
-  const sourceItem = await graphRequest(`drives/${driveId}/items/${itemId}?$select=id,parentReference`).catch((error) => {
-    throw Object.assign(error, {
-      safeCode: `${stageCode}_BLOCKED — ${error.safeCode || "GRAPH_METADATA_READ_FAILED"}`,
-      graphDetail: graphFailureDetail(error, sourceArtifact)
+  const driveId = normalizeString(artifacts[0]?.driveId || sourceArtifact.jm1pub_repositorydriveid);
+  let parentId = normalizeString(artifacts[0]?.parentId);
+  if (!parentId && driveId && normalizeString(artifacts[0]?.itemId)) {
+    const outputItem = await graphRequest(`drives/${driveId}/items/${artifacts[0].itemId}?$select=id,parentReference`).catch((error) => {
+      throw Object.assign(error, {
+        safeCode: `${stageCode}_BLOCKED — ${error.safeCode || "GRAPH_METADATA_READ_FAILED"}`,
+        graphDetail: graphFailureDetail(error, sourceArtifact)
+      });
     });
-  });
-  const parentId = normalizeString(sourceItem?.parentReference?.id);
+    parentId = normalizeString(outputItem?.parentReference?.id);
+  }
+  if (!parentId) {
+    throw Object.assign(new Error("Package output parent folder missing"), {
+      safeCode: `${stageCode}_BLOCKED — OUTPUT_PARENT_FOLDER_MISSING`
+    });
+  }
   const filename = `${new Date().toISOString().slice(0, 10)}-${stage.jm1pub_name.replace(/[^a-zA-Z0-9]+/g, "-")}-Package-Manifest-${packageVersion}.json`;
   const uploaded = await graphRequest(`drives/${driveId}/items/${parentId}:/${encodeURIComponent(filename)}:/content`, {
     method: "PUT",
@@ -4355,6 +4412,8 @@ module.exports = {
   buildDevelopmentalEditingChunkPrompt,
   buildDevelopmentalAuthorReviewDocx,
   buildDevelopmentalEditorialReviewDocx,
+  isCanonicalPipelineRepositoryPath,
+  resolveEditorialOutputParent,
   readPersistedGraphContent,
   buildChunkedDevelopmentalInvocation,
   validateDevelopmentalChunkOutput,

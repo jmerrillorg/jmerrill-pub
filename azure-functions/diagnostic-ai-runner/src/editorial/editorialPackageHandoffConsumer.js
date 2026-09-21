@@ -46,6 +46,8 @@ function toOutput(artifact) {
     outputName: outputNameFromArtifact(artifact.jm1pub_editorialartifactname),
     artifactId: artifact.jm1pub_editorialartifactid,
     itemId: artifact.jm1pub_repositoryitemid,
+    driveId: artifact.jm1pub_repositorydriveid,
+    repositoryPath: artifact.jm1pub_repositorypath,
     filename: artifact.jm1pub_filename,
     extension: artifact.jm1pub_fileextension,
     contentType: inferContentType(artifact),

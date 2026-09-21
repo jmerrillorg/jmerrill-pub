@@ -30,6 +30,8 @@ const {
   buildChunkedDevelopmentalInvocation,
   buildDevelopmentalAuthorReviewDocx,
   buildDevelopmentalEditorialReviewDocx,
+  isCanonicalPipelineRepositoryPath,
+  resolveEditorialOutputParent,
   validateDevelopmentalChunkOutput,
   isLivePortfolioStage,
   buildLineEditingQa,
@@ -105,6 +107,39 @@ test("Graph share token encodes SharePoint web URLs for driveItem resolution", (
   assert.equal(token.includes("+"), false);
   assert.equal(token.includes("/"), false);
   assert.equal(graphShareToken("/repo/path/source.docx"), "");
+});
+
+test("editorial outputs prefer a canonical title-workspace anchor over a legacy source parent", async () => {
+  const client = {
+    async list() {
+      return [
+        {
+          jm1pub_editorialartifactid: "canonical-anchor",
+          jm1pub_repositorypath: "https://example.sharepoint.com/Shared%20Documents/01_Pipeline_A-Z/06%20-%20Onboarding/Fly,%20Jackuline%20-%20Whole/02_Editorial/manifest.json",
+          _jm1pub_editorialstageid_value: "stage-1"
+        }
+      ];
+    }
+  };
+  const target = await resolveEditorialOutputParent(
+    client,
+    { _jm1pub_titleid_value: "title-1", jm1pub_editorialstageid: "stage-1" },
+    "DEVELOPMENTAL_EDITING",
+    { driveId: "legacy-drive", item: { parentReference: { id: "legacy-parent" } } },
+    {
+      async resolveSourceGraphItem() {
+        return { driveId: "canonical-drive", item: { parentReference: { id: "canonical-parent" } } };
+      }
+    }
+  );
+
+  assert.equal(isCanonicalPipelineRepositoryPath("https://example/01_Pipeline_A-Z/06%20-%20Onboarding/file.docx"), true);
+  assert.deepEqual(target, {
+    driveId: "canonical-drive",
+    parentId: "canonical-parent",
+    authority: "CANONICAL_TITLE_WORKSPACE",
+    anchorArtifactId: "canonical-anchor"
+  });
 });
 
 test("persisted Graph readback falls back from item identity to exact parent path", async () => {
