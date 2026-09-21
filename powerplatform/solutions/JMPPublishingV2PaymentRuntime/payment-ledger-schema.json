@@ -1,0 +1,99 @@
+{
+  "solution": {
+    "uniqueName": "JMP_PublishingV2_PaymentRuntime",
+    "friendlyName": "JMP Publishing V2 Payment Runtime",
+    "version": "1.0.0.0",
+    "parentSolution": "JMP_PublishingV2",
+    "publisherUniqueName": "JMPPublishingPaymentRuntime",
+    "publisherFriendlyName": "JMP Publishing Payment Runtime",
+    "publisherPrefix": "jmpv2",
+    "publisherOptionValuePrefix": 81517,
+    "managedDefaultEnabled": false
+  },
+  "authority": {
+    "agreement": "jmpv2_agreementrecord",
+    "obligation": "jmpv2_paymentrequirement",
+    "event": "jmpv2_paymentevidence",
+    "concurrency": "native Dataverse row version and If-Match",
+    "balance": "immutable payment/refund events plus contractual obligations",
+    "parallelTablesCreated": false
+  },
+  "tables": {
+    "jmpv2_agreementrecord": [
+      ["jmpv2_paymentscheduleid", "String", 100],
+      ["jmpv2_currency", "String", 3],
+      ["jmpv2_totalagreementamountcents", "BigInt"],
+      ["jmpv2_scheduledinstallmentamountcents", "BigInt"],
+      ["jmpv2_schedulecadence", "String", 50],
+      ["jmpv2_currentbalancecents", "BigInt"],
+      ["jmpv2_pastduebalancecents", "BigInt"],
+      ["jmpv2_nextduedate", "DateTime"],
+      ["jmpv2_nextpaymentat", "DateTime"],
+      ["jmpv2_paymentledgerstatus", "String", 50],
+      ["jmpv2_payoffstatus", "String", 50],
+      ["jmpv2_autopaystatus", "String", 50],
+      ["jmpv2_stripecustomerid", "String", 100],
+      ["jmpv2_stripesubscriptionscheduleid", "String", 100],
+      ["jmpv2_qbocustomerreference", "String", 100],
+      ["jmpv2_qboreceivablereference", "String", 100],
+      ["jmpv2_balanceversion", "String", 64],
+      ["jmpv2_lastpaymentat", "DateTime"]
+    ],
+    "jmpv2_paymentrequirement": [
+      ["jmpv2_agreementkey", "String", 100],
+      ["jmpv2_amountcents", "BigInt"],
+      ["jmpv2_duedate", "DateTime"],
+      ["jmpv2_obligationstatus", "String", 50],
+      ["jmpv2_installmentsequence", "Integer"],
+      ["jmpv2_idempotencykey", "String", 100],
+      ["jmpv2_stripeinvoiceid", "String", 100]
+    ],
+    "jmpv2_paymentevidence": [
+      ["jmpv2_agreementkey", "String", 100],
+      ["jmpv2_eventkind", "String", 50],
+      ["jmpv2_paymenttype", "String", 50],
+      ["jmpv2_obligationid", "String", 100],
+      ["jmpv2_stripeeventid", "String", 100],
+      ["jmpv2_stripepaymentid", "String", 100],
+      ["jmpv2_stripeinvoiceid", "String", 100],
+      ["jmpv2_refundid", "String", 100],
+      ["jmpv2_originalpaymentid", "String", 100],
+      ["jmpv2_grossamountcents", "BigInt"],
+      ["jmpv2_stripefeecents", "BigInt"],
+      ["jmpv2_netsettlementcents", "BigInt"],
+      ["jmpv2_scheduledallocationcents", "BigInt"],
+      ["jmpv2_pastdueallocationcents", "BigInt"],
+      ["jmpv2_additionalallocationcents", "BigInt"],
+      ["jmpv2_allocationsjson", "Memo", 100000],
+      ["jmpv2_balancebeforecents", "BigInt"],
+      ["jmpv2_balanceaftercents", "BigInt"],
+      ["jmpv2_eventstatus", "String", 50],
+      ["jmpv2_qboreconciliationstatus", "String", 50],
+      ["jmpv2_qbotransactionid", "String", 100],
+      ["jmpv2_settlementreference", "String", 100],
+      ["jmpv2_occurredat", "DateTime"]
+    ]
+  },
+  "alternateKeys": [
+    ["jmpv2_paymentevidence", "jmpv2_paymentevidence_idempotency", ["jmpv2_idempotencykey"]]
+  ],
+  "runtimeRole": {
+    "name": "JMP Publishing Payment Runtime",
+    "global": [
+      "prvReadjmpv2_AgreementRecord",
+      "prvWritejmpv2_AgreementRecord",
+      "prvReadjmpv2_PaymentRequirement",
+      "prvWritejmpv2_PaymentRequirement",
+      "prvReadjmpv2_PaymentEvidence",
+      "prvCreatejmpv2_PaymentEvidence",
+      "prvReadEnvironmentVariableDefinition"
+    ],
+    "platformRequiredGlobal": [
+      "prvCreateSharePointData",
+      "prvReadSharePointData",
+      "prvReadSharePointDocument",
+      "prvWriteSharePointData"
+    ],
+    "forbidden": ["delete", "assign", "share", "schema administration", "security administration"]
+  }
+}

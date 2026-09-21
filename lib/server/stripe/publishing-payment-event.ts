@@ -11,6 +11,14 @@ import {
   stripePaymentBindingName,
 } from './publishing-payment-correlation'
 import type { PublishingPaymentType } from './publishing-agreement-payment'
+import {
+  createDataversePublishingPaymentLedger,
+  createGovernedQboPaymentAdapter,
+} from './publishing-payment-adapters'
+import {
+  processConfirmedAgreementPayment,
+  productionPaymentGateReadback,
+} from './publishing-payment-runtime'
 
 const STRIPE_API_BASE = 'https://api.stripe.com'
 
@@ -88,6 +96,12 @@ export type PublishingPaymentSuccess = {
 
 type DataverseRow = Record<string, any>
 
+function requiredPaymentField(value: string | null | undefined, code: string) {
+  const normalized = String(value || '').trim()
+  if (!normalized) throw new Error(code)
+  return normalized
+}
+
 export async function retrieveStripePaymentIntent(paymentIntentId: string): Promise<PublishingPaymentSuccess> {
   const response = await fetch(`${STRIPE_API_BASE}/v1/payment_intents/${encodeURIComponent(paymentIntentId)}?expand[]=latest_charge`, {
     headers: {
@@ -150,11 +164,34 @@ export async function processPublishingPaymentSuccess(input: PublishingPaymentSu
     }
   }
   if (payment.paymentType) {
-    return blocked('AGREEMENT_PAYMENT_RUNTIME_NOT_COMMISSIONED', {
-      paymentType: payment.paymentType,
-      accountingAuthority: 'QBO',
-      financialEffect: 0,
-    })
+    const gate = productionPaymentGateReadback()
+    if (!gate.enabled) {
+      return blocked('AGREEMENT_PAYMENT_RUNTIME_NOT_COMMISSIONED', {
+        paymentType: payment.paymentType,
+        accountingAuthority: 'QBO',
+        missing: gate.missing,
+        financialEffect: 0,
+      })
+    }
+    try {
+      return await processConfirmedAgreementPayment({
+        agreementId: requiredPaymentField(payment.agreementId, 'AGREEMENT_ID_REQUIRED'),
+        stripeEventId: requiredPaymentField(payment.eventId, 'STRIPE_EVENT_ID_REQUIRED'),
+        stripePaymentId: requiredPaymentField(payment.paymentIntentId || payment.chargeId, 'STRIPE_PAYMENT_ID_REQUIRED'),
+        stripeInvoiceId: payment.invoiceId,
+        amountCents: payment.amountCents,
+        intent: payment.paymentType === 'ADDITIONAL_PAYMENT' ? 'ADDITIONAL_PAYMENT' : 'CURRENT_PLUS_ADDITIONAL',
+        occurredAt: payment.paidAt || isoFromStripeSeconds(payment.created) || new Date().toISOString(),
+        submittedBalanceVersion: requiredPaymentField(payment.balanceVersion, 'BALANCE_VERSION_REQUIRED'),
+        ledger: createDataversePublishingPaymentLedger(),
+        qbo: createGovernedQboPaymentAdapter(),
+      })
+    } catch (error) {
+      return blocked(error instanceof Error ? error.message : 'AGREEMENT_PAYMENT_RUNTIME_FAILED', {
+        paymentType: payment.paymentType,
+        accountingAuthority: 'QBO',
+      })
+    }
   }
   if (payment.source === 'GOVERNED_MANUAL_CORRECTION') {
     if (!payment.manualCorrectionConfirmed || !payment.correctionReason || !normalizeGuid(payment.opportunityId)) {

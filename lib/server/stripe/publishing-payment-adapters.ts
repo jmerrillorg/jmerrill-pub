@@ -1,3 +1,5 @@
+import { randomUUID } from 'node:crypto'
+
 import {
   dataverseFirst,
   dataverseList,
@@ -11,6 +13,7 @@ import type {
   AgreementRefund,
   ScheduledObligation,
 } from './publishing-agreement-payment'
+import { calculateAgreementPaymentState } from './publishing-agreement-payment'
 import {
   productionPaymentGateReadback,
   type AgreementLedgerRecord,
@@ -23,10 +26,9 @@ import {
 } from './publishing-payment-runtime'
 
 const STRIPE_API_BASE = 'https://api.stripe.com'
-const AGREEMENTS = 'jm1pub_publishingagreements'
-const OBLIGATIONS = 'jm1pub_paymentobligations'
-const EVENTS = 'jm1pub_paymentevents'
-const ATTEMPTS = 'jm1pub_paymentcollectionattempts'
+const AGREEMENTS = 'jmpv2_agreementrecords'
+const OBLIGATIONS = 'jmpv2_paymentrequirements'
+const EVENTS = 'jmpv2_paymentevidences'
 
 export function createDataversePublishingPaymentLedger(): PublishingPaymentLedger {
   const config = getDataverseServerConfig()
@@ -41,7 +43,7 @@ export class DataversePublishingPaymentLedger implements PublishingPaymentLedger
     const id = guid(agreementId)
     const row = await dataverseFirst(this.config, AGREEMENTS, {
       $select: agreementSelect,
-      $filter: `jm1pub_agreementid eq '${odata(id)}'`,
+      $filter: `jmpv2_agreementrecordid eq ${id}`,
     })
     return row ? this.hydrateAgreement(row) : null
   }
@@ -49,16 +51,27 @@ export class DataversePublishingPaymentLedger implements PublishingPaymentLedger
   async listDueAgreements(asOf: string) {
     const rows = await dataverseList(this.config, AGREEMENTS, {
       $select: agreementSelect,
-      $filter: `jm1pub_paymentstatus eq 'ACTIVE' and jm1pub_nextpaymentat le ${asOf}`,
-      $orderby: 'jm1pub_nextpaymentat asc',
+      $filter: `jmpv2_paymentledgerstatus eq 'ACTIVE' and jmpv2_nextduedate le ${asOf}`,
+      $orderby: 'jmpv2_nextduedate asc',
     })
     return Promise.all(rows.map((row) => this.hydrateAgreement(row)))
   }
 
   async findPaymentEvent(stripeEventId: string, stripePaymentId: string) {
-    const filter = `jm1pub_stripeeventid eq '${odata(stripeEventId)}' or jm1pub_stripepaymentid eq '${odata(stripePaymentId)}'`
+    const filter = `jmpv2_stripeeventid eq '${odata(stripeEventId)}' or jmpv2_stripepaymentid eq '${odata(stripePaymentId)}'`
     const row = await dataverseFirst(this.config, EVENTS, { $select: eventSelect, $filter: filter })
-    return row ? mapEvent(row) : null
+    if (!row) return null
+    const event = mapEvent(row)
+    const reconciliation = await dataverseFirst(this.config, EVENTS, {
+      $select: 'jmpv2_eventstatus,jmpv2_qbotransactionid',
+      $filter: `jmpv2_eventkind eq 'QBO_RECONCILIATION' and jmpv2_originalpaymentid eq '${odata(event.paymentEventId)}'`,
+      $orderby: 'jmpv2_occurredat desc',
+    })
+    if (reconciliation) {
+      event.qboReconciliationStatus = text(reconciliation.jmpv2_eventstatus) as PaymentEventRecord['qboReconciliationStatus']
+      event.qboTransactionId = text(reconciliation.jmpv2_qbotransactionid) || null
+    }
+    return event
   }
 
   async appendConfirmedPayment(input: {
@@ -67,11 +80,15 @@ export class DataversePublishingPaymentLedger implements PublishingPaymentLedger
     payment: AgreementPayment
     expectedEtag: string
   }) {
-    await this.invokeAtomicAction('jm1pub_ApplyPublishingPaymentEvent', {
-      AgreementId: input.agreement.snapshot.agreementId,
-      ExpectedETag: input.expectedEtag,
-      EventJson: JSON.stringify(input.event),
-      PaymentJson: JSON.stringify(input.payment),
+    const state = calculateAgreementPaymentState({
+      ...input.agreement.snapshot,
+      payments: [...input.agreement.snapshot.payments, input.payment],
+    })
+    await this.atomicLedgerCommit({
+      agreementId: input.agreement.snapshot.agreementId,
+      expectedEtag: input.expectedEtag,
+      event: paymentEventPayload(input.event),
+      agreementPatch: agreementStatePatch(state),
     })
     const record = await this.getAgreement(input.agreement.snapshot.agreementId)
     if (!record) throw new Error('DATAVERSE_LEDGER_READBACK_MISSING')
@@ -83,10 +100,15 @@ export class DataversePublishingPaymentLedger implements PublishingPaymentLedger
     refund: AgreementRefund
     expectedEtag: string
   }) {
-    await this.invokeAtomicAction('jm1pub_ApplyPublishingPaymentRefund', {
-      AgreementId: input.agreement.snapshot.agreementId,
-      ExpectedETag: input.expectedEtag,
-      RefundJson: JSON.stringify(input.refund),
+    const state = calculateAgreementPaymentState({
+      ...input.agreement.snapshot,
+      refunds: [...(input.agreement.snapshot.refunds || []), input.refund],
+    })
+    await this.atomicLedgerCommit({
+      agreementId: input.agreement.snapshot.agreementId,
+      expectedEtag: input.expectedEtag,
+      event: refundEventPayload(input.agreement.snapshot.agreementId, input.refund, state),
+      agreementPatch: agreementStatePatch(state),
     })
     const record = await this.getAgreement(input.agreement.snapshot.agreementId)
     if (!record) throw new Error('DATAVERSE_LEDGER_READBACK_MISSING')
@@ -94,24 +116,35 @@ export class DataversePublishingPaymentLedger implements PublishingPaymentLedger
   }
 
   async findCollectionAttempt(executionKey: string) {
-    const row = await dataverseFirst(this.config, ATTEMPTS, {
-      $select: 'jm1pub_executionkey,jm1pub_agreementid,jm1pub_obligationid,jm1pub_amountcents,jm1pub_stripeinvoiceid,jm1pub_status,createdon',
-      $filter: `jm1pub_executionkey eq '${odata(executionKey)}'`,
+    const row = await dataverseFirst(this.config, EVENTS, {
+      $select: 'jmpv2_idempotencykey,jmpv2_agreementkey,jmpv2_obligationid,jmpv2_grossamountcents,jmpv2_stripeinvoiceid,jmpv2_eventstatus,jmpv2_occurredat',
+      $filter: `jmpv2_eventkind eq 'COLLECTION_ATTEMPT' and jmpv2_idempotencykey eq '${odata(executionKey)}'`,
     })
     if (!row) return null
     return {
-      executionKey: text(row.jm1pub_executionkey),
-      agreementId: text(row.jm1pub_agreementid),
-      obligationId: text(row.jm1pub_obligationid) || null,
-      amountCents: integer(row.jm1pub_amountcents),
-      stripeInvoiceId: text(row.jm1pub_stripeinvoiceid),
+      executionKey: text(row.jmpv2_idempotencykey),
+      agreementId: text(row.jmpv2_agreementkey),
+      obligationId: text(row.jmpv2_obligationid) || null,
+      amountCents: integer(row.jmpv2_grossamountcents),
+      stripeInvoiceId: text(row.jmpv2_stripeinvoiceid),
       status: 'CREATED' as const,
-      createdAt: text(row.createdon),
+      createdAt: text(row.jmpv2_occurredat),
     }
   }
 
   async recordCollectionAttempt(attempt: CollectionAttempt) {
-    await this.invokeAtomicAction('jm1pub_RecordPublishingCollectionAttempt', { AttemptJson: JSON.stringify(attempt) })
+    await this.createEvidence({
+      jmpv2_paymentevidencekey: attempt.executionKey,
+      jmpv2_agreementkey: attempt.agreementId,
+      jmpv2_eventkind: 'COLLECTION_ATTEMPT',
+      jmpv2_paymenttype: 'SCHEDULED_INSTALLMENT',
+      jmpv2_obligationid: attempt.obligationId,
+      jmpv2_grossamountcents: attempt.amountCents,
+      jmpv2_stripeinvoiceid: attempt.stripeInvoiceId,
+      jmpv2_eventstatus: attempt.status,
+      jmpv2_idempotencykey: attempt.executionKey,
+      jmpv2_occurredat: attempt.createdAt,
+    })
   }
 
   async markQboReconciliation(input: {
@@ -119,80 +152,101 @@ export class DataversePublishingPaymentLedger implements PublishingPaymentLedger
     status: 'PASS' | 'ATTENTION_REQUIRED'
     qboTransactionId?: string | null
   }) {
-    await this.invokeAtomicAction('jm1pub_SetPublishingQboReconciliation', {
-      PaymentEventId: input.paymentEventId,
-      ReconciliationStatus: input.status,
-      QboTransactionId: input.qboTransactionId || null,
+    const row = await dataverseFirst(this.config, EVENTS, {
+      $select: 'jmpv2_agreementkey',
+      $filter: `jmpv2_paymentevidencekey eq '${odata(input.paymentEventId)}'`,
+    })
+    if (!row) throw new Error('DATAVERSE_PAYMENT_EVENT_NOT_FOUND')
+    const reconciliationKey = `qbo:${input.paymentEventId}:${input.status}:${input.qboTransactionId || 'none'}`
+    const existing = await dataverseFirst(this.config, EVENTS, {
+      $select: 'jmpv2_paymentevidenceid',
+      $filter: `jmpv2_paymentevidencekey eq '${odata(reconciliationKey)}'`,
+    })
+    if (existing) return
+    await this.createEvidence({
+      jmpv2_paymentevidencekey: reconciliationKey,
+      jmpv2_agreementkey: text(row.jmpv2_agreementkey),
+      jmpv2_eventkind: 'QBO_RECONCILIATION',
+      jmpv2_originalpaymentid: input.paymentEventId,
+      jmpv2_eventstatus: input.status,
+      jmpv2_qbotransactionid: input.qboTransactionId || null,
+      jmpv2_idempotencykey: reconciliationKey,
+      jmpv2_occurredat: new Date().toISOString(),
     })
   }
 
   private async hydrateAgreement(row: DataverseRow): Promise<AgreementLedgerRecord> {
-    const agreementId = text(row.jm1pub_agreementid)
+    const agreementId = text(row.jmpv2_agreementrecordid)
+    const agreementKey = text(row.jmpv2_agreementkey)
     const [obligationRows, eventRows] = await Promise.all([
       dataverseList(this.config, OBLIGATIONS, {
-        $select: 'jm1pub_obligationid,jm1pub_duedate,jm1pub_amountcents,jm1pub_status',
-        $filter: `jm1pub_agreementid eq '${odata(agreementId)}'`,
-        $orderby: 'jm1pub_duedate asc',
+        $select: 'jmpv2_paymentrequirementid,jmpv2_duedate,jmpv2_amountcents,jmpv2_obligationstatus',
+        $filter: `jmpv2_agreementkey eq '${odata(agreementKey)}'`,
+        $orderby: 'jmpv2_duedate asc',
       }),
       dataverseList(this.config, EVENTS, {
         $select: eventSelect,
-        $filter: `jm1pub_agreementid eq '${odata(agreementId)}'`,
-        $orderby: 'jm1pub_occurredat asc',
+        $filter: `jmpv2_agreementkey eq '${odata(agreementKey)}' and (jmpv2_eventkind eq 'PAYMENT' or jmpv2_eventkind eq 'REFUND')`,
+        $orderby: 'jmpv2_occurredat asc',
       }),
     ])
     const payments: AgreementPayment[] = eventRows
-      .filter((event) => text(event.jm1pub_eventkind) === 'PAYMENT')
+      .filter((event) => text(event.jmpv2_eventkind) === 'PAYMENT')
       .map((event) => ({
-        paymentId: text(event.jm1pub_stripepaymentid),
-        eventId: text(event.jm1pub_stripeeventid),
-        paymentType: text(event.jm1pub_paymenttype) as AgreementPayment['paymentType'],
-        amountCents: integer(event.jm1pub_grossamountcents),
-        status: text(event.jm1pub_status) === 'CONFIRMED' ? 'SUCCEEDED' : 'FAILED',
-        allocations: json(event.jm1pub_allocationsjson, []),
-        paidAt: text(event.jm1pub_occurredat),
+        paymentId: text(event.jmpv2_stripepaymentid),
+        eventId: text(event.jmpv2_stripeeventid),
+        paymentType: text(event.jmpv2_paymenttype) as AgreementPayment['paymentType'],
+        amountCents: integer(event.jmpv2_grossamountcents),
+        status: text(event.jmpv2_eventstatus) === 'CONFIRMED' ? 'SUCCEEDED' : 'FAILED',
+        allocations: json(event.jmpv2_allocationsjson, []),
+        paidAt: text(event.jmpv2_occurredat),
       }))
     const refunds: AgreementRefund[] = eventRows
-      .filter((event) => text(event.jm1pub_eventkind) === 'REFUND')
+      .filter((event) => text(event.jmpv2_eventkind) === 'REFUND')
       .map((event) => ({
-        refundId: text(event.jm1pub_refundid),
-        eventId: text(event.jm1pub_stripeeventid),
-        originalPaymentId: text(event.jm1pub_originalpaymentid),
-        amountCents: integer(event.jm1pub_grossamountcents),
-        status: text(event.jm1pub_status) === 'CONFIRMED' ? 'SUCCEEDED' : 'FAILED',
-        refundedAt: text(event.jm1pub_occurredat),
+        refundId: text(event.jmpv2_refundid),
+        eventId: text(event.jmpv2_stripeeventid),
+        originalPaymentId: text(event.jmpv2_originalpaymentid),
+        amountCents: integer(event.jmpv2_grossamountcents),
+        status: text(event.jmpv2_eventstatus) === 'CONFIRMED' ? 'SUCCEEDED' : 'FAILED',
+        refundedAt: text(event.jmpv2_occurredat),
       }))
     const scheduledObligations: ScheduledObligation[] = obligationRows.map((obligation) => ({
-      obligationId: text(obligation.jm1pub_obligationid),
-      dueDate: text(obligation.jm1pub_duedate),
-      amountCents: integer(obligation.jm1pub_amountcents),
-      status: text(obligation.jm1pub_status) as ScheduledObligation['status'],
+      obligationId: text(obligation.jmpv2_paymentrequirementid),
+      dueDate: text(obligation.jmpv2_duedate),
+      amountCents: integer(obligation.jmpv2_amountcents),
+      status: text(obligation.jmpv2_obligationstatus) as ScheduledObligation['status'],
     }))
     const snapshot: AgreementPaymentSnapshot = {
       agreementId,
-      authorId: text(row.jm1pub_authorid),
-      titleId: text(row.jm1pub_titleid),
-      paymentScheduleId: text(row.jm1pub_paymentscheduleid),
+      authorId: text(row.jmpv2_authoridentity),
+      titleId: text(row.jmpv2_titleid),
+      paymentScheduleId: text(row.jmpv2_paymentscheduleid),
       currency: 'usd',
-      contractualBalanceCents: integer(row.jm1pub_totalagreementamountcents),
-      normalInstallmentCents: integer(row.jm1pub_scheduledinstallmentamountcents),
-      nextScheduledDueDate: text(row.jm1pub_nextduedate) || null,
+      contractualBalanceCents: integer(row.jmpv2_totalagreementamountcents),
+      normalInstallmentCents: integer(row.jmpv2_scheduledinstallmentamountcents),
+      nextScheduledDueDate: text(row.jmpv2_nextduedate) || null,
       scheduledObligations,
       payments,
       refunds,
     }
     return {
       snapshot,
-      stripeCustomerId: text(row.jm1pub_stripecustomerid),
-      qboCustomerReference: text(row.jm1pub_qbocustomerreference),
-      qboReceivableReference: text(row.jm1pub_qboreceivablereference),
+      stripeCustomerId: text(row.jmpv2_stripecustomerid),
+      qboCustomerReference: text(row.jmpv2_qbocustomerreference),
+      qboReceivableReference: text(row.jmpv2_qboreceivablereference),
       etag: text(row['@odata.etag']),
-      status: text(row.jm1pub_paymentstatus) as AgreementLedgerRecord['status'],
+      status: text(row.jmpv2_paymentledgerstatus) as AgreementLedgerRecord['status'],
     }
   }
 
-  private async invokeAtomicAction(action: string, payload: Record<string, unknown>) {
-    const response = await fetch(`${this.config.webApiBaseUrl}/${action}`, {
-      method: 'POST',
+  private async createEvidence(payload: Record<string, unknown>) {
+    return this.evidenceRequest('', 'POST', payload)
+  }
+
+  private async evidenceRequest(suffix: string, method: 'POST', payload: Record<string, unknown>) {
+    const response = await fetch(`${this.config.webApiBaseUrl}/${EVENTS}${suffix}`, {
+      method,
       headers: {
         Authorization: `Bearer ${await getDataverseActionToken(this.config)}`,
         Accept: 'application/json',
@@ -201,11 +255,29 @@ export class DataversePublishingPaymentLedger implements PublishingPaymentLedger
       body: JSON.stringify(payload),
       cache: 'no-store',
     })
-    if (!response.ok) {
-      if (response.status === 404) throw new Error('DATAVERSE_PAYMENT_CUSTOM_API_NOT_COMMISSIONED')
-      if (response.status === 412) throw new Error('CONCURRENT_BALANCE_WRITE_REJECTED')
-      throw new Error(`DATAVERSE_PAYMENT_ACTION_FAILED_${response.status}`)
-    }
+    if (!response.ok) throw new Error(`DATAVERSE_PAYMENT_EVIDENCE_WRITE_FAILED_${response.status}`)
+  }
+
+  private async atomicLedgerCommit(input: {
+    agreementId: string
+    expectedEtag: string
+    event: Record<string, unknown>
+    agreementPatch: Record<string, unknown>
+  }) {
+    const batch = buildAtomicLedgerBatch(input)
+    const response = await fetch(`${this.config.webApiBaseUrl}/$batch`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${await getDataverseActionToken(this.config)}`,
+        Accept: 'application/json',
+        'Content-Type': `multipart/mixed; boundary=${batch.boundary}`,
+      },
+      body: batch.body,
+      cache: 'no-store',
+    })
+    const body = await response.text()
+    if (response.status === 412 || /HTTP\/1\.1 412/.test(body)) throw new Error('CONCURRENT_BALANCE_WRITE_REJECTED')
+    if (!response.ok || /HTTP\/1\.1 [45]\d\d/.test(body)) throw new Error('DATAVERSE_PAYMENT_BATCH_FAILED')
   }
 }
 
@@ -233,7 +305,12 @@ export function createStripeAgreementCollections(): StripeAgreementCollections {
       })
       addMetadata(invoiceBody, input.metadata)
       const invoice = await stripePost('/v1/invoices', invoiceBody, `${input.idempotencyKey}:invoice`, secret)
-      return { invoiceId: requiredText(invoice.id, 'STRIPE_INVOICE_ID_MISSING') }
+      const invoiceId = requiredText(invoice.id, 'STRIPE_INVOICE_ID_MISSING')
+      const finalized = await stripePost(`/v1/invoices/${encodeURIComponent(invoiceId)}/finalize`, new URLSearchParams(), `${input.idempotencyKey}:finalize`, secret)
+      return {
+        invoiceId,
+        hostedInvoiceUrl: requiredText(finalized.hosted_invoice_url, 'STRIPE_HOSTED_INVOICE_URL_MISSING'),
+      }
     },
   }
 }
@@ -266,41 +343,133 @@ export function createGovernedQboPaymentAdapter(): QboPublishingPaymentAdapter {
 }
 
 const agreementSelect = [
-  'jm1pub_agreementid', 'jm1pub_authorid', 'jm1pub_titleid', 'jm1pub_paymentscheduleid',
-  'jm1pub_totalagreementamountcents', 'jm1pub_scheduledinstallmentamountcents', 'jm1pub_nextduedate',
-  'jm1pub_stripecustomerid', 'jm1pub_qbocustomerreference', 'jm1pub_qboreceivablereference', 'jm1pub_paymentstatus',
+  'jmpv2_agreementrecordid', 'jmpv2_agreementkey', 'jmpv2_authoridentity', 'jmpv2_titleid', 'jmpv2_paymentscheduleid',
+  'jmpv2_totalagreementamountcents', 'jmpv2_scheduledinstallmentamountcents', 'jmpv2_schedulecadence', 'jmpv2_nextduedate',
+  'jmpv2_stripecustomerid', 'jmpv2_qbocustomerreference', 'jmpv2_qboreceivablereference', 'jmpv2_paymentledgerstatus',
 ].join(',')
 
 const eventSelect = [
-  'jm1pub_paymenteventid', 'jm1pub_agreementid', 'jm1pub_eventkind', 'jm1pub_paymenttype',
-  'jm1pub_stripeeventid', 'jm1pub_stripepaymentid', 'jm1pub_stripeinvoiceid', 'jm1pub_refundid',
-  'jm1pub_originalpaymentid', 'jm1pub_grossamountcents', 'jm1pub_scheduledallocationcents',
-  'jm1pub_pastdueallocationcents', 'jm1pub_additionalallocationcents', 'jm1pub_allocationsjson',
-  'jm1pub_balancebeforecents', 'jm1pub_balanceaftercents', 'jm1pub_status',
-  'jm1pub_qboreconciliationstatus', 'jm1pub_qbotransactionid', 'jm1pub_idempotencykey', 'jm1pub_occurredat',
+  'jmpv2_paymentevidenceid', 'jmpv2_paymentevidencekey', 'jmpv2_agreementkey', 'jmpv2_eventkind', 'jmpv2_paymenttype',
+  'jmpv2_stripeeventid', 'jmpv2_stripepaymentid', 'jmpv2_stripeinvoiceid', 'jmpv2_refundid',
+  'jmpv2_originalpaymentid', 'jmpv2_grossamountcents', 'jmpv2_scheduledallocationcents',
+  'jmpv2_pastdueallocationcents', 'jmpv2_additionalallocationcents', 'jmpv2_allocationsjson',
+  'jmpv2_balancebeforecents', 'jmpv2_balanceaftercents', 'jmpv2_eventstatus',
+  'jmpv2_qboreconciliationstatus', 'jmpv2_qbotransactionid', 'jmpv2_idempotencykey', 'jmpv2_occurredat',
 ].join(',')
 
 function mapEvent(row: DataverseRow): PaymentEventRecord {
   return {
-    paymentEventId: text(row.jm1pub_paymenteventid),
-    agreementId: text(row.jm1pub_agreementid),
-    paymentType: text(row.jm1pub_paymenttype) as PaymentEventRecord['paymentType'],
-    stripeEventId: text(row.jm1pub_stripeeventid),
-    stripePaymentId: text(row.jm1pub_stripepaymentid),
-    stripeInvoiceId: text(row.jm1pub_stripeinvoiceid) || null,
-    grossAmountCents: integer(row.jm1pub_grossamountcents),
-    scheduledAllocationCents: integer(row.jm1pub_scheduledallocationcents),
-    pastDueAllocationCents: integer(row.jm1pub_pastdueallocationcents),
-    additionalAllocationCents: integer(row.jm1pub_additionalallocationcents),
-    allocations: json(row.jm1pub_allocationsjson, []),
-    balanceBeforeCents: integer(row.jm1pub_balancebeforecents),
-    balanceAfterCents: integer(row.jm1pub_balanceaftercents),
-    status: text(row.jm1pub_status) as PaymentEventRecord['status'],
-    qboReconciliationStatus: text(row.jm1pub_qboreconciliationstatus) as PaymentEventRecord['qboReconciliationStatus'],
-    qboTransactionId: text(row.jm1pub_qbotransactionid) || null,
-    idempotencyKey: text(row.jm1pub_idempotencykey),
-    occurredAt: text(row.jm1pub_occurredat),
+    paymentEventId: text(row.jmpv2_paymentevidencekey),
+    agreementId: text(row.jmpv2_agreementkey),
+    paymentType: text(row.jmpv2_paymenttype) as PaymentEventRecord['paymentType'],
+    stripeEventId: text(row.jmpv2_stripeeventid),
+    stripePaymentId: text(row.jmpv2_stripepaymentid),
+    stripeInvoiceId: text(row.jmpv2_stripeinvoiceid) || null,
+    grossAmountCents: integer(row.jmpv2_grossamountcents),
+    scheduledAllocationCents: integer(row.jmpv2_scheduledallocationcents),
+    pastDueAllocationCents: integer(row.jmpv2_pastdueallocationcents),
+    additionalAllocationCents: integer(row.jmpv2_additionalallocationcents),
+    allocations: json(row.jmpv2_allocationsjson, []),
+    balanceBeforeCents: integer(row.jmpv2_balancebeforecents),
+    balanceAfterCents: integer(row.jmpv2_balanceaftercents),
+    status: text(row.jmpv2_eventstatus) as PaymentEventRecord['status'],
+    qboReconciliationStatus: text(row.jmpv2_qboreconciliationstatus) as PaymentEventRecord['qboReconciliationStatus'],
+    qboTransactionId: text(row.jmpv2_qbotransactionid) || null,
+    idempotencyKey: text(row.jmpv2_idempotencykey),
+    occurredAt: text(row.jmpv2_occurredat),
   }
+}
+
+function paymentEventPayload(event: PaymentEventRecord) {
+  return {
+    jmpv2_paymentevidencekey: event.paymentEventId,
+    jmpv2_agreementkey: event.agreementId,
+    jmpv2_eventkind: 'PAYMENT',
+    jmpv2_paymenttype: event.paymentType,
+    jmpv2_stripeeventid: event.stripeEventId,
+    jmpv2_stripepaymentid: event.stripePaymentId,
+    jmpv2_stripeinvoiceid: event.stripeInvoiceId,
+    jmpv2_grossamountcents: event.grossAmountCents,
+    jmpv2_scheduledallocationcents: event.scheduledAllocationCents,
+    jmpv2_pastdueallocationcents: event.pastDueAllocationCents,
+    jmpv2_additionalallocationcents: event.additionalAllocationCents,
+    jmpv2_allocationsjson: JSON.stringify(event.allocations),
+    jmpv2_balancebeforecents: event.balanceBeforeCents,
+    jmpv2_balanceaftercents: event.balanceAfterCents,
+    jmpv2_eventstatus: event.status,
+    jmpv2_qboreconciliationstatus: event.qboReconciliationStatus,
+    jmpv2_qbotransactionid: event.qboTransactionId,
+    jmpv2_idempotencykey: event.idempotencyKey,
+    jmpv2_occurredat: event.occurredAt,
+  }
+}
+
+function refundEventPayload(agreementId: string, refund: AgreementRefund, state: ReturnType<typeof calculateAgreementPaymentState>) {
+  return {
+    jmpv2_paymentevidencekey: refund.eventId,
+    jmpv2_agreementkey: agreementId,
+    jmpv2_eventkind: 'REFUND',
+    jmpv2_stripeeventid: refund.eventId,
+    jmpv2_refundid: refund.refundId,
+    jmpv2_originalpaymentid: refund.originalPaymentId,
+    jmpv2_grossamountcents: refund.amountCents,
+    jmpv2_balanceaftercents: state.remainingBalanceCents,
+    jmpv2_eventstatus: refund.status === 'SUCCEEDED' ? 'CONFIRMED' : 'FAILED',
+    jmpv2_qboreconciliationstatus: 'PENDING',
+    jmpv2_idempotencykey: refund.refundId,
+    jmpv2_occurredat: refund.refundedAt,
+  }
+}
+
+function agreementStatePatch(state: ReturnType<typeof calculateAgreementPaymentState>) {
+  return {
+    jmpv2_currentbalancecents: state.remainingBalanceCents,
+    jmpv2_pastduebalancecents: state.pastDueBalanceCents,
+    jmpv2_balanceversion: state.balanceVersion,
+    jmpv2_paymentledgerstatus: state.paidInFull ? 'PAID_IN_FULL' : 'ACTIVE',
+    jmpv2_payoffstatus: state.paidInFull ? 'PAID_IN_FULL' : 'OPEN',
+    jmpv2_nextduedate: state.nextScheduledDueDate,
+    jmpv2_nextpaymentat: state.nextScheduledDueDate,
+  }
+}
+
+function buildAtomicLedgerBatch(input: {
+  agreementId: string
+  expectedEtag: string
+  event: Record<string, unknown>
+  agreementPatch: Record<string, unknown>
+}) {
+  const suffix = randomUUID()
+  const boundary = `batch_${suffix}`
+  const changeset = `changeset_${suffix}`
+  const lines = [
+    `--${boundary}`,
+    `Content-Type: multipart/mixed; boundary=${changeset}`,
+    '',
+    `--${changeset}`,
+    'Content-Type: application/http',
+    'Content-Transfer-Encoding: binary',
+    'Content-ID: 1',
+    '',
+    `POST /api/data/v9.2/${EVENTS} HTTP/1.1`,
+    'Content-Type: application/json;type=entry',
+    '',
+    JSON.stringify(input.event),
+    `--${changeset}`,
+    'Content-Type: application/http',
+    'Content-Transfer-Encoding: binary',
+    'Content-ID: 2',
+    '',
+    `PATCH /api/data/v9.2/${AGREEMENTS}(${guid(input.agreementId)}) HTTP/1.1`,
+    'Content-Type: application/json;type=entry',
+    `If-Match: ${input.expectedEtag}`,
+    '',
+    JSON.stringify(input.agreementPatch),
+    `--${changeset}--`,
+    `--${boundary}--`,
+    '',
+  ]
+  return { boundary, body: lines.join('\r\n') }
 }
 
 async function stripePost(path: string, body: URLSearchParams, idempotencyKey: string, secret: string) {

@@ -1,0 +1,1 @@
+{"status":"BLOCKED_EXTERNAL","required":"transaction readback must exactly match idempotency key, customer, receivable, gross amount, Stripe identity, and allocation fingerprint","liveTransactionCreated":false}

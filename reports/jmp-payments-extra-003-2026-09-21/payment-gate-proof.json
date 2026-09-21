@@ -1,0 +1,1 @@
+{"status":"CLOSED","paymentGate":"DISABLED","productionSchema":"PASS","productionSeed":"NOT_EXECUTED","missing":["governed agreement migration/seed","runtime identity assignment","QBO customer-payment create endpoint","QBO independent readback","author surface","staff surface","production monitoring","production deployment and health readback"],"unsafeEnableAttempted":false}

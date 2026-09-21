@@ -1,0 +1,303 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ImportExportXml version="9.2.26083.167" SolutionPackageVersion="9.2" languagecode="1033" generatedBy="CrmLive" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" OrganizationVersion="9.2.26083.167" OrganizationSchemaType="Standard" CRMServerServiceabilityVersion="9.2.26083.00167">
+  <SolutionManifest>
+    <UniqueName>JMP_PublishingV2_PaymentRuntime</UniqueName>
+    <LocalizedNames>
+      <LocalizedName description="JMP Publishing V2 Payment Runtime" languagecode="1033" />
+    </LocalizedNames>
+    <Descriptions>
+      <Description description="Portable extension of canonical Publishing V2 tables for the durable payment ledger. Disabled by default." languagecode="1033" />
+    </Descriptions>
+    <Version>1.0.0.0</Version>
+    <Managed>0</Managed>
+    <Publisher>
+      <UniqueName>JMPPublishingPaymentRuntime</UniqueName>
+      <LocalizedNames>
+        <LocalizedName description="JMP Publishing Payment Runtime" languagecode="1033" />
+      </LocalizedNames>
+      <Descriptions />
+      <EMailAddress xsi:nil="true"></EMailAddress>
+      <SupportingWebsiteUrl xsi:nil="true"></SupportingWebsiteUrl>
+      <CustomizationPrefix>jmpv2</CustomizationPrefix>
+      <CustomizationOptionValuePrefix>81517</CustomizationOptionValuePrefix>
+      <Addresses>
+        <Address>
+          <AddressNumber>1</AddressNumber>
+          <AddressTypeCode>1</AddressTypeCode>
+          <City xsi:nil="true"></City>
+          <County xsi:nil="true"></County>
+          <Country xsi:nil="true"></Country>
+          <Fax xsi:nil="true"></Fax>
+          <FreightTermsCode xsi:nil="true"></FreightTermsCode>
+          <ImportSequenceNumber xsi:nil="true"></ImportSequenceNumber>
+          <Latitude xsi:nil="true"></Latitude>
+          <Line1 xsi:nil="true"></Line1>
+          <Line2 xsi:nil="true"></Line2>
+          <Line3 xsi:nil="true"></Line3>
+          <Longitude xsi:nil="true"></Longitude>
+          <Name xsi:nil="true"></Name>
+          <PostalCode xsi:nil="true"></PostalCode>
+          <PostOfficeBox xsi:nil="true"></PostOfficeBox>
+          <PrimaryContactName xsi:nil="true"></PrimaryContactName>
+          <ShippingMethodCode>1</ShippingMethodCode>
+          <StateOrProvince xsi:nil="true"></StateOrProvince>
+          <Telephone1 xsi:nil="true"></Telephone1>
+          <Telephone2 xsi:nil="true"></Telephone2>
+          <Telephone3 xsi:nil="true"></Telephone3>
+          <TimeZoneRuleVersionNumber xsi:nil="true"></TimeZoneRuleVersionNumber>
+          <UPSZone xsi:nil="true"></UPSZone>
+          <UTCOffset xsi:nil="true"></UTCOffset>
+          <UTCConversionTimeZoneCode xsi:nil="true"></UTCConversionTimeZoneCode>
+        </Address>
+        <Address>
+          <AddressNumber>2</AddressNumber>
+          <AddressTypeCode>1</AddressTypeCode>
+          <City xsi:nil="true"></City>
+          <County xsi:nil="true"></County>
+          <Country xsi:nil="true"></Country>
+          <Fax xsi:nil="true"></Fax>
+          <FreightTermsCode xsi:nil="true"></FreightTermsCode>
+          <ImportSequenceNumber xsi:nil="true"></ImportSequenceNumber>
+          <Latitude xsi:nil="true"></Latitude>
+          <Line1 xsi:nil="true"></Line1>
+          <Line2 xsi:nil="true"></Line2>
+          <Line3 xsi:nil="true"></Line3>
+          <Longitude xsi:nil="true"></Longitude>
+          <Name xsi:nil="true"></Name>
+          <PostalCode xsi:nil="true"></PostalCode>
+          <PostOfficeBox xsi:nil="true"></PostOfficeBox>
+          <PrimaryContactName xsi:nil="true"></PrimaryContactName>
+          <ShippingMethodCode>1</ShippingMethodCode>
+          <StateOrProvince xsi:nil="true"></StateOrProvince>
+          <Telephone1 xsi:nil="true"></Telephone1>
+          <Telephone2 xsi:nil="true"></Telephone2>
+          <Telephone3 xsi:nil="true"></Telephone3>
+          <TimeZoneRuleVersionNumber xsi:nil="true"></TimeZoneRuleVersionNumber>
+          <UPSZone xsi:nil="true"></UPSZone>
+          <UTCOffset xsi:nil="true"></UTCOffset>
+          <UTCConversionTimeZoneCode xsi:nil="true"></UTCConversionTimeZoneCode>
+        </Address>
+      </Addresses>
+    </Publisher>
+    <RootComponents>
+      <RootComponent type="1" schemaName="jmpv2_agreementrecord" behavior="1" />
+      <RootComponent type="1" schemaName="jmpv2_paymentevidence" behavior="1" />
+      <RootComponent type="1" schemaName="jmpv2_paymentrequirement" behavior="1" />
+      <RootComponent type="20" id="{6c73d789-fcb5-f111-aaac-70a8a5b27793}" behavior="0" />
+    </RootComponents>
+    <MissingDependencies>
+      <MissingDependency>
+        <Required type="1" schemaName="jmpv2_agreementrecord" displayName="V2 Agreement Record" solution="JMP_PublishingV2 (1.0.4.0)" />
+        <Dependent type="1" schemaName="jmpv2_agreementrecord" displayName="V2 Agreement Record" />
+      </MissingDependency>
+      <MissingDependency>
+        <Required type="1" schemaName="jmpv2_agreementrecord" displayName="V2 Agreement Record" solution="JMP_PublishingV2 (1.0.4.0)" />
+        <Dependent type="2" schemaName="jmpv2_autopaystatus" displayName="Autopaystatus" parentSchemaName="jmpv2_agreementrecord" parentDisplayName="V2 Agreement Record" />
+      </MissingDependency>
+      <MissingDependency>
+        <Required type="1" schemaName="jmpv2_agreementrecord" displayName="V2 Agreement Record" solution="JMP_PublishingV2 (1.0.4.0)" />
+        <Dependent type="2" schemaName="jmpv2_balanceversion" displayName="Balanceversion" parentSchemaName="jmpv2_agreementrecord" parentDisplayName="V2 Agreement Record" />
+      </MissingDependency>
+      <MissingDependency>
+        <Required type="1" schemaName="jmpv2_agreementrecord" displayName="V2 Agreement Record" solution="JMP_PublishingV2 (1.0.4.0)" />
+        <Dependent type="2" schemaName="jmpv2_currency" displayName="Currency" parentSchemaName="jmpv2_agreementrecord" parentDisplayName="V2 Agreement Record" />
+      </MissingDependency>
+      <MissingDependency>
+        <Required type="1" schemaName="jmpv2_agreementrecord" displayName="V2 Agreement Record" solution="JMP_PublishingV2 (1.0.4.0)" />
+        <Dependent type="2" schemaName="jmpv2_currentbalancecents" displayName="Currentbalancecents" parentSchemaName="jmpv2_agreementrecord" parentDisplayName="V2 Agreement Record" />
+      </MissingDependency>
+      <MissingDependency>
+        <Required type="1" schemaName="jmpv2_agreementrecord" displayName="V2 Agreement Record" solution="JMP_PublishingV2 (1.0.4.0)" />
+        <Dependent type="2" schemaName="jmpv2_lastpaymentat" displayName="Lastpaymentat" parentSchemaName="jmpv2_agreementrecord" parentDisplayName="V2 Agreement Record" />
+      </MissingDependency>
+      <MissingDependency>
+        <Required type="1" schemaName="jmpv2_agreementrecord" displayName="V2 Agreement Record" solution="JMP_PublishingV2 (1.0.4.0)" />
+        <Dependent type="2" schemaName="jmpv2_nextduedate" displayName="Nextduedate" parentSchemaName="jmpv2_agreementrecord" parentDisplayName="V2 Agreement Record" />
+      </MissingDependency>
+      <MissingDependency>
+        <Required type="1" schemaName="jmpv2_agreementrecord" displayName="V2 Agreement Record" solution="JMP_PublishingV2 (1.0.4.0)" />
+        <Dependent type="2" schemaName="jmpv2_nextpaymentat" displayName="Nextpaymentat" parentSchemaName="jmpv2_agreementrecord" parentDisplayName="V2 Agreement Record" />
+      </MissingDependency>
+      <MissingDependency>
+        <Required type="1" schemaName="jmpv2_agreementrecord" displayName="V2 Agreement Record" solution="JMP_PublishingV2 (1.0.4.0)" />
+        <Dependent type="2" schemaName="jmpv2_pastduebalancecents" displayName="Pastduebalancecents" parentSchemaName="jmpv2_agreementrecord" parentDisplayName="V2 Agreement Record" />
+      </MissingDependency>
+      <MissingDependency>
+        <Required type="1" schemaName="jmpv2_agreementrecord" displayName="V2 Agreement Record" solution="JMP_PublishingV2 (1.0.4.0)" />
+        <Dependent type="2" schemaName="jmpv2_paymentledgerstatus" displayName="Paymentledgerstatus" parentSchemaName="jmpv2_agreementrecord" parentDisplayName="V2 Agreement Record" />
+      </MissingDependency>
+      <MissingDependency>
+        <Required type="1" schemaName="jmpv2_agreementrecord" displayName="V2 Agreement Record" solution="JMP_PublishingV2 (1.0.4.0)" />
+        <Dependent type="2" schemaName="jmpv2_paymentscheduleid" displayName="Paymentscheduleid" parentSchemaName="jmpv2_agreementrecord" parentDisplayName="V2 Agreement Record" />
+      </MissingDependency>
+      <MissingDependency>
+        <Required type="1" schemaName="jmpv2_agreementrecord" displayName="V2 Agreement Record" solution="JMP_PublishingV2 (1.0.4.0)" />
+        <Dependent type="2" schemaName="jmpv2_payoffstatus" displayName="Payoffstatus" parentSchemaName="jmpv2_agreementrecord" parentDisplayName="V2 Agreement Record" />
+      </MissingDependency>
+      <MissingDependency>
+        <Required type="1" schemaName="jmpv2_agreementrecord" displayName="V2 Agreement Record" solution="JMP_PublishingV2 (1.0.4.0)" />
+        <Dependent type="2" schemaName="jmpv2_qbocustomerreference" displayName="Qbocustomerreference" parentSchemaName="jmpv2_agreementrecord" parentDisplayName="V2 Agreement Record" />
+      </MissingDependency>
+      <MissingDependency>
+        <Required type="1" schemaName="jmpv2_agreementrecord" displayName="V2 Agreement Record" solution="JMP_PublishingV2 (1.0.4.0)" />
+        <Dependent type="2" schemaName="jmpv2_qboreceivablereference" displayName="Qboreceivablereference" parentSchemaName="jmpv2_agreementrecord" parentDisplayName="V2 Agreement Record" />
+      </MissingDependency>
+      <MissingDependency>
+        <Required type="1" schemaName="jmpv2_agreementrecord" displayName="V2 Agreement Record" solution="JMP_PublishingV2 (1.0.4.0)" />
+        <Dependent type="2" schemaName="jmpv2_schedulecadence" displayName="Schedulecadence" parentSchemaName="jmpv2_agreementrecord" parentDisplayName="V2 Agreement Record" />
+      </MissingDependency>
+      <MissingDependency>
+        <Required type="1" schemaName="jmpv2_agreementrecord" displayName="V2 Agreement Record" solution="JMP_PublishingV2 (1.0.4.0)" />
+        <Dependent type="2" schemaName="jmpv2_scheduledinstallmentamountcents" displayName="Scheduledinstallmentamountcents" parentSchemaName="jmpv2_agreementrecord" parentDisplayName="V2 Agreement Record" />
+      </MissingDependency>
+      <MissingDependency>
+        <Required type="1" schemaName="jmpv2_agreementrecord" displayName="V2 Agreement Record" solution="JMP_PublishingV2 (1.0.4.0)" />
+        <Dependent type="2" schemaName="jmpv2_stripecustomerid" displayName="Stripecustomerid" parentSchemaName="jmpv2_agreementrecord" parentDisplayName="V2 Agreement Record" />
+      </MissingDependency>
+      <MissingDependency>
+        <Required type="1" schemaName="jmpv2_agreementrecord" displayName="V2 Agreement Record" solution="JMP_PublishingV2 (1.0.4.0)" />
+        <Dependent type="2" schemaName="jmpv2_stripesubscriptionscheduleid" displayName="Stripesubscriptionscheduleid" parentSchemaName="jmpv2_agreementrecord" parentDisplayName="V2 Agreement Record" />
+      </MissingDependency>
+      <MissingDependency>
+        <Required type="1" schemaName="jmpv2_agreementrecord" displayName="V2 Agreement Record" solution="JMP_PublishingV2 (1.0.4.0)" />
+        <Dependent type="2" schemaName="jmpv2_totalagreementamountcents" displayName="Totalagreementamountcents" parentSchemaName="jmpv2_agreementrecord" parentDisplayName="V2 Agreement Record" />
+      </MissingDependency>
+      <MissingDependency>
+        <Required type="1" schemaName="jmpv2_paymentevidence" displayName="V2 Payment Evidence" solution="JMP_PublishingV2 (1.0.4.0)" />
+        <Dependent type="1" schemaName="jmpv2_paymentevidence" displayName="V2 Payment Evidence" />
+      </MissingDependency>
+      <MissingDependency>
+        <Required type="1" schemaName="jmpv2_paymentevidence" displayName="V2 Payment Evidence" solution="JMP_PublishingV2 (1.0.4.0)" />
+        <Dependent type="14" schemaName="jmpv2_paymentevidence_idempotency" displayName="Paymentevidence Idempotency" parentSchemaName="jmpv2_paymentevidence" />
+      </MissingDependency>
+      <MissingDependency>
+        <Required type="1" schemaName="jmpv2_paymentevidence" displayName="V2 Payment Evidence" solution="JMP_PublishingV2 (1.0.4.0)" />
+        <Dependent type="2" schemaName="jmpv2_additionalallocationcents" displayName="Additionalallocationcents" parentSchemaName="jmpv2_paymentevidence" parentDisplayName="V2 Payment Evidence" />
+      </MissingDependency>
+      <MissingDependency>
+        <Required type="1" schemaName="jmpv2_paymentevidence" displayName="V2 Payment Evidence" solution="JMP_PublishingV2 (1.0.4.0)" />
+        <Dependent type="2" schemaName="jmpv2_agreementkey" displayName="Agreementkey" parentSchemaName="jmpv2_paymentevidence" parentDisplayName="V2 Payment Evidence" />
+      </MissingDependency>
+      <MissingDependency>
+        <Required type="1" schemaName="jmpv2_paymentevidence" displayName="V2 Payment Evidence" solution="JMP_PublishingV2 (1.0.4.0)" />
+        <Dependent type="2" schemaName="jmpv2_allocationsjson" displayName="Allocationsjson" parentSchemaName="jmpv2_paymentevidence" parentDisplayName="V2 Payment Evidence" />
+      </MissingDependency>
+      <MissingDependency>
+        <Required type="1" schemaName="jmpv2_paymentevidence" displayName="V2 Payment Evidence" solution="JMP_PublishingV2 (1.0.4.0)" />
+        <Dependent type="2" schemaName="jmpv2_balanceaftercents" displayName="Balanceaftercents" parentSchemaName="jmpv2_paymentevidence" parentDisplayName="V2 Payment Evidence" />
+      </MissingDependency>
+      <MissingDependency>
+        <Required type="1" schemaName="jmpv2_paymentevidence" displayName="V2 Payment Evidence" solution="JMP_PublishingV2 (1.0.4.0)" />
+        <Dependent type="2" schemaName="jmpv2_balancebeforecents" displayName="Balancebeforecents" parentSchemaName="jmpv2_paymentevidence" parentDisplayName="V2 Payment Evidence" />
+      </MissingDependency>
+      <MissingDependency>
+        <Required type="1" schemaName="jmpv2_paymentevidence" displayName="V2 Payment Evidence" solution="JMP_PublishingV2 (1.0.4.0)" />
+        <Dependent type="2" schemaName="jmpv2_eventkind" displayName="Eventkind" parentSchemaName="jmpv2_paymentevidence" parentDisplayName="V2 Payment Evidence" />
+      </MissingDependency>
+      <MissingDependency>
+        <Required type="1" schemaName="jmpv2_paymentevidence" displayName="V2 Payment Evidence" solution="JMP_PublishingV2 (1.0.4.0)" />
+        <Dependent type="2" schemaName="jmpv2_eventstatus" displayName="Eventstatus" parentSchemaName="jmpv2_paymentevidence" parentDisplayName="V2 Payment Evidence" />
+      </MissingDependency>
+      <MissingDependency>
+        <Required type="1" schemaName="jmpv2_paymentevidence" displayName="V2 Payment Evidence" solution="JMP_PublishingV2 (1.0.4.0)" />
+        <Dependent type="2" schemaName="jmpv2_grossamountcents" displayName="Grossamountcents" parentSchemaName="jmpv2_paymentevidence" parentDisplayName="V2 Payment Evidence" />
+      </MissingDependency>
+      <MissingDependency>
+        <Required type="1" schemaName="jmpv2_paymentevidence" displayName="V2 Payment Evidence" solution="JMP_PublishingV2 (1.0.4.0)" />
+        <Dependent type="2" schemaName="jmpv2_netsettlementcents" displayName="Netsettlementcents" parentSchemaName="jmpv2_paymentevidence" parentDisplayName="V2 Payment Evidence" />
+      </MissingDependency>
+      <MissingDependency>
+        <Required type="1" schemaName="jmpv2_paymentevidence" displayName="V2 Payment Evidence" solution="JMP_PublishingV2 (1.0.4.0)" />
+        <Dependent type="2" schemaName="jmpv2_obligationid" displayName="Obligationid" parentSchemaName="jmpv2_paymentevidence" parentDisplayName="V2 Payment Evidence" />
+      </MissingDependency>
+      <MissingDependency>
+        <Required type="1" schemaName="jmpv2_paymentevidence" displayName="V2 Payment Evidence" solution="JMP_PublishingV2 (1.0.4.0)" />
+        <Dependent type="2" schemaName="jmpv2_occurredat" displayName="Occurredat" parentSchemaName="jmpv2_paymentevidence" parentDisplayName="V2 Payment Evidence" />
+      </MissingDependency>
+      <MissingDependency>
+        <Required type="1" schemaName="jmpv2_paymentevidence" displayName="V2 Payment Evidence" solution="JMP_PublishingV2 (1.0.4.0)" />
+        <Dependent type="2" schemaName="jmpv2_originalpaymentid" displayName="Originalpaymentid" parentSchemaName="jmpv2_paymentevidence" parentDisplayName="V2 Payment Evidence" />
+      </MissingDependency>
+      <MissingDependency>
+        <Required type="1" schemaName="jmpv2_paymentevidence" displayName="V2 Payment Evidence" solution="JMP_PublishingV2 (1.0.4.0)" />
+        <Dependent type="2" schemaName="jmpv2_pastdueallocationcents" displayName="Pastdueallocationcents" parentSchemaName="jmpv2_paymentevidence" parentDisplayName="V2 Payment Evidence" />
+      </MissingDependency>
+      <MissingDependency>
+        <Required type="1" schemaName="jmpv2_paymentevidence" displayName="V2 Payment Evidence" solution="JMP_PublishingV2 (1.0.4.0)" />
+        <Dependent type="2" schemaName="jmpv2_paymenttype" displayName="Paymenttype" parentSchemaName="jmpv2_paymentevidence" parentDisplayName="V2 Payment Evidence" />
+      </MissingDependency>
+      <MissingDependency>
+        <Required type="1" schemaName="jmpv2_paymentevidence" displayName="V2 Payment Evidence" solution="JMP_PublishingV2 (1.0.4.0)" />
+        <Dependent type="2" schemaName="jmpv2_qboreconciliationstatus" displayName="Qboreconciliationstatus" parentSchemaName="jmpv2_paymentevidence" parentDisplayName="V2 Payment Evidence" />
+      </MissingDependency>
+      <MissingDependency>
+        <Required type="1" schemaName="jmpv2_paymentevidence" displayName="V2 Payment Evidence" solution="JMP_PublishingV2 (1.0.4.0)" />
+        <Dependent type="2" schemaName="jmpv2_qbotransactionid" displayName="Qbotransactionid" parentSchemaName="jmpv2_paymentevidence" parentDisplayName="V2 Payment Evidence" />
+      </MissingDependency>
+      <MissingDependency>
+        <Required type="1" schemaName="jmpv2_paymentevidence" displayName="V2 Payment Evidence" solution="JMP_PublishingV2 (1.0.4.0)" />
+        <Dependent type="2" schemaName="jmpv2_refundid" displayName="Refundid" parentSchemaName="jmpv2_paymentevidence" parentDisplayName="V2 Payment Evidence" />
+      </MissingDependency>
+      <MissingDependency>
+        <Required type="1" schemaName="jmpv2_paymentevidence" displayName="V2 Payment Evidence" solution="JMP_PublishingV2 (1.0.4.0)" />
+        <Dependent type="2" schemaName="jmpv2_scheduledallocationcents" displayName="Scheduledallocationcents" parentSchemaName="jmpv2_paymentevidence" parentDisplayName="V2 Payment Evidence" />
+      </MissingDependency>
+      <MissingDependency>
+        <Required type="1" schemaName="jmpv2_paymentevidence" displayName="V2 Payment Evidence" solution="JMP_PublishingV2 (1.0.4.0)" />
+        <Dependent type="2" schemaName="jmpv2_settlementreference" displayName="Settlementreference" parentSchemaName="jmpv2_paymentevidence" parentDisplayName="V2 Payment Evidence" />
+      </MissingDependency>
+      <MissingDependency>
+        <Required type="1" schemaName="jmpv2_paymentevidence" displayName="V2 Payment Evidence" solution="JMP_PublishingV2 (1.0.4.0)" />
+        <Dependent type="2" schemaName="jmpv2_stripeeventid" displayName="Stripeeventid" parentSchemaName="jmpv2_paymentevidence" parentDisplayName="V2 Payment Evidence" />
+      </MissingDependency>
+      <MissingDependency>
+        <Required type="1" schemaName="jmpv2_paymentevidence" displayName="V2 Payment Evidence" solution="JMP_PublishingV2 (1.0.4.0)" />
+        <Dependent type="2" schemaName="jmpv2_stripefeecents" displayName="Stripefeecents" parentSchemaName="jmpv2_paymentevidence" parentDisplayName="V2 Payment Evidence" />
+      </MissingDependency>
+      <MissingDependency>
+        <Required type="1" schemaName="jmpv2_paymentevidence" displayName="V2 Payment Evidence" solution="JMP_PublishingV2 (1.0.4.0)" />
+        <Dependent type="2" schemaName="jmpv2_stripeinvoiceid" displayName="Stripeinvoiceid" parentSchemaName="jmpv2_paymentevidence" parentDisplayName="V2 Payment Evidence" />
+      </MissingDependency>
+      <MissingDependency>
+        <Required type="1" schemaName="jmpv2_paymentevidence" displayName="V2 Payment Evidence" solution="JMP_PublishingV2 (1.0.4.0)" />
+        <Dependent type="2" schemaName="jmpv2_stripepaymentid" displayName="Stripepaymentid" parentSchemaName="jmpv2_paymentevidence" parentDisplayName="V2 Payment Evidence" />
+      </MissingDependency>
+      <MissingDependency>
+        <Required type="1" schemaName="jmpv2_paymentrequirement" displayName="V2 Payment Requirement" solution="JMP_PublishingV2 (1.0.4.0)" />
+        <Dependent type="1" schemaName="jmpv2_paymentrequirement" displayName="V2 Payment Requirement" />
+      </MissingDependency>
+      <MissingDependency>
+        <Required type="1" schemaName="jmpv2_paymentrequirement" displayName="V2 Payment Requirement" solution="JMP_PublishingV2 (1.0.4.0)" />
+        <Dependent type="2" schemaName="jmpv2_agreementkey" displayName="Agreementkey" parentSchemaName="jmpv2_paymentrequirement" parentDisplayName="V2 Payment Requirement" />
+      </MissingDependency>
+      <MissingDependency>
+        <Required type="1" schemaName="jmpv2_paymentrequirement" displayName="V2 Payment Requirement" solution="JMP_PublishingV2 (1.0.4.0)" />
+        <Dependent type="2" schemaName="jmpv2_amountcents" displayName="Amountcents" parentSchemaName="jmpv2_paymentrequirement" parentDisplayName="V2 Payment Requirement" />
+      </MissingDependency>
+      <MissingDependency>
+        <Required type="1" schemaName="jmpv2_paymentrequirement" displayName="V2 Payment Requirement" solution="JMP_PublishingV2 (1.0.4.0)" />
+        <Dependent type="2" schemaName="jmpv2_duedate" displayName="Duedate" parentSchemaName="jmpv2_paymentrequirement" parentDisplayName="V2 Payment Requirement" />
+      </MissingDependency>
+      <MissingDependency>
+        <Required type="1" schemaName="jmpv2_paymentrequirement" displayName="V2 Payment Requirement" solution="JMP_PublishingV2 (1.0.4.0)" />
+        <Dependent type="2" schemaName="jmpv2_idempotencykey" displayName="Idempotencykey" parentSchemaName="jmpv2_paymentrequirement" parentDisplayName="V2 Payment Requirement" />
+      </MissingDependency>
+      <MissingDependency>
+        <Required type="1" schemaName="jmpv2_paymentrequirement" displayName="V2 Payment Requirement" solution="JMP_PublishingV2 (1.0.4.0)" />
+        <Dependent type="2" schemaName="jmpv2_installmentsequence" displayName="Installmentsequence" parentSchemaName="jmpv2_paymentrequirement" parentDisplayName="V2 Payment Requirement" />
+      </MissingDependency>
+      <MissingDependency>
+        <Required type="1" schemaName="jmpv2_paymentrequirement" displayName="V2 Payment Requirement" solution="JMP_PublishingV2 (1.0.4.0)" />
+        <Dependent type="2" schemaName="jmpv2_obligationstatus" displayName="Obligationstatus" parentSchemaName="jmpv2_paymentrequirement" parentDisplayName="V2 Payment Requirement" />
+      </MissingDependency>
+      <MissingDependency>
+        <Required type="1" schemaName="jmpv2_paymentrequirement" displayName="V2 Payment Requirement" solution="JMP_PublishingV2 (1.0.4.0)" />
+        <Dependent type="2" schemaName="jmpv2_stripeinvoiceid" displayName="Stripeinvoiceid" parentSchemaName="jmpv2_paymentrequirement" parentDisplayName="V2 Payment Requirement" />
+      </MissingDependency>
+      <MissingDependency>
+        <Required type="2" schemaName="jmpv2_idempotencykey" displayName="Idempotency Key" parentSchemaName="jmpv2_paymentevidence" parentDisplayName="V2 Payment Evidence" solution="JMP_PublishingV2 (1.0.4.0)" />
+        <Dependent type="14" schemaName="jmpv2_paymentevidence_idempotency" displayName="Paymentevidence Idempotency" parentSchemaName="jmpv2_paymentevidence" />
+      </MissingDependency>
+    </MissingDependencies>
+  </SolutionManifest>
+</ImportExportXml>

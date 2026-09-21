@@ -3,6 +3,7 @@ import { createHash } from 'node:crypto'
 import {
   allocateIncomingPayment,
   calculateAgreementPaymentState,
+  listOpenScheduledObligations,
   type AgreementPayment,
   type AgreementPaymentAllocation,
   type AgreementPaymentSnapshot,
@@ -82,7 +83,7 @@ export interface StripeAgreementCollections {
     amountCents: number
     idempotencyKey: string
     metadata: Record<string, string>
-  }): Promise<{ invoiceId: string }>
+  }): Promise<{ invoiceId: string; hostedInvoiceUrl: string }>
 }
 
 export type QboPaymentEffect = {
@@ -227,7 +228,7 @@ export async function createAdditionalPaymentInvoice(input: {
   if (!allocation.ok) return allocation
   const executionKey = hashKey('additional', input.agreementId, input.expectedBalanceVersion, String(input.amountCents))
   const existing = await input.ledger.findCollectionAttempt(executionKey)
-  if (existing) return { ok: true as const, idempotent: true, invoiceId: existing.stripeInvoiceId, allocation }
+  if (existing) return { ok: true as const, idempotent: true, invoiceId: existing.stripeInvoiceId, hostedInvoiceUrl: null, allocation }
   const invoice = await input.stripe.createInvoice({
     customerId: required(agreement.stripeCustomerId, 'STRIPE_CUSTOMER_REQUIRED'),
     amountCents: input.amountCents,
@@ -243,7 +244,7 @@ export async function createAdditionalPaymentInvoice(input: {
     status: 'CREATED',
     createdAt: input.asOf,
   })
-  return { ok: true as const, idempotent: false, invoiceId: invoice.invoiceId, allocation }
+  return { ok: true as const, idempotent: false, invoiceId: invoice.invoiceId, hostedInvoiceUrl: invoice.hostedInvoiceUrl, allocation }
 }
 
 export async function processConfirmedAgreementPayment(input: {
@@ -406,8 +407,9 @@ function buildQboEffect(agreement: AgreementLedgerRecord, event: PaymentEventRec
 
 function nextDueObligation(snapshot: AgreementPaymentSnapshot, asOf: string) {
   const asOfTime = assertRuntimeDate(asOf)
-  return (snapshot.scheduledObligations || [])
+  return listOpenScheduledObligations(snapshot)
     .filter((row) => row.status === 'PAST_DUE' || (row.status === 'SCHEDULED' && Date.parse(row.dueDate) <= asOfTime))
+    .map((row) => ({ ...row, amountCents: row.remainingCents }))
     .sort((a, b) => a.dueDate.localeCompare(b.dueDate) || a.obligationId.localeCompare(b.obligationId))[0] || null
 }
 

@@ -1,0 +1,17 @@
+{
+  "status": "PASS",
+  "solutionName": "JMP_PublishingV2_PaymentRuntime",
+  "version": "1.0.0.0",
+  "sourceOrganizationId": "bb7a9d9e-8e73-f111-b27b-000d3a31ff17",
+  "unmanaged": {
+    "name": "JMP_PublishingV2_PaymentRuntime_1_0_0_0_unmanaged.zip",
+    "bytes": 8724,
+    "sha256": "202c5f03e8536f9de7bea83347b27a6248480a695119174528987bd8fab5805d"
+  },
+  "managed": {
+    "name": "JMP_PublishingV2_PaymentRuntime_1_0_0_0_managed.zip",
+    "bytes": 8724,
+    "sha256": "d225ecce755089cd12748919ceef5ca10d20d875470d7f899066a95984fa0499"
+  },
+  "exportedAt": "2026-09-21T20:52:41.976Z"
+}
