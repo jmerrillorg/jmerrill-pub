@@ -1,0 +1,8 @@
+{
+  "status": "PASS_DETERMINISTIC",
+  "control": "Dataverse ETag supplied to transactional Custom API",
+  "simultaneousScheduledAndAdditional": "one stale writer rejected and must recompute",
+  "overpaymentRace": "DENIED",
+  "duplicatePayoff": "DENIED",
+  "test": "concurrent balance writer loses optimistic concurrency race"
+}

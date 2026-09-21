@@ -1,0 +1,10 @@
+{
+  "status": "HEALTH_CONTRACT_PASS_ALERTING_NOT_COMMISSIONED",
+  "signals": [
+    "executor freshness", "Stripe webhook failures", "dead-letter count", "balance-processing failures",
+    "QBO posting failures", "QBO readback mismatches", "payoff schedule-stop failures"
+  ],
+  "privacy": "Telemetry carries codes and agreement IDs only; no amount, email, payment URL, credential, bank or card data",
+  "attentionRequiredTest": "PASS",
+  "applicationInsightsAlertRouting": "NOT_DEPLOYED"
+}

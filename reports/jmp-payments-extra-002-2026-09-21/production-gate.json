@@ -1,0 +1,22 @@
+{
+  "status": "CLOSED",
+  "paymentGate": "disabled",
+  "productionHealth": "ready",
+  "deployedRelease": "e5043cbbce2d95f7822d1a760be3545a643cfe9b",
+  "gates": {
+    "durableLedger": "BLOCKED_NOT_IMPORTED",
+    "recurringExecutor": "BLOCKED_NOT_DEPLOYED",
+    "stripeRuntime": "IMPLEMENTED_GATE_CLOSED",
+    "qboAdapter": "BLOCKED_NOT_COMMISSIONED",
+    "qboReadback": "BLOCKED_NO_LIVE_AUTHORIZED_EFFECT",
+    "idempotency": "PASS_DETERMINISTIC",
+    "concurrency": "PASS_DETERMINISTIC",
+    "refundRuntime": "PASS_DETERMINISTIC_NOT_DEPLOYED",
+    "autopayTermination": "PASS_DETERMINISTIC_NOT_DEPLOYED",
+    "systemMonitoring": "BLOCKED_ALERTS_NOT_DEPLOYED",
+    "tests": "PASS"
+  },
+  "authorSurfaceExposed": false,
+  "staffSurfaceExposed": false,
+  "financialEffects": 0
+}

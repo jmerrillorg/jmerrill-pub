@@ -1,6 +1,6 @@
 import { createHash } from 'node:crypto'
 
-export const PUBLISHING_AGREEMENT_PAYMENT_VERSION = 'JMP_PAYMENTS_EXTRA_001_v1.0'
+export const PUBLISHING_AGREEMENT_PAYMENT_VERSION = 'JMP_PAYMENTS_EXTRA_002_v1.0'
 
 export const PAYMENT_TYPES = ['SCHEDULED_INSTALLMENT', 'ADDITIONAL_PAYMENT'] as const
 export type PublishingPaymentType = (typeof PAYMENT_TYPES)[number]
@@ -12,7 +12,21 @@ export type AgreementPayment = {
   amountCents: number
   status: 'SUCCEEDED' | 'FAILED'
   scheduledObligationId?: string | null
+  allocations?: AgreementPaymentAllocation[]
   paidAt?: string | null
+}
+
+export type ScheduledObligation = {
+  obligationId: string
+  dueDate: string
+  amountCents: number
+  status: 'SCHEDULED' | 'PAST_DUE' | 'SATISFIED' | 'CANCELLED'
+}
+
+export type AgreementPaymentAllocation = {
+  kind: 'PAST_DUE_SCHEDULED_INSTALLMENT' | 'CURRENT_DUE_SCHEDULED_INSTALLMENT' | 'ADDITIONAL_PAYMENT'
+  amountCents: number
+  scheduledObligationId?: string | null
 }
 
 export type AgreementRefund = {
@@ -33,6 +47,7 @@ export type AgreementPaymentSnapshot = {
   contractualBalanceCents: number
   normalInstallmentCents: number
   nextScheduledDueDate?: string | null
+  scheduledObligations?: ScheduledObligation[]
   payments: AgreementPayment[]
   refunds?: AgreementRefund[]
 }
@@ -49,6 +64,7 @@ export type AgreementPaymentState = {
   paidInFull: boolean
   recurringCadenceActive: boolean
   nextScheduledDueDate: string | null
+  pastDueBalanceCents: number
   balanceVersion: string
 }
 
@@ -57,6 +73,8 @@ export type PaymentAllocation = {
   amountCents: number
   scheduledObligationId?: string | null
 }
+
+export type IncomingPaymentIntent = 'CURRENT_PAYMENT' | 'ADDITIONAL_PAYMENT' | 'CURRENT_PLUS_ADDITIONAL'
 
 export type PublishingPaymentMetadata = {
   jm1_runtime: string
@@ -109,6 +127,7 @@ export function calculateAgreementPaymentState(snapshot: AgreementPaymentSnapsho
   const remainingBalanceCents = snapshot.contractualBalanceCents - netPaymentsAppliedCents
   const nextScheduledInstallmentCents = Math.min(snapshot.normalInstallmentCents, remainingBalanceCents)
   const paidInFull = remainingBalanceCents === 0
+  const obligationState = calculateObligationState(snapshot)
 
   return {
     contractualBalanceCents: snapshot.contractualBalanceCents,
@@ -124,7 +143,72 @@ export function calculateAgreementPaymentState(snapshot: AgreementPaymentSnapsho
     paidInFull,
     recurringCadenceActive: !paidInFull,
     nextScheduledDueDate: paidInFull ? null : clean(snapshot.nextScheduledDueDate) || null,
+    pastDueBalanceCents: paidInFull ? 0 : obligationState.pastDueBalanceCents,
     balanceVersion: buildBalanceVersion(snapshot),
+  }
+}
+
+export function allocateIncomingPayment(input: {
+  snapshot: AgreementPaymentSnapshot
+  amountCents: number
+  intent: IncomingPaymentIntent
+  asOf: string
+  submittedBalanceVersion?: string | null
+}) {
+  const state = calculateAgreementPaymentState(input.snapshot)
+  if (input.submittedBalanceVersion && input.submittedBalanceVersion !== state.balanceVersion) {
+    return blocked('STALE_AGREEMENT_BALANCE')
+  }
+  if (state.paidInFull) return blocked('AGREEMENT_ALREADY_PAID_IN_FULL')
+  const amountCents = integerCents(input.amountCents)
+  if (amountCents <= 0) return blocked('PAYMENT_AMOUNT_INVALID')
+  if (amountCents > state.remainingBalanceCents) {
+    return blocked('PAYMENT_EXCEEDS_REMAINING_BALANCE', { permissibleAmountCents: state.remainingBalanceCents })
+  }
+
+  const obligations = openObligations(input.snapshot)
+  const asOf = requiredDate(input.asOf, 'PAYMENT_ALLOCATION_DATE_INVALID')
+  const allocations: AgreementPaymentAllocation[] = []
+  let unallocatedCents = amountCents
+
+  for (const obligation of obligations.filter((row) => requiredDate(row.dueDate, 'SCHEDULED_DUE_DATE_INVALID') < asOf)) {
+    if (unallocatedCents === 0) break
+    const allocated = Math.min(obligation.remainingCents, unallocatedCents)
+    allocations.push({
+      kind: 'PAST_DUE_SCHEDULED_INSTALLMENT',
+      amountCents: allocated,
+      scheduledObligationId: obligation.obligationId,
+    })
+    unallocatedCents -= allocated
+  }
+
+  if (unallocatedCents > 0 && input.intent !== 'ADDITIONAL_PAYMENT') {
+    const current = obligations.find((row) => requiredDate(row.dueDate, 'SCHEDULED_DUE_DATE_INVALID') >= asOf)
+    if (current) {
+      const allocated = Math.min(current.remainingCents, unallocatedCents)
+      allocations.push({
+        kind: 'CURRENT_DUE_SCHEDULED_INSTALLMENT',
+        amountCents: allocated,
+        scheduledObligationId: current.obligationId,
+      })
+      unallocatedCents -= allocated
+    }
+  }
+
+  if (unallocatedCents > 0) {
+    allocations.push({ kind: 'ADDITIONAL_PAYMENT', amountCents: unallocatedCents })
+  }
+
+  return {
+    ok: true as const,
+    allocations,
+    amountCents,
+    pastDueAllocationCents: sumAllocation(allocations, 'PAST_DUE_SCHEDULED_INSTALLMENT'),
+    scheduledAllocationCents: sumAllocation(allocations, 'CURRENT_DUE_SCHEDULED_INSTALLMENT'),
+    additionalAllocationCents: sumAllocation(allocations, 'ADDITIONAL_PAYMENT'),
+    balanceBeforeCents: state.remainingBalanceCents,
+    balanceAfterCents: state.remainingBalanceCents - amountCents,
+    paidInFullAfter: state.remainingBalanceCents === amountCents,
   }
 }
 
@@ -301,16 +385,68 @@ export function buildBalanceVersion(snapshot: AgreementPaymentSnapshot) {
   const refundFacts = (snapshot.refunds || [])
     .map((refund) => [refund.refundId, refund.originalPaymentId, refund.amountCents, refund.status])
     .sort((a, b) => String(a[0]).localeCompare(String(b[0])))
+  const obligationFacts = (snapshot.scheduledObligations || [])
+    .map((obligation) => [obligation.obligationId, obligation.dueDate, obligation.amountCents, obligation.status])
+    .sort((a, b) => String(a[0]).localeCompare(String(b[0])))
   return createHash('sha256')
     .update(stableJson({
       agreementId: snapshot.agreementId,
       contractualBalanceCents: snapshot.contractualBalanceCents,
       normalInstallmentCents: snapshot.normalInstallmentCents,
+      obligationFacts,
       paymentFacts,
       refundFacts,
     }))
     .digest('hex')
     .slice(0, 32)
+}
+
+function calculateObligationState(snapshot: AgreementPaymentSnapshot) {
+  const obligations = openObligations(snapshot)
+  const pastDueBalanceCents = obligations
+    .filter((row) => row.status === 'PAST_DUE')
+    .reduce((sum, row) => sum + row.remainingCents, 0)
+  return { pastDueBalanceCents }
+}
+
+function openObligations(snapshot: AgreementPaymentSnapshot) {
+  const applied = new Map<string, number>()
+  for (const payment of uniqueById(snapshot.payments.filter((row) => row.status === 'SUCCEEDED'), (row) => row.paymentId)) {
+    for (const allocation of payment.allocations || []) {
+      if (!allocation.scheduledObligationId || allocation.kind === 'ADDITIONAL_PAYMENT') continue
+      applied.set(
+        allocation.scheduledObligationId,
+        (applied.get(allocation.scheduledObligationId) || 0) + integerCents(allocation.amountCents),
+      )
+    }
+  }
+  for (const refund of uniqueById((snapshot.refunds || []).filter((row) => row.status === 'SUCCEEDED'), (row) => row.refundId)) {
+    const original = snapshot.payments.find((row) => row.paymentId === refund.originalPaymentId)
+    let remainingRefund = integerCents(refund.amountCents)
+    for (const allocation of [...(original?.allocations || [])].reverse()) {
+      if (remainingRefund === 0) break
+      const reversed = Math.min(remainingRefund, allocation.amountCents)
+      if (allocation.scheduledObligationId && allocation.kind !== 'ADDITIONAL_PAYMENT') {
+        applied.set(allocation.scheduledObligationId, Math.max(0, (applied.get(allocation.scheduledObligationId) || 0) - reversed))
+      }
+      remainingRefund -= reversed
+    }
+  }
+  return (snapshot.scheduledObligations || [])
+    .filter((row) => row.status !== 'SATISFIED' && row.status !== 'CANCELLED')
+    .map((row) => ({ ...row, remainingCents: Math.max(0, integerCents(row.amountCents) - (applied.get(row.obligationId) || 0)) }))
+    .filter((row) => row.remainingCents > 0)
+    .sort((a, b) => a.dueDate.localeCompare(b.dueDate) || a.obligationId.localeCompare(b.obligationId))
+}
+
+function sumAllocation(allocations: AgreementPaymentAllocation[], kind: AgreementPaymentAllocation['kind']) {
+  return allocations.filter((row) => row.kind === kind).reduce((sum, row) => sum + row.amountCents, 0)
+}
+
+function requiredDate(value: string, code: string) {
+  const timestamp = Date.parse(value)
+  if (!Number.isFinite(timestamp)) throw contractError(code)
+  return timestamp
 }
 
 function assertSnapshot(snapshot: AgreementPaymentSnapshot) {
@@ -321,6 +457,19 @@ function assertSnapshot(snapshot: AgreementPaymentSnapshot) {
   if (snapshot.currency !== 'usd') throw contractError('PAYMENT_CURRENCY_INVALID')
   if (integerCents(snapshot.contractualBalanceCents) <= 0) throw contractError('CONTRACTUAL_BALANCE_INVALID')
   if (integerCents(snapshot.normalInstallmentCents) <= 0) throw contractError('NORMAL_INSTALLMENT_INVALID')
+  const obligationIds = new Set<string>()
+  for (const obligation of snapshot.scheduledObligations || []) {
+    if (!clean(obligation.obligationId)) throw contractError('SCHEDULED_OBLIGATION_ID_REQUIRED')
+    if (obligationIds.has(obligation.obligationId)) throw contractError('SCHEDULED_OBLIGATION_ID_CONFLICT')
+    obligationIds.add(obligation.obligationId)
+    if (integerCents(obligation.amountCents) <= 0) throw contractError('SCHEDULED_OBLIGATION_AMOUNT_INVALID')
+    requiredDate(obligation.dueDate, 'SCHEDULED_DUE_DATE_INVALID')
+  }
+  for (const payment of snapshot.payments) {
+    if (!payment.allocations) continue
+    const allocated = payment.allocations.reduce((sum, allocation) => sum + integerCents(allocation.amountCents), 0)
+    if (allocated !== integerCents(payment.amountCents)) throw contractError('PAYMENT_ALLOCATION_TOTAL_MISMATCH')
+  }
 }
 
 function uniqueById<T>(rows: T[], id: (row: T) => string) {

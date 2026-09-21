@@ -1,0 +1,30 @@
+{
+  "package": "JMP-PAYMENTS-EXTRA-002",
+  "date": "2026-09-21",
+  "predecessor": {
+    "pr": 819,
+    "state": "MERGED",
+    "mergeSha": "e5043cbbce2d95f7822d1a760be3545a643cfe9b"
+  },
+  "runtime": { "node": "24.19.0", "npm": "11.6.0" },
+  "checks": {
+    "paymentTests": { "status": "PASS", "passed": 43, "failed": 0 },
+    "paymentIngestRegressions": { "status": "PASS", "passed": 26, "failed": 0 },
+    "typeCheck": "PASS",
+    "lint": "PASS_WITH_1_EXISTING_FONT_WARNING",
+    "build": "PASS_WITH_EXISTING_FRAMEWORK_AND_BROAD_GLOB_WARNINGS"
+  },
+  "productionReadback": {
+    "status": "ready",
+    "release": "e5043cbbce2d95f7822d1a760be3545a643cfe9b",
+    "paymentGate": "disabled"
+  },
+  "effects": {
+    "attaLiveCharges": 0,
+    "authorLiveCharges": 0,
+    "qboProductionWrites": 0,
+    "businessCentralWrites": 0,
+    "financialEffects": 0,
+    "dataverseSchemaWrites": 0
+  }
+}

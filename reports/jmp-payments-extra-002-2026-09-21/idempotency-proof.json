@@ -1,0 +1,10 @@
+{
+  "status": "PASS_DETERMINISTIC",
+  "stripeEventReplay": "one payment event",
+  "stripePaymentReplay": "one balance effect",
+  "scheduledExecutorRetry": "one collection attempt",
+  "qboRetry": "same accounting idempotency key",
+  "dataverseRetry": "alternate keys plus transactional Custom API",
+  "systemRestart": "durable collection attempt replay",
+  "webhookRedelivery": "existing event resumes pending QBO reconciliation without balance replay"
+}
