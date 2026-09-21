@@ -1074,7 +1074,10 @@ function validateCanonicalAuthorReviewHtmlPayload(payload = {}) {
     return { ok: false, reason: "AUTHOR_REVIEW_PACKAGE_CTA_BUTTON_REQUIRED" };
   }
 
-  if (!replyOnly && !text.includes("Optional Author Operating Center access: https://")) {
+  const hasPortalReference =
+    text.includes("Optional Author Operating Center access: https://") ||
+    (conversationalDevelopmental && text.includes("You may also view the materials in your Author Operating Center: https://"));
+  if (!replyOnly && !hasPortalReference) {
     return { ok: false, reason: "AUTHOR_REVIEW_PACKAGE_TEXT_PORTAL_REFERENCE_REQUIRED" };
   }
 
