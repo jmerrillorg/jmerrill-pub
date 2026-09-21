@@ -805,7 +805,10 @@ test("Developmental author artifacts render real paragraphs and a bounded publis
       editedManuscript: "Chapter One\\n\\nRevised paragraph with a clear opening for readers today.",
       developmentalSummary: summaries.join("\n\n"),
       appliedChanges: changes,
-      authorNotes: [{ class: "EDITOR_NOTE", anchor: "Revised paragraph", message: "The next chunk continues this idea." }],
+      authorNotes: [
+        { class: "EDITOR_NOTE", anchor: "Revised paragraph", message: "The next chunk continues this idea." },
+        { class: "AUTHOR_QUESTION", anchor: "Chapter One", message: "Should this remain consistent across all chunks?" }
+      ],
       internalNotes: [],
       authorityActions: [{ classification: "SYSTEM_AUTHORIZED_EDIT", description: "Clarified the opening." }]
     }
@@ -815,8 +818,10 @@ test("Developmental author artifacts render real paragraphs and a bounded publis
   const editorialReview = await mammoth.extractRawText({ buffer: await buildDevelopmentalEditorialReviewDocx(stage, invocation) });
 
   assert.doesNotMatch(authorReview.value, /\\n/);
-  assert.match(authorReview.value, /Chapter One\n\nRevised paragraph/);
+  assert.match(authorReview.value, /Chapter One[\s\S]*Revised paragraph/);
   assert.match(authorReview.value, /following section continues this idea/i);
+  assert.match(authorReview.value, /consistent across all sections/i);
+  assert.doesNotMatch(authorReview.value, /\bchunks?\b/i);
   assert.doesNotMatch(editorialReview.value, /\bchunk\s+\d+/i);
   assert.equal(editorialReview.value.split(/\s+/).filter(Boolean).length < 2500, true);
   assert.match(editorialReview.value, /Detailed editor's notes and author questions appear alongside the relevant passages/i);
