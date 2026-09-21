@@ -1,7 +1,11 @@
 "use strict";
 
 const crypto = require("node:crypto");
-const { DEVELOPMENTAL_ENTRY_MARKER, evaluateDevelopmentalEntry } = require("./parallelWorkstreamPolicy");
+const {
+  DEVELOPMENTAL_ENTRY_CORRELATION_PREFIX,
+  DEVELOPMENTAL_ENTRY_MARKER,
+  evaluateDevelopmentalEntry
+} = require("./parallelWorkstreamPolicy");
 
 const MODES = Object.freeze({ DRY_RUN: "DRY_RUN", EXECUTE: "EXECUTE" });
 const DEVELOPMENTAL_STAGE_TYPE = 100000001;
@@ -73,7 +77,8 @@ async function runDevelopmentalEntryMaterialization(input = {}, deps = {}) {
     jm1pub_author: clean(evaluated.canonicalTitle.jm1pub_authorname), jm1pub_stagetype: DEVELOPMENTAL_STAGE_TYPE,
     jm1pub_stagestatus: IN_PROGRESS_STAGE_STATUS, jm1pub_stagesequence: 2,
     jm1pub_authorsafesummary: "Developmental Editing is proceeding while any remaining onboarding tasks continue independently.",
-    jm1pub_internaloperationalsummary: summary, jm1pub_correlationid: `DEV-PARALLEL-${evaluated.idempotencyKey}`.slice(0, 100),
+    jm1pub_internaloperationalsummary: summary,
+    jm1pub_correlationid: `${DEVELOPMENTAL_ENTRY_CORRELATION_PREFIX}${clean(input.sourceArtifactId)}`,
     jm1pub_stagestartdate: new Date().toISOString(), jm1pub_currentartifactcount: 0, jm1pub_currentgatecount: 0, jm1pub_openexceptioncount: 0,
     "Jm1pub_Titleid@odata.bind": `/jm1pub_titles(${clean(input.titleId)})`,
     "Jm1pub_Contactid@odata.bind": `/contacts(${clean(input.contactId)})`

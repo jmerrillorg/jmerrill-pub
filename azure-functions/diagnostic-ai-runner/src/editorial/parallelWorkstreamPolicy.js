@@ -5,6 +5,7 @@ const DEPENDENCY_CLASSES = Object.freeze([
   "AUTHOR_DEPENDENCY", "PROVIDER_DEPENDENCY", "CADENCE_DEPENDENCY"
 ]);
 const DEVELOPMENTAL_ENTRY_MARKER = "DEVELOPMENTAL_PARALLEL_ENTRY_V1";
+const DEVELOPMENTAL_ENTRY_CORRELATION_PREFIX = "DEV-PARALLEL-SOURCE-";
 
 function clean(value) { return String(value || "").trim(); }
 
@@ -23,10 +24,20 @@ function evaluateDevelopmentalEntry(input = {}) {
 
 function hasDevelopmentalParallelEntryAuthority(stage, sourceArtifactId) {
   const summary = clean(stage?.jm1pub_internaloperationalsummary);
-  return summary.includes(DEVELOPMENTAL_ENTRY_MARKER)
-    && summary.includes(`sourceArtifactId=${clean(sourceArtifactId)}`)
-    && summary.includes("agreementEvidence=")
-    && summary.includes("commercialEvidence=");
+  const exactSource = clean(sourceArtifactId);
+  const durableCorrelation = clean(stage?.jm1pub_correlationid);
+  return durableCorrelation === `${DEVELOPMENTAL_ENTRY_CORRELATION_PREFIX}${exactSource}` || (
+    summary.includes(DEVELOPMENTAL_ENTRY_MARKER)
+      && summary.includes(`sourceArtifactId=${exactSource}`)
+      && summary.includes("agreementEvidence=")
+      && summary.includes("commercialEvidence=")
+  );
 }
 
-module.exports = { DEPENDENCY_CLASSES, DEVELOPMENTAL_ENTRY_MARKER, evaluateDevelopmentalEntry, hasDevelopmentalParallelEntryAuthority };
+module.exports = {
+  DEPENDENCY_CLASSES,
+  DEVELOPMENTAL_ENTRY_CORRELATION_PREFIX,
+  DEVELOPMENTAL_ENTRY_MARKER,
+  evaluateDevelopmentalEntry,
+  hasDevelopmentalParallelEntryAuthority
+};

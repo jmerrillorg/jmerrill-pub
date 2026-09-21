@@ -76,6 +76,7 @@ async function sendAttaTitleDecision(input = {}, deps = {}) {
     ...evaluated.copy, templateName: TEMPLATE_NAME, templateVersion: "1.0", attachments: [],
     communicationObservability: { from: FROM, replyTo: MAILBOX, cc: [MAILBOX], dataverseCommunicationRecordRequired: true, publishingMailboxCopyRequired: true },
     approvedBy: "founder-authority:parallel-workstream-correction", approvedOn: new Date().toISOString(),
+    futureSendRequiresInternalCopy: true, futureSendRequiresDataverseLog: true,
     internalVisibilityMailbox: MAILBOX, replyTo: MAILBOX, cc: [MAILBOX], bcc: [],
     idempotencyKey: reserve.semanticIdempotencyKey, communicationRecordId: reserve.communicationRecordId
   };

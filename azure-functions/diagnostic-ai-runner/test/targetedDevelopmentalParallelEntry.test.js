@@ -5,13 +5,14 @@ const test = require("node:test");
 const { evaluateTargetedEditorialExecution } = require("../src/editorial/editorialExecutionRuntime");
 const { DEVELOPMENTAL_ENTRY_MARKER } = require("../src/editorial/parallelWorkstreamPolicy");
 
-function client(marked = true) {
+function client(marked = true, options = {}) {
   const stage = {
     jm1pub_editorialstageid: "stage-dev", jm1pub_name: "Developmental Editing - Whole",
     jm1pub_stagetype: 100000001, jm1pub_stagestatus: 100000001, _jm1pub_titleid_value: "title-1",
     jm1pub_internaloperationalsummary: marked
       ? `${DEVELOPMENTAL_ENTRY_MARKER}; sourceArtifactId=source-1; agreementEvidence=agreement-1; commercialEvidence=payment-1;`
-      : "ordinary Developmental stage"
+      : "ordinary Developmental stage",
+    jm1pub_correlationid: options.correlationId || ""
   };
   return {
     async list(entitySet, query = {}) {
@@ -27,7 +28,12 @@ function client(marked = true) {
         }];
         return [];
       }
-      if (entitySet === "jm1pub_editorialapprovalgates" || entitySet === "jm1_executionlogs") return [];
+      if (entitySet === "jm1_executionlogs") {
+        return /DEVELOPMENTAL_PARALLEL_ENTRY_MATERIALIZED/.test(query.$filter || "")
+          ? options.executionLogs || []
+          : [];
+      }
+      if (entitySet === "jm1pub_editorialapprovalgates") return [];
       throw new Error(`Unexpected ${entitySet} ${JSON.stringify(query)}`);
     }
   };
@@ -48,4 +54,27 @@ test("targeted Developmental execution denies an unmarked stage without prior ap
   const result = await evaluateTargetedEditorialExecution(request, { client: client(false) });
   assert.equal(result.ok, false);
   assert.equal(result.code, "AUTHOR_APPROVAL_NOT_EXACT_ARTIFACT_BOUND");
+});
+
+test("targeted Developmental execution accepts an exact durable source correlation after summaries change", async () => {
+  const result = await evaluateTargetedEditorialExecution(request, {
+    client: client(false, { correlationId: "DEV-PARALLEL-SOURCE-source-1" })
+  });
+  assert.equal(result.ok, true);
+  assert.equal(result.authorApprovalEvidence.authorityType, "COMMERCIAL_MANUSCRIPT_PARALLEL_ENTRY");
+});
+
+test("targeted Developmental readback accepts immutable legacy materialization evidence", async () => {
+  const result = await evaluateTargetedEditorialExecution(request, {
+    client: client(false, {
+      executionLogs: [{
+        jm1_executionlogid: "materialization-log-1",
+        jm1_actiontype: "DEVELOPMENTAL_PARALLEL_ENTRY_MATERIALIZED",
+        jm1_actiondescription: "sourceArtifactId=source-1",
+        jm1_sourcerecordid: "stage-dev"
+      }]
+    })
+  });
+  assert.equal(result.ok, true);
+  assert.equal(result.authorApprovalEvidence.authorityType, "COMMERCIAL_MANUSCRIPT_PARALLEL_ENTRY");
 });
