@@ -1,0 +1,9 @@
+{
+  "additionalPaymentProcessing": "SYSTEM_OWNED_IN_DOMAIN_CONTRACT",
+  "payoffDetection": "SYSTEM_OWNED_IN_DOMAIN_CONTRACT",
+  "finalInstallmentAdjustment": "SYSTEM_OWNED_IN_DOMAIN_CONTRACT",
+  "autopayTermination": "NOT_COMMISSIONED_NO_EXECUTOR_FOUND",
+  "codyPaymentMonitoring": false,
+  "manualBalanceOverwrite": false,
+  "scheduledReconciliationRequired": false
+}

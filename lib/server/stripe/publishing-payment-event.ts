@@ -10,6 +10,7 @@ import {
   selectOpportunityCorrelation,
   stripePaymentBindingName,
 } from './publishing-payment-correlation'
+import type { PublishingPaymentType } from './publishing-agreement-payment'
 
 const STRIPE_API_BASE = 'https://api.stripe.com'
 
@@ -72,6 +73,14 @@ export type PublishingPaymentSuccess = {
   paymentRequestId?: string | null
   actionRequestId?: string | null
   agreementId?: string | null
+  paymentType?: PublishingPaymentType | null
+  authorId?: string | null
+  paymentScheduleId?: string | null
+  balanceVersion?: string | null
+  scheduledObligationId?: string | null
+  contractBalanceBeforeCents?: number | null
+  contractBalanceAfterCents?: number | null
+  agreementPaymentMetadataStatus?: string | null
   invalidMetadataKeys?: string[]
   manualCorrectionConfirmed?: boolean
   correctionReason?: string | null
@@ -130,6 +139,21 @@ export async function processPublishingPaymentSuccess(input: PublishingPaymentSu
   if (payment.invalidMetadataKeys.length > 0) {
     return blocked('PAYMENT_CORRELATION_METADATA_INVALID', {
       invalidMetadataKeys: payment.invalidMetadataKeys,
+    })
+  }
+  if (payment.agreementPaymentMetadataStatus && payment.agreementPaymentMetadataStatus !== 'PAYMENT_TYPE_MISSING') {
+    if (payment.agreementPaymentMetadataStatus !== 'VALID') {
+      return blocked('AGREEMENT_PAYMENT_METADATA_INVALID', {
+        metadataStatus: payment.agreementPaymentMetadataStatus,
+        financialEffect: 0,
+      })
+    }
+  }
+  if (payment.paymentType) {
+    return blocked('AGREEMENT_PAYMENT_RUNTIME_NOT_COMMISSIONED', {
+      paymentType: payment.paymentType,
+      accountingAuthority: 'QBO',
+      financialEffect: 0,
     })
   }
   if (payment.source === 'GOVERNED_MANUAL_CORRECTION') {
@@ -335,6 +359,18 @@ function normalizePayment(input: PublishingPaymentSuccess): Required<PublishingP
     paymentRequestId: normalizeString(input.paymentRequestId) || null,
     actionRequestId: normalizeString(input.actionRequestId) || null,
     agreementId: normalizeString(input.agreementId) || null,
+    paymentType: input.paymentType || null,
+    authorId: normalizeString(input.authorId) || null,
+    paymentScheduleId: normalizeString(input.paymentScheduleId) || null,
+    balanceVersion: normalizeString(input.balanceVersion) || null,
+    scheduledObligationId: normalizeString(input.scheduledObligationId) || null,
+    contractBalanceBeforeCents: typeof input.contractBalanceBeforeCents === 'number' && Number.isSafeInteger(input.contractBalanceBeforeCents)
+      ? input.contractBalanceBeforeCents
+      : null,
+    contractBalanceAfterCents: typeof input.contractBalanceAfterCents === 'number' && Number.isSafeInteger(input.contractBalanceAfterCents)
+      ? input.contractBalanceAfterCents
+      : null,
+    agreementPaymentMetadataStatus: normalizeString(input.agreementPaymentMetadataStatus) || null,
     invalidMetadataKeys: Array.isArray(input.invalidMetadataKeys) ? input.invalidMetadataKeys : [],
     manualCorrectionConfirmed: input.manualCorrectionConfirmed === true,
     correctionReason: normalizeString(input.correctionReason) || null,

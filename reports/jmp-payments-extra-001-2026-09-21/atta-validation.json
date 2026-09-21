@@ -1,0 +1,13 @@
+{
+  "author": "Atta Darko",
+  "validationMode": "BOUNDED_NON_EFFECT_MODEL",
+  "knownScheduledInstallmentCents": 25988,
+  "additionalPaymentRepresentable": true,
+  "sameSessionLogicalAllocationPreserved": true,
+  "legacyPolicyChanged": false,
+  "stripeMutations": 0,
+  "dataverseMutations": 0,
+  "qboMutations": 0,
+  "charges": 0,
+  "status": "PASS_MODEL_ONLY"
+}

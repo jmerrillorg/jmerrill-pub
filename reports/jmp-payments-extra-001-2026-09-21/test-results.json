@@ -1,0 +1,9 @@
+{
+  "node": "24.11.0",
+  "domainCommand": "npm run jmp-payments-extra-001-guard",
+  "domainTests": { "passed": 19, "failed": 0 },
+  "regressionCommand": "npm run jmp-pay-ingest-001-guard",
+  "regressionTests": { "passed": 26, "failed": 0 },
+  "typeCheck": "PASS",
+  "financialEffects": 0
+}

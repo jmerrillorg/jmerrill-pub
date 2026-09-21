@@ -1,0 +1,10 @@
+{
+  "status": "PASS_DOMAIN_CONTRACT",
+  "paymentIdentity": "paymentId",
+  "refundIdentity": "refundId",
+  "duplicatePaymentBalanceReduction": 0,
+  "duplicateRefundBalanceRestoration": 0,
+  "conflictingIdentityDisposition": "DENY",
+  "stripeWebhookVerificationPreserved": true,
+  "durableDataverseUniquenessCommissioned": false
+}

@@ -1,0 +1,8 @@
+{
+  "status": "PASS_DOMAIN_PREFLIGHT / BLOCKED_DURABLE_RESERVATION",
+  "balanceVersion": "SHA-256 over agreement total, normal installment, confirmed payments, and confirmed refunds",
+  "staleSubmissionDisposition": "DENY_STALE_AGREEMENT_BALANCE",
+  "overpaymentDisposition": "DENY_WITH_PERMISSIBLE_MAXIMUM",
+  "durableAtomicReservationAvailable": false,
+  "productionInitiationEnabled": false
+}
