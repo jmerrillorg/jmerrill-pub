@@ -488,6 +488,88 @@ test("durable targeted Developmental execution checkpoints one chunk and queues 
   }
 });
 
+test("bounded projection repair replaces only the contaminated durable chunk", async () => {
+  const previousLimit = process.env.JM1_DEVELOPMENTAL_EDITING_CHUNK_WORD_LIMIT;
+  process.env.JM1_DEVELOPMENTAL_EDITING_CHUNK_WORD_LIMIT = "3";
+  const sourceText = "one two three\n\nfour five six";
+  const sourceBuffer = Buffer.from(sourceText, "utf8");
+  const sourceSha = require("node:crypto").createHash("sha256").update(sourceBuffer).digest("hex");
+  const { client } = targetedDevelopmentalExecutionClient({ sourceSha });
+  const input = {
+    titleId: "title-1",
+    stageCode: "DEVELOPMENTAL_EDITING",
+    sourceArtifactId: "artifact-source",
+    sourceChecksum: sourceSha,
+    authorApprovalRequired: false,
+    executionMode: "EXECUTE",
+    repairAuthorProjection: true
+  };
+  const prefix = `targeted-editorial-execution/${targetedExecutionIdempotencyKey(input)}`;
+  const contaminated = {
+    chunkIndex: 1,
+    output: {
+      editedManuscript: "one two three revised",
+      developmentalSummary: 'Summary leaked {"class":"PRODUCTION_INTERNAL"}.',
+      appliedChanges: ["Improved progression."],
+      authorNotes: [],
+      internalNotes: [],
+      authorityActions: [{ classification: "SYSTEM_AUTHORIZED_EDIT", description: "Improved progression." }]
+    }
+  };
+  const bodies = new Map([
+    [`${prefix}/chunks/0001.json`, Buffer.from(JSON.stringify(contaminated))]
+  ]);
+  let uploads = 0;
+  const checkpointStore = {
+    async createIfNotExists() {},
+    getBlockBlobClient(name) {
+      return {
+        name,
+        async exists() { return bodies.has(name); },
+        async uploadData(body) { uploads += 1; bodies.set(name, Buffer.from(body)); },
+        async downloadToBuffer() { return bodies.get(name); }
+      };
+    }
+  };
+  const sent = [];
+  const queueClient = {
+    async createIfNotExists() {},
+    async sendMessage(body) { sent.push(JSON.parse(body)); return { messageId: "next-message" }; }
+  };
+  graphRequest.override = async (path) => path.endsWith("/content")
+    ? sourceBuffer
+    : { id: "source-item", parentReference: { driveId: "drive-1", id: "parent-1" } };
+  extractSourceText.override = async () => ({ value: sourceText });
+  invokeSingleStageModelProvider.override = async ({ extractedText }) => ({
+    ok: true,
+    fellBack: false,
+    provider: "microsoft-foundry-claude",
+    output: {
+      editedManuscript: `${extractedText} revised`,
+      developmentalSummary: "The passage was strengthened for progression.",
+      appliedChanges: ["Improved progression."],
+      authorNotes: [],
+      internalNotes: [],
+      authorityActions: [{ classification: "SYSTEM_AUTHORIZED_EDIT", description: "Improved progression." }]
+    }
+  });
+
+  try {
+    const result = await runChunkedTargetedDevelopmentalExecution(input, { client, checkpointStore, queueClient });
+    const repaired = JSON.parse(bodies.get(`${prefix}/chunks/0001.json`).toString("utf8"));
+    assert.equal(result.status, "CHUNK_COMPLETED_REQUEUED_NEXT");
+    assert.equal(uploads, 2); // plan plus the explicit replacement
+    assert.equal(repaired.output.developmentalSummary, "The passage was strengthened for progression.");
+    assert.equal(sent[0].repairAuthorProjection, true);
+  } finally {
+    graphRequest.override = null;
+    extractSourceText.override = null;
+    invokeSingleStageModelProvider.override = null;
+    if (previousLimit === undefined) delete process.env.JM1_DEVELOPMENTAL_EDITING_CHUNK_WORD_LIMIT;
+    else process.env.JM1_DEVELOPMENTAL_EDITING_CHUNK_WORD_LIMIT = previousLimit;
+  }
+});
+
 test("durable targeted Developmental execution retries malformed output without checkpointing it", async () => {
   const previousLimit = process.env.JM1_DEVELOPMENTAL_EDITING_CHUNK_WORD_LIMIT;
   process.env.JM1_DEVELOPMENTAL_EDITING_CHUNK_WORD_LIMIT = "20";
