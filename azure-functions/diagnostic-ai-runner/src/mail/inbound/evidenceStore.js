@@ -63,6 +63,12 @@ class InMemoryInboundEvidenceStore {
     return { created: true, path: key };
   }
 
+  async readSourceAttachment(attachment) {
+    const key = `${attachment.messageEventId}:${attachment.graphAttachmentId || attachment.originalFilename}:source`;
+    const bytes = this.sourceAttachments.get(key);
+    return bytes ? Buffer.from(bytes) : null;
+  }
+
   async upsertQueueItem(item) {
     const existing = this.queue.get(item.queueItemId);
     if (existing) return { created: false, record: existing };

@@ -144,6 +144,16 @@ class BlobInboundEvidenceStore {
     }
   }
 
+  async readSourceAttachment(attachment) {
+    await this.ensureReady();
+    try {
+      return await this.blob(this.sourceAttachmentPath(attachment)).downloadToBuffer();
+    } catch (err) {
+      if (err.statusCode === 404) return null;
+      throw err;
+    }
+  }
+
   async upsertQueueItem(item) {
     const path = this.queuePath(item.queueItemId);
     const existing = await this.get(path);
