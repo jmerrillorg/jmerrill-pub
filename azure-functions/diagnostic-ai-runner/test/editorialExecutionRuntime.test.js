@@ -107,8 +107,8 @@ test("Graph share token encodes SharePoint web URLs for driveItem resolution", (
 
 test("persisted Graph readback falls back from item identity to exact parent path", async () => {
   const calls = [];
-  graphRequest.override = async (path) => {
-    calls.push(path);
+  graphRequest.override = async (path, options) => {
+    calls.push({ path, options });
     if (path.includes("items/uploaded-id/content")) {
       throw Object.assign(new Error("Item identity not readable yet"), { safeCode: "GRAPH_ITEM_NOT_FOUND" });
     }
@@ -121,8 +121,8 @@ test("persisted Graph readback falls back from item identity to exact parent pat
     ], { attempts: 1, delayMs: 0 });
     assert.equal(body.toString("utf8"), "persisted bytes");
     assert.deepEqual(calls, [
-      "drives/drive/items/uploaded-id/content",
-      "drives/drive/items/parent:/manifest.json:/content"
+      { path: "drives/drive/items/uploaded-id/content", options: { responseType: "buffer" } },
+      { path: "drives/drive/items/parent:/manifest.json:/content", options: { responseType: "buffer" } }
     ]);
   } finally {
     graphRequest.override = null;

@@ -1656,7 +1656,7 @@ async function readPersistedGraphContent(paths = [], options = {}) {
   for (let attempt = 0; attempt < attempts; attempt += 1) {
     for (const path of candidates) {
       try {
-        const body = await graphRequest(path);
+        const body = await graphRequest(path, { responseType: "buffer" });
         if (Buffer.isBuffer(body)) return body;
         lastError = Object.assign(new Error("Persisted Graph content was not binary."), {
           safeCode: "GRAPH_PERSISTED_CONTENT_READBACK_FAILED"
@@ -2299,12 +2299,13 @@ async function graphRequest(path, options = {}) {
   if (typeof graphRequest.override === "function") {
     return graphRequest.override(path, options);
   }
+  const { responseType, ...requestOptions } = options;
   const endpoint = `${GRAPH_BASE}/${path.replace(/^\//, "")}`;
   const response = await fetch(`${GRAPH_BASE}/${path.replace(/^\//, "")}`, {
-    ...options,
+    ...requestOptions,
     headers: {
       Authorization: `Bearer ${await getGraphToken()}`,
-      ...(options.headers || {})
+      ...(requestOptions.headers || {})
     },
     redirect: "follow"
   });
@@ -2322,7 +2323,7 @@ async function graphRequest(path, options = {}) {
       normalizeString(body?.error?.innerError?.requestId) ||
       normalizeString(response.headers.get("request-id")) ||
       normalizeString(response.headers.get("client-request-id"));
-    const safeCode = classifyGraphFailure({ status: response.status, graphCode, path, method: options.method || "GET" });
+    const safeCode = classifyGraphFailure({ status: response.status, graphCode, path, method: requestOptions.method || "GET" });
     const details = {
       safeCode,
       status: response.status,
@@ -2330,7 +2331,7 @@ async function graphRequest(path, options = {}) {
       requestId,
       endpoint,
       path,
-      method: options.method || "GET"
+      method: requestOptions.method || "GET"
     };
     throw Object.assign(new Error(`Graph request failed: ${JSON.stringify(details)}`), {
       ...details,
@@ -2338,6 +2339,7 @@ async function graphRequest(path, options = {}) {
     });
   }
   if (response.status === 204) return null;
+  if (responseType === "buffer") return Buffer.from(await response.arrayBuffer());
   const contentType = response.headers.get("content-type") || "";
   return contentType.includes("application/json") ? response.json() : Buffer.from(await response.arrayBuffer());
 }
