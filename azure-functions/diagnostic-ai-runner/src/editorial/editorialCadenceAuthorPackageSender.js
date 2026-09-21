@@ -44,7 +44,7 @@ function semanticAttachmentManifest(attachments = []) {
 
 function validateDevelopmentalContentTruth(input = {}) {
   const roles = new Set((input.attachments || []).map((attachment) => normalizeString(attachment.role)));
-  const complete = roles.has("editedManuscript") && roles.has("reviewInstructions")
+  const complete = roles.has("editedManuscript") && roles.has("developmentalReview")
     && input.qa === "PASS" && input.versionParity === "PASS"
     && input.titleBinding === "PASS" && input.authorBinding === "PASS";
   const claimsComplete = /completed review package|complete package|developmental editing is complete/i.test(
@@ -121,7 +121,7 @@ function stageLabel(stageCode) {
 
 function requiredRolesFor(stageCode) {
   const reviewCode = stageCodeForNotification(stageCode);
-  if (reviewCode === "DEVELOPMENTAL_EDITING_REVIEW") return ["editedManuscript", "reviewInstructions"];
+  if (reviewCode === "DEVELOPMENTAL_EDITING_REVIEW") return ["editedManuscript", "developmentalReview"];
   if (reviewCode === "LINE_EDITING_REVIEW") return ["lineEditedManuscript", "reviewCoverNote"];
   if (reviewCode === "COPYEDITING_REVIEW") return ["copyeditedManuscript", "reviewCoverNote"];
   if (reviewCode === "PROOFREADING_REVIEW") return ["proofreadManuscript", "reviewInstructions"];
@@ -134,6 +134,7 @@ function requiredRolesFor(stageCode) {
 function rolePatterns(role) {
   return {
     editedManuscript: [/developmentally.*edited|edited.*manuscript|developmental.*manuscript/i],
+    developmentalReview: [/developmental.*editorial.*review|developmental.*memo|editor.*notes|instruction|guide|review/i],
     editorialMemo: [/author-facing.*editorial.*review|editorial.*review.*assessment|editorial.*review.*package|memo|summary|assessment/i],
     reviewInstructions: [/instruction|guide|review/i],
     lineEditedManuscript: [/line.*edited.*manuscript|line.*manuscript|edited.*manuscript/i],
@@ -184,6 +185,7 @@ function artifactRoleScore(artifact, role) {
   const haystack = artifactHaystack(artifact);
   let score = artifact?.jm1pub_iscurrentapproved === true ? 10 : 0;
   if (role === "editedManuscript" && /developmentally.*edited|edited.*manuscript/i.test(haystack)) score += 100;
+  if (role === "developmentalReview" && /developmental.*editorial.*review|developmental.*memo/i.test(haystack)) score += 100;
   if (role === "lineEditedManuscript" && /line.*editing|line.*edited/i.test(haystack)) score += 100;
   if (role === "reviewInstructions" && /instruction|guide/i.test(haystack)) score += 100;
   if (role === "reviewCoverNote" && /change.*ledger|review.*instruction|guide/i.test(haystack)) score += 70;
@@ -196,6 +198,7 @@ function authorFacingFilename(titleName, role, sourceFilename) {
   const title = sanitizeFilename(titleName).replace(/\.[a-z0-9]+$/i, "").replace(/\s+/g, " ").trim() || "Author Review";
   const labels = {
     editedManuscript: "Edited Manuscript",
+    developmentalReview: "Developmental Editorial Review",
     editorialMemo: "Editor's Notes",
     reviewInstructions: "Editorial Review Guide",
     lineEditedManuscript: "Line Edited Manuscript",
@@ -336,7 +339,7 @@ function renderReviewCopy(input) {
   }
   const subject = `${label} Materials - ${title}`;
   if (developmental) {
-    const reviewName = input.attachments.find((attachment) => attachment.role === "reviewInstructions")?.name;
+    const reviewName = input.attachments.find((attachment) => attachment.role === "developmentalReview")?.name;
     const manuscriptName = input.attachments.find((attachment) => attachment.role === "editedManuscript")?.name;
     if (!reviewName || !manuscriptName) {
       throw Object.assign(new Error("DEVELOPMENTAL_PACKAGE_INCOMPLETE"), { safeCode: "DEVELOPMENTAL_PACKAGE_INCOMPLETE" });
@@ -554,7 +557,7 @@ async function sendCadenceAuthorReviewPackage(input, deps = {}) {
     devReviewStatus: "COMPLETE",
     devEditedManuscriptStatus: "COMPLETE",
     devPackageComplete: true,
-    requiredRoles: ["editedManuscript", "reviewInstructions"],
+    requiredRoles: ["editedManuscript", "developmentalReview"],
     artifacts: governedAttachmentManifest
   } : undefined;
   const communicationObservability = {

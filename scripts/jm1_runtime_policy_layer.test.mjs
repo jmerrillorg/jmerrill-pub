@@ -93,6 +93,12 @@ test('author-facing artifact safety blocks internal metadata leakage', () => {
     'checksum: deadbeef',
     'Dataverse workflow record',
     'AUTHOR_REVIEW_RESPONSE',
+    'AI model: internal-editor-v2',
+    'execution ID: run-123',
+    'Publisher review note P318: Confirm legal posture before author-facing release.',
+    'RIGHTS_LEGAL_INTERNAL: permissions review pending',
+    'Title ID: daf8180f-85a3-f111-b8de-000d3a14673b',
+    'Source SHA256: 097b042aeb30e9fde1e9381201049788cf6ba3fac1866fceb3f53298619d64fa',
   ]) {
     assert.equal(policy.resolveArtifactAuthority({ text }).DECISION, 'DENY')
   }

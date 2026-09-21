@@ -21,6 +21,14 @@ const {
 } = require("../policy/canonPolicyLayer");
 const { evaluateBlock04StageTransition } = require("./block04EditorialPolicy");
 const { hasDevelopmentalParallelEntryAuthority } = require("./parallelWorkstreamPolicy");
+const { validateAuthorFacingProjection } = require("./authorFacingProjectionGuard");
+const {
+  ARTIFACT_AUDIENCE,
+  artifactAudience,
+  classifyNotes,
+  isAuthorVisibleAudience,
+  validateAuthorityActions
+} = require("./editorialArtifactAudience");
 
 const GRAPH_BASE = "https://graph.microsoft.com/v1.0";
 
@@ -66,6 +74,8 @@ const DEFAULT_LINE_EDITING_ADAPTIVE_RETRY_FLOOR_MS = 5000;
 const DEFAULT_LINE_EDITING_ADAPTIVE_RETRY_MAX_MS = 120000;
 const DEFAULT_LINE_EDITING_SCHEMA_MISS_MAX_RETRIES = 3;
 const DEFAULT_LINE_EDITING_TRANSIENT_MODEL_MAX_RETRIES = 3;
+const DEFAULT_DEVELOPMENTAL_EDITING_CHUNK_WORD_LIMIT = 900;
+const DEFAULT_DEVELOPMENTAL_EDITING_CHUNK_CONCURRENCY = 2;
 const DEFAULT_TARGETED_EDITORIAL_QUEUE_NAME = "jm1-targeted-editorial-execution";
 const DEFAULT_TARGETED_EDITORIAL_CHECKPOINT_CONTAINER = "publishing";
 const DEFAULT_TARGETED_EDITORIAL_CHECKPOINT_PREFIX = "targeted-editorial-execution";
@@ -78,7 +88,7 @@ const EXECUTOR_POLICIES = {
   },
   DEVELOPMENTAL_EDITING: {
     stageType: STAGE_TYPES.DEVELOPMENTAL_EDITING,
-    outputRoles: ["editedManuscript", "developmentalMemo", "changeLedger", "qaEvidence"],
+    outputRoles: ["authorReviewManuscript", "cleanEditedManuscript", "developmentalEditorialReview", "internalEvidenceManifest"],
     exactMissingSourceBlocker: "DEVELOPMENTAL_EDITING_BLOCKED — SOURCE_ARTIFACT_MISSING"
   },
   LINE_EDITING: {
@@ -380,7 +390,11 @@ async function evaluateTargetedEditorialExecution(input = {}, deps = {}) {
   const expected = expectedCurrentStageMatches(normalized, upstream, normalized.stageCode);
   if (!expected.ok) return targetedBlocked(normalized, "EXPECTED_CURRENT_STAGE_MISMATCH", expected.reason, { idempotencyKey });
 
-  const outputReadyVersion = normalized.stageCode === "EDITORIAL_REVIEW" ? "v5" : "v4";
+  const outputReadyVersion = normalized.stageCode === "EDITORIAL_REVIEW"
+    ? "v5"
+    : normalized.stageCode === "DEVELOPMENTAL_EDITING"
+      ? "v5-human-first"
+      : "v4";
   const existingOutput = await findExecutionLog(
     client,
     "ACTIVE_EDITORIAL_OUTPUT_CREATED",
@@ -1367,6 +1381,55 @@ function buildLineEditingChunkPrompt({
   });
 }
 
+function buildDevelopmentalEditingChunkPrompt({ stage, sourceArtifact, chunkText, chunkIndex, chunkCount, totalWordCount }) {
+  return JSON.stringify({
+    task: "cc010_developmental_editing_full_manuscript_chunk_execution",
+    contract: "Return only the required JSON tool output. Perform real developmental editing and return the complete edited text for this chunk.",
+    publisher: "J Merrill Publishing",
+    stageName: "Developmental Editing",
+    title: authorTitleFromStage(stage),
+    chunkIndex,
+    chunkCount,
+    sourceWordCount: totalWordCount,
+    developmentalScope: [
+      "structure and organization",
+      "chapter and section architecture",
+      "argument or narrative flow",
+      "pacing, redundancy, content gaps, and continuity",
+      "reader orientation and transitions",
+      "theme or argument development",
+      "audience, genre, and accessibility alignment"
+    ],
+    authorityRules: {
+      applyDirectly: "SYSTEM_AUTHORIZED_EDIT only",
+      askAuthor: "AUTHOR_DECISION_REQUIRED",
+      holdInternally: ["PUBLISHER_DECISION_REQUIRED", "FACT_CHECK_REQUIRED", "RIGHTS_LEGAL_REVIEW_REQUIRED"],
+      neverInventAuthorDecision: true,
+      preserveAuthorVoice: true
+    },
+    authorExperienceRules: [
+      "Author-facing notes must be natural professional editorial correspondence.",
+      "Use only EDITOR_NOTE, AUTHOR_QUESTION, or AUTHOR_DECISION_REQUIRED for authorNotes.",
+      "Never put internal systems, identifiers, checksums, model names, automation, governance, provider, production, rights/legal-internal, or diagnostic terminology in editedManuscript or authorNotes.",
+      "A rights concern requiring author information may become a natural AUTHOR_QUESTION. Otherwise keep it in internalNotes."
+    ],
+    requiredOutput: {
+      editedManuscript: "complete developmentally edited text for this exact chunk",
+      developmentalSummary: "professional author-safe summary",
+      appliedChanges: ["specific developmental revisions applied"],
+      authorNotes: [{ class: "EDITOR_NOTE | AUTHOR_QUESTION | AUTHOR_DECISION_REQUIRED", anchor: "short exact phrase from edited text", message: "natural author-facing guidance" }],
+      internalNotes: [{ class: "PUBLISHER_INTERNAL | RIGHTS_LEGAL_INTERNAL | FACT_CHECK_INTERNAL | PRODUCTION_INTERNAL | PROVIDER_INTERNAL | SYSTEM_INTERNAL | AI_INTERNAL", anchor: "optional", message: "internal detail" }],
+      authorityActions: [{ classification: "SYSTEM_AUTHORIZED_EDIT | AUTHOR_DECISION_REQUIRED | PUBLISHER_DECISION_REQUIRED | FACT_CHECK_REQUIRED | RIGHTS_LEGAL_REVIEW_REQUIRED", anchor: "optional", description: "action or decision" }]
+    },
+    sourceArtifactContext: {
+      id: sourceArtifact.jm1pub_editorialartifactid,
+      chunkIndex,
+      chunkCount
+    },
+    sourceText: chunkText
+  });
+}
+
 function selectedStyleGuidesForStage(stageCode) {
   if (stageCode === "LINE_EDITING" || stageCode === "COPYEDITING" || stageCode === "PROOFREADING") {
     return ["JMP-CG-LINE-COPY-PROOF-V1"];
@@ -1572,12 +1635,91 @@ async function invokeLineEditingModelProvider(stage, sourceArtifact, extractedTe
   };
 }
 
+async function invokeDevelopmentalEditingModelProvider(stage, sourceArtifact, extractedText, correlationId, upstreamContext = null) {
+  const chunkWordLimit = parsePositiveInteger(
+    process.env.JM1_DEVELOPMENTAL_EDITING_CHUNK_WORD_LIMIT,
+    DEFAULT_DEVELOPMENTAL_EDITING_CHUNK_WORD_LIMIT
+  );
+  const chunks = splitLineEditingSourceChunks(extractedText, chunkWordLimit);
+  const concurrency = Math.min(
+    chunks.length,
+    parsePositiveInteger(
+      process.env.JM1_DEVELOPMENTAL_EDITING_CHUNK_CONCURRENCY,
+      DEFAULT_DEVELOPMENTAL_EDITING_CHUNK_CONCURRENCY
+    )
+  );
+  const totalWordCount = summarizeExtractedText(extractedText).words;
+  const results = new Array(chunks.length);
+  let cursor = 0;
+  async function worker() {
+    while (cursor < chunks.length) {
+      const index = cursor;
+      cursor += 1;
+      const result = await invokeSingleStageModelProvider({
+        stage,
+        stageCode: "DEVELOPMENTAL_EDITING",
+        sourceArtifact,
+        extractedText: chunks[index],
+        correlationId: `${correlationId}:developmental-chunk-${index + 1}-of-${chunks.length}`,
+        upstreamContext,
+        promptBody: buildDevelopmentalEditingChunkPrompt({
+          stage,
+          sourceArtifact,
+          chunkText: chunks[index],
+          chunkIndex: index + 1,
+          chunkCount: chunks.length,
+          totalWordCount
+        }),
+        diagnosticId: `${normalizeString(stage._jm1pub_titleid_value) || stage.jm1pub_editorialstageid}:developmental-chunk-${index + 1}`,
+        promptVersion: "CC010-DEVELOPMENTAL-EDITING-HUMAN-FIRST-V2"
+      });
+      results[index] = result;
+    }
+  }
+  await Promise.all(Array.from({ length: Math.max(1, concurrency) }, () => worker()));
+  const failedIndex = results.findIndex((result) => !result?.ok || result?.fellBack || !developmentalEditingOutput(result).editedManuscript);
+  if (failedIndex >= 0) {
+    const failed = results[failedIndex] || {};
+    return {
+      ...failed,
+      ok: false,
+      fellBack: Boolean(failed.fellBack),
+      error: failed.error || `DEVELOPMENTAL_CHUNK_${failedIndex + 1}_OUTPUT_INVALID`
+    };
+  }
+  const parsed = results.map((result) => developmentalEditingOutput(result));
+  return {
+    ...results[0],
+    ok: true,
+    fellBack: false,
+    sourceText: extractedText,
+    output: {
+      editedManuscript: parsed.map((item) => item.editedManuscript).join("\n\n"),
+      developmentalSummary: parsed.map((item) => item.developmentalSummary).filter(Boolean).join(" "),
+      appliedChanges: parsed.flatMap((item) => item.appliedChanges),
+      authorNotes: parsed.flatMap((item) => item.authorNotes),
+      internalNotes: parsed.flatMap((item) => item.internalNotes),
+      authorityActions: parsed.flatMap((item) => item.authorityActions)
+    },
+    tokenCounts: results.reduce((total, item) => ({
+      input: total.input + (item.tokenCounts?.input || 0),
+      output: total.output + (item.tokenCounts?.output || 0),
+      total: total.total + (item.tokenCounts?.total || 0)
+    }), { input: 0, output: 0, total: 0 }),
+    chunkCount: chunks.length,
+    promptVersion: "CC010-DEVELOPMENTAL-EDITING-HUMAN-FIRST-V2"
+  };
+}
+
 async function invokeStageModelProvider(stage, stageCode, sourceArtifact, extractedText, correlationId, upstreamContext = null) {
   if (typeof invokeStageModelProvider.override === "function") {
     return invokeStageModelProvider.override(stage, stageCode, sourceArtifact, extractedText, correlationId, upstreamContext);
   }
   if (stageCode === "LINE_EDITING") {
     return invokeLineEditingModelProvider(stage, sourceArtifact, extractedText, correlationId, upstreamContext);
+  }
+  if (stageCode === "DEVELOPMENTAL_EDITING") {
+    return invokeDevelopmentalEditingModelProvider(stage, sourceArtifact, extractedText, correlationId, upstreamContext);
   }
   return invokeSingleStageModelProvider({ stage, stageCode, sourceArtifact, extractedText, correlationId, upstreamContext });
 }
@@ -2215,11 +2357,10 @@ function outputDefinitions(stageCode) {
   }
   if (stageCode === "DEVELOPMENTAL_EDITING") {
     return [
-      "Developmentally Edited Manuscript",
-      "Developmental Memo",
-      "Developmental Review Instructions",
-      "Change Ledger",
-      "Developmental QA Evidence"
+      "Author-Review Edited Manuscript",
+      "Clean Edited Manuscript",
+      "Developmental Editorial Review",
+      "Internal Evidence Manifest"
     ];
   }
   const displayNames = {
@@ -2255,90 +2396,148 @@ function paragraphFromText(text, options = {}) {
   });
 }
 
-function developmentalAnnotationForParagraph(paragraph, index) {
-  const words = paragraph.split(/\s+/).filter(Boolean).length;
-  const sentences = paragraph.split(/[.!?]+/).map((item) => item.trim()).filter(Boolean);
-  if (words >= 180) {
-    return `Developmental note P${index + 1}: Consider dividing this paragraph or adding a transition so the reader can track the movement without losing the author's voice.`;
-  }
-  if (sentences.some((sentence) => sentence.split(/\s+/).length >= 45)) {
-    return `Developmental note P${index + 1}: Review sentence length for clarity during line editing; preserve intentional cadence where it is part of the author's style.`;
-  }
-  if (/copyright|permission|quoted|scripture|lyrics|trademark|estate|legal/i.test(paragraph)) {
-    return `Publisher review note P${index + 1}: Confirm rights, permissions, or legal posture before author-facing release.`;
-  }
-  return "";
+function authorTitleFromStage(stage) {
+  return normalizeString(stage?.jm1pub_name)
+    .replace(/^developmental editing\s*[-—:]\s*/i, "")
+    .replace(/^line editing\s*[-—:]\s*/i, "")
+    .replace(/^copyediting\s*[-—:]\s*/i, "")
+    .replace(/^proofreading\s*[-—:]\s*/i, "") || "Manuscript";
 }
 
-async function buildDevelopmentalRevisionDocx(stage, stageCode, sourceArtifact, outputName, extractedText, correlationId) {
-  const stats = summarizeExtractedText(extractedText);
-  const analysis = analyzeManuscriptText(extractedText);
-  const sourceParagraphs = splitManuscriptParagraphs(extractedText);
-  if (!sourceParagraphs.length) {
-    throw Object.assign(new Error("Source text extraction did not produce manuscript body"), {
-      safeCode: `${stageCode}_BLOCKED — SOURCE_TEXT_EXTRACTION_EMPTY`
+function developmentalEditingOutput(modelInvocation = {}) {
+  const output = modelInvocation.output || {};
+  const editedManuscript = modelTextField(output, ["editedManuscript", "edited_manuscript", "revisedText", "manuscript"]);
+  const developmentalSummary = modelTextField(output, ["developmentalSummary", "developmental_summary", "authorReviewSummary"]);
+  const appliedChanges = modelArrayField(output, ["appliedChanges", "applied_changes", "changeLedger", "revisionCandidates"]);
+  const notes = classifyNotes([...(output.authorNotes || []), ...(output.internalNotes || [])]);
+  const authorityActions = Array.isArray(output.authorityActions) ? output.authorityActions : [];
+  const authorityValidation = validateAuthorityActions(authorityActions);
+  return {
+    editedManuscript,
+    developmentalSummary,
+    appliedChanges,
+    authorNotes: notes.authorVisible,
+    internalNotes: notes.internal,
+    invalidNotes: notes.invalid,
+    authorityActions,
+    authorityValidation
+  };
+}
+
+function assertDevelopmentalEditingOutputReady(modelInvocation, sourceText) {
+  const output = developmentalEditingOutput(modelInvocation);
+  const sourceWords = summarizeExtractedText(sourceText).words;
+  const editedWords = summarizeExtractedText(output.editedManuscript).words;
+  const changed = normalizeString(sourceText).replace(/\s+/g, " ") !== normalizeString(output.editedManuscript).replace(/\s+/g, " ");
+  const ratio = sourceWords > 0 ? editedWords / sourceWords : 0;
+  const failures = [];
+  if (!output.editedManuscript) failures.push("EDITED_MANUSCRIPT_MISSING");
+  if (!changed) failures.push("NO_MATERIAL_DEVELOPMENTAL_CHANGES");
+  if (!output.developmentalSummary) failures.push("DEVELOPMENTAL_SUMMARY_MISSING");
+  if (!output.appliedChanges.length) failures.push("APPLIED_CHANGE_MANIFEST_MISSING");
+  if (ratio < 0.7 || ratio > 1.35) failures.push("DEVELOPMENTAL_CONTENT_RETENTION_OUT_OF_RANGE");
+  if (output.invalidNotes.length) failures.push("UNCLASSIFIED_EDITORIAL_NOTE");
+  if (!output.authorityValidation.ok) failures.push("INVALID_EDITORIAL_AUTHORITY_CLASSIFICATION");
+  if (modelInvocation.fellBack) failures.push("MODEL_FALLBACK_NOT_ALLOWED");
+  if (failures.length) {
+    throw Object.assign(new Error("Developmental Editing output failed semantic QA"), {
+      safeCode: `DEVELOPMENTAL_EDITING_BLOCKED — ${failures.join("_")}`,
+      developmentalQa: { sourceWords, editedWords, retentionRatio: ratio, changed, failures }
     });
   }
+  return { output, qa: { sourceWords, editedWords, retentionRatio: ratio, changed, failures: [] } };
+}
 
-  const children = [
-    paragraphFromText(`${outputName} - ${stage.jm1pub_name}`, { heading: HeadingLevel.HEADING_1 }),
-    paragraphFromText("Generated by: JM1 Automation"),
-    paragraphFromText(`Stage: ${stageCode}`),
-    paragraphFromText(`Generated at: ${new Date().toISOString()}`),
-    paragraphFromText(`Source artifact: ${sourceArtifact.jm1pub_editorialartifactid}`),
-    paragraphFromText(`Source checksum: ${sourceArtifact.jm1pub_sha256}`),
-    paragraphFromText(`Correlation: ${correlationId}`),
-    paragraphFromText(`Extracted word count: ${stats.words}`),
-    paragraphFromText(`Extracted paragraph count: ${stats.paragraphs}`),
-    paragraphFromText("Governed Developmental Revision Artifact", { heading: HeadingLevel.HEADING_2 }),
-    paragraphFromText(
-      "This package-grade revision artifact preserves the full extracted manuscript text and adds non-destructive developmental notes where structure, pacing, permissions, or publisher judgment may be needed. It does not silently rewrite author voice, adjudicate sensitive claims, or make rights decisions."
-    ),
-    paragraphFromText("Developmental Findings", { heading: HeadingLevel.HEADING_2 }),
-    paragraphFromText(
-      analysis.longParagraphs.length || analysis.longSentences.length
-        ? "The manuscript contains pacing and readability candidates that should be addressed before line-level editing."
-        : "No high-volume pacing issue was detected in the automated pass; publisher/editor review remains required before author release."
-    ),
-    paragraphFromText("Manuscript Revision Layer", { heading: HeadingLevel.HEADING_2 })
-  ];
+function authorAnnotationText(note) {
+  const prefix = note.class === "EDITOR_NOTE" ? "Editor's note" : "Author question";
+  return `${prefix}: ${normalizeString(note.message)}`;
+}
 
-  sourceParagraphs.forEach((paragraph, index) => {
-    children.push(paragraphFromText(paragraph));
-    const annotation = developmentalAnnotationForParagraph(paragraph, index);
-    if (annotation) {
-      children.push(paragraphFromText(annotation, { italics: true }));
-    }
-  });
-
-  const doc = new Document({
+function buildProfessionalDocx(children) {
+  return Packer.toBuffer(new Document({
     styles: {
       default: { document: { run: { font: "Arial", size: 22 } } },
       paragraphStyles: [
-        {
-          id: "Heading1",
-          name: "Heading 1",
-          basedOn: "Normal",
-          next: "Normal",
-          quickFormat: true,
-          run: { size: 30, bold: true, font: "Arial" },
-          paragraph: { spacing: { before: 240, after: 240 }, outlineLevel: 0 }
-        },
-        {
-          id: "Heading2",
-          name: "Heading 2",
-          basedOn: "Normal",
-          next: "Normal",
-          quickFormat: true,
-          run: { size: 26, bold: true, font: "Arial" },
-          paragraph: { spacing: { before: 220, after: 160 }, outlineLevel: 1 }
-        }
+        { id: "Heading1", name: "Heading 1", basedOn: "Normal", next: "Normal", quickFormat: true, run: { size: 30, bold: true, font: "Arial" }, paragraph: { spacing: { before: 240, after: 240 }, outlineLevel: 0 } },
+        { id: "Heading2", name: "Heading 2", basedOn: "Normal", next: "Normal", quickFormat: true, run: { size: 26, bold: true, font: "Arial" }, paragraph: { spacing: { before: 220, after: 160 }, outlineLevel: 1 } }
       ]
     },
     sections: [{ children }]
-  });
+  }));
+}
 
-  return Packer.toBuffer(doc);
+async function buildDevelopmentalAuthorReviewDocx(stage, modelInvocation) {
+  const { output } = assertDevelopmentalEditingOutputReady(modelInvocation, modelInvocation.sourceText || "");
+  const title = authorTitleFromStage(stage);
+  const children = [paragraphFromText(title, { heading: HeadingLevel.HEADING_1 })];
+  const annotations = output.authorNotes.slice();
+  for (const paragraph of splitManuscriptParagraphs(output.editedManuscript)) {
+    children.push(paragraphFromText(paragraph));
+    const paragraphLower = paragraph.toLowerCase();
+    for (let index = annotations.length - 1; index >= 0; index -= 1) {
+      const anchor = normalizeString(annotations[index].anchor).toLowerCase();
+      if (anchor && paragraphLower.includes(anchor.slice(0, 80))) {
+        children.push(paragraphFromText(authorAnnotationText(annotations[index]), { italics: true }));
+        annotations.splice(index, 1);
+      }
+    }
+  }
+  if (annotations.length) {
+    children.push(paragraphFromText("Editor's Notes and Questions", { heading: HeadingLevel.HEADING_2 }));
+    annotations.forEach((note) => children.push(paragraphFromText(authorAnnotationText(note), { italics: true })));
+  }
+  return buildProfessionalDocx(children);
+}
+
+async function buildDevelopmentalCleanDocx(stage, modelInvocation) {
+  const { output } = assertDevelopmentalEditingOutputReady(modelInvocation, modelInvocation.sourceText || "");
+  const children = [paragraphFromText(authorTitleFromStage(stage), { heading: HeadingLevel.HEADING_1 })];
+  splitManuscriptParagraphs(output.editedManuscript).forEach((paragraph) => children.push(paragraphFromText(paragraph)));
+  return buildProfessionalDocx(children);
+}
+
+async function buildDevelopmentalEditorialReviewDocx(stage, modelInvocation) {
+  const { output } = assertDevelopmentalEditingOutputReady(modelInvocation, modelInvocation.sourceText || "");
+  const children = [
+    paragraphFromText(`${authorTitleFromStage(stage)} - Developmental Editorial Review`, { heading: HeadingLevel.HEADING_1 }),
+    paragraphFromText(output.developmentalSummary || "The manuscript has completed developmental review."),
+    paragraphFromText("Revisions Applied", { heading: HeadingLevel.HEADING_2 }),
+    ...(output.appliedChanges.length
+      ? output.appliedChanges.map((change) => paragraphFromText(`• ${change}`))
+      : [paragraphFromText("The manuscript was revised for structure, flow, continuity, pacing, and reader orientation while preserving the author's voice.")])
+  ];
+  if (output.authorNotes.length) {
+    children.push(paragraphFromText("Notes and Questions", { heading: HeadingLevel.HEADING_2 }));
+    output.authorNotes.forEach((note) => children.push(paragraphFromText(authorAnnotationText(note))));
+  }
+  return buildProfessionalDocx(children);
+}
+
+function buildDevelopmentalInternalManifest(stage, sourceArtifact, correlationId, modelInvocation, outputArtifacts = []) {
+  const { output, qa } = assertDevelopmentalEditingOutputReady(modelInvocation, modelInvocation.sourceText || "");
+  return Buffer.from(JSON.stringify({
+    audience: ARTIFACT_AUDIENCE.SYSTEM_EVIDENCE,
+    stageCode: "DEVELOPMENTAL_EDITING",
+    stageId: stage.jm1pub_editorialstageid,
+    titleId: stage._jm1pub_titleid_value,
+    sourceArtifactId: sourceArtifact.jm1pub_editorialartifactid,
+    sourceChecksum: sourceArtifact.jm1pub_sha256,
+    correlationId,
+    provider: modelInvocation.provider || modelInvocation.route?.provider || "",
+    deployment: modelInvocation.routeAlias || "",
+    promptVersion: modelInvocation.promptVersion || "",
+    outputArtifacts: outputArtifacts.map((artifact) => ({
+      audience: artifact.audience,
+      artifactId: artifact.artifactId,
+      artifactRole: artifact.role,
+      filename: artifact.filename,
+      checksum: artifact.sha256
+    })),
+    authorityActions: output.authorityActions,
+    internalNotes: output.internalNotes,
+    appliedChanges: output.appliedChanges,
+    qa
+  }, null, 2), "utf8");
 }
 
 function modelTextField(output, fields) {
@@ -2477,32 +2676,24 @@ function assertLineEditingOutputReady(modelInvocation, sourceText, correlationId
 async function buildLineEditedManuscriptDocx(stage, sourceArtifact, outputName, extractedText, correlationId, modelInvocation) {
   const { lineOutput, qa } = assertLineEditingOutputReady(modelInvocation, extractedText, correlationId);
   const children = [
-    paragraphFromText(`${outputName} - ${stage.jm1pub_name}`, { heading: HeadingLevel.HEADING_1 }),
-    paragraphFromText("Generated by: JM1 Automation"),
-    paragraphFromText("Stage: LINE_EDITING"),
-    paragraphFromText(`Generated at: ${new Date().toISOString()}`),
-    paragraphFromText(`Source artifact: ${sourceArtifact.jm1pub_editorialartifactid}`),
-    paragraphFromText(`Source checksum: ${sourceArtifact.jm1pub_sha256}`),
-    paragraphFromText(`Correlation: ${correlationId}`),
-    paragraphFromText(`Model provider: ${qa.provider}`),
-    paragraphFromText(`Model deployment: ${qa.deployment}`),
-    paragraphFromText(`Model fallback: ${qa.fallback ? "YES" : "NO"}`),
-    paragraphFromText(`Net word retention: ${qa.retentionPercent}%`),
-    paragraphFromText(`Measured output/source word ratio: ${qa.measuredRetentionPercent}%`),
-    paragraphFromText(`Output expansion: ${qa.outputExpansionPercent}%`),
-    paragraphFromText(`Rewrite magnitude: ${qa.rewriteMagnitudePercent}%`),
-    paragraphFromText("Governed Line-Edited Manuscript", { heading: HeadingLevel.HEADING_2 }),
-    paragraphFromText(
-      "This artifact uses the governed model output as the edited manuscript. The pass is limited to sentence-level clarity, paragraph flow, rhythm, readability, tone, and author-voice preservation. It does not authorize developmental restructuring, copyediting, proofreading, or progression to the next stage without author review."
-    ),
-    paragraphFromText("Edited Manuscript", { heading: HeadingLevel.HEADING_2 })
+    paragraphFromText(authorTitleFromStage(stage), { heading: HeadingLevel.HEADING_1 })
   ];
   splitManuscriptParagraphs(lineOutput.editedManuscript).forEach((paragraph) => children.push(paragraphFromText(paragraph)));
-  const doc = new Document({
-    styles: { default: { document: { run: { font: "Arial", size: 22 } } } },
-    sections: [{ children }]
-  });
-  return Packer.toBuffer(doc);
+  if (lineOutput.authorQueries.length) {
+    children.push(paragraphFromText("Author Questions", { heading: HeadingLevel.HEADING_2 }));
+    lineOutput.authorQueries.forEach((query) => children.push(paragraphFromText(`Author question: ${query}`, { italics: true })));
+  }
+  return buildProfessionalDocx(children);
+}
+
+async function buildCleanStageManuscriptDocx(stage, extractedText, modelInvocation) {
+  const candidate = modelTextField(modelInvocation?.output || {}, [
+    "editedManuscript", "edited_manuscript", "copyeditedManuscript", "copyedited_manuscript",
+    "proofreadManuscript", "proofread_manuscript", "revisedText", "manuscript"
+  ]) || extractedText;
+  const children = [paragraphFromText(authorTitleFromStage(stage), { heading: HeadingLevel.HEADING_1 })];
+  splitManuscriptParagraphs(candidate).forEach((paragraph) => children.push(paragraphFromText(paragraph)));
+  return buildProfessionalDocx(children);
 }
 
 function buildLineEditingMarkdownOutput(stage, outputName, sourceArtifact, extractedText, correlationId, modelInvocation) {
@@ -2798,28 +2989,44 @@ async function materializeEditorialOutputs(
       safeCode: `${stageCode}_BLOCKED — ${safeBlockerReason(modelInvocation.error, "MODEL_INVOCATION_FAILED")}`
     });
   }
+  modelInvocation.sourceText = extracted.value || "";
   const outputs = [];
   for (const outputName of outputDefinitions(stageCode)) {
-    const isDevelopmentalManuscript =
-      stageCode === "DEVELOPMENTAL_EDITING" && outputName === "Developmentally Edited Manuscript";
-    const isDevelopmentalMemo = stageCode === "DEVELOPMENTAL_EDITING" && outputName === "Developmental Memo";
+    const isDevelopmentalAuthorReview =
+      stageCode === "DEVELOPMENTAL_EDITING" && outputName === "Author-Review Edited Manuscript";
+    const isDevelopmentalClean =
+      stageCode === "DEVELOPMENTAL_EDITING" && outputName === "Clean Edited Manuscript";
+    const isDevelopmentalReview =
+      stageCode === "DEVELOPMENTAL_EDITING" && outputName === "Developmental Editorial Review";
+    const isDevelopmentalEvidence =
+      stageCode === "DEVELOPMENTAL_EDITING" && outputName === "Internal Evidence Manifest";
     const isLineEditedManuscript = stageCode === "LINE_EDITING" && outputName === "Edited Manuscript";
     const isEditedManuscript =
       (stageCode === "LINE_EDITING" || stageCode === "COPYEDITING") && outputName === "Edited Manuscript";
     const isProofreadManuscript = stageCode === "PROOFREADING" && outputName === "Proofread Manuscript";
     const isReviewInstructions = outputName.toLowerCase().includes("review instructions");
-    const shouldBuildDocx = isDevelopmentalManuscript || isDevelopmentalMemo || isEditedManuscript || isProofreadManuscript;
-    const extension = shouldBuildDocx ? "docx" : isReviewInstructions ? "txt" : "md";
+    const shouldBuildDocx = isDevelopmentalAuthorReview || isDevelopmentalClean || isDevelopmentalReview || isEditedManuscript || isProofreadManuscript;
+    const extension = shouldBuildDocx ? "docx" : isDevelopmentalEvidence ? "json" : isReviewInstructions ? "txt" : "md";
     const contentType = shouldBuildDocx
       ? "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+      : isDevelopmentalEvidence
+        ? "application/json"
       : isReviewInstructions
         ? "text/plain"
       : "text/markdown";
     const filename = `${new Date().toISOString().slice(0, 10)}-${stage.jm1pub_name.replace(/[^a-zA-Z0-9]+/g, "-")}-${outputName.replace(/[^a-zA-Z0-9]+/g, "-")}.${extension}`;
-    const body = isDevelopmentalManuscript
-      ? await buildDevelopmentalRevisionDocx(stage, stageCode, sourceArtifact, outputName, extracted.value || "", correlationId)
+    const body = isDevelopmentalAuthorReview
+      ? await buildDevelopmentalAuthorReviewDocx(stage, modelInvocation)
+      : isDevelopmentalClean
+        ? await buildDevelopmentalCleanDocx(stage, modelInvocation)
+      : isDevelopmentalReview
+        ? await buildDevelopmentalEditorialReviewDocx(stage, modelInvocation)
+      : isDevelopmentalEvidence
+        ? buildDevelopmentalInternalManifest(stage, sourceArtifact, correlationId, modelInvocation, outputs)
       : isLineEditedManuscript
         ? await buildLineEditedManuscriptDocx(stage, sourceArtifact, outputName, extracted.value || "", correlationId, modelInvocation)
+      : isEditedManuscript || isProofreadManuscript
+        ? await buildCleanStageManuscriptDocx(stage, extracted.value || "", modelInvocation)
       : shouldBuildDocx
         ? await buildSimpleEditorialDocx(stage, stageCode, sourceArtifact, outputName, extracted.value || "", correlationId, modelInvocation)
         : Buffer.from(
@@ -2830,6 +3037,19 @@ async function materializeEditorialOutputs(
               : buildOutputDocument(stage, stageCode, sourceArtifact, outputName, extracted.value || "", correlationId),
             "utf8"
           );
+    const audience = artifactAudience(stageCode, outputName);
+    if (isAuthorVisibleAudience(audience) || isDevelopmentalClean) {
+      const projectedText = shouldBuildDocx
+        ? normalizeString((await mammoth.extractRawText({ buffer: body })).value)
+        : body.toString("utf8");
+      const projection = validateAuthorFacingProjection(projectedText);
+      if (!projection.ok) {
+        throw Object.assign(new Error("Author artifact projection failed"), {
+          safeCode: `${stageCode}_BLOCKED — AUTHOR_EXPERIENCE_PROJECTION_FAILED`,
+          projectionIssues: projection.issues
+        });
+      }
+    }
     const uploaded = await graphRequest(`drives/${driveId}/items/${parentId}:/${encodeURIComponent(filename)}:/content`, {
       method: "PUT",
       headers: { "Content-Type": contentType },
@@ -2851,10 +3071,16 @@ async function materializeEditorialOutputs(
       jm1pub_repositorypath: uploaded.webUrl,
       jm1pub_sha256: crypto.createHash("sha256").update(body).digest("hex"),
       jm1pub_artifactstatus: 196650002,
-      jm1pub_visibility: 196650001,
+      jm1pub_visibility: isAuthorVisibleAudience(audience) ? 196650000 : 196650001,
       jm1pub_iscurrentapproved: false,
-      jm1pub_notes: isDevelopmentalManuscript
-        ? `Package-grade governed developmental revision artifact produced from source artifact ${sourceArtifact.jm1pub_editorialartifactid}. This preserves author voice and routes high-risk edits as notes instead of silent rewrites.`
+      jm1pub_notes: isDevelopmentalAuthorReview
+        ? `Audience ${audience}. Professional author-review manuscript produced from the governed Developmental Editing capability.`
+        : isDevelopmentalClean
+          ? `Audience ${audience}. Clean edited manuscript for downstream production use.`
+        : isDevelopmentalReview
+          ? `Audience ${audience}. Professional Developmental Editorial Review for the author.`
+        : isDevelopmentalEvidence
+          ? `Audience ${audience}. Internal lineage, authority, model provenance, change manifest, and QA evidence.`
         : isLineEditedManuscript
           ? `Package-grade governed Line Editing artifact produced from actual model output for source artifact ${sourceArtifact.jm1pub_editorialartifactid}. Retention/drift QA passed; author review is required before Copyediting.`
         : `Editorial runtime output produced from governed source artifact ${sourceArtifact.jm1pub_editorialartifactid}.`,
@@ -2874,11 +3100,13 @@ async function materializeEditorialOutputs(
     }
     outputs.push({
       outputName,
+      role: packageRoleForOutput(outputName),
       artifactId,
       itemId: uploaded.id,
       filename: uploaded.name || filename,
       extension,
       contentType,
+      audience,
       size: uploaded.size || body.length,
       sha256: artifactPayload.jm1pub_sha256,
       modelProvider: modelInvocation.provider || modelInvocation.route?.provider || "",
@@ -2902,7 +3130,11 @@ async function finalizeMaterializedEditorialOutputs(client, stage, stageCode, so
       `${stageCode === "EDITORIAL_REVIEW" ? "PACKAGE_PREPARATION" : "EXECUTING"}: JM1 Automation created governed ${stageCode} output artifacts from checksum-validated source ${sourceArtifact.jm1pub_editorialartifactid}. QA evidence registered. Package release remains gated by stage completion, cadence, and canonical Package Engine policy.`,
     jm1pub_authorsafesummary: "Editorial work is in progress internally. No author action is required at this time."
   });
-  const outputReadyVersion = stageCode === "EDITORIAL_REVIEW" ? "v5" : "v4";
+  const outputReadyVersion = stageCode === "EDITORIAL_REVIEW"
+    ? "v5"
+    : stageCode === "DEVELOPMENTAL_EDITING"
+      ? "v5-human-first"
+      : "v4";
   const idempotencyKey = `editorial-runtime:output-ready-${outputReadyVersion}:${stage.jm1pub_editorialstageid}:${stageCode}:${sourceArtifact.jm1pub_editorialartifactid}`;
   const outputLogId = await writeLog(client, {
     name: `ACTIVE_EDITORIAL_OUTPUT_CREATED - ${stage.jm1pub_name}`,
@@ -3030,6 +3262,10 @@ async function createAuthorReviewGate(client, stage, stageCode, artifact, correl
 
 function packageRoleForOutput(outputName) {
   const normalized = normalizeString(outputName).toLowerCase();
+  if (normalized.includes("author-review edited manuscript")) return "editedManuscript";
+  if (normalized.includes("clean edited manuscript")) return "cleanEditedManuscript";
+  if (normalized.includes("developmental editorial review")) return "developmentalMemo";
+  if (normalized.includes("internal evidence manifest")) return "internalEvidenceManifest";
   if (normalized === "edited manuscript") return "editedManuscript";
   if (normalized.includes("developmentally edited manuscript")) return "editedManuscript";
   if (normalized.includes("developmental memo")) return "developmentalMemo";
@@ -3049,7 +3285,7 @@ function packageRoleForOutput(outputName) {
 }
 
 function requiredPackageRoles(stageCode) {
-  if (stageCode === "DEVELOPMENTAL_EDITING") return ["editedManuscript", "developmentalMemo", "changeLedger", "reviewInstructions"];
+  if (stageCode === "DEVELOPMENTAL_EDITING") return ["editedManuscript", "developmentalMemo"];
   if (stageCode === "EDITORIAL_REVIEW") return ["assessment", "recommendedEditorialPath", "riskRegister", "qaEvidence"];
   if (stageCode === "LINE_EDITING") return ["editedManuscript", "lineEditingSummary", "changeLedger", "qaEvidence"];
   if (stageCode === "COPYEDITING") return ["editedManuscript", "copyeditingSummary", "styleSheet", "qaEvidence"];
@@ -3062,6 +3298,8 @@ function allowedMimeForRole(role) {
     return ["application/vnd.openxmlformats-officedocument.wordprocessingml.document", "application/pdf"];
   }
   if (role === "reviewInstructions") return ["text/plain", "application/pdf"];
+  if (role === "cleanEditedManuscript") return ["application/vnd.openxmlformats-officedocument.wordprocessingml.document"];
+  if (role === "internalEvidenceManifest") return ["application/json"];
   if (
     role === "changeLedger" ||
     role === "authorQueryList" ||
@@ -3144,6 +3382,7 @@ async function createPackageManifestArtifact(client, stage, stageCode, sourceArt
     sourceArtifactIds: [sourceArtifact.jm1pub_editorialartifactid],
     artifacts: artifacts.map((artifact) => ({
       artifactRole: artifact.role,
+      audience: artifactAudience(stageCode, artifact.outputName),
       artifactId: artifact.artifactId,
       filename: artifact.filename,
       mimeType: artifact.contentType,
@@ -3151,9 +3390,9 @@ async function createPackageManifestArtifact(client, stage, stageCode, sourceArt
       checksum: artifact.sha256,
       sourceVersion: packageVersion,
       createdAt: new Date().toISOString(),
-      authorVisible: deliveryPolicy.audience === "AUTHOR" && requiredRoles.includes(artifact.role),
-      emailAttachment: deliveryPolicy.audience === "AUTHOR" && requiredRoles.includes(artifact.role),
-      workspaceDownload: deliveryPolicy.audience === "AUTHOR" && requiredRoles.includes(artifact.role)
+      authorVisible: isAuthorVisibleAudience(artifactAudience(stageCode, artifact.outputName)) && requiredRoles.includes(artifact.role),
+      emailAttachment: isAuthorVisibleAudience(artifactAudience(stageCode, artifact.outputName)) && requiredRoles.includes(artifact.role),
+      workspaceDownload: isAuthorVisibleAudience(artifactAudience(stageCode, artifact.outputName)) && requiredRoles.includes(artifact.role)
     }))
   };
   manifest.packageChecksum = packageChecksum({
@@ -3420,7 +3659,11 @@ async function processStage(client, stage, correlationId, options = {}) {
   }
   await recordSourceExecutionReadiness(client, stage, stageCode, sourceArtifact, correlationId);
   await recordLegacyOutputScopeClarification(client, stage, stageCode, sourceArtifact, correlationId);
-  const outputReadyVersion = stageCode === "EDITORIAL_REVIEW" ? "v5" : "v4";
+  const outputReadyVersion = stageCode === "EDITORIAL_REVIEW"
+    ? "v5"
+    : stageCode === "DEVELOPMENTAL_EDITING"
+      ? "v5-human-first"
+      : "v4";
   const idempotencyKey = `editorial-runtime:output-ready-${outputReadyVersion}:${stage.jm1pub_editorialstageid}:${stageCode}:${sourceArtifact.jm1pub_editorialartifactid}`;
   const existing = await findExecutionLog(client, "ACTIVE_EDITORIAL_OUTPUT_CREATED", idempotencyKey);
   if (existing) {

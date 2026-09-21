@@ -48,6 +48,60 @@ const LINE_EDITING_CHUNK_OUTPUT_TOOL = Object.freeze({
     additionalProperties: true
   }
 });
+const DEVELOPMENTAL_EDITING_CHUNK_OUTPUT_TOOL = Object.freeze({
+  name: "submit_jm1_structured_output",
+  description: "Submit the complete governed Developmental Editing chunk output.",
+  input_schema: {
+    type: "object",
+    properties: {
+      editedManuscript: {
+        type: "string",
+        minLength: 1,
+        description: "The complete developmentally edited text for this exact chunk. Do not summarize or omit source content."
+      },
+      developmentalSummary: { type: "string", minLength: 1 },
+      appliedChanges: { type: "array", items: { type: "string" } },
+      authorNotes: {
+        type: "array",
+        items: {
+          type: "object",
+          properties: {
+            class: { type: "string", enum: ["EDITOR_NOTE", "AUTHOR_QUESTION", "AUTHOR_DECISION_REQUIRED"] },
+            anchor: { type: "string" },
+            message: { type: "string", minLength: 1 }
+          },
+          required: ["class", "message"]
+        }
+      },
+      internalNotes: {
+        type: "array",
+        items: {
+          type: "object",
+          properties: {
+            class: { type: "string", enum: ["PUBLISHER_INTERNAL", "RIGHTS_LEGAL_INTERNAL", "FACT_CHECK_INTERNAL", "PRODUCTION_INTERNAL", "PROVIDER_INTERNAL", "SYSTEM_INTERNAL", "AI_INTERNAL"] },
+            anchor: { type: "string" },
+            message: { type: "string", minLength: 1 }
+          },
+          required: ["class", "message"]
+        }
+      },
+      authorityActions: {
+        type: "array",
+        items: {
+          type: "object",
+          properties: {
+            classification: { type: "string", enum: ["SYSTEM_AUTHORIZED_EDIT", "AUTHOR_DECISION_REQUIRED", "PUBLISHER_DECISION_REQUIRED", "FACT_CHECK_REQUIRED", "RIGHTS_LEGAL_REVIEW_REQUIRED"] },
+            anchor: { type: "string" },
+            description: { type: "string", minLength: 1 }
+          },
+          required: ["classification", "description"]
+        }
+      }
+    },
+    required: ["editedManuscript", "developmentalSummary", "appliedChanges", "authorNotes", "internalNotes", "authorityActions"],
+    additionalProperties: true
+  }
+});
 
 function checkConfig(route = {}) {
   const missing = REQUIRED_VARS.filter((name) => !process.env[name]);
@@ -258,13 +312,17 @@ function extractTextContent(responseBody) {
 }
 
 function selectStructuredOutputTool(promptBody) {
-  return isLineEditingChunkPrompt(promptBody)
-    ? LINE_EDITING_CHUNK_OUTPUT_TOOL
-    : STRUCTURED_OUTPUT_TOOL;
+  if (isLineEditingChunkPrompt(promptBody)) return LINE_EDITING_CHUNK_OUTPUT_TOOL;
+  if (isDevelopmentalEditingChunkPrompt(promptBody)) return DEVELOPMENTAL_EDITING_CHUNK_OUTPUT_TOOL;
+  return STRUCTURED_OUTPUT_TOOL;
 }
 
 function isLineEditingChunkPrompt(promptBody) {
   return typeof promptBody === "string" && promptBody.includes("cc010_line_editing_full_manuscript_chunk_execution");
+}
+
+function isDevelopmentalEditingChunkPrompt(promptBody) {
+  return typeof promptBody === "string" && promptBody.includes("cc010_developmental_editing_full_manuscript_chunk_execution");
 }
 
 function parsePositiveInteger(value, fallback) {
@@ -273,8 +331,13 @@ function parsePositiveInteger(value, fallback) {
 }
 
 function selectMaxOutputTokens(promptBody) {
-  if (!isLineEditingChunkPrompt(promptBody)) return DEFAULT_MAX_OUTPUT_TOKENS;
-  return parsePositiveInteger(process.env.AZURE_FOUNDRY_LINE_CHUNK_MAX_OUTPUT_TOKENS, DEFAULT_LINE_CHUNK_MAX_OUTPUT_TOKENS);
+  if (isLineEditingChunkPrompt(promptBody)) {
+    return parsePositiveInteger(process.env.AZURE_FOUNDRY_LINE_CHUNK_MAX_OUTPUT_TOKENS, DEFAULT_LINE_CHUNK_MAX_OUTPUT_TOKENS);
+  }
+  if (isDevelopmentalEditingChunkPrompt(promptBody)) {
+    return parsePositiveInteger(process.env.AZURE_FOUNDRY_DEVELOPMENTAL_CHUNK_MAX_OUTPUT_TOKENS, 4096);
+  }
+  return DEFAULT_MAX_OUTPUT_TOKENS;
 }
 
 function extractStructuredToolInput(responseBody) {
@@ -295,6 +358,7 @@ module.exports = {
   DEFAULT_ANTHROPIC_VERSION,
   DEFAULT_LINE_CHUNK_MAX_OUTPUT_TOKENS,
   DEFAULT_MAX_OUTPUT_TOKENS,
+  DEVELOPMENTAL_EDITING_CHUNK_OUTPUT_TOOL,
   LINE_EDITING_CHUNK_OUTPUT_TOOL,
   REQUIRED_VARS,
   STRUCTURED_OUTPUT_TOOL,
@@ -304,6 +368,7 @@ module.exports = {
   extractStructuredToolInput,
   extractTextContent,
   isLineEditingChunkPrompt,
+  isDevelopmentalEditingChunkPrompt,
   selectMaxOutputTokens,
   selectStructuredOutputTool
 };

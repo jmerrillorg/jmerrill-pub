@@ -244,6 +244,30 @@ describe("microsoftFoundryClaudeProvider", () => {
     }
   });
 
+  test("uses the human-first Developmental Editing schema for full manuscript chunks", () => {
+    const { loaded, restore } = loadProviderWithStubs();
+    try {
+      const prompt = JSON.stringify({ task: "cc010_developmental_editing_full_manuscript_chunk_execution" });
+      const tool = loaded.selectStructuredOutputTool(prompt);
+      assert.equal(tool, loaded.DEVELOPMENTAL_EDITING_CHUNK_OUTPUT_TOOL);
+      assert.deepEqual(tool.input_schema.required, [
+        "editedManuscript",
+        "developmentalSummary",
+        "appliedChanges",
+        "authorNotes",
+        "internalNotes",
+        "authorityActions"
+      ]);
+      assert.deepEqual(
+        tool.input_schema.properties.authorNotes.items.properties.class.enum,
+        ["EDITOR_NOTE", "AUTHOR_QUESTION", "AUTHOR_DECISION_REQUIRED"]
+      );
+      assert.equal(loaded.selectMaxOutputTokens(prompt), 4096);
+    } finally {
+      restore();
+    }
+  });
+
   test("accepts structured tool_use output before falling back to text JSON parsing", async () => {
     const { loaded, restore } = loadProviderWithStubs({
       fetchImpl: async () => ({
