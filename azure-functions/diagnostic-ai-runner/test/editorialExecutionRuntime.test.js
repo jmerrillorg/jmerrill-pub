@@ -25,6 +25,7 @@ const {
   splitLineEditingSourceChunks,
   buildLineEditingChunkPrompt,
   buildDevelopmentalEditingChunkPrompt,
+  readPersistedGraphContent,
   buildProofreadingCoverNote,
   buildChunkedDevelopmentalInvocation,
   validateDevelopmentalChunkOutput,
@@ -102,6 +103,30 @@ test("Graph share token encodes SharePoint web URLs for driveItem resolution", (
   assert.equal(token.includes("+"), false);
   assert.equal(token.includes("/"), false);
   assert.equal(graphShareToken("/repo/path/source.docx"), "");
+});
+
+test("persisted Graph readback falls back from item identity to exact parent path", async () => {
+  const calls = [];
+  graphRequest.override = async (path) => {
+    calls.push(path);
+    if (path.includes("items/uploaded-id/content")) {
+      throw Object.assign(new Error("Item identity not readable yet"), { safeCode: "GRAPH_ITEM_NOT_FOUND" });
+    }
+    return Buffer.from("persisted bytes");
+  };
+  try {
+    const body = await readPersistedGraphContent([
+      "drives/drive/items/uploaded-id/content",
+      "drives/drive/items/parent:/manifest.json:/content"
+    ], { attempts: 1, delayMs: 0 });
+    assert.equal(body.toString("utf8"), "persisted bytes");
+    assert.deepEqual(calls, [
+      "drives/drive/items/uploaded-id/content",
+      "drives/drive/items/parent:/manifest.json:/content"
+    ]);
+  } finally {
+    graphRequest.override = null;
+  }
 });
 
 test("source Graph resolver preserves canonical drive/item identity when present", async () => {
