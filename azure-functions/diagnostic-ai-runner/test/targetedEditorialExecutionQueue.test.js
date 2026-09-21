@@ -69,17 +69,20 @@ test("processQueuedTargetedEditorialExecution invokes the durable chunked runtim
   assert.equal(calls[0].sourceChecksum, input.sourceChecksum);
 });
 
-test("processQueuedTargetedEditorialExecution preserves the direct runtime for non-Line stages", async () => {
+test("processQueuedTargetedEditorialExecution invokes the durable chunked runtime for Developmental Editing", async () => {
   const calls = [];
   const developmentalInput = { ...input, stageCode: "DEVELOPMENTAL_EDITING" };
   const message = buildQueuedTargetedEditorialExecutionMessage(developmentalInput, { idempotencyKey: "idem-3b" });
   const result = await processQueuedTargetedEditorialExecution(JSON.stringify(message), {
-    async runTargetedEditorialExecution(payload) {
+    async runChunkedTargetedDevelopmentalExecution(payload) {
       calls.push(payload);
       return { ok: true, status: "EXECUTED", idempotencyKey: "idem-3b" };
     },
     async runChunkedTargetedEditorialExecution() {
       throw new Error("Line chunked runtime should not be used for Developmental Editing.");
+    },
+    async runTargetedEditorialExecution() {
+      throw new Error("Direct runtime should not be used for Developmental Editing.");
     }
   });
   assert.equal(result.status, "EXECUTED");
