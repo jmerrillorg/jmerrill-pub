@@ -1831,7 +1831,8 @@ function buildDevelopmentalEditingChunkPrompt({
     authorExperienceRules: [
       "Author-facing notes must be natural professional editorial correspondence.",
       "Use only EDITOR_NOTE, AUTHOR_QUESTION, or AUTHOR_DECISION_REQUIRED for authorNotes.",
-      "Never put internal systems, identifiers, checksums, model names, automation, governance, provider, production, rights/legal-internal, or diagnostic terminology in editedManuscript or authorNotes.",
+      "Never put internal systems, identifiers, checksums, model names, automation, governance, provider, production, rights/legal-internal, diagnostic terminology, or internal classification labels in editedManuscript, developmentalSummary, appliedChanges, or authorNotes.",
+      "developmentalSummary and appliedChanges describe only the editorial work in natural publishing language. They must not mention, quote, enumerate, or explain internalNotes or any internal classification label, including to say that none were needed.",
       "A rights concern requiring author information may become a natural AUTHOR_QUESTION. Otherwise keep it in internalNotes."
     ],
     requiredOutput: {
@@ -1844,9 +1845,9 @@ function buildDevelopmentalEditingChunkPrompt({
     },
     schemaRetryInstruction:
       retryAttempt > 1
-        ? "Earlier responses failed the required schema. Return every required top-level key, including the complete editedManuscript for this chunk. Do not summarize or substitute production notes for manuscript text."
+        ? "Earlier responses failed the required schema or author-experience projection. Return every required top-level key, including the complete editedManuscript for this chunk. Remove all internal classification labels and internal production terminology from editedManuscript, developmentalSummary, appliedChanges, and authorNotes. Do not mention internal notes merely to say that none were needed. Do not summarize or substitute production notes for manuscript text."
         : retryAttempt > 0
-          ? "The previous response failed the required schema. Return every required top-level key and the complete editedManuscript for this chunk."
+          ? "The previous response failed the required schema or author-experience projection. Return every required top-level key and the complete editedManuscript for this chunk. Ensure editedManuscript, developmentalSummary, appliedChanges, and authorNotes contain no internal classification labels or internal production terminology."
           : "",
     sourceArtifactContext: {
       id: sourceArtifact.jm1pub_editorialartifactid,
