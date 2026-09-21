@@ -34,13 +34,22 @@ describe("editorial authority reconciliation", () => {
 
   test("overlay firewall rejects internal doctrine terms in author-facing payloads", () => {
     const result = validateAuthorFacingProjection({
-      headline: "Faith overlay recommendation",
-      body: "This doctrine applies to your package."
+      headline: "Editorial overlay recommendation",
+      body: "This system doctrine applies to your package."
     });
 
     assert.equal(result.ok, false);
     assert.ok(result.issues.some((issue) => issue.code === "OVERLAY_TERM"));
     assert.ok(result.issues.some((issue) => issue.code === "DOCTRINE_TERM"));
+  });
+
+  test("author projection permits ordinary theological and design vocabulary in manuscript content", () => {
+    const result = validateAuthorFacingProjection({
+      manuscript: "The chapter discusses Christian doctrine and the visual overlay used on the historical map."
+    });
+
+    assert.equal(result.ok, true);
+    assert.deepEqual(result.issues, []);
   });
 
   test("overlay firewall passes author-safe payloads", () => {

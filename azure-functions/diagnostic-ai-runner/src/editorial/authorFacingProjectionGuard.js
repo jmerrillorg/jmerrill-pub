@@ -1,8 +1,14 @@
 "use strict";
 
 const FORBIDDEN_PATTERNS = Object.freeze([
-  { code: "OVERLAY_TERM", pattern: /\boverlay\b/i },
-  { code: "DOCTRINE_TERM", pattern: /\bdoctrine\b/i },
+  {
+    code: "OVERLAY_TERM",
+    pattern: /\b(?:editorial|genre|prompt|capability|system|model)\s+overlay\b|\boverlay\s+(?:profile|id|configuration|rule)\b/i
+  },
+  {
+    code: "DOCTRINE_TERM",
+    pattern: /\b(?:editorial|system|workflow|prompt|capability)\s+doctrine\b|\bdoctrine\s+(?:profile|id|configuration|rule)\b/i
+  },
   { code: "OVERLAY_ID", pattern: /\bFAITH_INSPIRATIONAL\b|\bURBAN_STREET_LIT_VOICE_PRESERVATION\b|\bCHILDRENS_BOOK_STANDARD\b/i },
   {
     code: "MODEL_REASONING",
