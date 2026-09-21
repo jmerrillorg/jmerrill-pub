@@ -70,7 +70,9 @@ test("editorial execution runtime defines reusable executors for all required ed
     "LINE_EDITING",
     "PROOFREADING"
   ]);
-  assert.equal(EXECUTOR_POLICIES.DEVELOPMENTAL_EDITING.outputRoles.includes("developmentalMemo"), true);
+  assert.equal(EXECUTOR_POLICIES.DEVELOPMENTAL_EDITING.outputRoles.includes("authorReviewManuscript"), true);
+  assert.equal(EXECUTOR_POLICIES.DEVELOPMENTAL_EDITING.outputRoles.includes("cleanEditedManuscript"), true);
+  assert.equal(EXECUTOR_POLICIES.DEVELOPMENTAL_EDITING.outputRoles.includes("internalEvidenceManifest"), true);
   assert.equal(EXECUTOR_POLICIES.PROOFREADING.outputRoles.includes("proofreadManuscript"), true);
 });
 
@@ -1407,6 +1409,7 @@ test("developmental editing materializes a package-grade manuscript docx artifac
   const created = [];
   const patched = [];
   const logs = [];
+  const uploadedBodies = new Map();
   const sourceText = [
     "Chapter One",
     "",
@@ -1420,9 +1423,11 @@ test("developmental editing materializes a package-grade manuscript docx artifac
       return { id: "source-item", parentReference: { id: "parent-folder" }, webUrl: "https://sharepoint/source.docx" };
     }
     if (options.method === "PUT") {
+      const name = decodeURIComponent(path.split(":/").at(-2) || "output.docx");
+      uploadedBodies.set(name, options.body);
       return {
         id: `uploaded-${created.length + patched.length + 1}`,
-        name: decodeURIComponent(path.split(":/").at(-2) || "output.docx"),
+        name,
         size: Buffer.isBuffer(options.body) ? options.body.length : 120,
         webUrl: "https://sharepoint/output"
       };
@@ -1434,7 +1439,15 @@ test("developmental editing materializes a package-grade manuscript docx artifac
     ok: true,
     provider: "microsoft-foundry-claude",
     routeAlias: "prompt-route",
-    promptVersion: "CC010-DEVELOPMENTAL_EDITING-V1"
+    promptVersion: "CC010-DEVELOPMENTAL-EDITING-HUMAN-FIRST-V2",
+    output: {
+      editedManuscript: sourceText.replace("exercise developmental revision output", "strengthen the chapter's progression"),
+      developmentalSummary: "The revision strengthens progression and reader orientation while preserving the author's voice.",
+      appliedChanges: ["Strengthened the opening progression."],
+      authorNotes: [{ class: "EDITOR_NOTE", anchor: "governed source paragraph", message: "This transition now connects the opening idea more directly to the chapter's focus." }],
+      internalNotes: [{ class: "RIGHTS_LEGAL_INTERNAL", message: "No rights concern identified in this excerpt." }],
+      authorityActions: [{ classification: "SYSTEM_AUTHORIZED_EDIT", description: "Clarified progression without changing the author's meaning." }]
+    }
   });
   const client = {
     async list(entitySet, query = {}) {
@@ -1509,15 +1522,15 @@ test("developmental editing materializes a package-grade manuscript docx artifac
     assert.equal(result.results[0].status, "VALIDATING");
     const manuscript = created.find((item) =>
       item.entitySet === "jm1pub_editorialartifacts" &&
-      item.payload.jm1pub_editorialartifactname.startsWith("Developmentally Edited Manuscript")
+      item.payload.jm1pub_editorialartifactname.startsWith("Author-Review Edited Manuscript")
     );
     const memo = created.find((item) =>
       item.entitySet === "jm1pub_editorialartifacts" &&
-      item.payload.jm1pub_editorialartifactname.startsWith("Developmental Memo")
+      item.payload.jm1pub_editorialartifactname.startsWith("Developmental Editorial Review")
     );
-    const instructions = created.find((item) =>
+    const clean = created.find((item) =>
       item.entitySet === "jm1pub_editorialartifacts" &&
-      item.payload.jm1pub_editorialartifactname.startsWith("Developmental Review Instructions")
+      item.payload.jm1pub_editorialartifactname.startsWith("Clean Edited Manuscript")
     );
     const manifest = created.find((item) =>
       item.entitySet === "jm1pub_editorialartifacts" &&
@@ -1527,8 +1540,19 @@ test("developmental editing materializes a package-grade manuscript docx artifac
     assert.equal(manuscript.payload.jm1pub_fileextension, "docx");
     assert.ok(memo);
     assert.equal(memo.payload.jm1pub_fileextension, "docx");
-    assert.ok(instructions);
-    assert.equal(instructions.payload.jm1pub_fileextension, "txt");
+    assert.ok(clean);
+    assert.equal(clean.payload.jm1pub_fileextension, "docx");
+    const evidenceEntry = [...uploadedBodies.entries()].find(([name]) => name.includes("Internal-Evidence-Manifest"));
+    assert.ok(evidenceEntry);
+    const evidence = JSON.parse(evidenceEntry[1].toString("utf8"));
+    assert.equal(evidence.audience, "SYSTEM_EVIDENCE");
+    assert.equal(evidence.outputArtifacts.length, 3);
+    assert.deepEqual(evidence.outputArtifacts.map((artifact) => artifact.artifactRole), [
+      "editedManuscript",
+      "cleanEditedManuscript",
+      "developmentalMemo"
+    ]);
+    assert.equal(evidence.outputArtifacts.every((artifact) => artifact.artifactId && artifact.checksum), true);
     assert.ok(manifest);
     assert.equal(manifest.payload.jm1pub_fileextension, "json");
     assert.ok(manuscript.payload.jm1pub_sha256);

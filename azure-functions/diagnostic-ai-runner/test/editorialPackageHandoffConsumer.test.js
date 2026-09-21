@@ -38,7 +38,7 @@ function artifact(name, extra = {}) {
   };
 }
 
-function createClient({ existingCompleted = false, omitLedger = false } = {}) {
+function createClient({ existingCompleted = false, omitLedger = false, omitMemo = false } = {}) {
   const calls = { created: [], patched: [] };
   const stage = createStage();
   const source = artifact("Governed Source Manuscript - Before You Were Born", {
@@ -56,12 +56,12 @@ function createClient({ existingCompleted = false, omitLedger = false } = {}) {
       extension: "docx",
       sha256: "edited-sha"
     }),
-    artifact("Developmental Memo - Developmental Editing - Before You Were Born", {
+    ...(!omitMemo ? [artifact("Developmental Memo - Developmental Editing - Before You Were Born", {
       id: "memo-artifact",
       filename: "memo.docx",
       extension: "docx",
       sha256: "memo-sha"
-    }),
+    })] : []),
     artifact("Developmental Review Instructions - Developmental Editing - Before You Were Born", {
       id: "instructions-artifact",
       filename: "instructions.txt",
@@ -163,8 +163,8 @@ test("duplicate handoff completion prevents a second manifest and package versio
   assert.equal(client.calls.created.some((call) => call.entitySet === "jm1pub_editorialartifacts"), false);
 });
 
-test("missing package-required change ledger blocks handoff with an exact exception", async () => {
-  const client = createClient({ omitLedger: true });
+test("missing package-required developmental review blocks handoff with an exact exception", async () => {
+  const client = createClient({ omitMemo: true });
   const result = await runEditorialPackageHandoffConsumer(
     { correlationId: "missing-ledger-test", maxOutputs: 1 },
     {
@@ -179,5 +179,5 @@ test("missing package-required change ledger blocks handoff with an exact except
     }
   );
   assert.equal(result.blocked, 1);
-  assert.match(result.results[0].reason, /REQUIRED_STAGE_ARTIFACT_MISSING:changeLedger/);
+  assert.match(result.results[0].reason, /REQUIRED_STAGE_ARTIFACT_MISSING:developmentalMemo/);
 });

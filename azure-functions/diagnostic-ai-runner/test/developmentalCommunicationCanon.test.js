@@ -134,7 +134,7 @@ test("system renderer creates conversational Indomitable copy from a complete go
   assert.deepEqual(payload.communicationObservability.authorAttachmentManifest, payload.communicationObservability.publishingCopyAttachmentManifest);
   assert.deepEqual(payload.communicationObservability.authorAttachmentManifest, payload.communicationObservability.dataverseArtifactManifest);
   assert.equal(payload.communicationObservability.from, "publishing@email.jmerrill.one");
-  assert.deepEqual(payload.attachments.map((item) => item.role).sort(), ["editedManuscript", "reviewInstructions"]);
+  assert.deepEqual(payload.attachments.map((item) => item.role).sort(), ["developmentalReview", "editedManuscript"]);
   assert.doesNotMatch(`${payload.body}\n${payload.htmlBody}`, /Why you are receiving this|What has been completed|What's attached|What we need from you|How to respond|What happens next/i);
   assert.match(payload.body, /We've attached .*Edited Manuscript.* together with .*Editorial Review/i);
   assert.match(payload.body, /^Good day Quanisha,/);
