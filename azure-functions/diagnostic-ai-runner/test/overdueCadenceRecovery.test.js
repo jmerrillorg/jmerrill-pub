@@ -3,7 +3,7 @@
 const test = require("node:test");
 const assert = require("node:assert/strict");
 const { createHash } = require("node:crypto");
-const { RECOVERY_COHORT, repairCohortAuthority, roleForArtifact } = require("../src/editorial/overdueCadenceRecovery");
+const { RECOVERY_COHORT, isCanonicalPipelineItem, repairCohortAuthority, roleForArtifact } = require("../src/editorial/overdueCadenceRecovery");
 
 function sha(bytes) {
   return createHash("sha256").update(bytes).digest("hex");
@@ -13,6 +13,11 @@ test("recognizes only the two required Developmental package roles", () => {
   assert.equal(roleForArtifact({ jm1pub_filename: "Book-Developmentally-Edited-Manuscript.docx" }), "editedManuscript");
   assert.equal(roleForArtifact({ jm1pub_editorialartifactname: "Developmental Review Instructions - Book" }), "reviewInstructions");
   assert.equal(roleForArtifact({ jm1pub_filename: "Package-Manifest.json" }), null);
+});
+
+test("uses the Graph parent path when an Office web URL is a Doc.aspx link", () => {
+  assert.equal(isCanonicalPipelineItem({ parentReference: { path: "/drives/drive/root:/01_Pipeline_A-Z/07 - Developmental Editing/Book" } }, "https://sharepoint/_layouts/15/Doc.aspx?sourcedoc=id"), true);
+  assert.equal(isCanonicalPipelineItem({ parentReference: { path: "/drives/drive/root:/01_Pre-Pipeline/00_Inquiry/Book" } }, "https://sharepoint/_layouts/15/Doc.aspx?sourcedoc=id"), false);
 });
 
 test("repairs exact cohort authority only after checksum and binding proof", async () => {

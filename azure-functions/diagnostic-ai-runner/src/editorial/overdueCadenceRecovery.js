@@ -65,6 +65,12 @@ function roleForArtifact(artifact) {
   return null;
 }
 
+function isCanonicalPipelineItem(item, webUrl) {
+  return [webUrl, item?.parentReference?.path]
+    .map((value) => decodeURIComponent(clean(value)))
+    .some((value) => /(?:^|\/)01_Pipeline_A-Z(?:\/|$)/i.test(value));
+}
+
 async function resolveWorkspaceFolder(request, driveId, pathParts) {
   const parts = pathParts.slice();
   const leaf = parts.pop();
@@ -106,7 +112,8 @@ async function canonicalizeArtifact(artifact, authority, client, deps = {}) {
   let driveId = source.driveId;
   let itemId = source.item.id;
   let webUrl = source.item.webUrl || artifact.jm1pub_repositorypath;
-  if (!/\/01_Pipeline_A-Z\//i.test(decodeURIComponent(clean(webUrl))) && authority.workspacePath) {
+  let canonicalLocationProven = isCanonicalPipelineItem(source.item, webUrl);
+  if (!canonicalLocationProven && authority.workspacePath) {
     const folder = await resolveWorkspaceFolder(request, driveId, authority.workspacePath);
     let existing = null;
     try {
@@ -126,9 +133,10 @@ async function canonicalizeArtifact(artifact, authority, client, deps = {}) {
     }
     itemId = existing.id;
     webUrl = existing.webUrl;
+    canonicalLocationProven = true;
   }
 
-  if (!/\/01_Pipeline_A-Z\//i.test(decodeURIComponent(clean(webUrl)))) {
+  if (!canonicalLocationProven) {
     fail("RECOVERY_CANONICAL_WORKSPACE_REQUIRED", `${authority.key} artifact is not in the canonical pipeline workspace.`);
   }
 
@@ -253,4 +261,4 @@ async function executeOverdueCadenceRecovery(input = {}, deps = {}) {
   return { ok: true, authority: RECOVERY_AUTHORITY, repaired, cadence };
 }
 
-module.exports = { RECOVERY_AUTHORITY, RECOVERY_COHORT, executeOverdueCadenceRecovery, repairCohortAuthority, roleForArtifact };
+module.exports = { RECOVERY_AUTHORITY, RECOVERY_COHORT, executeOverdueCadenceRecovery, isCanonicalPipelineItem, repairCohortAuthority, roleForArtifact };
