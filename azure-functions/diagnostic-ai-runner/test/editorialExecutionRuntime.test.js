@@ -642,6 +642,25 @@ test("chunked Developmental aggregation preserves the full manuscript and editor
   assert.equal(validateDevelopmentalChunkOutput({ ok: true, fellBack: false, output: checkpoints[0].output }, "An opening passage.").ok, true);
 });
 
+test("Developmental chunk validation rejects internal note classes in author-facing summaries", () => {
+  const source = "The source paragraph establishes the central idea for readers.";
+  const result = validateDevelopmentalChunkOutput({
+    ok: true,
+    fellBack: false,
+    output: {
+      editedManuscript: "The revised source paragraph establishes the central idea clearly for readers.",
+      developmentalSummary: 'Summary leaked {"class":"PRODUCTION_INTERNAL"}.',
+      appliedChanges: ["Clarified the opening progression."],
+      authorNotes: [],
+      internalNotes: [],
+      authorityActions: [{ classification: "SYSTEM_AUTHORIZED_EDIT", description: "Clarified progression." }]
+    }
+  }, source);
+
+  assert.equal(result.ok, false);
+  assert.ok(result.failures.includes("AUTHOR_EXPERIENCE_PROJECTION_FAILED"));
+});
+
 test("targeted editorial execution dry-run resolves exactly one Line stage/source without mutations", async () => {
   const client = targetedExecutionClient();
   const result = await evaluateTargetedEditorialExecution(
@@ -1705,6 +1724,7 @@ test("developmental editing materializes a package-grade manuscript docx artifac
   const patched = [];
   const logs = [];
   const uploadedBodies = new Map();
+  const persistedBodies = new Map();
   const sourceText = [
     "Chapter One",
     "",
@@ -1713,6 +1733,8 @@ test("developmental editing materializes a package-grade manuscript docx artifac
   const sourceBuffer = Buffer.from(sourceText);
   const sourceSha = require("node:crypto").createHash("sha256").update(sourceBuffer).digest("hex");
   graphRequest.override = async (path, options = {}) => {
+    const persistedId = path.match(/\/items\/(uploaded-\d+)\/content$/)?.[1];
+    if (persistedId && !options.method) return persistedBodies.get(persistedId);
     if (path.endsWith("/content") && !options.method) return sourceBuffer;
     if (path.includes("?$select=id,name,parentReference,size,webUrl") || path.includes("?$select=id,parentReference")) {
       return { id: "source-item", parentReference: { id: "parent-folder" }, webUrl: "https://sharepoint/source.docx" };
@@ -1720,8 +1742,10 @@ test("developmental editing materializes a package-grade manuscript docx artifac
     if (options.method === "PUT") {
       const name = decodeURIComponent(path.split(":/").at(-2) || "output.docx");
       uploadedBodies.set(name, options.body);
+      const id = `uploaded-${created.length + patched.length + 1}`;
+      persistedBodies.set(id, Buffer.concat([options.body, Buffer.from("\n")]));
       return {
-        id: `uploaded-${created.length + patched.length + 1}`,
+        id,
         name,
         size: Buffer.isBuffer(options.body) ? options.body.length : 120,
         webUrl: "https://sharepoint/output"
@@ -1850,7 +1874,13 @@ test("developmental editing materializes a package-grade manuscript docx artifac
     assert.equal(evidence.outputArtifacts.every((artifact) => artifact.artifactId && artifact.checksum), true);
     assert.ok(manifest);
     assert.equal(manifest.payload.jm1pub_fileextension, "json");
-    assert.ok(manuscript.payload.jm1pub_sha256);
+    const manuscriptPersistedBody = persistedBodies.get(
+      [...persistedBodies.keys()].find((id) =>
+        require("node:crypto").createHash("sha256").update(persistedBodies.get(id)).digest("hex") === manuscript.payload.jm1pub_sha256
+      )
+    );
+    assert.ok(manuscriptPersistedBody);
+    assert.equal(manuscript.payload.jm1pub_filesizebytes, manuscriptPersistedBody.length);
     assert.equal(logs.some((log) => log.jm1_actiontype === "EDITORIAL_SOURCE_VALIDATED"), true);
     assert.equal(logs.some((log) => log.jm1_actiontype === "ACTIVE_EDITORIAL_OUTPUT_CREATED"), true);
     assert.equal(logs.some((log) => log.jm1_actiontype === "PACKAGE_MANIFEST_CREATED"), true);

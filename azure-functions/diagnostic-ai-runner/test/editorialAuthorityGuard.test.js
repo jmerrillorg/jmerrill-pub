@@ -78,6 +78,15 @@ describe("editorial authority reconciliation", () => {
     assert.equal(result.ok, true);
   });
 
+  test("author projection rejects every internal note class", () => {
+    const result = validateAuthorFacingProjection(
+      "PUBLISHER_INTERNAL RIGHTS_LEGAL_INTERNAL FACT_CHECK_INTERNAL PRODUCTION_INTERNAL PROVIDER_INTERNAL SYSTEM_INTERNAL AI_INTERNAL"
+    );
+
+    assert.equal(result.ok, false);
+    assert.ok(result.issues.some((issue) => issue.code === "INTERNAL_NOTE_CLASS"));
+  });
+
   test("author projection allows ordinary editorial uses of prompt while rejecting technical prompt leakage", () => {
     const authorSafe = validateAuthorFacingProjection({
       heading: "Journal Prompt",
