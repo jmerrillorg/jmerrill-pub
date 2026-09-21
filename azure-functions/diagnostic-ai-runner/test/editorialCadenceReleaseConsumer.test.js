@@ -193,6 +193,42 @@ test("due cadence marks the release boundary as expired", () => {
   assert.equal(schedule.remainingHoldDuration, "expired");
 });
 
+test("founder recovery authority makes only the exact authorized future stage due", () => {
+  const stage = {
+    jm1pub_editorialstageid: "ae3c9d5e-67b5-f111-aaab-000d3a10aa9c",
+    jm1pub_name: "Developmental Editing - Whole"
+  };
+  const schedule = buildSchedule(
+    stage,
+    { createdon: "2026-09-21T03:00:03Z" },
+    { createdon: "2026-09-21T03:00:03Z" },
+    "2026-09-21T08:00:00Z",
+    {
+      cadenceOverrideAuthorized: true,
+      cadenceOverrideAuthority: "FOUNDER-RECOVERY",
+      cadenceOverrideStageIds: [stage.jm1pub_editorialstageid]
+    }
+  );
+  assert.equal(schedule.naturallyDue, false);
+  assert.equal(schedule.due, true);
+  assert.equal(schedule.cadenceOverrideApplied, true);
+  assert.equal(schedule.cadenceOverrideAuthority, "FOUNDER-RECOVERY");
+
+  const other = buildSchedule(
+    { ...stage, jm1pub_editorialstageid: "7cf90c36-6cb5-f111-aaac-000d3a14673b" },
+    { createdon: "2026-09-21T03:00:03Z" },
+    { createdon: "2026-09-21T03:00:03Z" },
+    "2026-09-21T08:00:00Z",
+    {
+      cadenceOverrideAuthorized: true,
+      cadenceOverrideAuthority: "FOUNDER-RECOVERY",
+      cadenceOverrideStageIds: [stage.jm1pub_editorialstageid]
+    }
+  );
+  assert.equal(other.due, false);
+  assert.equal(other.cadenceOverrideApplied, false);
+});
+
 test("package identity is parsed from current handoff summaries", () => {
   const parsed = parsePackage(
     "PACKAGE_PREPARATION: Editorial-to-Package handoff completed for pkg-e698257d-ca9c-f111-b8dc-00224820105b-line-editing-v1; manifest e874adc0-bfa0-f111-b8dc-6045bdd69435; package checksum e05043e4c1bc85f4a4f6efec1d02e48821ca5cf81b540552ec9b318fb8a0654c; QA READY_INTERNAL;",
