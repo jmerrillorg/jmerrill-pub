@@ -10,6 +10,11 @@ const {
   writeLog
 } = require("./editorialExecutionRuntime");
 const { runEditorialCadenceReleaseConsumer } = require("./editorialCadenceReleaseConsumer");
+const {
+  buildCommunicationIdentity,
+  findIntentState,
+  markCommunicationFailed
+} = require("./communicationIntentStore");
 
 const RECOVERY_AUTHORITY = "JMP-PUBLISHING-V2-PORTFOLIO-OVERDUE-CADENCE-OVERRIDE-2026-09-21";
 const AUTHOR_FACING_VISIBILITY = 196650000;
@@ -242,11 +247,50 @@ async function repairCohortAuthority(authority, client, deps = {}) {
   return { key: authority.key, title: authority.titleName, author: authority.authorName, recipient: authority.recipient, stageId: authority.stageId, artifacts: artifactResults, logId, idempotent: Boolean(existing) };
 }
 
+async function releaseProvenPreDeliveryReservations(repaired, client) {
+  const released = [];
+  for (const item of repaired) {
+    const semantic = buildCommunicationIdentity({
+      titleId: RECOVERY_COHORT.find((entry) => entry.key === item.key)?.titleId,
+      authorId: RECOVERY_COHORT.find((entry) => entry.key === item.key)?.contactId,
+      communicationType: "DEVELOPMENTAL_EDITORIAL_REVIEW_READY_V2",
+      workstream: item.stageId,
+      recipient: item.recipient,
+      attachments: item.artifacts.map((artifact) => ({ role: artifact.role, sha256: artifact.checksum }))
+    });
+    const state = await findIntentState(client, semantic);
+    if (state.status !== "AMBIGUOUS_SEND_STATE") continue;
+    const denials = await client.list("jm1_executionlogs", {
+      $select: "jm1_executionlogid,jm1_actiontype,jm1_actiondescription,jm1_sourcerecordid,createdon",
+      $filter:
+        `jm1_actiontype eq 'PACKAGE_CADENCE_RELEASE_SEND_BLOCKED' and jm1_sourcerecordid eq '${item.stageId}' and ` +
+        "contains(jm1_actiondescription,'RELAY_SEND_FAILED:AUTHOR_REVIEW_PACKAGE_TEXT_PORTAL_REFERENCE_REQUIRED')",
+      $orderby: "createdon desc",
+      $top: "1"
+    });
+    if (denials.length !== 1) {
+      fail("RECOVERY_AMBIGUOUS_COMMUNICATION_INTENT", `${item.key} communication reservation lacks exact pre-delivery denial proof.`);
+    }
+    const result = await markCommunicationFailed(client, {
+      titleId: RECOVERY_COHORT.find((entry) => entry.key === item.key)?.titleId,
+      titleName: item.title,
+      semanticIdempotencyKey: semantic.key,
+      communicationRecordId: state.record?.jm1_executionlogid,
+      failureCode: "AUTHOR_REVIEW_PACKAGE_TEXT_PORTAL_REFERENCE_REQUIRED",
+      failedAt: new Date().toISOString(),
+      recipient: item.recipient
+    });
+    released.push({ key: item.key, semanticIdempotencyKey: semantic.key, denialLogId: denials[0].jm1_executionlogid, failureRecordId: result.failureRecordId });
+  }
+  return released;
+}
+
 async function executeOverdueCadenceRecovery(input = {}, deps = {}) {
   if (input.confirmAuthority !== RECOVERY_AUTHORITY) fail("RECOVERY_FOUNDER_AUTHORITY_REQUIRED", "Exact founder recovery authority is required.", 400);
   const client = deps.client || createDataverseClient(requireDataverseConfig(), deps);
   const repaired = [];
   for (const authority of RECOVERY_COHORT) repaired.push(await repairCohortAuthority(authority, client, deps));
+  const releasedPreDeliveryReservations = await releaseProvenPreDeliveryReservations(repaired, client);
   const correlationId = `OVERDUE-CADENCE-RECOVERY-${new Date().toISOString()}`;
   const cadence = await (deps.runEditorialCadenceReleaseConsumer || runEditorialCadenceReleaseConsumer)(
     { now: input.now || new Date().toISOString(), correlationId, maxSchedules: 100 },
@@ -258,7 +302,7 @@ async function executeOverdueCadenceRecovery(input = {}, deps = {}) {
       cadenceOverrideStageIds: RECOVERY_COHORT.map((item) => item.stageId)
     }
   );
-  return { ok: true, authority: RECOVERY_AUTHORITY, repaired, cadence };
+  return { ok: true, authority: RECOVERY_AUTHORITY, repaired, releasedPreDeliveryReservations, cadence };
 }
 
-module.exports = { RECOVERY_AUTHORITY, RECOVERY_COHORT, executeOverdueCadenceRecovery, isCanonicalPipelineItem, repairCohortAuthority, roleForArtifact };
+module.exports = { RECOVERY_AUTHORITY, RECOVERY_COHORT, executeOverdueCadenceRecovery, isCanonicalPipelineItem, releaseProvenPreDeliveryReservations, repairCohortAuthority, roleForArtifact };
