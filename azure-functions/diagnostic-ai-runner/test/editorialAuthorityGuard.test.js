@@ -87,6 +87,15 @@ describe("editorial authority reconciliation", () => {
     assert.ok(result.issues.some((issue) => issue.code === "INTERNAL_NOTE_CLASS"));
   });
 
+  test("author projection rejects every form of internal chunk terminology", () => {
+    const result = validateAuthorFacingProjection({
+      developmentalSummary: "The surrounding chunks continue the argument across later chunks."
+    });
+
+    assert.equal(result.ok, false);
+    assert.ok(result.issues.some((issue) => issue.code === "INTERNAL_CHUNK_REFERENCE"));
+  });
+
   test("author projection allows ordinary editorial uses of prompt while rejecting technical prompt leakage", () => {
     const authorSafe = validateAuthorFacingProjection({
       heading: "Journal Prompt",

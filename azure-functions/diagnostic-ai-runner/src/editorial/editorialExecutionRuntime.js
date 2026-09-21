@@ -2867,7 +2867,9 @@ function projectAuthorFacingEditorialText(value) {
     .replace(/\bnext chunk\b/gi, "following section")
     .replace(/\bprevious chunk\b/gi, "preceding section")
     .replace(/\b(?:this|the|source|manuscript) chunk\b/gi, "this section")
-    .replace(/\bchunk\s+\d+(?:\s+of\s+\d+)?\b/gi, "this section");
+    .replace(/\bchunk\s+\d+(?:\s+of\s+\d+)?\b/gi, "this section")
+    .replace(/\bchunks\b/gi, "sections")
+    .replace(/\bchunk\b/gi, "section");
 }
 
 function uniqueEditorialEntries(entries = []) {
