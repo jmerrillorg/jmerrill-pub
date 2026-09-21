@@ -81,6 +81,7 @@ function authorReviewAttachment(overrides = {}) {
     contentInBase64: bytes.toString("base64"),
     sha256: overrides.sha256 || createHash("sha256").update(bytes).digest("hex"),
     role: overrides.role || "developmentalSummary",
+    version: overrides.version || "v1",
     artifactId: overrides.artifactId || "artifact-developmental-summary"
   };
 }
@@ -186,7 +187,7 @@ describe("author response provider boundary", () => {
     assert.equal(providerCalled, false);
   });
 
-  test("valid enabled config sends only to author and hidden archive copy to internal visibility mailbox", async () => {
+  test("valid enabled config sends to the author with the required visible Publishing mailbox copy", async () => {
     const calls = [];
     const sendApproval = approval();
     const result = await sendConfiguredAuthorResponse({
@@ -207,8 +208,8 @@ describe("author response provider boundary", () => {
     assert.equal(result.internalVisibilityStatus, AUTHOR_RESPONSE_SEND_STATUS.INTERNAL_VISIBILITY_SATISFIED);
     assert.equal(calls.length, 1);
     assert.deepEqual(calls[0].to, [sendPreparationRecord.authorEmail]);
-    assert.deepEqual(calls[0].cc, []);
-    assert.deepEqual(calls[0].bcc, [INTERNAL_VISIBILITY_MAILBOX]);
+    assert.deepEqual(calls[0].cc, [INTERNAL_VISIBILITY_MAILBOX]);
+    assert.deepEqual(calls[0].bcc, []);
     assert.equal(calls[0].from, "publishing@email.jmerrill.one");
     assert.equal(calls[0].replyTo, "publishing@jmerrill.one");
   });
@@ -276,7 +277,7 @@ describe("author response provider boundary", () => {
   test("publishing@jmerrill.one copy is required", () => {
     const result = buildAuthorResponseEmail({
       sendApproval: approval(),
-      bcc: []
+      cc: []
     }, getAuthorResponseSendProviderConfig(enabledEnv()));
 
     assertSafeFailure(result, "INTERNAL_VISIBILITY_REQUIRED");
@@ -377,8 +378,10 @@ describe("author response provider boundary", () => {
       const body = JSON.parse(calls[0].options.body);
       assert.equal(body.messageType, "APPROVED_AUTHOR_RESPONSE");
       assert.equal(body.authorEmail, sendPreparationRecord.authorEmail);
-      assert.equal(body.cc, undefined);
-      assert.deepEqual(body.bcc, [INTERNAL_VISIBILITY_MAILBOX]);
+      assert.deepEqual(body.cc, [INTERNAL_VISIBILITY_MAILBOX]);
+      assert.deepEqual(body.bcc, []);
+      assert.equal(body.communicationObservability.from, "publishing@email.jmerrill.one");
+      assert.deepEqual(body.communicationObservability.cc, [INTERNAL_VISIBILITY_MAILBOX]);
       assert.equal(body.htmlBody, null);
       assert.equal(JSON.stringify(result).includes("SECRET_RELAY_KEY"), false);
     } finally {

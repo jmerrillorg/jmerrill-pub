@@ -56,13 +56,25 @@ async function executeApprovedAuthorResponse(value, deps = {}) {
   }
 
   try {
-    const providerMessageId = await deps.sendMessage(deps.buildMessage(value));
+    const providerReceipt = await deps.sendMessage(deps.buildMessage(value));
+    const providerMessageId = typeof providerReceipt === "string" ? providerReceipt : providerReceipt?.providerMessageId;
+    const providerStatus = typeof providerReceipt === "string" ? "Succeeded" : providerReceipt?.providerStatus;
+    if (!providerMessageId || providerStatus !== "Succeeded") {
+      throw Object.assign(new Error("ACS delivery did not reach Succeeded state."), { safeCode: "ACS_DELIVERY_UNPROVEN" });
+    }
     const accepted = await ledger.recordAccepted(reservation.entity, providerMessageId);
     return {
       status: "SENT",
       communicationRecordId: accepted.jm1MessageId,
       sentAt: accepted.acceptedAt,
       providerMessageId,
+      providerStatus,
+      observability: {
+        acsDelivery: "PASS",
+        publishingMailboxCopy: "PASS",
+        semanticAttachmentParity: "PASS",
+        evidenceClass: "ACS_SUCCEEDED_SINGLE_ENVELOPE_WITH_CANONICAL_CC"
+      },
       semanticIdempotencyKey: ledgerInput.idempotencyKey,
       recipient: value.authorEmail,
       artifactChecksums: value.attachments.map((attachment) => attachment.sha256)

@@ -242,6 +242,26 @@ function validAuthorResponsePayload(overrides = {}) {
   };
 }
 
+function communicationObservability(attachments) {
+  const manifest = attachments.map((attachment) => ({
+    role: attachment.role || "attachment",
+    filename: attachment.name,
+    version: attachment.version || "",
+    checksum: attachment.sha256 || ""
+  }));
+  return {
+    from: "publishing@email.jmerrill.one",
+    replyTo: "publishing@jmerrill.one",
+    cc: ["publishing@jmerrill.one"],
+    dataverseCommunicationRecordRequired: true,
+    publishingMailboxCopyRequired: true,
+    semanticAttachmentParityRequired: true,
+    authorAttachmentManifest: manifest,
+    publishingCopyAttachmentManifest: manifest,
+    dataverseArtifactManifest: manifest
+  };
+}
+
 function validEditorialRecommendationPayload(overrides = {}) {
   return validAuthorResponsePayload({
     subject: "Your Editorial Review & Publishing Recommendation | J Merrill Publishing",
@@ -259,6 +279,16 @@ function validEditorialRecommendationPayload(overrides = {}) {
 }
 
 function validAuthorReviewPackagePayload(overrides = {}) {
+  const attachmentBytes = Buffer.from("author-safe summary");
+  const attachments = [{
+    name: "Before You Were Born - Developmental Summary.pdf",
+    contentType: "application/pdf",
+    contentInBase64: attachmentBytes.toString("base64"),
+    sha256: createHash("sha256").update(attachmentBytes).digest("hex"),
+    role: "reviewInstructions",
+    version: "v1",
+    artifactId: "bywb-review-artifact"
+  }];
   const canonicalHtml = `<!doctype html>
 <html lang="en">
   <body>
@@ -328,18 +358,23 @@ function validAuthorReviewPackagePayload(overrides = {}) {
       renderMode: "CANONICAL_HTML",
       renderTemplateGuard: "PASS"
     },
-    attachments: [
-      {
-        name: "Before You Were Born - Developmental Summary.pdf",
-        contentType: "application/pdf",
-        contentInBase64: Buffer.from("author-safe summary").toString("base64")
-      }
-    ],
+    attachments,
+    communicationObservability: communicationObservability(attachments),
     ...overrides
   });
 }
 
 function validFinalDevelopmentalReviewPayload(overrides = {}) {
+  const attachmentBytes = Buffer.from("author-safe revised manuscript");
+  const attachments = [{
+    name: "The General’s Will and Last Testament - Editorial Working Version - Jackie Restoration.docx",
+    contentType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    contentInBase64: attachmentBytes.toString("base64"),
+    sha256: createHash("sha256").update(attachmentBytes).digest("hex"),
+    role: "editedManuscript",
+    version: "v1.1",
+    artifactId: "generals-will-v1-1"
+  }];
   const canonicalHtml = `<!doctype html>
 <html lang="en">
   <body>
@@ -406,13 +441,8 @@ function validFinalDevelopmentalReviewPayload(overrides = {}) {
       renderMode: "CANONICAL_HTML",
       renderTemplateGuard: "PASS"
     },
-    attachments: [
-      {
-        name: "The General’s Will and Last Testament - Editorial Working Version - Jackie Restoration.docx",
-        contentType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-        contentInBase64: Buffer.from("author-safe revised manuscript").toString("base64")
-      }
-    ],
+    attachments,
+    communicationObservability: communicationObservability(attachments),
     ...overrides
   });
 }
@@ -436,6 +466,27 @@ function validDevelopmentalV2Payload(overrides = {}) {
     "J Merrill Publishing, Inc."
   ].join("\n");
   const htmlBody = `<!doctype html><html><body><table><tr><td>J MERRILL PUBLISHING</td></tr></table><p>A Division of J Merrill One</p><p>Helping Authors Help Themselves.</p><p>Good day Quanisha,</p><p>We're writing to let you know that the Developmental Editing work for <strong>Indomitable</strong> is ready for your review.</p><p>We've attached the edited manuscript together with the editorial review. Please reply with Approved, Approved with corrections, or your questions.</p><a href="https://jmerrill.pub/author/portal?action=review-package" style="display:inline-block;background:#1D4ED8;">View in Author Operating Center</a><p>Once we receive your response, the Publishing Team will continue with the next approved step.</p><p>The Publishing Team<br>J Merrill Publishing, Inc.</p></body></html>`;
+  const attachments = [
+    {
+      name: "Indomitable - Edited Manuscript.docx",
+      contentType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      contentInBase64: manuscriptBytes.toString("base64"),
+      sha256: createHash("sha256").update(manuscriptBytes).digest("hex"),
+      role: "editedManuscript",
+      version: "v2",
+      artifactId: "manuscript-artifact"
+    },
+    {
+      name: "Indomitable - Editorial Review.pdf",
+      contentType: "application/pdf",
+      contentInBase64: reviewBytes.toString("base64"),
+      sha256: createHash("sha256").update(reviewBytes).digest("hex"),
+      role: "reviewInstructions",
+      version: "v2",
+      artifactId: "review-artifact"
+    }
+  ];
+  const artifacts = communicationObservability(attachments).authorAttachmentManifest;
   return validAuthorResponsePayload({
     authorName: "Quanisha Dockery",
     projectTitle: "Indomitable",
@@ -466,26 +517,11 @@ function validDevelopmentalV2Payload(overrides = {}) {
       devReviewStatus: "COMPLETE",
       devEditedManuscriptStatus: "COMPLETE",
       devPackageComplete: true,
-      requiredRoles: ["editedManuscript", "reviewInstructions"]
+      requiredRoles: ["editedManuscript", "reviewInstructions"],
+      artifacts
     },
-    attachments: [
-      {
-        name: "Indomitable - Edited Manuscript.docx",
-        contentType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-        contentInBase64: manuscriptBytes.toString("base64"),
-        sha256: createHash("sha256").update(manuscriptBytes).digest("hex"),
-        role: "editedManuscript",
-        artifactId: "manuscript-artifact"
-      },
-      {
-        name: "Indomitable - Editorial Review.pdf",
-        contentType: "application/pdf",
-        contentInBase64: reviewBytes.toString("base64"),
-        sha256: createHash("sha256").update(reviewBytes).digest("hex"),
-        role: "reviewInstructions",
-        artifactId: "review-artifact"
-      }
-    ],
+    attachments,
+    communicationObservability: communicationObservability(attachments),
     ...overrides
   });
 }
@@ -923,6 +959,19 @@ test("Developmental V2 accepts only a complete typed package and preserves canon
   assert.equal(email.attachments.length, 2);
 });
 
+test("Developmental V2 rejects mailbox-copy attachment manifest drift", () => {
+  const { validateApprovedAuthorResponsePayload } = loadRelayModule();
+  const base = validDevelopmentalV2Payload();
+  const drifted = structuredClone(base.communicationObservability);
+  drifted.publishingCopyAttachmentManifest = drifted.publishingCopyAttachmentManifest.map((item, index) => index === 0
+    ? { ...item, checksum: "0".repeat(64) }
+    : item);
+  assertRejected(
+    validateApprovedAuthorResponsePayload(validDevelopmentalV2Payload({ communicationObservability: drifted })),
+    "PUBLISHING_COPY_ATTACHMENT_MANIFEST_MISMATCH"
+  );
+});
+
 test("Developmental V2 rejects review-only packages and unproven bindings", () => {
   const { validateApprovedAuthorResponsePayload } = loadRelayModule();
   const base = validDevelopmentalV2Payload();
@@ -1002,16 +1051,20 @@ test("approved author-review package preserves full attachment base64 payloads",
   const { validateApprovedAuthorResponsePayload, buildApprovedAuthorResponseEmail } = loadRelayModule();
   const payloadBytes = Buffer.from("author-safe summary ".repeat(500));
   const payloadBase64 = payloadBytes.toString("base64");
+  const attachments = [{
+    name: "Before You Were Born - Developmental Summary.pdf",
+    contentType: "application/pdf",
+    contentInBase64: payloadBase64,
+    sha256: createHash("sha256").update(payloadBytes).digest("hex"),
+    role: "reviewInstructions",
+    version: "v1",
+    artifactId: "bywb-review-artifact"
+  }];
   assert.ok(payloadBase64.length > 300);
 
   const result = validateApprovedAuthorResponsePayload(validAuthorReviewPackagePayload({
-    attachments: [
-      {
-        name: "Before You Were Born - Developmental Summary.pdf",
-        contentType: "application/pdf",
-        contentInBase64: payloadBase64
-      }
-    ]
+    attachments,
+    communicationObservability: communicationObservability(attachments)
   }));
 
   assert.equal(result.ok, true);

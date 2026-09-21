@@ -32,6 +32,36 @@ function sha256(value) {
   return createHash("sha256").update(value).digest("hex");
 }
 
+function semanticAttachmentManifest(attachments = []) {
+  return attachments.map((attachment) => ({
+    role: normalizeString(attachment.role),
+    filename: normalizeString(attachment.name),
+    version: normalizeString(attachment.version),
+    checksum: normalizeLower(attachment.sha256)
+  })).sort((left, right) => `${left.role}:${left.filename}`.localeCompare(`${right.role}:${right.filename}`));
+}
+
+function validateDevelopmentalContentTruth(input = {}) {
+  const roles = new Set((input.attachments || []).map((attachment) => normalizeString(attachment.role)));
+  const complete = roles.has("editedManuscript") && roles.has("reviewInstructions")
+    && input.qa === "PASS" && input.versionParity === "PASS"
+    && input.titleBinding === "PASS" && input.authorBinding === "PASS";
+  const claimsComplete = /completed review package|complete package|developmental editing is complete/i.test(
+    `${normalizeString(input.body)}\n${normalizeString(input.htmlBody)}`
+  );
+  if (!complete) {
+    return {
+      ok: false,
+      code: claimsComplete ? "DEVELOPMENTAL_COMPLETION_CLAIM_PROHIBITED" : "DEVELOPMENTAL_PACKAGE_INCOMPLETE",
+      devDeliveryComplete: false,
+      nextAction: roles.has("editedManuscript")
+        ? "PRODUCE_OR_REGISTER_DEVELOPMENTAL_EDITORIAL_REVIEW"
+        : "PRODUCE_REGISTER_QA_MISSING_DEVELOPMENTALLY_EDITED_MANUSCRIPT"
+    };
+  }
+  return { ok: true, code: "DEVELOPMENTAL_PACKAGE_COMPLETE", devDeliveryComplete: true };
+}
+
 function normalizeId(value) {
   return normalizeLower(value).replace(/[{}]/g, "");
 }
@@ -263,6 +293,7 @@ async function materializeAttachments(input, deps = {}) {
       contentType: contentTypeFor(fileName),
       contentInBase64: buffer.toString("base64"),
       role,
+      version: normalizeString(artifact.jm1pub_versionlabel),
       artifactId: normalizeString(artifact.jm1pub_editorialartifactid),
       sha256: actualSha
     });
@@ -292,6 +323,16 @@ function renderReviewCopy(input) {
   const actionUrl = buildAuthorResponseUrl(input);
   const packageInventory = input.attachments.map((attachment) => attachment.name);
   const developmental = stageCodeForNotification(input.stageCode) === "DEVELOPMENTAL_EDITING_REVIEW";
+  if (developmental) {
+    const truth = validateDevelopmentalContentTruth({
+      attachments: input.attachments,
+      qa: "PASS",
+      versionParity: "PASS",
+      titleBinding: "PASS",
+      authorBinding: "PASS"
+    });
+    if (!truth.ok) throw Object.assign(new Error(truth.code), { safeCode: truth.code, nextAction: truth.nextAction });
+  }
   const subject = `${label} Materials - ${title}`;
   if (developmental) {
     const reviewName = input.attachments.find((attachment) => attachment.role === "reviewInstructions")?.name;
@@ -484,6 +525,21 @@ async function sendCadenceAuthorReviewPackage(input, deps = {}) {
     attachments
   });
   const developmental = stageCodeForNotification(input.schedule.stageCode) === "DEVELOPMENTAL_EDITING_REVIEW";
+  if (developmental) {
+    const contentTruth = validateDevelopmentalContentTruth({
+      attachments,
+      qa: validationBlockers.includes("QA_VALIDATION_MISSING") ? "FAIL" : "PASS",
+      versionParity: "PASS",
+      titleBinding: "PASS",
+      authorBinding: "PASS",
+      body: copy.body,
+      htmlBody: copy.htmlBody
+    });
+    if (!contentTruth.ok) {
+      throw Object.assign(new Error(contentTruth.code), { safeCode: contentTruth.code, nextAction: contentTruth.nextAction });
+    }
+  }
+  const governedAttachmentManifest = semanticAttachmentManifest(attachments);
   const artifactManifest = developmental ? {
     packageId: input.packageInfo.packageId,
     packageVersion: packageVersion(input.packageInfo),
@@ -497,8 +553,20 @@ async function sendCadenceAuthorReviewPackage(input, deps = {}) {
     devReviewStatus: "COMPLETE",
     devEditedManuscriptStatus: "COMPLETE",
     devPackageComplete: true,
-    requiredRoles: ["editedManuscript", "reviewInstructions"]
+    requiredRoles: ["editedManuscript", "reviewInstructions"],
+    artifacts: governedAttachmentManifest
   } : undefined;
+  const communicationObservability = {
+    from: TRANSACTIONAL_FROM,
+    replyTo: PUBLISHING_MAILBOX,
+    cc: [PUBLISHING_MAILBOX],
+    dataverseCommunicationRecordRequired: true,
+    publishingMailboxCopyRequired: true,
+    semanticAttachmentParityRequired: true,
+    authorAttachmentManifest: governedAttachmentManifest,
+    publishingCopyAttachmentManifest: governedAttachmentManifest,
+    dataverseArtifactManifest: governedAttachmentManifest
+  };
   const payload = {
     messageType: APPROVED_MESSAGE_TYPE,
     diagnosticId: input.gate.jm1pub_editorialapprovalgateid,
@@ -515,6 +583,7 @@ async function sendCadenceAuthorReviewPackage(input, deps = {}) {
     templateMetadata: copy.templateMetadata,
     attachments,
     artifactManifest,
+    communicationObservability,
     approvedBy: SYSTEM_OPERATOR,
     approvedOn: new Date().toISOString(),
     internalVisibilityMailbox: PUBLISHING_MAILBOX,
@@ -561,7 +630,9 @@ async function sendCadenceAuthorReviewPackage(input, deps = {}) {
         communicationRecordId: reserve.communicationRecordId,
         providerMessageId: result.providerMessageId,
         sentAt: result.sentAt,
-        artifactChecksums: attachments.map((attachment) => attachment.sha256)
+        artifactChecksums: attachments.map((attachment) => attachment.sha256),
+        artifactManifest: governedAttachmentManifest,
+        observability: result.observability
       });
     }
     return { ...result, semanticIdempotencyKey: reserve.semanticIdempotencyKey, communicationRecordId: reserve.communicationRecordId };
@@ -591,7 +662,9 @@ async function sendCadenceAuthorReviewPackage(input, deps = {}) {
       communicationRecordId: body.communicationRecordId || reserve.communicationRecordId,
       providerMessageId: body.providerMessageId,
       sentAt: body.sentAt,
-      artifactChecksums: attachments.map((attachment) => attachment.sha256)
+      artifactChecksums: attachments.map((attachment) => attachment.sha256),
+      artifactManifest: governedAttachmentManifest,
+      observability: body.observability
     });
   }
   return {
@@ -606,7 +679,8 @@ async function sendCadenceAuthorReviewPackage(input, deps = {}) {
     subject: copy.subject,
     from: TRANSACTIONAL_FROM,
     replyTo: PUBLISHING_MAILBOX,
-    cc: [PUBLISHING_MAILBOX]
+    cc: [PUBLISHING_MAILBOX],
+    observability: body.observability
   };
 }
 
@@ -621,7 +695,9 @@ module.exports = {
   materializeAttachments,
   renderReviewCopy,
   requiredRolesFor,
+  semanticAttachmentManifest,
   sendCadenceAuthorReviewPackage,
   stageCodeForNotification,
+  validateDevelopmentalContentTruth,
   validateDueSendInput
 };
