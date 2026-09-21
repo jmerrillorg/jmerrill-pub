@@ -1648,6 +1648,30 @@ function wait(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+async function readPersistedGraphContent(paths = [], options = {}) {
+  const candidates = [...new Set(paths.map((path) => normalizeString(path)).filter(Boolean))];
+  const attempts = Math.max(1, parsePositiveInteger(options.attempts, 3));
+  const delayMs = Math.max(0, Number(options.delayMs ?? 500));
+  let lastError = null;
+  for (let attempt = 0; attempt < attempts; attempt += 1) {
+    for (const path of candidates) {
+      try {
+        const body = await graphRequest(path);
+        if (Buffer.isBuffer(body)) return body;
+        lastError = Object.assign(new Error("Persisted Graph content was not binary."), {
+          safeCode: "GRAPH_PERSISTED_CONTENT_READBACK_FAILED"
+        });
+      } catch (error) {
+        lastError = error;
+      }
+    }
+    if (attempt < attempts - 1 && delayMs > 0) await wait(delayMs * (attempt + 1));
+  }
+  throw lastError || Object.assign(new Error("No persisted Graph content path was available."), {
+    safeCode: "GRAPH_PERSISTED_CONTENT_READBACK_FAILED"
+  });
+}
+
 function targetedEditorialCheckpointContainerName() {
   return normalizeString(process.env.JM1_TARGETED_EDITORIAL_CHECKPOINT_CONTAINER) ||
     DEFAULT_TARGETED_EDITORIAL_CHECKPOINT_CONTAINER;
@@ -3505,7 +3529,10 @@ async function materializeEditorialOutputs(
         graphDetail: graphFailureDetail(error, sourceArtifact)
       });
     });
-    const persistedBody = await graphRequest(`drives/${driveId}/items/${uploaded.id}/content`).catch((error) => {
+    const persistedBody = await readPersistedGraphContent([
+      uploaded.id ? `drives/${driveId}/items/${uploaded.id}/content` : "",
+      `drives/${driveId}/items/${parentId}:/${encodeURIComponent(filename)}:/content`
+    ]).catch((error) => {
       throw Object.assign(error, {
         safeCode: `${stageCode}_BLOCKED — ${error.safeCode || "GRAPH_PERSISTED_CONTENT_READBACK_FAILED"}`,
         graphDetail: graphFailureDetail(error, {
@@ -3897,7 +3924,10 @@ async function createPackageManifestArtifact(client, stage, stageCode, sourceArt
       graphDetail: graphFailureDetail(error, sourceArtifact)
     });
   });
-  const persistedManifestBody = await graphRequest(`drives/${driveId}/items/${uploaded.id}/content`).catch((error) => {
+  const persistedManifestBody = await readPersistedGraphContent([
+    uploaded.id ? `drives/${driveId}/items/${uploaded.id}/content` : "",
+    `drives/${driveId}/items/${parentId}:/${encodeURIComponent(filename)}:/content`
+  ]).catch((error) => {
     throw Object.assign(error, {
       safeCode: `${stageCode}_BLOCKED — ${error.safeCode || "GRAPH_PERSISTED_CONTENT_READBACK_FAILED"}`,
       graphDetail: graphFailureDetail(error, {
@@ -4271,6 +4301,7 @@ module.exports = {
   buildLineEditingChunkPrompt,
   buildProofreadingCoverNote,
   buildDevelopmentalEditingChunkPrompt,
+  readPersistedGraphContent,
   buildChunkedDevelopmentalInvocation,
   validateDevelopmentalChunkOutput,
   isLivePortfolioStage,
