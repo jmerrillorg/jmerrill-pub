@@ -1,0 +1,1 @@
+{"status":"PASS_JM1_TEST","solution":"JMP_PublishingV2_PaymentRuntime","version":"1.0.0.0","tables":["jmpv2_agreementrecord","jmpv2_paymentrequirement","jmpv2_paymentevidence"],"attributes":48,"alternateKey":"jmpv2_paymentevidence_idempotency","runtimeRolePrivileges":7,"managedDefaultEnabled":false,"productionImported":false}

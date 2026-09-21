@@ -92,7 +92,8 @@
     "royalty-mapping-decision-governance-guard": "node --test scripts/royalty_mapping_decision_governance.test.mjs",
     "jmp-pay-ingest-001-guard": "node --test scripts/jmp_pay_ingest_001_stripe_correlation.test.mjs scripts/atta_payment_event_recovery_guard.test.mjs scripts/atta_joined_family_reconciliation_guard.test.mjs",
     "jmp-payments-extra-001-guard": "node --test scripts/jmp_payments_extra_001.test.mjs",
-    "jmp-payments-extra-002-guard": "node --test scripts/jmp_payments_extra_001.test.mjs scripts/jmp_payments_extra_002.test.mjs"
+    "jmp-payments-extra-002-guard": "node --test scripts/jmp_payments_extra_001.test.mjs scripts/jmp_payments_extra_002.test.mjs",
+    "jmp-payments-extra-003-guard": "node --test scripts/jmp_payments_extra_002.test.mjs scripts/jmp_payments_extra_003.test.mjs && npm --prefix azure-functions/diagnostic-ai-runner run lint:payment-runtime && node --test azure-functions/diagnostic-ai-runner/test/publishingPaymentTimer.test.js"
   },
   "dependencies": {
     "@azure/communication-email": "^1.1.0",

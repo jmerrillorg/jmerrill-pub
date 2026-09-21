@@ -1,0 +1,1 @@
+{"status":"PASS","mechanism":"Dataverse ETag plus If-Match in atomic batch","staleBalance":"DENIED","overpaymentRace":"DENIED","duplicatePayoff":"DENIED"}

@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Role id="{6c73d789-fcb5-f111-aaac-70a8a5b27793}" name="JMP Publishing Payment Runtime" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <IsCustomizable>1</IsCustomizable>
+  <IsAutoAssigned>0</IsAutoAssigned>
+  <RolePrivileges>
+    <RolePrivilege name="prvCreatejmpv2_PaymentEvidence" level="Global" />
+    <RolePrivilege name="prvCreateSharePointData" level="Global" />
+    <RolePrivilege name="prvReadEnvironmentVariableDefinition" level="Global" />
+    <RolePrivilege name="prvReadjmpv2_AgreementRecord" level="Global" />
+    <RolePrivilege name="prvReadjmpv2_PaymentEvidence" level="Global" />
+    <RolePrivilege name="prvReadjmpv2_PaymentRequirement" level="Global" />
+    <RolePrivilege name="prvReadSharePointData" level="Global" />
+    <RolePrivilege name="prvReadSharePointDocument" level="Global" />
+    <RolePrivilege name="prvWritejmpv2_AgreementRecord" level="Global" />
+    <RolePrivilege name="prvWritejmpv2_PaymentRequirement" level="Global" />
+    <RolePrivilege name="prvWriteSharePointData" level="Global" />
+  </RolePrivileges>
+</Role>

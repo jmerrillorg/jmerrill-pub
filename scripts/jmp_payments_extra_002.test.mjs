@@ -316,6 +316,21 @@ test('recurring executor caps invoice, uses existing Stripe customer, and surviv
   assert.equal(stripe.byKey.size, 1)
 })
 
+test('recurring executor invoices only the unpaid remainder of a partially satisfied obligation', async () => {
+  const record = agreement({
+    scheduledObligations: [{ obligationId: 'due-1', dueDate: '2026-08-01T00:00:00.000Z', amountCents: 25988, status: 'PAST_DUE' }],
+    payments: [{
+      paymentId: 'pi_partial', eventId: 'evt_partial', paymentType: 'SCHEDULED_INSTALLMENT', amountCents: 10000, status: 'SUCCEEDED',
+      allocations: [{ kind: 'PAST_DUE_SCHEDULED_INSTALLMENT', amountCents: 10000, scheduledObligationId: 'due-1' }],
+    }],
+  })
+  const ledger = new MemoryLedger(record)
+  const stripe = new FakeStripe()
+  const result = await runtime.runRecurringInstallmentExecutor({ asOf: AS_OF, ledger, stripe })
+  assert.equal(result.results[0].amountCents, 15988)
+  assert.equal(stripe.calls[0].amountCents, 15988)
+})
+
 test('additional-payment invoice is bounded, versioned, and reuses same Stripe customer', async () => {
   const ledger = new MemoryLedger(agreement({ scheduledObligations: [snapshot().scheduledObligations[2]] }))
   const stripe = new FakeStripe()

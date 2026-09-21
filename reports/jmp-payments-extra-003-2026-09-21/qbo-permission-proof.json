@@ -1,0 +1,1 @@
+{"status":"BLOCKED_EXTERNAL","requiredScopes":["customer_payment:create","customer_payment:read"],"broaderScopesDeniedByAdapter":true,"broadAccountingAdministrationAuthorized":false}

@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { NextResponse } from 'next/server'
 import { getPublisherRuntimeAuthMode, getPublisherRuntimeAuthReadback } from '@/lib/server/publisher-runtime-auth'
+import { productionPaymentGateReadback } from '@/lib/server/stripe/publishing-payment-runtime'
 
 export const dynamic = 'force-dynamic'
 
@@ -44,9 +45,8 @@ export async function GET() {
   dependencies.graph = runtimeAuthDependencyHealth('graph')
   dependencies.relayHost = await relayHostHealth()
 
-  const paymentGate = String(process.env.JM1_STRIPE_COMMISSIONING_PAYMENT_ENABLED || '').toLowerCase() === 'true'
-    ? 'enabled'
-    : 'disabled'
+  const agreementPaymentGate = productionPaymentGateReadback()
+  const paymentGate = agreementPaymentGate.enabled ? 'enabled' : 'disabled'
   const sessionSecret = process.env.AUTHOR_PORTAL_SESSION_SECRET?.trim() || ''
   const release = readPackagedReleaseSha() ||
     process.env.JM1_RELEASE_SHA ||
@@ -74,6 +74,11 @@ export async function GET() {
     release,
     checkedAt: new Date().toISOString(),
     paymentGate,
+    agreementPaymentRuntime: {
+      status: agreementPaymentGate.status,
+      requested: agreementPaymentGate.requested,
+      missing: agreementPaymentGate.missing,
+    },
     dependencies,
   }, {
     status: fatalMissing ? 503 : 200,

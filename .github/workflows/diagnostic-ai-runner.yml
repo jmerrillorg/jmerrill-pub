@@ -206,6 +206,8 @@ jobs:
               JM1_ENTERPRISE_RELAY_AUDIENCE="api://84530e9b-2842-4ca6-8fe6-1a11eed051d1" \
               JM1_STRIPE_CONNECT_REMINDER_SYSTEM_ENABLED="true" \
               JM1_STRIPE_CONNECT_REMINDER_MAX_SENDS_PER_RUN="10" \
+              JMP_PUBLISHING_PAYMENT_TIMER_MODE="DRY_RUN" \
+              JMP_AGREEMENT_PAYMENT_GATE_ENABLED="false" \
               STRIPE_CONNECT_SECRET_KEY="@Microsoft.KeyVault(SecretUri=https://jm1-core-vault.vault.azure.net/secrets/STRIPE-CONNECT-SECRET-KEY)" \
               AUTHOR_CONNECT_ENROLLMENT_TOKEN_SECRET="@Microsoft.KeyVault(SecretUri=https://jm1-core-vault.vault.azure.net/secrets/AUTHOR-CONNECT-ENROLLMENT-TOKEN-SECRET)" \
             --output none

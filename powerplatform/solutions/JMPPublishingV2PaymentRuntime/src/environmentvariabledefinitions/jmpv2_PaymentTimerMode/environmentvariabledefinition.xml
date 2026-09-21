@@ -1,0 +1,14 @@
+<environmentvariabledefinition schemaname="jmpv2_PaymentTimerMode">
+  <defaultvalue>DISABLED</defaultvalue>
+  <description default="DISABLED, DRY_RUN, or ENABLED. Managed default is DISABLED.">
+    <label description="DISABLED, DRY_RUN, or ENABLED. Managed default is DISABLED." languagecode="1033" />
+  </description>
+  <displayname default="JMP V2 Payment Timer Mode">
+    <label description="JMP V2 Payment Timer Mode" languagecode="1033" />
+  </displayname>
+  <introducedversion>1.0.0.0</introducedversion>
+  <iscustomizable>1</iscustomizable>
+  <isrequired>0</isrequired>
+  <secretstore>0</secretstore>
+  <type>100000000</type>
+</environmentvariabledefinition>

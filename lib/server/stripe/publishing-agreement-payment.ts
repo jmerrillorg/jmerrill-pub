@@ -166,7 +166,7 @@ export function allocateIncomingPayment(input: {
     return blocked('PAYMENT_EXCEEDS_REMAINING_BALANCE', { permissibleAmountCents: state.remainingBalanceCents })
   }
 
-  const obligations = openObligations(input.snapshot)
+  const obligations = listOpenScheduledObligations(input.snapshot)
   const asOf = requiredDate(input.asOf, 'PAYMENT_ALLOCATION_DATE_INVALID')
   const allocations: AgreementPaymentAllocation[] = []
   let unallocatedCents = amountCents
@@ -402,14 +402,14 @@ export function buildBalanceVersion(snapshot: AgreementPaymentSnapshot) {
 }
 
 function calculateObligationState(snapshot: AgreementPaymentSnapshot) {
-  const obligations = openObligations(snapshot)
+  const obligations = listOpenScheduledObligations(snapshot)
   const pastDueBalanceCents = obligations
     .filter((row) => row.status === 'PAST_DUE')
     .reduce((sum, row) => sum + row.remainingCents, 0)
   return { pastDueBalanceCents }
 }
 
-function openObligations(snapshot: AgreementPaymentSnapshot) {
+export function listOpenScheduledObligations(snapshot: AgreementPaymentSnapshot) {
   const applied = new Map<string, number>()
   for (const payment of uniqueById(snapshot.payments.filter((row) => row.status === 'SUCCEEDED'), (row) => row.paymentId)) {
     for (const allocation of payment.allocations || []) {

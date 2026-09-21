@@ -1,0 +1,14 @@
+<environmentvariabledefinition schemaname="jmpv2_PaymentRuntimeEnabled">
+  <defaultvalue>false</defaultvalue>
+  <description default="Fail-closed gate for Publishing payment ledger mutation and collection.">
+    <label description="Fail-closed gate for Publishing payment ledger mutation and collection." languagecode="1033" />
+  </description>
+  <displayname default="JMP V2 Payment Runtime Enabled">
+    <label description="JMP V2 Payment Runtime Enabled" languagecode="1033" />
+  </displayname>
+  <introducedversion>1.0.0.0</introducedversion>
+  <iscustomizable>1</iscustomizable>
+  <isrequired>0</isrequired>
+  <secretstore>0</secretstore>
+  <type>100000000</type>
+</environmentvariabledefinition>
