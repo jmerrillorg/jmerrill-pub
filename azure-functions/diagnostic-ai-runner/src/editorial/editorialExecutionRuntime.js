@@ -20,6 +20,7 @@ const {
   resolveEditorialStageAuthority
 } = require("../policy/canonPolicyLayer");
 const { evaluateBlock04StageTransition } = require("./block04EditorialPolicy");
+const { hasDevelopmentalParallelEntryAuthority } = require("./parallelWorkstreamPolicy");
 
 const GRAPH_BASE = "https://graph.microsoft.com/v1.0";
 
@@ -228,7 +229,7 @@ function validateTargetedExecutionInput(input = {}) {
   if (!Object.values(TARGETED_EXECUTION_MODES).includes(mode)) {
     return targetedBlocked(input, "EXECUTION_MODE_REQUIRED", "executionMode must be DRY_RUN, EXECUTE, or EXECUTE_ASYNC.");
   }
-  if (input.authorApprovalRequired !== true) {
+  if (input.authorApprovalRequired !== true && stageCode !== "DEVELOPMENTAL_EDITING") {
     return targetedBlocked(input, "AUTHOR_APPROVAL_REQUIRED", "authorApprovalRequired must be true for targeted editorial execution.");
   }
   return null;
@@ -322,7 +323,11 @@ async function evaluateTargetedEditorialExecution(input = {}, deps = {}) {
     });
   }
 
-  const upstream = await findUpstreamApprovalEvidence(client, stage, normalized.stageCode);
+  const developmentalEntryAuthority = normalized.stageCode === "DEVELOPMENTAL_EDITING"
+    && hasDevelopmentalParallelEntryAuthority(stage, normalized.sourceArtifactId);
+  const upstream = developmentalEntryAuthority
+    ? { ok: true, reason: "DEVELOPMENTAL_PARALLEL_ENTRY_AUTHORITY", approvedArtifactId: normalized.sourceArtifactId, stages: [], artifacts: [], gates: [] }
+    : await findUpstreamApprovalEvidence(client, stage, normalized.stageCode);
   if (!upstream.ok) {
     return targetedBlocked(normalized, "AUTHOR_APPROVAL_NOT_EXACT_ARTIFACT_BOUND", upstream.reason || "Required upstream approval is missing.", {
       idempotencyKey
@@ -346,6 +351,7 @@ async function evaluateTargetedEditorialExecution(input = {}, deps = {}) {
   const editorialPolicyDecision = resolveEditorialStageAuthority({
     stageCode: normalized.stageCode,
     priorAuthorGateCleared: upstream.ok,
+    developmentalEntryAuthority,
     cadenceEligible: normalized.cadenceEligible !== false,
     scheduledReleaseAt: normalized.scheduledReleaseAt,
     titleId: normalized.titleId,
@@ -419,6 +425,7 @@ async function evaluateTargetedEditorialExecution(input = {}, deps = {}) {
       currentApproved: sourceArtifact.jm1pub_iscurrentapproved === true
     },
     authorApprovalEvidence: {
+      authorityType: developmentalEntryAuthority ? "COMMERCIAL_MANUSCRIPT_PARALLEL_ENTRY" : "UPSTREAM_AUTHOR_APPROVAL",
       approvedArtifactId: upstream.approvedArtifactId,
       gates: (upstream.gates || [])
         .filter((gate) =>
@@ -1854,6 +1861,26 @@ async function findUpstreamApprovalEvidence(client, stage, stageCode) {
   };
 }
 
+function parallelEntrySourceArtifactId(stage) {
+  return normalizeString(stage?.jm1pub_internaloperationalsummary).match(/sourceArtifactId=([^;\s]+)/i)?.[1] || "";
+}
+
+async function resolveExecutionEntryAuthority(client, stage, stageCode, sourceArtifactId = "") {
+  const boundSourceArtifactId = normalizeString(sourceArtifactId) || parallelEntrySourceArtifactId(stage);
+  if (stageCode === "DEVELOPMENTAL_EDITING" && hasDevelopmentalParallelEntryAuthority(stage, boundSourceArtifactId)) {
+    return {
+      ok: true,
+      reason: "DEVELOPMENTAL_PARALLEL_ENTRY_AUTHORITY",
+      approvedArtifactId: boundSourceArtifactId,
+      developmentalEntryAuthority: true,
+      stages: [],
+      artifacts: [],
+      gates: []
+    };
+  }
+  return findUpstreamApprovalEvidence(client, stage, stageCode);
+}
+
 async function findActiveEditorialStages(client, maxTasks) {
   const rows = await client.list("jm1pub_editorialstages", {
     $select:
@@ -1877,7 +1904,7 @@ async function findActiveEditorialStages(client, maxTasks) {
       continue;
     }
     const stageCode = normalizeStageCode(stage);
-    const upstream = await findUpstreamApprovalEvidence(client, stage, stageCode);
+    const upstream = await resolveExecutionEntryAuthority(client, stage, stageCode);
     if (!upstream.ok) continue;
     const gates = await client.list("jm1pub_editorialapprovalgates", {
       $select:
@@ -3298,7 +3325,13 @@ async function processStage(client, stage, correlationId, options = {}) {
       blocked: { idempotent: true, logId: null, idempotencyKey: "preserved-existing-exact-blocker" }
     };
   }
-  const upstream = await findUpstreamApprovalEvidence(client, stage, stageCode);
+  const sourceArtifact = options.sourceArtifact || await findSourceArtifact(client, stage);
+  const upstream = await resolveExecutionEntryAuthority(
+    client,
+    stage,
+    stageCode,
+    sourceArtifact?.jm1pub_editorialartifactid
+  );
   if (!upstream.ok) {
     const blocked = await recordAuthorApprovalBlocked(client, stage, stageCode, upstream, correlationId);
     return {
@@ -3310,9 +3343,22 @@ async function processStage(client, stage, correlationId, options = {}) {
       blocked
     };
   }
+  if (
+    upstream.developmentalEntryAuthority === true &&
+    normalizeString(upstream.approvedArtifactId) !== normalizeString(sourceArtifact?.jm1pub_editorialartifactid)
+  ) {
+    return {
+      stageId: stage.jm1pub_editorialstageid,
+      titleId: stage._jm1pub_titleid_value,
+      stageCode,
+      status: "BLOCKED_SOURCE_AUTHORITY_MISMATCH",
+      reason: "Developmental parallel-entry authority binds a different source artifact."
+    };
+  }
   const editorialPolicyDecision = resolveEditorialStageAuthority({
     stageCode,
     priorAuthorGateCleared: upstream.ok,
+    developmentalEntryAuthority: upstream.developmentalEntryAuthority === true,
     cadenceEligible: true,
     titleId: stage._jm1pub_titleid_value,
     stageId: stage.jm1pub_editorialstageid
@@ -3328,7 +3374,6 @@ async function processStage(client, stage, correlationId, options = {}) {
     };
   }
   const claim = await claimStageTask(client, stage, stageCode, correlationId);
-  const sourceArtifact = options.sourceArtifact || await findSourceArtifact(client, stage);
   const sourceArtifactPolicyDecision = resolveArtifactSupersessionAuthority({
     artifactId: sourceArtifact?.jm1pub_editorialartifactid,
     status: sourceArtifact?.jm1pub_artifactstatus,
