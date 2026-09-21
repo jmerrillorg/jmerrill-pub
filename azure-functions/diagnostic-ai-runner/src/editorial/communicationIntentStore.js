@@ -5,6 +5,7 @@ const { writeLog } = require("./editorialExecutionRuntime");
 
 const RESERVED_ACTION = "AUTHOR_COMMUNICATION_INTENT_RESERVED";
 const SENT_ACTION = "AUTHOR_COMMUNICATION_INTENT_SENT";
+const FAILED_ACTION = "AUTHOR_COMMUNICATION_INTENT_FAILED";
 
 function clean(value) {
   return String(value || "").trim().toLowerCase();
@@ -60,13 +61,17 @@ async function findIntentState(client, semantic) {
   const rows = await client.list("jm1_executionlogs", {
     $select: "jm1_executionlogid,jm1_actiontype,jm1_actiondescription,jm1_sourcerecordid,createdon",
     $filter:
-      `(jm1_actiontype eq '${RESERVED_ACTION}' or jm1_actiontype eq '${SENT_ACTION}') and ` +
+      `(jm1_actiontype eq '${RESERVED_ACTION}' or jm1_actiontype eq '${SENT_ACTION}' or jm1_actiontype eq '${FAILED_ACTION}') and ` +
       `contains(jm1_actiondescription,'${escapeODataText(semantic.key)}')`,
     $orderby: "createdon desc",
     $top: "10"
   });
   const sent = rows.find((row) => row.jm1_actiontype === SENT_ACTION);
   if (sent) return { status: "ALREADY_DELIVERED", record: sent, source: "CANONICAL_INTENT" };
+  const latest = rows[0];
+  if (latest?.jm1_actiontype === FAILED_ACTION) {
+    return { status: "AVAILABLE", record: latest, source: "PROVEN_PRE_DELIVERY_FAILURE" };
+  }
   const reserved = rows.find((row) => row.jm1_actiontype === RESERVED_ACTION);
   if (reserved) return { status: "AMBIGUOUS_SEND_STATE", record: reserved, source: "CANONICAL_INTENT" };
 
@@ -133,13 +138,31 @@ async function markCommunicationSent(client, input) {
   return { sentRecordId };
 }
 
+async function markCommunicationFailed(client, input) {
+  const description =
+    `Idempotency ${input.semanticIdempotencyKey}. DELIVERY_STATE=FAILED_PRE_DELIVERY; ` +
+    `communicationRecordId=${input.communicationRecordId}; failureCode=${input.failureCode || "UNKNOWN"}; ` +
+    `providerOperationId=${input.providerOperationId || "UNKNOWN"}; failedAt=${input.failedAt || new Date().toISOString()}; ` +
+    `recipient=${clean(input.recipient)}; ACS_DELIVERY=NO; PUBLISHING_MAILBOX_COPY=NO.`;
+  const failureRecordId = await writeLog(client, {
+    name: `AUTHOR_COMMUNICATION_INTENT_FAILED - ${input.titleName || input.titleId}`,
+    actionType: FAILED_ACTION,
+    description,
+    sourceEntity: "jm1pub_title",
+    sourceRecordId: input.titleId
+  });
+  return { failureRecordId };
+}
+
 module.exports = {
+  FAILED_ACTION,
   RESERVED_ACTION,
   SENT_ACTION,
   buildCommunicationIdentity,
   describesSameDelivery,
   evidenceManifest,
   findIntentState,
+  markCommunicationFailed,
   markCommunicationSent,
   reserveCommunicationIntent
 };

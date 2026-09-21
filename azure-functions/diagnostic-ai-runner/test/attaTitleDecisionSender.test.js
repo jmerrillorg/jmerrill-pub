@@ -83,3 +83,26 @@ test("Atta sender does not resend an already-delivered semantic intent", async (
   assert.equal(result.communicationsSent, 0);
   assert.equal(relayCalls, 0);
 });
+
+test("Atta sender records a terminal pre-delivery validation failure", async (t) => {
+  let failure;
+  const priorRelayKey = process.env.JM1_RELAY_API_KEY;
+  process.env.JM1_RELAY_API_KEY = "test-relay-key";
+  t.after(() => {
+    if (priorRelayKey === undefined) delete process.env.JM1_RELAY_API_KEY;
+    else process.env.JM1_RELAY_API_KEY = priorRelayKey;
+  });
+  const result = await sendAttaTitleDecision(input(), {
+    client: client(),
+    reserveCommunicationIntent: async () => ({ status: "RESERVED", semanticIdempotencyKey: "communication:v1:key", communicationRecordId: "communication-1" }),
+    fetchImpl: async () => ({
+      ok: false,
+      status: 400,
+      async json() { return { reason: "FUTURE_INTERNAL_COPY_REQUIRED" }; }
+    }),
+    markCommunicationFailed: async (_client, payload) => { failure = payload; }
+  });
+  assert.equal(result.code, "RELAY_SEND_FAILED");
+  assert.equal(failure.failureCode, "FUTURE_INTERNAL_COPY_REQUIRED");
+  assert.equal(failure.communicationRecordId, "communication-1");
+});

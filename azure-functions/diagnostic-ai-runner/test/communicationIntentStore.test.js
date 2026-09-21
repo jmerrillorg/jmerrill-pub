@@ -2,9 +2,12 @@
 
 const assert = require("node:assert/strict");
 const test = require("node:test");
-
 const {
+  FAILED_ACTION,
+  RESERVED_ACTION,
+  SENT_ACTION,
   buildCommunicationIdentity,
+  findIntentState,
   reserveCommunicationIntent
 } = require("../src/editorial/communicationIntentStore");
 
@@ -24,6 +27,15 @@ function input(overrides = {}) {
   };
 }
 
+const semantic = {
+  key: "communication:v1:key",
+  identity: { recipient: "author@example.com", titleId: "title-1", artifacts: [] }
+};
+
+function client(rows) {
+  return { async list(_entitySet, query) { return query.$filter.includes("recipient") ? [] : rows; } };
+}
+
 test("semantic identity is stable across attachment ordering", () => {
   const one = { role: "editedManuscript", sha256: checksum };
   const two = { role: "reviewInstructions", sha256: "a".repeat(64) };
@@ -35,7 +47,7 @@ test("semantic identity is stable across attachment ordering", () => {
 
 test("Naughty Tales historical send suppresses replay and preserves original clock", async () => {
   let creates = 0;
-  const client = {
+  const dataverse = {
     async list(_entitySet, query) {
       if (query.$filter.includes("AUTHOR_COMMUNICATION_INTENT")) return [];
       return [{
@@ -49,7 +61,7 @@ test("Naughty Tales historical send suppresses replay and preserves original clo
     },
     async create() { creates += 1; return "unexpected"; }
   };
-  const result = await reserveCommunicationIntent(client, input());
+  const result = await reserveCommunicationIntent(dataverse, input());
   assert.equal(result.status, "ALREADY_DELIVERED");
   assert.equal(result.communicationRecordId, "2a9ae47a-3fb3-f111-aaac-00224820105b");
   assert.equal(result.sentAt, "2026-09-18T09:00:13.000Z");
@@ -57,40 +69,57 @@ test("Naughty Tales historical send suppresses replay and preserves original clo
 });
 
 test("an incomplete pre-send intent blocks replay without a second effect", async () => {
-  const semantic = buildCommunicationIdentity(input());
-  const client = {
+  const identity = buildCommunicationIdentity(input());
+  const dataverse = {
     async list(_entitySet, query) {
       if (!query.$filter.includes("AUTHOR_COMMUNICATION_INTENT")) return [];
       return [{
         jm1_executionlogid: "reserved-record",
-        jm1_actiontype: "AUTHOR_COMMUNICATION_INTENT_RESERVED",
+        jm1_actiontype: RESERVED_ACTION,
         jm1_sourcerecordid: titleId,
         createdon: "2026-09-18T08:59:53.171Z",
-        jm1_actiondescription: `Idempotency ${semantic.key}. DELIVERY_STATE=RESERVED.`
+        jm1_actiondescription: `Idempotency ${identity.key}. DELIVERY_STATE=RESERVED.`
       }];
     }
   };
-  const result = await reserveCommunicationIntent(client, input());
+  const result = await reserveCommunicationIntent(dataverse, input());
   assert.equal(result.status, "AMBIGUOUS_SEND_STATE");
   assert.equal(result.communicationRecordId, "reserved-record");
 });
 
 test("reconciled sent intent returns its original provider acceptance time", async () => {
-  const semantic = buildCommunicationIdentity(input());
-  const client = {
+  const identity = buildCommunicationIdentity(input());
+  const dataverse = {
     async list(_entitySet, query) {
       if (!query.$filter.includes("AUTHOR_COMMUNICATION_INTENT")) return [];
       return [{
         jm1_executionlogid: "sent-record",
-        jm1_actiontype: "AUTHOR_COMMUNICATION_INTENT_SENT",
+        jm1_actiontype: SENT_ACTION,
         jm1_sourcerecordid: titleId,
         createdon: "2026-09-18T12:00:00.000Z",
         jm1_actiondescription:
-          `Idempotency ${semantic.key}. DELIVERY_STATE=SENT; sentAt=2026-09-18T09:00:13.000Z; recipient=jaylonnastevette@gmail.com; artifacts=${checksum}.`
+          `Idempotency ${identity.key}. DELIVERY_STATE=SENT; sentAt=2026-09-18T09:00:13.000Z; recipient=jaylonnastevette@gmail.com; artifacts=${checksum}.`
       }];
     }
   };
-  const result = await reserveCommunicationIntent(client, input());
+  const result = await reserveCommunicationIntent(dataverse, input());
   assert.equal(result.status, "ALREADY_DELIVERED");
   assert.equal(result.sentAt, "2026-09-18T09:00:13.000Z");
+});
+
+test("a terminal pre-delivery failure releases a reserved intent for governed retry", async () => {
+  const state = await findIntentState(client([
+    { jm1_executionlogid: "failed-1", jm1_actiontype: FAILED_ACTION, createdon: "2026-09-21T03:00:00Z" },
+    { jm1_executionlogid: "reserved-1", jm1_actiontype: RESERVED_ACTION, createdon: "2026-09-21T02:59:00Z" }
+  ]), semantic);
+  assert.equal(state.status, "AVAILABLE");
+  assert.equal(state.source, "PROVEN_PRE_DELIVERY_FAILURE");
+});
+
+test("sent authority wins even when a later failure row exists", async () => {
+  const state = await findIntentState(client([
+    { jm1_executionlogid: "failed-1", jm1_actiontype: FAILED_ACTION, createdon: "2026-09-21T03:00:00Z" },
+    { jm1_executionlogid: "sent-1", jm1_actiontype: SENT_ACTION, createdon: "2026-09-21T02:59:30Z" }
+  ]), semantic);
+  assert.equal(state.status, "ALREADY_DELIVERED");
 });
