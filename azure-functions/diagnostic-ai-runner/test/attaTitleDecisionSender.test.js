@@ -66,6 +66,8 @@ test("Atta sender uses ACS canon, Publishing mailbox observability, and semantic
   assert.deepEqual(result.cc, [MAILBOX]);
   assert.equal(relayPayload.authorEmail, RECIPIENT);
   assert.equal(relayPayload.attachments.length, 0);
+  assert.equal(relayPayload.futureSendRequiresInternalCopy, true);
+  assert.equal(relayPayload.futureSendRequiresDataverseLog, true);
   assert.equal(marked.providerMessageId, "provider-1");
 });
 
