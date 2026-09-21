@@ -1252,7 +1252,13 @@ async function runChunkedTargetedDevelopmentalExecution(input = {}, deps = {}) {
       },
       output: validation.output
     };
-    await uploadJsonCheckpoint(checkpointStore, evaluated.idempotencyKey, chunkName, chunkCheckpoint);
+    await uploadJsonCheckpoint(
+      checkpointStore,
+      evaluated.idempotencyKey,
+      chunkName,
+      chunkCheckpoint,
+      { overwrite: repairAuthorProjection }
+    );
   }
 
   if (nextMissingChunkCursor < source.chunkCount && chunkCursor < source.chunkCount - 1) {
@@ -1317,7 +1323,13 @@ async function runChunkedTargetedDevelopmentalExecution(input = {}, deps = {}) {
     })),
     packageHandoff: finalized.packageHandoff || null
   };
-  const checkpoint = await uploadJsonCheckpoint(checkpointStore, evaluated.idempotencyKey, completeName, completion);
+  const checkpoint = await uploadJsonCheckpoint(
+    checkpointStore,
+    evaluated.idempotencyKey,
+    completeName,
+    completion,
+    { overwrite: repairAuthorProjection }
+  );
   return {
     ok: true,
     status: "EXECUTED",
@@ -1707,11 +1719,11 @@ async function firstMissingDevelopmentalChunkCursor(store, idempotencyKey, chunk
   return boundedChunkCount;
 }
 
-async function uploadJsonCheckpoint(store, idempotencyKey, name, value) {
+async function uploadJsonCheckpoint(store, idempotencyKey, name, value, options = {}) {
   if (typeof store.createIfNotExists === "function") await store.createIfNotExists();
   const blob = store.getBlockBlobClient(targetedEditorialCheckpointBlobName(idempotencyKey, name));
   const body = Buffer.from(JSON.stringify(value, null, 2), "utf8");
-  if (typeof blob.exists === "function" && await blob.exists()) {
+  if (options.overwrite !== true && typeof blob.exists === "function" && await blob.exists()) {
     return { blobName: blob.name, sha256: crypto.createHash("sha256").update(body).digest("hex"), bytes: body.length, existed: true };
   }
   await blob.uploadData(body, {
