@@ -28,6 +28,10 @@ const FORBIDDEN_PATTERNS = Object.freeze([
     pattern: /\b(?:PUBLISHER_INTERNAL|RIGHTS_LEGAL_INTERNAL|FACT_CHECK_INTERNAL|PRODUCTION_INTERNAL|PROVIDER_INTERNAL|SYSTEM_INTERNAL|AI_INTERNAL)\b/i
   },
   { code: "RIGHTS_LEGAL_INTERNAL_NOTE", pattern: /\b(?:legal posture|before author-facing release|rights\/legal internal)\b/i },
+  {
+    code: "INTERNAL_CHUNK_REFERENCE",
+    pattern: /\b(?:this|the|next|previous|source|manuscript)\s+chunks?\b|\bchunk\s+\d+(?:\s+of\s+\d+)?\b/i
+  },
   { code: "TECHNICAL_ARTIFACT_WRAPPER", pattern: /\b(?:source artifact|source checksum|governed developmental revision artifact|extracted word count|extracted paragraph count)\b/i }
 ]);
 

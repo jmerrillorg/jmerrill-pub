@@ -1043,7 +1043,7 @@ function buildChunkedDevelopmentalInvocation(chunkCheckpoints = [], sourceText =
       developmentalSummary: ordered
         .map((item) => normalizeString(item.output?.developmentalSummary))
         .filter(Boolean)
-        .join(" "),
+        .join("\n\n"),
       appliedChanges: ordered.flatMap((item) => Array.isArray(item.output?.appliedChanges) ? item.output.appliedChanges : []),
       authorNotes: ordered.flatMap((item) => Array.isArray(item.output?.authorNotes) ? item.output.authorNotes : []),
       internalNotes: ordered.flatMap((item) => Array.isArray(item.output?.internalNotes) ? item.output.internalNotes : []),
@@ -1868,6 +1868,7 @@ function buildDevelopmentalEditingChunkPrompt({
       "Author-facing notes must be natural professional editorial correspondence.",
       "Use only EDITOR_NOTE, AUTHOR_QUESTION, or AUTHOR_DECISION_REQUIRED for authorNotes.",
       "Never put internal systems, identifiers, checksums, model names, automation, governance, provider, production, rights/legal-internal, diagnostic terminology, or internal classification labels in editedManuscript, developmentalSummary, appliedChanges, or authorNotes.",
+      "Do not refer to chunks, chunk numbers, chunk boundaries, or the next/previous chunk in author-visible fields; use natural manuscript terms such as section, passage, chapter, or following material.",
       "developmentalSummary and appliedChanges describe only the editorial work in natural publishing language. They must not mention, quote, enumerate, or explain internalNotes or any internal classification label, including to say that none were needed.",
       "A rights concern requiring author information may become a natural AUTHOR_QUESTION. Otherwise keep it in internalNotes."
     ],
@@ -2159,7 +2160,7 @@ async function invokeDevelopmentalEditingModelProvider(stage, sourceArtifact, ex
     sourceText: extractedText,
     output: {
       editedManuscript: parsed.map((item) => item.editedManuscript).join("\n\n"),
-      developmentalSummary: parsed.map((item) => item.developmentalSummary).filter(Boolean).join(" "),
+      developmentalSummary: parsed.map((item) => item.developmentalSummary).filter(Boolean).join("\n\n"),
       appliedChanges: parsed.flatMap((item) => item.appliedChanges),
       authorNotes: parsed.flatMap((item) => item.authorNotes),
       internalNotes: parsed.flatMap((item) => item.internalNotes),
@@ -2848,11 +2849,45 @@ function outputDefinitions(stageCode) {
 }
 
 function splitManuscriptParagraphs(text) {
-  return normalizeString(text)
+  return normalizeEditorialLineBreaks(text)
     .replace(/\r\n/g, "\n")
     .split(/\n{2,}/)
     .map((paragraph) => paragraph.replace(/\s+/g, " ").trim())
     .filter(Boolean);
+}
+
+function normalizeEditorialLineBreaks(value) {
+  return normalizeString(value)
+    .replace(/\\r\\n|\\n|\\r/g, "\n")
+    .replace(/\r\n?/g, "\n");
+}
+
+function projectAuthorFacingEditorialText(value) {
+  return normalizeEditorialLineBreaks(value)
+    .replace(/\bnext chunk\b/gi, "following section")
+    .replace(/\bprevious chunk\b/gi, "preceding section")
+    .replace(/\b(?:this|the|source|manuscript) chunk\b/gi, "this section")
+    .replace(/\bchunk\s+\d+(?:\s+of\s+\d+)?\b/gi, "this section");
+}
+
+function uniqueEditorialEntries(entries = []) {
+  const seen = new Set();
+  return entries
+    .map((entry) => projectAuthorFacingEditorialText(entry))
+    .filter((entry) => {
+      const key = entry.toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
+      if (!key || seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+}
+
+function representativeEditorialEntries(entries = [], limit = 12) {
+  const unique = uniqueEditorialEntries(entries);
+  if (unique.length <= limit) return unique;
+  return Array.from({ length: limit }, (_, index) =>
+    unique[Math.round(index * (unique.length - 1) / (limit - 1))]
+  );
 }
 
 function paragraphFromText(text, options = {}) {
@@ -2873,9 +2908,14 @@ function authorTitleFromStage(stage) {
 
 function developmentalEditingOutput(modelInvocation = {}) {
   const output = modelInvocation.output || {};
-  const editedManuscript = modelTextField(output, ["editedManuscript", "edited_manuscript", "revisedText", "manuscript"]);
-  const developmentalSummary = modelTextField(output, ["developmentalSummary", "developmental_summary", "authorReviewSummary"]);
-  const appliedChanges = modelArrayField(output, ["appliedChanges", "applied_changes", "changeLedger", "revisionCandidates"]);
+  const editedManuscript = normalizeEditorialLineBreaks(
+    modelTextField(output, ["editedManuscript", "edited_manuscript", "revisedText", "manuscript"])
+  );
+  const developmentalSummary = projectAuthorFacingEditorialText(
+    modelTextField(output, ["developmentalSummary", "developmental_summary", "authorReviewSummary"])
+  );
+  const appliedChanges = modelArrayField(output, ["appliedChanges", "applied_changes", "changeLedger", "revisionCandidates"])
+    .map((change) => projectAuthorFacingEditorialText(change));
   const notes = classifyNotes([...(output.authorNotes || []), ...(output.internalNotes || [])]);
   const authorityActions = Array.isArray(output.authorityActions) ? output.authorityActions : [];
   const authorityValidation = validateAuthorityActions(authorityActions);
@@ -2883,7 +2923,11 @@ function developmentalEditingOutput(modelInvocation = {}) {
     editedManuscript,
     developmentalSummary,
     appliedChanges,
-    authorNotes: notes.authorVisible,
+    authorNotes: notes.authorVisible.map((note) => ({
+      ...note,
+      anchor: normalizeEditorialLineBreaks(note.anchor),
+      message: projectAuthorFacingEditorialText(note.message)
+    })),
     internalNotes: notes.internal,
     invalidNotes: notes.invalid,
     authorityActions,
@@ -2965,18 +3009,22 @@ async function buildDevelopmentalCleanDocx(stage, modelInvocation) {
 
 async function buildDevelopmentalEditorialReviewDocx(stage, modelInvocation) {
   const { output } = assertDevelopmentalEditingOutputReady(modelInvocation, modelInvocation.sourceText || "");
+  const summaries = representativeEditorialEntries(output.developmentalSummary.split(/\n{2,}/), 12);
+  const revisions = representativeEditorialEntries(output.appliedChanges, 24);
   const children = [
     paragraphFromText(`${authorTitleFromStage(stage)} - Developmental Editorial Review`, { heading: HeadingLevel.HEADING_1 }),
-    paragraphFromText(output.developmentalSummary || "The manuscript has completed developmental review."),
-    paragraphFromText("Revisions Applied", { heading: HeadingLevel.HEADING_2 }),
-    ...(output.appliedChanges.length
-      ? output.appliedChanges.map((change) => paragraphFromText(`• ${change}`))
+    paragraphFromText("This review summarizes the principal developmental work completed across the manuscript. Detailed editor's notes and author questions appear alongside the relevant passages in the author-review manuscript."),
+    paragraphFromText("Editorial Overview", { heading: HeadingLevel.HEADING_2 }),
+    ...(summaries.length
+      ? summaries.map((summary) => paragraphFromText(summary))
+      : [paragraphFromText("The manuscript has completed developmental review.")]),
+    paragraphFromText("Key Revisions Applied", { heading: HeadingLevel.HEADING_2 }),
+    ...(revisions.length
+      ? revisions.map((change) => paragraphFromText(`• ${change}`))
       : [paragraphFromText("The manuscript was revised for structure, flow, continuity, pacing, and reader orientation while preserving the author's voice.")])
   ];
-  if (output.authorNotes.length) {
-    children.push(paragraphFromText("Notes and Questions", { heading: HeadingLevel.HEADING_2 }));
-    output.authorNotes.forEach((note) => children.push(paragraphFromText(authorAnnotationText(note))));
-  }
+  children.push(paragraphFromText("Reviewing Your Manuscript", { heading: HeadingLevel.HEADING_2 }));
+  children.push(paragraphFromText("Please review the edited manuscript together with the notes and questions placed at the relevant passages. Your responses will guide the next editorial step."));
   return buildProfessionalDocx(children);
 }
 
@@ -4303,6 +4351,8 @@ module.exports = {
   buildLineEditingChunkPrompt,
   buildProofreadingCoverNote,
   buildDevelopmentalEditingChunkPrompt,
+  buildDevelopmentalAuthorReviewDocx,
+  buildDevelopmentalEditorialReviewDocx,
   readPersistedGraphContent,
   buildChunkedDevelopmentalInvocation,
   validateDevelopmentalChunkOutput,
