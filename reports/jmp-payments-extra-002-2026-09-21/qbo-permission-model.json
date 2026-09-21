@@ -1,0 +1,15 @@
+{
+  "status": "NOT_COMMISSIONED",
+  "requiredScopes": ["customer_payment:create", "customer_payment:read"],
+  "deniedScopes": ["banking:*", "chart_of_accounts:*", "journal:*", "customer:*", "vendor:*"],
+  "credentialCustody": "attributable enterprise adapter workload identity required",
+  "directBrowserCredential": false,
+  "directQboTokenInPublishingRuntime": false,
+  "blockers": [
+    "Publishing customer reference not certified",
+    "Publishing receivable reference not certified",
+    "Bounded production write endpoint and workload credential absent",
+    "Current Stripe gross/fee/clearing/settlement posting behavior unresolved"
+  ],
+  "productionWrites": 0
+}

@@ -1,0 +1,13 @@
+{
+  "status": "IMPLEMENTED_NOT_DEPLOYED",
+  "systemOwnedContracts": [
+    "recurring installment execution", "payment success processing", "payment failure isolation",
+    "additional payment processing", "past-due allocation", "payoff detection", "final installment adjustment",
+    "QBO posting and readback", "refund processing", "exception classification"
+  ],
+  "missingProductionBindings": [
+    "Dataverse solution import and Custom APIs", "timer deployment", "QBO bounded adapter identity",
+    "certified QBO customer/receivable mapping", "Application Insights alert rules"
+  ],
+  "codyRoutinePaymentOperations": false
+}

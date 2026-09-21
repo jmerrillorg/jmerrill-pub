@@ -1,0 +1,12 @@
+{
+  "author": "Atta Darko",
+  "status": "MODEL_PASS_LIVE_TRANSACTION_NOT_AUTHORIZED",
+  "currentInstallmentCents": 25988,
+  "additionalPayment": "author-selected and bounded to payoff balance",
+  "currentPaymentRemainsDue": true,
+  "additionalReducesBalance": true,
+  "futureCadenceRemains": true,
+  "payoffAccelerates": true,
+  "sameStripeCustomerRequired": true,
+  "liveCharges": 0
+}

@@ -1,0 +1,11 @@
+{
+  "status": "PASS",
+  "testCount": 43,
+  "founderCases": {
+    "A": { "pastDue": 25988, "payment": 50000, "pastDueAllocation": 25988, "additionalAllocation": 24012 },
+    "B": { "pastDue": 51976, "payment": 40000, "pastDueAllocation": 40000, "pastDueRemaining": 11976 },
+    "C": { "account": "CURRENT", "payment": 50000, "additionalAllocation": 50000, "nextInstallmentPreserved": true },
+    "D": { "pastDue": 25988, "payment": 25988, "additionalAllocation": 0, "futureCadenceActive": true }
+  },
+  "additionalCoverage": ["multiple past due", "current plus additional", "final cap", "exact payoff", "overpayment denial", "stale version", "refund allocation"]
+}

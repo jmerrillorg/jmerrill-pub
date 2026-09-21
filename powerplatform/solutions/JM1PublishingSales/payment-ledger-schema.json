@@ -1,0 +1,56 @@
+{
+  "version": "JMP_PAYMENTS_EXTRA_002_v1.0",
+  "status": "PORTABLE_SCHEMA_CONTRACT_NOT_IMPORTED",
+  "authorityBoundary": {
+    "dataverse": "Publishing agreement obligations, immutable processor events, allocations, execution and reconciliation status",
+    "qbo": "Accounting ledger, accounts receivable and financial reporting",
+    "stripe": "Processor completion and collection objects"
+  },
+  "tables": {
+    "jm1pub_publishingagreement": {
+      "alternateKey": ["jm1pub_agreementid"],
+      "immutable": ["jm1pub_totalagreementamountcents", "jm1pub_authorid", "jm1pub_titleid"],
+      "derivedOnly": ["jm1pub_remainingbalancecents", "jm1pub_pastduebalancecents", "jm1pub_payoffstatus"],
+      "columns": [
+        "jm1pub_agreementid", "jm1pub_authorid", "jm1pub_titleid", "jm1pub_paymentscheduleid",
+        "jm1pub_totalagreementamountcents", "jm1pub_scheduletype", "jm1pub_scheduledinstallmentamountcents",
+        "jm1pub_nextduedate", "jm1pub_remainingbalancecents", "jm1pub_pastduebalancecents",
+        "jm1pub_paymentstatus", "jm1pub_payoffstatus", "jm1pub_stripecustomerid",
+        "jm1pub_qbocustomerreference", "jm1pub_qboreceivablereference", "jm1pub_lastpaymentat",
+        "jm1pub_nextpaymentat", "jm1pub_balanceversion"
+      ]
+    },
+    "jm1pub_paymentobligation": {
+      "alternateKey": ["jm1pub_obligationid"],
+      "columns": ["jm1pub_obligationid", "jm1pub_agreementid", "jm1pub_duedate", "jm1pub_amountcents", "jm1pub_status"]
+    },
+    "jm1pub_paymentevent": {
+      "appendOnly": true,
+      "alternateKeys": [["jm1pub_stripeeventid"], ["jm1pub_stripepaymentid"], ["jm1pub_idempotencykey"]],
+      "columns": [
+        "jm1pub_paymenteventid", "jm1pub_agreementid", "jm1pub_eventkind", "jm1pub_paymenttype",
+        "jm1pub_stripeeventid", "jm1pub_stripepaymentid", "jm1pub_stripeinvoiceid", "jm1pub_refundid",
+        "jm1pub_originalpaymentid", "jm1pub_grossamountcents", "jm1pub_scheduledallocationcents",
+        "jm1pub_pastdueallocationcents", "jm1pub_additionalallocationcents", "jm1pub_allocationsjson",
+        "jm1pub_balancebeforecents", "jm1pub_balanceaftercents", "jm1pub_status",
+        "jm1pub_qboreconciliationstatus", "jm1pub_qbotransactionid", "jm1pub_idempotencykey", "jm1pub_occurredat"
+      ]
+    },
+    "jm1pub_paymentcollectionattempt": {
+      "alternateKey": ["jm1pub_executionkey"],
+      "columns": ["jm1pub_executionkey", "jm1pub_agreementid", "jm1pub_obligationid", "jm1pub_amountcents", "jm1pub_stripeinvoiceid", "jm1pub_status"]
+    }
+  },
+  "transactionalCustomApis": [
+    "jm1pub_ApplyPublishingPaymentEvent",
+    "jm1pub_ApplyPublishingPaymentRefund",
+    "jm1pub_RecordPublishingCollectionAttempt",
+    "jm1pub_SetPublishingQboReconciliation"
+  ],
+  "security": {
+    "author": "Read own agreement projection and own payment-event projection; no create/update/delete",
+    "publishingStaff": "Read; invoke approved collection action; no balance edit, success override or event delete",
+    "runtimeIdentity": "Create append-only events and collection attempts; invoke bounded transactional APIs",
+    "delete": "Denied for payment events"
+  }
+}

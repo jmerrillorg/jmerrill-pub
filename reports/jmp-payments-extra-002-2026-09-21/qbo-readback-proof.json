@@ -1,0 +1,14 @@
+{
+  "status": "CONTRACT_PASS_LIVE_PROOF_BLOCKED",
+  "deterministicTests": {
+    "idempotentRetry": "PASS",
+    "duplicatePrevention": "PASS",
+    "exactReadback": "PASS",
+    "mismatchFailsClosed": "PASS",
+    "grossAmountAuthority": "PASS"
+  },
+  "liveTransactionReadback": "NOT_RUN",
+  "reason": "No authorized genuine payment and no commissioned bounded QBO write adapter",
+  "qboProductionWrites": 0,
+  "reconciliationVarianceClaim": "NOT_CERTIFIED_IN_PRODUCTION"
+}
