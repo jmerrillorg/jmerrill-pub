@@ -78,7 +78,7 @@ function fixture({ existingArtifact = null, intentStatus = "RESERVED" } = {}) {
       markCommunicationFailed: async () => ({ failureRecordId: "failed-record" }),
       sendConfiguredAuthorResponse: async (input) => {
         sends.push(input);
-        return { ok: true, authorEmailStatus: "SENT", providerMessageId: "provider-message" };
+        return { ok: true, authorEmailStatus: "AUTHOR_RESPONSE_SENT", providerMessageId: "provider-message" };
       }
     },
     updates,

@@ -257,7 +257,7 @@ async function sendAcknowledgment(bound, deps = {}) {
     env: deps.env || process.env,
     providers: deps.providers || {}
   });
-  if (!sendResult.ok || sendResult.authorEmailStatus !== "SENT") {
+  if (!sendResult.ok || sendResult.authorEmailStatus !== "AUTHOR_RESPONSE_SENT") {
     await (deps.markCommunicationFailed || markCommunicationFailed)(client, {
       ...intent,
       semanticIdempotencyKey: reserve.semanticIdempotencyKey,
