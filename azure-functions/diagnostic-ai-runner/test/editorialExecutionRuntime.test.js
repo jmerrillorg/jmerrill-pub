@@ -781,6 +781,24 @@ test("targeted editorial execution rejects stages already completed for the same
   assert.equal(result.existingOutputLogId, "existing-output-log");
 });
 
+test("bounded Developmental author-projection repair may replay an already recorded source", async () => {
+  const { client } = targetedDevelopmentalExecutionClient({
+    existingLogs: [{ jm1_executionlogid: "existing-output-log" }]
+  });
+  const result = await evaluateTargetedEditorialExecution({
+    titleId: "title-1",
+    stageCode: "DEVELOPMENTAL_EDITING",
+    sourceArtifactId: "artifact-source",
+    sourceChecksum: "source-sha",
+    authorApprovalRequired: false,
+    repairAuthorProjection: true,
+    executionMode: "EXECUTE_ASYNC"
+  }, { client });
+
+  assert.equal(result.ok, true);
+  assert.equal(result.status, "QUEUE_READY");
+});
+
 test("chunked targeted Line Editing requeues malformed chunk output before blocking the stage", async () => {
   const previousLimit = process.env.JM1_LINE_EDITING_CHUNK_WORD_LIMIT;
   const previousSchemaRetries = process.env.JM1_LINE_EDITING_SCHEMA_MISS_MAX_RETRIES;

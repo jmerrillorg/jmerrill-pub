@@ -40,6 +40,7 @@ function buildQueuedTargetedEditorialExecutionMessage(input = {}, evaluated = {}
     sourceChecksum: normalizeString(input.sourceChecksum),
     expectedCurrentStage: normalizeString(input.expectedCurrentStage),
     authorApprovalRequired: input.authorApprovalRequired === true,
+    repairAuthorProjection: input.repairAuthorProjection === true,
     executionMode: "EXECUTE"
   };
 }
@@ -118,6 +119,7 @@ async function processQueuedTargetedEditorialExecution(message, deps = {}) {
     sourceChecksum: parsed.sourceChecksum,
     expectedCurrentStage: parsed.expectedCurrentStage,
     authorApprovalRequired: parsed.authorApprovalRequired === true,
+    repairAuthorProjection: parsed.repairAuthorProjection === true,
     executionMode: "EXECUTE",
     chunked: parsed.chunked === true,
     chunkCursor: parsed.chunkCursor,

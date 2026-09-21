@@ -244,6 +244,9 @@ function validateTargetedExecutionInput(input = {}) {
   if (input.authorApprovalRequired !== true && stageCode !== "DEVELOPMENTAL_EDITING") {
     return targetedBlocked(input, "AUTHOR_APPROVAL_REQUIRED", "authorApprovalRequired must be true for targeted editorial execution.");
   }
+  if (input.repairAuthorProjection === true && stageCode !== "DEVELOPMENTAL_EDITING") {
+    return targetedBlocked(input, "AUTHOR_PROJECTION_REPAIR_STAGE_NOT_ALLOWED", "Author-projection repair is limited to Developmental Editing durable chunks.");
+  }
   return null;
 }
 
@@ -402,7 +405,7 @@ async function evaluateTargetedEditorialExecution(input = {}, deps = {}) {
     "ACTIVE_EDITORIAL_OUTPUT_CREATED",
     `editorial-runtime:output-ready-${outputReadyVersion}:${stage.jm1pub_editorialstageid}:${normalized.stageCode}:${sourceArtifact.jm1pub_editorialartifactid}`
   );
-  if (existingOutput) {
+  if (existingOutput && normalized.repairAuthorProjection !== true) {
     return targetedBlocked(normalized, "TARGET_STAGE_ALREADY_COMPLETED_FOR_SOURCE", "Output is already recorded for the target stage/source combination.", {
       idempotencyKey,
       existingOutputLogId: existingOutput.jm1_executionlogid

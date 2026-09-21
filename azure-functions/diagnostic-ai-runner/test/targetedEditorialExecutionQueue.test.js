@@ -32,6 +32,28 @@ test("buildQueuedTargetedEditorialExecutionMessage preserves the exact governed 
   assert.equal(message.executionMode, "EXECUTE");
 });
 
+test("bounded author-projection repair authority survives queue dispatch", async () => {
+  let received = null;
+  const result = await processQueuedTargetedEditorialExecution({
+    kind: "TARGETED_EDITORIAL_EXECUTION",
+    version: 1,
+    titleId: "title-1",
+    stageCode: "DEVELOPMENTAL_EDITING",
+    sourceArtifactId: "artifact-1",
+    sourceChecksum: "checksum-1",
+    expectedCurrentStage: "DEVELOPMENTAL_EDITING",
+    repairAuthorProjection: true
+  }, {
+    runChunkedTargetedDevelopmentalExecution: async (input) => {
+      received = input;
+      return { ok: true };
+    }
+  });
+
+  assert.equal(result.ok, true);
+  assert.equal(received.repairAuthorProjection, true);
+});
+
 test("enqueueTargetedEditorialExecution writes one durable queue message without inline execution", async () => {
   const sent = [];
   const queueClient = {
