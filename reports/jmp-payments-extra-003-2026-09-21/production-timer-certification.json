@@ -1,0 +1,1 @@
+{"status":"PASS","mode":"DRY_RUN","code":"DRY_RUN_NO_CANDIDATES","schedule":"0 0 * * * *","governedWindow":"12:00 America/New_York","candidates":0,"agreementRows":0,"obligationRows":0,"eventRows":0,"paymentGateEnabled":false,"liveCharges":0,"liveRefunds":0,"financialEffects":0}
