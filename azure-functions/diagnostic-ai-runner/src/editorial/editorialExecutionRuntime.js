@@ -247,7 +247,7 @@ async function findExactStage(client, titleId, stageCode) {
   const stageType = stageTypeForCode(stageCode);
   return client.list("jm1pub_editorialstages", {
     $select:
-      "jm1pub_editorialstageid,jm1pub_name,jm1pub_stagetype,jm1pub_stagestatus,jm1pub_internaloperationalsummary,jm1pub_authorsafesummary,_jm1pub_titleid_value,_jm1pub_publishingassetid_value,createdon,modifiedon",
+      "jm1pub_editorialstageid,jm1pub_name,jm1pub_stagetype,jm1pub_stagestatus,jm1pub_correlationid,jm1pub_internaloperationalsummary,jm1pub_authorsafesummary,_jm1pub_titleid_value,_jm1pub_publishingassetid_value,createdon,modifiedon",
     $filter: `_jm1pub_titleid_value eq ${normalizeString(titleId)} and jm1pub_stagetype eq ${stageType}`,
     $orderby: "modifiedon desc",
     $top: "2"
@@ -323,11 +323,8 @@ async function evaluateTargetedEditorialExecution(input = {}, deps = {}) {
     });
   }
 
-  const developmentalEntryAuthority = normalized.stageCode === "DEVELOPMENTAL_EDITING"
-    && hasDevelopmentalParallelEntryAuthority(stage, normalized.sourceArtifactId);
-  const upstream = developmentalEntryAuthority
-    ? { ok: true, reason: "DEVELOPMENTAL_PARALLEL_ENTRY_AUTHORITY", approvedArtifactId: normalized.sourceArtifactId, stages: [], artifacts: [], gates: [] }
-    : await findUpstreamApprovalEvidence(client, stage, normalized.stageCode);
+  const upstream = await resolveExecutionEntryAuthority(client, stage, normalized.stageCode, normalized.sourceArtifactId);
+  const developmentalEntryAuthority = upstream.developmentalEntryAuthority === true;
   if (!upstream.ok) {
     return targetedBlocked(normalized, "AUTHOR_APPROVAL_NOT_EXACT_ARTIFACT_BOUND", upstream.reason || "Required upstream approval is missing.", {
       idempotencyKey
@@ -1862,17 +1859,36 @@ async function findUpstreamApprovalEvidence(client, stage, stageCode) {
 }
 
 function parallelEntrySourceArtifactId(stage) {
-  return normalizeString(stage?.jm1pub_internaloperationalsummary).match(/sourceArtifactId=([^;\s]+)/i)?.[1] || "";
+  const summarySource = normalizeString(stage?.jm1pub_internaloperationalsummary).match(/sourceArtifactId=([^;\s]+)/i)?.[1] || "";
+  if (summarySource) return summarySource;
+  return normalizeString(stage?.jm1pub_correlationid).match(/^DEV-PARALLEL-SOURCE-([0-9a-f-]{36})$/i)?.[1] || "";
 }
 
 async function resolveExecutionEntryAuthority(client, stage, stageCode, sourceArtifactId = "") {
   const boundSourceArtifactId = normalizeString(sourceArtifactId) || parallelEntrySourceArtifactId(stage);
-  if (stageCode === "DEVELOPMENTAL_EDITING" && hasDevelopmentalParallelEntryAuthority(stage, boundSourceArtifactId)) {
+  let durableMaterializationEvidence = null;
+  if (stageCode === "DEVELOPMENTAL_EDITING" && boundSourceArtifactId && !hasDevelopmentalParallelEntryAuthority(stage, boundSourceArtifactId)) {
+    const rows = await client.list("jm1_executionlogs", {
+      $select: "jm1_executionlogid,jm1_actiontype,jm1_actiondescription,jm1_sourcerecordid,createdon",
+      $filter:
+        `jm1_actiontype eq 'DEVELOPMENTAL_PARALLEL_ENTRY_MATERIALIZED' and ` +
+        `jm1_sourcerecordid eq '${escapeODataText(normalizeString(stage.jm1pub_editorialstageid))}' and ` +
+        `contains(jm1_actiondescription,'sourceArtifactId=${escapeODataText(boundSourceArtifactId)}')`,
+      $orderby: "createdon desc",
+      $top: "1"
+    }).catch(() => []);
+    durableMaterializationEvidence = rows[0] || null;
+  }
+  if (
+    stageCode === "DEVELOPMENTAL_EDITING" &&
+    (hasDevelopmentalParallelEntryAuthority(stage, boundSourceArtifactId) || durableMaterializationEvidence)
+  ) {
     return {
       ok: true,
       reason: "DEVELOPMENTAL_PARALLEL_ENTRY_AUTHORITY",
       approvedArtifactId: boundSourceArtifactId,
       developmentalEntryAuthority: true,
+      durableMaterializationEvidenceId: durableMaterializationEvidence?.jm1_executionlogid || null,
       stages: [],
       artifacts: [],
       gates: []
@@ -1884,7 +1900,7 @@ async function resolveExecutionEntryAuthority(client, stage, stageCode, sourceAr
 async function findActiveEditorialStages(client, maxTasks) {
   const rows = await client.list("jm1pub_editorialstages", {
     $select:
-      "jm1pub_editorialstageid,jm1pub_name,jm1pub_stagetype,jm1pub_stagestatus,jm1pub_internaloperationalsummary,jm1pub_authorsafesummary,_jm1pub_titleid_value,_jm1pub_publishingassetid_value,createdon,modifiedon",
+      "jm1pub_editorialstageid,jm1pub_name,jm1pub_stagetype,jm1pub_stagestatus,jm1pub_correlationid,jm1pub_internaloperationalsummary,jm1pub_authorsafesummary,_jm1pub_titleid_value,_jm1pub_publishingassetid_value,createdon,modifiedon",
     $filter:
       `jm1pub_stagestatus eq ${STAGE_STATUS.IN_PROGRESS} and (` +
       Object.values(EXECUTOR_POLICIES)
