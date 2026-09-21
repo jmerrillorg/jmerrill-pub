@@ -959,6 +959,19 @@ test("Developmental V2 accepts only a complete typed package and preserves canon
   assert.equal(email.attachments.length, 2);
 });
 
+test("Developmental V2 accepts the conversational Author Operating Center reference", () => {
+  const { validateApprovedAuthorResponsePayload } = loadRelayModule();
+  const base = validDevelopmentalV2Payload();
+  const result = validateApprovedAuthorResponsePayload(validDevelopmentalV2Payload({
+    body: base.body.replace(
+      "Optional Author Operating Center access: https://",
+      "You may also view the materials in your Author Operating Center: https://"
+    )
+  }));
+
+  assert.equal(result.ok, true);
+});
+
 test("Developmental V2 rejects mailbox-copy attachment manifest drift", () => {
   const { validateApprovedAuthorResponsePayload } = loadRelayModule();
   const base = validDevelopmentalV2Payload();
