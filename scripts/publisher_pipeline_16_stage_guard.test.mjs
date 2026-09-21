@@ -50,6 +50,11 @@ test('Publisher Pipeline declares exactly the 16 human-facing stages in order', 
   assert.deepEqual(stageCalls, expectedStages)
 })
 
+test('Every human-facing stage exposes executable artifact and transition authority', () => {
+  assert.match(model, /completionAuthority: EDITORIAL_SYSTEM_STAGE_CONTRACTS\[id\]/)
+  assert.match(model, /type EditorialStageContract/)
+})
+
 test('Publisher Pipeline does not include 00 Template as a title stage', () => {
   assert.equal(model.includes('00_TEMPLATE'), false)
   assert.equal(model.includes("stage('00"), false)

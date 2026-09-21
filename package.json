@@ -83,6 +83,7 @@
     "portfolio-automation-wave3": "node scripts/jmp_portfolio_automation_wave3.mjs",
     "production-asset-registry-guard": "node --test scripts/jmp_production_asset_registry_guard.test.mjs",
     "publisher-pipeline-16-stage-guard": "node --test scripts/publisher_pipeline_16_stage_guard.test.mjs",
+    "editorial-system-contract-guard": "node --test scripts/editorial_system_contract.test.mjs scripts/author_final_approval_gate.test.mjs",
     "jmp-dist-001-provider-connectors-guard": "node --test scripts/jmp_dist_001_provider_connectors.test.mjs",
     "jmp-dist-002-live-canary-gate-guard": "node --test scripts/jmp_dist_002_live_canary_gate.test.mjs",
     "jmp-dist-003-provider-auth-guard": "node --test scripts/jmp_dist_003_provider_auth_guard.test.mjs",
@@ -106,6 +107,7 @@
     "autoprefixer": "^10.4.0",
     "eslint": "9.39.5",
     "eslint-config-next": "16.3.5",
+    "jiti": "^2.7.0",
     "postcss": "^8.4.0",
     "tailwindcss": "^3.4.0",
     "typescript": "^5.4.0"
