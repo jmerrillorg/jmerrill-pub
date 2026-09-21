@@ -137,18 +137,18 @@ test('cover review renders a styled CTA button', () => {
   assert.match(rendered.html, /View in Author Operating Center/)
 })
 
-test('cover review includes required author-facing sections', () => {
+test('cover review uses natural correspondence instead of checklist sections', () => {
   const rendered = renderCoverReview()
 
-  for (const label of ['Why you are receiving this', 'What has been completed', "What&#39;s attached", 'What we need from you', 'How to respond', 'What happens next', 'Support']) {
-    assert.match(rendered.html, new RegExp(label.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')))
-  }
+  assert.doesNotMatch(rendered.html, /Why you are receiving this|What has been completed|What(?:'|&#39;|’)?s attached|What we need from you|How to respond|What happens next/i)
+  assert.match(rendered.html, /The Publishing Team has prepared a cover design review package/)
+  assert.match(rendered.html, /Please review the cover concept and reply/)
 })
 
 test('cover review plain-text body carries portal reference and signature', () => {
   const rendered = renderCoverReview()
 
-  assert.match(rendered.text, /Optional Author Operating Center access: https:\/\/jmerrill\.pub\/author\/portal/)
+  assert.match(rendered.text, /You may also view the materials in your Author Operating Center: https:\/\/jmerrill\.pub\/author\/portal/)
   assert.match(rendered.text, /The Publishing Team\nJ Merrill Publishing, Inc\./)
 })
 

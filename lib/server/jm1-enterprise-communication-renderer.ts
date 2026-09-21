@@ -64,6 +64,7 @@ export type Jm1EnterpriseCommunicationInput = {
   timelineItems?: string[]
   supportNote?: string
   operationalNote?: string
+  presentationStyle?: 'STRUCTURED' | 'CORRESPONDENCE'
 }
 
 export type Jm1RenderedEnterpriseCommunication = {
@@ -191,10 +192,12 @@ function normalizeInput(input: Jm1EnterpriseCommunicationInput): Jm1EnterpriseCo
     responseWindow: input.responseWindow?.trim(),
     supportNote: input.supportNote?.trim() || 'Reply to this email and the team will help.',
     operationalNote: input.operationalNote === '' ? '' : input.operationalNote?.trim() || 'This message follows the JM1 Enterprise Communication Standard v1.0.',
+    presentationStyle: input.presentationStyle || 'STRUCTURED',
   }
 }
 
 function renderText(input: Jm1EnterpriseCommunicationInput) {
+  if (input.presentationStyle === 'CORRESPONDENCE') return renderCorrespondenceText(input)
   const responseWindow = input.responseWindow && input.executionAuthority.responseClockAuthorized
     ? [`Response window: ${input.responseWindow}`, '']
     : []
@@ -233,6 +236,7 @@ function renderText(input: Jm1EnterpriseCommunicationInput) {
 }
 
 function renderHtml(input: Jm1EnterpriseCommunicationInput) {
+  if (input.presentationStyle === 'CORRESPONDENCE') return renderCorrespondenceHtml(input)
   const standard = JM1_ENTERPRISE_COMMUNICATION_STANDARD
   const colors = standard.colors
   const type = standard.typography
@@ -297,6 +301,100 @@ function renderHtml(input: Jm1EnterpriseCommunicationInput) {
     </table>
   </body>
 </html>`
+}
+
+function renderCorrespondenceText(input: Jm1EnterpriseCommunicationInput) {
+  const responseWindow = input.responseWindow && input.executionAuthority.responseClockAuthorized
+    ? responseWindowSentence(input.responseWindow)
+    : ''
+  const attachments = naturalList(input.attachments || [])
+  const prepared = naturalParagraph(input.summaryItems || [])
+  const next = naturalParagraph(input.timelineItems || [])
+  return [
+    input.title,
+    input.subtitle || '',
+    '',
+    `Good day, ${input.recipientName},`,
+    '',
+    input.reason,
+    prepared,
+    attachments ? `We've included ${attachments}.` : '',
+    input.reviewPrompt || '',
+    input.actionInstruction,
+    responseWindow,
+    ...(input.replyOnly ? [] : [`You may also view the materials in your Author Operating Center: ${input.actionUrl}`]),
+    next,
+    input.supportNote || '',
+    input.operationalNote || '',
+    '',
+    signatureForBrand(input.brand),
+  ].filter(Boolean).join('\n\n')
+}
+
+function renderCorrespondenceHtml(input: Jm1EnterpriseCommunicationInput) {
+  const standard = JM1_ENTERPRISE_COMMUNICATION_STANDARD
+  const colors = standard.colors
+  const type = standard.typography
+  const brand = JM1_COMMUNICATION_BRANDS[input.brand]
+  const responseWindow = input.responseWindow && input.executionAuthority.responseClockAuthorized
+    ? `<p style="margin:0 0 18px;font-size:${type.body};line-height:1.7;color:${colors.textSecondary};">${escapeHtml(responseWindowSentence(input.responseWindow))}</p>`
+    : ''
+  const attachments = naturalList(input.attachments || [])
+  const paragraphs = [
+    input.reason,
+    naturalParagraph(input.summaryItems || []),
+    attachments ? `We've included ${attachments}.` : '',
+    input.reviewPrompt || '',
+    input.actionInstruction,
+  ].filter(Boolean).map((value) => `<p style="margin:0 0 18px;font-size:${type.body};line-height:1.7;color:${colors.textSecondary};">${escapeHtml(value)}</p>`).join('')
+  const next = naturalParagraph(input.timelineItems || [])
+  return `<!doctype html>
+<html lang="en">
+  <body style="margin:0;padding:0;background:${colors.neutralBackground};color:${colors.textPrimary};font-family:Arial,Helvetica,sans-serif;">
+    <div style="display:none;max-height:0;overflow:hidden;opacity:0;color:transparent;">${escapeHtml(input.preheader)}</div>
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;background:${colors.neutralBackground};">
+      <tr><td align="center" style="padding:28px 16px;">
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:680px;border-collapse:collapse;background:${colors.surfaceWhite};border:1px solid ${colors.border};">
+          <tr><td style="padding:18px 28px;background:${colors.enterpriseNavy};color:${colors.surfaceWhite};">
+            <strong style="font-size:11px;letter-spacing:1.4px;color:${colors.enterpriseGold};">${brand.brandName}</strong><br>
+            <span style="font-size:${type.metadata};color:#E5E7EB;">${brand.divisionRelationship}</span>
+          </td></tr>
+          <tr><td style="padding:28px;">
+            <h1 style="margin:0 0 6px;font-size:${type.headingXL};line-height:1.3;color:${colors.textPrimary};">${escapeHtml(input.title)}</h1>
+            ${input.subtitle ? `<p style="margin:0 0 18px;font-size:${type.headingL};line-height:1.4;color:${colors.textSecondary};">${escapeHtml(input.subtitle)}</p>` : ''}
+            <p style="margin:0 0 18px;font-size:16px;line-height:1.7;">Good day, ${escapeHtml(input.recipientName)},</p>
+            ${paragraphs}
+            ${responseWindow}
+            ${input.replyOnly ? '' : `<p style="margin:0 0 22px;"><a href="${escapeHtml(input.actionUrl || '')}" style="display:inline-block;background:${colors.primaryCta};color:${colors.surfaceWhite};padding:11px 16px;font-size:14px;font-weight:700;text-decoration:none;">${escapeHtml(input.actionLabel || '')}</a></p>`}
+            ${next ? `<p style="margin:0 0 18px;font-size:${type.body};line-height:1.7;color:${colors.textSecondary};">${escapeHtml(next)}</p>` : ''}
+            ${input.supportNote ? `<p style="margin:0 0 18px;font-size:${type.body};line-height:1.7;color:${colors.textSecondary};">${escapeHtml(input.supportNote)}</p>` : ''}
+            ${input.operationalNote ? `<p style="margin:0;font-size:${type.caption};line-height:1.6;color:${colors.textSecondary};">${escapeHtml(input.operationalNote)}</p>` : ''}
+          </td></tr>
+          <tr><td style="padding:22px 28px;background:#F3F4F6;border-top:1px solid ${colors.border};">
+            <p style="margin:0 0 4px;font-size:14px;font-weight:700;color:${colors.textPrimary};">${brand.teamName}</p>
+            <p style="margin:0;font-size:${type.caption};line-height:1.6;color:${colors.textSecondary};">${brand.legalEntityName}<br>${brand.divisionRelationship}<br>${brand.phone} · ${brand.email} · ${brand.website}<br>${brand.tagline}</p>
+          </td></tr>
+        </table>
+      </td></tr>
+    </table>
+  </body>
+</html>`
+}
+
+function naturalParagraph(items: string[]) {
+  return items.map((item) => item.trim()).filter(Boolean).join(' ')
+}
+
+function naturalList(items: string[]) {
+  const values = items.map((item) => item.trim()).filter(Boolean)
+  if (values.length < 2) return values[0] || ''
+  if (values.length === 2) return `${values[0]} and ${values[1]}`
+  return `${values.slice(0, -1).join(', ')}, and ${values.at(-1)}`
+}
+
+function responseWindowSentence(value: string) {
+  const normalized = value.trim().replace(/[.]+$/, '')
+  return /^please respond by\b/i.test(normalized) ? `${normalized}.` : `Please respond by ${normalized}.`
 }
 
 function validateExecutionAuthority(input: Jm1EnterpriseCommunicationInput): { ok: true } | { ok: false; blocker: string } {
