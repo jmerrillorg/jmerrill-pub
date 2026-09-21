@@ -2,6 +2,7 @@
 
 const { QueueServiceClient } = require("@azure/storage-queue");
 const {
+  runChunkedTargetedDevelopmentalExecution,
   runChunkedTargetedEditorialExecution,
   runTargetedEditorialExecution
 } = require("./editorialExecutionRuntime");
@@ -104,9 +105,12 @@ async function processQueuedTargetedEditorialExecution(message, deps = {}) {
     });
   }
   const isLineEditing = normalizeString(parsed.stageCode).toUpperCase() === "LINE_EDITING";
+  const isDevelopmentalEditing = normalizeString(parsed.stageCode).toUpperCase() === "DEVELOPMENTAL_EDITING";
   const runner = isLineEditing
     ? deps.runChunkedTargetedEditorialExecution || runChunkedTargetedEditorialExecution
-    : deps.runTargetedEditorialExecution || runTargetedEditorialExecution;
+    : isDevelopmentalEditing
+      ? deps.runChunkedTargetedDevelopmentalExecution || runChunkedTargetedDevelopmentalExecution
+      : deps.runTargetedEditorialExecution || runTargetedEditorialExecution;
   return runner({
     titleId: parsed.titleId,
     stageCode: parsed.stageCode,
@@ -117,7 +121,9 @@ async function processQueuedTargetedEditorialExecution(message, deps = {}) {
     executionMode: "EXECUTE",
     chunked: parsed.chunked === true,
     chunkCursor: parsed.chunkCursor,
-    chunkRetryAttempt: parsed.chunkRetryAttempt
+    chunkRetryAttempt: parsed.chunkRetryAttempt,
+    chunkSchemaRetryAttempt: parsed.chunkSchemaRetryAttempt,
+    chunkTransientRetryAttempt: parsed.chunkTransientRetryAttempt
   });
 }
 

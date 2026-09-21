@@ -24,12 +24,15 @@ const {
   invokeSingleStageModelProvider,
   splitLineEditingSourceChunks,
   buildLineEditingChunkPrompt,
+  buildChunkedDevelopmentalInvocation,
+  validateDevelopmentalChunkOutput,
   isLivePortfolioStage,
   buildLineEditingQa,
   normalizeStageCode,
   resolveSourceGraphItem,
   shouldPreserveExistingExactBlocker,
   evaluateTargetedEditorialExecution,
+  runChunkedTargetedDevelopmentalExecution,
   runChunkedTargetedEditorialExecution,
   targetedExecutionIdempotencyKey,
   runEditorialExecutionRuntime
@@ -346,6 +349,289 @@ function targetedExecutionClient(overrides = {}) {
     }
   };
 }
+
+function targetedDevelopmentalExecutionClient(overrides = {}) {
+  const stage = {
+    jm1pub_editorialstageid: "stage-dev",
+    jm1pub_name: "Developmental Editing - Whole",
+    jm1pub_stagetype: 100000001,
+    jm1pub_stagestatus: 100000001,
+    jm1pub_internaloperationalsummary:
+      "DEVELOPMENTAL_PARALLEL_ENTRY_V1; sourceArtifactId=artifact-source; agreementEvidence=executed; commercialEvidence=paid",
+    _jm1pub_titleid_value: "title-1"
+  };
+  const sourceArtifact = {
+    jm1pub_editorialartifactid: "artifact-source",
+    jm1pub_editorialartifactname: "Governed Source Manuscript",
+    jm1pub_filename: "Whole - Manuscript.docx",
+    jm1pub_sha256: overrides.sourceSha || "source-sha",
+    jm1pub_repositorydriveid: "drive-1",
+    jm1pub_repositoryitemid: "source-item",
+    jm1pub_artifactstatus: 100000000,
+    jm1pub_iscurrentapproved: true,
+    _jm1pub_titleid_value: "title-1",
+    _jm1pub_editorialstageid_value: "stage-dev"
+  };
+  const client = {
+    creates: [],
+    patches: [],
+    async list(entitySet, query = {}) {
+      if (entitySet === "jm1pub_titles") {
+        return [{ jm1pub_titleid: "title-1", jm1pub_titlename: "Whole", jm1pub_authorname: "Jackuline Fly" }];
+      }
+      if (entitySet === "jm1pub_editorialstages") return [stage];
+      if (entitySet === "jm1pub_editorialartifacts" && /artifact-source/.test(query.$filter || "")) return [sourceArtifact];
+      if (entitySet === "jm1pub_editorialartifacts") return [];
+      if (entitySet === "jm1pub_editorialapprovalgates") return [];
+      if (entitySet === "jm1_executionlogs") return overrides.existingLogs || [];
+      throw new Error(`Unexpected list ${entitySet} ${JSON.stringify(query)}`);
+    },
+    async first(entitySet, query = {}) {
+      return (await this.list(entitySet, query))[0] || null;
+    },
+    async create(entitySet, payload) {
+      this.creates.push({ entitySet, payload });
+      return `created-${this.creates.length}`;
+    },
+    async patch(entitySet, id, payload) {
+      this.patches.push({ entitySet, id, payload });
+    }
+  };
+  return { client, stage, sourceArtifact };
+}
+
+test("durable targeted Developmental execution checkpoints one chunk and queues the next", async () => {
+  const previousLimit = process.env.JM1_DEVELOPMENTAL_EDITING_CHUNK_WORD_LIMIT;
+  process.env.JM1_DEVELOPMENTAL_EDITING_CHUNK_WORD_LIMIT = "3";
+  const sourceText = "one two three\n\nfour five six";
+  const sourceBuffer = Buffer.from(sourceText, "utf8");
+  const sourceSha = require("node:crypto").createHash("sha256").update(sourceBuffer).digest("hex");
+  const { client } = targetedDevelopmentalExecutionClient({ sourceSha });
+  const input = {
+    titleId: "title-1",
+    stageCode: "DEVELOPMENTAL_EDITING",
+    sourceArtifactId: "artifact-source",
+    sourceChecksum: sourceSha,
+    authorApprovalRequired: false,
+    executionMode: "EXECUTE"
+  };
+  const prefix = `targeted-editorial-execution/${targetedExecutionIdempotencyKey(input)}`;
+  const bodies = new Map();
+  const sent = [];
+  const checkpointStore = {
+    async createIfNotExists() {},
+    getBlockBlobClient(name) {
+      return {
+        name,
+        async exists() { return bodies.has(name); },
+        async uploadData(body) { bodies.set(name, Buffer.from(body)); },
+        async downloadToBuffer() { return bodies.get(name); }
+      };
+    }
+  };
+  const queueClient = {
+    async createIfNotExists() {},
+    async sendMessage(body) {
+      sent.push(JSON.parse(body));
+      return { messageId: "next-message" };
+    }
+  };
+  graphRequest.override = async (path) => {
+    if (path.includes("?$select=")) return { id: "source-item", parentReference: { driveId: "drive-1", id: "parent-1" } };
+    if (path.endsWith("/content")) return sourceBuffer;
+    throw new Error(`Unexpected graph path ${path}`);
+  };
+  extractSourceText.override = async () => ({ value: sourceText });
+  invokeSingleStageModelProvider.override = async ({ extractedText }) => ({
+    ok: true,
+    fellBack: false,
+    provider: "microsoft-foundry-claude",
+    routeAlias: "jm1-editorial-devline-primary",
+    promptVersion: "CC010-DEVELOPMENTAL-EDITING-HUMAN-FIRST-V2",
+    tokenCounts: { input: 10, output: 10, total: 20 },
+    output: {
+      editedManuscript: `${extractedText} revised`,
+      developmentalSummary: "The passage was strengthened for progression.",
+      appliedChanges: ["Improved progression."],
+      authorNotes: [{ class: "EDITOR_NOTE", anchor: "one", message: "This transition is now clearer." }],
+      internalNotes: [],
+      authorityActions: [{ classification: "SYSTEM_AUTHORIZED_EDIT", description: "Improved progression." }]
+    }
+  });
+
+  try {
+    const result = await runChunkedTargetedDevelopmentalExecution(input, { client, checkpointStore, queueClient });
+    assert.equal(result.status, "CHUNK_COMPLETED_REQUEUED_NEXT");
+    assert.equal(result.chunkIndex, 1);
+    assert.equal(result.chunkCount, 2);
+    assert.equal(sent.length, 1);
+    assert.equal(sent[0].chunkCursor, 1);
+    assert.equal(bodies.has(`${prefix}/chunks/0001.json`), true);
+    assert.equal(bodies.has(`${prefix}/chunks/0002.json`), false);
+    assert.equal(client.patches.length, 0);
+  } finally {
+    graphRequest.override = null;
+    extractSourceText.override = null;
+    invokeSingleStageModelProvider.override = null;
+    if (previousLimit === undefined) delete process.env.JM1_DEVELOPMENTAL_EDITING_CHUNK_WORD_LIMIT;
+    else process.env.JM1_DEVELOPMENTAL_EDITING_CHUNK_WORD_LIMIT = previousLimit;
+  }
+});
+
+test("durable targeted Developmental execution retries malformed output without checkpointing it", async () => {
+  const previousLimit = process.env.JM1_DEVELOPMENTAL_EDITING_CHUNK_WORD_LIMIT;
+  process.env.JM1_DEVELOPMENTAL_EDITING_CHUNK_WORD_LIMIT = "20";
+  const sourceText = "one two three four five six";
+  const sourceBuffer = Buffer.from(sourceText, "utf8");
+  const sourceSha = require("node:crypto").createHash("sha256").update(sourceBuffer).digest("hex");
+  const { client } = targetedDevelopmentalExecutionClient({ sourceSha });
+  const input = {
+    titleId: "title-1",
+    stageCode: "DEVELOPMENTAL_EDITING",
+    sourceArtifactId: "artifact-source",
+    sourceChecksum: sourceSha,
+    authorApprovalRequired: false,
+    executionMode: "EXECUTE"
+  };
+  const prefix = `targeted-editorial-execution/${targetedExecutionIdempotencyKey(input)}`;
+  const bodies = new Map();
+  const sent = [];
+  const checkpointStore = {
+    async createIfNotExists() {},
+    getBlockBlobClient(name) {
+      return {
+        name,
+        async exists() { return bodies.has(name); },
+        async uploadData(body) { bodies.set(name, Buffer.from(body)); },
+        async downloadToBuffer() { return bodies.get(name); }
+      };
+    }
+  };
+  const queueClient = {
+    async createIfNotExists() {},
+    async sendMessage(body, options) {
+      sent.push({ body: JSON.parse(body), options });
+      return { messageId: "retry-message" };
+    }
+  };
+  graphRequest.override = async (path) => path.endsWith("/content")
+    ? sourceBuffer
+    : { id: "source-item", parentReference: { driveId: "drive-1", id: "parent-1" } };
+  extractSourceText.override = async () => ({ value: sourceText });
+  invokeSingleStageModelProvider.override = async () => ({
+    ok: true,
+    fellBack: false,
+    output: { developmentalSummary: "Missing manuscript text." }
+  });
+
+  try {
+    const result = await runChunkedTargetedDevelopmentalExecution(input, { client, checkpointStore, queueClient });
+    assert.equal(result.status, "CHUNK_REQUEUED_AFTER_SCHEMA_MISS");
+    assert.equal(sent.length, 1);
+    assert.equal(sent[0].body.chunkSchemaRetryAttempt, 1);
+    assert.equal(sent[0].options.visibilityTimeout, 60);
+    assert.equal(bodies.has(`${prefix}/chunks/0001.json`), false);
+    assert.equal(client.patches.length, 0);
+  } finally {
+    graphRequest.override = null;
+    extractSourceText.override = null;
+    invokeSingleStageModelProvider.override = null;
+    if (previousLimit === undefined) delete process.env.JM1_DEVELOPMENTAL_EDITING_CHUNK_WORD_LIMIT;
+    else process.env.JM1_DEVELOPMENTAL_EDITING_CHUNK_WORD_LIMIT = previousLimit;
+  }
+});
+
+test("durable targeted Developmental execution blocks after schema exhaustion without source-copy fallback", async () => {
+  const previousLimit = process.env.JM1_DEVELOPMENTAL_EDITING_CHUNK_WORD_LIMIT;
+  const previousRetries = process.env.JM1_DEVELOPMENTAL_SCHEMA_MISS_MAX_RETRIES;
+  process.env.JM1_DEVELOPMENTAL_EDITING_CHUNK_WORD_LIMIT = "20";
+  process.env.JM1_DEVELOPMENTAL_SCHEMA_MISS_MAX_RETRIES = "2";
+  const sourceText = "one two three four five six";
+  const sourceBuffer = Buffer.from(sourceText, "utf8");
+  const sourceSha = require("node:crypto").createHash("sha256").update(sourceBuffer).digest("hex");
+  const { client } = targetedDevelopmentalExecutionClient({ sourceSha });
+  const input = {
+    titleId: "title-1",
+    stageCode: "DEVELOPMENTAL_EDITING",
+    sourceArtifactId: "artifact-source",
+    sourceChecksum: sourceSha,
+    authorApprovalRequired: false,
+    executionMode: "EXECUTE",
+    chunkSchemaRetryAttempt: 2
+  };
+  const prefix = `targeted-editorial-execution/${targetedExecutionIdempotencyKey(input)}`;
+  const bodies = new Map();
+  const checkpointStore = {
+    async createIfNotExists() {},
+    getBlockBlobClient(name) {
+      return {
+        name,
+        async exists() { return bodies.has(name); },
+        async uploadData(body) { bodies.set(name, Buffer.from(body)); },
+        async downloadToBuffer() { return bodies.get(name); }
+      };
+    }
+  };
+  const queueClient = {
+    async createIfNotExists() {},
+    async sendMessage() { throw new Error("Exhausted malformed output must not be queued again."); }
+  };
+  graphRequest.override = async (path) => path.endsWith("/content")
+    ? sourceBuffer
+    : { id: "source-item", parentReference: { driveId: "drive-1", id: "parent-1" } };
+  extractSourceText.override = async () => ({ value: sourceText });
+  invokeSingleStageModelProvider.override = async () => ({
+    ok: true,
+    fellBack: false,
+    output: { developmentalSummary: "Still missing manuscript text." }
+  });
+
+  try {
+    const result = await runChunkedTargetedDevelopmentalExecution(input, { client, checkpointStore, queueClient });
+    assert.equal(result.status, "EXCEPTION");
+    assert.match(result.exactBlocker, /DEVELOPMENTAL_CHUNK_1_EDITED_MANUSCRIPT_MISSING/);
+    assert.equal(bodies.has(`${prefix}/chunks/0001.json`), false);
+    assert.equal(client.patches.length, 1);
+    assert.doesNotMatch(client.patches[0].payload.jm1pub_internaloperationalsummary, /SOURCE_TEXT_PRESERVED/);
+  } finally {
+    graphRequest.override = null;
+    extractSourceText.override = null;
+    invokeSingleStageModelProvider.override = null;
+    if (previousLimit === undefined) delete process.env.JM1_DEVELOPMENTAL_EDITING_CHUNK_WORD_LIMIT;
+    else process.env.JM1_DEVELOPMENTAL_EDITING_CHUNK_WORD_LIMIT = previousLimit;
+    if (previousRetries === undefined) delete process.env.JM1_DEVELOPMENTAL_SCHEMA_MISS_MAX_RETRIES;
+    else process.env.JM1_DEVELOPMENTAL_SCHEMA_MISS_MAX_RETRIES = previousRetries;
+  }
+});
+
+test("chunked Developmental aggregation preserves the full manuscript and editorial evidence", () => {
+  const checkpoints = [1, 2].map((chunkIndex) => ({
+    chunkIndex,
+    modelResult: {
+      provider: "microsoft-foundry-claude",
+      routeAlias: "jm1-editorial-devline-primary",
+      tokenCounts: { input: 10, output: 5, total: 15 }
+    },
+    output: {
+      editedManuscript: chunkIndex === 1 ? "A clearer opening passage." : "A stronger closing passage.",
+      developmentalSummary: `Chunk ${chunkIndex} was revised.`,
+      appliedChanges: [`Revision ${chunkIndex}`],
+      authorNotes: chunkIndex === 1 ? [{ class: "AUTHOR_QUESTION", message: "Would you like to expand this moment?" }] : [],
+      internalNotes: chunkIndex === 2 ? [{ class: "FACT_CHECK_INTERNAL", message: "Verify the date." }] : [],
+      authorityActions: [{ classification: "SYSTEM_AUTHORIZED_EDIT", description: `Revision ${chunkIndex}` }]
+    }
+  }));
+  const invocation = buildChunkedDevelopmentalInvocation(checkpoints, "Original opening.\n\nOriginal closing.");
+  assert.equal(invocation.chunkCount, 2);
+  assert.equal(invocation.scheduler.maxChunksPerInvocation, 1);
+  assert.equal(invocation.tokenCounts.total, 30);
+  assert.match(invocation.output.editedManuscript, /clearer opening/);
+  assert.match(invocation.output.editedManuscript, /stronger closing/);
+  assert.equal(invocation.output.appliedChanges.length, 2);
+  assert.equal(invocation.output.authorNotes.length, 1);
+  assert.equal(invocation.output.internalNotes.length, 1);
+  assert.equal(validateDevelopmentalChunkOutput({ ok: true, fellBack: false, output: checkpoints[0].output }, "An opening passage.").ok, true);
+});
 
 test("targeted editorial execution dry-run resolves exactly one Line stage/source without mutations", async () => {
   const client = targetedExecutionClient();

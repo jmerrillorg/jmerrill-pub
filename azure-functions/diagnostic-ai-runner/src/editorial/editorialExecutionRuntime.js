@@ -76,6 +76,8 @@ const DEFAULT_LINE_EDITING_SCHEMA_MISS_MAX_RETRIES = 3;
 const DEFAULT_LINE_EDITING_TRANSIENT_MODEL_MAX_RETRIES = 3;
 const DEFAULT_DEVELOPMENTAL_EDITING_CHUNK_WORD_LIMIT = 900;
 const DEFAULT_DEVELOPMENTAL_EDITING_CHUNK_CONCURRENCY = 2;
+const DEFAULT_DEVELOPMENTAL_SCHEMA_MISS_MAX_RETRIES = 3;
+const DEFAULT_DEVELOPMENTAL_TRANSIENT_MODEL_MAX_RETRIES = 3;
 const DEFAULT_TARGETED_EDITORIAL_QUEUE_NAME = "jm1-targeted-editorial-execution";
 const DEFAULT_TARGETED_EDITORIAL_CHECKPOINT_CONTAINER = "publishing";
 const DEFAULT_TARGETED_EDITORIAL_CHECKPOINT_PREFIX = "targeted-editorial-execution";
@@ -959,6 +961,355 @@ async function runChunkedTargetedEditorialExecution(input = {}, deps = {}) {
   };
 }
 
+async function loadTargetedDevelopmentalSource(stage, sourceArtifact, upstream, correlationId) {
+  const sourceRef = await resolveSourceGraphItem(sourceArtifact, "DEVELOPMENTAL_EDITING");
+  const sourceBuffer = await graphRequest(sourceRef.contentPath).catch((error) => {
+    throw Object.assign(error, {
+      safeCode: `DEVELOPMENTAL_EDITING_BLOCKED — ${error.safeCode || "GRAPH_DOWNLOAD_FAILED"}`,
+      graphDetail: graphFailureDetail(error, sourceArtifact)
+    });
+  });
+  const actualSha = crypto.createHash("sha256").update(sourceBuffer).digest("hex");
+  const expectedSha = normalizeString(sourceArtifact.jm1pub_sha256);
+  if (expectedSha && actualSha !== expectedSha) {
+    throw Object.assign(new Error("Source checksum mismatch"), {
+      safeCode: "DEVELOPMENTAL_EDITING_BLOCKED — SOURCE_CHECKSUM_MISMATCH"
+    });
+  }
+  const extracted = await extractSourceText(sourceBuffer, "DEVELOPMENTAL_EDITING");
+  const sourceText = extracted.value || "";
+  const chunkWordLimit = parsePositiveInteger(
+    process.env.JM1_DEVELOPMENTAL_EDITING_CHUNK_WORD_LIMIT,
+    DEFAULT_DEVELOPMENTAL_EDITING_CHUNK_WORD_LIMIT
+  );
+  const chunks = splitLineEditingSourceChunks(sourceText, chunkWordLimit);
+  return {
+    sourceText,
+    sourceSha256: actualSha,
+    totalWordCount: summarizeExtractedText(sourceText).words,
+    chunkWordLimit,
+    chunkCount: chunks.length,
+    chunks,
+    upstreamSummary: summarizeUpstreamContextForPrompt(stage, "DEVELOPMENTAL_EDITING", sourceArtifact, upstream || {}),
+    correlationId
+  };
+}
+
+function validateDevelopmentalChunkOutput(modelResult, sourceText) {
+  const output = developmentalEditingOutput(modelResult);
+  const sourceWords = summarizeExtractedText(sourceText).words;
+  const editedWords = summarizeExtractedText(output.editedManuscript).words;
+  const retentionRatio = sourceWords > 0 ? editedWords / sourceWords : 0;
+  const failures = [];
+  if (!modelResult?.ok || modelResult?.fellBack) failures.push("MODEL_INVOCATION_FAILED");
+  if (!output.editedManuscript) failures.push("EDITED_MANUSCRIPT_MISSING");
+  if (!output.developmentalSummary) failures.push("DEVELOPMENTAL_SUMMARY_MISSING");
+  if (!output.appliedChanges.length) failures.push("APPLIED_CHANGE_MANIFEST_MISSING");
+  if (retentionRatio < 0.7 || retentionRatio > 1.35) failures.push("DEVELOPMENTAL_CONTENT_RETENTION_OUT_OF_RANGE");
+  if (output.invalidNotes.length) failures.push("UNCLASSIFIED_EDITORIAL_NOTE");
+  if (!output.authorityValidation.ok) failures.push("INVALID_EDITORIAL_AUTHORITY_CLASSIFICATION");
+  return { ok: failures.length === 0, output, failures, sourceWords, editedWords, retentionRatio };
+}
+
+function buildChunkedDevelopmentalInvocation(chunkCheckpoints = [], sourceText = "") {
+  const ordered = chunkCheckpoints
+    .slice()
+    .sort((left, right) => Number(left.chunkIndex || 0) - Number(right.chunkIndex || 0));
+  const tokenCounts = { input: 0, output: 0, total: 0 };
+  for (const item of ordered) {
+    tokenCounts.input += item.modelResult?.tokenCounts?.input || 0;
+    tokenCounts.output += item.modelResult?.tokenCounts?.output || 0;
+    tokenCounts.total += item.modelResult?.tokenCounts?.total || 0;
+  }
+  const first = ordered.find((item) => item.modelResult)?.modelResult || {};
+  return {
+    ...first,
+    ok: true,
+    fellBack: false,
+    sourceText,
+    tokenCounts,
+    output: {
+      editedManuscript: ordered.map((item) => normalizeString(item.output?.editedManuscript)).join("\n\n"),
+      developmentalSummary: ordered
+        .map((item) => normalizeString(item.output?.developmentalSummary))
+        .filter(Boolean)
+        .join(" "),
+      appliedChanges: ordered.flatMap((item) => Array.isArray(item.output?.appliedChanges) ? item.output.appliedChanges : []),
+      authorNotes: ordered.flatMap((item) => Array.isArray(item.output?.authorNotes) ? item.output.authorNotes : []),
+      internalNotes: ordered.flatMap((item) => Array.isArray(item.output?.internalNotes) ? item.output.internalNotes : []),
+      authorityActions: ordered.flatMap((item) => Array.isArray(item.output?.authorityActions) ? item.output.authorityActions : [])
+    },
+    chunkCount: ordered.length,
+    scheduler: {
+      mode: "durable_queue_checkpoint",
+      chunkInvocations: ordered.length,
+      maxChunksPerInvocation: 1
+    },
+    promptVersion: "CC010-DEVELOPMENTAL-EDITING-HUMAN-FIRST-V2"
+  };
+}
+
+async function runChunkedTargetedDevelopmentalExecution(input = {}, deps = {}) {
+  const evaluated = await evaluateTargetedEditorialExecution(input, deps);
+  if (!evaluated.ok) return evaluated;
+  if (evaluated.executionMode === TARGETED_EXECUTION_MODES.DRY_RUN) {
+    const { stage, sourceArtifact, upstream, ...safe } = evaluated;
+    return { ...safe, mutationsPerformed: 0, externalSends: 0 };
+  }
+  if (evaluated.targetStage !== "DEVELOPMENTAL_EDITING") {
+    return runTargetedEditorialExecution(input, deps);
+  }
+
+  const client = deps.client || createDataverseClient(requireDataverseConfig(), deps);
+  const { checkpointStore, queueClient } = createStorageClients(deps);
+  const correlationId = `TARGETED-${evaluated.idempotencyKey}`;
+  const stage = evaluated.stage;
+  const stageCode = "DEVELOPMENTAL_EDITING";
+  const sourceArtifact = evaluated.sourceArtifact;
+  const completeName = "complete.json";
+  if (await checkpointExists(checkpointStore, evaluated.idempotencyKey, completeName)) {
+    return {
+      ok: true,
+      status: "OUTPUT_ALREADY_RECORDED",
+      executionMode: TARGETED_EXECUTION_MODES.EXECUTE,
+      idempotencyKey: evaluated.idempotencyKey,
+      checkpoint: await downloadJsonCheckpoint(checkpointStore, evaluated.idempotencyKey, completeName),
+      externalSends: 0
+    };
+  }
+
+  const commissioned = await recordRuntimeCommissioned(client, stageCode, correlationId);
+  const claim = await claimStageTask(client, stage, stageCode, correlationId);
+  const exactBlocker = buildExactBlocker(stageCode, sourceArtifact);
+  if (exactBlocker) {
+    const blocked = await recordBlockedTask(client, stage, stageCode, exactBlocker, correlationId);
+    return { ok: true, status: "EXCEPTION", idempotencyKey: evaluated.idempotencyKey, exactBlocker, claim, blocked, externalSends: 0 };
+  }
+  await recordSourceExecutionReadiness(client, stage, stageCode, sourceArtifact, correlationId);
+  await recordLegacyOutputScopeClarification(client, stage, stageCode, sourceArtifact, correlationId);
+
+  const source = await loadTargetedDevelopmentalSource(stage, sourceArtifact, evaluated.upstream, correlationId);
+  await uploadJsonCheckpoint(checkpointStore, evaluated.idempotencyKey, "plan.json", {
+    idempotencyKey: evaluated.idempotencyKey,
+    titleId: evaluated.canonicalTitle.titleId,
+    stageId: evaluated.currentStage.stageId,
+    stageCode,
+    sourceArtifactId: sourceArtifact.jm1pub_editorialartifactid,
+    sourceSha256: source.sourceSha256,
+    chunkCount: source.chunkCount,
+    chunkWordLimit: source.chunkWordLimit,
+    totalWordCount: source.totalWordCount,
+    createdAt: new Date().toISOString()
+  });
+
+  const nextMissingChunkCursor = await firstMissingDevelopmentalChunkCursor(
+    checkpointStore,
+    evaluated.idempotencyKey,
+    source.chunkCount
+  );
+  const requestedChunkCursor = Math.max(0, Math.min(source.chunkCount - 1, parseNonNegativeInteger(input.chunkCursor, 0)));
+  const chunkCursor = nextMissingChunkCursor < source.chunkCount ? nextMissingChunkCursor : requestedChunkCursor;
+  const chunkIndex = chunkCursor + 1;
+  const chunkName = developmentalChunkCheckpointName(chunkIndex);
+  let chunkCheckpoint;
+
+  if (nextMissingChunkCursor >= source.chunkCount || await checkpointExists(checkpointStore, evaluated.idempotencyKey, chunkName)) {
+    chunkCheckpoint = await downloadJsonCheckpoint(checkpointStore, evaluated.idempotencyKey, chunkName);
+  } else {
+    const schemaRetryAttempt = parseNonNegativeInteger(input.chunkSchemaRetryAttempt, 0);
+    const modelResult = await invokeSingleStageModelProvider({
+      stage,
+      stageCode,
+      sourceArtifact,
+      extractedText: source.chunks[chunkCursor],
+      correlationId: `${correlationId}:developmental-chunk-${chunkIndex}-of-${source.chunkCount}`,
+      upstreamContext: evaluated.upstream,
+      promptBody: buildDevelopmentalEditingChunkPrompt({
+        stage,
+        sourceArtifact,
+        chunkText: source.chunks[chunkCursor],
+        chunkIndex,
+        chunkCount: source.chunkCount,
+        totalWordCount: source.totalWordCount,
+        schemaRetryAttempt
+      }),
+      diagnosticId: `${normalizeString(stage._jm1pub_titleid_value) || stage.jm1pub_editorialstageid}:developmental-chunk-${chunkIndex}`,
+      promptVersion: "CC010-DEVELOPMENTAL-EDITING-HUMAN-FIRST-V2"
+    });
+
+    if (!modelResult.ok || modelResult.fellBack) {
+      const transientRetryAttempt = parseNonNegativeInteger(input.chunkTransientRetryAttempt, 0);
+      if ((isRateLimitModelResult(modelResult) || isTransientModelCallResult(modelResult)) &&
+          transientRetryAttempt < developmentalTransientModelMaxRetries()) {
+        const retryAfterSeconds = Math.max(
+          60,
+          Math.ceil(adaptiveLineEditingRetryDelayMs(modelResult, transientRetryAttempt + 1) / 1000)
+        );
+        const queued = await enqueueTargetedEditorialChunk(queueClient, {
+          ...input,
+          kind: "TARGETED_EDITORIAL_EXECUTION",
+          version: 1,
+          chunked: true,
+          chunkCursor,
+          chunkRetryAttempt: transientRetryAttempt + 1,
+          chunkTransientRetryAttempt: transientRetryAttempt + 1,
+          executionMode: "EXECUTE"
+        }, { visibilityTimeout: retryAfterSeconds });
+        return {
+          ok: true,
+          status: isRateLimitModelResult(modelResult)
+            ? "CHUNK_REQUEUED_AFTER_RATE_LIMIT"
+            : "CHUNK_REQUEUED_AFTER_TRANSIENT_MODEL_ERROR",
+          idempotencyKey: evaluated.idempotencyKey,
+          chunkIndex,
+          chunkCount: source.chunkCount,
+          retryAfterSeconds,
+          queued,
+          externalSends: 0
+        };
+      }
+      const exact = `DEVELOPMENTAL_EDITING_BLOCKED — ${safeBlockerReason(modelResult.error, "MODEL_INVOCATION_FAILED")}`;
+      const blocked = await recordBlockedTask(client, stage, stageCode, exact, correlationId);
+      return { ok: true, status: "EXCEPTION", idempotencyKey: evaluated.idempotencyKey, chunkIndex, chunkCount: source.chunkCount, exactBlocker: exact, blocked, externalSends: 0 };
+    }
+
+    const validation = validateDevelopmentalChunkOutput(modelResult, source.chunks[chunkCursor]);
+    if (!validation.ok) {
+      if (schemaRetryAttempt < developmentalSchemaMissMaxRetries()) {
+        const queued = await enqueueTargetedEditorialChunk(queueClient, {
+          ...input,
+          kind: "TARGETED_EDITORIAL_EXECUTION",
+          version: 1,
+          chunked: true,
+          chunkCursor,
+          chunkRetryAttempt: schemaRetryAttempt + 1,
+          chunkSchemaRetryAttempt: schemaRetryAttempt + 1,
+          executionMode: "EXECUTE"
+        }, { visibilityTimeout: 60 });
+        return {
+          ok: true,
+          status: "CHUNK_REQUEUED_AFTER_SCHEMA_MISS",
+          idempotencyKey: evaluated.idempotencyKey,
+          chunkIndex,
+          chunkCount: source.chunkCount,
+          failures: validation.failures,
+          retryAfterSeconds: 60,
+          queued,
+          externalSends: 0
+        };
+      }
+      const exact = `DEVELOPMENTAL_EDITING_BLOCKED — DEVELOPMENTAL_CHUNK_${chunkIndex}_${validation.failures.join("_")}`;
+      const blocked = await recordBlockedTask(client, stage, stageCode, exact, correlationId);
+      return { ok: true, status: "EXCEPTION", idempotencyKey: evaluated.idempotencyKey, chunkIndex, chunkCount: source.chunkCount, exactBlocker: exact, blocked, externalSends: 0 };
+    }
+
+    chunkCheckpoint = {
+      chunkIndex,
+      chunkCount: source.chunkCount,
+      completedAt: new Date().toISOString(),
+      sourceWordCount: validation.sourceWords,
+      editedWordCount: validation.editedWords,
+      retentionRatio: validation.retentionRatio,
+      modelResult: {
+        ok: true,
+        provider: modelResult.provider,
+        routeAlias: modelResult.routeAlias,
+        promptVersion: modelResult.promptVersion,
+        tokenCounts: modelResult.tokenCounts || {},
+        fellBack: false
+      },
+      output: validation.output
+    };
+    await uploadJsonCheckpoint(checkpointStore, evaluated.idempotencyKey, chunkName, chunkCheckpoint);
+  }
+
+  if (nextMissingChunkCursor < source.chunkCount && chunkCursor < source.chunkCount - 1) {
+    const queued = await enqueueTargetedEditorialChunk(queueClient, {
+      ...input,
+      kind: "TARGETED_EDITORIAL_EXECUTION",
+      version: 1,
+      chunked: true,
+      chunkCursor: chunkCursor + 1,
+      chunkRetryAttempt: 0,
+      chunkSchemaRetryAttempt: 0,
+      chunkTransientRetryAttempt: 0,
+      executionMode: "EXECUTE"
+    });
+    return {
+      ok: true,
+      status: "CHUNK_COMPLETED_REQUEUED_NEXT",
+      idempotencyKey: evaluated.idempotencyKey,
+      chunkIndex,
+      chunkCount: source.chunkCount,
+      queued,
+      externalSends: 0
+    };
+  }
+
+  const checkpoints = [];
+  for (let index = 1; index <= source.chunkCount; index += 1) {
+    checkpoints.push(await downloadJsonCheckpoint(
+      checkpointStore,
+      evaluated.idempotencyKey,
+      developmentalChunkCheckpointName(index)
+    ));
+  }
+  const modelInvocation = buildChunkedDevelopmentalInvocation(checkpoints, source.sourceText);
+  let outputs;
+  try {
+    outputs = await materializeEditorialOutputs(
+      client,
+      stage,
+      stageCode,
+      sourceArtifact,
+      correlationId,
+      evaluated.upstream,
+      { modelInvocation }
+    );
+  } catch (error) {
+    const exact = error.safeCode || "DEVELOPMENTAL_EDITING_BLOCKED — OUTPUT_MATERIALIZATION_FAILED";
+    const blocked = await recordBlockedTask(client, stage, stageCode, exact, correlationId);
+    return { ok: true, status: "EXCEPTION", idempotencyKey: evaluated.idempotencyKey, exactBlocker: exact, blocked, externalSends: 0 };
+  }
+  const finalized = await finalizeMaterializedEditorialOutputs(client, stage, stageCode, sourceArtifact, outputs, correlationId);
+  const completion = {
+    completedAt: new Date().toISOString(),
+    status: "EXECUTED",
+    sourceArtifactId: sourceArtifact.jm1pub_editorialartifactid,
+    outputCount: outputs.length,
+    outputArtifacts: outputs.map((item) => ({
+      outputName: item.outputName,
+      artifactId: item.artifactId,
+      sha256: item.sha256
+    })),
+    packageHandoff: finalized.packageHandoff || null
+  };
+  const checkpoint = await uploadJsonCheckpoint(checkpointStore, evaluated.idempotencyKey, completeName, completion);
+  return {
+    ok: true,
+    status: "EXECUTED",
+    executionMode: TARGETED_EXECUTION_MODES.EXECUTE,
+    idempotencyKey: evaluated.idempotencyKey,
+    canonicalTitle: evaluated.canonicalTitle,
+    currentStage: evaluated.currentStage,
+    exactSourceArtifact: evaluated.exactSourceArtifact,
+    commissioned,
+    claim,
+    chunkCount: source.chunkCount,
+    checkpoint,
+    result: {
+      stageId: stage.jm1pub_editorialstageid,
+      titleId: stage._jm1pub_titleid_value,
+      stageCode,
+      status: "VALIDATING",
+      sourceArtifactId: sourceArtifact.jm1pub_editorialartifactid,
+      outputs,
+      ...finalized
+    },
+    externalSends: 0
+  };
+}
+
 function compactPromptText(value, maxLength = 1200) {
   const text = normalizeString(value).replace(/\s+/g, " ");
   if (text.length <= maxLength) return text;
@@ -1111,6 +1462,20 @@ function lineEditingTransientModelMaxRetries() {
   return parsePositiveInteger(
     process.env.JM1_LINE_EDITING_TRANSIENT_MODEL_MAX_RETRIES,
     DEFAULT_LINE_EDITING_TRANSIENT_MODEL_MAX_RETRIES
+  );
+}
+
+function developmentalSchemaMissMaxRetries() {
+  return parsePositiveInteger(
+    process.env.JM1_DEVELOPMENTAL_SCHEMA_MISS_MAX_RETRIES,
+    DEFAULT_DEVELOPMENTAL_SCHEMA_MISS_MAX_RETRIES
+  );
+}
+
+function developmentalTransientModelMaxRetries() {
+  return parsePositiveInteger(
+    process.env.JM1_DEVELOPMENTAL_TRANSIENT_MODEL_MAX_RETRIES,
+    DEFAULT_DEVELOPMENTAL_TRANSIENT_MODEL_MAX_RETRIES
   );
 }
 
@@ -1285,10 +1650,24 @@ function lineEditingChunkCheckpointName(chunkIndex) {
   return `chunks/${String(chunkIndex).padStart(4, "0")}.json`;
 }
 
+function developmentalChunkCheckpointName(chunkIndex) {
+  return `chunks/${String(chunkIndex).padStart(4, "0")}.json`;
+}
+
 async function firstMissingLineEditingChunkCursor(store, idempotencyKey, chunkCount) {
   const boundedChunkCount = Math.max(0, parseNonNegativeInteger(chunkCount, 0));
   for (let index = 1; index <= boundedChunkCount; index += 1) {
     if (!await checkpointExists(store, idempotencyKey, lineEditingChunkCheckpointName(index))) {
+      return index - 1;
+    }
+  }
+  return boundedChunkCount;
+}
+
+async function firstMissingDevelopmentalChunkCursor(store, idempotencyKey, chunkCount) {
+  const boundedChunkCount = Math.max(0, parseNonNegativeInteger(chunkCount, 0));
+  for (let index = 1; index <= boundedChunkCount; index += 1) {
+    if (!await checkpointExists(store, idempotencyKey, developmentalChunkCheckpointName(index))) {
       return index - 1;
     }
   }
@@ -1381,7 +1760,16 @@ function buildLineEditingChunkPrompt({
   });
 }
 
-function buildDevelopmentalEditingChunkPrompt({ stage, sourceArtifact, chunkText, chunkIndex, chunkCount, totalWordCount }) {
+function buildDevelopmentalEditingChunkPrompt({
+  stage,
+  sourceArtifact,
+  chunkText,
+  chunkIndex,
+  chunkCount,
+  totalWordCount,
+  schemaRetryAttempt = 0
+}) {
+  const retryAttempt = parseNonNegativeInteger(schemaRetryAttempt, 0);
   return JSON.stringify({
     task: "cc010_developmental_editing_full_manuscript_chunk_execution",
     contract: "Return only the required JSON tool output. Perform real developmental editing and return the complete edited text for this chunk.",
@@ -1421,6 +1809,12 @@ function buildDevelopmentalEditingChunkPrompt({ stage, sourceArtifact, chunkText
       internalNotes: [{ class: "PUBLISHER_INTERNAL | RIGHTS_LEGAL_INTERNAL | FACT_CHECK_INTERNAL | PRODUCTION_INTERNAL | PROVIDER_INTERNAL | SYSTEM_INTERNAL | AI_INTERNAL", anchor: "optional", message: "internal detail" }],
       authorityActions: [{ classification: "SYSTEM_AUTHORIZED_EDIT | AUTHOR_DECISION_REQUIRED | PUBLISHER_DECISION_REQUIRED | FACT_CHECK_REQUIRED | RIGHTS_LEGAL_REVIEW_REQUIRED", anchor: "optional", description: "action or decision" }]
     },
+    schemaRetryInstruction:
+      retryAttempt > 1
+        ? "Earlier responses failed the required schema. Return every required top-level key, including the complete editedManuscript for this chunk. Do not summarize or substitute production notes for manuscript text."
+        : retryAttempt > 0
+          ? "The previous response failed the required schema. Return every required top-level key and the complete editedManuscript for this chunk."
+          : "",
     sourceArtifactContext: {
       id: sourceArtifact.jm1pub_editorialartifactid,
       chunkIndex,
@@ -2125,6 +2519,7 @@ function shouldPreserveExistingExactBlocker(exactBlocker) {
     "LINE_RETENTION_OUTSIDE_95_TO_100_PERCENT_WINDOW",
     "LINE_EDITED_MANUSCRIPT_MISSING",
     "LINE_CHUNK_EDITED_MANUSCRIPT_MISSING",
+    "DEVELOPMENTAL_CHUNK_",
     "MODEL_INVOCATION_FAILED",
     "MODEL_RESPONSE_NOT_JSON",
     "MODEL_CALL_EXCEPTION_REQUEST_TIMEOUT",
@@ -3745,6 +4140,9 @@ async function runEditorialExecutionRuntime(options = {}, deps = {}) {
 }
 
 module.exports = {
+  DEFAULT_DEVELOPMENTAL_EDITING_CHUNK_WORD_LIMIT,
+  DEFAULT_DEVELOPMENTAL_SCHEMA_MISS_MAX_RETRIES,
+  DEFAULT_DEVELOPMENTAL_TRANSIENT_MODEL_MAX_RETRIES,
   DEFAULT_LINE_EDITING_CHUNK_CONCURRENCY,
   DEFAULT_LINE_EDITING_DEPLOYMENT_TPM,
   DEFAULT_LINE_EDITING_OUTPUT_BUCKET_RATIO,
@@ -3774,9 +4172,13 @@ module.exports = {
   invokeSingleStageModelProvider,
   calculateLineEditingChunkConcurrency,
   firstMissingLineEditingChunkCursor,
+  firstMissingDevelopmentalChunkCursor,
   parseNonNegativeInteger,
   splitLineEditingSourceChunks,
   buildLineEditingChunkPrompt,
+  buildDevelopmentalEditingChunkPrompt,
+  buildChunkedDevelopmentalInvocation,
+  validateDevelopmentalChunkOutput,
   isLivePortfolioStage,
   buildLineEditingQa,
   recordRejectedLineOutputDiagnostics,
@@ -3790,6 +4192,7 @@ module.exports = {
   shouldPreserveExistingExactBlocker,
   writeLog,
   evaluateTargetedEditorialExecution,
+  runChunkedTargetedDevelopmentalExecution,
   runChunkedTargetedEditorialExecution,
   runTargetedEditorialExecution,
   targetedExecutionIdempotencyKey,
