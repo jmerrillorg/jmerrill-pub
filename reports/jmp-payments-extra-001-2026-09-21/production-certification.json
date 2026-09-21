@@ -1,0 +1,26 @@
+{
+  "status": "BLOCKED",
+  "sourceSha": "2e280502498f86e89660c4939a4fc72700c968f1",
+  "deployment": "NOT_PERFORMED",
+  "productionBaselineReadback": {
+    "checkedAt": "2026-09-21T17:12:56.638Z",
+    "status": "ready",
+    "release": "9e3a7cc6067462c943b57dfedb62cb2f083a2d33",
+    "paymentGate": "disabled",
+    "dataverse": "ready",
+    "acs": "ready"
+  },
+  "blockers": [
+    "DURABLE_DATAVERSE_PAYMENT_LEDGER_NOT_COMMISSIONED",
+    "RECURRING_INSTALLMENT_EXECUTOR_NOT_FOUND",
+    "QBO_POSTING_AND_READBACK_ADAPTER_NOT_FOUND",
+    "ATOMIC_BALANCE_RESERVATION_NOT_AVAILABLE"
+  ],
+  "typedPaymentRuntimeDisposition": "FAIL_CLOSED_AGREEMENT_PAYMENT_RUNTIME_NOT_COMMISSIONED",
+  "stripeCharges": 0,
+  "qboWrites": 0,
+  "businessCentralWrites": 0,
+  "dataverseWrites": 0,
+  "authorCommunications": 0,
+  "financialEffects": 0
+}

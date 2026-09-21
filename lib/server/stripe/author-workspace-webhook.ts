@@ -8,6 +8,7 @@ import {
   COMMISSIONING_TITLE,
 } from './author-workspace-stripe'
 import { extractStripePaymentCorrelation } from './publishing-payment-correlation'
+import { parsePublishingPaymentMetadata } from './publishing-agreement-payment'
 
 export type StripeWebhookVerification =
   | { ok: true; event: StripeWebhookEvent }
@@ -142,6 +143,7 @@ export function classifyPublishingPaymentSuccessEvent(event: StripeWebhookEvent)
   }
 
   const latestCharge = object.latest_charge
+  const agreementPayment = parsePublishingPaymentMetadata(object.metadata)
   return {
     process: true,
     code: 'publishing_payment_confirmed',
@@ -170,6 +172,8 @@ export function classifyPublishingPaymentSuccessEvent(event: StripeWebhookEvent)
       subscriptionId: typeof object.subscription === 'string' ? object.subscription : null,
       created: event.created || null,
       correlation: extractStripePaymentCorrelation(object.metadata),
+      agreementPayment: agreementPayment.ok ? agreementPayment : null,
+      agreementPaymentMetadataStatus: agreementPayment.ok ? 'VALID' : agreementPayment.reason,
     },
   }
 }

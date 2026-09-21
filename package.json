@@ -90,7 +90,8 @@
     "jmp-auth-003-managed-identity-runtime-guard": "node --test scripts/jmp_auth_003_managed_identity_runtime.test.mjs",
     "jmp-v1v2-automation-capability-registry-guard": "node --test scripts/jmp_v1v2_automation_capability_registry.test.mjs",
     "royalty-mapping-decision-governance-guard": "node --test scripts/royalty_mapping_decision_governance.test.mjs",
-    "jmp-pay-ingest-001-guard": "node --test scripts/jmp_pay_ingest_001_stripe_correlation.test.mjs scripts/atta_payment_event_recovery_guard.test.mjs scripts/atta_joined_family_reconciliation_guard.test.mjs"
+    "jmp-pay-ingest-001-guard": "node --test scripts/jmp_pay_ingest_001_stripe_correlation.test.mjs scripts/atta_payment_event_recovery_guard.test.mjs scripts/atta_joined_family_reconciliation_guard.test.mjs",
+    "jmp-payments-extra-001-guard": "node --test scripts/jmp_payments_extra_001.test.mjs"
   },
   "dependencies": {
     "@azure/communication-email": "^1.1.0",
