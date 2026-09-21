@@ -1008,6 +1008,13 @@ function validateDevelopmentalChunkOutput(modelResult, sourceText) {
   if (retentionRatio < 0.7 || retentionRatio > 1.35) failures.push("DEVELOPMENTAL_CONTENT_RETENTION_OUT_OF_RANGE");
   if (output.invalidNotes.length) failures.push("UNCLASSIFIED_EDITORIAL_NOTE");
   if (!output.authorityValidation.ok) failures.push("INVALID_EDITORIAL_AUTHORITY_CLASSIFICATION");
+  const projection = validateAuthorFacingProjection({
+    editedManuscript: output.editedManuscript,
+    developmentalSummary: output.developmentalSummary,
+    appliedChanges: output.appliedChanges,
+    authorNotes: output.authorNotes
+  });
+  if (!projection.ok) failures.push("AUTHOR_EXPERIENCE_PROJECTION_FAILED");
   return { ok: failures.length === 0, output, failures, sourceWords, editedWords, retentionRatio };
 }
 
@@ -1067,7 +1074,8 @@ async function runChunkedTargetedDevelopmentalExecution(input = {}, deps = {}) {
   const stageCode = "DEVELOPMENTAL_EDITING";
   const sourceArtifact = evaluated.sourceArtifact;
   const completeName = "complete.json";
-  if (await checkpointExists(checkpointStore, evaluated.idempotencyKey, completeName)) {
+  const repairAuthorProjection = input.repairAuthorProjection === true;
+  if (!repairAuthorProjection && await checkpointExists(checkpointStore, evaluated.idempotencyKey, completeName)) {
     return {
       ok: true,
       status: "OUTPUT_ALREADY_RECORDED",
@@ -1102,18 +1110,39 @@ async function runChunkedTargetedDevelopmentalExecution(input = {}, deps = {}) {
     createdAt: new Date().toISOString()
   });
 
-  const nextMissingChunkCursor = await firstMissingDevelopmentalChunkCursor(
-    checkpointStore,
-    evaluated.idempotencyKey,
-    source.chunkCount
-  );
+  let projectionRepairCursor = -1;
+  if (repairAuthorProjection) {
+    for (let index = 1; index <= source.chunkCount; index += 1) {
+      const name = developmentalChunkCheckpointName(index);
+      if (!await checkpointExists(checkpointStore, evaluated.idempotencyKey, name)) break;
+      const checkpoint = await downloadJsonCheckpoint(checkpointStore, evaluated.idempotencyKey, name);
+      const validation = validateDevelopmentalChunkOutput(
+        { ok: true, fellBack: false, output: checkpoint.output },
+        source.chunks[index - 1]
+      );
+      if (!validation.ok) {
+        projectionRepairCursor = index - 1;
+        break;
+      }
+    }
+  }
+  const nextMissingChunkCursor = projectionRepairCursor >= 0
+    ? projectionRepairCursor
+    : await firstMissingDevelopmentalChunkCursor(
+        checkpointStore,
+        evaluated.idempotencyKey,
+        source.chunkCount
+      );
   const requestedChunkCursor = Math.max(0, Math.min(source.chunkCount - 1, parseNonNegativeInteger(input.chunkCursor, 0)));
   const chunkCursor = nextMissingChunkCursor < source.chunkCount ? nextMissingChunkCursor : requestedChunkCursor;
   const chunkIndex = chunkCursor + 1;
   const chunkName = developmentalChunkCheckpointName(chunkIndex);
   let chunkCheckpoint;
 
-  if (nextMissingChunkCursor >= source.chunkCount || await checkpointExists(checkpointStore, evaluated.idempotencyKey, chunkName)) {
+  if (
+    projectionRepairCursor < 0 &&
+    (nextMissingChunkCursor >= source.chunkCount || await checkpointExists(checkpointStore, evaluated.idempotencyKey, chunkName))
+  ) {
     chunkCheckpoint = await downloadJsonCheckpoint(checkpointStore, evaluated.idempotencyKey, chunkName);
   } else {
     const schemaRetryAttempt = parseNonNegativeInteger(input.chunkSchemaRetryAttempt, 0);
@@ -1233,6 +1262,7 @@ async function runChunkedTargetedDevelopmentalExecution(input = {}, deps = {}) {
       chunkRetryAttempt: 0,
       chunkSchemaRetryAttempt: 0,
       chunkTransientRetryAttempt: 0,
+      repairAuthorProjection,
       executionMode: "EXECUTE"
     });
     return {
@@ -3459,16 +3489,32 @@ async function materializeEditorialOutputs(
         graphDetail: graphFailureDetail(error, sourceArtifact)
       });
     });
+    const persistedBody = await graphRequest(`drives/${driveId}/items/${uploaded.id}/content`).catch((error) => {
+      throw Object.assign(error, {
+        safeCode: `${stageCode}_BLOCKED — ${error.safeCode || "GRAPH_PERSISTED_CONTENT_READBACK_FAILED"}`,
+        graphDetail: graphFailureDetail(error, {
+          jm1pub_repositorydriveid: driveId,
+          jm1pub_repositoryitemid: uploaded.id,
+          jm1pub_repositorypath: uploaded.webUrl
+        })
+      });
+    });
+    if (!Buffer.isBuffer(persistedBody)) {
+      throw Object.assign(new Error("Persisted SharePoint artifact did not return binary content."), {
+        safeCode: `${stageCode}_BLOCKED — GRAPH_PERSISTED_CONTENT_READBACK_FAILED`
+      });
+    }
+    const persistedSha256 = crypto.createHash("sha256").update(persistedBody).digest("hex");
     const artifactName = `${outputName} - ${stage.jm1pub_name}`;
     const artifactPayload = {
       jm1pub_editorialartifactname: artifactName,
       jm1pub_filename: uploaded.name || filename,
       jm1pub_fileextension: extension,
-      jm1pub_filesizebytes: uploaded.size || body.length,
+      jm1pub_filesizebytes: persistedBody.length,
       jm1pub_repositorydriveid: driveId,
       jm1pub_repositoryitemid: uploaded.id,
       jm1pub_repositorypath: uploaded.webUrl,
-      jm1pub_sha256: crypto.createHash("sha256").update(body).digest("hex"),
+      jm1pub_sha256: persistedSha256,
       jm1pub_artifactstatus: 196650002,
       jm1pub_visibility: isAuthorVisibleAudience(audience) ? 196650000 : 196650001,
       jm1pub_iscurrentapproved: false,
@@ -3506,7 +3552,7 @@ async function materializeEditorialOutputs(
       extension,
       contentType,
       audience,
-      size: uploaded.size || body.length,
+      size: persistedBody.length,
       sha256: artifactPayload.jm1pub_sha256,
       modelProvider: modelInvocation.provider || modelInvocation.route?.provider || "",
       modelDeployment: modelInvocation.routeAlias || "",
@@ -3835,16 +3881,31 @@ async function createPackageManifestArtifact(client, stage, stageCode, sourceArt
       graphDetail: graphFailureDetail(error, sourceArtifact)
     });
   });
+  const persistedManifestBody = await graphRequest(`drives/${driveId}/items/${uploaded.id}/content`).catch((error) => {
+    throw Object.assign(error, {
+      safeCode: `${stageCode}_BLOCKED — ${error.safeCode || "GRAPH_PERSISTED_CONTENT_READBACK_FAILED"}`,
+      graphDetail: graphFailureDetail(error, {
+        jm1pub_repositorydriveid: driveId,
+        jm1pub_repositoryitemid: uploaded.id,
+        jm1pub_repositorypath: uploaded.webUrl
+      })
+    });
+  });
+  if (!Buffer.isBuffer(persistedManifestBody)) {
+    throw Object.assign(new Error("Persisted SharePoint package manifest did not return binary content."), {
+      safeCode: `${stageCode}_BLOCKED — GRAPH_PERSISTED_CONTENT_READBACK_FAILED`
+    });
+  }
   const artifactPayload = {
     jm1pub_editorialartifactname:
       packageVersion === "v1" ? `Package Manifest - ${stage.jm1pub_name}` : `Package Manifest ${packageVersion} - ${stage.jm1pub_name}`,
     jm1pub_filename: uploaded.name || filename,
     jm1pub_fileextension: "json",
-    jm1pub_filesizebytes: uploaded.size || manifestBody.length,
+    jm1pub_filesizebytes: persistedManifestBody.length,
     jm1pub_repositorydriveid: driveId,
     jm1pub_repositoryitemid: uploaded.id,
     jm1pub_repositorypath: uploaded.webUrl,
-    jm1pub_sha256: crypto.createHash("sha256").update(manifestBody).digest("hex"),
+    jm1pub_sha256: crypto.createHash("sha256").update(persistedManifestBody).digest("hex"),
     jm1pub_artifactstatus: 196650002,
     jm1pub_visibility: 196650001,
     jm1pub_iscurrentapproved: false,

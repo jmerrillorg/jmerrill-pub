@@ -23,7 +23,11 @@ const FORBIDDEN_PATTERNS = Object.freeze([
   { code: "CHECKSUM", pattern: /\b(?:sha-?256|checksum)\b|\b[a-f0-9]{64}\b/i },
   { code: "INTERNAL_STAGE_LABEL", pattern: /\b(?:DEVELOPMENTAL_EDITING|LINE_EDITING|COPYEDITING|PROOFREADING|EDITORIAL_INTERNAL_QA)\b/ },
   { code: "INTERNAL_PUBLISHER_NOTE", pattern: /\bPublisher review note(?:\s+P\d+)?\b/i },
-  { code: "RIGHTS_LEGAL_INTERNAL_NOTE", pattern: /\b(?:legal posture|before author-facing release|rights\/legal internal|RIGHTS_LEGAL_INTERNAL)\b/i },
+  {
+    code: "INTERNAL_NOTE_CLASS",
+    pattern: /\b(?:PUBLISHER_INTERNAL|RIGHTS_LEGAL_INTERNAL|FACT_CHECK_INTERNAL|PRODUCTION_INTERNAL|PROVIDER_INTERNAL|SYSTEM_INTERNAL|AI_INTERNAL)\b/i
+  },
+  { code: "RIGHTS_LEGAL_INTERNAL_NOTE", pattern: /\b(?:legal posture|before author-facing release|rights\/legal internal)\b/i },
   { code: "TECHNICAL_ARTIFACT_WRAPPER", pattern: /\b(?:source artifact|source checksum|governed developmental revision artifact|extracted word count|extracted paragraph count)\b/i }
 ]);
 

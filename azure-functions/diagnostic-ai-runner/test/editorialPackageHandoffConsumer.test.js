@@ -117,6 +117,7 @@ test("QA-complete developmental output creates governed package v2 without direc
   const client = createClient();
   graphRequest.override = async (path, options = {}) => {
     if (path.includes("?$select=id,parentReference")) return { id: "source-item", parentReference: { id: "parent-folder" } };
+    if (path.endsWith("/items/manifest-item/content") && !options.method) return Buffer.from("persisted-manifest");
     if (options.method === "PUT") return { id: "manifest-item", name: "manifest-v2.json", size: 512, webUrl: "https://sharepoint/manifest-v2.json" };
     throw new Error(`Unexpected Graph path ${path}`);
   };
