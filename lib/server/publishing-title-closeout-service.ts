@@ -43,8 +43,12 @@ export type PublishingTitleCloseoutRequest = {
   approvalSource: string
   approvalTimestamp: string
   authorApprovalSemantic?: AuthorFinalApprovalSemantic
+  currentStageArtifactId?: string
+  approvalBoundArtifactId?: string
   currentStageArtifactVersion?: string
   approvedArtifactVersion?: string
+  currentStageArtifactChecksum?: string
+  approvalBoundArtifactChecksum?: string
   unresolvedAuthorCorrections?: number
   requiredInternalVerification?: 'NOT_STARTED' | 'IN_PROGRESS' | 'COMPLETE'
   expectedCurrentStage: string
@@ -219,8 +223,12 @@ function finalAuthorApprovalExists(input: PublishingTitleCloseoutRequest) {
   return evaluateAuthorFinalApprovalGate({
     requiresAuthorApproval: true,
     responseSemantic: input.authorApprovalSemantic,
+    currentStageArtifactId: input.currentStageArtifactId || input.approvedArtifactId,
+    approvedArtifactId: input.approvalBoundArtifactId || input.approvedArtifactId,
     currentStageArtifactVersion: input.currentStageArtifactVersion || input.approvedArtifactId,
     approvedArtifactVersion: input.approvedArtifactVersion || input.approvedArtifactId,
+    currentStageArtifactChecksum: input.currentStageArtifactChecksum || input.approvedArtifactChecksum,
+    approvedArtifactChecksum: input.approvalBoundArtifactChecksum || input.approvedArtifactChecksum,
     unresolvedAuthorCorrections: input.unresolvedAuthorCorrections ?? 0,
     requiredInternalVerification: input.requiredInternalVerification || 'COMPLETE',
   }).stageCloseEligible

@@ -17,8 +17,12 @@ export type InternalVerificationState = 'NOT_STARTED' | 'IN_PROGRESS' | 'COMPLET
 export type AuthorFinalApprovalGateInput = {
   requiresAuthorApproval: boolean
   responseSemantic: AuthorFinalApprovalSemantic
+  currentStageArtifactId?: string | null
+  approvedArtifactId?: string | null
   currentStageArtifactVersion?: string | null
   approvedArtifactVersion?: string | null
+  currentStageArtifactChecksum?: string | null
+  approvedArtifactChecksum?: string | null
   unresolvedAuthorCorrections?: number
   requiredInternalVerification?: InternalVerificationState
   updatedArtifactReturnedToAuthor?: boolean
@@ -66,18 +70,32 @@ export function evaluateAuthorFinalApprovalGate(input: AuthorFinalApprovalGateIn
   const blockers: string[] = []
   const authorResponseReceived = RESPONSE_RECEIVED_SEMANTICS.has(input.responseSemantic)
   const finalAuthorApprovalReceived = input.responseSemantic === 'APPROVED'
+  const currentArtifactId = input.currentStageArtifactId?.trim() || ''
+  const approvedArtifactId = input.approvedArtifactId?.trim() || ''
   const currentVersion = input.currentStageArtifactVersion?.trim() || ''
   const approvedVersion = input.approvedArtifactVersion?.trim() || ''
+  const currentChecksum = input.currentStageArtifactChecksum?.trim().toLowerCase() || ''
+  const approvedChecksum = input.approvedArtifactChecksum?.trim().toLowerCase() || ''
   const unresolvedAuthorCorrections = input.unresolvedAuthorCorrections ?? 0
   const internalVerification = input.requiredInternalVerification || 'NOT_STARTED'
 
   if (input.manualOverride) blockers.push('MANUAL_OVERRIDE_IS_NOT_AUTHOR_APPROVAL')
   if (!authorResponseReceived) blockers.push('AUTHOR_RESPONSE_NOT_RECEIVED')
   if (!finalAuthorApprovalReceived) blockers.push('FINAL_AUTHOR_APPROVAL_NOT_RECEIVED')
+  if (!currentArtifactId) blockers.push('CURRENT_STAGE_ARTIFACT_ID_MISSING')
+  if (!approvedArtifactId) blockers.push('APPROVED_ARTIFACT_ID_MISSING')
+  if (currentArtifactId && approvedArtifactId && currentArtifactId !== approvedArtifactId) {
+    blockers.push('APPROVAL_ARTIFACT_ID_MISMATCH')
+  }
   if (!currentVersion) blockers.push('CURRENT_STAGE_ARTIFACT_VERSION_MISSING')
   if (!approvedVersion) blockers.push('APPROVED_ARTIFACT_VERSION_MISSING')
   if (currentVersion && approvedVersion && currentVersion !== approvedVersion) {
     blockers.push('APPROVAL_ARTIFACT_VERSION_MISMATCH')
+  }
+  if (!currentChecksum) blockers.push('CURRENT_STAGE_ARTIFACT_CHECKSUM_MISSING')
+  if (!approvedChecksum) blockers.push('APPROVED_ARTIFACT_CHECKSUM_MISSING')
+  if (currentChecksum && approvedChecksum && currentChecksum !== approvedChecksum) {
+    blockers.push('APPROVAL_ARTIFACT_CHECKSUM_MISMATCH')
   }
   if (unresolvedAuthorCorrections > 0) blockers.push('UNRESOLVED_AUTHOR_CORRECTIONS')
   if (internalVerification !== 'COMPLETE') blockers.push('INTERNAL_VERIFICATION_INCOMPLETE')

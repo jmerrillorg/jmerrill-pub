@@ -474,10 +474,12 @@ export const PACKAGE_STAGE_POLICIES: Record<PackageStageCode, CanonicalPackagePo
     qaChecks: baseQaChecks(),
     emailAttachmentRoles: [
       'editedManuscript',
+      'developmentalMemo',
       'reviewInstructions',
     ],
     workspaceDownloadRoles: [
       'editedManuscript',
+      'developmentalMemo',
       'reviewInstructions',
     ],
     cadencePolicyId: 'EDITORIAL_AUTHOR_REVIEW_BY_WORD_COUNT',

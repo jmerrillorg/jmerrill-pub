@@ -13,8 +13,12 @@ function gate(overrides = {}) {
   return evaluateAuthorFinalApprovalGate({
     requiresAuthorApproval: true,
     responseSemantic: 'APPROVED',
+    currentStageArtifactId: 'artifact-id-v2',
+    approvedArtifactId: 'artifact-id-v2',
     currentStageArtifactVersion: 'artifact-v2',
     approvedArtifactVersion: 'artifact-v2',
+    currentStageArtifactChecksum: 'a'.repeat(64),
+    approvedArtifactChecksum: 'a'.repeat(64),
     unresolvedAuthorCorrections: 0,
     requiredInternalVerification: 'COMPLETE',
     updatedArtifactReturnedToAuthor: true,
@@ -136,6 +140,18 @@ test('9. approval of V1 cannot approve materially revised V2', () => {
   const result = gate({ currentStageArtifactVersion: 'artifact-v2', approvedArtifactVersion: 'artifact-v1' })
   assert.equal(result.stageCloseEligible, false)
   assert.match(result.blockers.join(','), /APPROVAL_ARTIFACT_VERSION_MISMATCH/)
+})
+
+test('9a. approval of another artifact ID cannot approve the current artifact', () => {
+  const result = gate({ approvedArtifactId: 'artifact-id-v1' })
+  assert.equal(result.stageCloseEligible, false)
+  assert.match(result.blockers.join(','), /APPROVAL_ARTIFACT_ID_MISMATCH/)
+})
+
+test('9b. approval of an old checksum cannot approve a replacement with the same version label', () => {
+  const result = gate({ approvedArtifactChecksum: 'b'.repeat(64) })
+  assert.equal(result.stageCloseEligible, false)
+  assert.match(result.blockers.join(','), /APPROVAL_ARTIFACT_CHECKSUM_MISMATCH/)
 })
 
 test('10. multiple correction rounds remain open until final approval of current artifact', () => {

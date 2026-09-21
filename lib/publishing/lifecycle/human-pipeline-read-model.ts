@@ -4,6 +4,10 @@ import {
   isKnownNoncurrentHistoricalReferenceId,
   type NoncurrentHistoricalReference,
 } from './noncurrent-historical-reference-registry'
+import {
+  EDITORIAL_SYSTEM_STAGE_CONTRACTS,
+  type EditorialStageContract,
+} from './editorial-system-contract'
 
 export type HumanPipelineStageId =
   | '01_INQUIRY'
@@ -33,6 +37,7 @@ export type HumanPipelineStage = {
   label: string
   shortLabel: string
   description: string
+  completionAuthority: EditorialStageContract
 }
 
 export type HumanPipelineCard = {
@@ -167,7 +172,14 @@ function stage(
   shortLabel: string,
   description: string,
 ): HumanPipelineStage {
-  return { id, number, label: `${number} - ${label}`, shortLabel, description }
+  return {
+    id,
+    number,
+    label: `${number} - ${label}`,
+    shortLabel,
+    description,
+    completionAuthority: EDITORIAL_SYSTEM_STAGE_CONTRACTS[id],
+  }
 }
 
 function projectHumanPipelineCard(
