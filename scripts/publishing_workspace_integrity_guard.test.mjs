@@ -34,9 +34,8 @@ const checks = [
     name: 'author-facing package communication must use governed brand renderer',
     ok:
       communicationBrand.includes('AUTHOR_COMMUNICATION_BRAND') &&
-      communicationBrand.includes('Why you are receiving this') &&
-      communicationBrand.includes('How to respond') &&
-      communicationBrand.includes('What happens next') &&
+      communicationBrand.includes("presentationStyle: 'CORRESPONDENCE'") &&
+      communicationBrand.includes('assertHumanFirstWhyFirst') &&
       communicationBrand.includes('AUTHOR_COMMUNICATION_BLOCKED'),
   },
 ]

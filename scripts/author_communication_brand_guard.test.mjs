@@ -46,10 +46,10 @@ test('shared author communication renderer produces branded HTML and plain text'
   assert.match(rendered.html, /A Division of J Merrill One/)
   assert.match(rendered.html, /Helping Authors Help Themselves\./)
   assert.match(rendered.html, /<a href="https:\/\/jmerrill\.pub\/author\/portal\?action=review-package&amp;titleId=title-intentional-leader"/)
-  assert.match(rendered.text, /Optional Author Operating Center access: https:\/\/jmerrill\.pub\/author\/portal/)
+  assert.match(rendered.text, /You may also view the materials in your Author Operating Center: https:\/\/jmerrill\.pub\/author\/portal/)
   assert.match(rendered.text, /Reply directly to publishing@jmerrill\.one/)
   assert.match(rendered.text, /Approved with corrections/)
-  assert.match(rendered.text, /^Interior Layout Materials\nThe Intentional Leader\n/)
+  assert.match(rendered.text, /^Interior Layout Materials\n\nThe Intentional Leader\n/)
   assert.match(rendered.text, /The Publishing Team\nJ Merrill Publishing, Inc\./)
   assert.match(rendered.text, /614\.965\.6057 · publishing@jmerrill\.one · jmerrill\.pub/)
   assert.doesNotMatch(rendered.text, /\nWarmly,\s*\nJ Merrill Publishing\b/i)
@@ -79,7 +79,7 @@ test('author package binary validation rejects corrupt DOCX, JSON masquerading a
   )
   const jsonValidation = engine.validateGovernedPackageAttachmentBinary(jsonAsDocx, 'Before You Were Born')
   assert.equal(jsonValidation.ok, false)
-  assert.match(jsonValidation.blocker, /DOCX_ZIP_SIGNATURE|ERROR_PAYLOAD/)
+  assert.match(jsonValidation.blocker, /ATTACHMENT_CHECKSUM_INVALID|DOCX_ZIP_SIGNATURE|ERROR_PAYLOAD/)
 
   const invalidPdf = attachment(
     'editorialMemo',
@@ -89,7 +89,7 @@ test('author package binary validation rejects corrupt DOCX, JSON masquerading a
   )
   const pdfValidation = engine.validateGovernedPackageAttachmentBinary(invalidPdf, 'Before You Were Born')
   assert.equal(pdfValidation.ok, false)
-  assert.match(pdfValidation.blocker, /PDF_SIGNATURE/)
+  assert.match(pdfValidation.blocker, /ATTACHMENT_CHECKSUM_INVALID|PDF_SIGNATURE/)
 })
 
 test('author communication validation blocks unformatted or text-only output', () => {
@@ -202,12 +202,12 @@ test('author package notification copy uses the shared brand renderer', () => {
   assert.match(copy.htmlBody, /<h1[^>]*>\s*Interior Layout Review Materials\s*<\/h1>/i)
   assert.match(copy.htmlBody, /The Intentional Leader/)
   assert.match(copy.body, /Good day, Jackie,/)
-  assert.match(copy.body, /What has been completed/)
+  assert.doesNotMatch(copy.body, /Why you are receiving this|What has been completed|What's attached|What we need from you|How to respond|What happens next/i)
   assert.match(copy.body, /Reply directly to publishing@jmerrill\.one/)
-  assert.match(copy.body, /^Interior Layout Review Materials\nThe Intentional Leader\n/)
+  assert.match(copy.body, /^Interior Layout Review Materials\n\nThe Intentional Leader\n/)
   assert.match(copy.body, /The Publishing Team\nJ Merrill Publishing, Inc\./)
   assert.doesNotMatch(copy.body, /\nWarmly,\s*\nJ Merrill Publishing\b/i)
-  assert.match(copy.htmlBody, /Optional Author Operating Center access/)
+  assert.match(copy.htmlBody, /View in Author Operating Center/)
 })
 
 test('author communication rejects oversized brand heading and invented closing', () => {

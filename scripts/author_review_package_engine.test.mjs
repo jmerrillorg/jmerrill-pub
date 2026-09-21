@@ -583,6 +583,7 @@ test('Developmental and Interior packages keep response, manifest, and cover-mes
     developmentalNotification.attachments.map((attachment) => attachment.role).toSorted(),
     [
       'editedManuscript',
+      'editorialMemo',
       'reviewInstructions',
     ].toSorted(),
   )
@@ -807,6 +808,7 @@ test('author-review notification copy avoids last-mile system language regressio
   assert.doesNotMatch(rendered, /current author-facing files/i)
   assert.doesNotMatch(rendered, /current publishing stage/i)
   assert.doesNotMatch(rendered, /project history/i)
+  assert.doesNotMatch(rendered, /Why you are receiving this|What has been completed|What's attached|What we need from you|How to respond|What happens next/i)
   assert.match(rendered, /complete manuscript or proof/i)
   assert.match(rendered, /Please review the attached materials for this step/i)
 })

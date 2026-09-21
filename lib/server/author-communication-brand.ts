@@ -129,6 +129,7 @@ export function renderAuthorCommunicationEmail(input: AuthorCommunicationRenderI
     timelineItems: normalized.nextSteps,
     supportNote: normalized.supportNote,
     operationalNote: normalized.operationalNote,
+    presentationStyle: 'CORRESPONDENCE',
   })
   const text = rendered.text
   const html = rendered.html
@@ -192,7 +193,9 @@ export function validateAuthorCommunicationEmail(input: {
   if (/<span[^>]*>\s*(Review Package and Reply|Approve|Review)/i.test(html) && !/<a\b[^>]*>\s*(Review Package and Reply|Approve|Review)/i.test(html)) {
     blockers.push('PRIMARY_ACTION_NOT_CLICKABLE')
   }
-  if (!replyOnly && !/Optional Author Operating Center access:\s*https:\/\//i.test(text)) blockers.push('PLAIN_TEXT_OPTIONAL_PORTAL_URL_MISSING')
+  if (!replyOnly && !/(?:Optional Author Operating Center access:|You may also view the materials in your Author Operating Center:)\s*https:\/\//i.test(text)) {
+    blockers.push('PLAIN_TEXT_OPTIONAL_PORTAL_URL_MISSING')
+  }
   if (!text.includes(AUTHOR_COMMUNICATION_BRAND.signature)) blockers.push('PLAIN_TEXT_SIGNATURE_MISSING')
   const terminology = validateAuthorFacingPublishingActorTerminology(`${html}\n${text}`)
   if (!terminology.ok) {
