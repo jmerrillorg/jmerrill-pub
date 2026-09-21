@@ -458,7 +458,8 @@ function resolveEditorialStageAuthority(input = {}) {
   if (currentIndex < 0) {
     return deny(resolver, "Editorial stage is not in canonical sequence.", { sourceRecord, evidence: [`stage=${stageCode || "MISSING"}`], extra: { violationEvent: "EDITORIAL_GATE_BYPASS_ATTEMPT" } });
   }
-  if (currentIndex > 0 && input.priorAuthorGateCleared !== true) {
+  const developmentalParallelEntry = stageCode === "DEVELOPMENTAL_EDITING" && input.developmentalEntryAuthority === true;
+  if (currentIndex > 0 && input.priorAuthorGateCleared !== true && !developmentalParallelEntry) {
     return deny(resolver, "Downstream editorial worker requires prior author gate clearance.", {
       sourceRecord,
       evidence: [`stage=${stageCode}`, `prior=${EDITORIAL_SEQUENCE[currentIndex - 1]}`],
@@ -472,7 +473,10 @@ function resolveEditorialStageAuthority(input = {}) {
       extra: { violationEvent: "CADENCE_BYPASS_ATTEMPT" }
     });
   }
-  return allow(resolver, "Editorial stage authority resolved.", { sourceRecord, evidence: [`stage=${stageCode}`] });
+  return allow(resolver, "Editorial stage authority resolved.", {
+    sourceRecord,
+    evidence: [`stage=${stageCode}`, ...(developmentalParallelEntry ? ["developmentalEntryAuthority=parallel-commercial-entry"] : [])]
+  });
 }
 
 function resolvePublicationIntentAuthority(input = {}) {
