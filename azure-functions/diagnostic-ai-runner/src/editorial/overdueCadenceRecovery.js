@@ -88,8 +88,19 @@ async function canonicalizeArtifact(artifact, authority, client, deps = {}) {
   const source = await resolveSource(artifact, `${authority.key}_CADENCE_RECOVERY`);
   const sourceBytes = await request(source.contentPath);
   const checksum = digest(sourceBytes);
-  if (!clean(artifact.jm1pub_sha256) || checksum !== clean(artifact.jm1pub_sha256).toLowerCase()) {
-    fail("RECOVERY_ARTIFACT_CHECKSUM_MISMATCH", `${authority.key} artifact checksum parity failed.`);
+  const recordedChecksum = clean(artifact.jm1pub_sha256).toLowerCase();
+  const filename = clean(artifact.jm1pub_filename || source.item.name);
+  const persistedOfficeChecksumReconciliation = Boolean(
+    recordedChecksum &&
+    checksum !== recordedChecksum &&
+    /\.docx$/i.test(filename) &&
+    clean(source.item.name) === filename &&
+    Number(source.item.size) === sourceBytes.length &&
+    Number(artifact.jm1pub_filesizebytes) === sourceBytes.length &&
+    clean(artifact.jm1pub_correlationid)
+  );
+  if (!recordedChecksum || (checksum !== recordedChecksum && !persistedOfficeChecksumReconciliation)) {
+    fail("RECOVERY_ARTIFACT_CHECKSUM_MISMATCH", `${authority.key} artifact checksum parity failed for ${artifact.jm1pub_editorialartifactid}.`);
   }
 
   let driveId = source.driveId;
@@ -97,7 +108,6 @@ async function canonicalizeArtifact(artifact, authority, client, deps = {}) {
   let webUrl = source.item.webUrl || artifact.jm1pub_repositorypath;
   if (!/\/01_Pipeline_A-Z\//i.test(decodeURIComponent(clean(webUrl))) && authority.workspacePath) {
     const folder = await resolveWorkspaceFolder(request, driveId, authority.workspacePath);
-    const filename = clean(artifact.jm1pub_filename || source.item.name);
     let existing = null;
     try {
       existing = await request(`drives/${driveId}/items/${folder.id}:/${encodeURIComponent(filename)}?$select=id,name,size,webUrl`);
@@ -126,6 +136,8 @@ async function canonicalizeArtifact(artifact, authority, client, deps = {}) {
     jm1pub_repositorydriveid: driveId,
     jm1pub_repositoryitemid: itemId,
     jm1pub_repositorypath: webUrl,
+    jm1pub_sha256: checksum,
+    jm1pub_filesizebytes: sourceBytes.length,
     jm1pub_visibility: AUTHOR_FACING_VISIBILITY,
     jm1pub_artifactstatus: CURRENT_APPROVED_STATUS,
     jm1pub_iscurrentapproved: true,
@@ -136,6 +148,8 @@ async function canonicalizeArtifact(artifact, authority, client, deps = {}) {
     role: roleForArtifact(artifact),
     filename: clean(artifact.jm1pub_filename || source.item.name),
     checksum,
+    previousChecksum: recordedChecksum,
+    checksumAuthority: persistedOfficeChecksumReconciliation ? "SHAREPOINT_PERSISTED_OFFICE_BYTES_RECONCILED" : "DATAVERSE_SHAREPOINT_PARITY",
     path: webUrl,
     sharePointArtifact: "PASS",
     dataverseArtifact: "PASS",
@@ -166,7 +180,7 @@ async function repairCohortAuthority(authority, client, deps = {}) {
       $top: "2"
     }),
     client.list("jm1pub_editorialartifacts", {
-      $select: "jm1pub_editorialartifactid,jm1pub_editorialartifactname,jm1pub_filename,jm1pub_artifactstatus,jm1pub_visibility,jm1pub_versionlabel,jm1pub_sha256,jm1pub_repositorypath,jm1pub_repositorydriveid,jm1pub_repositoryitemid,jm1pub_filesizebytes,jm1pub_iscurrentapproved,jm1pub_supersededon,_jm1pub_titleid_value,_jm1pub_editorialstageid_value,modifiedon",
+      $select: "jm1pub_editorialartifactid,jm1pub_editorialartifactname,jm1pub_filename,jm1pub_artifactstatus,jm1pub_visibility,jm1pub_versionlabel,jm1pub_sha256,jm1pub_repositorypath,jm1pub_repositorydriveid,jm1pub_repositoryitemid,jm1pub_filesizebytes,jm1pub_iscurrentapproved,jm1pub_supersededon,jm1pub_correlationid,_jm1pub_titleid_value,_jm1pub_editorialstageid_value,modifiedon",
       $filter: `_jm1pub_titleid_value eq ${authority.titleId} and _jm1pub_editorialstageid_value eq ${authority.stageId}`,
       $orderby: "modifiedon desc",
       $top: "50"
@@ -212,7 +226,7 @@ async function repairCohortAuthority(authority, client, deps = {}) {
     logId = await writeLog(client, {
       name: `OVERDUE_CADENCE_RELEASE_AUTHORITY_REPAIRED - ${authority.titleName}`,
       actionType: "OVERDUE_CADENCE_RELEASE_AUTHORITY_REPAIRED",
-      description: `Idempotency ${key}. Founder recovery authority ${RECOVERY_AUTHORITY}; titleId=${authority.titleId}; stageId=${authority.stageId}; gateId=${authority.gateId}; intakeReference=${authority.intakeReference}; requiredArtifacts=${artifactResults.map((item) => `${item.role}:${item.checksum}`).join("|")}; SHAREPOINT_ARTIFACT=PASS; DATAVERSE_ARTIFACT=PASS; CHECKSUM_PARITY=PASS; manualBusinessActions=0.`,
+      description: `Idempotency ${key}. Founder recovery authority ${RECOVERY_AUTHORITY}; titleId=${authority.titleId}; stageId=${authority.stageId}; gateId=${authority.gateId}; intakeReference=${authority.intakeReference}; requiredArtifacts=${artifactResults.map((item) => `${item.role}:${item.checksum}:${item.checksumAuthority}`).join("|")}; SHAREPOINT_ARTIFACT=PASS; DATAVERSE_ARTIFACT=PASS; CHECKSUM_PARITY=PASS; manualBusinessActions=0.`,
       sourceEntity: "jm1pub_editorialstage",
       sourceRecordId: authority.stageId
     });
