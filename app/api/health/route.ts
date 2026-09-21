@@ -46,7 +46,9 @@ export async function GET() {
   dependencies.relayHost = await relayHostHealth()
 
   const agreementPaymentGate = productionPaymentGateReadback()
-  const paymentGate = agreementPaymentGate.enabled ? 'enabled' : 'disabled'
+  const paymentGate = process.env.JM1_STRIPE_COMMISSIONING_PAYMENT_ENABLED === 'true'
+    ? 'enabled'
+    : 'disabled'
   const sessionSecret = process.env.AUTHOR_PORTAL_SESSION_SECRET?.trim() || ''
   const release = readPackagedReleaseSha() ||
     process.env.JM1_RELEASE_SHA ||
