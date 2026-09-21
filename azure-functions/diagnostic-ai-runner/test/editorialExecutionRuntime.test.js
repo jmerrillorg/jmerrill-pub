@@ -28,6 +28,8 @@ const {
   readPersistedGraphContent,
   buildProofreadingCoverNote,
   buildChunkedDevelopmentalInvocation,
+  buildDevelopmentalAuthorReviewDocx,
+  buildDevelopmentalEditorialReviewDocx,
   validateDevelopmentalChunkOutput,
   isLivePortfolioStage,
   buildLineEditingQa,
@@ -788,6 +790,36 @@ test("Developmental retry prompt explicitly removes internal labels from every a
   assert.match(prompt.authorExperienceRules.join(" "), /internal classification label/);
   assert.match(prompt.schemaRetryInstruction, /author-experience projection/);
   assert.match(prompt.schemaRetryInstruction, /no internal classification labels/);
+});
+
+test("Developmental author artifacts render real paragraphs and a bounded publisher review", async () => {
+  const summaries = Array.from({ length: 96 }, (_, index) =>
+    `Chunk ${index + 1} strengthened structure, reader orientation, and narrative flow while preserving the author's voice.`
+  );
+  const changes = Array.from({ length: 96 }, (_, index) =>
+    `Chunk ${index + 1}: improved the transition into section ${index + 1}.`
+  );
+  const invocation = {
+    sourceText: "Chapter One\n\nOriginal paragraph with a clear opening for readers today.",
+    output: {
+      editedManuscript: "Chapter One\\n\\nRevised paragraph with a clear opening for readers today.",
+      developmentalSummary: summaries.join("\n\n"),
+      appliedChanges: changes,
+      authorNotes: [{ class: "EDITOR_NOTE", anchor: "Revised paragraph", message: "The next chunk continues this idea." }],
+      internalNotes: [],
+      authorityActions: [{ classification: "SYSTEM_AUTHORIZED_EDIT", description: "Clarified the opening." }]
+    }
+  };
+  const stage = { jm1pub_name: "Developmental Editing - Test" };
+  const authorReview = await mammoth.extractRawText({ buffer: await buildDevelopmentalAuthorReviewDocx(stage, invocation) });
+  const editorialReview = await mammoth.extractRawText({ buffer: await buildDevelopmentalEditorialReviewDocx(stage, invocation) });
+
+  assert.doesNotMatch(authorReview.value, /\\n/);
+  assert.match(authorReview.value, /Chapter One\n\nRevised paragraph/);
+  assert.match(authorReview.value, /following section continues this idea/i);
+  assert.doesNotMatch(editorialReview.value, /\bchunk\s+\d+/i);
+  assert.equal(editorialReview.value.split(/\s+/).filter(Boolean).length < 2500, true);
+  assert.match(editorialReview.value, /Detailed editor's notes and author questions appear alongside the relevant passages/i);
 });
 
 test("targeted editorial execution dry-run resolves exactly one Line stage/source without mutations", async () => {
