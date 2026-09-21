@@ -68,6 +68,7 @@ async function sendAttaTitleDecision(input = {}, deps = {}) {
   };
   const reserveIntent = deps.reserveCommunicationIntent || intentStore().reserveCommunicationIntent;
   const markSent = deps.markCommunicationSent || intentStore().markCommunicationSent;
+  const markFailed = deps.markCommunicationFailed || intentStore().markCommunicationFailed;
   const reserve = await reserveIntent(client, intent);
   if (reserve.status !== "RESERVED") return { ok: true, status: reserve.status, communicationsSent: 0, semanticIdempotencyKey: reserve.semanticIdempotencyKey, communicationRecordId: reserve.communicationRecordId };
   const payload = {
@@ -90,7 +91,18 @@ async function sendAttaTitleDecision(input = {}, deps = {}) {
       method: "POST", headers: { "Content-Type": "application/json", "x-jm1-relay-key": relayKey }, body: JSON.stringify(payload)
     });
     const body = await response.json().catch(() => null);
-    if (!response.ok || (!body?.accepted && !body?.providerMessageId)) return blocked("RELAY_SEND_FAILED", body?.reason || body?.code || `HTTP_${response.status}`, { relayResponse: body });
+    if (!response.ok || (!body?.accepted && !body?.providerMessageId)) {
+      const failureCode = body?.reason || body?.code || `HTTP_${response.status}`;
+      if (response.status >= 400 && response.status < 500 && failureCode !== "AMBIGUOUS_SEND_STATE") {
+        await markFailed(client, {
+          ...intent,
+          semanticIdempotencyKey: reserve.semanticIdempotencyKey,
+          communicationRecordId: reserve.communicationRecordId,
+          failureCode
+        });
+      }
+      return blocked("RELAY_SEND_FAILED", failureCode, { relayResponse: body });
+    }
     relayResult = { status: body.deliveryStatus === "ALREADY_DELIVERED" ? "ALREADY_DELIVERED" : "SENT", ...body };
   }
   if (relayResult.status !== "SENT" && relayResult.status !== "ALREADY_DELIVERED") return blocked("RELAY_SEND_FAILED", "Relay did not prove delivery.", { relayResult });
