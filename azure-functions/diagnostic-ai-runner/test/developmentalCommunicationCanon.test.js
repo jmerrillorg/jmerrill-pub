@@ -142,6 +142,36 @@ test("system renderer creates conversational Indomitable copy from a complete go
   assert.deepEqual(payload.cc, ["publishing@jmerrill.one"]);
 });
 
+test("deterministic relay denial records a pre-delivery failure before retry", async () => {
+  const created = [];
+  const priorKey = process.env.JM1_RELAY_API_KEY;
+  process.env.JM1_RELAY_API_KEY = "test-relay-key";
+  const result = await sendCadenceAuthorReviewPackage(input([
+    artifact("editedManuscript"),
+    artifact("reviewInstructions")
+  ]), {
+    client: { async create(entity, body) { created.push({ entity, body }); return "failure-record"; } },
+    downloadArtifact,
+    reserveCommunicationIntent: async () => ({
+      status: "RESERVED",
+      semanticIdempotencyKey: "communication:v1:exact",
+      communicationRecordId: "reservation-record"
+    }),
+    fetchImpl: async () => ({
+      ok: false,
+      status: 400,
+      async json() { return { reason: "AUTHOR_REVIEW_PACKAGE_TEXT_PORTAL_REFERENCE_REQUIRED" }; }
+    })
+  });
+  if (priorKey === undefined) delete process.env.JM1_RELAY_API_KEY;
+  else process.env.JM1_RELAY_API_KEY = priorKey;
+
+  assert.equal(result.status, "FAILED");
+  assert.equal(created.length, 1);
+  assert.equal(created[0].body.jm1_actiontype, "AUTHOR_COMMUNICATION_INTENT_FAILED");
+  assert.match(created[0].body.jm1_actiondescription, /DELIVERY_STATE=FAILED_PRE_DELIVERY/);
+});
+
 test("Developmental package rejects wrong title binding and version drift", async () => {
   await assert.rejects(
     materializeAttachments({

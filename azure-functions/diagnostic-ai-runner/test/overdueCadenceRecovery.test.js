@@ -3,7 +3,7 @@
 const test = require("node:test");
 const assert = require("node:assert/strict");
 const { createHash } = require("node:crypto");
-const { RECOVERY_COHORT, isCanonicalPipelineItem, repairCohortAuthority, roleForArtifact } = require("../src/editorial/overdueCadenceRecovery");
+const { RECOVERY_COHORT, isCanonicalPipelineItem, releaseProvenPreDeliveryReservations, repairCohortAuthority, roleForArtifact } = require("../src/editorial/overdueCadenceRecovery");
 
 function sha(bytes) {
   return createHash("sha256").update(bytes).digest("hex");
@@ -101,4 +101,36 @@ test("reconciles a SharePoint-persisted DOCX checksum only with exact item prove
   assert.equal(manuscript.checksumAuthority, "SHAREPOINT_PERSISTED_OFFICE_BYTES_RECONCILED");
   assert.equal(manuscript.checksum, sha(persisted));
   assert.equal(patches.some((item) => item.id === "artifact-manuscript" && item.body.jm1pub_sha256 === sha(persisted)), true);
+});
+
+test("releases only a reservation with exact deterministic pre-delivery denial proof", async () => {
+  const authority = RECOVERY_COHORT[0];
+  const created = [];
+  const repaired = [{
+    key: authority.key,
+    title: authority.titleName,
+    recipient: authority.recipient,
+    stageId: authority.stageId,
+    artifacts: [
+      { role: "editedManuscript", checksum: "a".repeat(64) },
+      { role: "reviewInstructions", checksum: "b".repeat(64) }
+    ]
+  }];
+  const client = {
+    async list(entity, query) {
+      if (query.$filter.includes("AUTHOR_COMMUNICATION_INTENT_RESERVED")) {
+        return [{ jm1_executionlogid: "reservation", jm1_actiontype: "AUTHOR_COMMUNICATION_INTENT_RESERVED", jm1_actiondescription: query.$filter.match(/communication:v1:[0-9a-f]+/)?.[0] || "" }];
+      }
+      if (query.$filter.includes("PACKAGE_CADENCE_RELEASE_SEND_BLOCKED")) {
+        return [{ jm1_executionlogid: "denial", jm1_actiontype: "PACKAGE_CADENCE_RELEASE_SEND_BLOCKED" }];
+      }
+      return [];
+    },
+    async create(entity, body) { created.push({ entity, body }); return "failure"; }
+  };
+
+  const result = await releaseProvenPreDeliveryReservations(repaired, client);
+  assert.equal(result.length, 1);
+  assert.equal(result[0].denialLogId, "denial");
+  assert.equal(created[0].body.jm1_actiontype, "AUTHOR_COMMUNICATION_INTENT_FAILED");
 });

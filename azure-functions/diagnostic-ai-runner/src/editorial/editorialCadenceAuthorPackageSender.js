@@ -3,6 +3,7 @@
 const { createHash } = require("node:crypto");
 const { DefaultAzureCredential } = require("@azure/identity");
 const {
+  markCommunicationFailed,
   markCommunicationSent,
   reserveCommunicationIntent
 } = require("./communicationIntentStore");
@@ -652,6 +653,15 @@ async function sendCadenceAuthorReviewPackage(input, deps = {}) {
   });
   const body = await response.json().catch(() => null);
   if (!response.ok || (!body?.accepted && !body?.providerMessageId)) {
+    if (response.status >= 400 && response.status < 500 && deps.client) {
+      await markCommunicationFailed(deps.client, {
+        ...intentInput,
+        semanticIdempotencyKey: reserve.semanticIdempotencyKey,
+        communicationRecordId: reserve.communicationRecordId,
+        failureCode: body?.reason || body?.code || `HTTP_${response.status}`,
+        failedAt: new Date().toISOString()
+      });
+    }
     return { status: "FAILED", blockers: [`RELAY_SEND_FAILED:${body?.reason || body?.code || response.status}`], relayResponse: body };
   }
   const status = body.deliveryStatus === "ALREADY_DELIVERED" ? "ALREADY_DELIVERED" : "SENT";
