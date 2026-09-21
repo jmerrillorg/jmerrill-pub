@@ -3399,6 +3399,8 @@ async function materializeEditorialOutputs(
     const isEditedManuscript =
       (stageCode === "LINE_EDITING" || stageCode === "COPYEDITING") && outputName === "Edited Manuscript";
     const isProofreadManuscript = stageCode === "PROOFREADING" && outputName === "Proofread Manuscript";
+    const isProofreadingCoverNote =
+      stageCode === "PROOFREADING" && outputName === "Proofreading Cover Note";
     const isReviewInstructions = outputName.toLowerCase().includes("review instructions");
     const shouldBuildDocx = isDevelopmentalAuthorReview || isDevelopmentalClean || isDevelopmentalReview || isEditedManuscript || isProofreadManuscript;
     const extension = shouldBuildDocx ? "docx" : isDevelopmentalEvidence ? "json" : isReviewInstructions ? "txt" : "md";
@@ -3418,6 +3420,8 @@ async function materializeEditorialOutputs(
         ? await buildDevelopmentalEditorialReviewDocx(stage, modelInvocation)
       : isDevelopmentalEvidence
         ? buildDevelopmentalInternalManifest(stage, sourceArtifact, correlationId, modelInvocation, outputs)
+      : isProofreadingCoverNote
+        ? Buffer.from(buildProofreadingCoverNote(stage), "utf8")
       : isLineEditedManuscript
         ? await buildLineEditedManuscriptDocx(stage, sourceArtifact, outputName, extracted.value || "", correlationId, modelInvocation)
       : isEditedManuscript || isProofreadManuscript
@@ -3517,6 +3521,18 @@ async function materializeEditorialOutputs(
     fellBack: Boolean(modelInvocation.fellBack)
   };
   return outputs;
+}
+
+function buildProofreadingCoverNote(stage) {
+  return [
+    `${authorTitleFromStage(stage)} - Proofreading Review`,
+    "",
+    "Your manuscript has completed proofreading and is ready for your review.",
+    "",
+    "Please read the attached proofread manuscript and note any corrections or questions you would like us to address.",
+    "",
+    "Reply to your J Merrill Publishing correspondence with your decision or requested corrections."
+  ].join("\n");
 }
 
 async function finalizeMaterializedEditorialOutputs(client, stage, stageCode, sourceArtifact, outputs, correlationId) {
@@ -4176,6 +4192,7 @@ module.exports = {
   parseNonNegativeInteger,
   splitLineEditingSourceChunks,
   buildLineEditingChunkPrompt,
+  buildProofreadingCoverNote,
   buildDevelopmentalEditingChunkPrompt,
   buildChunkedDevelopmentalInvocation,
   validateDevelopmentalChunkOutput,

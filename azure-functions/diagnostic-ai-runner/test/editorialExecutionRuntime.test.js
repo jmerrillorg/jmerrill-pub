@@ -24,6 +24,7 @@ const {
   invokeSingleStageModelProvider,
   splitLineEditingSourceChunks,
   buildLineEditingChunkPrompt,
+  buildProofreadingCoverNote,
   buildChunkedDevelopmentalInvocation,
   validateDevelopmentalChunkOutput,
   isLivePortfolioStage,
@@ -77,6 +78,14 @@ test("editorial execution runtime defines reusable executors for all required ed
   assert.equal(EXECUTOR_POLICIES.DEVELOPMENTAL_EDITING.outputRoles.includes("cleanEditedManuscript"), true);
   assert.equal(EXECUTOR_POLICIES.DEVELOPMENTAL_EDITING.outputRoles.includes("internalEvidenceManifest"), true);
   assert.equal(EXECUTOR_POLICIES.PROOFREADING.outputRoles.includes("proofreadManuscript"), true);
+});
+
+test("Proofreading cover note uses professional publisher language without internal machinery", () => {
+  const note = buildProofreadingCoverNote({ jm1pub_name: "Proofreading - Whole" });
+
+  assert.match(note, /Whole - Proofreading Review/);
+  assert.match(note, /ready for your review/);
+  assert.doesNotMatch(note, /JM1 Automation|AI model|Dataverse|Azure|Source artifact|Source checksum|Correlation|Execution ID|Capability ID|PROOFREADING_/i);
 });
 
 test("stage names normalize to canonical executor codes", () => {
