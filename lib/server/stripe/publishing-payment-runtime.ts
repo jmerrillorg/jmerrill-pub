@@ -53,6 +53,20 @@ export type CollectionAttempt = {
   createdAt: string
 }
 
+export type AdditionalPaymentRequest = {
+  requestId: string
+  idempotencyKey: string
+  agreementId: string
+  obligationId: string
+  amountCents: number
+  balanceBeforeCents: number
+  balanceAfterCents: number
+  balanceVersion: string
+  stripeCheckoutSessionId: string
+  expiresAt: number | null
+  createdAt: string
+}
+
 export interface PublishingPaymentLedger {
   getAgreement(agreementId: string): Promise<AgreementLedgerRecord | null>
   listDueAgreements(asOf: string): Promise<AgreementLedgerRecord[]>
@@ -84,6 +98,13 @@ export interface StripeAgreementCollections {
     idempotencyKey: string
     metadata: Record<string, string>
   }): Promise<{ invoiceId: string; hostedInvoiceUrl: string }>
+}
+
+export interface StripeAgreementPayoff {
+  stopFutureCollections(input: {
+    paymentScheduleId: string
+    idempotencyKey: string
+  }): Promise<{ status: 'CANCELLED' | 'ALREADY_STOPPED' }>
 }
 
 export type QboPaymentEffect = {
@@ -147,6 +168,22 @@ export function productionPaymentGateReadback(env: NodeJS.ProcessEnv = process.e
   ] as const
   const missing = required.filter((key) => clean(env[key]).toLowerCase() !== 'true')
   const requested = clean(env.JMP_AGREEMENT_PAYMENT_GATE_ENABLED).toLowerCase() === 'true'
+  return {
+    enabled: requested && missing.length === 0,
+    requested,
+    missing,
+    status: requested && missing.length === 0 ? 'PASS' : 'CLOSED',
+  } as const
+}
+
+export function productionAdditionalPaymentGateReadback(env: NodeJS.ProcessEnv = process.env) {
+  const required = [
+    'JMP_PAYMENT_LEDGER_COMMISSIONED',
+    'JMP_PAYMENT_STRIPE_RUNTIME_COMMISSIONED',
+    'JMP_PAYMENT_MONITORING_COMMISSIONED',
+  ] as const
+  const missing = required.filter((key) => clean(env[key]).toLowerCase() !== 'true')
+  const requested = clean(env.JMP_CUSTOMER_INITIATED_ADDITIONAL_PAYMENT_ENABLED).toLowerCase() === 'true'
   return {
     enabled: requested && missing.length === 0,
     requested,
@@ -257,14 +294,18 @@ export async function processConfirmedAgreementPayment(input: {
   occurredAt: string
   submittedBalanceVersion: string
   ledger: PublishingPaymentLedger
-  qbo: QboPublishingPaymentAdapter
+  qbo?: QboPublishingPaymentAdapter | null
+  payoff?: StripeAgreementPayoff | null
   telemetry?: PaymentRuntimeTelemetry
 }) {
   const duplicate = await input.ledger.findPaymentEvent(input.stripeEventId, input.stripePaymentId)
   if (duplicate) {
-    if (duplicate.qboReconciliationStatus === 'PASS') return { ok: true as const, idempotent: true, event: duplicate }
     const agreement = await input.ledger.getAgreement(input.agreementId)
     if (!agreement) return blocked('AGREEMENT_NOT_FOUND')
+    const payoff = await stopScheduleAfterPayoff({ agreement, event: duplicate, payoff: input.payoff, telemetry: input.telemetry })
+    if (!payoff.ok) return payoff
+    if (duplicate.qboReconciliationStatus === 'PASS') return { ok: true as const, idempotent: true, event: duplicate }
+    if (!input.qbo) return { ok: true as const, idempotent: true, event: duplicate, qboSyncState: 'PENDING_RECONCILIATION' as const }
     return reconcileQboEffect({ agreement, event: duplicate, ledger: input.ledger, qbo: input.qbo, telemetry: input.telemetry, idempotent: true })
   }
   const agreement = await input.ledger.getAgreement(input.agreementId)
@@ -312,7 +353,38 @@ export async function processConfirmedAgreementPayment(input: {
   const committed = await input.ledger.appendConfirmedPayment({ agreement, event, payment, expectedEtag: agreement.etag })
   if (!committed.applied) return blocked('CONCURRENT_BALANCE_WRITE_REJECTED')
 
+  const payoff = await stopScheduleAfterPayoff({ agreement: committed.record, event, payoff: input.payoff, telemetry: input.telemetry })
+  if (!payoff.ok) return payoff
+
+  if (!input.qbo) {
+    input.telemetry?.({ name: 'publishing.payment.qbo', success: true, code: 'QBO_RECONCILIATION_QUEUED', agreementId: input.agreementId })
+    return { ok: true as const, idempotent: false, event, qboSyncState: 'PENDING_RECONCILIATION' as const }
+  }
   return reconcileQboEffect({ agreement: committed.record, event, ledger: input.ledger, qbo: input.qbo, telemetry: input.telemetry, idempotent: false })
+}
+
+async function stopScheduleAfterPayoff(input: {
+  agreement: AgreementLedgerRecord
+  event: PaymentEventRecord
+  payoff?: StripeAgreementPayoff | null
+  telemetry?: PaymentRuntimeTelemetry
+}) {
+  if (input.event.balanceAfterCents !== 0) return { ok: true as const, required: false }
+  if (!input.payoff) {
+    input.telemetry?.({ name: 'publishing.payment.payoff', success: false, code: 'PAYOFF_SCHEDULE_ADAPTER_REQUIRED', agreementId: input.event.agreementId })
+    return blocked('PAYOFF_SCHEDULE_ADAPTER_REQUIRED', { paymentRecorded: true, paymentEventId: input.event.paymentEventId })
+  }
+  try {
+    const result = await input.payoff.stopFutureCollections({
+      paymentScheduleId: required(input.agreement.snapshot.paymentScheduleId, 'PAYMENT_SCHEDULE_ID_REQUIRED'),
+      idempotencyKey: hashKey('payoff', input.event.paymentEventId),
+    })
+    input.telemetry?.({ name: 'publishing.payment.payoff', success: true, code: result.status, agreementId: input.event.agreementId })
+    return { ok: true as const, required: true, status: result.status }
+  } catch (error) {
+    input.telemetry?.({ name: 'publishing.payment.payoff', success: false, code: safeCode(error), agreementId: input.event.agreementId })
+    return blocked('PAYOFF_SCHEDULE_STOP_FAILED', { paymentRecorded: true, paymentEventId: input.event.paymentEventId })
+  }
 }
 
 async function reconcileQboEffect(input: {
