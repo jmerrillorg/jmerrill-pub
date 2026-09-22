@@ -228,6 +228,34 @@ describe("Sender resolution and classification", () => {
     assert.equal(classified.manualReviewRequired, true);
   });
 
+  test("holds approval with corrections as a mixed author response", () => {
+    const evidence = buildMessageEvidence(message({ subject: "Approval with Corrections - Untitled Edited Manuscript" }));
+    const classified = classifyInboundMessage(evidence, [], resolveSender(evidence, context));
+    assert.equal(classified.messageClass, MESSAGE_CLASS.AUTHOR_RESPONSE);
+    assert.equal(classified.manualReviewRequired, true);
+  });
+
+  test("routes an installment request to payment correspondence", () => {
+    const evidence = buildMessageEvidence(message({ subject: "Request for 2nd and 3rd Installment Payment Plan" }));
+    const classified = classifyInboundMessage(evidence, [], resolveSender(evidence, context));
+    assert.equal(classified.messageClass, MESSAGE_CLASS.PAYMENT_CORRESPONDENCE);
+    assert.equal(classified.manualReviewRequired, true);
+  });
+
+  test("does not classify an unrelated question as an author question", () => {
+    const evidence = buildMessageEvidence(message({
+      subject: "Apply Today?",
+      from: { emailAddress: { address: "newsletter@example.net" } },
+      body: { content: "Would you like to join?" }
+    }));
+    const classified = classifyInboundMessage(
+      { ...evidence, bodyTextForClassification: "Would you like to join?" },
+      [],
+      resolveSender(evidence, context)
+    );
+    assert.equal(classified.messageClass, MESSAGE_CLASS.UNCLASSIFIED);
+  });
+
   test("classifies access support as author question", () => {
     const evidence = buildMessageEvidence(message({ subject: "Re: Updated Publishing Confirmation Link", body: { content: "I did not receive the code. Please assist." } }));
     const classified = classifyInboundMessage({ ...evidence, bodyTextForClassification: "I did not receive the code. Please assist." }, [], resolveSender(evidence, context));

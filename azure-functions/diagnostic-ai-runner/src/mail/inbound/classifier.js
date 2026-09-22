@@ -42,6 +42,23 @@ const RULES = [
       attachmentExtensions.some((ext) => ["docx", "pdf"].includes(ext))
   },
   {
+    messageClass: MESSAGE_CLASS.AUTHOR_RESPONSE,
+    authority: CLASSIFICATION_AUTHORITY.REVIEW_REQUIRED,
+    confidence: 0.82,
+    manualReviewRequired: true,
+    test: ({ text, sender }) =>
+      sender.identityType === "CONTACT" &&
+      /\b(approved?|approval|looks good)\b/i.test(text) &&
+      /\b(corrections?|changes?|revisions?|edits needed)\b/i.test(text)
+  },
+  {
+    messageClass: MESSAGE_CLASS.PAYMENT_CORRESPONDENCE,
+    authority: CLASSIFICATION_AUTHORITY.REVIEW_REQUIRED,
+    confidence: 0.78,
+    manualReviewRequired: true,
+    test: ({ text }) => /\b(payment|invoice|paid|charge|checkout|installment)\b/i.test(text)
+  },
+  {
     messageClass: MESSAGE_CLASS.AUTHOR_CLARIFICATION,
     authority: CLASSIFICATION_AUTHORITY.HIGH_CONFIDENCE,
     confidence: 0.88,
@@ -52,14 +69,14 @@ const RULES = [
     authority: CLASSIFICATION_AUTHORITY.REVIEW_REQUIRED,
     confidence: 0.82,
     manualReviewRequired: true,
-    test: ({ text }) => /\b(i approve|approved|approval|looks good|move forward|proceed)\b/i.test(text)
+    test: ({ text, sender }) => sender.identityType === "CONTACT" && /\b(i approve|approved|approval|looks good|move forward|proceed)\b/i.test(text)
   },
   {
     messageClass: MESSAGE_CLASS.AUTHOR_REQUEST_CHANGES,
     authority: CLASSIFICATION_AUTHORITY.REVIEW_REQUIRED,
     confidence: 0.82,
     manualReviewRequired: true,
-    test: ({ text }) => /\b(request changes|please change|revise|correction|not correct|edits needed)\b/i.test(text)
+    test: ({ text, sender }) => sender.identityType === "CONTACT" && /\b(request changes|please change|revise|correction|not correct|edits needed)\b/i.test(text)
   },
   {
     messageClass: MESSAGE_CLASS.AUTHOR_DECLINE,
@@ -80,7 +97,7 @@ const RULES = [
     authority: CLASSIFICATION_AUTHORITY.REVIEW_REQUIRED,
     confidence: 0.76,
     manualReviewRequired: true,
-    test: ({ text }) => /\?|question|please assist|help|code|cannot access|did not receive/i.test(text)
+    test: ({ text, sender }) => sender.identityType === "CONTACT" && /\?|question|please assist|help|code|cannot access|did not receive/i.test(text)
   },
   {
     messageClass: MESSAGE_CLASS.AGREEMENT_RESPONSE,
@@ -88,13 +105,6 @@ const RULES = [
     confidence: 0.78,
     manualReviewRequired: true,
     test: ({ text }) => /\b(agreement|contract|sign|signature)\b/i.test(text)
-  },
-  {
-    messageClass: MESSAGE_CLASS.PAYMENT_CORRESPONDENCE,
-    authority: CLASSIFICATION_AUTHORITY.REVIEW_REQUIRED,
-    confidence: 0.78,
-    manualReviewRequired: true,
-    test: ({ text }) => /\b(payment|invoice|paid|charge|checkout|installment)\b/i.test(text)
   },
   {
     messageClass: MESSAGE_CLASS.SECURITY_NOTICE,
