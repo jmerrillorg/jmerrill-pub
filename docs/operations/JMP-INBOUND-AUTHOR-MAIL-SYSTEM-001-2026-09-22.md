@@ -8,6 +8,7 @@ Packet: `JMP-INBOUND-AUTHOR-MAIL-SYSTEM-001`
 - Phase 1 mode: `PRODUCTION_MONITORING`; delta reconciliation enabled; evidence store: blob.
 - The Function App exposes the inbound notification, delta, health, queue, shadow-run, subscription, and asset-placement endpoints. It does not expose a Phase 2 author-response endpoint. The `A2_PRODUCTION_ACTIVE` app setting does not establish a deployed processor.
 - At readback, inbound health reported 2,499 review items, zero failed messages, zero author decisions, and zero title lifecycle transitions. The last delta reconciliation was `2026-09-22T19:35:00.164Z`.
+- A separate `run-author-review-response-consumer` function is deployed and runs every five minutes. Its Application Insights traces from `18:50Z` through `19:45Z` repeatedly reported `processed=0; idempotent=0; checked=10`. The Phase 1 counters alone do not cover that worker, but the worker's own traces show no processing during this interval.
 - The queue readback contained ten messages received on September 22 UTC, four of which were correlated author replies. The other six were not author responses and did not have an author/title binding.
 
 | Message received (UTC) | Subject | Phase 1 classification | System correlation | Durable state |
@@ -24,7 +25,7 @@ The two Atta editorial rows are distinct inbound message events. Their identical
 1. Phase 1 classified mixed approval/correction language as plain approval. The corrected classifier emits `AUTHOR_RESPONSE` with human review required.
 2. Phase 1 classified an installment payment request as a general author question. The corrected classifier emits `PAYMENT_CORRESPONDENCE` with human review required.
 3. Unrelated messages with a question mark entered the author-question queue. The corrected author-question rule requires a deterministically identified author contact.
-4. The currently deployed Phase 2 setting has no corresponding deployed author-response processor. Consequently, current production evidence does not show system-owned response-event persistence, editorial/payment routing, or governed human-review disposition for these messages. This is a separate open producer defect; Phase 1 queue presence must not be reported as full processing.
+4. The currently deployed Phase 2 setting has no corresponding deployed Phase 2 author-response function. A separate gate-scanning author-review consumer is deployed, but its current runs processed zero replies. Consequently, current production evidence does not show system-owned response-event persistence, editorial/payment routing, or governed human-review disposition for these messages. This is a separate open producer defect; Phase 1 queue presence must not be reported as full processing.
 
 The classifier correction is source-level until merged, deployed, and the affected messages are replayed through the governed system. No manual business record, payment, author decision, stage transition, or communication was created by this packet.
 
