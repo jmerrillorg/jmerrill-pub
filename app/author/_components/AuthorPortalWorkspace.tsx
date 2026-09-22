@@ -9,6 +9,12 @@ import type { AuthorPortalContext } from '@/lib/server/author-portal-context'
 
 type LoadState = 'loading' | 'ready' | 'error'
 type MarketingSaveState = 'idle' | 'saving' | 'saved' | 'error'
+type AdditionalPaymentState = {
+  status: 'loading' | 'eligible' | 'unavailable' | 'starting' | 'error'
+  currentBalanceCents?: number
+  maximumAmountCents?: number
+  message?: string
+}
 type MarketingProfileResponse = {
   ok?: boolean
   status?: string
@@ -50,6 +56,8 @@ export function AuthorPortalWorkspace() {
     instagram: '',
     xTwitter: '',
   })
+  const [additionalPayment, setAdditionalPayment] = useState<AdditionalPaymentState>({ status: 'loading' })
+  const [additionalAmount, setAdditionalAmount] = useState('')
 
   useEffect(() => {
     let mounted = true
@@ -169,6 +177,29 @@ export function AuthorPortalWorkspace() {
     })
   }, [context?.author.contactId, context?.author.marketingProfile])
 
+  useEffect(() => {
+    if (!context?.author.contactId) return
+    let mounted = true
+    const opportunityId = (findProjectForSelection(context, selectedParams) || context.currentProject).opportunityId || ''
+    const query = opportunityId ? `?opportunityId=${encodeURIComponent(opportunityId)}` : ''
+    fetch(`/api/author/stripe/payment/additional${query}`, { cache: 'no-store' })
+      .then(async (response) => ({ response, body: await response.json().catch(() => ({})) }))
+      .then(({ response, body }) => {
+        if (!mounted) return
+        if (!response.ok || !body.eligible) {
+          setAdditionalPayment({ status: 'unavailable' })
+          return
+        }
+        setAdditionalPayment({
+          status: 'eligible',
+          currentBalanceCents: body.currentBalanceCents,
+          maximumAmountCents: body.maximumAmountCents,
+        })
+      })
+      .catch(() => mounted && setAdditionalPayment({ status: 'error', message: 'We could not load payment options right now.' }))
+    return () => { mounted = false }
+  }, [context, selectedParams])
+
   async function submitMarketingProfile(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     if (marketingSaveState === 'saving') return
@@ -285,6 +316,30 @@ export function AuthorPortalWorkspace() {
     }
 
     await signOut({ callbackUrl: '/author/portal' })
+  }
+
+  async function handleAdditionalPayment(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    if (!context || additionalPayment.status === 'starting') return
+    const amountCents = Math.round(Number(additionalAmount) * 100)
+    if (!Number.isSafeInteger(amountCents) || amountCents < 100 || amountCents > Number(additionalPayment.maximumAmountCents || 0)) {
+      setAdditionalPayment((current) => ({ ...current, status: 'error', message: 'Enter an amount between $1.00 and your remaining balance.' }))
+      return
+    }
+    setAdditionalPayment((current) => ({ ...current, status: 'starting', message: '' }))
+    const opportunityId = (findProjectForSelection(context, selectedParams) || context.currentProject).opportunityId || ''
+    try {
+      const response = await fetch(`/api/author/stripe/payment/additional?opportunityId=${encodeURIComponent(opportunityId)}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ amountCents, operationId: crypto.randomUUID() }),
+      })
+      const body = await response.json().catch(() => ({}))
+      if (!response.ok || !body.checkoutUrl) throw new Error(body.reason || 'PAYMENT_PATH_UNAVAILABLE')
+      window.location.assign(body.checkoutUrl)
+    } catch {
+      setAdditionalPayment((current) => ({ ...current, status: 'error', message: 'We could not open the secure payment page. Please try again.' }))
+    }
   }
 
   return (
@@ -484,6 +539,45 @@ export function AuthorPortalWorkspace() {
           <p className="text-[13px] font-light leading-[1.7] text-white/35">
             Official approvals and time-sensitive publishing decisions continue through email while this center matures as a reliable operating dashboard.
           </p>
+        </section>
+      ) : null}
+
+      {additionalPayment.status !== 'unavailable' ? (
+        <section className="rounded-[28px] border border-blue-400/20 bg-blue-500/[0.06] p-6">
+          <p className="font-mono text-[10px] uppercase tracking-[0.1em] text-blue-200/65">Payments</p>
+          <h3 className="mt-2 text-[20px] font-semibold text-white">Make an additional payment</h3>
+          <p className="mt-2 max-w-[720px] text-[13px] font-light leading-[1.75] text-white/55">
+            Choose an amount to apply toward your remaining publishing balance. Your regular installment schedule stays in place unless the balance is paid in full.
+          </p>
+          {additionalPayment.currentBalanceCents ? (
+            <p className="mt-4 text-[13px] font-semibold text-blue-100">
+              Remaining balance: {formatMoney(additionalPayment.currentBalanceCents)}
+            </p>
+          ) : null}
+          <form className="mt-5 flex max-w-[520px] flex-col gap-3 sm:flex-row sm:items-end" onSubmit={handleAdditionalPayment}>
+            <label className="block flex-1">
+              <span className="text-[12px] font-semibold text-white/70">Additional amount</span>
+              <input
+                type="number"
+                min="1"
+                step="0.01"
+                max={additionalPayment.maximumAmountCents ? (additionalPayment.maximumAmountCents / 100).toFixed(2) : undefined}
+                value={additionalAmount}
+                onChange={(event) => setAdditionalAmount(event.target.value)}
+                disabled={!['eligible', 'error'].includes(additionalPayment.status)}
+                className="mt-2 w-full rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-[14px] text-white outline-none transition-colors focus:border-blue-300/60 disabled:opacity-50"
+                placeholder="0.00"
+              />
+            </label>
+            <button
+              type="submit"
+              disabled={!['eligible', 'error'].includes(additionalPayment.status)}
+              className="inline-flex min-h-[46px] items-center justify-center rounded-full bg-blue-500 px-5 text-[12px] font-semibold uppercase tracking-[0.08em] text-white transition-colors hover:bg-blue-400 disabled:cursor-not-allowed disabled:bg-blue-500/45"
+            >
+              {additionalPayment.status === 'starting' ? 'Opening secure payment...' : 'Continue to secure payment'}
+            </button>
+          </form>
+          {additionalPayment.message ? <p className="mt-3 text-[13px] text-amber-100">{additionalPayment.message}</p> : null}
         </section>
       ) : null}
 
@@ -716,6 +810,10 @@ function relationshipActivationLabel(
     default:
       return 'Pending Validation'
   }
+}
+
+function formatMoney(cents: number) {
+  return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(cents / 100)
 }
 
 function relationshipHealthLabel(

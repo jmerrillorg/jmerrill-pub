@@ -115,11 +115,19 @@ class FakeQbo {
   }
 }
 
+class FakePayoff {
+  constructor() { this.calls = [] }
+  async stopFutureCollections(input) {
+    this.calls.push(structuredClone(input))
+    return { status: 'CANCELLED' }
+  }
+}
+
 function allocate(amountCents, intent = 'ADDITIONAL_PAYMENT', source = snapshot()) {
   return domain.allocateIncomingPayment({ snapshot: source, amountCents, intent, asOf: AS_OF })
 }
 
-async function confirm({ ledger = new MemoryLedger(), qbo = new FakeQbo(), amountCents = 50000, intent = 'ADDITIONAL_PAYMENT', event = 'evt_1', payment = 'pi_1' } = {}) {
+async function confirm({ ledger = new MemoryLedger(), qbo = new FakeQbo(), payoff = new FakePayoff(), amountCents = 50000, intent = 'ADDITIONAL_PAYMENT', event = 'evt_1', payment = 'pi_1' } = {}) {
   const state = domain.calculateAgreementPaymentState(ledger.record.snapshot)
   const result = await runtime.processConfirmedAgreementPayment({
     agreementId: ledger.record.snapshot.agreementId,
@@ -132,8 +140,9 @@ async function confirm({ ledger = new MemoryLedger(), qbo = new FakeQbo(), amoun
     submittedBalanceVersion: state.balanceVersion,
     ledger,
     qbo,
+    payoff,
   })
-  return { result, ledger, qbo }
+  return { result, ledger, qbo, payoff }
 }
 
 test('Case A cures oldest past due then classifies remainder as additional', () => {
@@ -343,10 +352,11 @@ test('additional-payment invoice is bounded, versioned, and reuses same Stripe c
 
 test('exact payoff marks durable agreement paid and stops recurring cadence', async () => {
   const ledger = new MemoryLedger(agreement({ contractualBalanceCents: 11742, scheduledObligations: [{ obligationId: 'final', dueDate: '2026-09-01T00:00:00.000Z', amountCents: 11742, status: 'PAST_DUE' }] }))
-  const { result } = await confirm({ ledger, amountCents: 11742, intent: 'CURRENT_PAYMENT' })
+  const { result, payoff } = await confirm({ ledger, amountCents: 11742, intent: 'CURRENT_PAYMENT' })
   assert.equal(result.ok, true)
   assert.equal(ledger.record.status, 'PAID_IN_FULL')
   assert.equal(domain.calculateAgreementPaymentState(ledger.record.snapshot).recurringCadenceActive, false)
+  assert.equal(payoff.calls.length, 1)
 })
 
 test('ledger state rebuild is deterministic across event order', () => {
@@ -372,6 +382,40 @@ test('production gate stays closed until every commissioned dependency is explic
     JMP_PAYMENT_MONITORING_COMMISSIONED: 'true',
   })
   assert.equal(open.enabled, true)
+})
+
+test('customer-initiated additional payment gate is independent of recurring collection and QBO', () => {
+  const gate = runtime.productionAdditionalPaymentGateReadback({
+    JMP_CUSTOMER_INITIATED_ADDITIONAL_PAYMENT_ENABLED: 'true',
+    JMP_PAYMENT_LEDGER_COMMISSIONED: 'true',
+    JMP_PAYMENT_STRIPE_RUNTIME_COMMISSIONED: 'true',
+    JMP_PAYMENT_MONITORING_COMMISSIONED: 'true',
+    JMP_AGREEMENT_PAYMENT_GATE_ENABLED: 'false',
+    JMP_PAYMENT_QBO_WRITE_COMMISSIONED: 'false',
+  })
+  assert.equal(gate.enabled, true)
+  assert.deepEqual(gate.missing, [])
+})
+
+test('confirmed additional payment remains successful while QBO reconciliation is queued', async () => {
+  const ledger = new MemoryLedger()
+  const state = domain.calculateAgreementPaymentState(ledger.record.snapshot)
+  const result = await runtime.processConfirmedAgreementPayment({
+    agreementId: ledger.record.snapshot.agreementId,
+    stripeEventId: 'evt_additional_pending_qbo',
+    stripePaymentId: 'pi_additional_pending_qbo',
+    stripeInvoiceId: null,
+    amountCents: 50000,
+    intent: 'ADDITIONAL_PAYMENT',
+    occurredAt: AS_OF,
+    submittedBalanceVersion: state.balanceVersion,
+    ledger,
+    qbo: null,
+  })
+  assert.equal(result.ok, true)
+  assert.equal(result.qboSyncState, 'PENDING_RECONCILIATION')
+  assert.equal(ledger.appendCount, 1)
+  assert.equal(ledger.events.values().next().value.qboReconciliationStatus, 'PENDING')
 })
 
 test('monitoring health fails closed without executor freshness and on QBO mismatch', () => {

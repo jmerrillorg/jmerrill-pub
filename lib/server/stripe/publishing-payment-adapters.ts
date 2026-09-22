@@ -15,7 +15,9 @@ import type {
 } from './publishing-agreement-payment'
 import { calculateAgreementPaymentState } from './publishing-agreement-payment'
 import {
+  productionAdditionalPaymentGateReadback,
   productionPaymentGateReadback,
+  type AdditionalPaymentRequest,
   type AgreementLedgerRecord,
   type CollectionAttempt,
   type PaymentEventRecord,
@@ -23,6 +25,7 @@ import {
   type QboPaymentEffect,
   type QboPublishingPaymentAdapter,
   type StripeAgreementCollections,
+  type StripeAgreementPayoff,
 } from './publishing-payment-runtime'
 
 const STRIPE_API_BASE = 'https://api.stripe.com'
@@ -38,6 +41,14 @@ export function createDataversePublishingPaymentLedger(): PublishingPaymentLedge
 
 export class DataversePublishingPaymentLedger implements PublishingPaymentLedger {
   constructor(private readonly config: DataverseServerConfig) {}
+
+  async findActiveAgreementsForAuthor(authorId: string) {
+    const rows = await dataverseList(this.config, AGREEMENTS, {
+      $select: agreementSelect,
+      $filter: `jmpv2_authoridentity eq '${odata(authorId)}' and jmpv2_paymentledgerstatus eq 'ACTIVE'`,
+    })
+    return Promise.all(rows.map((row) => this.hydrateAgreement(row)))
+  }
 
   async getAgreement(agreementId: string) {
     const id = guid(agreementId)
@@ -89,6 +100,11 @@ export class DataversePublishingPaymentLedger implements PublishingPaymentLedger
       expectedEtag: input.expectedEtag,
       event: paymentEventPayload(input.event),
       agreementPatch: agreementStatePatch(state),
+      cancelledObligationIds: state.paidInFull
+        ? (input.agreement.snapshot.scheduledObligations || [])
+          .filter((obligation) => obligation.status !== 'SATISFIED' && obligation.status !== 'CANCELLED')
+          .map((obligation) => obligation.obligationId)
+        : [],
     })
     const record = await this.getAgreement(input.agreement.snapshot.agreementId)
     if (!record) throw new Error('DATAVERSE_LEDGER_READBACK_MISSING')
@@ -109,6 +125,7 @@ export class DataversePublishingPaymentLedger implements PublishingPaymentLedger
       expectedEtag: input.expectedEtag,
       event: refundEventPayload(input.agreement.snapshot.agreementId, input.refund, state),
       agreementPatch: agreementStatePatch(state),
+      cancelledObligationIds: [],
     })
     const record = await this.getAgreement(input.agreement.snapshot.agreementId)
     if (!record) throw new Error('DATAVERSE_LEDGER_READBACK_MISSING')
@@ -144,6 +161,37 @@ export class DataversePublishingPaymentLedger implements PublishingPaymentLedger
       jmpv2_eventstatus: attempt.status,
       jmpv2_idempotencykey: attempt.executionKey,
       jmpv2_occurredat: attempt.createdAt,
+    })
+  }
+
+  async recordAdditionalPaymentRequest(request: AdditionalPaymentRequest) {
+    const existing = await dataverseFirst(this.config, EVENTS, {
+      $select: 'jmpv2_paymentevidenceid',
+      $filter: `jmpv2_paymentevidencekey eq '${odata(request.requestId)}'`,
+    })
+    if (existing) return
+    await this.createEvidence({
+      jmpv2_paymentevidencekey: request.requestId,
+      jmpv2_agreementkey: request.agreementId,
+      jmpv2_eventkind: 'ADDITIONAL_PAYMENT_REQUEST',
+      jmpv2_paymenttype: 'ADDITIONAL_PAYMENT',
+      jmpv2_obligationid: request.obligationId,
+      jmpv2_grossamountcents: request.amountCents,
+      jmpv2_balancebeforecents: request.balanceBeforeCents,
+      jmpv2_balanceaftercents: request.balanceAfterCents,
+      jmpv2_eventstatus: 'CREATED',
+      jmpv2_qboreconciliationstatus: 'PENDING',
+      jmpv2_settlementreference: request.stripeCheckoutSessionId,
+      jmpv2_allocationsjson: JSON.stringify({
+        requestId: request.requestId,
+        idempotencyKey: request.idempotencyKey,
+        balanceVersion: request.balanceVersion,
+        stripeCheckoutSessionId: request.stripeCheckoutSessionId,
+        expiresAt: request.expiresAt,
+        qboSyncState: 'PENDING_RECONCILIATION',
+      }),
+      jmpv2_idempotencykey: request.idempotencyKey,
+      jmpv2_occurredat: request.createdAt,
     })
   }
 
@@ -263,6 +311,7 @@ export class DataversePublishingPaymentLedger implements PublishingPaymentLedger
     expectedEtag: string
     event: Record<string, unknown>
     agreementPatch: Record<string, unknown>
+    cancelledObligationIds: string[]
   }) {
     const batch = buildAtomicLedgerBatch(input)
     const response = await fetch(`${this.config.webApiBaseUrl}/$batch`, {
@@ -311,6 +360,67 @@ export function createStripeAgreementCollections(): StripeAgreementCollections {
         invoiceId,
         hostedInvoiceUrl: requiredText(finalized.hosted_invoice_url, 'STRIPE_HOSTED_INVOICE_URL_MISSING'),
       }
+    },
+  }
+}
+
+export async function createAdditionalPaymentCheckoutSession(input: {
+  agreement: AgreementLedgerRecord
+  amountCents: number
+  requestId: string
+  idempotencyKey: string
+  engagementId: string
+  obligationId: string
+  balanceVersion: string
+}) {
+  const gate = productionAdditionalPaymentGateReadback()
+  if (!gate.enabled) throw new Error(`ADDITIONAL_PAYMENT_GATE_CLOSED:${gate.missing.join(',')}`)
+  const secret = clean(process.env.STRIPE_CHECKOUT_SECRET_KEY || process.env.STRIPE_SECRET_KEY)
+  if (!/^(sk|rk)_live_/.test(secret)) throw new Error('STRIPE_LIVE_PAYMENT_CREDENTIAL_REQUIRED')
+
+  const metadata = paymentMetadataForCheckout(input)
+  const body = new URLSearchParams({
+    mode: 'payment',
+    customer: requiredText(input.agreement.stripeCustomerId, 'STRIPE_CUSTOMER_REQUIRED'),
+    client_reference_id: input.requestId,
+    success_url: `${publicSiteUrl()}/author/portal?payment=additional-success`,
+    cancel_url: `${publicSiteUrl()}/author/portal?payment=additional-cancelled`,
+    'line_items[0][quantity]': '1',
+    'line_items[0][price_data][currency]': 'usd',
+    'line_items[0][price_data][unit_amount]': String(input.amountCents),
+    'line_items[0][price_data][product_data][name]': 'Additional payment toward publishing balance',
+    'payment_intent_data[description]': 'Additional payment toward existing J Merrill Publishing obligation',
+  })
+  addMetadata(body, metadata)
+  for (const [key, value] of Object.entries(metadata)) body.set(`payment_intent_data[metadata][${key}]`, value)
+
+  const session = await stripePost('/v1/checkout/sessions', body, input.idempotencyKey, secret)
+  return {
+    sessionId: requiredText(session.id, 'STRIPE_CHECKOUT_SESSION_ID_MISSING'),
+    checkoutUrl: requiredText(session.url, 'STRIPE_CHECKOUT_SESSION_URL_MISSING'),
+    expiresAt: Number(session.expires_at || 0) || null,
+  }
+}
+
+export function createStripeAgreementPayoff(): StripeAgreementPayoff {
+  const additionalGate = productionAdditionalPaymentGateReadback()
+  const recurringGate = productionPaymentGateReadback()
+  if (!additionalGate.enabled && !recurringGate.enabled) throw new Error('PAYMENT_GATE_CLOSED')
+  const secret = clean(process.env.STRIPE_CHECKOUT_SECRET_KEY || process.env.STRIPE_SECRET_KEY)
+  if (!/^(sk|rk)_live_/.test(secret)) throw new Error('STRIPE_LIVE_PAYMENT_CREDENTIAL_REQUIRED')
+  return {
+    async stopFutureCollections(input) {
+      const schedule = await stripeGet(`/v1/subscription_schedules/${encodeURIComponent(input.paymentScheduleId)}`, secret)
+      if (schedule.status === 'canceled' || schedule.status === 'released' || schedule.status === 'completed') {
+        return { status: 'ALREADY_STOPPED' as const }
+      }
+      await stripePost(
+        `/v1/subscription_schedules/${encodeURIComponent(input.paymentScheduleId)}/cancel`,
+        new URLSearchParams(),
+        input.idempotencyKey,
+        secret,
+      )
+      return { status: 'CANCELLED' as const }
     },
   }
 }
@@ -438,6 +548,7 @@ function buildAtomicLedgerBatch(input: {
   expectedEtag: string
   event: Record<string, unknown>
   agreementPatch: Record<string, unknown>
+  cancelledObligationIds: string[]
 }) {
   const suffix = randomUUID()
   const boundary = `batch_${suffix}`
@@ -465,6 +576,17 @@ function buildAtomicLedgerBatch(input: {
     `If-Match: ${input.expectedEtag}`,
     '',
     JSON.stringify(input.agreementPatch),
+    ...input.cancelledObligationIds.flatMap((obligationId, index) => [
+      `--${changeset}`,
+      'Content-Type: application/http',
+      'Content-Transfer-Encoding: binary',
+      `Content-ID: ${index + 3}`,
+      '',
+      `PATCH /api/data/v9.2/${OBLIGATIONS}(${guid(obligationId)}) HTTP/1.1`,
+      'Content-Type: application/json;type=entry',
+      '',
+      JSON.stringify({ jmpv2_obligationstatus: 'CANCELLED' }),
+    ]),
     `--${changeset}--`,
     `--${boundary}--`,
     '',
@@ -483,8 +605,50 @@ async function stripePost(path: string, body: URLSearchParams, idempotencyKey: s
   return result
 }
 
+async function stripeGet(path: string, secret: string) {
+  const response = await fetch(`${STRIPE_API_BASE}${path}`, {
+    headers: { Authorization: `Bearer ${secret}` },
+    cache: 'no-store',
+  })
+  const result = await response.json().catch(() => ({}))
+  if (!response.ok) throw new Error(result?.error?.code || `STRIPE_PAYMENT_READ_FAILED_${response.status}`)
+  return result
+}
+
 function addMetadata(body: URLSearchParams, metadata: Record<string, string>) {
   for (const [key, value] of Object.entries(metadata)) body.set(`metadata[${key}]`, value)
+}
+
+function paymentMetadataForCheckout(input: {
+  agreement: AgreementLedgerRecord
+  amountCents: number
+  requestId: string
+  idempotencyKey: string
+  engagementId: string
+  obligationId: string
+  balanceVersion: string
+}) {
+  const state = calculateAgreementPaymentState(input.agreement.snapshot)
+  return {
+    jm1_runtime: 'PUBLISHING.ACCEPT_ADDITIONAL_PAYMENT.v1',
+    jm1_payment_type: 'ADDITIONAL_PAYMENT',
+    jm1_author_id: input.agreement.snapshot.authorId,
+    jm1_title_id: input.agreement.snapshot.titleId,
+    jm1_engagement_id: input.engagementId,
+    jm1_agreement_id: input.agreement.snapshot.agreementId,
+    jm1_obligation_id: input.obligationId,
+    jm1_scheduled_obligation_id: input.obligationId,
+    jm1_payment_schedule_id: input.agreement.snapshot.paymentScheduleId,
+    jm1_balance_version: input.balanceVersion,
+    jm1_contract_balance_before: String(state.remainingBalanceCents),
+    jm1_contract_balance_after: String(state.remainingBalanceCents - input.amountCents),
+    jm1_request_id: input.requestId,
+    jm1_idempotency_key: input.idempotencyKey,
+  }
+}
+
+function publicSiteUrl() {
+  return clean(process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXT_PUBLIC_APP_URL || 'https://jmerrill.pub').replace(/\/+$/, '')
 }
 
 async function qboAdapterRequest(endpoint: string, credential: string, path: string, input: {

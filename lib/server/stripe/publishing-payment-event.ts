@@ -14,9 +14,11 @@ import type { PublishingPaymentType } from './publishing-agreement-payment'
 import {
   createDataversePublishingPaymentLedger,
   createGovernedQboPaymentAdapter,
+  createStripeAgreementPayoff,
 } from './publishing-payment-adapters'
 import {
   processConfirmedAgreementPayment,
+  productionAdditionalPaymentGateReadback,
   productionPaymentGateReadback,
 } from './publishing-payment-runtime'
 
@@ -164,7 +166,10 @@ export async function processPublishingPaymentSuccess(input: PublishingPaymentSu
     }
   }
   if (payment.paymentType) {
-    const gate = productionPaymentGateReadback()
+    const additionalPayment = payment.paymentType === 'ADDITIONAL_PAYMENT'
+    const gate = additionalPayment
+      ? productionAdditionalPaymentGateReadback()
+      : productionPaymentGateReadback()
     if (!gate.enabled) {
       return blocked('AGREEMENT_PAYMENT_RUNTIME_NOT_COMMISSIONED', {
         paymentType: payment.paymentType,
@@ -184,7 +189,8 @@ export async function processPublishingPaymentSuccess(input: PublishingPaymentSu
         occurredAt: payment.paidAt || isoFromStripeSeconds(payment.created) || new Date().toISOString(),
         submittedBalanceVersion: requiredPaymentField(payment.balanceVersion, 'BALANCE_VERSION_REQUIRED'),
         ledger: createDataversePublishingPaymentLedger(),
-        qbo: createGovernedQboPaymentAdapter(),
+        qbo: additionalPayment ? null : createGovernedQboPaymentAdapter(),
+        payoff: createStripeAgreementPayoff(),
       })
     } catch (error) {
       return blocked(error instanceof Error ? error.message : 'AGREEMENT_PAYMENT_RUNTIME_FAILED', {
