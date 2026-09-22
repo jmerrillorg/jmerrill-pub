@@ -175,23 +175,17 @@ jobs:
             echo "JM1_PACKAGE_SHA256=$artifact_sha256"
           } >> "$GITHUB_ENV"
 
-      - name: Deploy Function App package
-        uses: Azure/functions-action@v1
-        with:
-          app-name: ${{ env.FUNCTION_APP_NAME }}
-          package: ${{ runner.temp }}/deploy/diagnostic-ai-runner.zip
-          scm-do-build-during-deployment: false
-          enable-oryx-build: false
-          remote-build: false
-
-      - name: Record deployed commit SHA
+      - name: Activate immutable Function App package
         shell: bash
         run: |
           set -euo pipefail
+          package_url="https://${DEPLOYMENT_STORAGE_ACCOUNT}.blob.core.windows.net/${DEPLOYMENT_STORAGE_CONTAINER}/${JM1_PACKAGE_BLOB_NAME}"
           az functionapp config appsettings set \
             --name "$FUNCTION_APP_NAME" \
             --resource-group "$FUNCTION_APP_RESOURCE_GROUP" \
             --settings \
+              WEBSITE_RUN_FROM_PACKAGE="$package_url" \
+              WEBSITE_RUN_FROM_PACKAGE_BLOB_MI_RESOURCE_ID="SystemAssigned" \
               JM1_RELEASE_SHA="$GITHUB_SHA" \
               JM1_PRODUCTION_RELEASE_SHA="$GITHUB_SHA" \
               JM1_PAYMENT_ELECTION_COMMUNICATION_ENABLED="true" \
@@ -457,22 +451,13 @@ jobs:
           fi
           package_blob_name="$(python3 -c "import json; print(json.load(open('$lkg_path'))['artifactBlobName'])")"
           source_sha="$(python3 -c "import json; print(json.load(open('$lkg_path'))['sourceSha'])")"
-          expiry="$(date -u -d '+6 days' +%Y-%m-%dT%H:%MZ)"
-          sas="$(az storage blob generate-sas \
-            --account-name "$DEPLOYMENT_STORAGE_ACCOUNT" \
-            --container-name "$DEPLOYMENT_STORAGE_CONTAINER" \
-            --name "$package_blob_name" \
-            --permissions r \
-            --expiry "$expiry" \
-            --auth-mode login \
-            --as-user \
-            --output tsv)"
-          package_url="https://${DEPLOYMENT_STORAGE_ACCOUNT}.blob.core.windows.net/${DEPLOYMENT_STORAGE_CONTAINER}/${package_blob_name}?${sas}"
+          package_url="https://${DEPLOYMENT_STORAGE_ACCOUNT}.blob.core.windows.net/${DEPLOYMENT_STORAGE_CONTAINER}/${package_blob_name}"
           az functionapp config appsettings set \
             --name "$FUNCTION_APP_NAME" \
             --resource-group "$FUNCTION_APP_RESOURCE_GROUP" \
             --settings \
               WEBSITE_RUN_FROM_PACKAGE="$package_url" \
+              WEBSITE_RUN_FROM_PACKAGE_BLOB_MI_RESOURCE_ID="SystemAssigned" \
               JM1_RELEASE_SHA="$source_sha" \
               JM1_PRODUCTION_RELEASE_SHA="$source_sha" \
             --output none
