@@ -2,8 +2,20 @@
 
 const { authorReplyText } = require("./businessRouter");
 
+function questionAuthority(question) {
+  if (/\b(acknowledg(?:e)?ments?|dedications?)\b/i.test(question)) {
+    return { authority: "PROCESS_POLICY", source: "GOVERNED_FRONT_MATTER_POLICY", humanJudgment: false };
+  }
+  if (/\bnext step\b/i.test(question)) {
+    return { authority: "CURRENT_LIFECYCLE_STATE", source: "DATAVERSE_CURRENT_MOVEMENT", humanJudgment: false };
+  }
+  return { authority: "EDITORIAL_EVIDENCE_REVIEW", source: "CURRENT_DELIVERED_EDITORIAL_ARTIFACT",
+    humanJudgment: "UNDETERMINED_UNTIL_EVIDENCE_REVIEW" };
+}
+
 function serviceIntent(graphMessage, classification) {
-  const reply = authorReplyText(graphMessage).replace(/\s+/g, " ").trim();
+  const rawReply = authorReplyText(graphMessage);
+  const reply = rawReply.replace(/\s+/g, " ").trim();
   if (/\bapprov(?:e|ed|al) with questions\b/i.test(reply)) {
     const remainder = reply.replace(/\bapprov(?:e|ed|al) with questions\b/i, "")
       .replace(/\b(thank you|thanks|regards|sincerely)\b/gi, "").replace(/[^\p{L}\p{N}?]/gu, "").trim();
@@ -21,6 +33,16 @@ function serviceIntent(graphMessage, classification) {
       return { intent: "COMMERCIAL_EXCEPTION_REQUEST", humanGate: true };
     }
     return { intent: "PAYMENT_LINK_ACCESS", humanGate: false };
+  }
+  if (classification === "AUTHOR_QUESTION" || (classification === "AUTHOR_CLARIFICATION" && reply.includes("?"))) {
+    const questions = rawReply.split(/\r?\n/).map((line) => line.replace(/^\s*\d+[.)]\s*/, "").trim())
+      .filter((line) => line.length >= 6 && line.length <= 300 && line.endsWith("?")).slice(0, 10);
+    if (questions.length === 0) {
+      questions.push(...[...reply.matchAll(/(?:^|[.!?]\s+|\b\d+[.)]\s*)([^?.!]{5,300}\?)/g)]
+        .map((match) => match[1].trim()).slice(0, 10));
+    }
+    return { intent: "EDITORIAL_QUESTION_REVIEW", humanGate: true, questions,
+      questionPlan: questions.map((question) => ({ question, ...questionAuthority(question) })) };
   }
   return { intent: "NO_ROUTINE_SERVICE_RULE", humanGate: false };
 }
@@ -52,4 +74,4 @@ function serviceCopy(intent, authorName, title, sourceSubject, linkResult = {}) 
   return { subject, body: `${opening}\n\n${message}${endings}` };
 }
 
-module.exports = { serviceIntent, serviceCopy };
+module.exports = { questionAuthority, serviceIntent, serviceCopy };

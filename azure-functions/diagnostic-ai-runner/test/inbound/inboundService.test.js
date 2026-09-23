@@ -62,6 +62,46 @@ test("questions missing is routine, but supplied questions require judgment", ()
   assert.equal(serviceIntent(message("Approved with questions. Can we change chapter three?"), "EDITORIAL_RESPONSE").intent, "EDITORIAL_JUDGMENT_REQUIRED");
 });
 
+test("a later author question turn creates one durable gate without an author send", async () => {
+  const body = "Good morning,\r\n\r\nI apologize for that. Here are my questions regarding the review:\r\n\r\n" +
+    "Does the book have a better flow after the corrections?\r\n\r\n" +
+    "Do I need to add all of the acknowledgments and dedications yet?\r\n\r\n" +
+    "Does the book need another chapter?\r\n\r\n" +
+    "Are there any other corrections or additions that need to be made?\r\n\r\n" +
+    "What is the next step?\r\n\r\nThank you for your patience.";
+  const { queue, store, deps, effects } = await setup(body, "AUTHOR_QUESTION");
+  const logs = [];
+  deps.writeLog = async (_client, log) => { logs.push(log); return "gate-log-1"; };
+  const first = await executeService(queue, deps);
+  const replay = await executeService(queue, deps);
+  assert.equal(first.outcome, "HUMAN_REVIEW_REQUIRED");
+  assert.equal(first.questionCount, 5);
+  assert.equal(replay.outcome, "HUMAN_REVIEW_REQUIRED");
+  assert.equal(logs.length, 1);
+  assert.equal(effects.sends.length, 0);
+  assert.equal(effects.reserves, 0);
+  assert.equal((await store.getQueueItem(queue.queueItemId)).serviceStatus, "HUMAN_REVIEW_REQUIRED");
+  assert.equal((await store.getBusinessRoute(queue.evidenceLink)).service.questions[0],
+    "Does the book have a better flow after the corrections?");
+  assert.equal((await store.getBusinessRoute(queue.evidenceLink)).service.questions[4], "What is the next step?");
+  assert.equal((await store.getBusinessRoute(queue.evidenceLink)).service.questionPlan[1].humanJudgment, false);
+  assert.equal((await store.getBusinessRoute(queue.evidenceLink)).service.questionPlan[4].humanJudgment, false);
+});
+
+test("unrouted overdue service creates one durable system exception and remains retryable", async () => {
+  const { queue, store, deps, effects } = await setup("Thank you for your note.", "AUTHOR_RESPONSE");
+  deps.enabled = true;
+  const logs = [];
+  deps.writeLog = async (_client, log) => { logs.push(log); return "exception-log-1"; };
+  assert.equal((await runInboundService({ targetEventId: queue.evidenceLink }, deps)).results[0].outcome,
+    "NO_ROUTINE_SERVICE_RULE");
+  await runInboundService({ targetEventId: queue.evidenceLink }, deps);
+  assert.equal(logs.length, 1);
+  assert.equal((await store.getQueueItem(queue.queueItemId)).serviceSla, "ESCALATED_SERVICE_EXCEPTION");
+  assert.equal((await store.getQueueItem(queue.queueItemId)).serviceStatus, undefined);
+  assert.equal(effects.sends.length, 0);
+});
+
 test("commercial terms request remains a human decision", () => {
   assert.equal(serviceIntent(message("Please send the next installment link"), "PAYMENT_CORRESPONDENCE").intent, "PAYMENT_LINK_ACCESS");
   assert.equal(serviceIntent(message("Please reduce the next installment"), "PAYMENT_CORRESPONDENCE").intent, "COMMERCIAL_EXCEPTION_REQUEST");
