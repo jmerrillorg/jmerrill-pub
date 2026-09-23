@@ -2,6 +2,8 @@
 
 const { MESSAGE_CLASS } = require("./constants");
 const { normalizeString, redactBodyForEvidence, sha256Hex, stableId } = require("./util");
+const { authorReplyText } = require("./replyText");
+const { serviceIntent } = require("./serviceIntent");
 const { createDataverseClient } = require("../../orchestration/authorReviewResponseConsumer");
 const { createDefaultInboundContextProvider } = require("./contextProvider");
 
@@ -17,13 +19,18 @@ const ROUTABLE_CLASSES = new Set([
 ]);
 const EVENT_ACTION_TYPE = "PUBLISHING_INBOUND_AUTHOR_BUSINESS_EVENT";
 
-function routeKind(classification) {
-  return classification === MESSAGE_CLASS.PAYMENT_CORRESPONDENCE ? "COMMERCIAL_HUMAN_REVIEW" : "EDITORIAL_HUMAN_REVIEW";
+function routeKind(classification, graphMessage) {
+  if (classification !== MESSAGE_CLASS.PAYMENT_CORRESPONDENCE) return "EDITORIAL_HUMAN_REVIEW";
+  return serviceIntent(graphMessage, classification).intent === "PAYMENT_LINK_ACCESS"
+    ? "ROUTINE_COMMERCIAL_SERVICE" : "COMMERCIAL_HUMAN_REVIEW";
 }
 
 function finalRouteStatus(kind, editorialGate, commercialAuthority) {
   if (kind === "EDITORIAL_HUMAN_REVIEW" && editorialGate?.status !== "EXACT") return "HELD_EDITORIAL_GATE_BINDING";
-  if (kind === "COMMERCIAL_HUMAN_REVIEW" && commercialAuthority?.status !== "EXACT") return "HELD_COMMERCIAL_AUTHORITY";
+  if (kind.startsWith("COMMERCIAL_") || kind === "ROUTINE_COMMERCIAL_SERVICE") {
+    if (commercialAuthority?.status !== "EXACT") return "HELD_COMMERCIAL_AUTHORITY";
+    if (kind === "ROUTINE_COMMERCIAL_SERVICE") return "ROUTINE_SERVICE_READY";
+  }
   return "HUMAN_REVIEW_READY";
 }
 
@@ -78,11 +85,6 @@ function exactCurrentMovement(queueItem, context) {
     normalizeString(candidate.stageId).toLowerCase() === normalizeString(queueItem.stageId).toLowerCase()
   );
   return matches.length === 1 ? matches[0] : null;
-}
-
-function authorReplyText(graphMessage) {
-  const body = normalizeString(graphMessage?.body?.content || graphMessage?.bodyPreview);
-  return body.split(/\r?\n\s*On .{10,200} wrote:\s*\r?\n|\r?\n\s*From:\s+.{3,200}\r?\n|\r?\n\s*---+\s*Original Message\s*---+/i)[0].trim();
 }
 
 function sentChecksums(row) {
@@ -189,7 +191,7 @@ async function resolveCommercialAuthority(client, queueItem) {
 }
 
 function buildRoute(queueItem, message, movement, graphMessage, editorialGate, commercialAuthority, now = new Date().toISOString()) {
-  const kind = routeKind(queueItem.classification);
+  const kind = routeKind(queueItem.classification, graphMessage);
   const sourceText = authorReplyText(graphMessage);
   return {
     routeId: stableId("inbound_business_route", [queueItem.evidenceLink]),
@@ -270,6 +272,7 @@ async function projectRoute(store, queueItem, route) {
       queueItem.commercialAuthority?.ledgerTitleId === route.commercialAuthority?.ledgerTitleId &&
       Boolean(queueItem.decisionGate) === Boolean(route.decisionGate)) return;
   const ready = route.status === "HUMAN_REVIEW_READY";
+  const routine = route.status === "ROUTINE_SERVICE_READY";
   const heldAction = route.status === "HELD_EDITORIAL_GATE_BINDING"
     ? "Resolve the exact delivered editorial artifact and approval gate before requesting a founder decision."
     : route.status === "HELD_COMMERCIAL_AUTHORITY"
@@ -287,11 +290,11 @@ async function projectRoute(store, queueItem, route) {
     editorialGate: route.editorialGate,
     commercialAuthority: route.commercialAuthority,
     currentStage: route.stageName,
-    nextAction: ready
-      ? route.decisionGate.decisionRequested
-      : heldAction,
-    waitingOn: ready ? "JMP" : "JMP_SYSTEM",
-    reasonUnresolved: ready ? null : route.status
+    nextAction: ready ? route.decisionGate.decisionRequested
+      : routine ? (queueItem.serviceStatus === "SENT" ? "Await author response to the governed installment communication." : "Complete governed routine author service.")
+        : heldAction,
+    waitingOn: ready ? "JMP" : routine && queueItem.serviceStatus === "SENT" ? "AUTHOR" : "JMP_SYSTEM",
+    reasonUnresolved: ready || routine ? null : route.status
   });
 }
 
@@ -332,18 +335,19 @@ async function routeQueueItem(queueItem, deps) {
     await invalidateExistingRoute(store, queueItem, existing, "HELD_SOURCE_MESSAGE_MISMATCH");
     return { outcome: "HELD_SOURCE_MESSAGE_MISMATCH", eventId };
   }
-  const editorialGate = routeKind(queueItem.classification) === "EDITORIAL_HUMAN_REVIEW"
+  const kind = routeKind(queueItem.classification, graphMessage);
+  const editorialGate = kind === "EDITORIAL_HUMAN_REVIEW"
     ? await (deps.resolveEditorialGate || resolveEditorialGate)(client, queueItem, message, graphMessage)
     : null;
-  const commercialAuthority = routeKind(queueItem.classification) === "COMMERCIAL_HUMAN_REVIEW"
+  const commercialAuthority = kind !== "EDITORIAL_HUMAN_REVIEW"
     ? await (deps.resolveCommercialAuthority || resolveCommercialAuthority)(client, queueItem)
     : null;
   const proposed = existing || buildRoute(queueItem, message, movement, graphMessage, editorialGate, commercialAuthority);
   if (!existing) await store.upsertBusinessRoute(proposed);
   return store.withBusinessRouteLease(eventId, async () => {
     const record = await store.getBusinessRoute(eventId);
-    const status = finalRouteStatus(record.kind, editorialGate, commercialAuthority);
-    if (record.status === status && record.editorialGate?.status === editorialGate?.status &&
+    const status = finalRouteStatus(kind, editorialGate, commercialAuthority);
+    if (record.kind === kind && record.status === status && record.editorialGate?.status === editorialGate?.status &&
         record.editorialGate?.gateId === editorialGate?.gateId &&
         record.editorialGate?.artifactChecksum === editorialGate?.artifactChecksum &&
         record.editorialGate?.deliveryEventId === editorialGate?.deliveryEventId &&
@@ -355,6 +359,7 @@ async function routeQueueItem(queueItem, deps) {
     const logId = record.dataverseExecutionLogId || await persistBusinessEvent(client, record);
     const completed = {
       ...record,
+      kind,
       editorialGate,
       commercialAuthority,
       status,

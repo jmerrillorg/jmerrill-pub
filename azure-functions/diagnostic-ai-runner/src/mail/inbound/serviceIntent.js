@@ -1,6 +1,6 @@
 "use strict";
 
-const { authorReplyText } = require("./businessRouter");
+const { authorReplyText } = require("./replyText");
 
 function questionAuthority(question) {
   if (/\b(acknowledg(?:e)?ments?|dedications?)\b/i.test(question)) {
