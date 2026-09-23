@@ -67,6 +67,11 @@ test("commercial terms request remains a human decision", () => {
   assert.equal(serviceIntent(message("Please reduce the next installment"), "PAYMENT_CORRESPONDENCE").intent, "COMMERCIAL_EXCEPTION_REQUEST");
 });
 
+test("developmental approval with corrections is an acknowledgment, not stage approval", () => {
+  const actualWording = "I have reviewed the manuscript and would like to approve the developmental editing with corrections.";
+  assert.equal(serviceIntent(message(actualWording), "AUTHOR_RESPONSE").intent, "EDITORIAL_CORRECTIONS_ACKNOWLEDGMENT");
+});
+
 test("routine clarification sends once through governed provider and preserves held transition", async () => {
   const { queue, store, deps, effects } = await setup("Approved with questions");
   const first = await executeService(queue, deps);
