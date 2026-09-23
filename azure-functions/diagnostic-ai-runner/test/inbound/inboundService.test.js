@@ -37,7 +37,8 @@ async function setup(body, classification = "EDITORIAL_RESPONSE") {
   queue.classification = classification;
   const route = {
     inboundMessageEventId: queue.evidenceLink, dataverseExecutionLogId: "log-1",
-    authorId, titleId, engagementId, status: "HELD_EDITORIAL_AUTHORITY"
+    authorId, titleId, engagementId, status: "HELD_EDITORIAL_AUTHORITY",
+    editorialGate: { status: "EXACT" }
   };
   await store.upsertBusinessRoute(route);
   const effects = { sends: [], reserves: 0, sentRecords: 0 };
@@ -60,6 +61,31 @@ async function setup(body, classification = "EDITORIAL_RESPONSE") {
 test("questions missing is routine, but supplied questions require judgment", () => {
   assert.equal(serviceIntent(message("Approved with questions"), "EDITORIAL_RESPONSE").intent, "AUTHOR_QUESTIONS_MISSING");
   assert.equal(serviceIntent(message("Approved with questions. Can we change chapter three?"), "EDITORIAL_RESPONSE").intent, "EDITORIAL_JUDGMENT_REQUIRED");
+});
+
+test("question follow-up with an unbound delivered artifact stays a system authority hold", async () => {
+  const { queue, store, deps, effects } = await setup("Does the book need another chapter?", "AUTHOR_QUESTION");
+  deps.enabled = true;
+  const route = await store.getBusinessRoute(queue.evidenceLink);
+  await store.updateBusinessRoute({ ...route, editorialGate: { status: "DELIVERY_MISMATCH" },
+    service: { intent: "EDITORIAL_QUESTION_REVIEW", status: "HUMAN_REVIEW_REQUIRED", humanGateAt: "2026-09-23T13:32:16Z" } });
+  await store.updateQueueItem({ ...queue, businessEventId: "route-1",
+    serviceIntent: "EDITORIAL_QUESTION_REVIEW", serviceStatus: "HUMAN_REVIEW_REQUIRED" });
+  const logs = [];
+  deps.writeLog = async (_client, log) => { logs.push(log); return "authority-log-1"; };
+  const result = await runInboundService({}, deps);
+  assert.equal(result.results[0].outcome, "HELD_EDITORIAL_AUTHORITY");
+  const corrected = await store.getQueueItem(queue.queueItemId);
+  assert.equal(corrected.serviceStatus, null);
+  assert.equal(corrected.serviceAuthorityStatus, "DELIVERY_MISMATCH");
+  assert.equal(corrected.serviceWaitingOn, "JMP_SYSTEM");
+  assert.ok(corrected.serviceHumanGateRetractedAt);
+  assert.equal((await store.getBusinessRoute(queue.evidenceLink)).service.status, "HELD_EDITORIAL_AUTHORITY");
+  assert.equal(effects.sends.length, 0);
+  assert.equal(effects.reserves, 0);
+  assert.equal(logs.filter((item) => item.actionType === "PUBLISHING_INBOUND_EDITORIAL_AUTHORITY_HOLD").length, 1);
+  await runInboundService({}, deps);
+  assert.equal(logs.filter((item) => item.actionType === "PUBLISHING_INBOUND_EDITORIAL_AUTHORITY_HOLD").length, 1);
 });
 
 test("a later author question turn creates one durable gate without an author send", async () => {
