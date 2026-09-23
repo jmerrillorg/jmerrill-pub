@@ -21,13 +21,13 @@ function routeKind(classification) {
   return classification === MESSAGE_CLASS.PAYMENT_CORRESPONDENCE ? "COMMERCIAL_HUMAN_REVIEW" : "EDITORIAL_HUMAN_REVIEW";
 }
 
-function finalRouteStatus(kind, editorialGate) {
-  return kind === "EDITORIAL_HUMAN_REVIEW" && editorialGate?.status !== "EXACT"
-    ? "HELD_EDITORIAL_GATE_BINDING"
-    : "HUMAN_REVIEW_READY";
+function finalRouteStatus(kind, editorialGate, commercialAuthority) {
+  if (kind === "EDITORIAL_HUMAN_REVIEW" && editorialGate?.status !== "EXACT") return "HELD_EDITORIAL_GATE_BINDING";
+  if (kind === "COMMERCIAL_HUMAN_REVIEW" && commercialAuthority?.status !== "EXACT") return "HELD_COMMERCIAL_AUTHORITY";
+  return "HUMAN_REVIEW_READY";
 }
 
-function humanDecision(kind) {
+function humanDecision(kind, sourceText) {
   if (kind === "COMMERCIAL_HUMAN_REVIEW") {
     return {
       why: "An author has raised a payment or installment request; no additional charge is authorized by this message.",
@@ -40,6 +40,19 @@ function humanDecision(kind) {
         DEFER: "Keep the commercial gate open without financial effect."
       },
       financialEffectsAuthorized: false
+    };
+  }
+  if (/\bapprov(?:e|ed|al)\b[\s\S]{0,80}\bcorrections?\b/i.test(sourceText)) {
+    return {
+      why: "The author approves developmental work only with corrections and asks to review the revised manuscript again.",
+      decisionRequested: "Confirm the requested correction scope or request clarification; do not treat this as final manuscript approval.",
+      allowedOutcomes: ["ROUTE_CORRECTIONS_TO_EDITORIAL", "REQUEST_CLARIFICATION", "DEFER"],
+      outcomeRoutes: {
+        ROUTE_CORRECTIONS_TO_EDITORIAL: "Open governed editorial revision work against the exact delivered artifact; retain the author final-review gate.",
+        REQUEST_CLARIFICATION: "Prepare a governed clarification for human approval before any author communication.",
+        DEFER: "Keep the review open without production stage movement."
+      },
+      authorDecisionAuthorized: false
     };
   }
   return {
@@ -67,31 +80,117 @@ function exactCurrentMovement(queueItem, context) {
   return matches.length === 1 ? matches[0] : null;
 }
 
-async function resolveEditorialGate(client, queueItem) {
+function authorReplyText(graphMessage) {
+  const body = normalizeString(graphMessage?.body?.content || graphMessage?.bodyPreview);
+  return body.split(/\r?\n\s*On .{10,200} wrote:\s*\r?\n|\r?\n\s*From:\s+.{3,200}\r?\n|\r?\n\s*---+\s*Original Message\s*---+/i)[0].trim();
+}
+
+function sentChecksums(row) {
+  const description = normalizeString(row.jm1_actiondescription);
+  if (row.jm1_actiontype === "AUTHOR_COMMUNICATION_INTENT_SENT" &&
+      !/DELIVERY_STATE=SENT;/.test(description)) return [];
+  if (row.jm1_actiontype === "PACKAGE_CADENCE_RELEASE_AUTHOR_PACKAGE_SENT" &&
+      !/DELIVERY_STATUS=SENT;/.test(description)) return [];
+  const manifestText = description.match(/artifactManifest=(\[[\s\S]*?\]);/i)?.[1];
+  if (manifestText) {
+    try {
+      const manifest = JSON.parse(manifestText);
+      if (Array.isArray(manifest)) return manifest.map((item) => normalizeString(item.checksum).toLowerCase()).filter((value) => /^[0-9a-f]{64}$/.test(value));
+    } catch {
+      return [];
+    }
+  }
+  return [...description.matchAll(/(?:^|;)\s*checksum=([0-9a-f]{64})(?:;|$)/gi)].map((match) => match[1].toLowerCase());
+}
+
+async function resolveEditorialGate(client, queueItem, message, graphMessage) {
   const titleId = normalizeString(queueItem.titleId);
   const stageId = normalizeString(queueItem.stageId);
   if (!/^[0-9a-f-]{36}$/i.test(titleId) || !/^[0-9a-f-]{36}$/i.test(stageId)) {
     return { status: "UNPROVEN", gateId: null, artifactId: null };
   }
+  const reply = authorReplyText(graphMessage);
+  if (/\btitle of the book is\b/i.test(reply) && /\b(update|change)\b/i.test(reply)) {
+    return { status: "TITLE_CHANGE_REQUEST", gateId: null, artifactId: null };
+  }
+  const replyQualification = /\bapproved? with questions\b/i.test(reply) && !/\?/.test(reply)
+    ? "QUESTIONS_NOT_SUPPLIED" : null;
   const rows = await client.list("jm1pub_editorialapprovalgates", {
     $select: "jm1pub_editorialapprovalgateid,_jm1pub_titleid_value,_jm1pub_editorialstageid_value,_jm1pub_deliverableartifactid_value,jm1pub_authordecisionon",
     $filter: `_jm1pub_titleid_value eq ${titleId} and _jm1pub_editorialstageid_value eq ${stageId} and jm1pub_authordecisionon eq null`,
     $top: "3"
   });
-  if (rows.length !== 1) return { status: rows.length === 0 ? "MISSING" : "AMBIGUOUS", gateId: null, artifactId: null };
-  if (!rows[0]._jm1pub_deliverableartifactid_value) {
-    return { status: "UNBOUND_ARTIFACT", gateId: rows[0].jm1pub_editorialapprovalgateid, artifactId: null };
-  }
+  if (rows.length === 0) return { status: "MISSING", gateId: null, artifactId: null };
+  const artifactIds = rows.map((row) => normalizeString(row._jm1pub_deliverableartifactid_value)).filter(Boolean);
+  if (artifactIds.length === 0) return { status: "UNBOUND_ARTIFACT", gateId: null, artifactId: null };
+  const artifacts = await client.list("jm1pub_editorialartifacts", {
+    $select: "jm1pub_editorialartifactid,jm1pub_sha256,_jm1pub_titleid_value,_jm1pub_editorialstageid_value",
+    $filter: artifactIds.map((id) => `jm1pub_editorialartifactid eq ${id}`).join(" or "),
+    $top: String(Math.min(artifactIds.length, 10))
+  });
+  const sentRows = await client.list("jm1_executionlogs", {
+    $select: "jm1_executionlogid,jm1_actiontype,jm1_actiondescription,jm1_sourcerecordid,createdon",
+    $filter: `jm1_sourcerecordid eq '${titleId.replace(/'/g, "''")}' and (jm1_actiontype eq 'AUTHOR_COMMUNICATION_INTENT_SENT' or jm1_actiontype eq 'PACKAGE_CADENCE_RELEASE_AUTHOR_PACKAGE_SENT')`,
+    $orderby: "createdon desc",
+    $top: "100"
+  });
+  const receivedAt = Date.parse(message?.receivedAt || queueItem.receivedAt || "");
+  const delivered = sentRows.filter((row) => Number.isFinite(receivedAt) && Date.parse(row.createdon) <= receivedAt)
+    .map((row) => ({ row, checksums: sentChecksums(row) }));
+  const matches = rows.flatMap((gate) => {
+    const artifact = artifacts.find((item) => item.jm1pub_editorialartifactid === gate._jm1pub_deliverableartifactid_value &&
+      item._jm1pub_titleid_value === titleId && item._jm1pub_editorialstageid_value === stageId);
+    const checksum = normalizeString(artifact?.jm1pub_sha256).toLowerCase();
+    if (!/^[0-9a-f]{64}$/.test(checksum)) return [];
+    return delivered.filter((item) => item.checksums.includes(checksum)).map((item) => ({ gate, artifact, delivery: item.row }));
+  });
+  const uniqueGates = [...new Set(matches.map((item) => item.gate.jm1pub_editorialapprovalgateid))];
+  if (uniqueGates.length !== 1) return {
+    status: uniqueGates.length ? "AMBIGUOUS_DELIVERY" : "DELIVERY_MISMATCH",
+    gateId: null, artifactId: null, replyQualification
+  };
+  const matched = matches.find((item) => item.gate.jm1pub_editorialapprovalgateid === uniqueGates[0]);
   return {
-    status: "EXACT",
-    gateId: rows[0].jm1pub_editorialapprovalgateid,
-    artifactId: rows[0]._jm1pub_deliverableartifactid_value || null
+    // A matching delivered artifact identifies a candidate, not the message this author replied to.
+    status: replyQualification || "PROBABLE_DELIVERY_MATCH",
+    gateId: matched.gate.jm1pub_editorialapprovalgateid,
+    artifactId: matched.artifact.jm1pub_editorialartifactid,
+    artifactChecksum: normalizeString(matched.artifact.jm1pub_sha256).toLowerCase(),
+    deliveryEventId: matched.delivery.jm1_executionlogid,
+    deliveryAt: matched.delivery.createdon,
+    replyQualification
   };
 }
 
-function buildRoute(queueItem, message, movement, graphMessage, editorialGate, now = new Date().toISOString()) {
+async function resolveCommercialAuthority(client, queueItem) {
+  const title = await client.first("jm1pub_titles", {
+    $select: "jm1pub_titleid,_jm1pub_contract_value",
+    $filter: `jm1pub_titleid eq ${queueItem.titleId}`
+  });
+  if (!title?._jm1pub_contract_value) return { status: "CONTRACT_NOT_BOUND" };
+  const contract = await client.first("jm1pub_contracts", {
+    $select: "jm1pub_contractid,jm1pub_providerstatus,_jm1pub_opportunity_value,_new_author_value",
+    $filter: `jm1pub_contractid eq ${title._jm1pub_contract_value}`
+  });
+  if (!contract || contract._new_author_value !== queueItem.authorId || contract.jm1pub_providerstatus !== "ADOBE_SIGNED_COMPLETED") {
+    return { status: "CONTRACT_AUTHORITY_MISMATCH" };
+  }
+  const ledger = await client.first("jmpv2_agreementrecords", {
+    $select: "jmpv2_agreementrecordid,jmpv2_authoridentity,jmpv2_titleid,jmpv2_agreementkey",
+    $filter: `jmpv2_agreementrecordid eq ${contract._jm1pub_opportunity_value}`
+  });
+  if (!ledger || ledger.jmpv2_authoridentity !== queueItem.authorId || ledger.jmpv2_agreementkey !== contract._jm1pub_opportunity_value) {
+    return { status: "LEDGER_AUTHORITY_MISMATCH" };
+  }
+  if (ledger.jmpv2_titleid !== queueItem.titleId) {
+    return { status: "LEDGER_TITLE_MISMATCH", ledgerTitleId: ledger.jmpv2_titleid, currentTitleId: queueItem.titleId };
+  }
+  return { status: "EXACT", contractId: contract.jm1pub_contractid, agreementId: ledger.jmpv2_agreementrecordid };
+}
+
+function buildRoute(queueItem, message, movement, graphMessage, editorialGate, commercialAuthority, now = new Date().toISOString()) {
   const kind = routeKind(queueItem.classification);
-  const sourceText = normalizeString(graphMessage.body?.content || graphMessage.bodyPreview);
+  const sourceText = authorReplyText(graphMessage);
   return {
     routeId: stableId("inbound_business_route", [queueItem.evidenceLink]),
     inboundMessageEventId: queueItem.evidenceLink,
@@ -108,12 +207,13 @@ function buildRoute(queueItem, message, movement, graphMessage, editorialGate, n
     stageId: queueItem.stageId,
     stageName: movement.stageName || null,
     editorialGate,
+    commercialAuthority,
     classification: queueItem.classification,
     kind,
     subject: message.subject,
     authorRequestExcerpt: sourceText.slice(0, 1200),
     attachmentCount: queueItem.attachmentCount || 0,
-    decisionGate: finalRouteStatus(kind, editorialGate) === "HUMAN_REVIEW_READY" ? humanDecision(kind) : null,
+    decisionGate: finalRouteStatus(kind, editorialGate, commercialAuthority) === "HUMAN_REVIEW_READY" ? humanDecision(kind, sourceText) : null,
     status: "PENDING_DATAVERSE_EVENT",
     dataverseExecutionLogId: null,
     effects: { authorDecisions: 0, titleTransitions: 0, authorMessages: 0, financialMutations: 0 }
@@ -140,6 +240,7 @@ async function persistBusinessEvent(client, route) {
     `class=${route.classification}`,
     `route=${route.kind}`,
     `gateBinding=${route.editorialGate?.status || "NOT_APPLICABLE"}`,
+    `commercialBinding=${route.commercialAuthority?.status || "NOT_APPLICABLE"}`,
     "humanDisposition=PENDING",
     "businessEffects=0"
   ].join("; ");
@@ -161,11 +262,19 @@ async function persistBusinessEvent(client, route) {
 async function projectRoute(store, queueItem, route) {
   if (queueItem.businessEventId === route.routeId && queueItem.routingStatus === route.status &&
       queueItem.editorialGate?.status === route.editorialGate?.status &&
+      queueItem.editorialGate?.gateId === route.editorialGate?.gateId &&
+      queueItem.editorialGate?.artifactChecksum === route.editorialGate?.artifactChecksum &&
+      queueItem.editorialGate?.deliveryEventId === route.editorialGate?.deliveryEventId &&
+      queueItem.commercialAuthority?.status === route.commercialAuthority?.status &&
+      queueItem.commercialAuthority?.currentTitleId === route.commercialAuthority?.currentTitleId &&
+      queueItem.commercialAuthority?.ledgerTitleId === route.commercialAuthority?.ledgerTitleId &&
       Boolean(queueItem.decisionGate) === Boolean(route.decisionGate)) return;
   const ready = route.status === "HUMAN_REVIEW_READY";
   const heldAction = route.status === "HELD_EDITORIAL_GATE_BINDING"
     ? "Resolve the exact delivered editorial artifact and approval gate before requesting a founder decision."
-    : "Reconcile current title/stage and source-message authority before any human decision.";
+    : route.status === "HELD_COMMERCIAL_AUTHORITY"
+      ? "Reconcile executed commercial terms and title-bound payment ledger before preparing payment advice or requesting a founder decision."
+      : "Reconcile current title/stage and source-message authority before any human decision.";
   await store.updateQueueItem({
     ...queueItem,
     businessEventId: route.routeId,
@@ -176,6 +285,7 @@ async function projectRoute(store, queueItem, route) {
     title: route.title,
     authorRequestExcerpt: route.authorRequestExcerpt,
     editorialGate: route.editorialGate,
+    commercialAuthority: route.commercialAuthority,
     currentStage: route.stageName,
     nextAction: ready
       ? route.decisionGate.decisionRequested
@@ -223,14 +333,22 @@ async function routeQueueItem(queueItem, deps) {
     return { outcome: "HELD_SOURCE_MESSAGE_MISMATCH", eventId };
   }
   const editorialGate = routeKind(queueItem.classification) === "EDITORIAL_HUMAN_REVIEW"
-    ? await resolveEditorialGate(client, queueItem)
+    ? await (deps.resolveEditorialGate || resolveEditorialGate)(client, queueItem, message, graphMessage)
     : null;
-  const proposed = existing || buildRoute(queueItem, message, movement, graphMessage, editorialGate);
+  const commercialAuthority = routeKind(queueItem.classification) === "COMMERCIAL_HUMAN_REVIEW"
+    ? await (deps.resolveCommercialAuthority || resolveCommercialAuthority)(client, queueItem)
+    : null;
+  const proposed = existing || buildRoute(queueItem, message, movement, graphMessage, editorialGate, commercialAuthority);
   if (!existing) await store.upsertBusinessRoute(proposed);
   return store.withBusinessRouteLease(eventId, async () => {
     const record = await store.getBusinessRoute(eventId);
-    const status = finalRouteStatus(record.kind, editorialGate);
-    if (record.status === status && record.editorialGate?.status === editorialGate?.status && record.dataverseExecutionLogId) {
+    const status = finalRouteStatus(record.kind, editorialGate, commercialAuthority);
+    if (record.status === status && record.editorialGate?.status === editorialGate?.status &&
+        record.editorialGate?.gateId === editorialGate?.gateId &&
+        record.editorialGate?.artifactChecksum === editorialGate?.artifactChecksum &&
+        record.editorialGate?.deliveryEventId === editorialGate?.deliveryEventId &&
+        record.commercialAuthority?.status === commercialAuthority?.status &&
+        record.dataverseExecutionLogId) {
       await projectRoute(store, queueItem, record);
       return { outcome: status === "HUMAN_REVIEW_READY" ? "IDEMPOTENT" : status, route: record };
     }
@@ -238,8 +356,9 @@ async function routeQueueItem(queueItem, deps) {
     const completed = {
       ...record,
       editorialGate,
+      commercialAuthority,
       status,
-      decisionGate: status === "HUMAN_REVIEW_READY" ? humanDecision(record.kind) : null,
+      decisionGate: status === "HUMAN_REVIEW_READY" ? humanDecision(record.kind, record.authorRequestExcerpt) : null,
       dataverseExecutionLogId: logId
     };
     await store.updateBusinessRoute(completed);
@@ -265,14 +384,14 @@ async function runInboundBusinessRouter(input = {}, deps = {}) {
     ROUTABLE_CLASSES.has(row.classification) &&
     row.authorId &&
     (targetEventId || normalizeString(row.receivedAt) >= fromIso) &&
-    (targetEventId || row.routingStatus !== "HELD_IDENTITY_OR_EVENT_LINK") &&
-    (targetEventId || row.routingStatus !== "HUMAN_REVIEW_READY" || routeKind(row.classification) === "EDITORIAL_HUMAN_REVIEW")
+    (targetEventId || row.routingStatus !== "HELD_IDENTITY_OR_EVENT_LINK")
   ).sort((a, b) => normalizeString(a.receivedAt).localeCompare(normalizeString(b.receivedAt)))
     .slice(0, targetEventId ? 1 : Math.min(Math.max(Number(input.limit || 100), 1), 500));
   const results = [];
   for (const row of selected) {
     try {
-      const result = await routeQueueItem(row, { store, graphClient, contextProvider, client });
+      const result = await routeQueueItem(row, { store, graphClient, contextProvider, client,
+        resolveEditorialGate: deps.resolveEditorialGate, resolveCommercialAuthority: deps.resolveCommercialAuthority });
       if (result.outcome.startsWith("HELD_")) {
         const current = await store.getQueueItem(row.queueItemId) || row;
         await store.updateQueueItem({
@@ -303,4 +422,5 @@ async function runInboundBusinessRouter(input = {}, deps = {}) {
   };
 }
 
-module.exports = { buildRoute, exactCurrentMovement, resolveEditorialGate, routeQueueItem, runInboundBusinessRouter, EVENT_ACTION_TYPE };
+module.exports = { authorReplyText, buildRoute, exactCurrentMovement, resolveCommercialAuthority, resolveEditorialGate,
+  routeQueueItem, runInboundBusinessRouter, sentChecksums, EVENT_ACTION_TYPE };
