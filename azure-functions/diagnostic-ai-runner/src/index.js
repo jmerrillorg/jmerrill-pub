@@ -44,6 +44,7 @@ require("./functions/runPublishingInboundDeltaReconciliation");
 require("./functions/runPublishingInboundNotification");
 require("./functions/runPublishingInboundReadback");
 require("./functions/runPublishingInboundBusinessRouter");
+require("./functions/runPublishingInboundService");
 require("./functions/runPublishingInboundAssetPlacement");
 require("./functions/runIyorwueseMapContinuity");
 require("./functions/runOverdueCadenceRecovery");
