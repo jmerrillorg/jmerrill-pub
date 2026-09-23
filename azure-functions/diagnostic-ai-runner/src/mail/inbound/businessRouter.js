@@ -269,6 +269,22 @@ async function persistBusinessEvent(client, route) {
 }
 
 async function projectRoute(store, queueItem, route) {
+  const ready = route.status === "HUMAN_REVIEW_READY";
+  const routine = route.status === "ROUTINE_SERVICE_READY";
+  const heldAction = route.status === "HELD_EDITORIAL_GATE_BINDING"
+    ? "Resolve the exact delivered editorial artifact and approval gate before requesting a founder decision."
+    : route.status === "HELD_COMMERCIAL_AUTHORITY"
+      ? "Reconcile executed commercial terms and title-bound payment ledger before preparing payment advice or requesting a founder decision."
+      : "Reconcile current title/stage and source-message authority before any human decision.";
+  const nextAction = ready ? route.decisionGate.decisionRequested
+    : routine ? (queueItem.serviceStatus === "SENT"
+      ? queueItem.serviceWaitingOn === "JMP_IDENTITY_VERIFICATION"
+        ? "Verify the requested author correspondence address before changing account identity."
+        : "Await author response to the governed service communication."
+      : "Complete governed routine author service.")
+      : heldAction;
+  const waitingOn = ready ? "JMP" : routine && queueItem.serviceStatus === "SENT"
+    ? queueItem.serviceWaitingOn || "AUTHOR" : "JMP_SYSTEM";
   if (queueItem.businessEventId === route.routeId && queueItem.routingStatus === route.status &&
       queueItem.editorialGate?.status === route.editorialGate?.status &&
       queueItem.editorialGate?.gateId === route.editorialGate?.gateId &&
@@ -277,14 +293,8 @@ async function projectRoute(store, queueItem, route) {
       queueItem.commercialAuthority?.status === route.commercialAuthority?.status &&
       queueItem.commercialAuthority?.currentTitleId === route.commercialAuthority?.currentTitleId &&
       queueItem.commercialAuthority?.ledgerTitleId === route.commercialAuthority?.ledgerTitleId &&
-      Boolean(queueItem.decisionGate) === Boolean(route.decisionGate)) return;
-  const ready = route.status === "HUMAN_REVIEW_READY";
-  const routine = route.status === "ROUTINE_SERVICE_READY";
-  const heldAction = route.status === "HELD_EDITORIAL_GATE_BINDING"
-    ? "Resolve the exact delivered editorial artifact and approval gate before requesting a founder decision."
-    : route.status === "HELD_COMMERCIAL_AUTHORITY"
-      ? "Reconcile executed commercial terms and title-bound payment ledger before preparing payment advice or requesting a founder decision."
-      : "Reconcile current title/stage and source-message authority before any human decision.";
+      Boolean(queueItem.decisionGate) === Boolean(route.decisionGate) &&
+      queueItem.nextAction === nextAction && queueItem.waitingOn === waitingOn) return;
   await store.updateQueueItem({
     ...queueItem,
     businessEventId: route.routeId,
@@ -297,14 +307,8 @@ async function projectRoute(store, queueItem, route) {
     editorialGate: route.editorialGate,
     commercialAuthority: route.commercialAuthority,
     currentStage: route.stageName,
-    nextAction: ready ? route.decisionGate.decisionRequested
-      : routine ? (queueItem.serviceStatus === "SENT"
-        ? queueItem.serviceWaitingOn === "JMP_IDENTITY_VERIFICATION"
-          ? "Verify the requested author correspondence address before changing account identity."
-          : "Await author response to the governed service communication."
-        : "Complete governed routine author service.")
-        : heldAction,
-    waitingOn: ready ? "JMP" : routine && queueItem.serviceStatus === "SENT" ? queueItem.serviceWaitingOn || "AUTHOR" : "JMP_SYSTEM",
+    nextAction,
+    waitingOn,
     reasonUnresolved: ready || routine ? null : route.status
   });
 }

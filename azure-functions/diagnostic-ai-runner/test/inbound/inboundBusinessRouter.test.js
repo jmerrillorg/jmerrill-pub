@@ -74,6 +74,14 @@ describe("Inbound business route", () => {
     assert.equal(result.results[0].route.editorialGate, null);
     assert.equal(result.results[0].route.commercialAuthority, null);
     assert.equal(result.results[0].route.decisionGate, null);
+    const queue = [...deps.store.queue.values()][0];
+    await deps.store.updateQueueItem({ ...queue, serviceStatus: "SENT",
+      serviceWaitingOn: "JMP_IDENTITY_VERIFICATION" });
+    await runInboundBusinessRouter({ targetEventId: queue.evidenceLink }, deps);
+    const projected = await deps.store.getQueueItem(queue.queueItemId);
+    assert.equal(projected.waitingOn, "JMP_IDENTITY_VERIFICATION");
+    assert.equal(projected.nextAction,
+      "Verify the requested author correspondence address before changing account identity.");
   });
   test("finds a delivered candidate but holds until the reply-to-delivery link is proven", async () => {
     const queue = {
