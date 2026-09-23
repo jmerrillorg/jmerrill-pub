@@ -1,5 +1,7 @@
 "use strict";
 
+const { messageIdKey } = require("./deliveryLedger");
+
 class InMemoryInboundEvidenceStore {
   constructor(seed = {}) {
     this.messages = new Map(seed.messages || []);
@@ -7,6 +9,7 @@ class InMemoryInboundEvidenceStore {
     this.sourceAttachments = new Map(seed.sourceAttachments || []);
     this.queue = new Map(seed.queue || []);
     this.businessRoutes = new Map(seed.businessRoutes || []);
+    this.deliveries = new Map(seed.deliveries || []);
     this.businessRouteLocks = new Map();
     this.checkpoints = new Map(seed.checkpoints || []);
     this.health = {
@@ -41,6 +44,25 @@ class InMemoryInboundEvidenceStore {
 
   async getMessageByIdempotencyKey(key) {
     return this.messages.get(key) || null;
+  }
+
+  async getDeliveryByInternetMessageId(internetMessageId) {
+    const key = messageIdKey(internetMessageId);
+    return key ? this.deliveries.get(key) || null : null;
+  }
+
+  async upsertDelivery(delivery) {
+    const key = messageIdKey(delivery.internetMessageId);
+    if (!key) throw new Error("Delivery Internet Message ID is required");
+    const existing = this.deliveries.get(key);
+    if (existing && existing.deliveryId !== delivery.deliveryId) {
+      throw Object.assign(new Error("Outbound message ID belongs to another delivery"), {
+        safeCode: "DELIVERY_IDENTITY_CONFLICT"
+      });
+    }
+    if (existing) return { created: false, record: existing };
+    this.deliveries.set(key, delivery);
+    return { created: true, record: delivery };
   }
 
   async getBusinessRoute(eventId) {

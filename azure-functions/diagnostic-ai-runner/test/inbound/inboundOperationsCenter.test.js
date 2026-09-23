@@ -506,6 +506,43 @@ describe("Processing, idempotency, and reconciliation", () => {
     assert.equal(store.queue.size, 1);
   });
 
+  test("binds a reply through the durable outbound delivery and exact author", async () => {
+    const store = new InMemoryInboundEvidenceStore();
+    await store.upsertDelivery({ deliveryId: "delivery-1", internetMessageId: "<outbound-1@example.com>",
+      authorId: "author-1", titleId: "title-1", engagementId: "engagement-1", stageId: "stage-7" });
+    const noFixtureOutbound = { ...context, outboundEvents: [] };
+    const result = await processGraphMessage(message(), { store, contextProvider: async () => noFixtureOutbound });
+    assert.equal(result.correlation.status, "DETERMINISTIC");
+    assert.equal(result.correlation.deliveryId, "delivery-1");
+    assert.equal(result.queueItem.matchedDeliveryId, "delivery-1");
+    assert.equal(store.deliveries.size, 1);
+    assert.equal((await processGraphMessage(message(), { store, contextProvider: async () => noFixtureOutbound })).idempotent, true);
+  });
+
+  test("rejects an exact outbound header when the sender belongs to another author", async () => {
+    const store = new InMemoryInboundEvidenceStore();
+    await store.upsertDelivery({ deliveryId: "delivery-2", internetMessageId: "<outbound-1@example.com>",
+      authorId: "another-author", titleId: "another-title", engagementId: "another-engagement", stageId: "stage-7" });
+    const result = await processGraphMessage(message(), { store, contextProvider: async () => ({ ...context, outboundEvents: [] }) });
+    assert.equal(result.correlation.status, "AMBIGUOUS");
+    assert.equal(result.correlation.error, "OUTBOUND_DELIVERY_AUTHOR_OR_THREAD_CONFLICT");
+    assert.equal(result.queueItem.processingStatus, "REVIEW_REQUIRED");
+  });
+
+  test("does not match a substring of an outbound Internet Message ID", () => {
+    const result = correlateMessage({ inReplyTo: "<outbound-10@example.com>", references: "" },
+      { authorId: "author-1" }, { ...context, activeEngagements: [], outboundEvents: context.outboundEvents });
+    assert.notEqual(result.evidence, "OUTBOUND_MESSAGE_HEADER");
+  });
+
+  test("conflicting records for one outbound header never authorize correlation", () => {
+    const result = correlateMessage({ inReplyTo: "<outbound-1@example.com>", references: "" },
+      { authorId: "author-1" }, { ...context, outboundEvents: [context.outboundEvents[0],
+        { ...context.outboundEvents[0], titleId: "other-title" }] });
+    assert.equal(result.status, "AMBIGUOUS");
+    assert.equal(result.error, "OUTBOUND_DELIVERY_AUTHOR_OR_THREAD_CONFLICT");
+  });
+
   test("persists attachment evidence idempotently", async () => {
     const store = new InMemoryInboundEvidenceStore();
     const msg = buildMessageEvidence(message());

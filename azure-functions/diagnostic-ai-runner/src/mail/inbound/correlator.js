@@ -2,6 +2,7 @@
 
 const { MESSAGE_CLASS } = require("./constants");
 const { normalizeLower, normalizeString } = require("./util");
+const { normalizeMessageId, replyMessageIds } = require("./deliveryLedger");
 
 function explicitTitleMatches(messageEvidence, candidates) {
   const sourceText = normalizeLower(`${messageEvidence.subject || ""} ${messageEvidence.bodyTextForCorrelation || ""}`);
@@ -27,12 +28,21 @@ function deterministic(candidate, evidence) {
 }
 
 function correlateMessage(messageEvidence, senderResolution = {}, context = {}) {
-  const outbound = Array.isArray(context.outboundEvents)
-    ? context.outboundEvents.find((e) => {
-        const headers = [messageEvidence.inReplyTo, messageEvidence.references].filter(Boolean).join(" ");
-        return normalizeString(e.internetMessageId) && headers.includes(e.internetMessageId);
-      })
-    : null;
+  const outboundEvents = Array.isArray(context.outboundEvents) ? context.outboundEvents : [];
+  const inReplyTo = normalizeMessageId(messageEvidence.inReplyTo);
+  const headerIds = replyMessageIds(messageEvidence);
+  const directMatches = outboundEvents.filter((event) => inReplyTo && normalizeMessageId(event.internetMessageId) === inReplyTo);
+  const referenceMatches = directMatches.length ? [] : outboundEvents.filter((event) =>
+    headerIds.includes(normalizeMessageId(event.internetMessageId)));
+  const matches = directMatches.length ? directMatches : referenceMatches;
+  const identities = new Set(matches.map((event) => [event.authorId, event.titleId, event.engagementId, event.stageId].map(normalizeLower).join("|")));
+  const unique = [...new Map(matches.map((event) => [normalizeMessageId(event.internetMessageId), event])).values()];
+  if (unique.length > 1 || identities.size > 1 ||
+      (unique.length === 1 && normalizeLower(unique[0].authorId) !== normalizeLower(senderResolution.authorId))) {
+    return { status: "AMBIGUOUS", reviewRequired: true,
+      error: "OUTBOUND_DELIVERY_AUTHOR_OR_THREAD_CONFLICT", evidence: "OUTBOUND_MESSAGE_HEADER_CONFLICT" };
+  }
+  const outbound = unique[0];
   if (outbound) {
     return {
       status: "DETERMINISTIC",
@@ -43,7 +53,9 @@ function correlateMessage(messageEvidence, senderResolution = {}, context = {}) 
       engagementId: outbound.engagementId,
       lifecycleId: outbound.lifecycleId,
       stageId: outbound.stageId,
-      evidence: "OUTBOUND_MESSAGE_HEADER"
+      evidence: "OUTBOUND_MESSAGE_HEADER",
+      deliveryId: outbound.deliveryId || null,
+      outboundInternetMessageId: outbound.internetMessageId
     };
   }
 

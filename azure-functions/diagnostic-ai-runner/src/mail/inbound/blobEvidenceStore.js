@@ -2,6 +2,7 @@
 
 const { createHash } = require("node:crypto");
 const { BlobServiceClient } = require("@azure/storage-blob");
+const { messageIdKey } = require("./deliveryLedger");
 
 const DEFAULT_CONTAINER = "jm1-publishing-inbound-evidence";
 const DELTA_CHECKPOINT_NAME = "publishing-mailbox-delta";
@@ -83,6 +84,38 @@ class BlobInboundEvidenceStore {
 
   checkpointPath(name) {
     return `checkpoints/${encodePathPart(name)}.json`;
+  }
+
+  deliveryPath(internetMessageId) {
+    const key = messageIdKey(internetMessageId);
+    if (!key) throw new Error("Delivery Internet Message ID is required");
+    return `deliveries/${key}.json`;
+  }
+
+  async getDeliveryByInternetMessageId(internetMessageId) {
+    return messageIdKey(internetMessageId) ? this.get(this.deliveryPath(internetMessageId)) : null;
+  }
+
+  async upsertDelivery(delivery) {
+    await this.ensureReady();
+    const path = this.deliveryPath(delivery.internetMessageId);
+    const value = safeJson(delivery);
+    try {
+      await this.blob(path).upload(value, Buffer.byteLength(value), {
+        conditions: { ifNoneMatch: "*" },
+        blobHTTPHeaders: { blobContentType: "application/json; charset=utf-8" }
+      });
+      return { created: true, record: delivery };
+    } catch (err) {
+      if (err.statusCode !== 409 && err.statusCode !== 412) throw err;
+      const existing = await this.get(path);
+      if (existing?.deliveryId !== delivery.deliveryId) {
+        throw Object.assign(new Error("Outbound message ID belongs to another delivery"), {
+          safeCode: "DELIVERY_IDENTITY_CONFLICT"
+        });
+      }
+      return { created: false, record: existing };
+    }
   }
 
   async upsertMessage(message) {

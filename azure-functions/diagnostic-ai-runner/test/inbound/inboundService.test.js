@@ -48,7 +48,8 @@ async function setup(body, classification = "EDITORIAL_RESPONSE") {
     client: { first: async (set) => set === "contacts" ? { contactid: authorId, fullname: "Author Example", emailaddress1: "author@example.com" } : null },
     reserveCommunicationIntent: async () => { effects.reserves++; return { status: "RESERVED", communicationRecordId: "comm-1", semanticIdempotencyKey: "semantic-1" }; },
     markCommunicationSent: async () => { effects.sentRecords++; return { sentRecordId: "sent-1" }; },
-    verifyMailboxCopy: async () => ({ status: "PASS", graphMessageId: "graph-1", conversationId: "thread-1" }),
+    verifyMailboxCopy: async () => ({ status: "PASS", graphMessageId: "graph-1",
+      internetMessageId: "<system-reply@example.com>", conversationId: "thread-1" }),
     writeLog: async () => "copy-log-1",
     sendConfiguredAuthorResponse: async (input) => {
       effects.sends.push(input);
@@ -84,6 +85,11 @@ test("onboarding access service sends only to the existing governed contact in f
   assert.deepEqual(effects.sends[0].input.cc, ["publishing@jmerrill.one"]);
   assert.equal(effects.sends[0].input.sendApproval.draftBody.includes("new@example.com"), false);
   assert.equal((await deps.store.getQueueItem(queue.queueItemId)).waitingOn, "JMP_IDENTITY_VERIFICATION");
+  const delivery = await deps.store.getDeliveryByInternetMessageId("<system-reply@example.com>");
+  assert.equal(delivery.authorId, authorId);
+  assert.equal(delivery.titleId, titleId);
+  assert.equal(delivery.engagementId, engagementId);
+  assert.equal(delivery.deliveryStatus, "SENT_COPY_VERIFIED");
   assert.equal((await executeService(queue, deps)).outcome, "IDEMPOTENT");
   assert.equal(effects.sends.length, 1);
 });
@@ -186,13 +192,25 @@ test("delayed mailbox copy never resends author communication", async () => {
   const { queue, store, deps, effects } = await setup("Approved with questions");
   let copyReady = false;
   deps.verifyMailboxCopy = async () => copyReady
-    ? { status: "PASS", graphMessageId: "graph-1", conversationId: "thread-1" }
+    ? { status: "PASS", graphMessageId: "graph-1", internetMessageId: "<system-reply@example.com>", conversationId: "thread-1" }
     : { status: "PENDING" };
   assert.equal((await executeService(queue, deps)).outcome, "SENT_READBACK_PENDING");
   assert.equal((await store.getQueueItem(queue.queueItemId)).serviceStatus, "SENT_READBACK_PENDING");
   copyReady = true;
   assert.equal((await executeService(queue, deps)).outcome, "SENT");
   assert.equal(effects.sends.length, 1);
+});
+
+test("mailbox copy without an Internet Message ID cannot certify delivery or trigger a resend", async () => {
+  const { queue, store, deps, effects } = await setup("Approved with questions");
+  deps.verifyMailboxCopy = async () => ({ status: "PASS", graphMessageId: "graph-1", conversationId: "thread-1" });
+  const first = await executeService(queue, deps);
+  const retry = await executeService(queue, deps);
+  assert.equal(first.outcome, "SENT_READBACK_PENDING");
+  assert.equal(first.reason, "OUTBOUND_INTERNET_MESSAGE_ID_MISSING");
+  assert.equal(retry.outcome, "SENT_READBACK_PENDING");
+  assert.equal(effects.sends.length, 1);
+  assert.equal(store.deliveries.size, 0);
 });
 
 test("replay corrects an acknowledgment wait owner without resending", async () => {
@@ -209,7 +227,7 @@ test("mailbox copy readback requires exact sender, recipient, and body", async (
   const body = "Good day, Author,\n\nPlease send your questions.\n\nJ Merrill Publishing";
   const hash = require("node:crypto").createHash("sha256").update(body).digest("hex");
   const service = { sentAt: "2026-09-22T18:11:14Z", subject: "Re: Indomitable review", recipient: "author@example.com", bodyHash: hash };
-  const copy = { id: "graph-1", conversationId: "conversation-1", subject: service.subject,
+  const copy = { id: "graph-1", internetMessageId: "<system-reply@example.com>", conversationId: "conversation-1", subject: service.subject,
     from: { emailAddress: { address: "publishing@email.jmerrill.one" } },
     toRecipients: [{ emailAddress: { address: service.recipient } }],
     ccRecipients: [{ emailAddress: { address: "publishing@jmerrill.one" } }],
