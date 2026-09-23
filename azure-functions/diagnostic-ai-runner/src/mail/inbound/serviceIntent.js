@@ -13,7 +13,7 @@ function serviceIntent(graphMessage, classification) {
   if (/\btitle of the book is\b/i.test(reply) && /\b(update|change)\b/i.test(reply)) {
     return { intent: "TITLE_CHANGE_ACKNOWLEDGMENT", humanGate: false, transitionHeld: true };
   }
-  if (/\bapprov(?:e|ed|al) with corrections\b/i.test(reply)) {
+  if (/\bapprov(?:e|ed|al)\b.{0,80}\bwith corrections\b/i.test(reply)) {
     return { intent: "EDITORIAL_CORRECTIONS_ACKNOWLEDGMENT", humanGate: false, transitionHeld: true };
   }
   if (classification === "PAYMENT_CORRESPONDENCE" && /\b(payments?|installments?|invoices?|links?)\b/i.test(reply)) {
@@ -44,7 +44,7 @@ function serviceCopy(intent, authorName, title, sourceSubject, linkResult = {}) 
       message = "Thank you for sharing your requested title update. We have received it and will review it with your current project materials. We will confirm the title before applying it to the manuscript or other materials.";
       break;
     case "EDITORIAL_CORRECTIONS_ACKNOWLEDGMENT":
-      message = "Thank you for reviewing the edited manuscript and sharing the corrections you would like addressed. We have received your response and will review those points before a revised manuscript is returned for your final review.";
+      message = "Thank you for reviewing the edited manuscript. We understand that you approve the developmental edit with corrections. We will review the identified points and let you know when the revised manuscript is ready for your final review.";
       break;
     default:
       return null;
