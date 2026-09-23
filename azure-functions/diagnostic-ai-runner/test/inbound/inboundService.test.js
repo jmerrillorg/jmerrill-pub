@@ -155,6 +155,10 @@ test("unrouted overdue service creates one durable system exception and remains 
 
 test("commercial terms request remains a human decision", () => {
   assert.equal(serviceIntent(message("Please send the next installment link"), "PAYMENT_CORRESPONDENCE").intent, "PAYMENT_LINK_ACCESS");
+  assert.deepEqual(serviceIntent(message("Please send the second and third installment details"), "PAYMENT_CORRESPONDENCE"),
+    { intent: "PAYMENT_SCHEDULE_DETAILS", humanGate: false });
+  assert.equal(serviceIntent(message("Please change my second installment date"), "PAYMENT_CORRESPONDENCE").intent,
+    "COMMERCIAL_EXCEPTION_REQUEST");
   assert.equal(serviceIntent(message("Please reduce the next installment"), "PAYMENT_CORRESPONDENCE").intent, "COMMERCIAL_EXCEPTION_REQUEST");
 });
 
@@ -242,6 +246,17 @@ test("preview is effect-free and payment link remains withheld without exact aut
   assert.equal(preview.results[0].intent, "PAYMENT_LINK_ACCESS");
   assert.equal(preview.results[0].linkStatus, "UNVERIFIED");
   assert.equal(effects.sends.length, 0);
+});
+
+test("installment schedule request cannot receive a link-only service reply", async () => {
+  const { queue, deps, effects } = await setup("Please send details for my second and third installment payments.",
+    "PAYMENT_CORRESPONDENCE");
+  deps.enabled = true;
+  const result = await runInboundService({ targetEventId: queue.evidenceLink }, deps);
+  assert.equal(result.results[0].outcome, "HELD_PAYMENT_SCHEDULE_AUTHORITY");
+  assert.equal(result.results[0].intent, "PAYMENT_SCHEDULE_DETAILS");
+  assert.equal(effects.sends.length, 0);
+  assert.equal(effects.reserves, 0);
 });
 
 test("payment link validation requires exact existing live invoice and reachable page", async () => {

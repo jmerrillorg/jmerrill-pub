@@ -23,8 +23,9 @@ const EVENT_ACTION_TYPE = "PUBLISHING_INBOUND_AUTHOR_BUSINESS_EVENT";
 function routeKind(classification, graphMessage) {
   if (classification === MESSAGE_CLASS.AUTHOR_ACCESS_REQUEST) return "ROUTINE_AUTHOR_ACCESS_SERVICE";
   if (classification !== MESSAGE_CLASS.PAYMENT_CORRESPONDENCE) return "EDITORIAL_HUMAN_REVIEW";
-  return serviceIntent(graphMessage, classification).intent === "PAYMENT_LINK_ACCESS"
-    ? "ROUTINE_COMMERCIAL_SERVICE" : "COMMERCIAL_HUMAN_REVIEW";
+  const intent = serviceIntent(graphMessage, classification).intent;
+  if (intent === "PAYMENT_SCHEDULE_DETAILS") return "ROUTINE_COMMERCIAL_SCHEDULE";
+  return intent === "PAYMENT_LINK_ACCESS" ? "ROUTINE_COMMERCIAL_SERVICE" : "COMMERCIAL_HUMAN_REVIEW";
 }
 
 function finalRouteStatus(kind, editorialGate, commercialAuthority) {
@@ -33,6 +34,9 @@ function finalRouteStatus(kind, editorialGate, commercialAuthority) {
   if (kind.startsWith("COMMERCIAL_") || kind === "ROUTINE_COMMERCIAL_SERVICE") {
     if (commercialAuthority?.status !== "EXACT") return "HELD_COMMERCIAL_AUTHORITY";
     if (kind === "ROUTINE_COMMERCIAL_SERVICE") return "ROUTINE_SERVICE_READY";
+  }
+  if (kind === "ROUTINE_COMMERCIAL_SCHEDULE") {
+    return commercialAuthority?.status === "EXACT" ? "HELD_SERVICE_CAPABILITY" : "HELD_COMMERCIAL_AUTHORITY";
   }
   return "HUMAN_REVIEW_READY";
 }

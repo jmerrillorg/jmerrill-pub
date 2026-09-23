@@ -163,13 +163,13 @@ describe("Inbound business route", () => {
     ]);
     const first = await runInboundBusinessRouter({}, deps);
     assert.equal(first.businessEventsReady, 2);
-    assert.equal(first.exceptions, 0);
+    assert.equal(first.exceptions, 1);
     assert.equal(deps.client.rows.length, 3);
     const routes = [...deps.store.businessRoutes.values()];
     assert.equal(new Set(routes.map((route) => route.inboundMessageEventId)).size, 3);
     assert.equal(routes.filter((route) => route.kind === "EDITORIAL_HUMAN_REVIEW").length, 2);
-    const payment = routes.find((route) => route.kind === "ROUTINE_COMMERCIAL_SERVICE");
-    assert.equal(payment.status, "ROUTINE_SERVICE_READY");
+    const payment = routes.find((route) => route.kind === "ROUTINE_COMMERCIAL_SCHEDULE");
+    assert.equal(payment.status, "HELD_SERVICE_CAPABILITY");
     assert.equal(payment.decisionGate, null);
     const conditionalApproval = routes.find((route) => route.subject.includes("Approval with Corrections"));
     assert.ok(conditionalApproval.decisionGate.allowedOutcomes.includes("ROUTE_CORRECTIONS_TO_EDITORIAL"));
@@ -180,7 +180,7 @@ describe("Inbound business route", () => {
       assert.equal(route.titleId, "11111111-1111-4111-8111-111111111111");
       assert.equal(route.engagementId, "engagement-1");
       assert.equal(route.stageId, "22222222-2222-4222-8222-222222222222");
-      assert.equal(route.status, route === payment ? "ROUTINE_SERVICE_READY" : "HUMAN_REVIEW_READY");
+      assert.equal(route.status, route === payment ? "HELD_SERVICE_CAPABILITY" : "HUMAN_REVIEW_READY");
     }
     const replay = await Promise.all(routes.map((route) => runInboundBusinessRouter({ targetEventId: route.inboundMessageEventId }, deps)));
     assert.equal(replay.reduce((sum, result) => sum + result.idempotent, 0), 2);
@@ -192,14 +192,14 @@ describe("Inbound business route", () => {
     const deps = await setup([message]);
     const first = await runInboundBusinessRouter({}, deps);
     const eventId = first.results[0].eventId;
-    assert.equal(first.results[0].route.status, "ROUTINE_SERVICE_READY");
+    assert.equal(first.results[0].route.status, "HELD_SERVICE_CAPABILITY");
     assert.equal(first.results[0].route.decisionGate, null);
 
     const route = await deps.store.getBusinessRoute(eventId);
     await deps.store.updateBusinessRoute({ ...route, kind: "COMMERCIAL_HUMAN_REVIEW", status: "HUMAN_REVIEW_READY",
       decisionGate: { allowedOutcomes: ["APPROVE_GOVERNED_ARRANGEMENT"] } });
     const replay = await runInboundBusinessRouter({ targetEventId: eventId }, deps);
-    assert.equal(replay.results[0].route.kind, "ROUTINE_COMMERCIAL_SERVICE");
+    assert.equal(replay.results[0].route.kind, "ROUTINE_COMMERCIAL_SCHEDULE");
     assert.equal(replay.results[0].route.decisionGate, null);
 
     const changed = await setup([authorMessage("payment-3", "Payment request", "Please postpone and change my second installment date.")]);

@@ -36,6 +36,10 @@ function serviceIntent(graphMessage, classification) {
     if (/\b(change|modify|amend|waive|discount|reduce|increase|postpone|reschedule|extend|different amount|different date)\b/i.test(reply)) {
       return { intent: "COMMERCIAL_EXCEPTION_REQUEST", humanGate: true };
     }
+    if (/\b(details?|schedule|amounts?|dates?|terms?)\b/i.test(reply) ||
+        /\b(?:second|third|2nd|3rd)\b[\s\S]*\b(?:and|&)\b[\s\S]*\b(?:second|third|2nd|3rd)\b/i.test(reply)) {
+      return { intent: "PAYMENT_SCHEDULE_DETAILS", humanGate: false };
+    }
     return { intent: "PAYMENT_LINK_ACCESS", humanGate: false };
   }
   if (classification === "AUTHOR_QUESTION" || (classification === "AUTHOR_CLARIFICATION" && reply.includes("?"))) {
