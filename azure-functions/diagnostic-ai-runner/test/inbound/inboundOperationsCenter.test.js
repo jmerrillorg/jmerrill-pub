@@ -564,6 +564,27 @@ describe("Processing, idempotency, and reconciliation", () => {
     assert.equal(store.messages.size, 1);
   });
 
+  test("delta reconciliation retains a failed page until the system retries it", async () => {
+    const store = new InMemoryInboundEvidenceStore();
+    let contextAvailable = false;
+    const contextProvider = async () => {
+      if (!contextAvailable) throw new Error("Temporary authority read failure");
+      return context;
+    };
+    const first = await reconcileDelta({ graphClient: graphClient(), store, contextProvider });
+    assert.equal(first.ok, false);
+    assert.equal(first.failed, 1);
+    assert.equal((await store.getCheckpoint("publishing-mailbox-delta")).deltaLink, null);
+    assert.equal((await store.getCheckpoint("publishing-mailbox-delta")).tokenStatus, "RETRY_PENDING");
+
+    contextAvailable = true;
+    const retry = await reconcileDelta({ graphClient: graphClient(), store, contextProvider });
+    assert.equal(retry.ok, true);
+    assert.equal(retry.failed, 0);
+    assert.equal(store.messages.size, 1);
+    assert.equal((await store.getCheckpoint("publishing-mailbox-delta")).tokenStatus, "CURRENT");
+  });
+
   test("attachment capture reads metadata and bytes", async () => {
     const store = new InMemoryInboundEvidenceStore();
     const client = graphClient({

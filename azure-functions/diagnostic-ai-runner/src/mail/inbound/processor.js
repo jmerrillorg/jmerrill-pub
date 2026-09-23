@@ -201,18 +201,21 @@ async function reconcileDelta(options = {}) {
     }));
   }
 
+  const failed = results.filter((result) => !result.ok).length;
   await store.setCheckpoint("publishing-mailbox-delta", {
-    deltaLink: deltaResult["@odata.deltaLink"] || deltaResult["@odata.nextLink"] || checkpoint?.deltaLink || null,
+    // Retain the current page when any message fails so the next timer run retries it.
+    deltaLink: failed ? checkpoint?.deltaLink || null
+      : deltaResult["@odata.deltaLink"] || deltaResult["@odata.nextLink"] || checkpoint?.deltaLink || null,
     lastRunAt: new Date().toISOString(),
-    tokenStatus: deltaResult["@odata.deltaLink"] ? "CURRENT" : "PAGED"
+    tokenStatus: failed ? "RETRY_PENDING" : deltaResult["@odata.deltaLink"] ? "CURRENT" : "PAGED"
   });
 
   return {
-    ok: true,
+    ok: failed === 0,
     messagesDetected: messages.length,
     messagesIngested: results.filter((r) => r.ok).length,
     idempotent: results.filter((r) => r.idempotent).length,
-    failed: results.filter((r) => !r.ok).length,
+    failed,
     results
   };
 }
