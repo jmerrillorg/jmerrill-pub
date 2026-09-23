@@ -77,6 +77,10 @@ class BlobInboundEvidenceStore {
     return `queue/${encodePathPart(id)}.json`;
   }
 
+  businessRoutePath(eventId) {
+    return `business-routes/${encodePathPart(eventId)}.json`;
+  }
+
   checkpointPath(name) {
     return `checkpoints/${encodePathPart(name)}.json`;
   }
@@ -101,6 +105,57 @@ class BlobInboundEvidenceStore {
   async findMessageByEventId(eventId) {
     const messages = await this.listPrefix("messages/");
     return messages.find((message) => message.inboundMessageEventId === eventId) || null;
+  }
+
+  async getMessageByIdempotencyKey(key) {
+    return this.get(this.messagePath(key));
+  }
+
+  async getBusinessRoute(eventId) {
+    return this.get(this.businessRoutePath(eventId));
+  }
+
+  async upsertBusinessRoute(route) {
+    await this.ensureReady();
+    const path = this.businessRoutePath(route.inboundMessageEventId);
+    const value = safeJson(route);
+    try {
+      await this.blob(path).upload(value, Buffer.byteLength(value), {
+        conditions: { ifNoneMatch: "*" },
+        blobHTTPHeaders: { blobContentType: "application/json; charset=utf-8" }
+      });
+      return { created: true, record: route };
+    } catch (err) {
+      if (err.statusCode !== 409 && err.statusCode !== 412) throw err;
+      return { created: false, record: await this.get(path) };
+    }
+  }
+
+  async updateBusinessRoute(route) {
+    await this.put(this.businessRoutePath(route.inboundMessageEventId), route);
+    return { record: route };
+  }
+
+  async withBusinessRouteLease(eventId, action) {
+    await this.ensureReady();
+    const lockBlob = this.blob(`business-route-locks/${encodePathPart(eventId)}`);
+    try {
+      await lockBlob.upload("", 0, { conditions: { ifNoneMatch: "*" } });
+    } catch (err) {
+      if (err.statusCode !== 409 && err.statusCode !== 412) throw err;
+    }
+    const lease = lockBlob.getBlobLeaseClient();
+    try {
+      await lease.acquireLease(60);
+    } catch (err) {
+      if (err.statusCode === 409 || err.statusCode === 412) return { outcome: "ROUTE_IN_PROGRESS", eventId };
+      throw err;
+    }
+    try {
+      return await action();
+    } finally {
+      await lease.releaseLease();
+    }
   }
 
   async upsertAttachment(attachment) {
@@ -208,18 +263,22 @@ class BlobInboundEvidenceStore {
   }
 
   async getHealthSnapshot() {
-    const [health, messages, queue, attachments] = await Promise.all([
+    const [health, messages, queue, attachments, routes] = await Promise.all([
       this.get("health/health.json"),
       this.listPrefix("messages/"),
       this.listPrefix("queue/"),
-      this.listPrefix("attachments/")
+      this.listPrefix("attachments/"),
+      this.listPrefix("business-routes/")
     ]);
     return {
       ...(health || {}),
       processingBacklog: queue.filter((q) => q.processingStatus === "REVIEW_REQUIRED").length,
       failedMessageCount: messages.filter((m) => m.processingStatus === "FAILED").length,
       unclassifiedCount: messages.filter((m) => m.classification === "UNCLASSIFIED").length,
-      attachmentFailureCount: attachments.filter((a) => a.processingStatus === "FAILED").length
+      attachmentFailureCount: attachments.filter((a) => a.processingStatus === "FAILED").length,
+      humanReviewGatesReady: routes.filter((route) => route.status === "HUMAN_REVIEW_READY").length,
+      businessRoutesPending: routes.filter((route) => route.status !== "HUMAN_REVIEW_READY").length,
+      businessRouteExceptions: queue.filter((item) => /^(HELD_|ROUTE_FAILED_)/.test(item.routingStatus || "")).length
     };
   }
 
