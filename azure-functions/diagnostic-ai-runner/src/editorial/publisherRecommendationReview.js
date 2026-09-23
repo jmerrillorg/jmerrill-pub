@@ -28,6 +28,11 @@ const {
   TEMPLATE_NAME: EDITORIAL_RECOMMENDATION_TEMPLATE_NAME,
   TEMPLATE_VERSION: EDITORIAL_RECOMMENDATION_TEMPLATE_VERSION
 } = require("./editorialRecommendationEmailTemplate");
+const {
+  catalogPackage,
+  buildAuthorCenteredPackageRationale,
+  validatePackageRecommendation
+} = require("../author/authorCommunicationPreflight");
 
 const DIAGNOSTIC_ENTITY_SET = "jm1pub_editorialdiagnostics";
 const INTAKE_ENTITY_SET = "jm1_publishingintakes";
@@ -62,25 +67,17 @@ const PACKAGE_CODES_BY_VALUE = Object.freeze({
   196650002: "JMP-PKG-PREMIER"
 });
 
-const PACKAGE_DETAILS_BY_CODE = Object.freeze({
+const PACKAGE_DESCRIPTIONS_BY_CODE = Object.freeze({
   "JMP-PKG-STARTER": {
-    name: "Starter Publishing Package",
-    price: "$1,999",
     shortDifference: "Starter keeps the path lean: a focused publishing foundation for authors who want a smaller first step."
   },
   "JMP-PKG-PRO": {
-    name: "Professional Publishing Package",
-    price: "$4,500",
     shortDifference: "Professional gives the manuscript a fuller editorial and production path, which better fits a substantial leadership/devotional book."
   },
   "JMP-PKG-PREMIER": {
-    name: "Premier Publishing Package",
-    price: "$7,500",
     shortDifference: "Premier gives large or complex manuscripts expanded editorial, production, and planning scope."
   },
   "JMP-PKG-CHILD": {
-    name: "Children's Package, author provides art",
-    price: "$2,495",
     shortDifference: "Children's Package is only for children's books where the author supplies usable art."
   }
 });
@@ -250,13 +247,13 @@ function parseLogDescription(description) {
 function buildPackageRationale({ diagnostic, logSummary }) {
   const code = logSummary.recommendedPackageCode || PACKAGE_CODES_BY_VALUE[diagnostic.jm1pub_recommendedpackage] || "unknown";
   const alternate = logSummary.alternatePackageCode || (code === "JMP-PKG-PRO" ? "JMP-PKG-STARTER" : null);
-  const primary = PACKAGE_DETAILS_BY_CODE[code];
-  const alternative = PACKAGE_DETAILS_BY_CODE[alternate];
+  const primary = packageDetailsFrom({ packageCode: code });
+  const alternative = packageDetailsFrom({ packageCode: alternate });
   const pieces = [
     primary
-      ? `${primary.name} is recommended because the manuscript is a substantial full-length work and needs a professional editorial path before agreement/onboarding.`
+      ? buildAuthorCenteredPackageRationale({ packageCode: code, projectTitle: "the manuscript" })
       : `${code} is recommended because the manuscript needs a governed publishing path before agreement/onboarding.`,
-    alternative ? `${alternative.name} remains the lower-scope alternative if Jackie chooses a narrower starting path.` : null,
+    alternative ? `${alternative.name} at ${alternative.price} remains an available alternate path if the author wants to compare scope before choosing.` : null,
     "Payment options, contracts, production, and workspace movement remain blocked until author acceptance and later lifecycle gates."
   ].filter(Boolean);
   return pieces.join(" ");
@@ -293,19 +290,7 @@ function buildRecommendedServicesLine(packageCode) {
 }
 
 function buildPackageWhy({ packageCode, recommendation, projectTitle }) {
-  if (packageCode === "JMP-PKG-PRO") {
-    return `${recommendation.name} is the strongest fit because ${projectTitle} needs more than a quick publishing setup; it needs a fuller editorial and production path that can help the manuscript mature without losing its message.`;
-  }
-  if (packageCode === "JMP-PKG-PREMIER") {
-    return `${recommendation.name} is the strongest fit when a large or complex manuscript needs expanded editorial and production planning beyond the standard full-service path.`;
-  }
-  if (packageCode === "JMP-PKG-STARTER") {
-    return `${recommendation.name} is the strongest fit when a manuscript is ready for a focused publishing foundation and a leaner first step into publication.`;
-  }
-  if (packageCode === "JMP-PKG-CHILD") {
-    return `${recommendation.name} is the strongest fit when a children's manuscript has usable author-provided art and needs a governed production path built around that material.`;
-  }
-  return `${recommendation.name} is the strongest fit because it gives this manuscript a governed path from editorial review into the next publishing decision.`;
+  return buildAuthorCenteredPackageRationale({ packageCode, packageName: recommendation.name, projectTitle });
 }
 
 function buildAlternatePackageDifference({ recommendation, alternate }) {
@@ -331,7 +316,13 @@ function firstNameFrom(value) {
 
 function packageDetailsFrom({ packageCode, packageValue }) {
   const code = normalizeString(packageCode) || PACKAGE_CODES_BY_VALUE[packageValue] || null;
-  return code ? PACKAGE_DETAILS_BY_CODE[code] || null : null;
+  if (!code) return null;
+  const catalog = catalogPackage(code);
+  if (!catalog) return null;
+  return {
+    ...catalog,
+    ...(PACKAGE_DESCRIPTIONS_BY_CODE[code] || {})
+  };
 }
 
 function indefiniteArticleFor(value) {
@@ -354,12 +345,8 @@ function buildEditorialRecommendationLetterBody({
     authorName,
     projectTitle,
     packageCode,
-    recommendedPackage: recommendedPackage || {
-      name: "Professional Publishing Package",
-      price: "$4,500",
-      shortDifference: "Professional gives the manuscript a fuller editorial and production path."
-    },
-    alternatePackage: alternatePackage || { name: "Starter Publishing Package", price: "$1,999" },
+    recommendedPackage: recommendedPackage || packageDetailsFrom({ packageCode: packageCode || "JMP-PKG-PRO" }),
+    alternatePackage: alternatePackage || packageDetailsFrom({ packageCode: "JMP-PKG-STARTER" }),
     imprintLabel,
     workType,
     genre,
@@ -407,6 +394,7 @@ function buildRecommendationView(context, { diagnosticId, intakeReferenceCode })
     projectTitle,
     packageCode,
     recommendedPackage: recommendedPackageDetails,
+    alternatePackageCode: logSummary.alternatePackageCode || undefined,
     alternatePackage: alternatePackageDetails,
     imprintLabel,
     workType: WORK_TYPE_LABELS[diagnostic.jm1pub_worktype] || null,
@@ -482,6 +470,11 @@ function buildRecommendationView(context, { diagnosticId, intakeReferenceCode })
       agreementReadiness: logSummary.agreementReadiness || (publisherReviewRequired ? "BLOCKED_HUMAN_REVIEW_REQUIRED" : "READY_FOR_AGREEMENT")
     },
     packageOptionsRationale: packageRationale,
+    packageRecommendationValidation: validatePackageRecommendation({
+      primaryPackageCode: packageCode,
+      alternatePackageCode: logSummary.alternatePackageCode,
+      rationale: packageRationale
+    }),
     flags: flagList.length > 0 ? flagList : ["none"],
     authorFacingRecommendationDraft: authorDraft,
     authorWorkspaceArtifact: {
