@@ -24,6 +24,12 @@ function safeError(code) {
   return { outcome: "HELD_SERVICE_AUTHORITY", reason: code };
 }
 
+function serviceWaitOwner(intent) {
+  if (intent === "AUTHOR_QUESTIONS_MISSING") return "AUTHOR_QUESTIONS";
+  if (intent === "PAYMENT_LINK_ACCESS") return "AUTHOR";
+  return "JMP";
+}
+
 function emailAddress(recipient) {
   return normalizeString(recipient?.emailAddress?.address).toLowerCase();
 }
@@ -53,7 +59,18 @@ async function verifyMailboxCopy(graphClient, service) {
 async function completeMailboxReadback(queueItem, deps) {
   const route = await deps.store.getBusinessRoute(queueItem.evidenceLink);
   const service = route?.service;
-  if (service?.status === "SENT") return { outcome: "IDEMPOTENT", eventId: queueItem.evidenceLink };
+  if (service?.status === "SENT") {
+    const waitingOn = serviceWaitOwner(service.intent);
+    if (service.waitingOn !== waitingOn || service.authorWaitingOn !== waitingOn) {
+      await deps.store.updateBusinessRoute({ ...route, service: { ...service, waitingOn, authorWaitingOn: waitingOn } });
+    }
+    const currentQueue = await deps.store.getQueueItem(queueItem.queueItemId);
+    if (currentQueue?.serviceWaitingOn !== waitingOn) {
+      await deps.store.updateQueueItem({ ...currentQueue, serviceWaitingOn: waitingOn });
+    }
+    return { outcome: "IDEMPOTENT", eventId: queueItem.evidenceLink, intent: service.intent,
+      providerMessageId: service.providerMessageId, sentAt: service.sentAt };
+  }
   if (service?.status !== "SENT_READBACK_PENDING") return { outcome: "HELD_AMBIGUOUS_SEND_STATE", eventId: queueItem.evidenceLink };
   const readback = await (deps.verifyMailboxCopy || verifyMailboxCopy)(deps.graphClient, service);
   if (readback.status !== "PASS") return { outcome: "SENT_READBACK_PENDING", eventId: queueItem.evidenceLink,
@@ -68,10 +85,11 @@ async function completeMailboxReadback(queueItem, deps) {
   });
   await deps.store.updateBusinessRoute({ ...route, service: { ...service, status: "SENT",
     mailboxCopy: "PASS", graphMessageId: readback.graphMessageId,
-    outboundConversationId: readback.conversationId } });
+    outboundConversationId: readback.conversationId, waitingOn: serviceWaitOwner(service.intent),
+    authorWaitingOn: serviceWaitOwner(service.intent) } });
   const currentQueue = await deps.store.getQueueItem(queueItem.queueItemId);
   await deps.store.updateQueueItem({ ...currentQueue, serviceStatus: "SENT",
-    serviceSentAt: service.sentAt, serviceIntent: service.intent, serviceWaitingOn: service.authorWaitingOn });
+    serviceSentAt: service.sentAt, serviceIntent: service.intent, serviceWaitingOn: serviceWaitOwner(service.intent) });
   return { outcome: "SENT", eventId: queueItem.evidenceLink, intent: service.intent,
     providerMessageId: service.providerMessageId, sentAt: service.sentAt };
 }
@@ -213,7 +231,7 @@ async function executeService(queueItem, deps) {
       subject: prepared.copy.subject, recipient: prepared.recipient,
       sourceConversationId: prepared.message.conversationId || null,
       linkStatus: prepared.linkStatus, linkReason: prepared.linkReason,
-      authorWaitingOn: prepared.intent === "AUTHOR_QUESTIONS_MISSING" ? "AUTHOR_QUESTIONS" : "AUTHOR_RESPONSE" } });
+      waitingOn: serviceWaitOwner(prepared.intent), authorWaitingOn: serviceWaitOwner(prepared.intent) } });
     const currentQueue = await store.getQueueItem(queueItem.queueItemId);
     await store.updateQueueItem({ ...currentQueue, serviceIntent: prepared.intent, serviceStatus: "SENT_READBACK_PENDING",
       serviceSentAt: sentAt });

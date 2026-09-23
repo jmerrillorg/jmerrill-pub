@@ -100,6 +100,16 @@ test("delayed mailbox copy never resends author communication", async () => {
   assert.equal(effects.sends.length, 1);
 });
 
+test("replay corrects an acknowledgment wait owner without resending", async () => {
+  const { queue, store, deps, effects } = await setup("I approve the developmental editing with corrections.", "AUTHOR_RESPONSE");
+  assert.equal((await executeService(queue, deps)).outcome, "SENT");
+  const current = await store.getQueueItem(queue.queueItemId);
+  await store.updateQueueItem({ ...current, serviceWaitingOn: "AUTHOR_RESPONSE" });
+  assert.equal((await executeService(queue, deps)).outcome, "IDEMPOTENT");
+  assert.equal((await store.getQueueItem(queue.queueItemId)).serviceWaitingOn, "JMP");
+  assert.equal(effects.sends.length, 1);
+});
+
 test("mailbox copy readback requires exact sender, recipient, and body", async () => {
   const body = "Good day, Author,\n\nPlease send your questions.\n\nJ Merrill Publishing";
   const hash = require("node:crypto").createHash("sha256").update(body).digest("hex");
