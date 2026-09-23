@@ -40,6 +40,7 @@ function titleCandidate(contact, email, row, overrides = {}) {
   const postRelease = Number(row.jm1pub_stage) === TITLE_STAGE_BACKLIST_PUBLISHED;
   return {
     authorId: contact.authorId,
+    authorName: contact.name,
     authorEmail: email,
     titleId,
     workId: titleId,

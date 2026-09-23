@@ -43,6 +43,7 @@ require("./functions/runPublishingIntakeAutostartRecovery");
 require("./functions/runPublishingInboundDeltaReconciliation");
 require("./functions/runPublishingInboundNotification");
 require("./functions/runPublishingInboundReadback");
+require("./functions/runPublishingInboundBusinessRouter");
 require("./functions/runPublishingInboundAssetPlacement");
 require("./functions/runIyorwueseMapContinuity");
 require("./functions/runOverdueCadenceRecovery");

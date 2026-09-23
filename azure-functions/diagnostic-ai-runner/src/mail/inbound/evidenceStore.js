@@ -6,6 +6,8 @@ class InMemoryInboundEvidenceStore {
     this.attachments = new Map(seed.attachments || []);
     this.sourceAttachments = new Map(seed.sourceAttachments || []);
     this.queue = new Map(seed.queue || []);
+    this.businessRoutes = new Map(seed.businessRoutes || []);
+    this.businessRouteLocks = new Map();
     this.checkpoints = new Map(seed.checkpoints || []);
     this.health = {
       lastNotificationAt: null,
@@ -35,6 +37,40 @@ class InMemoryInboundEvidenceStore {
 
   async findMessageByEventId(eventId) {
     return [...this.messages.values()].find((message) => message.inboundMessageEventId === eventId) || null;
+  }
+
+  async getMessageByIdempotencyKey(key) {
+    return this.messages.get(key) || null;
+  }
+
+  async getBusinessRoute(eventId) {
+    return this.businessRoutes.get(eventId) || null;
+  }
+
+  async upsertBusinessRoute(route) {
+    const existing = this.businessRoutes.get(route.inboundMessageEventId);
+    if (existing) return { created: false, record: existing };
+    this.businessRoutes.set(route.inboundMessageEventId, route);
+    return { created: true, record: route };
+  }
+
+  async updateBusinessRoute(route) {
+    this.businessRoutes.set(route.inboundMessageEventId, route);
+    return { record: route };
+  }
+
+  async withBusinessRouteLease(eventId, action) {
+    const previous = this.businessRouteLocks.get(eventId) || Promise.resolve();
+    let release;
+    const current = new Promise((resolve) => { release = resolve; });
+    this.businessRouteLocks.set(eventId, current);
+    await previous;
+    try {
+      return await action();
+    } finally {
+      release();
+      if (this.businessRouteLocks.get(eventId) === current) this.businessRouteLocks.delete(eventId);
+    }
   }
 
   async upsertAttachment(attachment) {
@@ -117,7 +153,10 @@ class InMemoryInboundEvidenceStore {
       processingBacklog: queue.filter((q) => q.processingStatus === "REVIEW_REQUIRED").length,
       failedMessageCount: messages.filter((m) => m.processingStatus === "FAILED").length + this.health.failedMessageCount,
       unclassifiedCount: messages.filter((m) => m.classification === "UNCLASSIFIED").length,
-      attachmentFailureCount: attachments.filter((a) => a.processingStatus === "FAILED").length + this.health.attachmentFailureCount
+      attachmentFailureCount: attachments.filter((a) => a.processingStatus === "FAILED").length + this.health.attachmentFailureCount,
+      humanReviewGatesReady: [...this.businessRoutes.values()].filter((route) => route.status === "HUMAN_REVIEW_READY").length,
+      businessRoutesPending: [...this.businessRoutes.values()].filter((route) => route.status !== "HUMAN_REVIEW_READY").length,
+      businessRouteExceptions: queue.filter((item) => /^(HELD_|ROUTE_FAILED_)/.test(item.routingStatus || "")).length
     };
   }
 }

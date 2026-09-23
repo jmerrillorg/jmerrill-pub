@@ -72,6 +72,8 @@ function buildQueueItem(messageEvidence, attachments = []) {
     waitingOn: reviewRequired ? "JMP" : null,
     nextAction: reviewRequired ? "Review inbound evidence and route through the applicable V2 authority contract." : "No immediate human action required.",
     evidenceLink: messageEvidence.inboundMessageEventId,
+    messageIdempotencyKey: messageEvidence.idempotencyKey,
+    graphMessageId: messageEvidence.graphMessageId,
     processingStatus: reviewRequired ? PROCESSING_STATUS.REVIEW_REQUIRED : PROCESSING_STATUS.ROUTED,
     priority: category === QUEUE_CATEGORY.ROYALTY_REPORT_RECEIVED ? "NORMAL" : reviewRequired ? "HIGH" : "NORMAL",
     reasonUnresolved: reviewRequired ? (messageEvidence.error || "MANUAL_REVIEW_REQUIRED") : null,

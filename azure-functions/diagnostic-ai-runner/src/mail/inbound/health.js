@@ -21,6 +21,9 @@ function computeMailboxHealth({ subscription = null, storeHealth = {}, now = new
     failedMessageCount: failed,
     unclassifiedCount: unclassified,
     attachmentFailureCount: attachmentFailures,
+    humanReviewGatesReady: Number(storeHealth.humanReviewGatesReady || 0),
+    businessRoutesPending: Number(storeHealth.businessRoutesPending || 0),
+    businessRouteExceptions: Number(storeHealth.businessRouteExceptions || 0),
     noSilentDropStatus: failed > 0 ? "VISIBLE_FAILURES_PRESENT" : "PASS"
   };
 }
