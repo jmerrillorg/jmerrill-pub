@@ -1,7 +1,7 @@
 "use strict";
 
 const { app } = require("@azure/functions");
-const { runInboundService } = require("../mail/inbound/serviceRunner");
+const { diagnoseMailboxCopy, runInboundService } = require("../mail/inbound/serviceRunner");
 
 function authorized(request) {
   const expected = process.env.JM1_DIAGNOSTIC_RUNNER_KEY;
@@ -40,6 +40,18 @@ app.http("run-publishing-inbound-service-replay", {
       return { status: 400, jsonBody: { status: "error", code: "EVENT_ID_AND_CONFIRMATION_REQUIRED" } };
     }
     return { status: 200, jsonBody: await runInboundService({ targetEventId: body.targetEventId }) };
+  }
+});
+
+app.http("run-publishing-inbound-service-copy-diagnostic", {
+  methods: ["POST"],
+  authLevel: "anonymous",
+  route: "publishing/inbound/service/copy-diagnostic",
+  handler: async (request) => {
+    if (!authorized(request)) return { status: 401, jsonBody: { status: "error", code: "UNAUTHORIZED" } };
+    const body = await request.json().catch(() => null);
+    if (!body?.targetEventId) return { status: 400, jsonBody: { status: "error", code: "EVENT_ID_REQUIRED" } };
+    return { status: 200, jsonBody: await diagnoseMailboxCopy(body.targetEventId) };
   }
 });
 

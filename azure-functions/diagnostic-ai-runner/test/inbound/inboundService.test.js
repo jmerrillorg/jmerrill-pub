@@ -4,7 +4,7 @@ const { test } = require("node:test");
 const assert = require("node:assert/strict");
 const { InMemoryInboundEvidenceStore, processGraphMessage } = require("../../src/mail/inbound");
 const { serviceIntent } = require("../../src/mail/inbound/serviceIntent");
-const { executeService, runInboundService, verifyMailboxCopy } = require("../../src/mail/inbound/serviceRunner");
+const { diagnoseMailboxCopy, executeService, runInboundService, verifyMailboxCopy } = require("../../src/mail/inbound/serviceRunner");
 const { validatePaymentLink } = require("../../src/mail/inbound/paymentLinkAuthority");
 
 const authorId = "11111111-1111-4111-8111-111111111111";
@@ -113,6 +113,22 @@ test("mailbox copy readback requires exact sender, recipient, and body", async (
   assert.equal((await verifyMailboxCopy(graph, service)).status, "PASS");
   copy.from.emailAddress.address = "other@example.com";
   assert.equal((await verifyMailboxCopy(graph, service)).status, "PENDING");
+});
+
+test("mailbox diagnostic exposes match flags without message body", async () => {
+  const store = new InMemoryInboundEvidenceStore();
+  await store.upsertBusinessRoute({ inboundMessageEventId: "event-1", service: {
+    status: "SENT_READBACK_PENDING", sentAt: "2026-09-22T18:11:14Z", subject: "Re: Review",
+    recipient: "author@example.com", bodyHash: "0".repeat(64)
+  } });
+  const graphClient = { listInboxMessagesSince: async () => ({ value: [{ id: "graph-1", subject: "Re: Review",
+    from: { emailAddress: { address: "publishing@email.jmerrill.one" } },
+    toRecipients: [{ emailAddress: { address: "author@example.com" } }], ccRecipients: [],
+    body: { content: "private author correspondence" } }] }) };
+  const result = await diagnoseMailboxCopy("event-1", { store, graphClient });
+  assert.equal(result.candidates[0].senderMatches, true);
+  assert.equal(result.candidates[0].ccMatches, false);
+  assert.equal(JSON.stringify(result).includes("private author correspondence"), false);
 });
 
 test("routine service uses the existing sender canon and Publishing CC", async () => {

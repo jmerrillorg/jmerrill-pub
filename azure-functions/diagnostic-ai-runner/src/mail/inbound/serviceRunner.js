@@ -50,6 +50,31 @@ async function verifyMailboxCopy(graphClient, service) {
   }
 }
 
+async function diagnoseMailboxCopy(eventId, deps = {}) {
+  const store = deps.store || new BlobInboundEvidenceStore();
+  const graphClient = deps.graphClient || new PublishingMailboxGraphClient();
+  const route = await store.getBusinessRoute(eventId);
+  const service = route?.service;
+  if (!service?.sentAt || !service.subject || !service.bodyHash) return { status: "NO_SENT_SERVICE_RECORD" };
+  const after = new Date(new Date(service.sentAt).getTime() - 120000).toISOString();
+  const rows = (await graphClient.listInboxMessagesSince(after, 100)).value || [];
+  return {
+    status: "READ_ONLY",
+    eventId,
+    serviceStatus: service.status,
+    candidates: rows.filter((row) => normalizedMailText(row.subject) === service.subject ||
+      emailAddress(row.from) === SYSTEM_SENDER).slice(0, 20).map((row) => ({
+      graphMessageId: row.id,
+      receivedAt: row.receivedDateTime,
+      senderMatches: emailAddress(row.from) === SYSTEM_SENDER,
+      recipientMatches: (row.toRecipients || []).some((item) => emailAddress(item) === service.recipient),
+      ccMatches: (row.ccRecipients || []).some((item) => emailAddress(item) === INTERNAL_MAILBOX),
+      subjectMatches: normalizedMailText(row.subject) === service.subject,
+      bodyMatches: createHash("sha256").update(normalizedMailText(row.body?.content)).digest("hex") === service.bodyHash
+    }))
+  };
+}
+
 async function completeMailboxReadback(queueItem, deps) {
   const route = await deps.store.getBusinessRoute(queueItem.evidenceLink);
   const service = route?.service;
@@ -250,4 +275,4 @@ async function runInboundService(input = {}, deps = {}) {
   return { status: preview ? "PREVIEW" : "EXECUTED", selected: rows.length, results };
 }
 
-module.exports = { executeService, prepareService, runInboundService, verifyMailboxCopy };
+module.exports = { diagnoseMailboxCopy, executeService, prepareService, runInboundService, verifyMailboxCopy };
