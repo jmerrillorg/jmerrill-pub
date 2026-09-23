@@ -23,8 +23,8 @@ function authorMessage(id, subject, body) {
 const authoritativeContext = {
   contacts: [{ email: "author@example.com", authorId: "author-1", contactId: "author-1", name: "Author" }],
   activeEngagements: [{
-    authorId: "author-1", authorEmail: "author@example.com", titleId: "title-1", title: "Untitled",
-    engagementId: "engagement-1", stageId: "stage-7", stageName: "07 Developmental Editing"
+    authorId: "author-1", authorEmail: "author@example.com", titleId: "11111111-1111-4111-8111-111111111111", title: "Untitled",
+    engagementId: "engagement-1", stageId: "22222222-2222-4222-8222-222222222222", stageName: "07 Developmental Editing"
   }]
 };
 
@@ -32,7 +32,7 @@ function fakeDataverse() {
   const rows = [];
   return {
     rows,
-    async list() { return []; },
+    async list() { return [{ jm1pub_editorialapprovalgateid: "gate-1", _jm1pub_deliverableartifactid_value: "artifact-1" }]; },
     async first(_set, query) {
       const eventId = query.$filter.match(/jm1_sourcerecordid eq '([^']+)'/)?.[1];
       return rows.find((row) => row.jm1_sourcerecordid === eventId) || null;
@@ -99,9 +99,9 @@ describe("Inbound business route", () => {
     assert.deepEqual(payment.effects, { authorDecisions: 0, titleTransitions: 0, authorMessages: 0, financialMutations: 0 });
     for (const route of routes) {
       assert.equal(route.authorId, "author-1");
-      assert.equal(route.titleId, "title-1");
+      assert.equal(route.titleId, "11111111-1111-4111-8111-111111111111");
       assert.equal(route.engagementId, "engagement-1");
-      assert.equal(route.stageId, "stage-7");
+      assert.equal(route.stageId, "22222222-2222-4222-8222-222222222222");
       assert.equal(route.status, "HUMAN_REVIEW_READY");
     }
     const replay = await Promise.all(routes.map((route) => runInboundBusinessRouter({ targetEventId: route.inboundMessageEventId }, deps)));
@@ -120,6 +120,45 @@ describe("Inbound business route", () => {
       await deps.store.updateQueueItem(queue);
     }
     assert.equal(deps.client.rows.length, 0);
+  });
+
+  test("ambiguous editorial gate is a system binding exception, not a founder decision", async () => {
+    const deps = await setup([authorMessage("editorial-1", "Approval with Corrections", "I approve with corrections.")]);
+    deps.client.list = async () => [{ jm1pub_editorialapprovalgateid: "gate-1" }, { jm1pub_editorialapprovalgateid: "gate-2" }];
+    const first = await runInboundBusinessRouter({}, deps);
+    assert.equal(first.results[0].outcome, "HELD_EDITORIAL_GATE_BINDING");
+    assert.equal(first.businessEventsReady, 0);
+    assert.equal(deps.client.rows.length, 1);
+    const queue = [...deps.store.queue.values()][0];
+    assert.equal(queue.waitingOn, "JMP_SYSTEM");
+    assert.equal(queue.decisionGate, null);
+    assert.equal(queue.editorialGate.status, "AMBIGUOUS");
+    const replay = await runInboundBusinessRouter({ targetEventId: queue.evidenceLink }, deps);
+    assert.equal(replay.results[0].outcome, "HELD_EDITORIAL_GATE_BINDING");
+    assert.equal(deps.client.rows.length, 1);
+  });
+
+  test("an editorial gate without a bound artifact does not request a founder decision", async () => {
+    const deps = await setup([authorMessage("editorial-1", "Approval with Corrections", "I approve with corrections.")]);
+    deps.client.list = async () => [{ jm1pub_editorialapprovalgateid: "gate-1" }];
+    const result = await runInboundBusinessRouter({}, deps);
+    assert.equal(result.results[0].outcome, "HELD_EDITORIAL_GATE_BINDING");
+    const queue = [...deps.store.queue.values()][0];
+    assert.equal(queue.editorialGate.status, "UNBOUND_ARTIFACT");
+    assert.equal(queue.decisionGate, null);
+    assert.equal(queue.waitingOn, "JMP_SYSTEM");
+  });
+
+  test("a previously ready decision is invalidated when gate binding becomes ambiguous", async () => {
+    const deps = await setup([authorMessage("editorial-1", "Approval with Corrections", "I approve with corrections.")]);
+    await runInboundBusinessRouter({}, deps);
+    deps.client.list = async () => [{ jm1pub_editorialapprovalgateid: "gate-1" }, { jm1pub_editorialapprovalgateid: "gate-2" }];
+    const targetEventId = [...deps.store.queue.values()][0].evidenceLink;
+    const result = await runInboundBusinessRouter({ targetEventId }, deps);
+    assert.equal(result.results[0].outcome, "HELD_EDITORIAL_GATE_BINDING");
+    assert.equal((await deps.store.getBusinessRoute(targetEventId)).decisionGate, null);
+    assert.equal([...deps.store.queue.values()][0].waitingOn, "JMP_SYSTEM");
+    assert.equal(deps.client.rows.length, 1);
   });
 
   test("source message mismatch and transient Dataverse failure remain retryable", async () => {
