@@ -5,8 +5,18 @@ const {
   MESSAGE_CLASS
 } = require("./constants");
 const { extensionFromName, normalizeLower, normalizeString } = require("./util");
+const { authorReplyText } = require("./replyText");
 
 const RULES = [
+  {
+    messageClass: MESSAGE_CLASS.AUTHOR_ACCESS_REQUEST,
+    authority: CLASSIFICATION_AUTHORITY.HIGH_CONFIDENCE,
+    confidence: 0.9,
+    manualReviewRequired: false,
+    test: ({ text, replyText, sender }) => sender.identityType === "CONTACT" &&
+      /\b(onboarding|author access)\b/i.test(text) &&
+      /\b(assist(?:ance)?|help|code|sign[ -]?in|access|email|junk)\b/i.test(replyText)
+  },
   {
     messageClass: MESSAGE_CLASS.AUTHOR_PRODUCTION_ASSET,
     authority: CLASSIFICATION_AUTHORITY.REVIEW_REQUIRED,
@@ -129,11 +139,12 @@ const RULES = [
 
 function classifyInboundMessage(messageEvidence, attachments = [], senderResolution = {}) {
   const subject = normalizeString(messageEvidence.subject);
-  const text = `${subject}\n${normalizeString(messageEvidence.bodyTextForClassification || "")}`;
+  const replyText = authorReplyText({ body: { content: messageEvidence.bodyTextForClassification || "" } });
+  const text = `${subject}\n${replyText}`;
   const attachmentExtensions = attachments.map((a) => extensionFromName(a.originalFilename || a.name)).filter(Boolean);
 
   for (const rule of RULES) {
-    if (rule.test({ message: messageEvidence, text, attachmentExtensions, sender: senderResolution })) {
+    if (rule.test({ message: messageEvidence, text, replyText, attachmentExtensions, sender: senderResolution })) {
       return {
         messageClass: rule.messageClass,
         authority: rule.authority,

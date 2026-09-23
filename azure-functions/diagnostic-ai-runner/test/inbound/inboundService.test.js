@@ -3,7 +3,7 @@
 const { test } = require("node:test");
 const assert = require("node:assert/strict");
 const { InMemoryInboundEvidenceStore, processGraphMessage } = require("../../src/mail/inbound");
-const { serviceIntent } = require("../../src/mail/inbound/serviceIntent");
+const { serviceIntent, serviceCopy } = require("../../src/mail/inbound/serviceIntent");
 const { executeService, runInboundService, verifyMailboxCopy } = require("../../src/mail/inbound/serviceRunner");
 const { validatePaymentLink } = require("../../src/mail/inbound/paymentLinkAuthority");
 
@@ -61,6 +61,31 @@ async function setup(body, classification = "EDITORIAL_RESPONSE") {
 test("questions missing is routine, but supplied questions require judgment", () => {
   assert.equal(serviceIntent(message("Approved with questions"), "EDITORIAL_RESPONSE").intent, "AUTHOR_QUESTIONS_MISSING");
   assert.equal(serviceIntent(message("Approved with questions. Can we change chapter three?"), "EDITORIAL_RESPONSE").intent, "EDITORIAL_JUDGMENT_REQUIRED");
+});
+
+test("onboarding access response keeps identity changes behind verification", () => {
+  assert.equal(serviceIntent(message("I need onboarding help and want a new email"), "AUTHOR_ACCESS_REQUEST").intent,
+    "AUTHOR_ONBOARDING_CONTACT_CHANGE");
+  assert.equal(serviceIntent(message("I need help signing in"), "AUTHOR_ACCESS_REQUEST").intent,
+    "AUTHOR_ONBOARDING_ACCESS");
+  const copy = serviceCopy("AUTHOR_ONBOARDING_CONTACT_CHANGE", "Jackuline Fly", "Whole", "Re: Begin Author Onboarding for Whole");
+  assert.match(copy.body, /email address that received the invitation/);
+  assert.match(copy.body, /verify the new address before updating it/);
+  assert.doesNotMatch(copy.body, /payment link|one-time code:|Dataverse|ACS/);
+});
+
+test("onboarding access service sends only to the existing governed contact in fixture mode", async () => {
+  const { queue, deps, effects } = await setup("I found the invitation in junk and need help with onboarding. My new email is new@example.com.",
+    "AUTHOR_ACCESS_REQUEST");
+  const result = await executeService(queue, deps);
+  assert.equal(result.outcome, "SENT");
+  assert.equal(effects.sends.length, 1);
+  assert.deepEqual(effects.sends[0].input.to, ["author@example.com"]);
+  assert.deepEqual(effects.sends[0].input.cc, ["publishing@jmerrill.one"]);
+  assert.equal(effects.sends[0].input.sendApproval.draftBody.includes("new@example.com"), false);
+  assert.equal((await deps.store.getQueueItem(queue.queueItemId)).waitingOn, "JMP_IDENTITY_VERIFICATION");
+  assert.equal((await executeService(queue, deps)).outcome, "IDEMPOTENT");
+  assert.equal(effects.sends.length, 1);
 });
 
 test("question follow-up with an unbound delivered artifact stays a system authority hold", async () => {

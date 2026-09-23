@@ -65,6 +65,16 @@ async function setup(messages) {
 }
 
 describe("Inbound business route", () => {
+  test("onboarding access help routes without editorial, commercial, or founder gates", async () => {
+    const deps = await setup([authorMessage("access-1", "Re: Begin Author Onboarding for Whole",
+      "I found the email in junk and need assistance with onboarding.\n\nOn Sep 17, 2026 at 9:15 PM Publisher wrote:\nPayment is complete.")]);
+    const result = await runInboundBusinessRouter({}, deps);
+    assert.equal(result.results[0].route.kind, "ROUTINE_AUTHOR_ACCESS_SERVICE");
+    assert.equal(result.results[0].route.status, "ROUTINE_SERVICE_READY");
+    assert.equal(result.results[0].route.editorialGate, null);
+    assert.equal(result.results[0].route.commercialAuthority, null);
+    assert.equal(result.results[0].route.decisionGate, null);
+  });
   test("finds a delivered candidate but holds until the reply-to-delivery link is proven", async () => {
     const queue = {
       titleId: "11111111-1111-4111-8111-111111111111",
