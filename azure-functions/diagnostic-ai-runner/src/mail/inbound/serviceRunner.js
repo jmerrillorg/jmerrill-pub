@@ -115,6 +115,10 @@ async function prepareService(queueItem, deps) {
     return safeError("SOURCE_MESSAGE_MISMATCH");
   }
   const classified = serviceIntent(graphMessage, queueItem.classification);
+  if (classified.intent === "PAYMENT_SCHEDULE_DETAILS") {
+    return { outcome: "HELD_PAYMENT_SCHEDULE_AUTHORITY", intent: classified.intent, humanGate: false,
+      eventId: queueItem.evidenceLink, transitionHeld: true };
+  }
   if (classified.intent === "EDITORIAL_QUESTION_REVIEW" && route.editorialGate?.status !== "EXACT") {
     return { outcome: "HELD_EDITORIAL_AUTHORITY", intent: classified.intent, humanGate: false,
       questions: classified.questions || [], questionPlan: classified.questionPlan || [],
