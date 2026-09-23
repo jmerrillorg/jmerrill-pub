@@ -116,7 +116,11 @@ async function prepareService(queueItem, deps) {
   }
   const classified = serviceIntent(graphMessage, queueItem.classification);
   if (!ROUTINE_INTENTS.has(classified.intent)) {
-    return { outcome: classified.humanGate ? "HUMAN_JUDGMENT_REQUIRED" : "NO_ROUTINE_SERVICE_RULE", intent: classified.intent };
+    return { outcome: classified.humanGate ? "HUMAN_JUDGMENT_REQUIRED" : "NO_ROUTINE_SERVICE_RULE",
+      intent: classified.intent, humanGate: classified.humanGate, questions: classified.questions || [],
+      questionPlan: classified.questionPlan || [],
+      eventId: queueItem.evidenceLink, sourceConversationId: message.conversationId || null,
+      sourceInternetMessageId: message.internetMessageId || null };
   }
   const contact = await client.first("contacts", {
     $select: "contactid,fullname,emailaddress1",
@@ -159,12 +163,80 @@ function publicServiceResult(prepared) {
   };
 }
 
+function serviceSla(receivedAt, now = new Date()) {
+  const elapsedMinutes = (now.getTime() - Date.parse(receivedAt)) / 60000;
+  if (!Number.isFinite(elapsedMinutes)) return "TIMESTAMP_UNPROVEN";
+  if (elapsedMinutes > 60) return "ESCALATED_SERVICE_EXCEPTION";
+  if (elapsedMinutes > 30) return "SERVICE_EXCEPTION";
+  return "WITHIN_TARGET";
+}
+
+async function persistHumanGate(queueItem, prepared, deps) {
+  return deps.store.withBusinessRouteLease(queueItem.evidenceLink, async () => {
+    const route = await deps.store.getBusinessRoute(queueItem.evidenceLink);
+    if (route?.service?.status === "HUMAN_REVIEW_REQUIRED") {
+      return { outcome: "HUMAN_REVIEW_REQUIRED", eventId: queueItem.evidenceLink,
+        intent: route.service.intent, humanGate: true, questionCount: route.service.questions?.length || 0 };
+    }
+    const now = new Date().toISOString();
+    const sla = serviceSla(queueItem.receivedAt, new Date(now));
+    const auditId = await (deps.writeLog || writeLog)(deps.client, {
+      name: "PUBLISHING_INBOUND_SERVICE_HUMAN_GATE",
+      actionType: "PUBLISHING_INBOUND_SERVICE_HUMAN_GATE",
+      description: `sourceInboundEvent=${queueItem.evidenceLink}; businessEventId=${queueItem.businessEventId}; ` +
+        `intent=${prepared.intent}; questionCount=${prepared.questions.length}; sla=${sla}; authorMessages=0.`,
+      sourceEntity: "jm1pub_title", sourceRecordId: queueItem.titleId
+    });
+    await deps.store.updateBusinessRoute({ ...route, service: {
+      intent: prepared.intent, status: "HUMAN_REVIEW_REQUIRED", questions: prepared.questions,
+      questionPlan: prepared.questionPlan,
+      requestedDecision: "Resolve editorial-evidence questions against the current delivered artifact; escalate only genuinely new editorial judgment.",
+      humanGateAt: now, auditId, sla, sourceConversationId: prepared.sourceConversationId,
+      sourceInternetMessageId: prepared.sourceInternetMessageId,
+      waitingOn: "JMP", authorWaitingOn: "JMP", authorMessages: 0
+    } });
+    const currentQueue = await deps.store.getQueueItem(queueItem.queueItemId);
+    await deps.store.updateQueueItem({ ...currentQueue, serviceIntent: prepared.intent,
+      serviceStatus: "HUMAN_REVIEW_REQUIRED", serviceWaitingOn: "JMP", serviceHumanGateAt: now,
+      serviceSla: sla });
+    return { outcome: "HUMAN_REVIEW_REQUIRED", eventId: queueItem.evidenceLink,
+      intent: prepared.intent, humanGate: true, questionCount: prepared.questions.length, sla };
+  });
+}
+
+async function persistServiceException(queueItem, outcome, deps) {
+  const sla = serviceSla(queueItem.receivedAt);
+  if (sla === "WITHIN_TARGET" || sla === "TIMESTAMP_UNPROVEN") return;
+  await deps.store.withBusinessRouteLease(queueItem.evidenceLink, async () => {
+    const route = await deps.store.getBusinessRoute(queueItem.evidenceLink);
+    if (!route || route.service?.status === "SENT" || route.service?.status === "HUMAN_REVIEW_REQUIRED" ||
+        route.serviceException?.sla === sla) return;
+    const now = new Date().toISOString();
+    const auditId = await (deps.writeLog || writeLog)(deps.client, {
+      name: "PUBLISHING_INBOUND_SERVICE_EXCEPTION",
+      actionType: "PUBLISHING_INBOUND_SERVICE_EXCEPTION",
+      description: `sourceInboundEvent=${queueItem.evidenceLink}; businessEventId=${queueItem.businessEventId}; ` +
+        `outcome=${outcome}; sla=${sla}; authorMessages=0.`,
+      sourceEntity: "jm1pub_title", sourceRecordId: queueItem.titleId
+    });
+    await deps.store.updateBusinessRoute({ ...route, serviceException: { sla, outcome, detectedAt: now, auditId } });
+    const currentQueue = await deps.store.getQueueItem(queueItem.queueItemId);
+    await deps.store.updateQueueItem({ ...currentQueue, serviceSla: sla, serviceExceptionAt: now,
+      serviceExceptionOutcome: outcome });
+    if (typeof deps.store.mergeHealth === "function") {
+      await deps.store.mergeHealth({ lastPublishingServiceExceptionAt: now,
+        lastPublishingServiceExceptionEventId: queueItem.evidenceLink });
+    }
+  });
+}
+
 async function executeService(queueItem, deps) {
   const priorRoute = await deps.store.getBusinessRoute(queueItem.evidenceLink);
   if (["SENT_READBACK_PENDING", "SENT"].includes(priorRoute?.service?.status)) {
     return deps.store.withBusinessRouteLease(queueItem.evidenceLink, () => completeMailboxReadback(queueItem, deps));
   }
   let prepared = await prepareService(queueItem, deps);
+  if (prepared.outcome === "HUMAN_JUDGMENT_REQUIRED") return persistHumanGate(queueItem, prepared, deps);
   if (prepared.outcome !== "ROUTINE_SERVICE_READY") return publicServiceResult(prepared);
   const { store, client } = deps;
   return store.withBusinessRouteLease(queueItem.evidenceLink, async () => {
@@ -260,6 +332,9 @@ async function runInboundService(input = {}, deps = {}) {
       const prepared = preview
         ? await prepareService(row, { store, graphClient, contextProvider, client, validatePaymentLink: deps.validatePaymentLink })
         : await executeService(row, { store, graphClient, contextProvider, client, ...deps });
+      if (!preview && !["SENT", "IDEMPOTENT", "HUMAN_REVIEW_REQUIRED", "SENT_READBACK_PENDING"].includes(prepared.outcome)) {
+        await persistServiceException(row, prepared.outcome, { store, client, ...deps });
+      }
       results.push(publicServiceResult(prepared));
     } catch (error) {
       results.push({ outcome: "SERVICE_FAILED_RETRYABLE", eventId: row.evidenceLink, reason: error.safeCode || "SERVICE_RUNTIME_FAILURE" });
