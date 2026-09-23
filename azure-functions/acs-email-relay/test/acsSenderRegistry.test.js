@@ -172,6 +172,10 @@ test("registry contains the decided enterprise brands including AIC and JSJ", ()
   );
 });
 
+test("Foundation profile uses the canonical public domain", () => {
+  assert.equal(getSenderProfile("JMFN").profile.website, "jmerrill.foundation");
+});
+
 function pick(result) {
   return { ok: result.ok, reason: result.reason };
 }

@@ -60,7 +60,7 @@ const REGISTRY = Object.freeze({
     organizationDisplayName: "J Merrill Foundation",
     signatureName: "J Merrill Foundation",
     publicContactIdentity: "foundation@jmerrill.one",
-    website: "jmerrillfoundation.org",
+    website: "jmerrill.foundation",
     riskPolicy: "FOUNDATION"
   }),
   JMPRODUCTIONS: profile({
