@@ -17,6 +17,8 @@ const INTERNAL_MAILBOX = "publishing@jmerrill.one";
 const SYSTEM_SENDER = "publishing@email.jmerrill.one";
 const ROUTINE_INTENTS = new Set([
   "AUTHOR_QUESTIONS_MISSING", "PAYMENT_LINK_ACCESS",
+  "AUTHOR_ONBOARDING_ACCESS",
+  "AUTHOR_ONBOARDING_CONTACT_CHANGE",
   "TITLE_CHANGE_ACKNOWLEDGMENT", "EDITORIAL_CORRECTIONS_ACKNOWLEDGMENT"
 ]);
 
@@ -25,6 +27,8 @@ function safeError(code) {
 }
 
 function serviceWaitOwner(intent) {
+  if (intent === "AUTHOR_ONBOARDING_ACCESS") return "AUTHOR";
+  if (intent === "AUTHOR_ONBOARDING_CONTACT_CHANGE") return "JMP_IDENTITY_VERIFICATION";
   if (intent === "AUTHOR_QUESTIONS_MISSING") return "AUTHOR_QUESTIONS";
   if (intent === "PAYMENT_LINK_ACCESS") return "AUTHOR";
   return "JMP";
@@ -65,8 +69,8 @@ async function completeMailboxReadback(queueItem, deps) {
       await deps.store.updateBusinessRoute({ ...route, service: { ...service, waitingOn, authorWaitingOn: waitingOn } });
     }
     const currentQueue = await deps.store.getQueueItem(queueItem.queueItemId);
-    if (currentQueue?.serviceWaitingOn !== waitingOn) {
-      await deps.store.updateQueueItem({ ...currentQueue, serviceWaitingOn: waitingOn });
+    if (currentQueue?.serviceWaitingOn !== waitingOn || currentQueue?.waitingOn !== waitingOn) {
+      await deps.store.updateQueueItem({ ...currentQueue, serviceWaitingOn: waitingOn, waitingOn });
     }
     return { outcome: "IDEMPOTENT", eventId: queueItem.evidenceLink, intent: service.intent,
       providerMessageId: service.providerMessageId, sentAt: service.sentAt };
@@ -89,7 +93,8 @@ async function completeMailboxReadback(queueItem, deps) {
     authorWaitingOn: serviceWaitOwner(service.intent) } });
   const currentQueue = await deps.store.getQueueItem(queueItem.queueItemId);
   await deps.store.updateQueueItem({ ...currentQueue, serviceStatus: "SENT",
-    serviceSentAt: service.sentAt, serviceIntent: service.intent, serviceWaitingOn: serviceWaitOwner(service.intent) });
+    serviceSentAt: service.sentAt, serviceIntent: service.intent,
+    serviceWaitingOn: serviceWaitOwner(service.intent), waitingOn: serviceWaitOwner(service.intent) });
   return { outcome: "SENT", eventId: queueItem.evidenceLink, intent: service.intent,
     providerMessageId: service.providerMessageId, sentAt: service.sentAt };
 }

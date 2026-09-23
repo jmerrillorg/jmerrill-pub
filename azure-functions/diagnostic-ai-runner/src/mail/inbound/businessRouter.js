@@ -9,6 +9,7 @@ const { createDefaultInboundContextProvider } = require("./contextProvider");
 
 const ROUTABLE_CLASSES = new Set([
   MESSAGE_CLASS.AUTHOR_RESPONSE,
+  MESSAGE_CLASS.AUTHOR_ACCESS_REQUEST,
   MESSAGE_CLASS.AUTHOR_APPROVAL,
   MESSAGE_CLASS.AUTHOR_REQUEST_CHANGES,
   MESSAGE_CLASS.AUTHOR_CLARIFICATION,
@@ -20,12 +21,14 @@ const ROUTABLE_CLASSES = new Set([
 const EVENT_ACTION_TYPE = "PUBLISHING_INBOUND_AUTHOR_BUSINESS_EVENT";
 
 function routeKind(classification, graphMessage) {
+  if (classification === MESSAGE_CLASS.AUTHOR_ACCESS_REQUEST) return "ROUTINE_AUTHOR_ACCESS_SERVICE";
   if (classification !== MESSAGE_CLASS.PAYMENT_CORRESPONDENCE) return "EDITORIAL_HUMAN_REVIEW";
   return serviceIntent(graphMessage, classification).intent === "PAYMENT_LINK_ACCESS"
     ? "ROUTINE_COMMERCIAL_SERVICE" : "COMMERCIAL_HUMAN_REVIEW";
 }
 
 function finalRouteStatus(kind, editorialGate, commercialAuthority) {
+  if (kind === "ROUTINE_AUTHOR_ACCESS_SERVICE") return "ROUTINE_SERVICE_READY";
   if (kind === "EDITORIAL_HUMAN_REVIEW" && editorialGate?.status !== "EXACT") return "HELD_EDITORIAL_GATE_BINDING";
   if (kind.startsWith("COMMERCIAL_") || kind === "ROUTINE_COMMERCIAL_SERVICE") {
     if (commercialAuthority?.status !== "EXACT") return "HELD_COMMERCIAL_AUTHORITY";
@@ -291,9 +294,13 @@ async function projectRoute(store, queueItem, route) {
     commercialAuthority: route.commercialAuthority,
     currentStage: route.stageName,
     nextAction: ready ? route.decisionGate.decisionRequested
-      : routine ? (queueItem.serviceStatus === "SENT" ? "Await author response to the governed installment communication." : "Complete governed routine author service.")
+      : routine ? (queueItem.serviceStatus === "SENT"
+        ? queueItem.serviceWaitingOn === "JMP_IDENTITY_VERIFICATION"
+          ? "Verify the requested author correspondence address before changing account identity."
+          : "Await author response to the governed service communication."
+        : "Complete governed routine author service.")
         : heldAction,
-    waitingOn: ready ? "JMP" : routine && queueItem.serviceStatus === "SENT" ? "AUTHOR" : "JMP_SYSTEM",
+    waitingOn: ready ? "JMP" : routine && queueItem.serviceStatus === "SENT" ? queueItem.serviceWaitingOn || "AUTHOR" : "JMP_SYSTEM",
     reasonUnresolved: ready || routine ? null : route.status
   });
 }
@@ -339,7 +346,7 @@ async function routeQueueItem(queueItem, deps) {
   const editorialGate = kind === "EDITORIAL_HUMAN_REVIEW"
     ? await (deps.resolveEditorialGate || resolveEditorialGate)(client, queueItem, message, graphMessage)
     : null;
-  const commercialAuthority = kind !== "EDITORIAL_HUMAN_REVIEW"
+  const commercialAuthority = kind !== "EDITORIAL_HUMAN_REVIEW" && kind !== "ROUTINE_AUTHOR_ACCESS_SERVICE"
     ? await (deps.resolveCommercialAuthority || resolveCommercialAuthority)(client, queueItem)
     : null;
   const proposed = existing || buildRoute(queueItem, message, movement, graphMessage, editorialGate, commercialAuthority);
