@@ -309,8 +309,9 @@ jobs:
             run-manual-signature-handoff \
             publishing/inbound/business-router/replay \
             run-stripe-connect-reminder-monitor-certification; do
+            probe_name="${route//\//-}"
             status="$(curl --silent --show-error --max-time 30 \
-              --output "$RUNNER_TEMP/${route}-probe.json" \
+              --output "$RUNNER_TEMP/${probe_name}-probe.json" \
               --write-out "%{http_code}" \
               --request POST \
               --header "content-type: application/json" \
@@ -318,7 +319,7 @@ jobs:
               "https://$FUNCTION_APP_NAME.azurewebsites.net/api/$route")"
             if [ "$status" = "404" ] || [ "$status" = "000" ]; then
               echo "FATAL: route probe failed for $route with HTTP $status" >&2
-              cat "$RUNNER_TEMP/${route}-probe.json" >&2 || true
+              cat "$RUNNER_TEMP/${probe_name}-probe.json" >&2 || true
               exit 1
             fi
             echo "Route probe for $route returned HTTP $status — indexed route present"
@@ -471,9 +472,11 @@ jobs:
               "https://${FUNCTION_APP_NAME}.azurewebsites.net/api/health" \
               --output "$RUNNER_TEMP/diagnostic-ai-runner-rollback-health.json"; then
               rollback_release="$(python3 -c "import json; print(json.load(open('$RUNNER_TEMP/diagnostic-ai-runner-rollback-health.json')).get('release'))")"
-              test "$rollback_release" = "$source_sha"
-              echo "Rollback to last-known-good release $source_sha verified."
-              exit 0
+              if [ "$rollback_release" = "$source_sha" ]; then
+                echo "Rollback to last-known-good release $source_sha verified."
+                exit 0
+              fi
+              echo "Rollback readback reports release=$rollback_release; retrying in 10s..."
             fi
             sleep 10
           done
