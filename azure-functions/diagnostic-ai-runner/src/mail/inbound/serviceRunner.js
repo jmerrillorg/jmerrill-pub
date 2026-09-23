@@ -115,6 +115,11 @@ async function prepareService(queueItem, deps) {
     return safeError("SOURCE_MESSAGE_MISMATCH");
   }
   const classified = serviceIntent(graphMessage, queueItem.classification);
+  if (classified.intent === "EDITORIAL_QUESTION_REVIEW" && route.editorialGate?.status !== "EXACT") {
+    return { outcome: "HELD_EDITORIAL_AUTHORITY", intent: classified.intent, humanGate: false,
+      questions: classified.questions || [], questionPlan: classified.questionPlan || [],
+      eventId: queueItem.evidenceLink, authorityStatus: route.editorialGate?.status || "UNPROVEN" };
+  }
   if (!ROUTINE_INTENTS.has(classified.intent)) {
     return { outcome: classified.humanGate ? "HUMAN_JUDGMENT_REQUIRED" : "NO_ROUTINE_SERVICE_RULE",
       intent: classified.intent, humanGate: classified.humanGate, questions: classified.questions || [],
@@ -230,12 +235,47 @@ async function persistServiceException(queueItem, outcome, deps) {
   });
 }
 
+async function reconcileEditorialAuthorityHold(queueItem, prepared, deps) {
+  return deps.store.withBusinessRouteLease(queueItem.evidenceLink, async () => {
+    const route = await deps.store.getBusinessRoute(queueItem.evidenceLink);
+    if (route?.service?.status === "HELD_EDITORIAL_AUTHORITY" &&
+        route.service.authorityStatus === prepared.authorityStatus) {
+      return { outcome: "HELD_EDITORIAL_AUTHORITY", eventId: queueItem.evidenceLink,
+        intent: prepared.intent, authorityStatus: prepared.authorityStatus };
+    }
+    const now = new Date().toISOString();
+    const priorGate = route?.service?.status === "HUMAN_REVIEW_REQUIRED";
+    const auditId = await (deps.writeLog || writeLog)(deps.client, {
+      name: "PUBLISHING_INBOUND_EDITORIAL_AUTHORITY_HOLD",
+      actionType: "PUBLISHING_INBOUND_EDITORIAL_AUTHORITY_HOLD",
+      description: `sourceInboundEvent=${queueItem.evidenceLink}; authorityStatus=${prepared.authorityStatus}; ` +
+        `questionCount=${prepared.questions.length}; prematureHumanGateRetracted=${priorGate ? "YES" : "NO"}; authorMessages=0.`,
+      sourceEntity: "jm1pub_title", sourceRecordId: queueItem.titleId
+    });
+    await deps.store.updateBusinessRoute({ ...route, service: {
+      ...route.service, intent: prepared.intent, status: "HELD_EDITORIAL_AUTHORITY",
+      questions: prepared.questions, questionPlan: prepared.questionPlan,
+      authorityStatus: prepared.authorityStatus, authorityHoldAt: now, authorityHoldAuditId: auditId,
+      prematureHumanGateRetractedAt: priorGate ? now : null,
+      waitingOn: "JMP_SYSTEM", authorWaitingOn: "JMP_SYSTEM", authorMessages: 0
+    } });
+    const currentQueue = await deps.store.getQueueItem(queueItem.queueItemId);
+    await deps.store.updateQueueItem({ ...currentQueue, serviceIntent: prepared.intent,
+      serviceStatus: null, serviceWaitingOn: "JMP_SYSTEM",
+      serviceAuthorityStatus: prepared.authorityStatus,
+      serviceHumanGateRetractedAt: priorGate ? now : currentQueue.serviceHumanGateRetractedAt || null });
+    return { outcome: "HELD_EDITORIAL_AUTHORITY", eventId: queueItem.evidenceLink,
+      intent: prepared.intent, authorityStatus: prepared.authorityStatus };
+  });
+}
+
 async function executeService(queueItem, deps) {
   const priorRoute = await deps.store.getBusinessRoute(queueItem.evidenceLink);
   if (["SENT_READBACK_PENDING", "SENT"].includes(priorRoute?.service?.status)) {
     return deps.store.withBusinessRouteLease(queueItem.evidenceLink, () => completeMailboxReadback(queueItem, deps));
   }
   let prepared = await prepareService(queueItem, deps);
+  if (prepared.outcome === "HELD_EDITORIAL_AUTHORITY") return reconcileEditorialAuthorityHold(queueItem, prepared, deps);
   if (prepared.outcome === "HUMAN_JUDGMENT_REQUIRED") return persistHumanGate(queueItem, prepared, deps);
   if (prepared.outcome !== "ROUTINE_SERVICE_READY") return publicServiceResult(prepared);
   const { store, client } = deps;
@@ -325,7 +365,8 @@ async function runInboundService(input = {}, deps = {}) {
   const targetEventId = normalizeString(input.targetEventId);
   const rows = targetEventId ? [await store.getQueueItem(`queue_${targetEventId}`)].filter(Boolean)
     : (await store.listQueueItems(Number.MAX_SAFE_INTEGER)).filter((row) => row.receivedAt >= "2026-09-22T00:00:00Z" && row.businessEventId &&
-      (!row.serviceStatus || row.serviceStatus === "SENT_READBACK_PENDING"));
+      (!row.serviceStatus || row.serviceStatus === "SENT_READBACK_PENDING" ||
+        (row.serviceStatus === "HUMAN_REVIEW_REQUIRED" && row.serviceIntent === "EDITORIAL_QUESTION_REVIEW")));
   const results = [];
   for (const row of rows.slice(0, Math.min(Math.max(Number(input.limit || 20), 1), 100))) {
     try {
