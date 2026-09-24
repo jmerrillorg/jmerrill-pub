@@ -1,0 +1,107 @@
+name: Publishing Stage 0 Shadow Host
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches: [main]
+    paths:
+      - "azure-functions/diagnostic-ai-runner/src/shadow/**"
+      - "azure-functions/diagnostic-ai-runner/test/shadow/**"
+      - "azure-functions/diagnostic-ai-runner/src/index.js"
+      - ".github/workflows/stage0-shadow-host.yml"
+
+permissions:
+  contents: read
+
+env:
+  APP: func-jm1-pub-stage0-shadow
+  RESOURCE_GROUP: rg-jm1-ai
+  STORAGE: stjm1pubstage0shadow
+  CONTAINER: releases
+  IDENTITY_RESOURCE_ID: /subscriptions/9ee13245-2303-4010-8b6d-35f7cbcfdc0e/resourceGroups/rg-jm1-ai/providers/Microsoft.ManagedIdentity/userAssignedIdentities/id-jm1-pub-stage0-shadow
+  SOURCE: azure-functions/diagnostic-ai-runner
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    outputs:
+      checksum: ${{ steps.package.outputs.checksum }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: azure-functions/diagnostic-ai-runner/package-lock.json
+      - name: Validate runner and isolation
+        working-directory: azure-functions/diagnostic-ai-runner
+        run: |
+          npm ci
+          npm test
+          node --check src/index.js src/shadow/host.js src/shadow/stage0ShadowRuntime.js src/shadow/blobBudgetLedger.js
+      - name: Build immutable package
+        id: package
+        shell: bash
+        run: |
+          set -euo pipefail
+          root="$RUNNER_TEMP/stage0-shadow-package"
+          mkdir -p "$root"
+          git archive --format=tar "$GITHUB_SHA:$SOURCE" | tar -xf - -C "$root"
+          rm -rf "$root/test" "$root/local.settings.example.json"
+          (cd "$root" && npm ci --omit=dev --ignore-scripts)
+          (cd "$root" && find . -mindepth 1 -print | LC_ALL=C sort | zip -X -q "$RUNNER_TEMP/stage0-shadow.zip" -@)
+          unzip -Z1 "$RUNNER_TEMP/stage0-shadow.zip" | grep -Fx 'src/shadow/host.js'
+          unzip -Z1 "$RUNNER_TEMP/stage0-shadow.zip" | grep -Fx 'node_modules/@azure/functions/package.json'
+          sha256sum "$RUNNER_TEMP/stage0-shadow.zip" | awk '{print "checksum=" $1}' >> "$GITHUB_OUTPUT"
+      - uses: actions/upload-artifact@v7
+        with:
+          name: stage0-shadow-${{ github.sha }}
+          path: ${{ runner.temp }}/stage0-shadow.zip
+          if-no-files-found: error
+
+  deploy:
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    needs: validate
+    runs-on: ubuntu-latest
+    environment: jmerrill-pub-production
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          name: stage0-shadow-${{ github.sha }}
+          path: ${{ runner.temp }}/deploy
+      - uses: azure/login@v3
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+      - name: Publish with managed-identity package access
+        shell: bash
+        run: |
+          set -euo pipefail
+          package="$RUNNER_TEMP/deploy/stage0-shadow.zip"
+          test "$(sha256sum "$package" | awk '{print $1}')" = "${{ needs.validate.outputs.checksum }}"
+          az storage container create --name "$CONTAINER" --account-name "$STORAGE" --auth-mode login --output none
+          name="stage0-shadow-${GITHUB_SHA}.zip"
+          az storage blob upload --account-name "$STORAGE" --container-name "$CONTAINER" --name "$name" --file "$package" --auth-mode login --overwrite false --output none
+          az functionapp config appsettings set -g "$RESOURCE_GROUP" -n "$APP" --settings \
+            JM1_SHADOW_HOST=true \
+            JM1_RELEASE_SHA="$GITHUB_SHA" \
+            WEBSITE_RUN_FROM_PACKAGE="https://${STORAGE}.blob.core.windows.net/${CONTAINER}/${name}" \
+            WEBSITE_RUN_FROM_PACKAGE_BLOB_MI_RESOURCE_ID="$IDENTITY_RESOURCE_ID" \
+            --output none
+          az functionapp restart -g "$RESOURCE_GROUP" -n "$APP" --output none
+          az functionapp sync-function-triggers -g "$RESOURCE_GROUP" -n "$APP" --output none
+      - name: Verify isolated function indexing and disabled route
+        shell: bash
+        run: |
+          set -euo pipefail
+          sleep 20
+          functions="$(az functionapp function list -g "$RESOURCE_GROUP" -n "$APP" --query '[].name' -o tsv)"
+          test "$functions" = "${APP}/stage0-shadow-poll"
+          release="$(az functionapp config appsettings list -g "$RESOURCE_GROUP" -n "$APP" --query "[?name=='JM1_RELEASE_SHA'].value | [0]" -o tsv)"
+          enabled="$(az functionapp config appsettings list -g "$RESOURCE_GROUP" -n "$APP" --query "[?name=='JM1_SHADOW_ENABLED'].value | [0]" -o tsv)"
+          test "$release" = "$GITHUB_SHA"
+          test "$enabled" = false
