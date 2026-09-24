@@ -213,6 +213,43 @@ test("mailbox copy without an Internet Message ID cannot certify delivery or tri
   assert.equal(store.deliveries.size, 0);
 });
 
+test("timer reconstructs a prior verified service delivery without another send", async () => {
+  const { queue, store, deps, effects } = await setup("Approved with questions");
+  assert.equal((await executeService(queue, deps)).outcome, "SENT");
+  const route = await store.getBusinessRoute(queue.evidenceLink);
+  await store.updateBusinessRoute({ ...route, service: { ...route.service, deliveryId: null } });
+  const currentQueue = await store.getQueueItem(queue.queueItemId);
+  await store.updateQueueItem({ ...currentQueue, serviceDeliveryId: null, businessEventId: "route-1" });
+  store.deliveries.clear();
+  deps.enabled = true;
+  deps.graphClient.getMessage = async () => ({ id: "graph-1", internetMessageId: "<system-reply@example.com>",
+    conversationId: "thread-1", subject: route.service.subject,
+    from: { emailAddress: { address: "publishing@email.jmerrill.one" } },
+    toRecipients: [{ emailAddress: { address: route.service.recipient } }],
+    ccRecipients: [{ emailAddress: { address: "publishing@jmerrill.one" } }],
+    body: { content: effects.sends[0].input.sendApproval.draftBody } });
+  const result = await runInboundService({}, deps);
+  assert.equal(result.results[0].outcome, "IDEMPOTENT");
+  assert.equal(store.deliveries.size, 1);
+  assert.ok((await store.getQueueItem(queue.queueItemId)).serviceDeliveryId);
+  assert.equal(effects.sends.length, 1);
+});
+
+test("unverifiable historical mailbox copy remains visible and never resends", async () => {
+  const { queue, store, deps, effects } = await setup("Approved with questions");
+  await executeService(queue, deps);
+  const route = await store.getBusinessRoute(queue.evidenceLink);
+  await store.updateBusinessRoute({ ...route, service: { ...route.service, deliveryId: null } });
+  const currentQueue = await store.getQueueItem(queue.queueItemId);
+  await store.updateQueueItem({ ...currentQueue, serviceDeliveryId: null });
+  store.deliveries.clear();
+  const result = await executeService(queue, deps);
+  assert.equal(result.outcome, "HELD_DELIVERY_BACKFILL");
+  assert.equal(result.reason, "VERIFIED_COPY_IDENTITY_MISMATCH");
+  assert.equal((await store.getQueueItem(queue.queueItemId)).serviceLedgerStatus, "VERIFIED_COPY_IDENTITY_MISMATCH");
+  assert.equal(effects.sends.length, 1);
+});
+
 test("replay corrects an acknowledgment wait owner without resending", async () => {
   const { queue, store, deps, effects } = await setup("I approve the developmental editing with corrections.", "AUTHOR_RESPONSE");
   assert.equal((await executeService(queue, deps)).outcome, "SENT");

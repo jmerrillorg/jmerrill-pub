@@ -47,13 +47,7 @@ async function verifyMailboxCopy(graphClient, service) {
   try {
     const after = new Date(new Date(service.sentAt).getTime() - 120000).toISOString();
     const rows = (await graphClient.listInboxMessagesSince(after, 100)).value || [];
-    const matched = rows.find((row) =>
-      emailAddress(row.from) === SYSTEM_SENDER &&
-      (row.toRecipients || []).some((item) => emailAddress(item) === service.recipient) &&
-      (row.ccRecipients || []).some((item) => emailAddress(item) === INTERNAL_MAILBOX) &&
-      normalizedMailText(row.subject) === service.subject &&
-      createHash("sha256").update(normalizedMailText(row.body?.content)).digest("hex") === service.bodyHash
-    );
+    const matched = rows.find((row) => matchesMailboxCopy(row, service));
     return matched ? { status: "PASS", graphMessageId: matched.id,
       internetMessageId: matched.internetMessageId || null,
       conversationId: matched.conversationId || null } : { status: "PENDING" };
@@ -62,10 +56,41 @@ async function verifyMailboxCopy(graphClient, service) {
   }
 }
 
+function matchesMailboxCopy(row, service) {
+  return emailAddress(row.from) === SYSTEM_SENDER &&
+    (row.toRecipients || []).some((item) => emailAddress(item) === service.recipient) &&
+    (row.ccRecipients || []).some((item) => emailAddress(item) === INTERNAL_MAILBOX) &&
+    normalizedMailText(row.subject) === service.subject &&
+    createHash("sha256").update(normalizedMailText(row.body?.content)).digest("hex") === service.bodyHash;
+}
+
 async function completeMailboxReadback(queueItem, deps) {
-  const route = await deps.store.getBusinessRoute(queueItem.evidenceLink);
-  const service = route?.service;
+  let route = await deps.store.getBusinessRoute(queueItem.evidenceLink);
+  let service = route?.service;
   if (service?.status === "SENT") {
+    if (!service.deliveryId) {
+      const holdBackfill = async (reason) => {
+        const currentQueue = await deps.store.getQueueItem(queueItem.queueItemId);
+        await deps.store.updateQueueItem({ ...currentQueue, serviceLedgerStatus: reason });
+        return { outcome: "HELD_DELIVERY_BACKFILL", eventId: queueItem.evidenceLink, reason };
+      };
+      if (service.mailboxCopy !== "PASS" || !service.graphMessageId) {
+        return holdBackfill("VERIFIED_COPY_REFERENCE_MISSING");
+      }
+      let copy;
+      try { copy = await deps.graphClient.getMessage(service.graphMessageId); }
+      catch { return holdBackfill("VERIFIED_COPY_UNAVAILABLE"); }
+      if (!matchesMailboxCopy(copy, service) || !copy.internetMessageId) {
+        return holdBackfill("VERIFIED_COPY_IDENTITY_MISMATCH");
+      }
+      const delivery = verifiedServiceDelivery(route, service, copy);
+      await deps.store.upsertDelivery(delivery);
+      await deps.store.updateBusinessRoute({ ...route, service: { ...service, deliveryId: delivery.deliveryId } });
+      const currentQueue = await deps.store.getQueueItem(queueItem.queueItemId);
+      await deps.store.updateQueueItem({ ...currentQueue, serviceDeliveryId: delivery.deliveryId, serviceLedgerStatus: "CERTIFIED" });
+      route = { ...route, service: { ...service, deliveryId: delivery.deliveryId } };
+      service = route.service;
+    }
     const waitingOn = serviceWaitOwner(service.intent);
     if (service.waitingOn !== waitingOn || service.authorWaitingOn !== waitingOn) {
       await deps.store.updateBusinessRoute({ ...route, service: { ...service, waitingOn, authorWaitingOn: waitingOn } });
@@ -83,7 +108,8 @@ async function completeMailboxReadback(queueItem, deps) {
     reason: readback.status, providerMessageId: service.providerMessageId };
   if (!readback.internetMessageId) return { outcome: "SENT_READBACK_PENDING", eventId: queueItem.evidenceLink,
     reason: "OUTBOUND_INTERNET_MESSAGE_ID_MISSING", providerMessageId: service.providerMessageId };
-  await deps.store.upsertDelivery(verifiedServiceDelivery(route, service, readback));
+  const delivery = verifiedServiceDelivery(route, service, readback);
+  await deps.store.upsertDelivery(delivery);
   await (deps.writeLog || writeLog)(deps.client, {
     name: "AUTHOR_COMMUNICATION_MAILBOX_COPY_VERIFIED",
     actionType: "AUTHOR_COMMUNICATION_MAILBOX_COPY_VERIFIED",
@@ -93,11 +119,14 @@ async function completeMailboxReadback(queueItem, deps) {
     sourceEntity: "jm1pub_title", sourceRecordId: queueItem.titleId
   });
   await deps.store.updateBusinessRoute({ ...route, service: { ...service, status: "SENT",
+    deliveryId: delivery.deliveryId,
     mailboxCopy: "PASS", graphMessageId: readback.graphMessageId,
     outboundConversationId: readback.conversationId, waitingOn: serviceWaitOwner(service.intent),
     authorWaitingOn: serviceWaitOwner(service.intent) } });
   const currentQueue = await deps.store.getQueueItem(queueItem.queueItemId);
   await deps.store.updateQueueItem({ ...currentQueue, serviceStatus: "SENT",
+    serviceDeliveryId: delivery.deliveryId,
+    serviceLedgerStatus: "CERTIFIED",
     serviceSentAt: service.sentAt, serviceIntent: service.intent,
     serviceWaitingOn: serviceWaitOwner(service.intent), waitingOn: serviceWaitOwner(service.intent) });
   return { outcome: "SENT", eventId: queueItem.evidenceLink, intent: service.intent,
@@ -380,6 +409,7 @@ async function runInboundService(input = {}, deps = {}) {
   const rows = targetEventId ? [await store.getQueueItem(`queue_${targetEventId}`)].filter(Boolean)
     : (await store.listQueueItems(Number.MAX_SAFE_INTEGER)).filter((row) => row.receivedAt >= "2026-09-22T00:00:00Z" && row.businessEventId &&
       (!row.serviceStatus || row.serviceStatus === "SENT_READBACK_PENDING" ||
+        (row.serviceStatus === "SENT" && !row.serviceDeliveryId) ||
         (row.serviceStatus === "HUMAN_REVIEW_REQUIRED" && row.serviceIntent === "EDITORIAL_QUESTION_REVIEW")));
   const results = [];
   for (const row of rows.slice(0, Math.min(Math.max(Number(input.limit || 20), 1), 100))) {
