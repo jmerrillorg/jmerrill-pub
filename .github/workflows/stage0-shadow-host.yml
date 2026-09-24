@@ -94,7 +94,8 @@ jobs:
             WEBSITE_RUN_FROM_PACKAGE_BLOB_MI_RESOURCE_ID="$IDENTITY_RESOURCE_ID" \
             --output none
           az functionapp restart -g "$RESOURCE_GROUP" -n "$APP" --output none
-          az functionapp sync-function-triggers -g "$RESOURCE_GROUP" -n "$APP" --output none
+          subscription="$(az account show --query id -o tsv)"
+          az rest --method post --url "https://management.azure.com/subscriptions/${subscription}/resourceGroups/${RESOURCE_GROUP}/providers/Microsoft.Web/sites/${APP}/syncfunctiontriggers?api-version=2023-12-01" --output none
       - name: Verify isolated function indexing and disabled route
         shell: bash
         run: |

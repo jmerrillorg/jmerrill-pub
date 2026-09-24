@@ -7,7 +7,7 @@ const { Stage0DataverseSource } = require("./stage0DataverseSource");
 const { probe } = require("./authorityProbe");
 
 app.timer("stage0-shadow-authority-probe", {
-  schedule: "0 2 * * * *",
+  schedule: "0 */5 * * * *",
   run: async (_timer, context) => {
     const clientId = process.env.JM1_SHADOW_MANAGED_IDENTITY_CLIENT_ID;
     const accountName = process.env.JM1_SHADOW_STORAGE_ACCOUNT;
