@@ -14,5 +14,6 @@ test("shadow host indexes its timer without registering Publishing effect routes
   assert.equal(result.status, 0, result.stderr);
   const output = result.stdout + result.stderr;
   assert.match(output, /stage0-shadow-poll/);
+  assert.match(output, /stage0-shadow-authority-probe/);
   assert.doesNotMatch(output, /run-stage0-diagnostic|run-agreement|signnow-webhook/i);
 });
