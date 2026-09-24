@@ -8,7 +8,7 @@ const { probe } = require("./authorityProbe");
 
 app.timer("stage0-shadow-authority-probe", {
   schedule: "0 */5 * * * *",
-  run: async (_timer, context) => {
+  handler: async (_timer, context) => {
     const clientId = process.env.JM1_SHADOW_MANAGED_IDENTITY_CLIENT_ID;
     const accountName = process.env.JM1_SHADOW_STORAGE_ACCOUNT;
     if (!clientId || !accountName) throw new Error("SHADOW_PROBE_CONFIG_MISSING");
@@ -36,7 +36,7 @@ app.timer("stage0-shadow-authority-probe", {
 
 app.timer("stage0-shadow-poll", {
   schedule: "0 */5 * * * *",
-  run: async (_timer, context) => {
+  handler: async (_timer, context) => {
     if (process.env.JM1_SHADOW_ENABLED !== "true") {
       context.log("stage0_shadow_disabled");
       return;
