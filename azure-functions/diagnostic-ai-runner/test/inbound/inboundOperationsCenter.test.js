@@ -665,6 +665,35 @@ describe("Processing, idempotency, and reconciliation", () => {
     assert.equal(store.queue.size, 1);
   });
 
+  test("replay of a routed event preserves its service and decision state", async () => {
+    const store = new InMemoryInboundEvidenceStore();
+    const graphMessage = message();
+    const first = await processGraphMessage(graphMessage, { store, context });
+    const original = first.queueItem;
+    await store.updateQueueItem({ ...original, businessEventId: "route-1", routingStatus: "HELD_EDITORIAL_GATE_BINDING",
+      serviceStatus: "SENT", serviceDeliveryId: "delivery-1", waitingOn: "AUTHOR", nextAction: "Await author response" });
+    const replay = await processGraphMessage(graphMessage, { store, context, reprocessReviewRequired: true });
+    assert.equal(replay.ok, true);
+    const projected = await store.getQueueItem(original.queueItemId);
+    assert.equal(projected.businessEventId, "route-1");
+    assert.equal(projected.serviceStatus, "SENT");
+    assert.equal(projected.serviceDeliveryId, "delivery-1");
+    assert.equal(projected.waitingOn, "AUTHOR");
+    assert.equal(projected.nextAction, "Await author response");
+  });
+
+  test("replay cannot silently rebind a routed event to another title", async () => {
+    const store = new InMemoryInboundEvidenceStore();
+    const graphMessage = message();
+    const first = await processGraphMessage(graphMessage, { store, context });
+    await store.updateQueueItem({ ...first.queueItem, businessEventId: "route-1", serviceStatus: "SENT" });
+    const different = { ...context, outboundEvents: [], activeEngagements: [{ ...context.activeEngagements[0], titleId: "another-title" }] };
+    const replay = await processGraphMessage(graphMessage, { store, context: different, reprocessReviewRequired: true });
+    assert.equal(replay.ok, false);
+    assert.equal(replay.code, "ROUTED_REPLAY_AUTHORITY_CHANGED");
+    assert.equal((await store.getQueueItem(first.queueItem.queueItemId)).titleId, "title-1");
+  });
+
   test("shadow replay can select one exact Internet Message ID", async () => {
     const target = message({ id: "target", internetMessageId: "<target@example.com>" });
     const other = message({ id: "other", internetMessageId: "<other@example.com>" });

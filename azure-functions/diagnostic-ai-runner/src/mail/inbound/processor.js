@@ -148,7 +148,20 @@ async function processGraphMessage(graphMessage, options = {}) {
     if (typeof store.updateAttachment === "function") await store.updateAttachment(attachment);
   }
 
-  const queueItem = buildQueueItem(messageEvidence, attachmentEvidence);
+  let queueItem = buildQueueItem(messageEvidence, attachmentEvidence);
+  if (mayReprocess && typeof store.getQueueItem === "function") {
+    const existingQueue = await store.getQueueItem(queueItem.queueItemId);
+    if (existingQueue?.businessEventId) {
+      const sameAuthority = ["authorId", "titleId", "engagementId", "stageId", "classification"]
+        .every((field) => existingQueue[field] === queueItem[field]);
+      if (!sameAuthority) return { ok: false, code: "ROUTED_REPLAY_AUTHORITY_CHANGED",
+        messageEvent: created.record, queueItem: existingQueue, attachments: attachmentEvidence };
+      queueItem = { ...existingQueue,
+        correlationEvidence: queueItem.correlationEvidence,
+        matchedDeliveryId: queueItem.matchedDeliveryId,
+        matchedOutboundInternetMessageId: queueItem.matchedOutboundInternetMessageId };
+    }
+  }
   messageEvidence = {
     ...messageEvidence,
     processingStatus: queueItem.processingStatus === PROCESSING_STATUS.REVIEW_REQUIRED
