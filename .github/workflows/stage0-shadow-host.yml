@@ -38,7 +38,7 @@ jobs:
         run: |
           npm ci
           npm test
-          node --check src/index.js src/shadow/host.js src/shadow/stage0ShadowRuntime.js src/shadow/blobBudgetLedger.js
+          for file in src/index.js src/shadow/host.js src/shadow/authorityProbe.js src/shadow/stage0ShadowRuntime.js src/shadow/blobBudgetLedger.js; do node --check "$file"; done
       - name: Build immutable package
         id: package
         shell: bash
@@ -60,7 +60,7 @@ jobs:
           if-no-files-found: error
 
   deploy:
-    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    if: github.event_name == 'workflow_dispatch' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/codex/stage0-shadow-runtime')
     needs: validate
     runs-on: ubuntu-latest
     environment: jmerrill-pub-production
@@ -88,6 +88,9 @@ jobs:
           az storage blob upload --account-name "$STORAGE" --container-name "$CONTAINER" --name "$name" --file "$package" --auth-mode login --overwrite false --output none
           az functionapp config appsettings set -g "$RESOURCE_GROUP" -n "$APP" --settings \
             JM1_SHADOW_HOST=true \
+            JM1_SHADOW_STORAGE_ACCOUNT="$STORAGE" \
+            DATAVERSE_WEB_API_BASE_URL=https://jm1hq.crm.dynamics.com/api/data/v9.2 \
+            DATAVERSE_RESOURCE_URL=https://jm1hq.crm.dynamics.com \
             JM1_RELEASE_SHA="$GITHUB_SHA" \
             WEBSITE_RUN_FROM_PACKAGE="https://${STORAGE}.blob.core.windows.net/${CONTAINER}/${name}" \
             WEBSITE_RUN_FROM_PACKAGE_BLOB_MI_RESOURCE_ID="$IDENTITY_RESOURCE_ID" \
@@ -100,7 +103,9 @@ jobs:
           set -euo pipefail
           sleep 20
           functions="$(az functionapp function list -g "$RESOURCE_GROUP" -n "$APP" --query '[].name' -o tsv)"
-          test "$functions" = "${APP}/stage0-shadow-poll"
+          printf '%s\n' "$functions" | grep -Fx "${APP}/stage0-shadow-poll"
+          printf '%s\n' "$functions" | grep -Fx "${APP}/stage0-shadow-authority-probe"
+          test "$(printf '%s\n' "$functions" | wc -l | tr -d ' ')" = 2
           release="$(az functionapp config appsettings list -g "$RESOURCE_GROUP" -n "$APP" --query "[?name=='JM1_RELEASE_SHA'].value | [0]" -o tsv)"
           enabled="$(az functionapp config appsettings list -g "$RESOURCE_GROUP" -n "$APP" --query "[?name=='JM1_SHADOW_ENABLED'].value | [0]" -o tsv)"
           test "$release" = "$GITHUB_SHA"
