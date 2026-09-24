@@ -154,6 +154,8 @@ function applyCorrelation(messageEvidence, correlation) {
     stageId: correlation.stageId || null,
     correlationCandidates: Array.isArray(correlation.candidates) ? correlation.candidates : [],
     correlationEvidence: correlation.evidence || null,
+    matchedDeliveryId: correlation.deliveryId || null,
+    matchedOutboundInternetMessageId: correlation.outboundInternetMessageId || null,
     manualReviewRequired: messageEvidence.manualReviewRequired || correlation.reviewRequired,
     processingStatus: correlation.reviewRequired ? PROCESSING_STATUS.REVIEW_REQUIRED : PROCESSING_STATUS.CORRELATED,
     error: correlation.error || messageEvidence.error

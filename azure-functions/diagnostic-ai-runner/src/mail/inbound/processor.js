@@ -6,6 +6,7 @@ const { classifyInboundMessage } = require("./classifier");
 const { correlateMessage } = require("./correlator");
 const { buildQueueItem } = require("./queueProjection");
 const { resolveSender } = require("./senderResolver");
+const { replyMessageIds } = require("./deliveryLedger");
 
 async function captureAttachments(graphClient, store, messageEvidence) {
   if (!messageEvidence.hasAttachments) return [];
@@ -97,6 +98,12 @@ async function processGraphMessage(graphMessage, options = {}) {
   let authoritativeContext = context;
   try {
     if (typeof contextProvider === "function") authoritativeContext = await contextProvider(messageEvidence);
+    const deliveryIds = replyMessageIds(messageEvidence);
+    if (typeof store.getDeliveryByInternetMessageId === "function" && deliveryIds.length) {
+      const deliveries = (await Promise.all(deliveryIds.map((id) => store.getDeliveryByInternetMessageId(id)))).filter(Boolean);
+      authoritativeContext = { ...authoritativeContext,
+        outboundEvents: [...deliveries, ...(authoritativeContext.outboundEvents || [])] };
+    }
   } catch (err) {
     messageEvidence = {
       ...messageEvidence,

@@ -68,6 +68,8 @@ function buildQueueItem(messageEvidence, attachments = []) {
     titleCandidates: messageEvidence.correlationCandidates || [],
     stageId: messageEvidence.stageId,
     correlationEvidence: messageEvidence.correlationEvidence,
+    matchedDeliveryId: messageEvidence.matchedDeliveryId || null,
+    matchedOutboundInternetMessageId: messageEvidence.matchedOutboundInternetMessageId || null,
     attachmentIndicator: attachments.length > 0,
     attachmentCount: attachments.length,
     waitingOn: reviewRequired ? "JMP" : null,

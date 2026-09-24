@@ -12,6 +12,7 @@ const { PublishingMailboxGraphClient } = require("./graphClient");
 const { serviceCopy, serviceIntent } = require("./serviceIntent");
 const { validatePaymentLink } = require("./paymentLinkAuthority");
 const { normalizeString, redactBodyForEvidence, sha256Hex } = require("./util");
+const { verifiedServiceDelivery } = require("./deliveryLedger");
 
 const INTERNAL_MAILBOX = "publishing@jmerrill.one";
 const SYSTEM_SENDER = "publishing@email.jmerrill.one";
@@ -54,6 +55,7 @@ async function verifyMailboxCopy(graphClient, service) {
       createHash("sha256").update(normalizedMailText(row.body?.content)).digest("hex") === service.bodyHash
     );
     return matched ? { status: "PASS", graphMessageId: matched.id,
+      internetMessageId: matched.internetMessageId || null,
       conversationId: matched.conversationId || null } : { status: "PENDING" };
   } catch {
     return { status: "READBACK_FAILED" };
@@ -79,6 +81,9 @@ async function completeMailboxReadback(queueItem, deps) {
   const readback = await (deps.verifyMailboxCopy || verifyMailboxCopy)(deps.graphClient, service);
   if (readback.status !== "PASS") return { outcome: "SENT_READBACK_PENDING", eventId: queueItem.evidenceLink,
     reason: readback.status, providerMessageId: service.providerMessageId };
+  if (!readback.internetMessageId) return { outcome: "SENT_READBACK_PENDING", eventId: queueItem.evidenceLink,
+    reason: "OUTBOUND_INTERNET_MESSAGE_ID_MISSING", providerMessageId: service.providerMessageId };
+  await deps.store.upsertDelivery(verifiedServiceDelivery(route, service, readback));
   await (deps.writeLog || writeLog)(deps.client, {
     name: "AUTHOR_COMMUNICATION_MAILBOX_COPY_VERIFIED",
     actionType: "AUTHOR_COMMUNICATION_MAILBOX_COPY_VERIFIED",
