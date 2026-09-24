@@ -1,8 +1,5 @@
 "use strict";
 
-if (process.env.JM1_SHADOW_HOST === "true") {
-  require("./shadow/host");
-} else {
 require("./functions/health");
 require("./functions/getPublisherRecommendationReview");
 require("./functions/runAgreementDocumentPreparation");
@@ -69,4 +66,3 @@ if (
 }
 require("./functions/runStage0Diagnostic");
 require("./functions/signNowWebhook");
-}

@@ -5,9 +5,7 @@ on:
   pull_request:
     branches: [main]
     paths:
-      - "azure-functions/diagnostic-ai-runner/src/shadow/**"
-      - "azure-functions/diagnostic-ai-runner/test/shadow/**"
-      - "azure-functions/diagnostic-ai-runner/src/index.js"
+      - "azure-functions/stage0-shadow-host/**"
       - ".github/workflows/stage0-shadow-host.yml"
 
 permissions:
@@ -19,7 +17,7 @@ env:
   STORAGE: stjm1pubstage0shadow
   CONTAINER: releases
   IDENTITY_RESOURCE_ID: /subscriptions/9ee13245-2303-4010-8b6d-35f7cbcfdc0e/resourceGroups/rg-jm1-ai/providers/Microsoft.ManagedIdentity/userAssignedIdentities/id-jm1-pub-stage0-shadow
-  SOURCE: azure-functions/diagnostic-ai-runner
+  SOURCE: azure-functions/stage0-shadow-host
 
 jobs:
   validate:
@@ -32,13 +30,13 @@ jobs:
         with:
           node-version: 22
           cache: npm
-          cache-dependency-path: azure-functions/diagnostic-ai-runner/package-lock.json
+          cache-dependency-path: azure-functions/stage0-shadow-host/package-lock.json
       - name: Validate runner and isolation
-        working-directory: azure-functions/diagnostic-ai-runner
+        working-directory: azure-functions/stage0-shadow-host
         run: |
           npm ci
           npm test
-          for file in src/index.js src/shadow/host.js src/shadow/authorityProbe.js src/shadow/stage0ShadowRuntime.js src/shadow/blobBudgetLedger.js; do node --check "$file"; done
+          npm run lint
       - name: Build immutable package
         id: package
         shell: bash
