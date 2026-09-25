@@ -146,3 +146,34 @@ test("missing independent evaluator keeps the reservation and fails closed", asy
   assert.equal(result.status, "FAILED_RESERVED");
   assert.equal(finalized, false);
 });
+
+test("soft cost target records anomaly without denying an otherwise authorized shadow run", async () => {
+  const evidence = [];
+  const metrics = [];
+  const alerts = [];
+  const result = await processStage0Event(event, route, {
+    identityClientId: "isolated-identity",
+    now: () => "2026-09-24T12:00:00Z",
+    projectMaximumCost: async () => 15,
+    ledger: {
+      reserve: async () => ({ outcome: "RESERVED", event: { recordedAt: "2026-09-24T12:00:00Z" } }),
+      recordEvidence: async (...args) => evidence.push(args),
+      finalize: async () => {},
+    },
+    readApprovedInput: async () => ({ synthetic: true }),
+    infer: async () => ({
+      output: { jm1_diagnosticoutputsummary: "Synthetic summary", jm1_diagnosticriskflags: "none",
+        jm1_confidence: 0.9, jm1_requireshumanreview: true },
+      tokenCounts: { input: 10, output: 4 },
+    }),
+    evaluate: async () => ({ pass: true, evaluatorId: "deterministic-v1",
+      policyVersion: "v1", method: "RULES" }),
+    actualCostCents: () => 12,
+    metric: (name) => metrics.push(name),
+    alert: async (name) => alerts.push(name),
+  });
+  assert.equal(result.status, "SHADOW_ONLY");
+  assert.equal(evidence[0][2].costAnomaly, true);
+  assert.ok(metrics.includes("stage0_shadow_cost_anomaly"));
+  assert.ok(alerts.includes("stage0_shadow_cost_anomaly"));
+});

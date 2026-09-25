@@ -95,6 +95,7 @@ async function processStage0Event(event, route, ports) {
     if (!Number.isSafeInteger(actualCents) || actualCents < 0 || actualCents > projectedCents) {
       throw new Error("SHADOW_COST_RECONCILIATION_FAILED");
     }
+    const costAnomaly = actualCents > 10;
     const evaluationFailed = !evaluation.structureValid || !evaluation.independent.pass;
     await ports.ledger.recordEvidence(event.sourceEventId, selection.policyVersion, {
       shadowExecutionId,
@@ -106,6 +107,7 @@ async function processStage0Event(event, route, ports) {
       inputTokens: result.tokenCounts.input,
       outputTokens: result.tokenCounts.output,
       executionCostCents: actualCents,
+      costAnomaly,
       latencyMs: Date.now() - start,
       status: evaluationFailed ? "EVALUATION_FAILED" : "SHADOW_ONLY",
       recordedAt: ports.now(),
@@ -118,6 +120,10 @@ async function processStage0Event(event, route, ports) {
       now: ports.now(),
       reservedAt: reservation.event.recordedAt,
     });
+    if (costAnomaly) {
+      ports.metric("stage0_shadow_cost_anomaly", 1);
+      await ports.alert("stage0_shadow_cost_anomaly", { sourceEventId: event.sourceEventId });
+    }
     if (evaluationFailed) {
       ports.metric("stage0_shadow_eval_fail", 1);
       await ports.alert("stage0_shadow_eval_fail", { sourceEventId: event.sourceEventId });
