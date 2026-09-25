@@ -2,7 +2,7 @@
 
 const test = require("node:test");
 const assert = require("node:assert/strict");
-const { authorizeRoute, evaluateStructure, processStage0Event } = require("../../src/shadow/stage0ShadowRuntime");
+const { authorizeRoute, evaluateStructure, processStage0Event, CANARY_EVENT_ID } = require("../../src/shadow/stage0ShadowRuntime");
 
 const modelResourceId = "/subscriptions/9ee13245-2303-4010-8b6d-35f7cbcfdc0e/resourceGroups/rg-jm1-ai/providers/Microsoft.CognitiveServices/accounts/oai-jm1-diagnostic";
 const modelRegisterId = "AZURE:OAI-JM1-DIAGNOSTIC:JM1-PUB-DIAGNOSTIC-PRIMARY";
@@ -48,6 +48,15 @@ test("route denies any business authority and unknown identity", () => {
   assert.throws(() => check({ ...route, azureResourceId: undefined }));
   assert.throws(() => check({ ...route, deploymentId: "jm1-pub-diagnostic-primary" }));
   assert.throws(() => check({ ...route, azureResourceId: "/other/resource" }));
+});
+
+test("canary-only route cannot admit a natural Publishing event", () => {
+  const canaryRoute = { ...route, status: "CANARY_ONLY" };
+  const check = (candidate) => authorizeRoute(candidate, canaryRoute,
+    "isolated-identity", modelResourceId, modelRegisterId);
+  assert.throws(() => check(event), /SHADOW_ROUTE_DENIED/);
+  assert.throws(() => check({ ...event, synthetic: true }), /SHADOW_ROUTE_DENIED/);
+  assert.equal(check({ ...event, sourceEventId: CANARY_EVENT_ID, synthetic: true }).routeId, route.id);
 });
 
 test("evaluation does not mistake structural agreement for groundedness", () => {

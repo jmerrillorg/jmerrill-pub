@@ -6,13 +6,14 @@ const { ManagedIdentityCredential } = require("@azure/identity");
 const { Stage0DataverseSource } = require("./stage0DataverseSource");
 const { probe } = require("./authorityProbe");
 const { BlobBudgetLedger } = require("./blobBudgetLedger");
-const { processStage0Event, ROUTE_ID, ENTITY, WORKLOAD } = require("./stage0ShadowRuntime");
+const { processStage0Event, ROUTE_ID, ENTITY, WORKLOAD, CANARY_EVENT_ID } = require("./stage0ShadowRuntime");
 const { readApprovedInput } = require("./stage0InputAdapter");
 const model = require("./exactResourceExecutor");
 const evaluator = require("./deterministicEvaluator");
 const cost = require("./stage0ModelCost");
 
 const MODEL_REGISTER_ID = "AZURE:OAI-JM1-DIAGNOSTIC:JM1-PUB-DIAGNOSTIC-PRIMARY";
+const CANARY_FIXTURE_URL = "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/90_INFRA/INFRA-003/infra-003-demo-2026-07-09T19-28-57-623Z.txt";
 
 function routeFromEnvironment(env) {
   if (env.JM1_SHADOW_MODEL_REGISTER_ID !== MODEL_REGISTER_ID ||
@@ -97,6 +98,30 @@ app.timer("stage0-shadow-authority-probe", {
   },
 });
 
+app.timer("stage0-shadow-commissioning-canary", {
+  schedule: "0 */5 * * * *",
+  handler: async (_timer, context) => {
+    if (process.env.JM1_SHADOW_CANARY_ENABLED !== "true") return;
+    if (process.env.JM1_SHADOW_ENABLED === "true" ||
+        process.env.JM1_SHADOW_ROUTE_STATUS !== "CANARY_ONLY") {
+      throw new Error("SHADOW_CANARY_ROUTE_BOUNDARY_DENIED");
+    }
+    const event = {
+      sourceEventId: CANARY_EVENT_ID,
+      entity: ENTITY,
+      workload: WORKLOAD,
+      synthetic: true,
+      manuscriptApprovedForDiagnostic: true,
+      manuscriptUrl: CANARY_FIXTURE_URL,
+      currentOutcome: 835500004,
+    };
+    const result = await processStage0Event(event, routeFromEnvironment(process.env),
+      productionPorts(process.env, context));
+    context.log(JSON.stringify({ event: "stage0_shadow_canary", status: result.status,
+      sourceEventId: CANARY_EVENT_ID }));
+  },
+});
+
 app.timer("stage0-shadow-poll", {
   schedule: "0 */5 * * * *",
   handler: async (_timer, context) => {
@@ -137,4 +162,4 @@ app.timer("stage0-shadow-poll", {
   },
 });
 
-module.exports = { routeFromEnvironment, productionPorts };
+module.exports = { routeFromEnvironment, productionPorts, CANARY_EVENT_ID, CANARY_FIXTURE_URL };

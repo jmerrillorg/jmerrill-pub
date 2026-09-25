@@ -5,13 +5,16 @@ const { randomUUID } = require("node:crypto");
 const ROUTE_ID = "STAGE_0_DIAGNOSTIC_SHADOW_ONLY";
 const ENTITY = "J_MERRILL_PUBLISHING";
 const WORKLOAD = "STAGE_0_DIAGNOSTIC_SHADOW";
+const CANARY_EVENT_ID = "c1100000-0000-4000-8000-000000000001";
 
 function authorizeRoute(event, route, identityClientId, modelResourceId, modelRegisterId) {
   if (!event || !route || !identityClientId || !modelResourceId || !modelRegisterId) {
     throw new Error("SHADOW_AUTHORITY_MISSING");
   }
   const deploymentResourceId = `${modelResourceId}/deployments/${route.deploymentName}`;
-  if (route.status !== "ACTIVE" || route.id !== ROUTE_ID || route.entity !== ENTITY ||
+  const canaryOnly = route.status === "CANARY_ONLY" && event.synthetic === true &&
+    event.sourceEventId === CANARY_EVENT_ID;
+  if (!(route.status === "ACTIVE" || canaryOnly) || route.id !== ROUTE_ID || route.entity !== ENTITY ||
       route.workload !== WORKLOAD || route.mode !== "SHADOW_ONLY" ||
       route.actionAuthority !== "READ_ONLY" || route.businessWriteAuthority !== "NONE" ||
       route.authorMessageAuthority !== "NONE" || route.financialAuthority !== "NONE" ||
@@ -190,4 +193,5 @@ async function processStage0Event(event, route, ports) {
   }
 }
 
-module.exports = { ROUTE_ID, ENTITY, WORKLOAD, authorizeRoute, evaluateStructure, processStage0Event };
+module.exports = { ROUTE_ID, ENTITY, WORKLOAD, CANARY_EVENT_ID,
+  authorizeRoute, evaluateStructure, processStage0Event };
