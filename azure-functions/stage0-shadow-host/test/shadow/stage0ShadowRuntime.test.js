@@ -140,8 +140,9 @@ test("independent evaluator failure prevents a valid structure from succeeding",
   assert.equal(evidence[0][2].status, "EVALUATION_FAILED");
 });
 
-test("missing independent evaluator keeps the reservation and fails closed", async () => {
+test("missing independent evaluator settles known provider usage and fails closed", async () => {
   let finalized = false;
+  let finalizedCost = null;
   const result = await processStage0Event(event, route, {
     identityClientId: "isolated-identity",
     modelResourceId,
@@ -151,7 +152,7 @@ test("missing independent evaluator keeps the reservation and fails closed", asy
     ledger: {
       reserve: async () => ({ outcome: "RESERVED", event: { recordedAt: "2026-09-24T12:00:00Z" } }),
       recordEvidence: async () => {},
-      finalize: async () => { finalized = true; },
+      finalize: async (args) => { finalized = true; finalizedCost = args.actualCents; },
     },
     readApprovedInput: async () => ({ synthetic: true }),
     infer: async () => ({
@@ -163,8 +164,9 @@ test("missing independent evaluator keeps the reservation and fails closed", asy
     metric: () => {},
     alert: async () => {},
   });
-  assert.equal(result.status, "FAILED_RESERVED");
-  assert.equal(finalized, false);
+  assert.equal(result.status, "EVALUATION_FAILED");
+  assert.equal(finalized, true);
+  assert.equal(finalizedCost, 2);
 });
 
 test("soft cost target records anomaly without denying an otherwise authorized shadow run", async () => {

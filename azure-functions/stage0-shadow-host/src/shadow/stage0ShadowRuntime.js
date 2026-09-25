@@ -82,9 +82,12 @@ async function processStage0Event(event, route, ports) {
 
   const shadowExecutionId = randomUUID();
   const start = Date.now();
+  let providerUsage = null;
+  let input = null;
   try {
-    const input = await ports.readApprovedInput(event);
+    input = await ports.readApprovedInput(event);
     const result = await ports.infer(input, selection);
+    providerUsage = result.tokenCounts;
     const evaluation = evaluateStructure(event.currentOutcome, result.output);
     if (evaluation.structureValid) {
       if (typeof ports.evaluate !== "function") throw new Error("INDEPENDENT_EVALUATOR_NOT_BOUND");
@@ -111,6 +114,8 @@ async function processStage0Event(event, route, ports) {
       shadowExecutionId,
       routeId: selection.routeId,
       deploymentId: selection.deploymentId,
+      modelRegisterId: selection.modelRegisterId,
+      sourceHashes: input.sourceReferenceIds,
       currentOutcome: event.currentOutcome,
       shadowOutcome: evaluation.shadowOutcome,
       evaluation,
@@ -144,14 +149,44 @@ async function processStage0Event(event, route, ports) {
     if (!evaluation.outcomeAgreement) ports.metric("stage0_shadow_divergence", 1);
     return { status: "SHADOW_ONLY", shadowExecutionId, evaluation };
   } catch (error) {
-    // An ambiguous provider failure may already have incurred cost. Keep the
-    // reservation and deny replay until reconciliation instead of spending twice.
+    // A returned provider usage record is billable even when evaluation fails.
+    // Ambiguous provider failures keep their reservation for reconciliation.
+    let settled = false;
+    if (providerUsage) {
+      try {
+        const actualCents = ports.actualCostCents(providerUsage);
+        await ports.ledger.recordEvidence(event.sourceEventId, selection.policyVersion, {
+          shadowExecutionId,
+          routeId: selection.routeId,
+          deploymentId: selection.deploymentId,
+          modelRegisterId: selection.modelRegisterId,
+          sourceHashes: input?.sourceReferenceIds || [],
+          evaluation: { pass: false, failureClass: error.message },
+          inputTokens: providerUsage.input,
+          outputTokens: providerUsage.output,
+          executionCostCents: actualCents,
+          status: "EVALUATION_FAILED",
+          recordedAt: ports.now(),
+        });
+        await ports.ledger.finalize({
+          sourceEventId: event.sourceEventId,
+          policyVersion: selection.policyVersion,
+          actualCents,
+          status: "EVALUATION_FAILED",
+          now: ports.now(),
+          reservedAt: reservation.event.recordedAt,
+        });
+        settled = true;
+      } catch {
+        ports.metric("stage0_shadow_cost_reconciliation_pending", 1);
+      }
+    }
     ports.metric("stage0_shadow_failure", 1);
     await ports.alert("stage0_shadow_failure", {
       sourceEventId: event.sourceEventId,
       code: error.message,
     });
-    return { status: "FAILED_RESERVED", shadowExecutionId };
+    return { status: settled ? "EVALUATION_FAILED" : "FAILED_RESERVED", shadowExecutionId };
   }
 }
 
