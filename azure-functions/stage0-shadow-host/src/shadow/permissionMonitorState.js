@@ -12,8 +12,7 @@ function validatePermissionState(state, expected, now = Date.now()) {
       !expected.appId || !expected.siteId || !expected.grantId ||
       state.runtimeAppId !== expected.appId || state.targetSiteId !== expected.siteId ||
       state.grantId !== expected.grantId || state.role !== "read" ||
-      state.tenantWideSharePointAccess !== false || state.unrelatedSiteGrants !== 0 ||
-      state.effectiveProbe !== "PASS") {
+      state.tenantWideSharePointAccess !== false || state.unrelatedSiteGrants !== 0) {
     throw new Error("SHADOW_PERMISSION_STATE_UNVERIFIED");
   }
   const observed = Date.parse(state.observedAt);

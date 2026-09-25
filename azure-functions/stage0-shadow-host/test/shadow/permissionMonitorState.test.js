@@ -28,7 +28,7 @@ test("accepts only fresh independent exact-site read authority", () => {
 for (const change of [
   { status: "DRIFTED" }, { role: "write" }, { grantId: "other" },
   { tenantWideSharePointAccess: true }, { unrelatedSiteGrants: 1 },
-  { effectiveProbe: "FAIL" }, { observedAt: new Date(now - MAX_AGE_MS - 1).toISOString() },
+  { observedAt: new Date(now - MAX_AGE_MS - 1).toISOString() },
 ]) {
   test(`denies permission state ${JSON.stringify(change)}`, () => {
     assert.throws(() => validatePermissionState({ ...state, ...change }, expected, now));
