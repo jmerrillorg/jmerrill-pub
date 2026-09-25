@@ -86,6 +86,8 @@ class BlobBudgetLedger {
       policyVersion,
       routeId: evidence.routeId,
       deploymentId: evidence.deploymentId,
+      modelRegisterId: evidence.modelRegisterId,
+      sourceHashes: evidence.sourceHashes,
       currentOutcome: evidence.currentOutcome,
       shadowOutcome: evidence.shadowOutcome,
       evaluation: evidence.evaluation,

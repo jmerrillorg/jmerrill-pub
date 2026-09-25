@@ -5,6 +5,69 @@ const { BlobServiceClient } = require("@azure/storage-blob");
 const { ManagedIdentityCredential } = require("@azure/identity");
 const { Stage0DataverseSource } = require("./stage0DataverseSource");
 const { probe } = require("./authorityProbe");
+const { BlobBudgetLedger } = require("./blobBudgetLedger");
+const { processStage0Event, ROUTE_ID, ENTITY, WORKLOAD } = require("./stage0ShadowRuntime");
+const { readApprovedInput } = require("./stage0InputAdapter");
+const model = require("./exactResourceExecutor");
+const evaluator = require("./deterministicEvaluator");
+const cost = require("./stage0ModelCost");
+
+const MODEL_REGISTER_ID = "AZURE:OAI-JM1-DIAGNOSTIC:JM1-PUB-DIAGNOSTIC-PRIMARY";
+
+function routeFromEnvironment(env) {
+  if (env.JM1_SHADOW_MODEL_REGISTER_ID !== MODEL_REGISTER_ID ||
+      !env.JM1_SHADOW_RISK_REGISTER_ID ||
+      !env.JM1_SHADOW_ROUTE_POLICY_VERSION || !env.JM1_SHADOW_ROUTE_EXPIRES_AT) {
+    throw new Error("SHADOW_ROUTE_AUTHORITY_MISSING");
+  }
+  return {
+    id: ROUTE_ID,
+    entity: ENTITY,
+    workload: WORKLOAD,
+    status: env.JM1_SHADOW_ROUTE_STATUS,
+    mode: "SHADOW_ONLY",
+    actionAuthority: "READ_ONLY",
+    businessWriteAuthority: "NONE",
+    authorMessageAuthority: "NONE",
+    financialAuthority: "NONE",
+    identityClientId: env.JM1_SHADOW_MANAGED_IDENTITY_CLIENT_ID,
+    policyVersion: env.JM1_SHADOW_ROUTE_POLICY_VERSION,
+    expiresAt: env.JM1_SHADOW_ROUTE_EXPIRES_AT,
+    azureResourceId: model.RESOURCE_ID,
+    deploymentId: model.DEPLOYMENT_ID,
+    deploymentName: model.DEPLOYMENT_NAME,
+    modelRegisterId: MODEL_REGISTER_ID,
+    riskRegisterId: env.JM1_SHADOW_RISK_REGISTER_ID,
+    modelVersion: model.MODEL_VERSION,
+    region: "eastus",
+    evaluationRequired: true,
+    executionLogRequired: true,
+    costGovernanceRequired: true,
+  };
+}
+
+function productionPorts(env, context) {
+  const clientId = env.JM1_SHADOW_MANAGED_IDENTITY_CLIENT_ID;
+  const ledger = new BlobBudgetLedger({
+    accountName: env.JM1_SHADOW_STORAGE_ACCOUNT,
+    containerName: "shadow-ledger",
+    clientId,
+  });
+  return {
+    identityClientId: clientId,
+    modelResourceId: model.RESOURCE_ID,
+    modelRegisterId: MODEL_REGISTER_ID,
+    now: () => new Date().toISOString(),
+    projectMaximumCost: () => cost.projectMaximumCost({ approvedExcerpt: "x".repeat(12000) }),
+    actualCostCents: cost.actualCostCents,
+    ledger,
+    readApprovedInput: (event) => readApprovedInput(event, { clientId }),
+    infer: (input, selection) => model.infer(input, selection, { clientId }),
+    evaluate: evaluator.evaluate,
+    metric: (name, value) => context.log(JSON.stringify({ event: name, value })),
+    alert: async (name, details) => context.error(JSON.stringify({ event: name, ...details })),
+  };
+}
 
 app.timer("stage0-shadow-authority-probe", {
   schedule: "0 */5 * * * *",
@@ -45,8 +108,8 @@ app.timer("stage0-shadow-poll", {
       context.error("stage0_shadow_route_not_active");
       return;
     }
-    // Real-data execution stays closed until the site-scoped asset read and
-    // independent-evaluation ports pass their production proofs.
+    // Production data remains closed until the bounded route and execution
+    // controls have been separately certified.
     if (process.env.JM1_SHADOW_EXECUTION_CERTIFIED !== "true") {
       context.error("stage0_shadow_execution_not_certified");
       return;
@@ -59,6 +122,19 @@ app.timer("stage0-shadow-poll", {
     });
     const events = await source.listNaturalCompletedEvents();
     context.log(`stage0_shadow_natural_events_observed=${events.length}`);
-    throw new Error("STAGE0_SHADOW_EXECUTOR_NOT_BOUND");
+    const route = routeFromEnvironment(process.env);
+    const ports = productionPorts(process.env, context);
+    for (const event of events) {
+      try {
+        const result = await processStage0Event(event, route, ports);
+        context.log(JSON.stringify({ event: "stage0_shadow_result", sourceEventId: event.sourceEventId,
+          status: result.status }));
+      } catch (error) {
+        context.error(JSON.stringify({ event: "stage0_shadow_rejected", sourceEventId: event.sourceEventId,
+          code: error.message }));
+      }
+    }
   },
 });
+
+module.exports = { routeFromEnvironment, productionPorts };
