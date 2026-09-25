@@ -5,7 +5,7 @@ const { randomUUID } = require("node:crypto");
 const ROUTE_ID = "STAGE_0_DIAGNOSTIC_SHADOW_ONLY";
 const ENTITY = "J_MERRILL_PUBLISHING";
 const WORKLOAD = "STAGE_0_DIAGNOSTIC_SHADOW";
-const CANARY_EVENT_ID = "c1100000-0000-4000-8000-000000000002";
+const CANARY_EVENT_ID = "c1100000-0000-4000-8000-000000000003";
 
 function authorizeRoute(event, route, identityClientId, modelResourceId, modelRegisterId) {
   if (!event || !route || !identityClientId || !modelResourceId || !modelRegisterId) {

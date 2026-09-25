@@ -53,6 +53,12 @@ test("exact resource uses managed identity token and returns bounded output with
   });
   assert.ok(url.startsWith("https://oai-jm1-diagnostic.openai.azure.com/openai/deployments/jm1-pub-diagnostic-primary/"));
   assert.equal(request.messages[1].content, JSON.stringify(input));
+  assert.equal(request.response_format.type, "json_schema");
+  assert.equal(request.response_format.json_schema.strict, true);
+  assert.deepEqual(request.response_format.json_schema.schema.properties.source_event_id.enum,
+    [input.sourceEventId]);
+  assert.deepEqual(request.response_format.json_schema.schema.properties.source_reference_ids.items.enum,
+    input.sourceReferenceIds);
   assert.equal(result.output.jm1_diagnosticoutputsummary, "Synthetic");
   assert.deepEqual(result.tokenCounts, { input: 12, output: 3 });
 });

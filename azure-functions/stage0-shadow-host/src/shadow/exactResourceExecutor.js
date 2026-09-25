@@ -38,10 +38,30 @@ async function infer(input, selection, options = {}) {
   if (!token?.token) throw new Error("SHADOW_MODEL_AUTH_FAILED");
   const request = {
     messages: [
-      { role: "system", content: "Return one JSON object with source_event_id, source_reference_ids, jm1_diagnosticoutputsummary, jm1_diagnosticriskflags, jm1_confidence, and jm1_requireshumanreview. This is non-authoritative shadow analysis. Do not recommend or execute business actions. Use only the supplied excerpt." },
+      { role: "system", content: "Return one JSON object matching the supplied schema. Echo source_event_id and source_reference_ids exactly. Set jm1_requireshumanreview to true. Keep summary and risk flags concise. This is non-authoritative shadow analysis. Do not recommend or execute business actions. Use only the supplied excerpt." },
       { role: "user", content: JSON.stringify(input) },
     ],
-    response_format: { type: "json_object" },
+    response_format: {
+      type: "json_schema",
+      json_schema: {
+        name: "stage0_shadow_diagnostic",
+        strict: true,
+        schema: {
+          type: "object",
+          properties: {
+            source_event_id: { type: "string", enum: [input.sourceEventId] },
+            source_reference_ids: { type: "array", items: { type: "string", enum: input.sourceReferenceIds } },
+            jm1_diagnosticoutputsummary: { type: "string" },
+            jm1_diagnosticriskflags: { type: "string" },
+            jm1_confidence: { type: "number" },
+            jm1_requireshumanreview: { type: "boolean" },
+          },
+          required: ["source_event_id", "source_reference_ids", "jm1_diagnosticoutputsummary",
+            "jm1_diagnosticriskflags", "jm1_confidence", "jm1_requireshumanreview"],
+          additionalProperties: false,
+        },
+      },
+    },
     temperature: 0,
     max_tokens: 500,
   };
