@@ -76,10 +76,26 @@ async function processStage0Event(event, route, ports) {
     const input = await ports.readApprovedInput(event);
     const result = await ports.infer(input, selection);
     const evaluation = evaluateStructure(event.currentOutcome, result.output);
+    if (evaluation.structureValid) {
+      if (typeof ports.evaluate !== "function") throw new Error("INDEPENDENT_EVALUATOR_NOT_BOUND");
+      const verdict = await ports.evaluate({ input, output: result.output, selection, event });
+      if (!verdict || typeof verdict.pass !== "boolean" || !verdict.evaluatorId ||
+          !verdict.policyVersion || !verdict.method) {
+        throw new Error("INDEPENDENT_EVALUATION_INVALID");
+      }
+      evaluation.independent = {
+        pass: verdict.pass,
+        evaluatorId: verdict.evaluatorId,
+        policyVersion: verdict.policyVersion,
+        method: verdict.method,
+        failureClass: verdict.failureClass || null,
+      };
+    }
     const actualCents = ports.actualCostCents(result.tokenCounts);
     if (!Number.isSafeInteger(actualCents) || actualCents < 0 || actualCents > projectedCents) {
       throw new Error("SHADOW_COST_RECONCILIATION_FAILED");
     }
+    const evaluationFailed = !evaluation.structureValid || !evaluation.independent.pass;
     await ports.ledger.recordEvidence(event.sourceEventId, selection.policyVersion, {
       shadowExecutionId,
       routeId: selection.routeId,
@@ -91,17 +107,22 @@ async function processStage0Event(event, route, ports) {
       outputTokens: result.tokenCounts.output,
       executionCostCents: actualCents,
       latencyMs: Date.now() - start,
-      status: "SHADOW_ONLY",
+      status: evaluationFailed ? "EVALUATION_FAILED" : "SHADOW_ONLY",
       recordedAt: ports.now(),
     });
     await ports.ledger.finalize({
       sourceEventId: event.sourceEventId,
       policyVersion: selection.policyVersion,
       actualCents,
-      status: "SUCCEEDED",
+      status: evaluationFailed ? "EVALUATION_FAILED" : "SUCCEEDED",
       now: ports.now(),
       reservedAt: reservation.event.recordedAt,
     });
+    if (evaluationFailed) {
+      ports.metric("stage0_shadow_eval_fail", 1);
+      await ports.alert("stage0_shadow_eval_fail", { sourceEventId: event.sourceEventId });
+      return { status: "EVALUATION_FAILED", shadowExecutionId, evaluation };
+    }
     ports.metric("stage0_shadow_success", 1);
     ports.metric("stage0_shadow_cost", actualCents / 100);
     if (!evaluation.outcomeAgreement) ports.metric("stage0_shadow_divergence", 1);

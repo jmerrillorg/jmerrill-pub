@@ -66,3 +66,83 @@ test("denied budget never reads material or calls model", async () => {
   assert.equal(reads, 0);
   assert.equal(calls, 0);
 });
+
+test("invalid output is recorded as evaluation failure, never shadow success", async () => {
+  const evidence = [];
+  const finalizations = [];
+  const metrics = [];
+  const alerts = [];
+  const result = await processStage0Event(event, route, {
+    identityClientId: "isolated-identity",
+    now: () => "2026-09-24T12:00:00Z",
+    projectMaximumCost: async () => 11,
+    ledger: {
+      reserve: async () => ({ outcome: "RESERVED", event: { recordedAt: "2026-09-24T12:00:00Z" } }),
+      recordEvidence: async (...args) => evidence.push(args),
+      finalize: async (args) => finalizations.push(args),
+    },
+    readApprovedInput: async () => ({ synthetic: true }),
+    infer: async () => ({ output: {}, tokenCounts: { input: 10, output: 4 } }),
+    actualCostCents: () => 2,
+    metric: (name) => metrics.push(name),
+    alert: async (name) => alerts.push(name),
+  });
+  assert.equal(result.status, "EVALUATION_FAILED");
+  assert.equal(evidence[0][2].status, "EVALUATION_FAILED");
+  assert.equal(finalizations[0].status, "EVALUATION_FAILED");
+  assert.deepEqual(metrics, ["stage0_shadow_eval_fail"]);
+  assert.deepEqual(alerts, ["stage0_shadow_eval_fail"]);
+});
+
+test("independent evaluator failure prevents a valid structure from succeeding", async () => {
+  const evidence = [];
+  const result = await processStage0Event(event, route, {
+    identityClientId: "isolated-identity",
+    now: () => "2026-09-24T12:00:00Z",
+    projectMaximumCost: async () => 11,
+    ledger: {
+      reserve: async () => ({ outcome: "RESERVED", event: { recordedAt: "2026-09-24T12:00:00Z" } }),
+      recordEvidence: async (...args) => evidence.push(args),
+      finalize: async () => {},
+    },
+    readApprovedInput: async () => ({ synthetic: true }),
+    infer: async () => ({
+      output: { jm1_diagnosticoutputsummary: "Synthetic summary", jm1_diagnosticriskflags: "none",
+        jm1_confidence: 0.9, jm1_requireshumanreview: true },
+      tokenCounts: { input: 10, output: 4 },
+    }),
+    evaluate: async () => ({ pass: false, evaluatorId: "deterministic-v1",
+      policyVersion: "v1", method: "RULES", failureClass: "UNSUPPORTED_CLAIM" }),
+    actualCostCents: () => 2,
+    metric: () => {},
+    alert: async () => {},
+  });
+  assert.equal(result.status, "EVALUATION_FAILED");
+  assert.equal(evidence[0][2].evaluation.independent.pass, false);
+  assert.equal(evidence[0][2].status, "EVALUATION_FAILED");
+});
+
+test("missing independent evaluator keeps the reservation and fails closed", async () => {
+  let finalized = false;
+  const result = await processStage0Event(event, route, {
+    identityClientId: "isolated-identity",
+    now: () => "2026-09-24T12:00:00Z",
+    projectMaximumCost: async () => 11,
+    ledger: {
+      reserve: async () => ({ outcome: "RESERVED", event: { recordedAt: "2026-09-24T12:00:00Z" } }),
+      recordEvidence: async () => {},
+      finalize: async () => { finalized = true; },
+    },
+    readApprovedInput: async () => ({ synthetic: true }),
+    infer: async () => ({
+      output: { jm1_diagnosticoutputsummary: "Synthetic summary", jm1_diagnosticriskflags: "none",
+        jm1_confidence: 0.9, jm1_requireshumanreview: true },
+      tokenCounts: { input: 10, output: 4 },
+    }),
+    actualCostCents: () => 2,
+    metric: () => {},
+    alert: async () => {},
+  });
+  assert.equal(result.status, "FAILED_RESERVED");
+  assert.equal(finalized, false);
+});
