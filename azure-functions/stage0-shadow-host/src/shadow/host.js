@@ -195,11 +195,15 @@ app.timer("stage0-shadow-budget-certification", {
         projectedCents: await ports.projectMaximumCost(),
         now,
       });
-      if (result.status !== "BUDGET_DENIED" || claim.outcome !== "IDEMPOTENT_REPLAY" || providerCalls !== 0) {
+      const remainingCents = 2500 - spentCents;
+      if (result.status !== "BUDGET_DENIED" || claim.outcome !== "IDEMPOTENT_REPLAY" || providerCalls !== 0 ||
+          claim.event.monthToDateCostCents !== spentCents ||
+          claim.event.budgetRemainingCents !== remainingCents) {
         throw new Error(`SHADOW_BUDGET_CERTIFICATION_FAILED_${scenario.toUpperCase()}`);
       }
       results.push({ scenario, spentCents, result: result.status, claim: claim.outcome,
-        providerCalls, containerName });
+        providerCalls, monthToDateCostCents: claim.event.monthToDateCostCents,
+        budgetRemainingCents: claim.event.budgetRemainingCents, containerName });
     }
     const softContainerName = `shadow-cert-${randomUUID().replace(/-/g, "")}`;
     const softPorts = productionPorts(process.env, context);
@@ -246,13 +250,23 @@ app.timer("stage0-shadow-budget-certification", {
     });
     if (softResult.status !== "SHADOW_ONLY" || softClaim.outcome !== "IDEMPOTENT_REPLAY" ||
         softClaim.event.actualCents !== 11 || syntheticInferenceCalls !== 1 ||
+        softClaim.event.primaryInferenceCostCents !== 11 ||
+        softClaim.event.evaluatorCostCents !== 0 ||
+        softClaim.event.totalEventCostCents !== 11 ||
+        softClaim.event.monthToDateCostCents !== 11 ||
+        softClaim.event.budgetRemainingCents !== 2489 ||
         !softSignals.includes("metric:stage0_shadow_cost_anomaly") ||
         !softSignals.includes("alert:stage0_shadow_cost_anomaly")) {
       throw new Error("SHADOW_SOFT_COST_CERTIFICATION_FAILED");
     }
     results.push({ scenario: "soft_target", spentCents: 0, result: softResult.status,
       claim: softClaim.outcome, syntheticInferenceCalls, providerCalls: 0,
-      actualCents: 11, costAnomaly: true, containerName: softContainerName });
+      primaryInferenceCostCents: softClaim.event.primaryInferenceCostCents,
+      evaluatorCostCents: softClaim.event.evaluatorCostCents,
+      totalEventCostCents: softClaim.event.totalEventCostCents,
+      monthToDateCostCents: softClaim.event.monthToDateCostCents,
+      budgetRemainingCents: softClaim.event.budgetRemainingCents,
+      costAnomaly: true, containerName: softContainerName });
     context.log(JSON.stringify({ event: "stage0_shadow_budget_certification", status: "PASS", results }));
   },
 });
