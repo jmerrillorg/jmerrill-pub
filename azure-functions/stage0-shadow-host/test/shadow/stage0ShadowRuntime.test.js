@@ -4,6 +4,9 @@ const test = require("node:test");
 const assert = require("node:assert/strict");
 const { authorizeRoute, evaluateStructure, processStage0Event } = require("../../src/shadow/stage0ShadowRuntime");
 
+const modelResourceId = "/subscriptions/9ee13245-2303-4010-8b6d-35f7cbcfdc0e/resourceGroups/rg-jm1-ai/providers/Microsoft.CognitiveServices/accounts/oai-jm1-diagnostic";
+const modelRegisterId = "AZURE:OAI-JM1-DIAGNOSTIC:JM1-PUB-DIAGNOSTIC-PRIMARY";
+
 const event = {
   sourceEventId: "00000000-0000-4000-8000-000000000001",
   entity: "J_MERRILL_PUBLISHING",
@@ -26,16 +29,25 @@ const route = {
   executionLogRequired: true,
   costGovernanceRequired: true,
   policyVersion: "v1",
-  deploymentId: "exact-resource/deployment",
+  azureResourceId: modelResourceId,
+  deploymentName: "jm1-pub-diagnostic-primary",
+  deploymentId: `${modelResourceId}/deployments/jm1-pub-diagnostic-primary`,
+  modelRegisterId,
+  modelVersion: "2024-07-18",
+  region: "eastus",
   expiresAt: "2099-01-01T00:00:00Z",
 };
 
 test("route denies any business authority and unknown identity", () => {
-  assert.equal(authorizeRoute(event, route, "isolated-identity").routeId, route.id);
-  assert.throws(() => authorizeRoute(event, { ...route, businessWriteAuthority: "TITLE_UPDATE" }, "isolated-identity"));
-  assert.throws(() => authorizeRoute(event, route, "another-identity"));
-  assert.throws(() => authorizeRoute(event, { ...route, status: "NOT_COMMISSIONED" }, "isolated-identity"));
-  assert.throws(() => authorizeRoute(event, { ...route, expiresAt: "invalid" }, "isolated-identity"));
+  const check = (candidate) => authorizeRoute(event, candidate, "isolated-identity", modelResourceId, modelRegisterId);
+  assert.equal(check(route).routeId, route.id);
+  assert.throws(() => check({ ...route, businessWriteAuthority: "TITLE_UPDATE" }));
+  assert.throws(() => authorizeRoute(event, route, "another-identity", modelResourceId, modelRegisterId));
+  assert.throws(() => check({ ...route, status: "NOT_COMMISSIONED" }));
+  assert.throws(() => check({ ...route, expiresAt: "invalid" }));
+  assert.throws(() => check({ ...route, azureResourceId: undefined }));
+  assert.throws(() => check({ ...route, deploymentId: "jm1-pub-diagnostic-primary" }));
+  assert.throws(() => check({ ...route, azureResourceId: "/other/resource" }));
 });
 
 test("evaluation does not mistake structural agreement for groundedness", () => {
@@ -55,6 +67,8 @@ test("denied budget never reads material or calls model", async () => {
   let calls = 0;
   const result = await processStage0Event(event, route, {
     identityClientId: "isolated-identity",
+    modelResourceId,
+    modelRegisterId,
     now: () => "2026-09-24T12:00:00Z",
     projectMaximumCost: async () => 11,
     ledger: { reserve: async () => ({ outcome: "BUDGET_DENIED" }) },
@@ -74,6 +88,8 @@ test("invalid output is recorded as evaluation failure, never shadow success", a
   const alerts = [];
   const result = await processStage0Event(event, route, {
     identityClientId: "isolated-identity",
+    modelResourceId,
+    modelRegisterId,
     now: () => "2026-09-24T12:00:00Z",
     projectMaximumCost: async () => 11,
     ledger: {
@@ -98,6 +114,8 @@ test("independent evaluator failure prevents a valid structure from succeeding",
   const evidence = [];
   const result = await processStage0Event(event, route, {
     identityClientId: "isolated-identity",
+    modelResourceId,
+    modelRegisterId,
     now: () => "2026-09-24T12:00:00Z",
     projectMaximumCost: async () => 11,
     ledger: {
@@ -126,6 +144,8 @@ test("missing independent evaluator keeps the reservation and fails closed", asy
   let finalized = false;
   const result = await processStage0Event(event, route, {
     identityClientId: "isolated-identity",
+    modelResourceId,
+    modelRegisterId,
     now: () => "2026-09-24T12:00:00Z",
     projectMaximumCost: async () => 11,
     ledger: {
@@ -153,6 +173,8 @@ test("soft cost target records anomaly without denying an otherwise authorized s
   const alerts = [];
   const result = await processStage0Event(event, route, {
     identityClientId: "isolated-identity",
+    modelResourceId,
+    modelRegisterId,
     now: () => "2026-09-24T12:00:00Z",
     projectMaximumCost: async () => 15,
     ledger: {

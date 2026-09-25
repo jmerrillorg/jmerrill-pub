@@ -6,14 +6,21 @@ const ROUTE_ID = "STAGE_0_DIAGNOSTIC_SHADOW_ONLY";
 const ENTITY = "J_MERRILL_PUBLISHING";
 const WORKLOAD = "STAGE_0_DIAGNOSTIC_SHADOW";
 
-function authorizeRoute(event, route, identityClientId) {
-  if (!event || !route || !identityClientId) throw new Error("SHADOW_AUTHORITY_MISSING");
+function authorizeRoute(event, route, identityClientId, modelResourceId, modelRegisterId) {
+  if (!event || !route || !identityClientId || !modelResourceId || !modelRegisterId) {
+    throw new Error("SHADOW_AUTHORITY_MISSING");
+  }
+  const deploymentResourceId = `${modelResourceId}/deployments/${route.deploymentName}`;
   if (route.status !== "ACTIVE" || route.id !== ROUTE_ID || route.entity !== ENTITY ||
       route.workload !== WORKLOAD || route.mode !== "SHADOW_ONLY" ||
       route.actionAuthority !== "READ_ONLY" || route.businessWriteAuthority !== "NONE" ||
       route.authorMessageAuthority !== "NONE" || route.financialAuthority !== "NONE" ||
       route.identityClientId !== identityClientId ||
-      !route.policyVersion || !route.deploymentId ||
+      !route.policyVersion || !route.deploymentName ||
+      route.azureResourceId !== modelResourceId ||
+      route.deploymentId !== deploymentResourceId ||
+      route.modelRegisterId !== modelRegisterId ||
+      !route.modelVersion || !route.region ||
       route.evaluationRequired !== true || route.executionLogRequired !== true ||
       route.costGovernanceRequired !== true) {
     throw new Error("SHADOW_ROUTE_DENIED");
@@ -25,7 +32,9 @@ function authorizeRoute(event, route, identityClientId) {
   }
   const expiry = new Date(route.expiresAt).getTime();
   if (!Number.isFinite(expiry) || expiry <= Date.now()) throw new Error("SHADOW_ROUTE_EXPIRED");
-  return { routeId: ROUTE_ID, policyVersion: route.policyVersion, deploymentId: route.deploymentId };
+  return { routeId: ROUTE_ID, policyVersion: route.policyVersion,
+    azureResourceId: modelResourceId, deploymentId: route.deploymentId,
+    deploymentName: route.deploymentName, modelRegisterId, modelVersion: route.modelVersion };
 }
 
 function evaluateStructure(currentOutcome, modelOutput) {
@@ -55,7 +64,8 @@ function evaluateStructure(currentOutcome, modelOutput) {
 }
 
 async function processStage0Event(event, route, ports) {
-  const selection = authorizeRoute(event, route, ports.identityClientId);
+  const selection = authorizeRoute(event, route, ports.identityClientId,
+    ports.modelResourceId, ports.modelRegisterId);
   const now = ports.now();
   const projectedCents = await ports.projectMaximumCost(event, selection);
   const reservation = await ports.ledger.reserve({
