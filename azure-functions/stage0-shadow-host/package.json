@@ -6,7 +6,7 @@
   "engines": { "node": ">=22 <25" },
   "scripts": {
     "test": "node --test",
-    "lint": "node --check src/index.js && node --check src/shadow/host.js && node --check src/shadow/authorityProbe.js && node --check src/shadow/stage0ShadowRuntime.js && node --check src/shadow/blobBudgetLedger.js && node --check src/shadow/stage0DataverseSource.js && node --check src/shadow/stage0BudgetPolicy.js && node --check src/shadow/exactResourceExecutor.js && node --check src/shadow/deterministicEvaluator.js"
+    "lint": "node --check src/index.js && node --check src/shadow/host.js && node --check src/shadow/authorityProbe.js && node --check src/shadow/stage0ShadowRuntime.js && node --check src/shadow/blobBudgetLedger.js && node --check src/shadow/stage0DataverseSource.js && node --check src/shadow/stage0BudgetPolicy.js && node --check src/shadow/exactResourceExecutor.js && node --check src/shadow/deterministicEvaluator.js && node --check src/shadow/stage0ModelCost.js"
   },
   "dependencies": {
     "@azure/functions": "^4.7.0",
