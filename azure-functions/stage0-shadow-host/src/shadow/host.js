@@ -93,6 +93,22 @@ app.timer("stage0-shadow-authority-probe", {
       releaseSha: process.env.JM1_RELEASE_SHA,
       shadowEnabled: process.env.JM1_SHADOW_ENABLED === "true",
     });
+    try {
+      const personalSiteIds = await readPermissionState({
+        accountName: process.env.JM1_SHADOW_PERMISSION_STATE_ACCOUNT,
+        clientId,
+        expected: {
+          appId: clientId,
+          siteId: TARGET_SITE,
+          grantId: process.env.JM1_SHADOW_EXPECTED_SITE_GRANT_ID,
+        },
+      });
+      await probeWithManagedIdentity(personalSiteIds, clientId);
+      state.states.opsPermissionVerdict = "PASS";
+      state.personalSitesDenied = personalSiteIds.length;
+    } catch (error) {
+      state.states.opsPermissionVerdict = `FAIL_${String(error.message || error).replace(/[^A-Z0-9_]/gi, "_").slice(0, 60)}`;
+    }
     const storage = new BlobServiceClient(
       `https://${accountName}.blob.core.windows.net`, new ManagedIdentityCredential(clientId),
     );
