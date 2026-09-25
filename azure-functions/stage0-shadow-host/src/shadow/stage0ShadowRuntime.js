@@ -6,14 +6,21 @@ const ROUTE_ID = "STAGE_0_DIAGNOSTIC_SHADOW_ONLY";
 const ENTITY = "J_MERRILL_PUBLISHING";
 const WORKLOAD = "STAGE_0_DIAGNOSTIC_SHADOW";
 
-function authorizeRoute(event, route, identityClientId) {
-  if (!event || !route || !identityClientId) throw new Error("SHADOW_AUTHORITY_MISSING");
+function authorizeRoute(event, route, identityClientId, modelResourceId, modelRegisterId) {
+  if (!event || !route || !identityClientId || !modelResourceId || !modelRegisterId) {
+    throw new Error("SHADOW_AUTHORITY_MISSING");
+  }
+  const deploymentResourceId = `${modelResourceId}/deployments/${route.deploymentName}`;
   if (route.status !== "ACTIVE" || route.id !== ROUTE_ID || route.entity !== ENTITY ||
       route.workload !== WORKLOAD || route.mode !== "SHADOW_ONLY" ||
       route.actionAuthority !== "READ_ONLY" || route.businessWriteAuthority !== "NONE" ||
       route.authorMessageAuthority !== "NONE" || route.financialAuthority !== "NONE" ||
       route.identityClientId !== identityClientId ||
-      !route.policyVersion || !route.deploymentId ||
+      !route.policyVersion || !route.deploymentName ||
+      route.azureResourceId !== modelResourceId ||
+      route.deploymentId !== deploymentResourceId ||
+      route.modelRegisterId !== modelRegisterId ||
+      !route.modelVersion || !route.region ||
       route.evaluationRequired !== true || route.executionLogRequired !== true ||
       route.costGovernanceRequired !== true) {
     throw new Error("SHADOW_ROUTE_DENIED");
@@ -25,7 +32,9 @@ function authorizeRoute(event, route, identityClientId) {
   }
   const expiry = new Date(route.expiresAt).getTime();
   if (!Number.isFinite(expiry) || expiry <= Date.now()) throw new Error("SHADOW_ROUTE_EXPIRED");
-  return { routeId: ROUTE_ID, policyVersion: route.policyVersion, deploymentId: route.deploymentId };
+  return { routeId: ROUTE_ID, policyVersion: route.policyVersion,
+    azureResourceId: modelResourceId, deploymentId: route.deploymentId,
+    deploymentName: route.deploymentName, modelRegisterId, modelVersion: route.modelVersion };
 }
 
 function evaluateStructure(currentOutcome, modelOutput) {
@@ -55,7 +64,8 @@ function evaluateStructure(currentOutcome, modelOutput) {
 }
 
 async function processStage0Event(event, route, ports) {
-  const selection = authorizeRoute(event, route, ports.identityClientId);
+  const selection = authorizeRoute(event, route, ports.identityClientId,
+    ports.modelResourceId, ports.modelRegisterId);
   const now = ports.now();
   const projectedCents = await ports.projectMaximumCost(event, selection);
   const reservation = await ports.ledger.reserve({
@@ -76,10 +86,27 @@ async function processStage0Event(event, route, ports) {
     const input = await ports.readApprovedInput(event);
     const result = await ports.infer(input, selection);
     const evaluation = evaluateStructure(event.currentOutcome, result.output);
+    if (evaluation.structureValid) {
+      if (typeof ports.evaluate !== "function") throw new Error("INDEPENDENT_EVALUATOR_NOT_BOUND");
+      const verdict = await ports.evaluate({ input, output: result.output, selection, event });
+      if (!verdict || typeof verdict.pass !== "boolean" || !verdict.evaluatorId ||
+          !verdict.policyVersion || !verdict.method) {
+        throw new Error("INDEPENDENT_EVALUATION_INVALID");
+      }
+      evaluation.independent = {
+        pass: verdict.pass,
+        evaluatorId: verdict.evaluatorId,
+        policyVersion: verdict.policyVersion,
+        method: verdict.method,
+        failureClass: verdict.failureClass || null,
+      };
+    }
     const actualCents = ports.actualCostCents(result.tokenCounts);
     if (!Number.isSafeInteger(actualCents) || actualCents < 0 || actualCents > projectedCents) {
       throw new Error("SHADOW_COST_RECONCILIATION_FAILED");
     }
+    const costAnomaly = actualCents > 10;
+    const evaluationFailed = !evaluation.structureValid || !evaluation.independent.pass;
     await ports.ledger.recordEvidence(event.sourceEventId, selection.policyVersion, {
       shadowExecutionId,
       routeId: selection.routeId,
@@ -90,18 +117,28 @@ async function processStage0Event(event, route, ports) {
       inputTokens: result.tokenCounts.input,
       outputTokens: result.tokenCounts.output,
       executionCostCents: actualCents,
+      costAnomaly,
       latencyMs: Date.now() - start,
-      status: "SHADOW_ONLY",
+      status: evaluationFailed ? "EVALUATION_FAILED" : "SHADOW_ONLY",
       recordedAt: ports.now(),
     });
     await ports.ledger.finalize({
       sourceEventId: event.sourceEventId,
       policyVersion: selection.policyVersion,
       actualCents,
-      status: "SUCCEEDED",
+      status: evaluationFailed ? "EVALUATION_FAILED" : "SUCCEEDED",
       now: ports.now(),
       reservedAt: reservation.event.recordedAt,
     });
+    if (costAnomaly) {
+      ports.metric("stage0_shadow_cost_anomaly", 1);
+      await ports.alert("stage0_shadow_cost_anomaly", { sourceEventId: event.sourceEventId });
+    }
+    if (evaluationFailed) {
+      ports.metric("stage0_shadow_eval_fail", 1);
+      await ports.alert("stage0_shadow_eval_fail", { sourceEventId: event.sourceEventId });
+      return { status: "EVALUATION_FAILED", shadowExecutionId, evaluation };
+    }
     ports.metric("stage0_shadow_success", 1);
     ports.metric("stage0_shadow_cost", actualCents / 100);
     if (!evaluation.outcomeAgreement) ports.metric("stage0_shadow_divergence", 1);

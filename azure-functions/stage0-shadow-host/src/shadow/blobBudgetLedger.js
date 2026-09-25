@@ -92,6 +92,7 @@ class BlobBudgetLedger {
       inputTokens: evidence.inputTokens,
       outputTokens: evidence.outputTokens,
       executionCostCents: evidence.executionCostCents,
+      costAnomaly: evidence.costAnomaly,
       latencyMs: evidence.latencyMs,
       status: evidence.status,
       recordedAt: evidence.recordedAt,
