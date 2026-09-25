@@ -201,6 +201,58 @@ app.timer("stage0-shadow-budget-certification", {
       results.push({ scenario, spentCents, result: result.status, claim: claim.outcome,
         providerCalls, containerName });
     }
+    const softContainerName = `shadow-cert-${randomUUID().replace(/-/g, "")}`;
+    const softPorts = productionPorts(process.env, context);
+    softPorts.ledger = new BlobBudgetLedger({
+      accountName: process.env.JM1_SHADOW_STORAGE_ACCOUNT,
+      containerName: softContainerName,
+      clientId: process.env.JM1_SHADOW_MANAGED_IDENTITY_CLIENT_ID,
+    });
+    softPorts.projectMaximumCost = async () => 12;
+    softPorts.readApprovedInput = async () => ({
+      approvedExcerpt: CANARY_EXCERPT,
+      sourceReferenceIds: [createHash("sha256").update(CANARY_EXCERPT).digest("hex")],
+    });
+    let syntheticInferenceCalls = 0;
+    softPorts.infer = async () => {
+      syntheticInferenceCalls++;
+      return {
+        output: {
+          jm1_diagnosticoutputsummary: "Synthetic certification output",
+          jm1_diagnosticriskflags: "none",
+          jm1_confidence: 0.9,
+          jm1_requireshumanreview: true,
+        },
+        tokenCounts: { input: 1, output: 1 },
+      };
+    };
+    softPorts.evaluate = async () => ({
+      pass: true, evaluatorId: "synthetic-cost-certification",
+      policyVersion: route.policyVersion, method: "SYNTHETIC",
+    });
+    softPorts.actualCostCents = () => 11;
+    const softSignals = [];
+    const emitMetric = softPorts.metric;
+    const emitAlert = softPorts.alert;
+    softPorts.metric = (name, value) => { softSignals.push(`metric:${name}`); emitMetric(name, value); };
+    softPorts.alert = async (name, details) => {
+      softSignals.push(`alert:${name}`);
+      await emitAlert(name, details);
+    };
+    const softResult = await processStage0Event(event, route, softPorts);
+    const softClaim = await softPorts.ledger.reserve({
+      sourceEventId: CANARY_EVENT_ID, policyVersion: route.policyVersion,
+      projectedCents: 12, now,
+    });
+    if (softResult.status !== "SHADOW_ONLY" || softClaim.outcome !== "IDEMPOTENT_REPLAY" ||
+        softClaim.event.actualCents !== 11 || syntheticInferenceCalls !== 1 ||
+        !softSignals.includes("metric:stage0_shadow_cost_anomaly") ||
+        !softSignals.includes("alert:stage0_shadow_cost_anomaly")) {
+      throw new Error("SHADOW_SOFT_COST_CERTIFICATION_FAILED");
+    }
+    results.push({ scenario: "soft_target", spentCents: 0, result: softResult.status,
+      claim: softClaim.outcome, syntheticInferenceCalls, providerCalls: 0,
+      actualCents: 11, costAnomaly: true, containerName: softContainerName });
     context.log(JSON.stringify({ event: "stage0_shadow_budget_certification", status: "PASS", results }));
   },
 });
