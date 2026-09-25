@@ -66,6 +66,8 @@ function reserve(state, { sourceEventId, policyVersion, projectedCents, now }) {
     workload: WORKLOAD,
     projectedCents,
     status: decision.allowed ? "RESERVED" : "BUDGET_DENIED",
+    monthToDateCostCents: current.spentCents,
+    budgetRemainingCents: decision.budgetRemainingCents,
     recordedAt: new Date(now).toISOString(),
   };
   const next = {
@@ -86,13 +88,19 @@ function finalize(state, { sourceEventId, policyVersion, actualCents, status, no
   if (state.month !== monthKey(event.recordedAt) || new Date(now) < new Date(event.recordedAt)) {
     throw new Error("INVALID_RESERVATION_PERIOD");
   }
+  const spentCents = state.spentCents + actualCents;
+  const reservedCents = state.reservedCents - event.projectedCents;
   return {
     ...state,
-    spentCents: state.spentCents + actualCents,
-    reservedCents: state.reservedCents - event.projectedCents,
+    spentCents,
+    reservedCents,
     events: {
       ...state.events,
-      [key]: { ...event, status, actualCents, completedAt: new Date(now).toISOString() },
+      [key]: { ...event, status, actualCents,
+        primaryInferenceCostCents: actualCents, evaluatorCostCents: 0,
+        totalEventCostCents: actualCents, monthToDateCostCents: spentCents,
+        budgetRemainingCents: HARD_CEILING_CENTS - spentCents - reservedCents,
+        completedAt: new Date(now).toISOString() },
     },
   };
 }

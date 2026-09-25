@@ -25,6 +25,8 @@ test("budget denial is durable and replay is still denied", () => {
   const denied = reserve(state, { sourceEventId: id, policyVersion: "v1", projectedCents: 11, now });
   assert.equal(denied.outcome, "BUDGET_DENIED");
   assert.equal(denied.state.reservedCents, 0);
+  assert.equal(denied.event.monthToDateCostCents, 2490);
+  assert.equal(denied.event.budgetRemainingCents, 10);
   assert.equal(reserve(denied.state, { sourceEventId: id, policyVersion: "v1", projectedCents: 11, now }).event.status, "BUDGET_DENIED");
 });
 
@@ -33,6 +35,13 @@ test("actual cost releases the unused reservation without permitting overspend",
   const final = finalize(reserved.state, { sourceEventId: id, policyVersion: "v1", actualCents: 7, status: "SUCCEEDED", now });
   assert.equal(final.spentCents, 7);
   assert.equal(final.reservedCents, 0);
+  assert.deepEqual(Object.values(final.events).map((event) => ({
+    primary: event.primaryInferenceCostCents,
+    evaluator: event.evaluatorCostCents,
+    total: event.totalEventCostCents,
+    monthToDate: event.monthToDateCostCents,
+    remaining: event.budgetRemainingCents,
+  })), [{ primary: 7, evaluator: 0, total: 7, monthToDate: 7, remaining: 2493 }]);
   assert.throws(() => finalize(reserved.state, { sourceEventId: id, policyVersion: "v1", actualCents: 21, status: "SUCCEEDED", now }), /EXCEEDS_RESERVATION/);
 });
 
