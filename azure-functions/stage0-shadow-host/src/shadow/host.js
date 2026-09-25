@@ -12,6 +12,8 @@ const { readApprovedInput } = require("./stage0InputAdapter");
 const model = require("./exactResourceExecutor");
 const evaluator = require("./deterministicEvaluator");
 const cost = require("./stage0ModelCost");
+const { readPermissionState } = require("./permissionMonitorState");
+const { TARGET_SITE } = require("./authorityProbe");
 
 const MODEL_REGISTER_ID = "AZURE:OAI-JM1-DIAGNOSTIC:JM1-PUB-DIAGNOSTIC-PRIMARY";
 const RISK_REGISTER_ID = "JM1-AI-RISK-STAGE0-SHADOW-001";
@@ -145,6 +147,20 @@ app.timer("stage0-shadow-poll", {
     // controls have been separately certified.
     if (process.env.JM1_SHADOW_EXECUTION_CERTIFIED !== "true") {
       context.error("stage0_shadow_execution_not_certified");
+      return;
+    }
+    try {
+      await readPermissionState({
+        accountName: process.env.JM1_SHADOW_PERMISSION_STATE_ACCOUNT,
+        clientId: process.env.JM1_SHADOW_MANAGED_IDENTITY_CLIENT_ID,
+        expected: {
+          appId: process.env.JM1_SHADOW_MANAGED_IDENTITY_CLIENT_ID,
+          siteId: TARGET_SITE,
+          grantId: process.env.JM1_SHADOW_EXPECTED_SITE_GRANT_ID,
+        },
+      });
+    } catch (error) {
+      context.error(JSON.stringify({ event: "stage0_shadow_permission_unverified", code: error.message }));
       return;
     }
     const source = new Stage0DataverseSource({
