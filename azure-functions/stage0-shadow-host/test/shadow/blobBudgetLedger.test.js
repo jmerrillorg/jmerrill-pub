@@ -92,3 +92,20 @@ test("monthly budget mutation supplies the active lease in blob conditions", asy
   assert.deepEqual(writeOptions.conditions, { ifMatch: '"etag-123"', leaseId: "lease-123" });
   assert.equal(writeOptions.leaseId, undefined);
 });
+
+test("durable execution evidence retains cost components without unapproved fields", async () => {
+  const ledger = Object.create(BlobBudgetLedger.prototype);
+  let written;
+  ledger.container = { getBlockBlobClient: () => ({
+    uploadData: async (data) => { written = JSON.parse(data.toString("utf8")); },
+  }) };
+  await ledger.recordEvidence(args.sourceEventId, args.policyVersion, {
+    primaryInferenceCostCents: 7, evaluatorCostCents: 0,
+    totalEventCostCents: 7, executionCostCents: 7,
+    unapprovedContent: "must not persist",
+  });
+  assert.equal(written.primaryInferenceCostCents, 7);
+  assert.equal(written.evaluatorCostCents, 0);
+  assert.equal(written.totalEventCostCents, 7);
+  assert.equal(written.unapprovedContent, undefined);
+});

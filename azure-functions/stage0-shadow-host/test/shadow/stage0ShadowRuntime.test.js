@@ -119,6 +119,9 @@ test("invalid output is recorded as evaluation failure, never shadow success", a
   });
   assert.equal(result.status, "EVALUATION_FAILED");
   assert.equal(evidence[0][2].status, "EVALUATION_FAILED");
+  assert.equal(evidence[0][2].primaryInferenceCostCents, 2);
+  assert.equal(evidence[0][2].evaluatorCostCents, 0);
+  assert.equal(evidence[0][2].totalEventCostCents, 2);
   assert.equal(finalizations[0].status, "EVALUATION_FAILED");
   assert.deepEqual(metrics, ["stage0_shadow_eval_fail"]);
   assert.deepEqual(alerts, ["stage0_shadow_eval_fail"]);
