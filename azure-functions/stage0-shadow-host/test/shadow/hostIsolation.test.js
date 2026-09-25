@@ -17,13 +17,14 @@ test("shadow host indexes its timer without registering Publishing effect routes
   assert.match(output, /stage0-shadow-poll/);
   assert.match(output, /stage0-shadow-authority-probe/);
   assert.match(output, /stage0-shadow-commissioning-canary/);
+  assert.match(output, /stage0-shadow-budget-certification/);
   assert.doesNotMatch(output, /run-stage0-diagnostic|run-agreement|signnow-webhook/i);
 });
 
-test("all three isolated Azure Functions timers register callable handlers", () => {
+test("all four isolated Azure Functions timers register callable handlers", () => {
   const source = fs.readFileSync(path.resolve(__dirname, "../../src/shadow/host.js"), "utf8");
-  assert.equal((source.match(/app\.timer\(/g) || []).length, 3);
-  assert.equal((source.match(/handler: async \(/g) || []).length, 3);
+  assert.equal((source.match(/app\.timer\(/g) || []).length, 4);
+  assert.equal((source.match(/handler: async \(/g) || []).length, 4);
   assert.doesNotMatch(source, /\brun: async \(/);
 });
 
