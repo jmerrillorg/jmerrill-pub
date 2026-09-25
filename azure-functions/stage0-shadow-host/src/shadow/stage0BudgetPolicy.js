@@ -78,7 +78,7 @@ function reserve(state, { sourceEventId, policyVersion, projectedCents, now }) {
 
 function finalize(state, { sourceEventId, policyVersion, actualCents, status, now }) {
   assertCents(actualCents, "ACTUAL_COST");
-  if (!new Set(["SUCCEEDED", "FAILED"]).has(status)) throw new Error("INVALID_FINAL_STATUS");
+  if (!new Set(["SUCCEEDED", "FAILED", "EVALUATION_FAILED"]).has(status)) throw new Error("INVALID_FINAL_STATUS");
   const key = eventKey(sourceEventId, policyVersion);
   const event = state.events?.[key];
   if (!event || event.status !== "RESERVED") throw new Error("EVENT_NOT_RESERVED");
