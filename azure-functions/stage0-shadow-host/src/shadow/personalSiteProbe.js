@@ -14,7 +14,12 @@ async function probePersonalSites(siteIds, { getToken, fetchFn = fetch }) {
     const response = await fetchFn(`https://graph.microsoft.com/v1.0/sites/${encodeURIComponent(siteId)}?$select=id`, {
       headers: { Authorization: `Bearer ${token}` }, signal: AbortSignal.timeout(15000),
     });
-    if (response.status !== 403) throw new Error(`SHADOW_PERSONAL_SITE_NOT_DENIED_${response.status}`);
+    if (response.status === 403) continue;
+    if (response.status === 423) {
+      const body = await response.json().catch(() => null);
+      if (body?.error?.code === "notAllowed") continue;
+    }
+    throw new Error(`SHADOW_PERSONAL_SITE_NOT_DENIED_${response.status}`);
   }
   return true;
 }
