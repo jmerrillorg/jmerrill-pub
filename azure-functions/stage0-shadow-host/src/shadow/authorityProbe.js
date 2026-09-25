@@ -3,10 +3,12 @@
 const { ManagedIdentityCredential } = require("@azure/identity");
 const { BlobBudgetLedger } = require("./blobBudgetLedger");
 const { Stage0DataverseSource } = require("./stage0DataverseSource");
+const { readApprovedInput } = require("./stage0InputAdapter");
 
 const TARGET_SITE = "jmerrillfoundation.sharepoint.com,35fb0d98-bc68-4250-9d0d-8c07d68e4024,10208ad5-0028-48f0-9ffa-717812924835";
 const PROBE_DRIVE = "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se";
 const PROBE_FILE = "01DF3SEQLUWUKM5W34E5E3ZGWYZLLGRGXR";
+const PROBE_FILE_URL = "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/90_INFRA/INFRA-003/infra-003-demo-2026-07-09T19-28-57-623Z.txt";
 
 async function graphRead(url, token) {
   const response = await fetch(url, {
@@ -58,6 +60,15 @@ async function probe(config) {
       if (!response.ok) throw new Error(`GRAPH_FILE_${response.status}`);
       const bytes = await response.arrayBuffer();
       if (bytes.byteLength < 1 || bytes.byteLength > 1024) throw new Error("PROBE_FILE_SIZE_INVALID");
+    });
+    await run("manuscriptAdapterRead", async () => {
+      const input = await readApprovedInput({
+        sourceEventId: "c1100000-0000-4000-8000-000000000001",
+        manuscriptApprovedForDiagnostic: true,
+        manuscriptUrl: PROBE_FILE_URL,
+      }, { clientId });
+      if (!input.approvedExcerpt || input.approvedExcerpt.length > 12000 ||
+          input.sourceReferenceIds.length !== 1) throw new Error("ADAPTER_OUTPUT_INVALID");
     });
     await run("unrelatedSiteReadDenied", async () => {
       const response = await fetch("https://graph.microsoft.com/v1.0/sites/root?$select=id", {

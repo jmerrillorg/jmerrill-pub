@@ -1,5 +1,6 @@
 "use strict";
 
+const { createHash } = require("node:crypto");
 const { app } = require("@azure/functions");
 const { BlobServiceClient } = require("@azure/storage-blob");
 const { ManagedIdentityCredential } = require("@azure/identity");
@@ -15,7 +16,7 @@ const cost = require("./stage0ModelCost");
 const MODEL_REGISTER_ID = "AZURE:OAI-JM1-DIAGNOSTIC:JM1-PUB-DIAGNOSTIC-PRIMARY";
 const RISK_REGISTER_ID = "JM1-AI-RISK-STAGE0-SHADOW-001";
 const POLICY_VERSION = "STAGE0-SHADOW-C11-v1";
-const CANARY_FIXTURE_URL = "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/90_INFRA/INFRA-003/infra-003-demo-2026-07-09T19-28-57-623Z.txt";
+const CANARY_EXCERPT = "Synthetic publishing diagnostic sample. A fictional manuscript excerpt has a clear opening, an unresolved transition, and no real author or client information.";
 
 function routeFromEnvironment(env) {
   if (env.JM1_SHADOW_MODEL_REGISTER_ID !== MODEL_REGISTER_ID ||
@@ -115,11 +116,15 @@ app.timer("stage0-shadow-commissioning-canary", {
       workload: WORKLOAD,
       synthetic: true,
       manuscriptApprovedForDiagnostic: true,
-      manuscriptUrl: CANARY_FIXTURE_URL,
       currentOutcome: 835500004,
     };
-    const result = await processStage0Event(event, routeFromEnvironment(process.env),
-      productionPorts(process.env, context));
+    const ports = productionPorts(process.env, context);
+    ports.readApprovedInput = async () => ({
+      sourceEventId: CANARY_EVENT_ID,
+      approvedExcerpt: CANARY_EXCERPT,
+      sourceReferenceIds: [createHash("sha256").update(CANARY_EXCERPT).digest("hex")],
+    });
+    const result = await processStage0Event(event, routeFromEnvironment(process.env), ports);
     context.log(JSON.stringify({ event: "stage0_shadow_canary", status: result.status,
       sourceEventId: CANARY_EVENT_ID }));
   },
@@ -165,4 +170,4 @@ app.timer("stage0-shadow-poll", {
   },
 });
 
-module.exports = { routeFromEnvironment, productionPorts, CANARY_EVENT_ID, CANARY_FIXTURE_URL };
+module.exports = { routeFromEnvironment, productionPorts, CANARY_EVENT_ID };
