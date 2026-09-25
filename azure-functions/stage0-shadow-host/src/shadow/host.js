@@ -118,6 +118,7 @@ app.timer("stage0-shadow-authority-probe", {
     await blob.uploadData(Buffer.from(JSON.stringify(state)), {
       blobHTTPHeaders: { blobContentType: "application/json" },
     });
+    context.log(`stage0_shadow_permission_probe=${state.states.opsPermissionVerdict} personal=${state.personalSitesDenied || 0}`);
     context.log(`stage0_shadow_probe=${Object.values(state.states).every((value) => value === "PASS") ? "PASS" : "PARTIAL"}`);
   },
 });
