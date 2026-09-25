@@ -16,11 +16,13 @@ const state = {
   tenantWideSharePointAccess: false,
   unrelatedSiteGrants: 0,
   effectiveProbe: "PASS",
+  siteEnumerationComplete: true,
+  personalSiteIds: [],
   observedAt: new Date(now).toISOString(),
 };
 
 test("accepts only fresh independent exact-site read authority", () => {
-  assert.equal(validatePermissionState(state, expected, now), true);
+  assert.deepEqual(validatePermissionState(state, expected, now), []);
   assert.throws(() => validatePermissionState({ ...state, grantId: undefined },
     { ...expected, grantId: undefined }, now));
 });
@@ -28,9 +30,17 @@ test("accepts only fresh independent exact-site read authority", () => {
 for (const change of [
   { status: "DRIFTED" }, { role: "write" }, { grantId: "other" },
   { tenantWideSharePointAccess: true }, { unrelatedSiteGrants: 1 },
-  { effectiveProbe: "FAIL" }, { observedAt: new Date(now - MAX_AGE_MS - 1).toISOString() },
+  { siteEnumerationComplete: false }, { personalSiteIds: ["personal"] },
+  { observedAt: new Date(now - MAX_AGE_MS - 1).toISOString() },
 ]) {
   test(`denies permission state ${JSON.stringify(change)}`, () => {
     assert.throws(() => validatePermissionState({ ...state, ...change }, expected, now));
   });
 }
+
+test("personal-site state requires runtime denial probes", () => {
+  assert.deepEqual(validatePermissionState({ ...state,
+    status: "CONTROL_PLANE_PASS_RUNTIME_PERSONAL_PROBE_REQUIRED",
+    personalSiteIds: ["tenant-my.sharepoint.com,00000000-0000-4000-8000-000000000001,00000000-0000-4000-8000-000000000002"],
+  }, expected, now).length, 1);
+});
