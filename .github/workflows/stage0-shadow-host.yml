@@ -107,7 +107,8 @@ jobs:
           printf '%s\n' "$functions" | grep -Fx "${APP}/stage0-shadow-poll"
           printf '%s\n' "$functions" | grep -Fx "${APP}/stage0-shadow-authority-probe"
           printf '%s\n' "$functions" | grep -Fx "${APP}/stage0-shadow-commissioning-canary"
-          test "$(printf '%s\n' "$functions" | wc -l | tr -d ' ')" = 3
+          printf '%s\n' "$functions" | grep -Fx "${APP}/stage0-shadow-budget-certification"
+          test "$(printf '%s\n' "$functions" | wc -l | tr -d ' ')" = 4
           release="$(az functionapp config appsettings list -g "$RESOURCE_GROUP" -n "$APP" --query "[?name=='JM1_RELEASE_SHA'].value | [0]" -o tsv)"
           enabled="$(az functionapp config appsettings list -g "$RESOURCE_GROUP" -n "$APP" --query "[?name=='JM1_SHADOW_ENABLED'].value | [0]" -o tsv)"
           test "$release" = "$GITHUB_SHA"
