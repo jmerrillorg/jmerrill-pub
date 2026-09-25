@@ -87,6 +87,8 @@ jobs:
           az functionapp config appsettings set -g "$RESOURCE_GROUP" -n "$APP" --settings \
             JM1_SHADOW_HOST=true \
             JM1_SHADOW_STORAGE_ACCOUNT="$STORAGE" \
+            JM1_SHADOW_PERMISSION_STATE_ACCOUNT=jm1core \
+            JM1_SHADOW_EXPECTED_SITE_GRANT_ID=aTowaS50fG1zLnNwLmV4dHxlZTJkM2YxZS1mMGI5LTQ1NzYtYmVjYy0xMGM0MDA2MmVmYTRAMzUyZDA3NWUtOGUxNy00MTY5LTlmOGUtMjJlNjk0NmNlNjZk \
             DATAVERSE_WEB_API_BASE_URL=https://jm1hq.crm.dynamics.com/api/data/v9.2 \
             DATAVERSE_RESOURCE_URL=https://jm1hq.crm.dynamics.com \
             JM1_RELEASE_SHA="$GITHUB_SHA" \
