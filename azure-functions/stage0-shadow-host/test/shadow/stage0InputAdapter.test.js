@@ -2,7 +2,7 @@
 
 const test = require("node:test");
 const assert = require("node:assert/strict");
-const { canonicalAssetUrl, readApprovedInput, SITE_ID } = require("../../src/shadow/stage0InputAdapter");
+const { canonicalAssetUrl, readApprovedInput, SITE_GUID } = require("../../src/shadow/stage0InputAdapter");
 
 const event = {
   sourceEventId: "11111111-1111-4111-8111-111111111111",
@@ -26,7 +26,7 @@ test("read adapter returns only bounded excerpt and hash reference", async () =>
     fetchImpl: async (url) => {
       calls.push(url);
       if (url.includes("?$select=")) return new Response(JSON.stringify({
-        id: "item-1", parentReference: { siteId: SITE_ID, driveId: "drive-1" },
+        id: "item-1", parentReference: { siteId: SITE_GUID, driveId: "drive-1" },
       }), { status: 200 });
       return new Response("Approved manuscript sample. ".repeat(800), { status: 200 });
     },
