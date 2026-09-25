@@ -83,7 +83,9 @@ function finalize(state, { sourceEventId, policyVersion, actualCents, status, no
   const event = state.events?.[key];
   if (!event || event.status !== "RESERVED") throw new Error("EVENT_NOT_RESERVED");
   if (actualCents > event.projectedCents) throw new Error("ACTUAL_COST_EXCEEDS_RESERVATION");
-  if (state.month !== monthKey(now)) throw new Error("CROSS_MONTH_FINALIZATION_REQUIRES_RECONCILIATION");
+  if (state.month !== monthKey(event.recordedAt) || new Date(now) < new Date(event.recordedAt)) {
+    throw new Error("INVALID_RESERVATION_PERIOD");
+  }
   return {
     ...state,
     spentCents: state.spentCents + actualCents,
