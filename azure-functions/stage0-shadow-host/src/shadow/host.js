@@ -14,6 +14,7 @@ const evaluator = require("./deterministicEvaluator");
 const cost = require("./stage0ModelCost");
 const { readPermissionState } = require("./permissionMonitorState");
 const { readAuthorityProbe } = require("./authorityProbeState");
+const { probeWithManagedIdentity } = require("./personalSiteProbe");
 const { TARGET_SITE } = require("./authorityProbe");
 
 const MODEL_REGISTER_ID = "AZURE:OAI-JM1-DIAGNOSTIC:JM1-PUB-DIAGNOSTIC-PRIMARY";
@@ -151,7 +152,7 @@ app.timer("stage0-shadow-poll", {
       return;
     }
     try {
-      await readPermissionState({
+      const personalSiteIds = await readPermissionState({
         accountName: process.env.JM1_SHADOW_PERMISSION_STATE_ACCOUNT,
         clientId: process.env.JM1_SHADOW_MANAGED_IDENTITY_CLIENT_ID,
         expected: {
@@ -160,6 +161,7 @@ app.timer("stage0-shadow-poll", {
           grantId: process.env.JM1_SHADOW_EXPECTED_SITE_GRANT_ID,
         },
       });
+      await probeWithManagedIdentity(personalSiteIds, process.env.JM1_SHADOW_MANAGED_IDENTITY_CLIENT_ID);
       await readAuthorityProbe({
         accountName: process.env.JM1_SHADOW_STORAGE_ACCOUNT,
         clientId: process.env.JM1_SHADOW_MANAGED_IDENTITY_CLIENT_ID,
