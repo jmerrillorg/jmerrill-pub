@@ -41,8 +41,7 @@ class BlobBudgetLedger {
       const result = mutation(state);
       if (result.state !== state) {
         await blob.uploadData(Buffer.from(JSON.stringify(result.state)), {
-          leaseId: lease.leaseId,
-          conditions: { ifMatch: download.etag },
+          conditions: { ifMatch: download.etag, leaseId: lease.leaseId },
           blobHTTPHeaders: { blobContentType: "application/json" },
         });
       }
