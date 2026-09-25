@@ -8,6 +8,13 @@ function isConflict(error) {
   return error?.statusCode === 409 || error?.statusCode === 412;
 }
 
+async function readJson(blob) {
+  const download = await blob.download();
+  const chunks = [];
+  for await (const chunk of download.readableStreamBody) chunks.push(chunk);
+  return JSON.parse(Buffer.concat(chunks).toString("utf8"));
+}
+
 class BlobBudgetLedger {
   constructor({ accountName, containerName, clientId }) {
     if (!/^[a-z0-9]{3,24}$/.test(accountName || "") || !/^[a-z0-9-]{3,63}$/.test(containerName || "") || !clientId) {
@@ -66,7 +73,24 @@ class BlobBudgetLedger {
         blobHTTPHeaders: { blobContentType: "application/json" },
       });
     } catch (error) {
-      if (isConflict(error)) return { outcome: "IDEMPOTENT_REPLAY" };
+      if (isConflict(error)) {
+        const existingClaim = await readJson(claim);
+        if (existingClaim.sourceEventId !== args.sourceEventId.toLowerCase() ||
+            existingClaim.policyVersion !== args.policyVersion) throw new Error("SHADOW_CLAIM_MISMATCH");
+        const month = policy.monthKey(existingClaim.claimedAt);
+        const monthly = this.container.getBlockBlobClient(`budget/${month}.json`);
+        let previous;
+        try {
+          previous = (await readJson(monthly)).events?.[key];
+        } catch (readError) {
+          if (readError?.statusCode !== 404) throw readError;
+        }
+        if (!previous || previous.status === "RESERVED") return { outcome: "INDETERMINATE_CLAIM" };
+        if (!["SUCCEEDED", "EVALUATION_FAILED", "FAILED", "BUDGET_DENIED"].includes(previous.status)) {
+          throw new Error("SHADOW_CLAIM_STATE_INVALID");
+        }
+        return { outcome: "IDEMPOTENT_REPLAY", event: previous };
+      }
       throw error;
     }
     return this.mutateMonth(args.now, (state) => policy.reserve(state, args));

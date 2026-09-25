@@ -78,6 +78,10 @@ async function processStage0Event(event, route, ports) {
     now,
   });
   if (reservation.outcome === "IDEMPOTENT_REPLAY") return { status: "IDEMPOTENT_REPLAY" };
+  if (reservation.outcome === "INDETERMINATE_CLAIM") {
+    await ports.alert("stage0_shadow_claim_reconciliation_required", { sourceEventId: event.sourceEventId });
+    return { status: "INDETERMINATE_CLAIM" };
+  }
   if (reservation.outcome === "BUDGET_DENIED") {
     await ports.alert("stage0_shadow_budget_denied", { sourceEventId: event.sourceEventId });
     return { status: "BUDGET_DENIED" };
