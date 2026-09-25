@@ -36,6 +36,18 @@ test("actual cost releases the unused reservation without permitting overspend",
   assert.throws(() => finalize(reserved.state, { sourceEventId: id, policyVersion: "v1", actualCents: 21, status: "SUCCEEDED", now }), /EXCEEDS_RESERVATION/);
 });
 
+test("completion after month rollover settles the original reservation", () => {
+  const reserved = reserve(null, { sourceEventId: id, policyVersion: "v1", projectedCents: 20, now });
+  const completedAt = "2026-10-01T00:01:00Z";
+  const final = finalize(reserved.state, {
+    sourceEventId: id, policyVersion: "v1", actualCents: 7,
+    status: "SUCCEEDED", now: completedAt,
+  });
+  assert.equal(final.month, "2026-09");
+  assert.equal(final.spentCents, 7);
+  assert.equal(final.reservedCents, 0);
+});
+
 test("invalid or zero projections fail closed", () => {
   assert.throws(() => budgetDecision({ spentCents: 0, reservedCents: 0, projectedCents: 0 }));
   assert.throws(() => reserve(null, { sourceEventId: "bad", policyVersion: "v1", projectedCents: 1, now }));

@@ -100,6 +100,7 @@ async function processStage0Event(event, route, ports) {
       actualCents,
       status: "SUCCEEDED",
       now: ports.now(),
+      reservedAt: reservation.event.recordedAt,
     });
     ports.metric("stage0_shadow_success", 1);
     ports.metric("stage0_shadow_cost", actualCents / 100);

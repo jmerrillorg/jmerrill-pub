@@ -54,11 +54,27 @@ class BlobBudgetLedger {
 
   async reserve(args) {
     await this.ensureContainer();
+    const key = policy.eventKey(args.sourceEventId, args.policyVersion);
+    const claim = this.container.getBlockBlobClient(`claims/${key}.json`);
+    try {
+      await claim.uploadData(Buffer.from(JSON.stringify({
+        sourceEventId: args.sourceEventId.toLowerCase(),
+        policyVersion: args.policyVersion,
+        workload: policy.WORKLOAD,
+        claimedAt: new Date(args.now).toISOString(),
+      })), {
+        conditions: { ifNoneMatch: "*" },
+        blobHTTPHeaders: { blobContentType: "application/json" },
+      });
+    } catch (error) {
+      if (isConflict(error)) return { outcome: "IDEMPOTENT_REPLAY" };
+      throw error;
+    }
     return this.mutateMonth(args.now, (state) => policy.reserve(state, args));
   }
 
   async finalize(args) {
-    return this.mutateMonth(args.now, (state) => ({ state: policy.finalize(state, args) }));
+    return this.mutateMonth(args.reservedAt, (state) => ({ state: policy.finalize(state, args) }));
   }
 
   async recordEvidence(sourceEventId, policyVersion, evidence) {
