@@ -74,6 +74,8 @@ test("evaluation does not mistake structural agreement for groundedness", () => 
 test("denied budget never reads material or calls model", async () => {
   let reads = 0;
   let calls = 0;
+  const metrics = [];
+  const alerts = [];
   const result = await processStage0Event(event, route, {
     identityClientId: "isolated-identity",
     modelResourceId,
@@ -83,11 +85,14 @@ test("denied budget never reads material or calls model", async () => {
     ledger: { reserve: async () => ({ outcome: "BUDGET_DENIED" }) },
     readApprovedInput: async () => { reads++; },
     infer: async () => { calls++; },
-    alert: async () => {},
+    metric: (name) => metrics.push(name),
+    alert: async (name) => alerts.push(name),
   });
   assert.equal(result.status, "BUDGET_DENIED");
   assert.equal(reads, 0);
   assert.equal(calls, 0);
+  assert.deepEqual(metrics, ["stage0_shadow_budget_denied"]);
+  assert.deepEqual(alerts, ["stage0_shadow_budget_denied"]);
 });
 
 test("invalid output is recorded as evaluation failure, never shadow success", async () => {

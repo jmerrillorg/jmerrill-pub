@@ -1,6 +1,6 @@
 "use strict";
 
-const { createHash } = require("node:crypto");
+const { createHash, randomUUID } = require("node:crypto");
 const { app } = require("@azure/functions");
 const { BlobServiceClient } = require("@azure/storage-blob");
 const { ManagedIdentityCredential } = require("@azure/identity");
@@ -148,6 +148,60 @@ app.timer("stage0-shadow-commissioning-canary", {
     const result = await processStage0Event(event, routeFromEnvironment(process.env), ports);
     context.log(JSON.stringify({ event: "stage0_shadow_canary", status: result.status,
       sourceEventId: CANARY_EVENT_ID }));
+  },
+});
+
+app.timer("stage0-shadow-budget-certification", {
+  schedule: "0 */5 * * * *",
+  handler: async (_timer, context) => {
+    if (process.env.JM1_SHADOW_BUDGET_CERTIFICATION_ENABLED !== "true") return;
+    if (process.env.JM1_SHADOW_ENABLED === "true" ||
+        process.env.JM1_SHADOW_ROUTE_STATUS !== "CANARY_ONLY") {
+      throw new Error("SHADOW_BUDGET_CERTIFICATION_BOUNDARY_DENIED");
+    }
+    const now = new Date().toISOString();
+    const month = now.slice(0, 7);
+    const event = {
+      sourceEventId: CANARY_EVENT_ID,
+      entity: ENTITY,
+      workload: WORKLOAD,
+      synthetic: true,
+      manuscriptApprovedForDiagnostic: true,
+      currentOutcome: 835500004,
+    };
+    const route = routeFromEnvironment(process.env);
+    const results = [];
+    for (const [scenario, spentCents] of [["exhausted", 2500], ["projected", 2499]]) {
+      const containerName = `shadow-cert-${randomUUID().replace(/-/g, "")}`;
+      const ports = productionPorts(process.env, context);
+      if (scenario === "projected") ports.projectMaximumCost = async () => 2;
+      ports.ledger = new BlobBudgetLedger({
+        accountName: process.env.JM1_SHADOW_STORAGE_ACCOUNT,
+        containerName,
+        clientId: process.env.JM1_SHADOW_MANAGED_IDENTITY_CLIENT_ID,
+      });
+      await ports.ledger.ensureContainer();
+      const budget = ports.ledger.container.getBlockBlobClient(`budget/${month}.json`);
+      await budget.uploadData(Buffer.from(JSON.stringify({
+        month, spentCents, reservedCents: 0, events: {},
+      })), { conditions: { ifNoneMatch: "*" } });
+      let providerCalls = 0;
+      ports.readApprovedInput = async () => { throw new Error("CERTIFICATION_INPUT_READ_DENIED"); };
+      ports.infer = async () => { providerCalls++; throw new Error("CERTIFICATION_PROVIDER_CALL_DENIED"); };
+      const result = await processStage0Event(event, route, ports);
+      const claim = await ports.ledger.reserve({
+        sourceEventId: CANARY_EVENT_ID,
+        policyVersion: route.policyVersion,
+        projectedCents: await ports.projectMaximumCost(),
+        now,
+      });
+      if (result.status !== "BUDGET_DENIED" || claim.outcome !== "IDEMPOTENT_REPLAY" || providerCalls !== 0) {
+        throw new Error(`SHADOW_BUDGET_CERTIFICATION_FAILED_${scenario.toUpperCase()}`);
+      }
+      results.push({ scenario, spentCents, result: result.status, claim: claim.outcome,
+        providerCalls, containerName });
+    }
+    context.log(JSON.stringify({ event: "stage0_shadow_budget_certification", status: "PASS", results }));
   },
 });
 

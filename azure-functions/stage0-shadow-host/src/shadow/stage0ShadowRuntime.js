@@ -83,6 +83,7 @@ async function processStage0Event(event, route, ports) {
     return { status: "INDETERMINATE_CLAIM" };
   }
   if (reservation.outcome === "BUDGET_DENIED") {
+    ports.metric("stage0_shadow_budget_denied", 1);
     await ports.alert("stage0_shadow_budget_denied", { sourceEventId: event.sourceEventId });
     return { status: "BUDGET_DENIED" };
   }
