@@ -5,6 +5,7 @@ const { ManagedIdentityCredential } = require("@azure/identity");
 const mammoth = require("mammoth");
 
 const SITE_ID = "jmerrillfoundation.sharepoint.com,35fb0d98-bc68-4250-9d0d-8c07d68e4024,10208ad5-0028-48f0-9ffa-717812924835";
+const SITE_GUID = "35fb0d98-bc68-4250-9d0d-8c07d68e4024";
 const SITE_ORIGIN = "https://jmerrillfoundation.sharepoint.com";
 const SITE_PATH = "/sites/publishing/";
 const MAX_BYTES = 10 * 1024 * 1024;
@@ -66,7 +67,7 @@ async function readApprovedInput(event, { clientId, credential, fetchImpl = fetc
   });
   if (!metadataResponse.ok) throw new Error(`SHADOW_MANUSCRIPT_METADATA_${metadataResponse.status}`);
   const metadata = await metadataResponse.json();
-  if (!metadata.id || metadata.parentReference?.siteId !== SITE_ID ||
+  if (!metadata.id || metadata.parentReference?.siteId?.toLowerCase() !== SITE_GUID ||
       !metadata.parentReference?.driveId) throw new Error("SHADOW_MANUSCRIPT_SITE_MISMATCH");
   let content = await fetchImpl(`${base}/content`, {
     headers, signal: AbortSignal.timeout(30000), redirect: "manual",
@@ -94,4 +95,4 @@ async function readApprovedInput(event, { clientId, credential, fetchImpl = fetc
   };
 }
 
-module.exports = { SITE_ID, canonicalAssetUrl, readApprovedInput };
+module.exports = { SITE_ID, SITE_GUID, canonicalAssetUrl, readApprovedInput };
