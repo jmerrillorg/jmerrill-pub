@@ -13,12 +13,15 @@ const evaluator = require("./deterministicEvaluator");
 const cost = require("./stage0ModelCost");
 
 const MODEL_REGISTER_ID = "AZURE:OAI-JM1-DIAGNOSTIC:JM1-PUB-DIAGNOSTIC-PRIMARY";
+const RISK_REGISTER_ID = "JM1-AI-RISK-STAGE0-SHADOW-001";
+const POLICY_VERSION = "STAGE0-SHADOW-C11-v1";
 const CANARY_FIXTURE_URL = "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/90_INFRA/INFRA-003/infra-003-demo-2026-07-09T19-28-57-623Z.txt";
 
 function routeFromEnvironment(env) {
   if (env.JM1_SHADOW_MODEL_REGISTER_ID !== MODEL_REGISTER_ID ||
-      !env.JM1_SHADOW_RISK_REGISTER_ID ||
-      !env.JM1_SHADOW_ROUTE_POLICY_VERSION || !env.JM1_SHADOW_ROUTE_EXPIRES_AT) {
+      env.JM1_SHADOW_RISK_REGISTER_ID !== RISK_REGISTER_ID ||
+      env.JM1_SHADOW_ROUTE_POLICY_VERSION !== POLICY_VERSION ||
+      !env.JM1_SHADOW_ROUTE_EXPIRES_AT) {
     throw new Error("SHADOW_ROUTE_AUTHORITY_MISSING");
   }
   return {
