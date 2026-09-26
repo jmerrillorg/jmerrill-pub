@@ -102,6 +102,11 @@ async function runObservedPaymentConsumer(deps = {}) {
   }
   const tail = await call("RECONCILE_PROVIDER_TAIL", null, env).catch(error => ({ results: [{
     requestId: "provider-census", status: "RECONCILIATION_PENDING", reason: error.safeCode || "PROVIDER_CENSUS_RETRY_REQUIRED" }] }));
+  if (!tail.results.some(item => item.requestId === "provider-census")) {
+    const path = "payment-service/tail/provider-census.json";
+    const prior = await store.get(path);
+    if (prior) await store.put(path, { ...prior, status: "RECONCILED", updatedAt: now, firstPendingAt: null });
+  }
   for (const item of tail.results) {
     const path = `payment-service/tail/${item.requestId}.json`;
     const prior = await store.get(path);

@@ -117,6 +117,13 @@ test("provider census outage remains durably visible and cannot erase earlier fa
   assert.equal(health.unreconciledSettlementCount, 1);
   assert.ok(health.oldestUnreconciledSettlement);
   assert.equal(health.retryCount, 1);
+  deps.paymentServiceCall = call;
+  await runObservedPaymentConsumer(deps);
+  const recovered = await store.get("payment-service/health.json");
+  assert.equal(recovered.status, "HEALTHY");
+  assert.equal(recovered.unreconciledSettlementCount, 0);
+  assert.equal(recovered.retryCount, 1);
+  assert.equal(recovered.lastFailure, health.lastFailure);
 });
 
 test("observed-request preview cannot reconcile, create access, or send", async () => {
