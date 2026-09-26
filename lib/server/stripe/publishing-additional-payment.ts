@@ -29,13 +29,11 @@ export async function resolveAdditionalPaymentEligibility(input: {
   if (!agreement.stripeCustomerId) return { eligible: false as const, reason: 'STRIPE_CUSTOMER_BINDING_INVALID' }
   const state = calculateAgreementPaymentState(agreement.snapshot)
   if (state.remainingBalanceCents <= 0) return { eligible: false as const, reason: 'BALANCE_NOT_OUTSTANDING' }
-  const obligation = (agreement.snapshot.scheduledObligations || []).find((item) => item.status !== 'SATISFIED' && item.status !== 'CANCELLED')
-  if (!obligation) return { eligible: false as const, reason: 'OBLIGATION_NOT_FOUND' }
   return {
     eligible: true as const,
     agreement,
     state,
-    obligationId: obligation.obligationId,
+    obligationId: null,
     engagementId: engagementId || agreement.snapshot.agreementId,
     maximumAmountCents: state.remainingBalanceCents,
   }

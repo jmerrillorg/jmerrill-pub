@@ -36,10 +36,11 @@ async function validatePaymentLink(client, queueItem, deps = {}) {
     return hold("SIGNED_CONTRACT_AUTHORITY_UNPROVEN");
   }
   const ledger = await client.first("jmpv2_agreementrecords", {
-    $select: "jmpv2_agreementrecordid,jmpv2_authoridentity,jmpv2_agreementkey,jmpv2_stripecustomerid,jmpv2_paymentledgerstatus",
+    $select: "jmpv2_agreementrecordid,jmpv2_authoridentity,jmpv2_titleid,jmpv2_agreementkey,jmpv2_stripecustomerid,jmpv2_paymentledgerstatus",
     $filter: `jmpv2_agreementrecordid eq ${contract._jm1pub_opportunity_value}`
   });
-  if (ledger?.jmpv2_authoridentity !== queueItem.authorId || ledger?.jmpv2_agreementkey !== contract._jm1pub_opportunity_value ||
+  if (ledger?.jmpv2_authoridentity !== queueItem.authorId || ledger?.jmpv2_titleid !== queueItem.titleId ||
+      ledger?.jmpv2_agreementkey !== contract._jm1pub_opportunity_value ||
       ledger?.jmpv2_paymentledgerstatus !== "ACTIVE" || !ledger?.jmpv2_stripecustomerid) return hold("PAYMENT_LEDGER_AUTHORITY_UNPROVEN");
   const obligations = await client.list("jmpv2_paymentrequirements", {
     $select: "jmpv2_paymentrequirementid,jmpv2_agreementkey,jmpv2_installmentsequence,jmpv2_amountcents,jmpv2_duedate,jmpv2_obligationstatus,jmpv2_stripeinvoiceid",

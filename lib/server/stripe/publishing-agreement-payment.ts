@@ -61,6 +61,7 @@ export type AgreementPaymentState = {
   normalInstallmentCents: number
   nextScheduledInstallmentCents: number
   remainingInstallmentCount: number
+  projectedFinalCollectionCents: number
   paidInFull: boolean
   recurringCadenceActive: boolean
   nextScheduledDueDate: string | null
@@ -140,6 +141,9 @@ export function calculateAgreementPaymentState(snapshot: AgreementPaymentSnapsho
     remainingInstallmentCount: paidInFull
       ? 0
       : Math.ceil(remainingBalanceCents / snapshot.normalInstallmentCents),
+    projectedFinalCollectionCents: paidInFull
+      ? 0
+      : remainingBalanceCents % snapshot.normalInstallmentCents || snapshot.normalInstallmentCents,
     paidInFull,
     recurringCadenceActive: !paidInFull,
     nextScheduledDueDate: paidInFull ? null : clean(snapshot.nextScheduledDueDate) || null,

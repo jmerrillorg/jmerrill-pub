@@ -370,7 +370,7 @@ export async function createAdditionalPaymentCheckoutSession(input: {
   requestId: string
   idempotencyKey: string
   engagementId: string
-  obligationId: string
+  obligationId: string | null
   balanceVersion: string
 }) {
   const gate = productionAdditionalPaymentGateReadback()
@@ -625,7 +625,7 @@ function paymentMetadataForCheckout(input: {
   requestId: string
   idempotencyKey: string
   engagementId: string
-  obligationId: string
+  obligationId: string | null
   balanceVersion: string
 }) {
   const state = calculateAgreementPaymentState(input.agreement.snapshot)
@@ -636,8 +636,6 @@ function paymentMetadataForCheckout(input: {
     jm1_title_id: input.agreement.snapshot.titleId,
     jm1_engagement_id: input.engagementId,
     jm1_agreement_id: input.agreement.snapshot.agreementId,
-    jm1_obligation_id: input.obligationId,
-    jm1_scheduled_obligation_id: input.obligationId,
     jm1_payment_schedule_id: input.agreement.snapshot.paymentScheduleId,
     jm1_balance_version: input.balanceVersion,
     jm1_contract_balance_before: String(state.remainingBalanceCents),
