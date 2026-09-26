@@ -351,9 +351,17 @@ async function executeService(queueItem, deps) {
   const { store, client } = deps;
   return store.withBusinessRouteLease(queueItem.evidenceLink, async () => {
     const route = await store.getBusinessRoute(queueItem.evidenceLink);
+    // The relay retains its own durable semantic reservation. Replay a rejected
+    // observed payment request through that same path, never through a raw sender.
+    const rejectedRelayReplay = queueItem.sourceKind === "OBSERVED_PAYMENT_REQUEST" &&
+      (deps.env || process.env).JM1_AUTHOR_RESPONSE_SEND_PROVIDER === "acs-relay" &&
+      route.service?.status === "AMBIGUOUS_SEND_STATE" &&
+      route.service.reason === "AUTHOR_RESPONSE_SEND_PROVIDER_REJECTED" &&
+      route.service.communicationRecordId && !route.service.providerMessageId;
     if (route.service?.status === "SENT") return { ...publicServiceResult(prepared), outcome: "IDEMPOTENT", providerMessageId: route.service.providerMessageId };
     if (route.service?.status === "SENT_READBACK_PENDING") return completeMailboxReadback(queueItem, deps);
-    if (route.service?.status === "SEND_ACCEPTED_AUDIT_PENDING" || route.service?.status === "AMBIGUOUS_SEND_STATE") {
+    if (route.service?.status === "SEND_ACCEPTED_AUDIT_PENDING" ||
+        (route.service?.status === "AMBIGUOUS_SEND_STATE" && !rejectedRelayReplay)) {
       return { ...publicServiceResult(prepared), outcome: "HELD_AMBIGUOUS_SEND_STATE" };
     }
     prepared = await prepareService(queueItem, deps);
@@ -365,9 +373,17 @@ async function executeService(queueItem, deps) {
     };
     const reserve = await (deps.reserveCommunicationIntent || reserveCommunicationIntent)(client, intent);
     if (reserve.status === "ALREADY_DELIVERED") return { ...publicServiceResult(prepared), outcome: "IDEMPOTENT" };
-    if (reserve.status !== "RESERVED") return { ...publicServiceResult(prepared), outcome: "HELD_AMBIGUOUS_SEND_STATE" };
-    await store.updateBusinessRoute({ ...route, service: { intent: prepared.intent, status: "RESERVED", communicationRecordId: reserve.communicationRecordId } });
+    if (reserve.status !== "RESERVED" && !(rejectedRelayReplay && reserve.status === "AMBIGUOUS_SEND_STATE" &&
+        reserve.communicationRecordId === route.service.communicationRecordId)) {
+      return { ...publicServiceResult(prepared), outcome: "HELD_AMBIGUOUS_SEND_STATE" };
+    }
+    const relayIdentityVersion = rejectedRelayReplay ? route.service.relayIdentityVersion || "LEGACY_V1" : "CANONICAL_V1";
+    await store.updateBusinessRoute({ ...route, service: { intent: prepared.intent, status: "RESERVED",
+      communicationRecordId: reserve.communicationRecordId, relayIdentityVersion } });
     const approval = {
+      ...(queueItem.sourceKind === "OBSERVED_PAYMENT_REQUEST" && relayIdentityVersion === "CANONICAL_V1" ? {
+        authorId: intent.authorId, communicationType: intent.communicationType, workstream: intent.workstream,
+      } : {}),
       diagnosticId: queueItem.sourceKind === "OBSERVED_PAYMENT_REQUEST" ? queueItem.titleId : queueItem.stageId,
       intakeReferenceCode: queueItem.engagementId,
       authorEmail: prepared.recipient,
@@ -392,7 +408,7 @@ async function executeService(queueItem, deps) {
     });
     if (!result.ok || result.authorEmailStatus !== "AUTHOR_RESPONSE_SENT" || !result.providerMessageId) {
       await store.updateBusinessRoute({ ...route, service: { intent: prepared.intent, status: "AMBIGUOUS_SEND_STATE",
-        communicationRecordId: reserve.communicationRecordId, reason: result.reason || "SEND_READBACK_UNPROVEN" } });
+        communicationRecordId: reserve.communicationRecordId, relayIdentityVersion, reason: result.reason || "SEND_READBACK_UNPROVEN" } });
       return { ...publicServiceResult(prepared), outcome: "HELD_AMBIGUOUS_SEND_STATE" };
     }
     const sentAt = new Date().toISOString();

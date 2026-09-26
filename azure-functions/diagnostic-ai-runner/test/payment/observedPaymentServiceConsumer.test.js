@@ -104,6 +104,38 @@ test("mailbox copy delay retries readback without a second provider send", async
   assert.equal(effects.sends, 1);
 });
 
+test("rejected relay recovery reuses the same canonical reservation and durable relay path", async () => {
+  const { store, deps, effects } = setup();
+  await runObservedPaymentConsumer(deps);
+  const queue = (await store.listQueueItems())[0];
+  const route = await store.getBusinessRoute(queue.evidenceLink);
+  const held = { intent: "ADDITIONAL_PAYMENT_REQUEST", status: "AMBIGUOUS_SEND_STATE",
+    communicationRecordId: "comm-1", reason: "AUTHOR_RESPONSE_SEND_PROVIDER_REJECTED" };
+  await store.updateBusinessRoute({ ...route, service: held });
+  deps.env.JM1_AUTHOR_RESPONSE_SEND_PROVIDER = "acs-relay";
+  deps.reserveCommunicationIntent = async () => ({ status: "AMBIGUOUS_SEND_STATE",
+    communicationRecordId: "comm-1", semanticIdempotencyKey: "semantic-1" });
+  assert.equal((await executeService(queue, deps)).outcome, "SENT");
+  assert.equal((await executeService(queue, deps)).outcome, "IDEMPOTENT");
+  assert.equal(effects.sends, 1);
+});
+
+test("unknown ambiguity, a different reservation, or a non-durable sender cannot replay", async () => {
+  for (const variant of ["UNKNOWN", "WRONG_RESERVATION", "INJECTED"]) {
+    const { store, deps, effects } = setup();
+    await runObservedPaymentConsumer(deps);
+    const queue = (await store.listQueueItems())[0];
+    const route = await store.getBusinessRoute(queue.evidenceLink);
+    await store.updateBusinessRoute({ ...route, service: { status: "AMBIGUOUS_SEND_STATE",
+      communicationRecordId: "comm-1", reason: variant === "UNKNOWN" ? "UNKNOWN" : "AUTHOR_RESPONSE_SEND_PROVIDER_REJECTED" } });
+    deps.env.JM1_AUTHOR_RESPONSE_SEND_PROVIDER = variant === "INJECTED" ? "injected" : "acs-relay";
+    deps.reserveCommunicationIntent = async () => ({ status: "AMBIGUOUS_SEND_STATE",
+      communicationRecordId: variant === "WRONG_RESERVATION" ? "comm-2" : "comm-1", semanticIdempotencyKey: "semantic-1" });
+    assert.equal((await executeService(queue, deps)).outcome, "HELD_AMBIGUOUS_SEND_STATE");
+    assert.equal(effects.sends, 0);
+  }
+});
+
 test("provider census outage remains durably visible and cannot erase earlier failures", async () => {
   const { store, deps } = setup();
   const call = deps.paymentServiceCall;
