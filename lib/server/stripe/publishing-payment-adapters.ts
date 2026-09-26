@@ -206,7 +206,7 @@ export class DataversePublishingPaymentLedger implements PublishingPaymentLedger
   async recordAdditionalPaymentRequest(request: AdditionalPaymentRequest) {
     const existing = await dataverseFirst(this.config, EVENTS, {
       $select: 'jmpv2_paymentevidenceid',
-      $filter: `jmpv2_paymentevidencekey eq '${odata(request.requestId)}'`,
+      $filter: `jmpv2_eventkind eq 'ADDITIONAL_PAYMENT_REQUEST' and jmpv2_paymentevidencekey eq '${odata(request.requestId)}'`,
     })
     if (existing) return
     await this.createEvidence({

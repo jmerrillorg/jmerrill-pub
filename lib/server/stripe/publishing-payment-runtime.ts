@@ -71,7 +71,7 @@ export type AdditionalPaymentPreparation = Omit<AdditionalPaymentRequest, 'strip
   authorId: string
   titleId: string
   engagementId: string
-  sourceEvent: { kind: 'AUTHOR_PORTAL'; operationId: string }
+  sourceEvent: { kind: 'AUTHOR_PORTAL'; operationId: string } | { kind: 'OBSERVED_AUTHOR_REQUEST'; requestId: string }
 }
 
 export interface PublishingPaymentLedger {
