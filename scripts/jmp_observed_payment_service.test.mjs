@@ -5,6 +5,7 @@ import createJiti from 'jiti'
 
 const jiti = createJiti(import.meta.url)
 const { observedPaymentRequestIdentity, assertObservedRequestReplay } = jiti('../lib/server/stripe/publishing-observed-payment-service.ts')
+const { paymentLedgerGuid } = jiti('../lib/server/stripe/publishing-payment-adapters.ts')
 
 const request = {
   authorId: 'author-1', titleId: 'title-1', agreementId: 'agreement-1', engagementId: 'agreement-1',
@@ -21,6 +22,15 @@ test('observation identity is independent of capture time and does not fabricate
   assert.notEqual(observedPaymentRequestIdentity({ ...request, authorId: 'another-author' }), identity)
   assert.notEqual(observedPaymentRequestIdentity({ ...request, agreementId: 'another-agreement' }), identity)
   assert.equal(request.sourceEvent.providerMessageId, null)
+})
+
+test('canonical sequential Dataverse GUIDs are accepted without weakening identifier shape validation', () => {
+  const id = '131da28b-919c-f111-b8dc-6045bdd69435'
+  assert.equal(paymentLedgerGuid(id), id)
+  assert.equal(paymentLedgerGuid(`{${id.toUpperCase()}}`), id)
+  for (const invalid of ['name', `${id} or 1 eq 1`, '131da28b-919c-f111-b8dc', 'zzzzzzzz-919c-f111-b8dc-6045bdd69435']) {
+    assert.throws(() => paymentLedgerGuid(invalid), /AGREEMENT_ID_INVALID/)
+  }
 })
 
 test('replay cannot change the amount, title, agreement or settled-payment attribution', () => {
