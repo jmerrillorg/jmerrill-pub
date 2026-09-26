@@ -62,6 +62,7 @@ jobs:
           node --test scripts/jmp_intake_redesign_guard.test.mjs
           node scripts/check-catalog-runtime-source.mjs
           node scripts/infra006_health_contract.test.mjs
+          node --test scripts/jmp_payments_extra_001.test.mjs scripts/jmp_payments_extra_002.test.mjs scripts/jmp_payments_extra_003.test.mjs scripts/jmp_payments_extra_003a.test.mjs scripts/jmp_payment_model_correction_001.test.mjs
 
       - name: Build
         env:

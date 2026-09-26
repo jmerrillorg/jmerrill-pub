@@ -20,6 +20,7 @@ import {
   processConfirmedAgreementPayment,
   productionAdditionalPaymentGateReadback,
   productionPaymentGateReadback,
+  type AgreementLedgerRecord,
 } from './publishing-payment-runtime'
 
 const STRIPE_API_BASE = 'https://api.stripe.com'
@@ -179,6 +180,10 @@ export async function processPublishingPaymentSuccess(input: PublishingPaymentSu
       })
     }
     try {
+      const ledger = createDataversePublishingPaymentLedger()
+      const agreement = await ledger.getAgreement(requiredPaymentField(payment.agreementId, 'AGREEMENT_ID_REQUIRED'))
+      const binding = validateAgreementPaymentBinding(payment, agreement)
+      if (!binding.ok) return blocked(binding.reason, { financialEffect: 0 })
       return await processConfirmedAgreementPayment({
         agreementId: requiredPaymentField(payment.agreementId, 'AGREEMENT_ID_REQUIRED'),
         stripeEventId: requiredPaymentField(payment.eventId, 'STRIPE_EVENT_ID_REQUIRED'),
@@ -188,7 +193,7 @@ export async function processPublishingPaymentSuccess(input: PublishingPaymentSu
         intent: payment.paymentType === 'ADDITIONAL_PAYMENT' ? 'ADDITIONAL_PAYMENT' : 'CURRENT_PLUS_ADDITIONAL',
         occurredAt: payment.paidAt || isoFromStripeSeconds(payment.created) || new Date().toISOString(),
         submittedBalanceVersion: requiredPaymentField(payment.balanceVersion, 'BALANCE_VERSION_REQUIRED'),
-        ledger: createDataversePublishingPaymentLedger(),
+        ledger,
         qbo: additionalPayment ? null : createGovernedQboPaymentAdapter(),
         payoff: createStripeAgreementPayoff(),
       })
@@ -350,6 +355,29 @@ export async function processPublishingPaymentSuccess(input: PublishingPaymentSu
       startsProduction: false,
     },
   }
+}
+
+export function validateAgreementPaymentBinding(payment: PublishingPaymentSuccess, agreement: AgreementLedgerRecord | null) {
+  if (!agreement) return { ok: false as const, reason: 'AGREEMENT_NOT_FOUND' }
+  const matches = (left: unknown, right: unknown) => {
+    const value = normalizeString(left)
+    const expected = normalizeString(right)
+    const guid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+    return Boolean(value) && (guid.test(value) && guid.test(expected)
+      ? value.toLowerCase() === expected.toLowerCase()
+      : value === expected)
+  }
+  if (!matches(payment.agreementId, agreement.snapshot.agreementId) ||
+      !matches(payment.authorId, agreement.snapshot.authorId) ||
+      !matches(payment.titleId, agreement.snapshot.titleId) ||
+      !matches(payment.paymentScheduleId, agreement.snapshot.paymentScheduleId) ||
+      !matches(payment.customerId, agreement.stripeCustomerId)) {
+    return { ok: false as const, reason: 'AGREEMENT_PAYMENT_IDENTITY_BINDING_MISMATCH' }
+  }
+  if (payment.paymentType === 'ADDITIONAL_PAYMENT' && payment.scheduledObligationId) {
+    return { ok: false as const, reason: 'ADDITIONAL_PAYMENT_SCHEDULE_BINDING_PROHIBITED' }
+  }
+  return { ok: true as const }
 }
 
 export async function recordPublishingPaymentException(input: PublishingPaymentSuccess, reason: string) {

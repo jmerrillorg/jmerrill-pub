@@ -57,7 +57,7 @@ export type AdditionalPaymentRequest = {
   requestId: string
   idempotencyKey: string
   agreementId: string
-  obligationId: string
+  obligationId: string | null
   amountCents: number
   balanceBeforeCents: number
   balanceAfterCents: number
@@ -65,6 +65,13 @@ export type AdditionalPaymentRequest = {
   stripeCheckoutSessionId: string
   expiresAt: number | null
   createdAt: string
+}
+
+export type AdditionalPaymentPreparation = Omit<AdditionalPaymentRequest, 'stripeCheckoutSessionId' | 'expiresAt'> & {
+  authorId: string
+  titleId: string
+  engagementId: string
+  sourceEvent: { kind: 'AUTHOR_PORTAL'; operationId: string }
 }
 
 export interface PublishingPaymentLedger {
@@ -300,6 +307,8 @@ export async function processConfirmedAgreementPayment(input: {
 }) {
   const duplicate = await input.ledger.findPaymentEvent(input.stripeEventId, input.stripePaymentId)
   if (duplicate) {
+    if (duplicate.agreementId !== input.agreementId || duplicate.stripePaymentId !== input.stripePaymentId ||
+        duplicate.grossAmountCents !== input.amountCents) return blocked('PAYMENT_REPLAY_BINDING_MISMATCH')
     const agreement = await input.ledger.getAgreement(input.agreementId)
     if (!agreement) return blocked('AGREEMENT_NOT_FOUND')
     const payoff = await stopScheduleAfterPayoff({ agreement, event: duplicate, payoff: input.payoff, telemetry: input.telemetry })

@@ -3,6 +3,7 @@ import { createHash } from 'node:crypto'
 import { calculateAgreementPaymentState } from './publishing-agreement-payment'
 import {
   createAdditionalPaymentCheckoutSession,
+  readAdditionalPaymentCheckoutSession,
   DataversePublishingPaymentLedger,
 } from './publishing-payment-adapters'
 import { productionAdditionalPaymentGateReadback } from './publishing-payment-runtime'
@@ -29,13 +30,11 @@ export async function resolveAdditionalPaymentEligibility(input: {
   if (!agreement.stripeCustomerId) return { eligible: false as const, reason: 'STRIPE_CUSTOMER_BINDING_INVALID' }
   const state = calculateAgreementPaymentState(agreement.snapshot)
   if (state.remainingBalanceCents <= 0) return { eligible: false as const, reason: 'BALANCE_NOT_OUTSTANDING' }
-  const obligation = (agreement.snapshot.scheduledObligations || []).find((item) => item.status !== 'SATISFIED' && item.status !== 'CANCELLED')
-  if (!obligation) return { eligible: false as const, reason: 'OBLIGATION_NOT_FOUND' }
   return {
     eligible: true as const,
     agreement,
     state,
-    obligationId: obligation.obligationId,
+    obligationId: null,
     engagementId: engagementId || agreement.snapshot.agreementId,
     maximumAmountCents: state.remainingBalanceCents,
   }
@@ -59,8 +58,41 @@ export async function startAdditionalPayment(input: {
   if (!/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/.test(operationId)) {
     return { eligible: true as const, started: false as const, reason: 'PAYMENT_OPERATION_ID_INVALID', maximumAmountCents: eligibility.maximumAmountCents }
   }
-  const requestId = hash('request', eligibility.agreement.snapshot.agreementId, eligibility.state.balanceVersion, String(input.amountCents), operationId)
+  const requestId = additionalPaymentRequestId(eligibility.agreement.snapshot.agreementId, operationId)
   const idempotencyKey = hash('checkout', requestId)
+  const ledger = new DataversePublishingPaymentLedger(getDataverseServerConfig()!)
+  const preparation = await ledger.reserveAdditionalPaymentPreparation({
+    requestId, idempotencyKey,
+    agreementId: eligibility.agreement.snapshot.agreementId,
+    authorId: eligibility.agreement.snapshot.authorId,
+    titleId: eligibility.agreement.snapshot.titleId,
+    engagementId: eligibility.engagementId,
+    sourceEvent: { kind: 'AUTHOR_PORTAL', operationId },
+    obligationId: null,
+    amountCents: input.amountCents,
+    balanceBeforeCents: eligibility.state.remainingBalanceCents,
+    balanceAfterCents: eligibility.state.remainingBalanceCents - input.amountCents,
+    balanceVersion: eligibility.state.balanceVersion,
+    createdAt: new Date().toISOString(),
+  })
+  if (preparation.agreementId !== eligibility.agreement.snapshot.agreementId || preparation.amountCents !== input.amountCents ||
+      preparation.idempotencyKey !== idempotencyKey || preparation.obligationId !== null ||
+      preparation.authorId !== eligibility.agreement.snapshot.authorId || preparation.titleId !== eligibility.agreement.snapshot.titleId ||
+      preparation.engagementId !== eligibility.engagementId || preparation.sourceEvent?.kind !== 'AUTHOR_PORTAL' ||
+      preparation.sourceEvent.operationId !== operationId) {
+    return { eligible: true as const, started: false as const, reason: 'PAYMENT_OPERATION_BINDING_MISMATCH' }
+  }
+  const existing = await ledger.findAdditionalPaymentRequest(requestId)
+  if (existing) {
+    if (existing.agreementId !== preparation.agreementId || existing.amountCents !== preparation.amountCents ||
+        existing.idempotencyKey !== preparation.idempotencyKey) throw new Error('PAYMENT_REQUEST_BINDING_MISMATCH')
+    const session = await readAdditionalPaymentCheckoutSession({ request: existing, customerId: eligibility.agreement.stripeCustomerId! })
+    return { eligible: true as const, started: true as const, idempotent: true as const,
+      amountCents: existing.amountCents, maximumAmountCents: eligibility.maximumAmountCents,
+      balanceVersion: existing.balanceVersion, requestId, qboSyncState: 'PENDING_RECONCILIATION' as const, ...session }
+  }
+  const denial = additionalPaymentPreparationDenial(preparation, eligibility.state.balanceVersion, Date.now())
+  if (denial) return { eligible: true as const, started: false as const, reason: denial }
   const session = await createAdditionalPaymentCheckoutSession({
     agreement: eligibility.agreement,
     amountCents: input.amountCents,
@@ -68,20 +100,12 @@ export async function startAdditionalPayment(input: {
     idempotencyKey,
     engagementId: eligibility.engagementId,
     obligationId: eligibility.obligationId,
-    balanceVersion: eligibility.state.balanceVersion,
+    balanceVersion: preparation.balanceVersion,
   })
-  await new DataversePublishingPaymentLedger(getDataverseServerConfig()!).recordAdditionalPaymentRequest({
-    requestId,
-    idempotencyKey,
-    agreementId: eligibility.agreement.snapshot.agreementId,
-    obligationId: eligibility.obligationId,
-    amountCents: input.amountCents,
-    balanceBeforeCents: eligibility.state.remainingBalanceCents,
-    balanceAfterCents: eligibility.state.remainingBalanceCents - input.amountCents,
-    balanceVersion: eligibility.state.balanceVersion,
+  await ledger.recordAdditionalPaymentRequest({
+    ...preparation,
     stripeCheckoutSessionId: session.sessionId,
     expiresAt: session.expiresAt,
-    createdAt: new Date().toISOString(),
   })
   return {
     eligible: true as const,
@@ -93,6 +117,18 @@ export async function startAdditionalPayment(input: {
     qboSyncState: 'PENDING_RECONCILIATION' as const,
     ...session,
   }
+}
+
+export function additionalPaymentRequestId(agreementId: string, operationId: string) {
+  return hash('request-v2', clean(agreementId), clean(operationId))
+}
+
+export function additionalPaymentPreparationDenial(preparation: { createdAt: string; balanceVersion: string }, balanceVersion: string, now: number) {
+  const age = now - Date.parse(preparation.createdAt)
+  // Stripe may prune idempotency keys after 24 hours; never recreate an ambiguous session beyond that window.
+  if (!Number.isFinite(age) || age < 0 || age >= 23 * 60 * 60 * 1000) return 'PAYMENT_PROVIDER_RECONCILIATION_REQUIRED'
+  if (preparation.balanceVersion !== balanceVersion) return 'STALE_AGREEMENT_BALANCE'
+  return null
 }
 
 function hash(...parts: string[]) {

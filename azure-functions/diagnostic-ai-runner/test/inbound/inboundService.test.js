@@ -320,7 +320,7 @@ test("payment link validation requires exact existing live invoice and reachable
       jm1pub_titles: { _jm1pub_contract_value: "contract-1" },
       jm1pub_contracts: { _new_author_value: authorId, jm1pub_providerstatus: "ADOBE_SIGNED_COMPLETED", _jm1pub_opportunity_value: engagementId },
       jmpv2_agreementrecords: { jmpv2_agreementrecordid: engagementId, jmpv2_authoridentity: authorId,
-        jmpv2_agreementkey: engagementId, jmpv2_paymentledgerstatus: "ACTIVE", jmpv2_stripecustomerid: "cus-1" }
+        jmpv2_titleid: titleId, jmpv2_agreementkey: engagementId, jmpv2_paymentledgerstatus: "ACTIVE", jmpv2_stripecustomerid: "cus-1" }
     })[set],
     list: async () => [{ jmpv2_installmentsequence: 2, jmpv2_amountcents: 25988,
       jmpv2_obligationstatus: "SCHEDULED", jmpv2_stripeinvoiceid: "in-1" }]
@@ -335,4 +335,33 @@ test("payment link validation requires exact existing live invoice and reachable
   deps.retrieveStripeInvoice = async () => ({ status: "READ", invoice: { id: "in-1", customer: "cus-other", status: "open",
     livemode: true, currency: "usd", amount_remaining: 25988, hosted_invoice_url: "https://invoice.stripe.com/i/test" } });
   assert.equal((await validatePaymentLink(client, { titleId, authorId }, deps)).reason, "INVOICE_PARITY_FAILED");
+});
+
+test("existing payment access requires the exact ledger title before reading Stripe", async () => {
+  const ledger = { jmpv2_agreementrecordid: engagementId, jmpv2_authoridentity: authorId,
+    jmpv2_titleid: titleId, jmpv2_agreementkey: engagementId,
+    jmpv2_paymentledgerstatus: "ACTIVE", jmpv2_stripecustomerid: "cus-1" };
+  const obligations = [
+    { jmpv2_installmentsequence: 2, jmpv2_amountcents: 25988, jmpv2_obligationstatus: "SCHEDULED", jmpv2_stripeinvoiceid: "in-paid-2" },
+    { jmpv2_installmentsequence: 3, jmpv2_amountcents: 25988, jmpv2_obligationstatus: "SCHEDULED",
+      jmpv2_duedate: "2099-10-27T12:18:59Z", jmpv2_stripeinvoiceid: null }
+  ];
+  const client = {
+    first: async (set) => ({
+      jm1pub_titles: { _jm1pub_contract_value: "contract-1" },
+      jm1pub_contracts: { _new_author_value: authorId, jm1pub_providerstatus: "ADOBE_SIGNED_COMPLETED", _jm1pub_opportunity_value: engagementId },
+      jmpv2_agreementrecords: ledger
+    })[set],
+    list: async () => obligations
+  };
+  const reads = [];
+  const deps = {
+    retrieveStripeInvoice: async (id) => {
+      reads.push(id);
+      return { status: "READ", invoice: { id, customer: "cus-1", status: "open", livemode: true,
+        currency: "usd", amount_remaining: 25988, hosted_invoice_url: "https://invoice.stripe.com/i/test" } };
+    }, checkHostedInvoiceUrl: async () => ({ status: "ACCESSIBLE" }) };
+  ledger.jmpv2_titleid = "another-title";
+  assert.equal((await validatePaymentLink(client, { titleId, authorId }, deps)).reason, "PAYMENT_LEDGER_AUTHORITY_UNPROVEN");
+  assert.deepEqual(reads, []);
 });

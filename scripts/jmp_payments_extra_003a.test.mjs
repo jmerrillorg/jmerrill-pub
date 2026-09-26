@@ -14,12 +14,16 @@ test('additional payment capability has a separate fail-closed production gate',
   assert.doesNotMatch(runtime.match(/productionAdditionalPaymentGateReadback[\s\S]*?\n}/)?.[0] || '', /QBO|RECURRING/)
 })
 
-test('checkout carries deterministic author, title, engagement, obligation, request, and idempotency metadata', () => {
+test('additional checkout carries agreement-balance correlation, not a future scheduled obligation', () => {
   for (const key of [
-    'jm1_author_id', 'jm1_title_id', 'jm1_engagement_id', 'jm1_obligation_id',
+    'jm1_author_id', 'jm1_title_id', 'jm1_engagement_id', 'jm1_agreement_id',
     'jm1_payment_type', 'jm1_request_id', 'jm1_idempotency_key', 'jm1_balance_version',
   ]) assert.match(adapter, new RegExp(key))
   assert.match(adapter, /ADDITIONAL_PAYMENT/)
+  const metadata = adapter.match(/function paymentMetadataForCheckout[\s\S]*?\n}/)?.[0] || ''
+  assert.doesNotMatch(metadata, /jm1_scheduled_obligation_id|jm1_obligation_id/)
+  const eligibility = service.match(/export async function resolveAdditionalPaymentEligibility[\s\S]*?\n}/)?.[0] || ''
+  assert.doesNotMatch(eligibility, /scheduledObligations|obligation\.obligationId/)
 })
 
 test('server resolves author authority and caps checkout at current balance', () => {
