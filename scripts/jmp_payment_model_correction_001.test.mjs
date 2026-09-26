@@ -5,6 +5,8 @@ import createJiti from 'jiti'
 const jiti = createJiti(import.meta.url)
 const { calculateAgreementPaymentState, allocateIncomingPayment } = jiti('../lib/server/stripe/publishing-agreement-payment.ts')
 const { processConfirmedAgreementPayment } = jiti('../lib/server/stripe/publishing-payment-runtime.ts')
+const { additionalPaymentRequestId, additionalPaymentPreparationDenial } = jiti('../lib/server/stripe/publishing-additional-payment.ts')
+const { validateAgreementPaymentBinding } = jiti('../lib/server/stripe/publishing-payment-event.ts')
 
 function snapshot() {
   return {
@@ -25,6 +27,24 @@ function additional(source, amountCents, number = 1, status = 'SUCCEEDED') {
     allocations: [{ kind: 'ADDITIONAL_PAYMENT', amountCents }],
   }] }
 }
+
+test('ratified second settlement is additional against the same balance without consuming October', () => {
+  const source = snapshot()
+  source.payments = source.payments.slice(0, 1)
+  const october = structuredClone(source.scheduledObligations[0])
+  const allocation = allocateIncomingPayment({ snapshot: source, amountCents: 25988,
+    intent: 'ADDITIONAL_PAYMENT', asOf: '2026-09-24T12:13:26Z' })
+  assert.equal(allocation.scheduledAllocationCents, 0)
+  assert.equal(allocation.additionalAllocationCents, 25988)
+  const settled = additional(source, 25988)
+  const state = calculateAgreementPaymentState(settled)
+  assert.equal(settled.payments[0].paymentType, 'SCHEDULED_INSTALLMENT')
+  assert.equal(settled.payments[1].paymentType, 'ADDITIONAL_PAYMENT')
+  assert.equal(state.remainingBalanceCents, 155923)
+  assert.equal(settled.payments.reduce((total, payment) => total + payment.amountCents, 0), 51976)
+  assert.equal(state.nextScheduledDueDate, october.dueDate)
+  assert.deepEqual(settled.scheduledObligations[0], october)
+})
 
 test('additional September payment reduces one contractual balance and tail, not October cadence', () => {
   const source = snapshot()
@@ -93,4 +113,36 @@ test('settlement replay cannot borrow a payment from another agreement or change
     assert.equal(result.reason, 'PAYMENT_REPLAY_BINDING_MISMATCH')
   }
   assert.equal(reads, 0)
+})
+
+test('additional request identity survives balance changes and is scoped to agreement and operation', () => {
+  const operationId = '814f7278-01df-433c-804f-d8649c4c3137'
+  const original = additionalPaymentRequestId('agreement-1', operationId)
+  assert.equal(additionalPaymentRequestId('AGREEMENT-1', operationId.toUpperCase()), original)
+  assert.notEqual(additionalPaymentRequestId('agreement-2', operationId), original)
+  assert.notEqual(additionalPaymentRequestId('agreement-1', 'another-operation'), original)
+})
+
+test('ambiguous provider outcome cannot create another session after idempotency expiry or balance change', () => {
+  const preparation = { createdAt: '2026-09-26T12:00:00Z', balanceVersion: 'version-1' }
+  const created = Date.parse(preparation.createdAt)
+  assert.equal(additionalPaymentPreparationDenial(preparation, 'version-1', created + 60000), null)
+  assert.equal(additionalPaymentPreparationDenial(preparation, 'version-2', created + 60000), 'STALE_AGREEMENT_BALANCE')
+  assert.equal(additionalPaymentPreparationDenial(preparation, 'version-1', created + 23 * 3600000), 'PAYMENT_PROVIDER_RECONCILIATION_REQUIRED')
+  assert.equal(additionalPaymentPreparationDenial({ ...preparation, createdAt: 'invalid' }, 'version-1', created), 'PAYMENT_PROVIDER_RECONCILIATION_REQUIRED')
+  assert.equal(additionalPaymentPreparationDenial(preparation, 'version-1', created - 1), 'PAYMENT_PROVIDER_RECONCILIATION_REQUIRED')
+})
+
+test('settlement requires exact author, title, agreement, customer and schedule identity', () => {
+  const agreement = { snapshot: snapshot(), stripeCustomerId: 'cus_1' }
+  const payment = { agreementId: 'agreement-1', authorId: 'author-1', titleId: 'title-1',
+    paymentScheduleId: 'schedule-1', customerId: 'cus_1', paymentType: 'ADDITIONAL_PAYMENT' }
+  assert.equal(validateAgreementPaymentBinding(payment, agreement).ok, true)
+  for (const field of ['agreementId', 'authorId', 'titleId', 'paymentScheduleId', 'customerId']) {
+    assert.equal(validateAgreementPaymentBinding({ ...payment, [field]: 'wrong' }, agreement).ok, false)
+    assert.equal(validateAgreementPaymentBinding({ ...payment, [field]: null }, agreement).ok, false)
+  }
+  assert.equal(validateAgreementPaymentBinding(payment, null).reason, 'AGREEMENT_NOT_FOUND')
+  assert.equal(validateAgreementPaymentBinding({ ...payment, scheduledObligationId: 'october' }, agreement).reason,
+    'ADDITIONAL_PAYMENT_SCHEDULE_BINDING_PROHIBITED')
 })

@@ -67,6 +67,13 @@ export type AdditionalPaymentRequest = {
   createdAt: string
 }
 
+export type AdditionalPaymentPreparation = Omit<AdditionalPaymentRequest, 'stripeCheckoutSessionId' | 'expiresAt'> & {
+  authorId: string
+  titleId: string
+  engagementId: string
+  sourceEvent: { kind: 'AUTHOR_PORTAL'; operationId: string }
+}
+
 export interface PublishingPaymentLedger {
   getAgreement(agreementId: string): Promise<AgreementLedgerRecord | null>
   listDueAgreements(asOf: string): Promise<AgreementLedgerRecord[]>

@@ -109,7 +109,10 @@ test('already-paid state is not rewritten on semantic replay', () => {
 })
 
 test('customer, title, author, and amount are not accepted as identity authorities', () => {
-  assert.doesNotMatch(consumerSource, /payment\.customerId,[\s\S]*const fragments/)
+  const lookup = consumerSource.slice(consumerSource.indexOf('async function findOpportunityForPayment('),
+    consumerSource.indexOf('async function persistPaymentBindings('))
+  assert.match(lookup, /const fragments/)
+  assert.doesNotMatch(lookup, /payment\.customerId|payment\.amountCents|authorName\(|titleName\(/)
   assert.doesNotMatch(consumerSource, /authorName.*findOpportunityForPayment/)
   assert.doesNotMatch(consumerSource, /titleName.*findOpportunityForPayment/)
   assert.match(consumerSource, /PAYMENT_AMOUNT_DOES_NOT_MATCH_SELECTED_INSTALLMENT/)

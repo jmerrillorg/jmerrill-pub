@@ -18,6 +18,7 @@ import {
   productionAdditionalPaymentGateReadback,
   productionPaymentGateReadback,
   type AdditionalPaymentRequest,
+  type AdditionalPaymentPreparation,
   type AgreementLedgerRecord,
   type CollectionAttempt,
   type PaymentEventRecord,
@@ -164,6 +165,44 @@ export class DataversePublishingPaymentLedger implements PublishingPaymentLedger
     })
   }
 
+  async findAdditionalPaymentPreparation(requestId: string): Promise<AdditionalPaymentPreparation | null> {
+    const row = await dataverseFirst(this.config, EVENTS, {
+      $select: 'jmpv2_allocationsjson',
+      $filter: `jmpv2_eventkind eq 'ADDITIONAL_PAYMENT_PREPARATION' and jmpv2_paymentevidencekey eq '${odata(requestId)}'`,
+    })
+    return row ? json(row.jmpv2_allocationsjson, null) : null
+  }
+
+  async reserveAdditionalPaymentPreparation(preparation: AdditionalPaymentPreparation) {
+    try {
+      await this.createEvidence({
+        jmpv2_paymentevidencekey: preparation.requestId,
+        jmpv2_agreementkey: preparation.agreementId,
+        jmpv2_eventkind: 'ADDITIONAL_PAYMENT_PREPARATION',
+        jmpv2_paymenttype: 'ADDITIONAL_PAYMENT',
+        jmpv2_grossamountcents: preparation.amountCents,
+        jmpv2_eventstatus: 'PREPARED',
+        jmpv2_allocationsjson: JSON.stringify(preparation),
+        jmpv2_idempotencykey: `${preparation.requestId}:prepare`,
+        jmpv2_occurredat: preparation.createdAt,
+      })
+    } catch (error) {
+      // A competing request may have won the unique-key reservation.
+      if (!await this.findAdditionalPaymentPreparation(preparation.requestId)) throw error
+    }
+    const reserved = await this.findAdditionalPaymentPreparation(preparation.requestId)
+    if (!reserved) throw new Error('ADDITIONAL_PAYMENT_PREPARATION_READBACK_MISSING')
+    return reserved
+  }
+
+  async findAdditionalPaymentRequest(requestId: string): Promise<AdditionalPaymentRequest | null> {
+    const row = await dataverseFirst(this.config, EVENTS, {
+      $select: 'jmpv2_allocationsjson',
+      $filter: `jmpv2_eventkind eq 'ADDITIONAL_PAYMENT_REQUEST' and jmpv2_paymentevidencekey eq '${odata(requestId)}'`,
+    })
+    return row ? json(row.jmpv2_allocationsjson, null) : null
+  }
+
   async recordAdditionalPaymentRequest(request: AdditionalPaymentRequest) {
     const existing = await dataverseFirst(this.config, EVENTS, {
       $select: 'jmpv2_paymentevidenceid',
@@ -183,6 +222,7 @@ export class DataversePublishingPaymentLedger implements PublishingPaymentLedger
       jmpv2_qboreconciliationstatus: 'PENDING',
       jmpv2_settlementreference: request.stripeCheckoutSessionId,
       jmpv2_allocationsjson: JSON.stringify({
+        ...request,
         requestId: request.requestId,
         idempotencyKey: request.idempotencyKey,
         balanceVersion: request.balanceVersion,
@@ -328,6 +368,26 @@ export class DataversePublishingPaymentLedger implements PublishingPaymentLedger
     if (response.status === 412 || /HTTP\/1\.1 412/.test(body)) throw new Error('CONCURRENT_BALANCE_WRITE_REJECTED')
     if (!response.ok || /HTTP\/1\.1 [45]\d\d/.test(body)) throw new Error('DATAVERSE_PAYMENT_BATCH_FAILED')
   }
+}
+
+export async function readAdditionalPaymentCheckoutSession(input: {
+  request: AdditionalPaymentRequest
+  customerId: string
+}) {
+  const secret = clean(process.env.STRIPE_CHECKOUT_SECRET_KEY || process.env.STRIPE_SECRET_KEY)
+  if (!/^(sk|rk)_live_/.test(secret)) throw new Error('STRIPE_LIVE_PAYMENT_CREDENTIAL_REQUIRED')
+  const session = await stripeGet(`/v1/checkout/sessions/${encodeURIComponent(input.request.stripeCheckoutSessionId)}`, secret)
+  if (session.customer !== input.customerId || session.client_reference_id !== input.request.requestId ||
+      session.metadata?.jm1_agreement_id !== input.request.agreementId ||
+      session.amount_total !== input.request.amountCents || session.currency !== 'usd' || session.livemode !== true) {
+    throw new Error('ADDITIONAL_PAYMENT_SESSION_BINDING_MISMATCH')
+  }
+  if (session.status !== 'open' || session.payment_status !== 'unpaid') {
+    throw new Error('ADDITIONAL_PAYMENT_SESSION_NOT_PAYABLE')
+  }
+  const url = new URL(requiredText(session.url, 'STRIPE_CHECKOUT_SESSION_URL_MISSING'))
+  if (url.protocol !== 'https:' || url.hostname !== 'checkout.stripe.com') throw new Error('ADDITIONAL_PAYMENT_URL_INVALID')
+  return { sessionId: session.id as string, checkoutUrl: url.toString(), expiresAt: Number(session.expires_at) || null }
 }
 
 export function createStripeAgreementCollections(): StripeAgreementCollections {
