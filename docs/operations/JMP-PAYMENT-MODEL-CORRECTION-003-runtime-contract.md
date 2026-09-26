@@ -53,3 +53,20 @@ roll back a settled financial fact.
 
 Deployment, live parity, actual author delivery, and second-cycle idempotency must
 be evidenced separately. Source tests alone do not commission this runtime.
+# Relay Contract and Rejected-Response Recovery
+
+Observed payment service uses the exact engagement GUID as its private relay
+reference. Only the four certified payment-service templates accept this
+reference form; legacy intake-template validation is unchanged.
+
+A rejected observed-request delivery may replay only through the existing
+ACS relay with durable semantic idempotency, under the business-route lease.
+It must reuse the original canonical outbox reservation ID. Unknown ambiguity,
+a different reservation, an accepted provider ID, or an injected/non-durable
+sender does not qualify. The relay returns an accepted receipt on replay or
+holds its ambiguous reservation; it does not blindly send twice.
+
+Legacy rejected records retain the original relay identity during recovery.
+New observed requests carry the author ID, request ID/workstream, and exact
+communication type into relay identity. Distinct requests therefore do not
+collide, while an identical replay retains its original semantic key.

@@ -536,7 +536,7 @@ function buildAcknowledgmentEmail(payload) {
   return email;
 }
 
-function validateCommonMilestoneFields(payload) {
+function validateCommonMilestoneFields(payload, { allowEngagementReference = false } = {}) {
   if (hasUnsafeField(payload)) {
     return { ok: false, reason: "UNSAFE_FIELD_PRESENT" };
   }
@@ -544,7 +544,8 @@ function validateCommonMilestoneFields(payload) {
   const intakeReferenceCode = normalizeText(payload.intakeReferenceCode);
   const diagnosticId = normalizeText(payload.diagnosticId);
 
-  if (!intakeReferenceCode || !REFERENCE_PATTERN.test(intakeReferenceCode)) {
+  if (!intakeReferenceCode || (!REFERENCE_PATTERN.test(intakeReferenceCode) &&
+      !(allowEngagementReference && DIAGNOSTIC_ID_PATTERN.test(intakeReferenceCode)))) {
     return { ok: false, reason: "INTAKE_REFERENCE_CODE_INVALID" };
   }
 
@@ -818,7 +819,14 @@ function validateJoinedFamilyInternalNotificationPayload(payload = {}) {
 }
 
 function validateApprovedAuthorResponsePayload(payload = {}) {
-  const common = validateCommonMilestoneFields(payload);
+  const paymentServiceTemplate = /^INBOUND_SERVICE_(ADDITIONAL_PAYMENT_REQUEST|PAYMENT_ACCESS_REQUEST|INSTALLMENT_INFORMATION_REQUEST|PAYMENT_LINK_ACCESS_PROBLEM)_V1$/.test(normalizeText(payload.templateName));
+  const common = validateCommonMilestoneFields(payload, { allowEngagementReference: paymentServiceTemplate });
+  if (paymentServiceTemplate && payload.workstream &&
+      (!/^observed_payment_[a-f0-9]{40}$/.test(normalizeText(payload.workstream)) ||
+       !DIAGNOSTIC_ID_PATTERN.test(normalizeText(payload.authorId)) ||
+       normalizeText(payload.communicationType) !== normalizeText(payload.templateName).replace(/_V1$/, ""))) {
+    return { ok: false, reason: "PAYMENT_SERVICE_SEMANTIC_IDENTITY_INVALID" };
+  }
   if (!common.ok) return common;
 
   const authorEmail = normalizeText(payload.authorEmail).toLowerCase();
@@ -933,6 +941,8 @@ function validateApprovedAuthorResponsePayload(payload = {}) {
       messageType: APPROVED_AUTHOR_RESPONSE_TYPE,
       diagnosticId: common.diagnosticId,
       intakeReferenceCode: common.intakeReferenceCode,
+      ...(paymentServiceTemplate && payload.workstream ? { workstream: normalizeText(payload.workstream),
+        authorId: normalizeText(payload.authorId), communicationType: normalizeText(payload.communicationType) } : {}),
       authorEmail,
       authorName: normalizeText(payload.authorName),
       projectTitle: normalizeText(payload.projectTitle),

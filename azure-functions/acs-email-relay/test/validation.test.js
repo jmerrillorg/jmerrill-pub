@@ -262,6 +262,38 @@ function communicationObservability(attachments) {
   };
 }
 
+test("observed payment service accepts an exact engagement GUID without widening legacy intake contracts", () => {
+  const { validateApprovedAuthorResponsePayload } = loadRelayModule();
+  const engagementId = "131da28b-919c-f111-b8dc-6045bdd69435";
+  for (const type of ["ADDITIONAL_PAYMENT_REQUEST", "PAYMENT_ACCESS_REQUEST", "INSTALLMENT_INFORMATION_REQUEST", "PAYMENT_LINK_ACCESS_PROBLEM"]) {
+    assert.equal(validateApprovedAuthorResponsePayload(validAuthorResponsePayload({
+      intakeReferenceCode: engagementId, templateName: `INBOUND_SERVICE_${type}_V1`,
+    })).ok, true);
+  }
+  assert.equal(validateApprovedAuthorResponsePayload(validAuthorResponsePayload({ intakeReferenceCode: engagementId })).ok, false);
+  assert.equal(validateApprovedAuthorResponsePayload(validAuthorResponsePayload({
+    intakeReferenceCode: "unbound-author-name", templateName: "INBOUND_SERVICE_ADDITIONAL_PAYMENT_REQUEST_V1",
+  })).ok, false);
+});
+
+test("distinct observed requests retain distinct relay semantic keys and exact replay identity", () => {
+  const { validateApprovedAuthorResponsePayload } = loadRelayModule();
+  const { buildCommunicationIdentity } = require("../src/state/communicationIdentity");
+  const make = digit => validateApprovedAuthorResponsePayload(validAuthorResponsePayload({
+    intakeReferenceCode: "131da28b-919c-f111-b8dc-6045bdd69435",
+    authorId: "60937251-d589-f111-ab10-6045bdd69678",
+    templateName: "INBOUND_SERVICE_ADDITIONAL_PAYMENT_REQUEST_V1",
+    communicationType: "INBOUND_SERVICE_ADDITIONAL_PAYMENT_REQUEST",
+    workstream: `observed_payment_${digit.repeat(40)}`,
+  }));
+  const first = make("a");
+  const second = make("b");
+  assert.equal(first.ok, true);
+  assert.equal(second.ok, true);
+  assert.notEqual(buildCommunicationIdentity(first.value).key, buildCommunicationIdentity(second.value).key);
+  assert.equal(buildCommunicationIdentity(first.value).key, buildCommunicationIdentity(make("a").value).key);
+});
+
 function validEditorialRecommendationPayload(overrides = {}) {
   return validAuthorResponsePayload({
     subject: "Your Editorial Review & Publishing Recommendation | J Merrill Publishing",

@@ -199,6 +199,8 @@ function buildAuthorResponseRelayPayload(email) {
     messageType: "APPROVED_AUTHOR_RESPONSE",
     diagnosticId: approval.diagnosticId,
     intakeReferenceCode: approval.intakeReferenceCode,
+    ...(approval.workstream ? { workstream: approval.workstream, authorId: approval.authorId,
+      communicationType: approval.communicationType } : {}),
     authorEmail: approval.authorEmail,
     authorName: approval.authorName,
     projectTitle: approval.projectTitle,
