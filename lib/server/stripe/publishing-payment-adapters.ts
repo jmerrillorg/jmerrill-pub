@@ -735,13 +735,16 @@ async function getDataverseActionToken(config: DataverseServerConfig) {
   return getDataverseRuntimeAccessToken(config.resourceUrl)
 }
 
-function guid(value: string) {
+export function paymentLedgerGuid(value: string) {
   const normalized = value.trim().replace(/[{}]/g, '').toLowerCase()
-  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/.test(normalized)) {
+  // Dataverse identifiers are GUIDs; sequential IDs need not encode RFC UUID version/variant bits.
+  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/.test(normalized)) {
     throw new Error('AGREEMENT_ID_INVALID')
   }
   return normalized
 }
+
+const guid = paymentLedgerGuid
 
 function odata(value: string) { return value.replace(/'/g, "''") }
 function text(value: unknown) { return typeof value === 'string' ? value.trim() : '' }
