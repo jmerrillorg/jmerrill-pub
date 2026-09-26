@@ -7,6 +7,7 @@ import {
   DataversePublishingPaymentLedger,
 } from './publishing-payment-adapters'
 import { productionAdditionalPaymentGateReadback } from './publishing-payment-runtime'
+import type { AdditionalPaymentPreparation } from './publishing-payment-runtime'
 import { getDataverseServerConfig } from '../dataverse-server'
 
 export async function resolveAdditionalPaymentEligibility(input: {
@@ -45,6 +46,7 @@ export async function startAdditionalPayment(input: {
   engagementId?: string | null
   amountCents: number
   operationId: string
+  sourceEvent?: AdditionalPaymentPreparation['sourceEvent']
 }) {
   const eligibility = await resolveAdditionalPaymentEligibility(input)
   if (!eligibility.eligible) return eligibility
@@ -67,7 +69,7 @@ export async function startAdditionalPayment(input: {
     authorId: eligibility.agreement.snapshot.authorId,
     titleId: eligibility.agreement.snapshot.titleId,
     engagementId: eligibility.engagementId,
-    sourceEvent: { kind: 'AUTHOR_PORTAL', operationId },
+    sourceEvent: input.sourceEvent || { kind: 'AUTHOR_PORTAL', operationId },
     obligationId: null,
     amountCents: input.amountCents,
     balanceBeforeCents: eligibility.state.remainingBalanceCents,
@@ -78,8 +80,8 @@ export async function startAdditionalPayment(input: {
   if (preparation.agreementId !== eligibility.agreement.snapshot.agreementId || preparation.amountCents !== input.amountCents ||
       preparation.idempotencyKey !== idempotencyKey || preparation.obligationId !== null ||
       preparation.authorId !== eligibility.agreement.snapshot.authorId || preparation.titleId !== eligibility.agreement.snapshot.titleId ||
-      preparation.engagementId !== eligibility.engagementId || preparation.sourceEvent?.kind !== 'AUTHOR_PORTAL' ||
-      preparation.sourceEvent.operationId !== operationId) {
+      preparation.engagementId !== eligibility.engagementId ||
+      JSON.stringify(preparation.sourceEvent) !== JSON.stringify(input.sourceEvent || { kind: 'AUTHOR_PORTAL', operationId })) {
     return { eligible: true as const, started: false as const, reason: 'PAYMENT_OPERATION_BINDING_MISMATCH' }
   }
   const existing = await ledger.findAdditionalPaymentRequest(requestId)

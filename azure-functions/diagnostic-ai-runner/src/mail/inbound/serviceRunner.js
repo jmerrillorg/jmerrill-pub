@@ -3,7 +3,7 @@
 const { createHash } = require("node:crypto");
 const { createDataverseClient } = require("../../orchestration/authorReviewResponseConsumer");
 const { sendConfiguredAuthorResponse } = require("../../author/authorResponseSendProviderConfig");
-const { markCommunicationSent, reserveCommunicationIntent } = require("../../editorial/communicationIntentStore");
+const { markCommunicationSent, reserveCommunicationIntent, findIntentState, buildCommunicationIdentity } = require("../../editorial/communicationIntentStore");
 const { writeLog } = require("../../editorial/editorialExecutionRuntime");
 const { authorReplyText, exactCurrentMovement } = require("./businessRouter");
 const { BlobInboundEvidenceStore } = require("./blobEvidenceStore");
@@ -13,6 +13,8 @@ const { serviceCopy, serviceIntent } = require("./serviceIntent");
 const { validatePaymentLink } = require("./paymentLinkAuthority");
 const { normalizeString, redactBodyForEvidence, sha256Hex } = require("./util");
 const { verifiedServiceDelivery } = require("./deliveryLedger");
+const { prepareObservedService } = require("../../payment/observedPaymentServiceConsumer");
+const { htmlProjectionHashes, textProjectionHash } = require("./mailboxBodyProjection");
 
 const INTERNAL_MAILBOX = "publishing@jmerrill.one";
 const SYSTEM_SENDER = "publishing@email.jmerrill.one";
@@ -28,6 +30,7 @@ function safeError(code) {
 }
 
 function serviceWaitOwner(intent) {
+  if (["ADDITIONAL_PAYMENT_REQUEST", "PAYMENT_ACCESS_REQUEST", "INSTALLMENT_INFORMATION_REQUEST", "PAYMENT_LINK_ACCESS_PROBLEM"].includes(intent)) return "AUTHOR";
   if (intent === "AUTHOR_ONBOARDING_ACCESS") return "AUTHOR";
   if (intent === "AUTHOR_ONBOARDING_CONTACT_CHANGE") return "JMP_IDENTITY_VERIFICATION";
   if (intent === "AUTHOR_QUESTIONS_MISSING") return "AUTHOR_QUESTIONS";
@@ -61,7 +64,8 @@ function matchesMailboxCopy(row, service) {
     (row.toRecipients || []).some((item) => emailAddress(item) === service.recipient) &&
     (row.ccRecipients || []).some((item) => emailAddress(item) === INTERNAL_MAILBOX) &&
     normalizedMailText(row.subject) === service.subject &&
-    createHash("sha256").update(normalizedMailText(row.body?.content)).digest("hex") === service.bodyHash;
+    (createHash("sha256").update(normalizedMailText(row.body?.content)).digest("hex") === service.bodyHash ||
+      (service.htmlBodyProjectionHashes || []).includes(textProjectionHash(row.body?.content)));
 }
 
 async function completeMailboxReadback(queueItem, deps) {
@@ -134,6 +138,10 @@ async function completeMailboxReadback(queueItem, deps) {
 }
 
 async function prepareService(queueItem, deps) {
+  if (queueItem?.sourceKind === "OBSERVED_PAYMENT_REQUEST") {
+    if (deps.preview) return { outcome: "PREVIEW_OBSERVED_REQUEST", eventId: queueItem.evidenceLink, transitionHeld: true };
+    return prepareObservedService(queueItem, deps);
+  }
   const { store, graphClient, contextProvider, client } = deps;
   if (!queueItem?.evidenceLink || !queueItem.authorId || !queueItem.titleId || !queueItem.engagementId || !queueItem.stageId) {
     return safeError("INBOUND_IDENTITY_INCOMPLETE");
@@ -314,6 +322,25 @@ async function reconcileEditorialAuthorityHold(queueItem, prepared, deps) {
 
 async function executeService(queueItem, deps) {
   const priorRoute = await deps.store.getBusinessRoute(queueItem.evidenceLink);
+  if (priorRoute?.service?.status === "SEND_ACCEPTED_AUDIT_PENDING" && priorRoute.service.outboxIntent) {
+    return deps.store.withBusinessRouteLease(queueItem.evidenceLink, async () => {
+      const route = await deps.store.getBusinessRoute(queueItem.evidenceLink);
+      if (route.service.status !== "SEND_ACCEPTED_AUDIT_PENDING") return completeMailboxReadback(queueItem, deps);
+      const service = route.service;
+      const existing = await (deps.findIntentState || findIntentState)(deps.client, buildCommunicationIdentity(service.outboxIntent));
+      const sent = existing.status === "ALREADY_DELIVERED" ? { sentRecordId: existing.record.jm1_executionlogid } :
+        await (deps.markCommunicationSent || markCommunicationSent)(deps.client, {
+          ...service.outboxIntent, semanticIdempotencyKey: service.semanticIdempotencyKey,
+          communicationRecordId: service.communicationRecordId, providerMessageId: service.providerMessageId,
+          sentAt: service.sentAt, artifactChecksums: [], artifactManifest: [],
+          observability: { acsDelivery: "PASS", publishingMailboxCopy: "UNPROVEN", semanticAttachmentParity: "PASS" }
+        });
+      await deps.store.updateBusinessRoute({ ...route, service: { ...service, ...sent, status: "SENT_READBACK_PENDING" } });
+      const queue = await deps.store.getQueueItem(queueItem.queueItemId);
+      await deps.store.updateQueueItem({ ...queue, serviceStatus: "SENT_READBACK_PENDING" });
+      return completeMailboxReadback(queueItem, deps);
+    });
+  }
   if (["SENT_READBACK_PENDING", "SENT"].includes(priorRoute?.service?.status)) {
     return deps.store.withBusinessRouteLease(queueItem.evidenceLink, () => completeMailboxReadback(queueItem, deps));
   }
@@ -341,13 +368,14 @@ async function executeService(queueItem, deps) {
     if (reserve.status !== "RESERVED") return { ...publicServiceResult(prepared), outcome: "HELD_AMBIGUOUS_SEND_STATE" };
     await store.updateBusinessRoute({ ...route, service: { intent: prepared.intent, status: "RESERVED", communicationRecordId: reserve.communicationRecordId } });
     const approval = {
-      diagnosticId: queueItem.stageId,
+      diagnosticId: queueItem.sourceKind === "OBSERVED_PAYMENT_REQUEST" ? queueItem.titleId : queueItem.stageId,
       intakeReferenceCode: queueItem.engagementId,
       authorEmail: prepared.recipient,
       authorName: prepared.authorName,
       projectTitle: prepared.movement.title,
       draftSubject: prepared.copy.subject,
       draftBody: prepared.copy.body,
+      draftHtmlBody: prepared.copy.html || null,
       templateName: `INBOUND_SERVICE_${prepared.intent}_V1`,
       templateVersion: "1.0",
       approvedBy: `publishing-service-rule:${prepared.intent}:v1`,
@@ -370,7 +398,10 @@ async function executeService(queueItem, deps) {
     const sentAt = new Date().toISOString();
     const copyHash = createHash("sha256").update(`${prepared.copy.subject}\n${prepared.copy.body}`).digest("hex");
     const bodyHash = createHash("sha256").update(normalizedMailText(prepared.copy.body)).digest("hex");
+    const htmlBodyProjectionHashes = htmlProjectionHashes(prepared.copy.html);
     await store.updateBusinessRoute({ ...route, service: { intent: prepared.intent, status: "SEND_ACCEPTED_AUDIT_PENDING",
+      outboxIntent: intent, semanticIdempotencyKey: reserve.semanticIdempotencyKey,
+      htmlBodyProjectionHashes,
       communicationRecordId: reserve.communicationRecordId, providerMessageId: result.providerMessageId, sentAt, copyHash,
       subject: prepared.copy.subject, bodyHash, recipient: prepared.recipient,
       sourceConversationId: prepared.message.conversationId || null } });
@@ -383,6 +414,7 @@ async function executeService(queueItem, deps) {
     await store.updateBusinessRoute({ ...route, service: { intent: prepared.intent, status: "SENT_READBACK_PENDING",
       communicationRecordId: reserve.communicationRecordId, sentRecordId: sent.sentRecordId,
       providerMessageId: result.providerMessageId, sentAt, copyHash, bodyHash,
+      htmlBodyProjectionHashes,
       subject: prepared.copy.subject, recipient: prepared.recipient,
       sourceConversationId: prepared.message.conversationId || null,
       linkStatus: prepared.linkStatus, linkReason: prepared.linkReason,
@@ -415,7 +447,7 @@ async function runInboundService(input = {}, deps = {}) {
   for (const row of rows.slice(0, Math.min(Math.max(Number(input.limit || 20), 1), 100))) {
     try {
       const prepared = preview
-        ? await prepareService(row, { store, graphClient, contextProvider, client, validatePaymentLink: deps.validatePaymentLink })
+        ? await prepareService(row, { store, graphClient, contextProvider, client, preview: true, validatePaymentLink: deps.validatePaymentLink })
         : await executeService(row, { store, graphClient, contextProvider, client, ...deps });
       if (!preview && !["SENT", "IDEMPOTENT", "HUMAN_REVIEW_REQUIRED", "SENT_READBACK_PENDING"].includes(prepared.outcome)) {
         await persistServiceException(row, prepared.outcome, { store, client, ...deps });
