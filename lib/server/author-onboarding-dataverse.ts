@@ -53,6 +53,7 @@ const WORKFLOW_STAGE_AUTHOR_ONBOARDING = 196650008
 export async function writeAuthorOnboardingDataverseFallback(
   payload: Record<string, any>,
   failureDetail: string,
+  receiptOnly = false,
 ): Promise<AuthorOnboardingDataverseResult> {
   const config = getDataverseConfig()
   if (!config) {
@@ -67,15 +68,18 @@ export async function writeAuthorOnboardingDataverseFallback(
   try {
     const token = await getDataverseToken(config)
     const submittedAt = new Date().toISOString()
-    const submissionId = deterministicGuid(buildSubmissionIdentity(payload))
+    const submissionId = receiptOnly
+      ? deterministicGuid(`attempt:${buildSubmissionIdentity(payload)}`)
+      : deterministicGuid(buildSubmissionIdentity(payload))
     const executionLogId = deterministicGuid(`execution:${submissionId}`)
-    const submissionPayload = buildSubmissionPayload(payload, submittedAt)
+    const submissionPayload = buildSubmissionPayload(payload, submittedAt, receiptOnly)
     const submission = await upsertDataverseRecord(config, token, 'jm1pub_submissions', submissionId, submissionPayload)
     const executionLog = await upsertDataverseRecord(config, token, 'jm1_executionlogs', executionLogId, {
       jm1_name: `AUTHOR-ONBOARDING-${submissionId}`,
-      jm1_actiondescription:
-        'Author onboarding submitted through website Dataverse fallback after Power Automate onboarding ingestion failed. No payment, contract, royalty, production, distribution, or workspace movement action was performed.',
-      jm1_actiontype: 'AUTHOR_ONBOARDING_SUBMITTED',
+      jm1_actiondescription: receiptOnly
+        ? 'Authenticated onboarding answers preserved as an attempt receipt. No onboarding completion or lifecycle transition was asserted.'
+        : 'Author onboarding submitted through website Dataverse fallback after Power Automate onboarding ingestion failed. No payment, contract, royalty, production, distribution, or workspace movement action was performed.',
+      jm1_actiontype: receiptOnly ? 'AUTHOR_ONBOARDING_ATTEMPT_CAPTURED' : 'AUTHOR_ONBOARDING_SUBMITTED',
       jm1_agentname: 'jmerrill.pub',
       jm1_bandlevel: BAND_LEVEL.BAND_1,
       jm1_executionstatus: EXECUTION_STATUS.SUCCESS,
@@ -104,7 +108,7 @@ export async function writeAuthorOnboardingDataverseFallback(
   }
 }
 
-function buildSubmissionPayload(payload: Record<string, any>, submittedAt: string) {
+export function buildSubmissionPayload(payload: Record<string, any>, submittedAt: string, receiptOnly = false) {
   const genreValue = GENRE_OPTIONS[String(payload.genreKey || '').toLowerCase()] || GENRE_OPTIONS.other
   const authority = payload.governedAuthority || {}
 
@@ -117,11 +121,11 @@ function buildSubmissionPayload(payload: Record<string, any>, submittedAt: strin
     jm1pub_booktitle: stringValue(payload.bookTitle || payload.book?.title),
     jm1pub_genre: genreValue,
     jm1pub_formsource: 'private-author-onboarding',
-    jm1pub_formtype: 'author-onboarding',
+    jm1pub_formtype: receiptOnly ? 'author-onboarding-attempt' : 'author-onboarding',
     jm1pub_internalclassification: stringValue(payload.internalClassification?.label || 'Other'),
     jm1pub_legalname: stringValue(payload.legalName),
     jm1pub_mailingaddress: stringValue(payload.mailingAddress),
-    jm1pub_onboardingcompletedat: submittedAt,
+    jm1pub_onboardingcompletedat: receiptOnly ? undefined : submittedAt,
     jm1pub_primarygoal: stringValue(payload.publishingGoal),
     jm1pub_recipient: 'publishing@jmerrill.one',
     jm1pub_rightsholderconfirmed: payload.rightsHolderConfirmed === true,
@@ -140,14 +144,25 @@ function buildSubmissionPayload(payload: Record<string, any>, submittedAt: strin
   })
 }
 
-function buildSubmissionIdentity(payload: Record<string, any>) {
+export function buildSubmissionIdentity(payload: Record<string, any>) {
   const authority = payload.governedAuthority || {}
   return [
     authority.policyVersion || 'AUTHOR_ONBOARDING_CONTINUITY_V1',
     authority.contactId || payload.email || '',
     authority.titleId || payload.bookTitle || '',
     authority.engagementId || '',
+    // Keep distinct answer sets; exact replay remains idempotent.
+    createHash('sha256').update(JSON.stringify(canonicalAnswers(payload.rawFormData || payload))).digest('hex'),
   ].join(':').toLowerCase()
+}
+
+function canonicalAnswers(value: unknown): unknown {
+  if (Array.isArray(value)) return value.map(canonicalAnswers)
+  if (value && typeof value === 'object') {
+    return Object.fromEntries(Object.entries(value).sort(([a], [b]) => a.localeCompare(b))
+      .map(([key, entry]) => [key, canonicalAnswers(entry)]))
+  }
+  return value
 }
 
 function deterministicGuid(value: string) {

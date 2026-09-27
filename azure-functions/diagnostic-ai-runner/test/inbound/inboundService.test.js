@@ -94,6 +94,31 @@ test("onboarding access service sends only to the existing governed contact in f
   assert.equal(effects.sends.length, 1);
 });
 
+test("the persistent runtime recovers a misrouted onboarding failure without resending access advice", async () => {
+  const { queue, route, store, deps, effects } = await setup(
+    "I answered all onboarding questions but my relationship could not be verified.", "AUTHOR_ACCESS_REQUEST");
+  const previous = { intent: "AUTHOR_ONBOARDING_CONTACT_CHANGE", status: "SENT_READBACK_PENDING",
+    communicationRecordId: "previous-communication", providerMessageId: "previous-provider", sentAt: "2026-09-22T18:12:00Z" };
+  await store.updateBusinessRoute({ ...route, service: previous });
+  await store.updateQueueItem({ ...queue, serviceIntent: previous.intent, serviceStatus: previous.status, businessEventId: "route-1" });
+  const result = await executeService(queue, deps);
+  assert.equal(result.outcome, "SENT");
+  assert.equal(result.intent, "AUTHOR_ONBOARDING_SERVICE_RECOVERY");
+  assert.equal(effects.sends.length, 1);
+  const approval = effects.sends[0].input.sendApproval;
+  assert.equal(approval.authorId, authorId);
+  assert.equal(approval.communicationType, "INBOUND_SERVICE_AUTHOR_ONBOARDING_SERVICE_RECOVERY");
+  assert.equal(approval.workstream, `onboarding-service-recovery:${authorId}:${titleId}:v1`);
+  assert.match(approval.draftBody, /do not need to complete the onboarding form again/);
+  const recovered = await store.getBusinessRoute(queue.evidenceLink);
+  assert.deepEqual(recovered.serviceHistory, [previous]);
+  assert.equal(recovered.onboardingServiceException.status, "ACKNOWLEDGED_RECOVERY_OPEN");
+  assert.equal(recovered.onboardingServiceException.authorRetryRequired, false);
+  assert.equal(recovered.service.waitingOn, "JMP_ONBOARDING_RECOVERY");
+  assert.equal((await executeService(queue, deps)).outcome, "IDEMPOTENT");
+  assert.equal(effects.sends.length, 1);
+});
+
 test("question follow-up with an unbound delivered artifact stays a system authority hold", async () => {
   const { queue, store, deps, effects } = await setup("Does the book need another chapter?", "AUTHOR_QUESTION");
   deps.enabled = true;

@@ -16,6 +16,10 @@ function questionAuthority(question) {
 function serviceIntent(graphMessage, classification) {
   const rawReply = authorReplyText(graphMessage);
   const reply = rawReply.replace(/\s+/g, " ").trim();
+  if ((classification === "AUTHOR_ACCESS_REQUEST" || /\b(?:onboarding|form|verification)\b/i.test(reply)) &&
+      /\b(?:failed|failure|without success|could not be verified|answered all|three times|multiple times|error)\b/i.test(reply)) {
+    return { intent: "AUTHOR_ONBOARDING_SERVICE_RECOVERY", humanGate: false };
+  }
   if (classification === "AUTHOR_ACCESS_REQUEST") {
     const contactChange = /\b(?:new|different|another|making an)\s+(?:email|address)\b/i.test(reply);
     return { intent: contactChange ? "AUTHOR_ONBOARDING_CONTACT_CHANGE" : "AUTHOR_ONBOARDING_ACCESS", humanGate: false };
@@ -62,6 +66,9 @@ function serviceCopy(intent, authorName, title, sourceSubject, linkResult = {}) 
   const endings = "\n\nJ Merrill Publishing";
   let message;
   switch (intent) {
+    case "AUTHOR_ONBOARDING_SERVICE_RECOVERY":
+      message = `Thank you for letting us know about the difficulty with onboarding for ${title}. We are sorry that you have had to repeat the process. You do not need to complete the onboarding form again or request another code. We are reviewing your project records and handling the verification issue on our side. If any specific information is still needed, we will ask only for that information rather than sending you through the form again. We will keep you updated as we continue your project.`;
+      break;
     case "AUTHOR_ONBOARDING_ACCESS":
       message = `Thank you for letting us know you found the onboarding invitation and would like help getting started with ${title}. Please use the email address that received the invitation to sign in at https://jmerrill.pub/author/onboarding and request a fresh one-time code. For your account's protection, a different email address cannot be used until it has been verified and added to your author profile. Please tell us where you get stuck, and we will help you with that step.`;
       break;

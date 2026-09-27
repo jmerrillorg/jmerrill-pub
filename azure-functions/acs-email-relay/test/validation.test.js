@@ -294,6 +294,26 @@ test("distinct observed requests retain distinct relay semantic keys and exact r
   assert.equal(buildCommunicationIdentity(first.value).key, buildCommunicationIdentity(make("a").value).key);
 });
 
+test("onboarding recovery retains exact semantic identity and renders the same correspondence as HTML", () => {
+  const { validateApprovedAuthorResponsePayload } = loadRelayModule();
+  const { buildCommunicationIdentity } = require("../src/state/communicationIdentity");
+  const authorId = "106a78d0-fb9a-f111-b8dc-6045bdd69738";
+  const titleId = "daf8180f-85a3-f111-b8de-000d3a14673b";
+  const input = validAuthorResponsePayload({ diagnosticId: titleId, authorId,
+    templateName: "INBOUND_SERVICE_AUTHOR_ONBOARDING_SERVICE_RECOVERY_V1",
+    communicationType: "INBOUND_SERVICE_AUTHOR_ONBOARDING_SERVICE_RECOVERY",
+    workstream: `onboarding-service-recovery:${authorId}:${titleId}:v1` });
+  const result = validateApprovedAuthorResponsePayload(input);
+  assert.equal(result.ok, true);
+  assert.equal(result.value.workstream, input.workstream);
+  assert.match(result.value.htmlBody, /<html/);
+  assert.ok(result.value.htmlBody.includes(result.value.body.split('\n')[0]));
+  assert.equal(buildCommunicationIdentity(result.value).key, buildCommunicationIdentity(validateApprovedAuthorResponsePayload(input).value).key);
+  assert.equal(validateApprovedAuthorResponsePayload({ ...input, authorId: titleId }).ok, false);
+  assert.equal(validateApprovedAuthorResponsePayload({ ...input, diagnosticId: authorId }).ok, false);
+  assert.equal(validateApprovedAuthorResponsePayload({ ...input, workstream: '' }).ok, false);
+});
+
 function validEditorialRecommendationPayload(overrides = {}) {
   return validAuthorResponsePayload({
     subject: "Your Editorial Review & Publishing Recommendation | J Merrill Publishing",

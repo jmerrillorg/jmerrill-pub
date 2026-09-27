@@ -21,15 +21,18 @@ const SYSTEM_SENDER = "publishing@email.jmerrill.one";
 const ROUTINE_INTENTS = new Set([
   "AUTHOR_QUESTIONS_MISSING", "PAYMENT_LINK_ACCESS",
   "AUTHOR_ONBOARDING_ACCESS",
+  "AUTHOR_ONBOARDING_SERVICE_RECOVERY",
   "AUTHOR_ONBOARDING_CONTACT_CHANGE",
   "TITLE_CHANGE_ACKNOWLEDGMENT", "EDITORIAL_CORRECTIONS_ACKNOWLEDGMENT"
 ]);
+const ACCESS_INTENTS = new Set(["AUTHOR_ONBOARDING_ACCESS", "AUTHOR_ONBOARDING_CONTACT_CHANGE"]);
 
 function safeError(code) {
   return { outcome: "HELD_SERVICE_AUTHORITY", reason: code };
 }
 
 function serviceWaitOwner(intent) {
+  if (intent === "AUTHOR_ONBOARDING_SERVICE_RECOVERY") return "JMP_ONBOARDING_RECOVERY";
   if (["ADDITIONAL_PAYMENT_REQUEST", "PAYMENT_ACCESS_REQUEST", "INSTALLMENT_INFORMATION_REQUEST", "PAYMENT_LINK_ACCESS_PROBLEM"].includes(intent)) return "AUTHOR";
   if (intent === "AUTHOR_ONBOARDING_ACCESS") return "AUTHOR";
   if (intent === "AUTHOR_ONBOARDING_CONTACT_CHANGE") return "JMP_IDENTITY_VERIFICATION";
@@ -122,7 +125,13 @@ async function completeMailboxReadback(queueItem, deps) {
       `communicationRecordId=${service.communicationRecordId}; MAILBOX_COPY=PASS.`,
     sourceEntity: "jm1pub_title", sourceRecordId: queueItem.titleId
   });
-  await deps.store.updateBusinessRoute({ ...route, service: { ...service, status: "SENT",
+  await deps.store.updateBusinessRoute({ ...route,
+    ...(service.intent === "AUTHOR_ONBOARDING_SERVICE_RECOVERY" ? {
+      onboardingServiceException: { ...route.onboardingServiceException,
+        status: "ACKNOWLEDGED_RECOVERY_OPEN", systemAcknowledgedAt: service.sentAt,
+        recoveryCompletedAt: null, authorRetryRequired: false }
+    } : {}),
+    service: { ...service, status: "SENT",
     deliveryId: delivery.deliveryId,
     mailboxCopy: "PASS", graphMessageId: readback.graphMessageId,
     outboundConversationId: readback.conversationId, waitingOn: serviceWaitOwner(service.intent),
@@ -321,7 +330,32 @@ async function reconcileEditorialAuthorityHold(queueItem, prepared, deps) {
 }
 
 async function executeService(queueItem, deps) {
-  const priorRoute = await deps.store.getBusinessRoute(queueItem.evidenceLink);
+  let priorRoute = await deps.store.getBusinessRoute(queueItem.evidenceLink);
+  if (ACCESS_INTENTS.has(priorRoute?.service?.intent) &&
+      ["SENT", "SENT_READBACK_PENDING"].includes(priorRoute.service.status)) {
+    const recovery = await prepareService(queueItem, deps);
+    if (recovery.intent === "AUTHOR_ONBOARDING_SERVICE_RECOVERY" && recovery.outcome === "ROUTINE_SERVICE_READY") {
+      await deps.store.withBusinessRouteLease(queueItem.evidenceLink, async () => {
+        const current = await deps.store.getBusinessRoute(queueItem.evidenceLink);
+        if (!ACCESS_INTENTS.has(current?.service?.intent)) return;
+        const now = new Date().toISOString();
+        const auditId = await (deps.writeLog || writeLog)(deps.client, {
+          name: "ONBOARDING_SERVICE_EXCEPTION", actionType: "ONBOARDING_SERVICE_EXCEPTION",
+          sourceEntity: "jm1pub_title", sourceRecordId: queueItem.titleId,
+          description: `sourceInboundEvent=${queueItem.evidenceLink}; priorCommunication=${current.service.communicationRecordId}; ` +
+            "recovery=AUTHOR_ONBOARDING_SERVICE_RECOVERY; authorRetryRequired=NO; businessTransition=NONE."
+        });
+        await deps.store.updateBusinessRoute({ ...current,
+          serviceHistory: [...(current.serviceHistory || []), current.service],
+          onboardingServiceException: { firstFailureAt: queueItem.receivedAt, authorContactAt: queueItem.receivedAt,
+            recoveryStartedAt: now, status: "RECOVERY_IN_PROGRESS", auditId }, service: null });
+        const queue = await deps.store.getQueueItem(queueItem.queueItemId);
+        await deps.store.updateQueueItem({ ...queue, serviceStatus: null, serviceDeliveryId: null,
+          serviceWaitingOn: "JMP_ONBOARDING_RECOVERY", waitingOn: "JMP_ONBOARDING_RECOVERY" });
+      });
+      priorRoute = await deps.store.getBusinessRoute(queueItem.evidenceLink);
+    }
+  }
   if (priorRoute?.service?.status === "SEND_ACCEPTED_AUDIT_PENDING" && priorRoute.service.outboxIntent) {
     return deps.store.withBusinessRouteLease(queueItem.evidenceLink, async () => {
       const route = await deps.store.getBusinessRoute(queueItem.evidenceLink);
@@ -369,7 +403,9 @@ async function executeService(queueItem, deps) {
     const intent = {
       titleId: queueItem.titleId, titleName: prepared.movement.title,
       authorId: queueItem.authorId, communicationType: `INBOUND_SERVICE_${prepared.intent}`,
-      workstream: queueItem.evidenceLink, recipient: prepared.recipient, attachments: []
+      workstream: prepared.intent === "AUTHOR_ONBOARDING_SERVICE_RECOVERY"
+        ? `onboarding-service-recovery:${queueItem.authorId}:${queueItem.titleId}:v1` : queueItem.evidenceLink,
+      recipient: prepared.recipient, attachments: []
     };
     const reserve = await (deps.reserveCommunicationIntent || reserveCommunicationIntent)(client, intent);
     if (reserve.status === "ALREADY_DELIVERED") return { ...publicServiceResult(prepared), outcome: "IDEMPOTENT" };
@@ -378,13 +414,19 @@ async function executeService(queueItem, deps) {
       return { ...publicServiceResult(prepared), outcome: "HELD_AMBIGUOUS_SEND_STATE" };
     }
     const relayIdentityVersion = rejectedRelayReplay ? route.service.relayIdentityVersion || "LEGACY_V1" : "CANONICAL_V1";
-    await store.updateBusinessRoute({ ...route, service: { intent: prepared.intent, status: "RESERVED",
+    if (prepared.intent === "AUTHOR_ONBOARDING_SERVICE_RECOVERY" && !route.onboardingServiceException) {
+      route.onboardingServiceException = { firstFailureAt: queueItem.receivedAt, authorContactAt: queueItem.receivedAt,
+        recoveryStartedAt: new Date().toISOString(), status: "RECOVERY_IN_PROGRESS", authorRetryRequired: false };
+    }
+    await store.updateBusinessRoute({ ...route,
+      service: { intent: prepared.intent, status: "RESERVED",
       communicationRecordId: reserve.communicationRecordId, relayIdentityVersion } });
     const approval = {
-      ...(queueItem.sourceKind === "OBSERVED_PAYMENT_REQUEST" && relayIdentityVersion === "CANONICAL_V1" ? {
+      ...(relayIdentityVersion === "CANONICAL_V1" ? {
         authorId: intent.authorId, communicationType: intent.communicationType, workstream: intent.workstream,
       } : {}),
-      diagnosticId: queueItem.sourceKind === "OBSERVED_PAYMENT_REQUEST" ? queueItem.titleId : queueItem.stageId,
+      diagnosticId: queueItem.sourceKind === "OBSERVED_PAYMENT_REQUEST" || prepared.intent === "AUTHOR_ONBOARDING_SERVICE_RECOVERY"
+        ? queueItem.titleId : queueItem.stageId,
       intakeReferenceCode: queueItem.engagementId,
       authorEmail: prepared.recipient,
       authorName: prepared.authorName,
@@ -414,7 +456,8 @@ async function executeService(queueItem, deps) {
     const sentAt = new Date().toISOString();
     const copyHash = createHash("sha256").update(`${prepared.copy.subject}\n${prepared.copy.body}`).digest("hex");
     const bodyHash = createHash("sha256").update(normalizedMailText(prepared.copy.body)).digest("hex");
-    const htmlBodyProjectionHashes = htmlProjectionHashes(prepared.copy.html);
+    const htmlBodyProjectionHashes = prepared.intent === "AUTHOR_ONBOARDING_SERVICE_RECOVERY"
+      ? [textProjectionHash(prepared.copy.body)] : htmlProjectionHashes(prepared.copy.html);
     await store.updateBusinessRoute({ ...route, service: { intent: prepared.intent, status: "SEND_ACCEPTED_AUDIT_PENDING",
       outboxIntent: intent, semanticIdempotencyKey: reserve.semanticIdempotencyKey,
       htmlBodyProjectionHashes,
@@ -454,11 +497,16 @@ async function runInboundService(input = {}, deps = {}) {
     resourceUrl: normalizeString(process.env.DATAVERSE_RESOURCE_URL).replace(/\/$/, "")
   });
   const targetEventId = normalizeString(input.targetEventId);
-  const rows = targetEventId ? [await store.getQueueItem(`queue_${targetEventId}`)].filter(Boolean)
-    : (await store.listQueueItems(Number.MAX_SAFE_INTEGER)).filter((row) => row.receivedAt >= "2026-09-22T00:00:00Z" && row.businessEventId &&
+  const allRows = targetEventId ? [await store.getQueueItem(`queue_${targetEventId}`)].filter(Boolean)
+    : await store.listQueueItems(Number.MAX_SAFE_INTEGER);
+  const rows = allRows.filter((row) => targetEventId || (row.receivedAt >= "2026-09-22T00:00:00Z" && row.businessEventId &&
       (!row.serviceStatus || row.serviceStatus === "SENT_READBACK_PENDING" ||
+        (ACCESS_INTENTS.has(row.serviceIntent) && !allRows.some(other => other.authorId === row.authorId &&
+          other.titleId === row.titleId && other.classification === "AUTHOR_ACCESS_REQUEST" && other.receivedAt > row.receivedAt)) ||
         (row.serviceStatus === "SENT" && !row.serviceDeliveryId) ||
-        (row.serviceStatus === "HUMAN_REVIEW_REQUIRED" && row.serviceIntent === "EDITORIAL_QUESTION_REVIEW")));
+        (row.serviceStatus === "HUMAN_REVIEW_REQUIRED" && row.serviceIntent === "EDITORIAL_QUESTION_REVIEW"))))
+    .filter(row => !ACCESS_INTENTS.has(row.serviceIntent) || !allRows.some(other => other.authorId === row.authorId &&
+      other.titleId === row.titleId && other.classification === "AUTHOR_ACCESS_REQUEST" && other.receivedAt > row.receivedAt));
   const results = [];
   for (const row of rows.slice(0, Math.min(Math.max(Number(input.limit || 20), 1), 100))) {
     try {
