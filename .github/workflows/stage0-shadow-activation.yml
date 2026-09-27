@@ -1,0 +1,154 @@
+name: Stage 0 Shadow Route Activation
+
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        description: "Choose the single approved shadow-only action"
+        type: choice
+        required: true
+        default: no-op
+        options:
+          - no-op
+          - activate-stage0-shadow-only
+      expected-release-sha:
+        description: "Exact approved repaired runtime release SHA"
+        type: string
+        required: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: stage0-shadow-route-activation
+  cancel-in-progress: false
+
+env:
+  APP: func-jm1-pub-stage0-shadow
+  RESOURCE_GROUP: rg-jm1-ai
+  EXPECTED_RELEASE_SHA: ${{ inputs.expected-release-sha }}
+  EXPECTED_RUNTIME_CLIENT_ID: ee2d3f1e-f0b9-4576-becc-10c40062efa4
+  EXPECTED_BASELINE_VERSION: STAGE0-AUTHORITY-C15-v2
+  EXPECTED_BASELINE_CHECKSUM: f09ccaaa4865b80faec04d21bb739c622f41460f7006e2bb2cad54391586d4dd
+  EXPECTED_POLICY_VERSION: STAGE0-SHADOW-C11-v1
+  EXPECTED_MODEL_REGISTER_ID: AZURE:OAI-JM1-DIAGNOSTIC:JM1-PUB-DIAGNOSTIC-PRIMARY
+  EXPECTED_RISK_REGISTER_ID: JM1-AI-RISK-STAGE0-SHADOW-001
+  ROUTE_REVIEW_EXPIRES_AT: "2026-10-23T00:00:00Z"
+
+jobs:
+  activate:
+    if: github.event.inputs.action == 'activate-stage0-shadow-only'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment: jmerrill-pub-production
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Authenticate using protected environment identity
+        uses: azure/login@v3
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Validate fresh C15 authority and exact current runtime
+        id: preflight
+        shell: bash
+        run: |
+          set -euo pipefail
+          [[ "$EXPECTED_RELEASE_SHA" =~ ^[a-f0-9]{40}$ ]]
+          test "$(az functionapp show -g "$RESOURCE_GROUP" -n "$APP" --query state -o tsv)" = Running
+          setting() {
+            az functionapp config appsettings list -g "$RESOURCE_GROUP" -n "$APP" \
+              --query "[?name=='$1'].value | [0]" -o tsv
+          }
+          test "$(setting JM1_RELEASE_SHA)" = "$EXPECTED_RELEASE_SHA"
+          test "$(setting JM1_SHADOW_ENABLED)" = false
+          test "$(setting JM1_SHADOW_CANARY_ENABLED)" = false
+          test "$(setting JM1_SHADOW_BUDGET_CERTIFICATION_ENABLED)" = false
+          test "$(setting JM1_SHADOW_ROUTE_STATUS)" = CANARY_ONLY
+          test "$(setting JM1_SHADOW_ROUTE_POLICY_VERSION)" = "$EXPECTED_POLICY_VERSION"
+          test "$(setting JM1_SHADOW_ROUTE_EXPIRES_AT)" = 2026-09-26T00:00:00Z
+          test "$(setting JM1_SHADOW_EXECUTION_CERTIFIED)" != true
+          test "$(setting JM1_SHADOW_MANAGED_IDENTITY_CLIENT_ID)" = "$EXPECTED_RUNTIME_CLIENT_ID"
+          test "$(setting JM1_SHADOW_PERMISSION_BASELINE_VERSION)" = "$EXPECTED_BASELINE_VERSION"
+          test "$(setting JM1_SHADOW_PERMISSION_BASELINE_CHECKSUM)" = "$EXPECTED_BASELINE_CHECKSUM"
+          test "$(setting JM1_SHADOW_MODEL_REGISTER_ID)" = "$EXPECTED_MODEL_REGISTER_ID"
+          test "$(setting JM1_SHADOW_RISK_REGISTER_ID)" = "$EXPECTED_RISK_REGISTER_ID"
+
+          printf 'PUBLISHING CONFIG PREFLIGHT=PASS; live monitor verdict remains enforced by the Stage 0 runtime before every inference.\n'
+
+      - name: Activate the one bounded read-only shadow route
+        id: activate
+        shell: bash
+        env:
+          ACTIVATION_ID: C15-${{ github.run_id }}-${{ github.run_attempt }}
+        run: |
+          set -euo pipefail
+          activated_at="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          az functionapp config appsettings set -g "$RESOURCE_GROUP" -n "$APP" --settings \
+            JM1_SHADOW_ENABLED=true \
+            JM1_SHADOW_ROUTE_STATUS=ACTIVE \
+            JM1_SHADOW_EXECUTION_CERTIFIED=true \
+            JM1_SHADOW_ROUTE_EXPIRES_AT="$ROUTE_REVIEW_EXPIRES_AT" \
+            JM1_SHADOW_ACTIVATION_ID="$ACTIVATION_ID" \
+            JM1_SHADOW_ACTIVATED_AT="$activated_at" \
+            JM1_SHADOW_ACTIVATION_UTC="$activated_at" \
+            --output none
+          echo "activation_id=$ACTIVATION_ID" >> "$GITHUB_OUTPUT"
+          echo "activated_at=$activated_at" >> "$GITHUB_OUTPUT"
+          az functionapp restart -g "$RESOURCE_GROUP" -n "$APP" --output none
+
+      - name: Independently read back activation and preserve code release
+        shell: bash
+        env:
+          ACTIVATION_ID: C15-${{ github.run_id }}-${{ github.run_attempt }}
+        run: |
+          set -euo pipefail
+          for attempt in $(seq 1 20); do
+            state="$(az functionapp show -g "$RESOURCE_GROUP" -n "$APP" --query state -o tsv)"
+            if [ "$state" = Running ]; then break; fi
+            sleep 15
+          done
+          test "$state" = Running
+          setting() {
+            az functionapp config appsettings list -g "$RESOURCE_GROUP" -n "$APP" \
+              --query "[?name=='$1'].value | [0]" -o tsv
+          }
+          test "$(setting JM1_SHADOW_ENABLED)" = true
+          test "$(setting JM1_SHADOW_ROUTE_STATUS)" = ACTIVE
+          test "$(setting JM1_SHADOW_EXECUTION_CERTIFIED)" = true
+          test "$(setting JM1_SHADOW_ACTIVATION_ID)" = "$ACTIVATION_ID"
+          test "$(setting JM1_SHADOW_ACTIVATION_UTC)" = "$(setting JM1_SHADOW_ACTIVATED_AT)"
+          test "$(setting JM1_SHADOW_ROUTE_EXPIRES_AT)" = "$ROUTE_REVIEW_EXPIRES_AT"
+          test "$(setting JM1_RELEASE_SHA)" = "$EXPECTED_RELEASE_SHA"
+          test "$(setting JM1_SHADOW_MANAGED_IDENTITY_CLIENT_ID)" = "$EXPECTED_RUNTIME_CLIENT_ID"
+          test "$(setting JM1_SHADOW_PERMISSION_BASELINE_CHECKSUM)" = "$EXPECTED_BASELINE_CHECKSUM"
+          functions="$(az functionapp function list -g "$RESOURCE_GROUP" -n "$APP" --query '[].name' -o tsv)"
+          for expected in stage0-shadow-poll stage0-shadow-authority-probe stage0-shadow-commissioning-canary stage0-shadow-budget-certification; do
+            printf '%s\n' "$functions" | grep -Fx "$APP/$expected"
+          done
+          test "$(printf '%s\n' "$functions" | wc -l | tr -d ' ')" = 4
+          printf 'POST_ACTIVATION_READBACK=PASS activation=%s release=%s route=STAGE_0_DIAGNOSTIC_SHADOW_ONLY\n' "$ACTIVATION_ID" "$EXPECTED_RELEASE_SHA"
+
+      - name: Fail closed if activation/readback failed
+        if: always() && (failure() || cancelled()) && steps.preflight.outcome == 'success'
+        shell: bash
+        run: |
+          set -euo pipefail
+          az functionapp config appsettings set -g "$RESOURCE_GROUP" -n "$APP" --settings \
+            JM1_SHADOW_ENABLED=false \
+            JM1_SHADOW_ROUTE_STATUS=CANARY_ONLY \
+            JM1_SHADOW_EXECUTION_CERTIFIED=false \
+            --output none
+          az functionapp restart -g "$RESOURCE_GROUP" -n "$APP" --output none
+          for attempt in $(seq 1 20); do
+            state="$(az functionapp show -g "$RESOURCE_GROUP" -n "$APP" --query state -o tsv)"
+            if [ "$state" = Running ]; then break; fi
+            sleep 15
+          done
+          test "$state" = Running
+          test "$(az functionapp config appsettings list -g "$RESOURCE_GROUP" -n "$APP" --query "[?name=='JM1_SHADOW_ENABLED'].value | [0]" -o tsv)" = false
+          test "$(az functionapp config appsettings list -g "$RESOURCE_GROUP" -n "$APP" --query "[?name=='JM1_SHADOW_EXECUTION_CERTIFIED'].value | [0]" -o tsv)" = false
+          echo "ROUTE_ACTIVATION_FAIL_CLOSED=PASS"
