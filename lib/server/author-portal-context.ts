@@ -2,6 +2,7 @@
 // Reusable? Y
 // Stage-specific exception? N
 import { cookies } from 'next/headers'
+import { readAuthorEditorialStage } from './author-editorial-stage-readback'
 import { type NextRequest, NextResponse } from 'next/server'
 
 import {
@@ -765,14 +766,11 @@ async function buildProjectSummaries(
           })
         : null)
 
-    const stage = asset
-      ? await dataverseFirst(config, 'jm1pub_editorialstages', {
-          $select:
-            'jm1pub_editorialstageid,jm1pub_authorsafesummary,jm1pub_stagestatus,jm1pub_stagetype,createdon',
-          $filter: `_jm1pub_publishingassetid_value eq ${dataverseLookupId(asset, 'jm1pub_publishingassetid')}`,
-          $orderby: 'createdon desc',
-        })
-      : null
+    const stage = title ? await readAuthorEditorialStage(config, {
+      titleId: dataverseLookupId(title, 'jm1pub_titleid'),
+      assetId: dataverseLookupId(asset || {}, 'jm1pub_publishingassetid') || undefined,
+      assetTitleId: dataverseLookupId(asset || {}, '_jm1pub_titleid_value') || undefined,
+    }) : null
 
     const summary = asset
       ? pickAuthorFacingSummary(
@@ -947,14 +945,11 @@ async function buildProjectSummaries(
       $filter: `_jm1pub_titleid_value eq ${dataverseLookupId(title, 'jm1pub_titleid')}`,
     })
 
-    const stage = asset
-      ? await dataverseFirst(config, 'jm1pub_editorialstages', {
-          $select:
-            'jm1pub_editorialstageid,jm1pub_authorsafesummary,jm1pub_stagestatus,jm1pub_stagetype,createdon',
-          $filter: `_jm1pub_publishingassetid_value eq ${dataverseLookupId(asset, 'jm1pub_publishingassetid')}`,
-          $orderby: 'createdon desc',
-        })
-      : null
+    const stage = title ? await readAuthorEditorialStage(config, {
+      titleId: dataverseLookupId(title, 'jm1pub_titleid'),
+      assetId: dataverseLookupId(asset || {}, 'jm1pub_publishingassetid') || undefined,
+      assetTitleId: dataverseLookupId(asset || {}, '_jm1pub_titleid_value') || undefined,
+    }) : null
 
     const summary = asset
       ? pickAuthorFacingSummary(

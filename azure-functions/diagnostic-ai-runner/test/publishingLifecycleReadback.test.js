@@ -1,9 +1,15 @@
 "use strict";
 const test = require("node:test");
 const assert = require("node:assert/strict");
+const fs = require("node:fs");
+const path = require("node:path");
 const { lifecycleReadback } = require("../src/functions/runPublishingLifecycleReadback");
 const authorId = "106a78d0-fb9a-f111-b8dc-6045bdd69738";
 const titleId = "daf8180f-85a3-f111-b8de-000d3a14673b";
+test("production startup explicitly registers the read-only route", () => {
+  assert.match(fs.readFileSync(path.join(__dirname, "../src/index.js"), "utf8"),
+    /require\("\.\/functions\/runPublishingLifecycleReadback"\)/);
+});
 function dependencies(wrongAuthor = false) {
   return { client: { first: async entity => entity === "contacts"
     ? { contactid: authorId, fullname: "Test Author", emailaddress1: "test@example.com" }
