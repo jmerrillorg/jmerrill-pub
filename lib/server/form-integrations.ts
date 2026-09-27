@@ -102,7 +102,11 @@ const CANON_RUNTIME_SEQUENCE = [
 ]
 
 export function getNotificationRecipient() {
-  return process.env.FORM_NOTIFICATION_TO || DEFAULT_NOTIFICATION_TO
+  const recipient = (process.env.FORM_NOTIFICATION_TO || DEFAULT_NOTIFICATION_TO).trim().toLowerCase()
+  if (recipient !== DEFAULT_NOTIFICATION_TO) {
+    throw new Error('INTERNAL_FORM_NOTIFICATION_RECIPIENT_DENIED')
+  }
+  return recipient
 }
 
 export function getInternalClassificationChoice(label: Jm1PubInternalClassification) {

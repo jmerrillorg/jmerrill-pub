@@ -60,6 +60,7 @@ jobs:
           npm run jmp-lifecycle-wave-c1-artifact-commercial-evidence-guard
           npm run jm1-initiative-handoff-guard
           node --test scripts/jmp_intake_redesign_guard.test.mjs
+          node --test scripts/form_notification_recipient_boundary.test.mjs scripts/author_editorial_stage_readback.test.mjs
           node --test scripts/author_onboarding_authority.test.mjs scripts/author_onboarding_answer_preservation.test.mjs scripts/whole_onboarding_continuity.test.mjs scripts/author_email_otp_login.test.mjs
           node scripts/check-catalog-runtime-source.mjs
           node scripts/infra006_health_contract.test.mjs

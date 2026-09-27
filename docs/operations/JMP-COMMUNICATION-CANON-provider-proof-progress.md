@@ -28,6 +28,20 @@ instead of awaiting completion. This repair requires Succeeded plus an immutable
 provider ID before recording acceptance. Transport ambiguity preserves the
 reservation; it does not make the command automatically retryable.
 
+Inquiry, agreement, approved-response, and enterprise relay producers now share
+one completed-ACS receipt helper. Inquiry and agreement responses also expose
+the generated renderer/template metadata for their producing workflows. This
+does not itself prove that every upstream workflow durably persists those fields.
+
+Production has no FORM_NOTIFICATION_TO override and therefore uses the internal
+Publishing mailbox default. That internal Graph/Resend fallback now rejects any
+other recipient. Its boundary test is part of the web deployment guards. It
+cannot become an author-facing raw send path by changing configuration.
+
+The explicitly requested system-sender census is limited to seven days and at
+most 50 native HTML presentations, with truncation/completeness surfaced. It is
+separate from immutable author/title business correlation and makes no decisions.
+
 The existing internal proof must not be resent while its outcome is ambiguous.
 The read-only mailbox endpoint can retrieve its native HTML only for the fixed
 internal subject and exclusively contained Publishing mailbox recipients.
