@@ -50,3 +50,16 @@ test("original mailbox-copy event recovers the original provider binding without
   await recoverAcceptanceFromMailboxEvent({ ...nativeMessage, from: { emailAddress: { address: "attacker@example.com" } } },
     { relayRequest: async () => { throw new Error("must not call"); } });
 });
+test("recovered native evidence re-arms only the exact held service readback, never a send", async () => {
+  let route = { service: { relayCommunicationId: "command-1", providerMessageId: command.providerMessageId,
+    status: "DELIVERY_UNVERIFIED", serviceException: true } };
+  let queue = { evidenceLink: "original-event", serviceStatus: "DELIVERY_UNVERIFIED" };
+  const store = { listQueueItems: async () => [queue], withBusinessRouteLease: async (_id, fn) => fn(),
+    getBusinessRoute: async () => route, updateBusinessRoute: async value => { route = value; },
+    updateQueueItem: async value => { queue = value; } };
+  await recoverAcceptanceFromMailboxEvent(nativeMessage, { store, relayRequest: async () => ({ acceptance: {
+    communicationComplete: true, communicationId: "command-1", providerMessageId: command.providerMessageId } }) });
+  assert.equal(route.service.status, "SENT_READBACK_PENDING");
+  assert.equal(route.service.serviceException, false);
+  assert.equal(queue.serviceStatus, "SENT_READBACK_PENDING");
+});

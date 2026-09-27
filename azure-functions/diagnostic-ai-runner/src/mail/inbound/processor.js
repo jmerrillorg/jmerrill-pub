@@ -46,7 +46,7 @@ async function processGraphMessage(graphMessage, options = {}) {
   if (!store) throw new Error("store is required");
   if (detectionSource !== DETECTION_SOURCE.SYNTHETIC && process.env.JM1_PUBLISHING_INBOUND_SERVICE_ENABLED === "true"
       && graphMessage.from?.emailAddress?.address?.toLowerCase() === "publishing@email.jmerrill.one") {
-    try { await recoverAcceptanceFromMailboxEvent(graphMessage); }
+    try { await recoverAcceptanceFromMailboxEvent(graphMessage, { store }); }
     catch { await store.put("communication-acceptance/ingress-exception.json", {
       code: "MAILBOX_ACCEPTANCE_RECOVERY_UNAVAILABLE", detectedAt, requiresResend: false }); }
   }

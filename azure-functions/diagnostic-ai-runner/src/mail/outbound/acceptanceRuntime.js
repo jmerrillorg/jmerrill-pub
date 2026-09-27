@@ -52,6 +52,8 @@ async function runAcceptanceVerification(deps = {}) {
       else counts.pending++;
     } catch { counts.runtimeFailures++; }
   }
+  const summary = await request({ action: "summary" }, deps);
+  counts.unverified = Math.max(counts.unverified, Number(summary.counts?.unverified || 0));
   await request({ action: "runtime-health", counts }, deps);
   return counts;
 }
@@ -60,6 +62,22 @@ async function recoverAcceptanceFromMailboxEvent(message, deps = {}) {
   const token = providerIdFromInternetMessageId(message.internetMessageId);
   if (!token) return null;
   const id = `${token.slice(0, 8)}-${token.slice(8, 12)}-${token.slice(12, 16)}-${token.slice(16, 20)}-${token.slice(20)}`;
-  return (deps.relayRequest || relayRequest)({ action: "recover-provider", providerMessageId: id }, deps);
+  const result = await (deps.relayRequest || relayRequest)({ action: "recover-provider", providerMessageId: id }, deps);
+  if (result?.acceptance?.communicationComplete && deps.store) {
+    const acceptance = result.acceptance;
+    for (const queue of await deps.store.listQueueItems(1000)) {
+      if (queue.serviceStatus !== "DELIVERY_UNVERIFIED") continue;
+      await deps.store.withBusinessRouteLease(queue.evidenceLink, async () => {
+        const route = await deps.store.getBusinessRoute(queue.evidenceLink);
+        if (route?.service?.relayCommunicationId !== acceptance.communicationId
+            || route.service.providerMessageId !== acceptance.providerMessageId
+            || route.service.status !== "DELIVERY_UNVERIFIED") return;
+        await deps.store.updateBusinessRoute({ ...route, service: { ...route.service,
+          status: "SENT_READBACK_PENDING", serviceException: false } });
+        await deps.store.updateQueueItem({ ...queue, serviceStatus: "SENT_READBACK_PENDING" });
+      });
+    }
+  }
+  return result;
 }
 module.exports = { relayConfig, relayRequest, nativeAcceptanceProof, runAcceptanceVerification, recoverAcceptanceFromMailboxEvent };
