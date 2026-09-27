@@ -17,6 +17,7 @@ import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { randomUUID } from 'node:crypto'
 import { selectTitleBoundEditorialStage } from './author-editorial-stage-readback'
+import { hasDeliveredPendingReview, isBoundEditorialTransition, sameProjectionTitle } from '../publishing/lifecycle/editorial-projection-evidence'
 import {
   classifyTitlePortfolio,
   isActivePipeline,
@@ -508,6 +509,7 @@ export type PublisherTitleOperatingView = {
 
 export type PublisherAuthorResponseQueueItem = {
   key: string
+  titleId?: string
   author: string
   title: string
   stagePackage: string
@@ -954,9 +956,10 @@ export async function buildPublisherOperatingCenterSnapshot(): Promise<Publisher
     )
     .slice(0, 2)
   const portfolio = buildPortfolioItems(titles, assets, editorialStages, productionProjects)
-  const workload = buildWorkloadItems(titles, assets, editorialStages, intakes, logs, portfolio)
+  const deliveryLogs = await getDeliveredReviewLogs(config, approvalGates)
+  const workload = buildWorkloadItems(titles, assets, editorialStages, intakes, [...logs, ...deliveryLogs], portfolio, approvalGates)
   const productionCommand = buildProductionCommand(workload, portfolio, productionProjects, productionTasks)
-  const authorResponses = buildAuthorResponseQueue(approvalGates, editorialStages, titles, logs)
+  const authorResponses = buildAuthorResponseQueue(approvalGates, titles, logs)
   const metrics = buildMetrics(queue, logs, workload, portfolio)
   const today = buildPublisherToday({
     generatedAt: new Date().toISOString(),
@@ -1620,6 +1623,20 @@ async function getRecentExecutionLogs(config: DataverseServerConfig) {
   })
 }
 
+async function getDeliveredReviewLogs(config: DataverseServerConfig, gates: DataverseRow[]) {
+  const stageIds = [...new Set(gates
+    .filter((gate) => Number(gate.jm1pub_gatestatus) === 196650002 && !gate.jm1pub_authordecision && !gate.jm1pub_authordecisionon)
+    .map((gate) => dataverseLookupId(gate, '_jm1pub_editorialstageid_value'))
+    .filter((stageId) => sameProjectionTitle(stageId, stageId)))]
+  if (!stageIds.length) return []
+  return dataverseList(config, 'jm1_executionlogs', {
+    $select: 'jm1_executionlogid,jm1_actiontype,jm1_actiondescription,jm1_sourcerecordid,createdon',
+    $filter: `jm1_actiontype eq 'PACKAGE_CADENCE_RELEASE_AUTHOR_PACKAGE_SENT' and (${stageIds.map((stageId) => `jm1_sourcerecordid eq '${stageId}'`).join(' or ')})`,
+    $orderby: 'createdon desc',
+    $top: '250',
+  })
+}
+
 async function getRecentProductionProjects(config: DataverseServerConfig) {
   return dataverseList(config, 'jm1_productionprojects', {
     $select:
@@ -1878,6 +1895,7 @@ function buildWorkloadItems(
   intakes: DataverseRow[],
   logs: DataverseRow[],
   portfolio: PublisherPortfolioItem[],
+  approvalGates: DataverseRow[] = [],
 ): PublisherWorkloadItem[] {
   const draftItems = (titles
     .map((title) => {
@@ -1901,10 +1919,11 @@ function buildWorkloadItems(
       const pipelineStage = dataverseFormatted(title, 'jm1pub_stage') || 'Unstaged'
       const intake = intakes.find((row) => normalizeTitle(stringValue(row.jm1_projecttitle || row.jm1_name)) === normalizeTitle(titleName))
       const latestLog = findLatestLogForWorkload(logs, titleId, assetId, stages)
+      const pendingDeliveredReview = Boolean(latestStage && hasDeliveredPendingReview(latestStage, approvalGates, logs))
       const workloadState = deriveWorkloadState({
         pipelineStage,
         stageType,
-        stageStatus,
+        stageStatus: pendingDeliveredReview ? 'Author Review' : stageStatus,
         stageSummary: stringValue(latestStage?.jm1pub_authorsafesummary),
         hasAsset: Boolean(assetId),
         latestAction: stringValue(latestLog?.jm1_actiontype),
@@ -1937,7 +1956,7 @@ function buildWorkloadItems(
         assetId,
         pipelineStage,
         editorialStage: latestStage ? stringValue(latestStage.jm1pub_name) : 'Not initialized',
-        editorialSubstage: workloadState === 'Line Editing - Author Review' ? 'Author Review' : stageStatus || 'Not Started',
+        editorialSubstage: workloadState.includes('Author Review') ? 'Author Review' : stageStatus || 'Not Started',
         workloadState,
         activeCapability: capability,
         currentOwner: owner,
@@ -3645,7 +3664,7 @@ export function selectGovernedProjectionPrimaryItem(
   canonicalLifecycle: CanonicalPublisherReadModel
 } {
   const candidates = prioritizeTodayItems(items).map((item) => {
-    const titleResponse = authorResponses.find((response) => normalizeTitle(response.title) === normalizeTitle(item.title))
+    const titleResponse = authorResponses.find((response) => sameProjectionTitle(response.titleId, item.titleId))
     const canonicalLifecycle = projectTodayItemCanonicalLifecycle(item, titleResponse)
     return {
       item,
@@ -4519,7 +4538,6 @@ function royaltyDecisionTodayItem(royalties: PublisherRoyaltyReviewQueue): Publi
 
 function buildAuthorResponseQueue(
   gates: DataverseRow[],
-  stages: DataverseRow[],
   titles: DataverseRow[],
   logs: DataverseRow[],
 ): PublisherAuthorResponseQueueItem[] {
@@ -4543,18 +4561,6 @@ function buildAuthorResponseQueue(
       const stageId = dataverseLookupId(gate, '_jm1pub_editorialstageid_value')
       const titleId = dataverseLookupId(gate, '_jm1pub_titleid_value')
       const packageId = dataverseLookupId(gate, '_jm1pub_deliverableartifactid_value')
-      const stage = stages.find((candidate) => stringValue(candidate.jm1pub_editorialstageid) === stageId)
-      const stageSequence = Number(stage?.jm1pub_stagesequence || 0)
-      const downstreamStage = stages.find((candidate) => {
-        const candidateTitleId = dataverseLookupId(candidate, '_jm1pub_titleid_value')
-        const candidateSequence = Number(candidate.jm1pub_stagesequence || 0)
-        const candidateStatus = dataverseFormatted(candidate, 'jm1pub_stagestatus').toLowerCase()
-        return (
-          candidateTitleId === titleId &&
-          candidateSequence > stageSequence &&
-          (candidateStatus.includes('progress') || candidateStatus.includes('complete') || candidateStatus.includes('author'))
-        )
-      })
       const title = titles.find((candidate) => stringValue(candidate.jm1pub_titleid) === titleId)
       const summary = stringValue(gate.jm1pub_authorresponsesummary)
       const gateStatus = dataverseFormatted(gate, 'jm1pub_gatestatus') || stringValue(gate.jm1pub_gatestatus)
@@ -4563,20 +4569,7 @@ function buildAuthorResponseQueue(
       const modifiedOn = stringValue(gate.modifiedon || decisionOn)
       const ageMinutes = ageMinutesSince(decisionOn || modifiedOn)
       const classifiedDecision = classifyAuthorDecision(authorDecision, summary)
-      const transitionLog = logs.find((log) => {
-        const type = stringValue(log.jm1_actiontype)
-        const source = stringValue(log.jm1_sourcerecordid)
-        const detail = stringValue(log.jm1_actiondescription)
-        return (
-          source === gateId ||
-          (stageId && source === stageId) ||
-          detail.includes(gateId) ||
-          type.includes('STAGE_TRANSITION') ||
-          type.includes('PROOFREADING_STARTED') ||
-          type.includes('CAP004_PROOFREADING_STARTED')
-        )
-      })
-      const transitionEvidence = transitionLog || downstreamStage
+      const transitionEvidence = logs.find((log) => isBoundEditorialTransition(log, { titleId, stageId, gateId, decisionOn }))
       const processingStatus = deriveAuthorResponseProcessingStatus(gateStatus, classifiedDecision, transitionEvidence)
       const failedStep = deriveAuthorResponseFailedStep(gateStatus, transitionEvidence, processingStatus)
       const stagePackage = [
@@ -4588,6 +4581,7 @@ function buildAuthorResponseQueue(
 
       return {
         key: gateId,
+        titleId,
         author: dataverseFormatted(gate, '_jm1pub_titleid_value') ? stringValue(title?.jm1pub_authorname) || 'Author' : 'Author',
         title:
           stringValue(title?.jm1pub_titlename || title?.jm1pub_name) ||
@@ -4663,7 +4657,7 @@ function authorResponseToTodayItem(item: PublisherAuthorResponseQueueItem): Publ
   return {
     key: `author-response:${item.key}`,
     recordId: item.gateId,
-    titleId: item.gateId,
+    titleId: item.titleId || '',
     title: item.title,
     author: item.author,
     portfolioState: 'author_response',
