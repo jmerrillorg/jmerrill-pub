@@ -3,7 +3,7 @@ const { EmailClient } = require("@azure/communication-email");
 const { DefaultAzureCredential } = require("@azure/identity");
 const { createHash } = require("node:crypto");
 const { executeApprovedAuthorResponse } = require("../state/approvedAuthorDelivery");
-const { renderServiceCorrespondence } = require("../templates/renderer");
+const { renderPublishingServiceCorrespondence, validateJm1EnterpriseCommunication } = require("../generated/communications/jm1-enterprise-communication-renderer");
 const {
   assertPolicyAllows,
   resolveCommunicationAuthority
@@ -383,8 +383,10 @@ function validatePublishingAcknowledgmentEmail(email, payload) {
     cc: email.recipients?.cc?.map((recipient) => recipient.address) || []
   });
   if (!identity.ok) return { ok: false, reason: identity.reason };
-  const signature = validateSignatureBlock({ brand: "JMP", text: `${text}\n${html}` });
-  if (!signature.ok) return { ok: false, reason: signature.reason };
+  for (const content of [text, html]) {
+    const signature = validateSignatureBlock({ brand: "JMP", text: content });
+    if (!signature.ok) return { ok: false, reason: signature.reason };
+  }
   if (subject.includes(payload.reference) || REFERENCE_PATTERN.test(subject) || DIAGNOSTIC_ID_PATTERN.test(subject)) {
     return { ok: false, reason: "SUBJECT_EXPOSES_INTERNAL_REFERENCE" };
   }
@@ -454,49 +456,14 @@ function buildAcknowledgmentEmail(payload) {
     "Helping Authors Help Themselves",
     "https://jmerrill.pub"
   ].join("\n");
-  const html = `<!doctype html>
-<html lang="en">
-  <body style="margin:0;padding:0;background:#f6f7f9;color:#1f2933;font-family:Arial,Helvetica,sans-serif;">
-    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#f6f7f9;padding:24px 0;">
-      <tr>
-        <td align="center">
-          <table role="presentation" width="640" cellspacing="0" cellpadding="0" style="max-width:640px;width:100%;background:#ffffff;border:1px solid #d9dee7;">
-            <tr>
-              <td style="background:#162033;color:#ffffff;padding:24px 28px;">
-                <div style="font-size:13px;letter-spacing:.08em;font-weight:700;">J MERRILL PUBLISHING</div>
-                <div style="font-size:12px;color:#cbd5e1;margin-top:6px;">A Division of J Merrill One</div>
-              </td>
-            </tr>
-            <tr>
-              <td style="padding:28px;">
-                <p style="margin:0 0 18px;font-size:16px;line-height:1.55;">Good day ${escapeHtml(payload.firstName)},</p>
-                <p style="margin:0 0 18px;font-size:16px;line-height:1.55;">Thank you for reaching out to J Merrill Publishing and trusting us with the first step of your publishing journey.</p>
-                <p style="margin:0 0 18px;font-size:16px;line-height:1.55;"><strong>Book / project:</strong> ${escapeHtml(projectTitle)}</p>
-                <h2 style="font-size:18px;line-height:1.35;margin:24px 0 8px;color:#162033;">Why you are receiving this</h2>
-                <p style="margin:0 0 18px;font-size:16px;line-height:1.55;">We received your publishing inquiry and are confirming the next step.</p>
-                <h2 style="font-size:18px;line-height:1.35;margin:24px 0 8px;color:#162033;">What has happened</h2>
-                <p style="margin:0 0 18px;font-size:16px;line-height:1.55;"><strong>${escapeHtml(copy.statusHeading)}</strong> ${escapeHtml(copy.statusText)}</p>
-                <h2 style="font-size:18px;line-height:1.35;margin:24px 0 8px;color:#162033;">What we need from you</h2>
-                <p style="margin:0 0 18px;font-size:16px;line-height:1.55;">${escapeHtml(copy.actionText)}</p>
-                ${copy.ctaLabel && copy.ctaUrl ? `<p style="margin:24px 0;"><a href="${escapeHtml(copy.ctaUrl)}" style="display:inline-block;background:#1d4ed8;color:#ffffff;text-decoration:none;border-radius:4px;padding:12px 18px;font-weight:700;">${escapeHtml(copy.ctaLabel)}</a></p>` : ""}
-                <h2 style="font-size:18px;line-height:1.35;margin:24px 0 8px;color:#162033;">What happens next</h2>
-                <p style="margin:0 0 18px;font-size:16px;line-height:1.55;">Our team will review the details you shared and follow up within 7-10 business days with the next right step.</p>
-                <p style="margin:0 0 18px;font-size:16px;line-height:1.55;">Please keep this reference number for your records: <strong>${escapeHtml(payload.reference)}</strong></p>
-                <p style="margin:24px 0 0;font-size:16px;line-height:1.55;">With care,<br>J Merrill Publishing<br><span style="color:#4b5563;">Helping Authors Help Themselves</span></p>
-              </td>
-            </tr>
-          </table>
-        </td>
-      </tr>
-    </table>
-  </body>
-</html>`;
-
+  const rendered = renderPublishingServiceCorrespondence({ subject, body: plainText,
+    authorName: payload.firstName, templateName: "PUBLISHING_INQUIRY_ACKNOWLEDGMENT", templateVersion: "1.0", actionLabel: copy.ctaLabel });
+  const html = rendered.html;
   const email = {
     senderAddress,
     content: {
       subject,
-      plainText,
+      plainText: rendered.text,
       html
     },
     replyTo: [
@@ -869,8 +836,9 @@ function validateApprovedAuthorResponsePayload(payload = {}) {
   }
 
   const subject = normalizeText(payload.subject);
-  const body = normalizeBody(payload.body);
-  const htmlBody = normalizeHtmlBody(payload.htmlBody);
+  let body = normalizeBody(payload.body);
+  let htmlBody = normalizeHtmlBody(payload.htmlBody);
+  let canonicalMetadata = payload.templateMetadata;
   const attachments = normalizeAuthorReviewAttachments(payload.attachments);
   if (!subject) {
     return { ok: false, reason: "SUBJECT_MISSING" };
@@ -878,6 +846,28 @@ function validateApprovedAuthorResponsePayload(payload = {}) {
 
   if (!body) {
     return { ok: false, reason: "BODY_MISSING" };
+  }
+
+  // Existing certified packages retain their exact renderer output. Service
+  // content without rendering authority is projected by the same canonical ECR.
+  const routineService = /^INBOUND_SERVICE_/.test(normalizeText(payload.templateName));
+  if (routineService && !canonicalMetadata?.renderer) {
+    try {
+      const rendered = renderPublishingServiceCorrespondence({ subject, body,
+        authorName: normalizeText(payload.authorName),
+        templateName: normalizeText(payload.templateName), templateVersion: normalizeText(payload.templateVersion) });
+      body = rendered.text;
+      htmlBody = rendered.html;
+      canonicalMetadata = rendered.metadata;
+    } catch { return { ok: false, reason: "AUTHOR_CANONICAL_RENDER_FAILED" }; }
+  }
+  const presentation = !routineService ? { ok: true } : validateJm1EnterpriseCommunication({ html: htmlBody, text: body, brand: "publishing",
+    replyOnly: !/<a\b[^>]+href="https:\/\//i.test(htmlBody || "") });
+  if (routineService && (!presentation.ok || canonicalMetadata.renderer !== CANONICAL_AUTHOR_RENDERER ||
+      canonicalMetadata.qualityGate !== "PASS" ||
+      canonicalMetadata.htmlSha256 !== createHash("sha256").update(htmlBody).digest("hex") ||
+      (canonicalMetadata.textSha256 || canonicalMetadata.plainTextSha256) !== createHash("sha256").update(body).digest("hex"))) {
+    return { ok: false, reason: "AUTHOR_CANONICAL_PRESENTATION_REQUIRED" };
   }
 
   if (normalizeText(payload.templateName) === "EDITORIAL_RECOMMENDATION_LETTER_V1" && !htmlBody) {
@@ -942,6 +932,30 @@ function validateApprovedAuthorResponsePayload(payload = {}) {
     return { ok: false, reason: "FUTURE_DATAVERSE_SEND_LOG_REQUIRED" };
   }
 
+  const certifiedPackage = [AUTHOR_REVIEW_PACKAGE_TEMPLATE, DEVELOPMENTAL_REVIEW_PACKAGE_TEMPLATE, FINAL_DEVELOPMENTAL_REVIEW_TEMPLATE,
+    PACKAGE_ACCEPTANCE_TEMPLATE, "EDITORIAL_RECOMMENDATION_LETTER_V1"].includes(normalizeText(payload.templateName));
+  if (!certifiedPackage && !routineService) {
+    try {
+      if (canonicalMetadata?.renderer === CANONICAL_AUTHOR_RENDERER) {
+        const checked = validateJm1EnterpriseCommunication({ html: htmlBody, text: body, brand: "publishing",
+          replyOnly: !/<a\b[^>]+href="https:\/\//i.test(htmlBody || ""),
+          accessCodeMessage: normalizeText(payload.templateName) === "AUTHOR_EMAIL_OTP_LOGIN_V1" });
+        if (!checked.ok || canonicalMetadata.qualityGate !== "PASS" ||
+            canonicalMetadata.htmlSha256 !== createHash("sha256").update(htmlBody).digest("hex") ||
+            canonicalMetadata.textSha256 !== createHash("sha256").update(body).digest("hex")) {
+          return { ok: false, reason: "AUTHOR_CANONICAL_PRESENTATION_REQUIRED" };
+        }
+      } else {
+        const rendered = renderPublishingServiceCorrespondence({ subject, body,
+        authorName: normalizeText(payload.authorName), templateName: normalizeText(payload.templateName),
+        templateVersion: normalizeText(payload.templateVersion) });
+        body = rendered.text;
+        htmlBody = rendered.html;
+        canonicalMetadata = rendered.metadata;
+      }
+    } catch { return { ok: false, reason: "AUTHOR_CANONICAL_RENDER_FAILED" }; }
+  }
+
   return {
     ok: true,
     value: {
@@ -955,19 +969,19 @@ function validateApprovedAuthorResponsePayload(payload = {}) {
       projectTitle: normalizeText(payload.projectTitle),
       subject,
       body,
-      htmlBody: onboardingRecovery ? renderServiceCorrespondence(body) : htmlBody || null,
+      htmlBody,
       templateName: normalizeText(payload.templateName),
       templateVersion: normalizeText(payload.templateVersion),
-      templateMetadata: payload.templateMetadata && typeof payload.templateMetadata === "object" ? {
-        htmlSha256: normalizeText(payload.templateMetadata.htmlSha256),
-        textSha256: normalizeText(payload.templateMetadata.textSha256),
-        qualityGate: normalizeText(payload.templateMetadata.qualityGate),
-        brandSystem: normalizeText(payload.templateMetadata.brandSystem),
-        enterpriseStandard: normalizeText(payload.templateMetadata.enterpriseStandard),
-        renderer: normalizeText(payload.templateMetadata.renderer),
-        rendererVersion: normalizeText(payload.templateMetadata.rendererVersion),
-        renderMode: normalizeText(payload.templateMetadata.renderMode),
-        renderTemplateGuard: normalizeText(payload.templateMetadata.renderTemplateGuard)
+      templateMetadata: canonicalMetadata && typeof canonicalMetadata === "object" ? {
+        htmlSha256: normalizeText(canonicalMetadata.htmlSha256),
+        textSha256: normalizeText(canonicalMetadata.textSha256),
+        qualityGate: normalizeText(canonicalMetadata.qualityGate),
+        brandSystem: normalizeText(canonicalMetadata.brandSystem),
+        enterpriseStandard: normalizeText(canonicalMetadata.enterpriseStandard || canonicalMetadata.standard),
+        renderer: normalizeText(canonicalMetadata.renderer),
+        rendererVersion: normalizeText(canonicalMetadata.rendererVersion),
+        renderMode: normalizeText(canonicalMetadata.renderMode),
+        renderTemplateGuard: normalizeText(canonicalMetadata.renderTemplateGuard)
       } : null,
       attachments: attachments.ok ? attachments.value : [],
       artifactManifest: normalizeText(payload.templateName) === DEVELOPMENTAL_REVIEW_PACKAGE_TEMPLATE ? payload.artifactManifest : null,
@@ -1093,7 +1107,7 @@ function validateCanonicalAuthorReviewHtmlPayload(payload = {}) {
 
   const hasPortalReference =
     text.includes("Optional Author Operating Center access: https://") ||
-    (conversationalDevelopmental && text.includes("You may also view the materials in your Author Operating Center: https://"));
+    text.includes("You may also view the materials in your Author Operating Center: https://");
   if (!replyOnly && !hasPortalReference) {
     return { ok: false, reason: "AUTHOR_REVIEW_PACKAGE_TEXT_PORTAL_REFERENCE_REQUIRED" };
   }
@@ -1846,6 +1860,8 @@ app.http("send-approved-author-response", {
           sentAt: result.sentAt,
           semanticIdempotencyKey: result.semanticIdempotencyKey,
           artifactChecksums: result.artifactChecksums,
+          renderMetadata: validation.value.templateMetadata,
+          templateVersion: validation.value.templateVersion,
           observability: result.observability
         }
       };

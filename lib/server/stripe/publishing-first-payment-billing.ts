@@ -1,3 +1,5 @@
+import { renderPublishingServiceCorrespondence } from '../jm1-enterprise-communication-renderer'
+
 // Engine: Stage Transition Engine
 // Reusable? Y
 // Stage-specific exception? N
@@ -102,11 +104,17 @@ export function buildFirstPaymentEmail(input: { hostedInvoiceUrl: string }) {
     'J Merrill Publishing',
   ].join('\n')
 
-  const htmlBody = `<!doctype html><html><body style="margin:0;background:#f6f7f9;font-family:Arial,Helvetica,sans-serif;color:#111827;"><div style="max-width:680px;margin:0 auto;background:#ffffff;"><div style="background:#111827;color:#ffffff;padding:24px 28px;"><div style="font-size:18px;font-weight:700;">J Merrill Publishing</div><div style="font-size:13px;margin-top:4px;">A Division of J Merrill One</div></div><div style="padding:28px;"><p>Good day ${escapeHtml(firstName(a.authorName))},</p><p>Your signed J Merrill Publishing agreement package for <strong>${escapeHtml(a.title)}</strong> is complete.</p><p>Your selected plan is the <strong>${escapeHtml(a.packageName)}</strong> on the <strong>24-payment option</strong>.</p><table role="presentation" cellpadding="0" cellspacing="0" style="border-collapse:collapse;width:100%;margin:18px 0;"><tr><td style="border:1px solid #dbe3ef;padding:10px;font-weight:700;">First payment</td><td style="border:1px solid #dbe3ef;padding:10px;">${firstPayment}</td></tr><tr><td style="border:1px solid #dbe3ef;padding:10px;font-weight:700;">Total before any applicable tax</td><td style="border:1px solid #dbe3ef;padding:10px;">${total}</td></tr></table><p>Please use the secure payment link below to make your first payment.</p><p style="margin:28px 0;"><a href="${escapeHtml(input.hostedInvoiceUrl)}" style="display:inline-block;background:#1d4ed8;color:#ffffff;text-decoration:none;font-weight:700;padding:12px 18px;border-radius:6px;">Make First Payment</a></p><p>Production begins after J Merrill Publishing receives the first payment. Your release date is not locked until the full package payment obligation is complete.</p><p>If you have questions, simply reply to this message.</p><p>With care,<br>J Merrill Publishing</p></div></div></body></html>`
+  const rendered = renderPublishingServiceCorrespondence({
+    subject: 'Indomitable — First Payment Link', body, authorName: a.authorName,
+    templateName: 'PUBLISHING_FIRST_PAYMENT_REQUEST_V1', templateVersion: 'v1.0',
+    actionLabel: 'Make First Payment',
+  })
+  const htmlBody = rendered.html
   return {
     subject: 'Indomitable — First Payment Link',
-    body,
+    body: rendered.text,
     htmlBody,
+    templateMetadata: rendered.metadata,
     from: 'publishing@email.jmerrill.one',
     replyTo: 'publishing@jmerrill.one',
     cc: 'publishing@jmerrill.one',
@@ -327,14 +335,7 @@ async function sendFirstPaymentAuthorEmail(email: ReturnType<typeof buildFirstPa
       htmlBody: email.htmlBody,
       templateName: 'PUBLISHING_FIRST_PAYMENT_REQUEST_V1',
       templateVersion: 'v1.0',
-      templateMetadata: {
-        qualityGate: 'EXECUTED_AGREEMENT_FIRST_PAYMENT',
-        brandSystem: 'J Merrill Publishing',
-        enterpriseStandard: 'JM1-COM-001',
-        renderer: 'publishing-first-payment-billing',
-        rendererVersion: PUBLISHING_BILLING_CONTINUATION_VERSION,
-        renderMode: 'CANONICAL_HTML',
-      },
+      templateMetadata: email.templateMetadata,
       approvedBy: 'Jackie Smith, Jr.',
       approvedOn: new Date().toISOString(),
       internalVisibilityMailbox: 'publishing@jmerrill.one',

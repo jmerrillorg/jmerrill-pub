@@ -233,6 +233,7 @@ function validAuthorResponsePayload(overrides = {}) {
     subject: "Next step for your J Merrill Publishing submission",
     body: "Approved author response body.",
     templateName: "INITIAL_DIAGNOSTIC_REVIEW_NEXT_STEP",
+    templateVersion: "1.0",
     approvedBy: "jackie",
     approvedOn: "2026-06-18T12:00:00.000Z",
     internalVisibilityMailbox: "publishing@jmerrill.one",

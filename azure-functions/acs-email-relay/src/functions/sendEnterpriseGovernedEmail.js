@@ -5,6 +5,7 @@ const { authenticateCaller } = require("../security/callerAuthentication");
 const { authorizeCallerForBrand, authorizeCallerForTemplate, normalizeBrand } = require("../policy/callerRegistry");
 const { DELIVERY_STATE, getMessageLedger } = require("../state/messageLedger");
 const { renderTemplate } = require("../templates/renderer");
+const { renderPublishingServiceCorrespondence } = require("../generated/communications/jm1-enterprise-communication-renderer");
 const { isGovernedNamespace } = require("../templates/templateRegistry");
 const {
   getSenderProfile,
@@ -186,6 +187,16 @@ function validateEnterprisePayload(payload = {}) {
   if (!subject) return { ok: false, reason: "ACS_SUBJECT_REQUIRED" };
   if (!plainText) return { ok: false, reason: "ACS_PLAIN_TEXT_REQUIRED" };
   if (!html || !/^<!doctype html>/i.test(html)) return { ok: false, reason: "ACS_HTML_REQUIRED" };
+  if (brand === "JMP" && !renderMetadata) {
+    try {
+      const rendered = renderPublishingServiceCorrespondence({ subject, body: plainText,
+        authorName: plainText.match(/Good day,?\s*([^,\n]+)/i)?.[1] || to[0].displayName || "Author",
+        templateName: templateId, templateVersion });
+      html = rendered.html;
+      plainText = rendered.text;
+      renderMetadata = { ...rendered.metadata, plainTextSha256: rendered.metadata.textSha256 };
+    } catch { return { ok: false, reason: "AUTHOR_CANONICAL_RENDER_FAILED" }; }
+  }
   if (containsInternalLanguage(`${subject}\n${plainText}\n${html}`)) return { ok: false, reason: "HUMAN_FIRST_INTERNAL_LANGUAGE_BLOCKED" };
   if (senderAddress.includes("noreply") || replyTo.includes("noreply")) return { ok: false, reason: "ACS_NOREPLY_BLOCKED" };
 

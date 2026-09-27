@@ -1,3 +1,5 @@
+import { renderPublishingServiceCorrespondence } from './jm1-enterprise-communication-renderer'
+
 import { createHash, createHmac, randomInt, randomUUID, timingSafeEqual } from 'node:crypto'
 
 import {
@@ -437,11 +439,15 @@ export async function sendAuthorOtpEmail(input: {
     '',
     'J Merrill Publishing',
   ].join('\n')
-  const html = `<!doctype html><html><body style="margin:0;background:#f6f7f9;font-family:Arial,Helvetica,sans-serif;color:#111827;"><div style="max-width:640px;margin:0 auto;background:#ffffff;"><div style="background:#111827;color:#ffffff;padding:24px 28px;"><div style="font-size:18px;font-weight:700;">J Merrill Publishing</div><div style="font-size:13px;margin-top:4px;">Author access</div></div><div style="padding:28px;"><p>Good day ${escapeHtml(firstName(input.authorName))},</p><p>Use this one-time code to sign in to your J Merrill Publishing Author Operating Center:</p><p style="font-size:28px;letter-spacing:4px;font-weight:700;margin:24px 0;">${escapeHtml(input.code)}</p><p>This code expires in ${expiresMinutes} minutes and can be used one time.</p><p>If you did not request this code, you can ignore this email.</p><p>J Merrill Publishing</p></div></div></body></html>`
+  const rendered = renderPublishingServiceCorrespondence({
+    subject: 'Your J Merrill Publishing author access code', body: text, authorName: input.authorName,
+    templateName: 'AUTHOR_EMAIL_OTP_LOGIN_V1', templateVersion: AUTHOR_EMAIL_OTP_POLICY,
+  })
+  const html = rendered.html
   const draft = buildGovernedPublishingEmail({
     to: [input.to],
     subject: 'Your J Merrill Publishing author access code',
-    text,
+    text: rendered.text,
     correlationId: input.correlationId,
   })
   const validation = validatePublishingOutboundEmail(draft)
@@ -468,14 +474,7 @@ export async function sendAuthorOtpEmail(input: {
       htmlBody: html,
       templateName: 'AUTHOR_EMAIL_OTP_LOGIN_V1',
       templateVersion: AUTHOR_EMAIL_OTP_POLICY,
-      templateMetadata: {
-        qualityGate: 'AUTHOR_EMAIL_OTP_LOGIN',
-        brandSystem: 'J Merrill Publishing',
-        enterpriseStandard: 'JM1-COM-001',
-        renderer: 'author-email-otp',
-        rendererVersion: AUTHOR_EMAIL_OTP_POLICY,
-        renderMode: 'CANONICAL_HTML',
-      },
+      templateMetadata: rendered.metadata,
       approvedBy: 'J Merrill Publishing author access policy',
       approvedOn: new Date().toISOString(),
       internalVisibilityMailbox: PUBLISHING_EMAIL_CANON.archiveCopy,

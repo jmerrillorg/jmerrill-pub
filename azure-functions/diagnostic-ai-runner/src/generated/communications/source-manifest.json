@@ -1,0 +1,13 @@
+{
+  "sourceAuthority": "lib/server/jm1-enterprise-communication-renderer.ts",
+  "files": {
+    "jm1-enterprise-design-tokens": {
+      "sourceSha256": "4d6d307af1951da8b0145c153da927f345cacc8100e532a2b3e65662c5b69b84",
+      "runtimeSha256": "31d8b8b694424f111db30c1e2cd23fa3c47e08a5bbad7e5ad2f07c80f563534b"
+    },
+    "jm1-enterprise-communication-renderer": {
+      "sourceSha256": "ce554953f5afc2c3c2d4800710f37ff55ca793ed9a305edb9d99165d3258afc1",
+      "runtimeSha256": "efd35a1c8208fd7f1ee23e2a389aaf80bb943bbde0b39a211a77cbd9775a962a"
+    }
+  }
+}

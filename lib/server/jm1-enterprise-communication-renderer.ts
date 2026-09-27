@@ -12,7 +12,7 @@ import {
 export const JM1_ENTERPRISE_COMMUNICATION_STANDARD = {
   name: 'JM1 Enterprise Communication Standard v1.0',
   rendererName: 'JM1 Enterprise Communication Renderer',
-  rendererVersion: '1.0.0',
+  rendererVersion: '1.0.1',
   supportedOutputProfiles: ['EMAIL_HTML', 'EMAIL_TEXT'],
   futureOutputProfiles: ['LETTER', 'PORTAL_NOTICE', 'SMS_SUMMARY', 'REPORT'],
   colors: JM1_ENTERPRISE_DESIGN_TOKENS.colors,
@@ -54,6 +54,7 @@ export type Jm1EnterpriseCommunicationInput = {
   preheader: string
   reason: string
   summaryItems?: string[]
+  correspondenceParagraphs?: string[]
   attachments?: string[]
   reviewPrompt?: string
   actionLabel?: string
@@ -92,7 +93,8 @@ export function renderJm1EnterpriseCommunication(input: Jm1EnterpriseCommunicati
   if (!brandValidation.ok) throw new Error(brandValidation.blocker)
   const html = renderHtml(normalized)
   const text = renderText(normalized)
-  const validation = validateJm1EnterpriseCommunication({ html, text, brand: normalized.brand, replyOnly: normalized.replyOnly })
+  const validation = validateJm1EnterpriseCommunication({ html, text, brand: normalized.brand, replyOnly: normalized.replyOnly,
+    accessCodeMessage: normalized.templateName === 'AUTHOR_EMAIL_OTP_LOGIN_V1' })
   if (!validation.ok) throw new Error(validation.blocker)
   return {
     subject: normalized.subject,
@@ -124,6 +126,40 @@ export function signatureForBrand(brandKey: Jm1CommunicationBrandKey) {
   ].join('\n')
 }
 
+// Runtime adapters supply correspondence content; presentation stays in this renderer.
+export function renderPublishingServiceCorrespondence(input: {
+  subject: string
+  body: string
+  authorName: string
+  templateName: string
+  templateVersion: string
+  actionLabel?: string
+}) {
+  const body = required(input.body, 'body')
+  if (body.length > 12000) throw new Error('JM1_ECR_BLOCKED - BODY_TOO_LONG')
+  const paragraphs = body.replace(/^Good day,?[^\n]+,\s*\n+/i, '')
+    .replace(/\n\s*(?:(?:Warm regards|With care),\s*\n+)?J Merrill Publishing(?:\s*\nHelping Authors Help Themselves)?(?:\s*\nhttps:\/\/jmerrill\.pub)?\s*$/i, '')
+    .split(/\n\s*\n/).map(value => value.trim()).filter(Boolean)
+  const url = paragraphs.join('\n').match(/https:\/\/[^\s<>]+/)?.[0]?.replace(/[.,;]+$/, '')
+  return renderJm1EnterpriseCommunication({
+    brand: 'publishing',
+    executionAuthority: { authoritySource: 'JM1 Governed Bootstrap', renderAllowed: true, communicationAllowed: true },
+    templateName: input.templateName,
+    templateVersion: input.templateVersion,
+    subject: input.subject,
+    recipientName: required(input.authorName, 'authorName').split(/\s+/)[0],
+    title: input.subject.replace(/^Re:\s*/i, ''),
+    preheader: input.subject.replace(/^Re:\s*/i, ''),
+    reason: paragraphs[0] || '',
+    correspondenceParagraphs: paragraphs.slice(1),
+    presentationStyle: 'CORRESPONDENCE',
+    actionInstruction: 'Please reply to this email if you need assistance.',
+    replyOnly: !url,
+    operationalNote: '',
+    ...(url ? { actionUrl: url, actionLabel: input.actionLabel || 'Open Your Secure Link' } : {}),
+  })
+}
+
 export function messageTitleFromSubject(subject: string, subtitle?: string) {
   const title = subtitle?.trim()
   if (!title) return subject.trim()
@@ -135,6 +171,7 @@ export function validateJm1EnterpriseCommunication(input: {
   text?: string | null
   brand?: Jm1CommunicationBrandKey
   replyOnly?: boolean | null
+  accessCodeMessage?: boolean
 }): { ok: true } | { ok: false; blocker: string } {
   const html = input.html?.trim() || ''
   const text = input.text?.trim() || ''
@@ -165,7 +202,8 @@ export function validateJm1EnterpriseCommunication(input: {
     blockers.push('HTML_TEXT_REVIEW_PROMPT_PARITY_MISSING')
   }
   if (!input.replyOnly && !/<a\b[^>]+href="https:\/\/[^"]+"/i.test(html)) blockers.push('PRIMARY_ACTION_LINK_MISSING')
-  if (input.replyOnly && /author\/portal|Author Operating Center|<a\b[^>]+href=/i.test(`${html}\n${text}`)) {
+  if (input.replyOnly && (/author\/portal|<a\b[^>]+href=/i.test(`${html}\n${text}`) ||
+      (!input.accessCodeMessage && /Author Operating Center/i.test(`${html}\n${text}`)))) {
     blockers.push('REPLY_ONLY_PORTAL_OR_LINK_PRESENT')
   }
 
@@ -253,6 +291,7 @@ function renderHtml(input: Jm1EnterpriseCommunicationInput) {
 
   return `<!doctype html>
 <html lang="en">
+  <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escapeHtml(input.subject)}</title></head>
   <body style="margin:0;padding:0;background:${colors.neutralBackground};color:${colors.textPrimary};font-family:Arial,Helvetica,sans-serif;">
     <div style="display:none;max-height:0;overflow:hidden;opacity:0;color:transparent;">${escapeHtml(input.preheader)}</div>
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;background:${colors.neutralBackground};">
@@ -308,7 +347,7 @@ function renderCorrespondenceText(input: Jm1EnterpriseCommunicationInput) {
     ? responseWindowSentence(input.responseWindow)
     : ''
   const attachments = naturalList(input.attachments || [])
-  const prepared = naturalParagraph(input.summaryItems || [])
+  const prepared = input.correspondenceParagraphs?.join('\n\n') || naturalParagraph(input.summaryItems || [])
   const next = naturalParagraph(input.timelineItems || [])
   return [
     input.title,
@@ -322,7 +361,7 @@ function renderCorrespondenceText(input: Jm1EnterpriseCommunicationInput) {
     input.reviewPrompt || '',
     input.actionInstruction,
     responseWindow,
-    ...(input.replyOnly ? [] : [`You may also view the materials in your Author Operating Center: ${input.actionUrl}`]),
+    ...(input.replyOnly ? [] : [input.correspondenceParagraphs ? `Use the secure link: ${input.actionUrl}` : `You may also view the materials in your Author Operating Center: ${input.actionUrl}`]),
     next,
     input.supportNote || '',
     input.operationalNote || '',
@@ -342,14 +381,15 @@ function renderCorrespondenceHtml(input: Jm1EnterpriseCommunicationInput) {
   const attachments = naturalList(input.attachments || [])
   const paragraphs = [
     input.reason,
-    naturalParagraph(input.summaryItems || []),
+    ...(input.correspondenceParagraphs || [naturalParagraph(input.summaryItems || [])]),
     attachments ? `We've included ${attachments}.` : '',
     input.reviewPrompt || '',
     input.actionInstruction,
-  ].filter(Boolean).map((value) => `<p style="margin:0 0 18px;font-size:${type.body};line-height:1.7;color:${colors.textSecondary};">${escapeHtml(value)}</p>`).join('')
+  ].filter(Boolean).map((value) => `<p style="margin:0 0 18px;font-size:${type.body};line-height:1.7;color:${colors.textSecondary};">${escapeHtml(value).replace(/\n/g, '<br>')}</p>`).join('')
   const next = naturalParagraph(input.timelineItems || [])
   return `<!doctype html>
 <html lang="en">
+  <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escapeHtml(input.subject)}</title></head>
   <body style="margin:0;padding:0;background:${colors.neutralBackground};color:${colors.textPrimary};font-family:Arial,Helvetica,sans-serif;">
     <div style="display:none;max-height:0;overflow:hidden;opacity:0;color:transparent;">${escapeHtml(input.preheader)}</div>
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;background:${colors.neutralBackground};">

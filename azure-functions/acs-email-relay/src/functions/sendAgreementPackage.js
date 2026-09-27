@@ -319,33 +319,16 @@ function validateAgreementPackageSendPayload(payload = {}) {
 }
 
 function buildAgreementPackageSendEmail(value) {
-  const htmlBody = `<!doctype html>
-<html lang="en">
-  <body style="margin:0;padding:0;background:#f6f7f9;color:#111827;font-family:Arial,Helvetica,sans-serif;">
-    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#f6f7f9;padding:24px 0;">
-      <tr>
-        <td align="center">
-          <table role="presentation" width="640" cellspacing="0" cellpadding="0" style="max-width:640px;width:100%;background:#ffffff;border:1px solid #d9dee7;">
-            <tr>
-              <td style="background:#162033;color:#ffffff;padding:24px 28px;">
-                <div style="font-size:13px;letter-spacing:.08em;font-weight:700;">J MERRILL PUBLISHING</div>
-                <div style="font-size:12px;color:#cbd5e1;margin-top:6px;">A Division of J Merrill One</div>
-              </td>
-            </tr>
-            <tr>
-              <td style="padding:28px;font-size:16px;line-height:1.55;white-space:pre-wrap;">${escapeHtml(value.bodyText)}</td>
-            </tr>
-          </table>
-        </td>
-      </tr>
-    </table>
-  </body>
-</html>`;
+  const rendered = require("../generated/communications/jm1-enterprise-communication-renderer").renderPublishingServiceCorrespondence({
+    subject: value.subject, body: value.bodyText, authorName: value.toDisplayName,
+    templateName: "AGREEMENT_PACKAGE_SEND", templateVersion: "1.0"
+  });
+  const htmlBody = rendered.html;
   const email = {
     senderAddress: getAuthorResponseSenderAddress(),
     content: {
       subject: value.subject,
-      plainText: value.bodyText,
+      plainText: rendered.text,
       html: htmlBody
     },
     replyTo: [

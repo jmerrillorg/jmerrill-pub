@@ -1,0 +1,26 @@
+{
+  "recovery": {
+    "htmlSha256": "67ff73de8a33ad66d6cf645ca82798e2e181ecbb8e875c99ac29522641eda6ac",
+    "textSha256": "64a5a4bdd1c3a3a609eb275b4d7aa2601f2b1eea63f45649d6bb5a9606c73dc4"
+  },
+  "developmental": {
+    "htmlSha256": "6d6622c603ee10db151b0b4da4ca1257e252042f66c8d3cf25332cd37b65f80e",
+    "textSha256": "9511a3a37887924f69098047c1b33e6bcba0026c600583dfb8e9b241d735f1fc"
+  },
+  "payment": {
+    "htmlSha256": "702b8e9a1c4acf0fa45de3d17739e74b8017f32095a0cad171be2183ffa3cc0e",
+    "textSha256": "26016a256a5f6c8c70bfe947f97b6bc42966f195e473ace1e106801fa80e9b9d"
+  },
+  "informational": {
+    "htmlSha256": "3311fdf347ffdd02d8073bac7a37d72022362ac695c2e181cd610c84ba03cc55",
+    "textSha256": "6545b6f5140e90eeb1674315430ba7523b3cb924522ca586017e8100579d969a"
+  },
+  "with-cta": {
+    "htmlSha256": "f8224fa5a3b67fc888dd6a177ac820ddf9d9625091a6cd103fa78c9bbfc53ff9",
+    "textSha256": "35ebe70a03d6da29d929cfea3c603da7cbf2f860f9983bb1d88991317744f8d2"
+  },
+  "without-cta": {
+    "htmlSha256": "004f1b9878c44099533f8f7f1f2c8840340d02eea705a5db7967401764fd1479",
+    "textSha256": "acd500a17f69a3a85a27edbc7e8e7951d2dfa1b25e399f3c19586d1b119d412a"
+  }
+}

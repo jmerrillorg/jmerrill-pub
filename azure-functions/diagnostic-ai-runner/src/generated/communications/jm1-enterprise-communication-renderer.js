@@ -1,0 +1,436 @@
+// GENERATED from canonical TypeScript; run scripts/build_publishing_communication_runtime.mjs.
+"use strict";
+// Engine: JM1 Enterprise Communication Renderer
+// Reusable? Y
+// Stage-specific exception? N
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.JM1_COMMUNICATION_BRANDS = exports.JM1_ENTERPRISE_COMMUNICATION_STANDARD = void 0;
+exports.renderJm1EnterpriseCommunication = renderJm1EnterpriseCommunication;
+exports.signatureForBrand = signatureForBrand;
+exports.renderPublishingServiceCorrespondence = renderPublishingServiceCorrespondence;
+exports.messageTitleFromSubject = messageTitleFromSubject;
+exports.validateJm1EnterpriseCommunication = validateJm1EnterpriseCommunication;
+const node_crypto_1 = require("node:crypto");
+const jm1_enterprise_design_tokens_1 = require("./jm1-enterprise-design-tokens");
+exports.JM1_ENTERPRISE_COMMUNICATION_STANDARD = {
+    name: 'JM1 Enterprise Communication Standard v1.0',
+    rendererName: 'JM1 Enterprise Communication Renderer',
+    rendererVersion: '1.0.1',
+    supportedOutputProfiles: ['EMAIL_HTML', 'EMAIL_TEXT'],
+    futureOutputProfiles: ['LETTER', 'PORTAL_NOTICE', 'SMS_SUMMARY', 'REPORT'],
+    colors: jm1_enterprise_design_tokens_1.JM1_ENTERPRISE_DESIGN_TOKENS.colors,
+    typography: jm1_enterprise_design_tokens_1.JM1_ENTERPRISE_DESIGN_TOKENS.typography,
+    components: [
+        'Brand Header',
+        'Hero',
+        'Greeting',
+        'Purpose',
+        'Summary',
+        'Attachments',
+        'Action Required',
+        'Timeline',
+        'Support',
+        'Signature',
+        'Footer',
+    ],
+};
+exports.JM1_COMMUNICATION_BRANDS = jm1_enterprise_design_tokens_1.JM1_BRAND_OVERLAYS;
+function renderJm1EnterpriseCommunication(input) {
+    const normalized = normalizeInput(input);
+    const authorityValidation = validateExecutionAuthority(normalized);
+    if (!authorityValidation.ok)
+        throw new Error(authorityValidation.blocker);
+    const brandValidation = validateBrandSignatureConfiguration(normalized.brand);
+    if (!brandValidation.ok)
+        throw new Error(brandValidation.blocker);
+    const html = renderHtml(normalized);
+    const text = renderText(normalized);
+    const validation = validateJm1EnterpriseCommunication({ html, text, brand: normalized.brand, replyOnly: normalized.replyOnly,
+        accessCodeMessage: normalized.templateName === 'AUTHOR_EMAIL_OTP_LOGIN_V1' });
+    if (!validation.ok)
+        throw new Error(validation.blocker);
+    return {
+        subject: normalized.subject,
+        html,
+        text,
+        metadata: {
+            standard: exports.JM1_ENTERPRISE_COMMUNICATION_STANDARD.name,
+            renderer: exports.JM1_ENTERPRISE_COMMUNICATION_STANDARD.rendererName,
+            rendererVersion: exports.JM1_ENTERPRISE_COMMUNICATION_STANDARD.rendererVersion,
+            templateName: normalized.templateName,
+            templateVersion: normalized.templateVersion,
+            brand: normalized.brand,
+            qualityGate: 'PASS',
+            htmlSha256: sha256(html),
+            textSha256: sha256(text),
+        },
+    };
+}
+function signatureForBrand(brandKey) {
+    const brand = exports.JM1_COMMUNICATION_BRANDS[brandKey];
+    if (!brand)
+        throw new Error('BRAND_SIGNATURE_CONFIGURATION_MISSING');
+    return [
+        brand.teamName,
+        brand.legalEntityName,
+        brand.divisionRelationship,
+        `${brand.phone} · ${brand.email} · ${brand.website}`,
+        brand.tagline,
+    ].join('\n');
+}
+// Runtime adapters supply correspondence content; presentation stays in this renderer.
+function renderPublishingServiceCorrespondence(input) {
+    const body = required(input.body, 'body');
+    if (body.length > 12000)
+        throw new Error('JM1_ECR_BLOCKED - BODY_TOO_LONG');
+    const paragraphs = body.replace(/^Good day,?[^\n]+,\s*\n+/i, '')
+        .replace(/\n\s*(?:(?:Warm regards|With care),\s*\n+)?J Merrill Publishing(?:\s*\nHelping Authors Help Themselves)?(?:\s*\nhttps:\/\/jmerrill\.pub)?\s*$/i, '')
+        .split(/\n\s*\n/).map(value => value.trim()).filter(Boolean);
+    const url = paragraphs.join('\n').match(/https:\/\/[^\s<>]+/)?.[0]?.replace(/[.,;]+$/, '');
+    return renderJm1EnterpriseCommunication({
+        brand: 'publishing',
+        executionAuthority: { authoritySource: 'JM1 Governed Bootstrap', renderAllowed: true, communicationAllowed: true },
+        templateName: input.templateName,
+        templateVersion: input.templateVersion,
+        subject: input.subject,
+        recipientName: required(input.authorName, 'authorName').split(/\s+/)[0],
+        title: input.subject.replace(/^Re:\s*/i, ''),
+        preheader: input.subject.replace(/^Re:\s*/i, ''),
+        reason: paragraphs[0] || '',
+        correspondenceParagraphs: paragraphs.slice(1),
+        presentationStyle: 'CORRESPONDENCE',
+        actionInstruction: 'Please reply to this email if you need assistance.',
+        replyOnly: !url,
+        operationalNote: '',
+        ...(url ? { actionUrl: url, actionLabel: input.actionLabel || 'Open Your Secure Link' } : {}),
+    });
+}
+function messageTitleFromSubject(subject, subtitle) {
+    const title = subtitle?.trim();
+    if (!title)
+        return subject.trim();
+    return subject.replace(new RegExp(`\\s+[—-]\\s+${escapeRegExp(title)}\\s*$`, 'i'), '').trim();
+}
+function validateJm1EnterpriseCommunication(input) {
+    const html = input.html?.trim() || '';
+    const text = input.text?.trim() || '';
+    const brand = input.brand ? exports.JM1_COMMUNICATION_BRANDS[input.brand] : undefined;
+    const blockers = [];
+    if (!html)
+        blockers.push('HTML_BODY_MISSING');
+    if (!text)
+        blockers.push('PLAIN_TEXT_BODY_MISSING');
+    if (!/<!doctype html>/i.test(html))
+        blockers.push('HTML_DOCTYPE_MISSING');
+    if (!/<table\b/i.test(html))
+        blockers.push('EMAIL_TABLE_LAYOUT_MISSING');
+    if (/<script\b|<link\b|<iframe\b|<form\b/i.test(html))
+        blockers.push('UNSUPPORTED_EMAIL_MARKUP');
+    if (brand) {
+        if (!html.includes(brand.brandName))
+            blockers.push('BRAND_HEADER_MISSING');
+        if (!text.includes(signatureForBrand(input.brand)))
+            blockers.push('GOVERNED_SIGNATURE_MISSING');
+        if (new RegExp(`<h1[^>]*>\\s*${escapeRegExp(brand.brandName)}\\s*</h1>`, 'i').test(html)) {
+            blockers.push('BRAND_NAME_RENDERED_AS_MESSAGE_H1');
+        }
+    }
+    if (/\b(manifest|ledger|workflow record|evidence file|internal instruction)\b/i.test(text)) {
+        blockers.push('AUTHOR_EMAIL_INTERNAL_ARTIFACT_EXPOSED');
+    }
+    if (/\bresponse window\b/i.test(text) && !/\bResponse window:\s+\S+/i.test(text))
+        blockers.push('RESPONSE_WINDOW_INVALID');
+    if (/\bresponse clock\b/i.test(text))
+        blockers.push('RESPONSE_CLOCK_LANGUAGE_UNAUTHORIZED');
+    if (/\bmust use the portal|required to use the portal|portal is required\b/i.test(text))
+        blockers.push('MANDATORY_PORTAL_LANGUAGE');
+    if (/<h1[^>]*>\s*(Warmly|J Merrill Publishing)\s*<\/h1>/i.test(html))
+        blockers.push('INVENTED_CLOSING_OR_BRAND_H1');
+    if (/\nWarmly,\s*\nJ Merrill Publishing\b/i.test(text))
+        blockers.push('INVENTED_CLOSING_PRESENT');
+    if (html.includes('What we need from you') !== text.includes('What we need from you')) {
+        blockers.push('HTML_TEXT_REVIEW_PROMPT_PARITY_MISSING');
+    }
+    if (!input.replyOnly && !/<a\b[^>]+href="https:\/\/[^"]+"/i.test(html))
+        blockers.push('PRIMARY_ACTION_LINK_MISSING');
+    if (input.replyOnly && (/author\/portal|<a\b[^>]+href=/i.test(`${html}\n${text}`) ||
+        (!input.accessCodeMessage && /Author Operating Center/i.test(`${html}\n${text}`)))) {
+        blockers.push('REPLY_ONLY_PORTAL_OR_LINK_PRESENT');
+    }
+    return blockers.length ? { ok: false, blocker: `JM1_ECR_BLOCKED - ${blockers.join(',')}` } : { ok: true };
+}
+function normalizeInput(input) {
+    return {
+        ...input,
+        brand: input.brand,
+        outputProfiles: input.outputProfiles || ['EMAIL_HTML', 'EMAIL_TEXT'],
+        templateName: required(input.templateName, 'templateName'),
+        templateVersion: required(input.templateVersion, 'templateVersion'),
+        subject: required(input.subject, 'subject'),
+        recipientName: required(input.recipientName, 'recipientName'),
+        title: required(input.title, 'title'),
+        subtitle: input.subtitle?.trim(),
+        preheader: required(input.preheader, 'preheader'),
+        reason: required(input.reason, 'reason'),
+        actionLabel: input.replyOnly ? input.actionLabel?.trim() : required(input.actionLabel, 'actionLabel'),
+        actionUrl: input.replyOnly ? input.actionUrl?.trim() : validateUrl(required(input.actionUrl, 'actionUrl')),
+        actionInstruction: required(input.actionInstruction, 'actionInstruction'),
+        replyOnly: Boolean(input.replyOnly),
+        responseWindow: input.responseWindow?.trim(),
+        supportNote: input.supportNote?.trim() || 'Reply to this email and the team will help.',
+        operationalNote: input.operationalNote === '' ? '' : input.operationalNote?.trim() || 'This message follows the JM1 Enterprise Communication Standard v1.0.',
+        presentationStyle: input.presentationStyle || 'STRUCTURED',
+    };
+}
+function renderText(input) {
+    if (input.presentationStyle === 'CORRESPONDENCE')
+        return renderCorrespondenceText(input);
+    const responseWindow = input.responseWindow && input.executionAuthority.responseClockAuthorized
+        ? [`Response window: ${input.responseWindow}`, '']
+        : [];
+    return [
+        input.title,
+        input.subtitle || '',
+        '',
+        `Good day, ${input.recipientName},`,
+        '',
+        'Why you are receiving this',
+        input.reason,
+        '',
+        'What has been completed',
+        ...(input.summaryItems || []).map((item) => `- ${item}`),
+        '',
+        "What's attached",
+        ...(input.attachments || ['No files are attached.']).map((item) => `- ${item}`),
+        '',
+        input.reviewPrompt ? 'What we need from you' : '',
+        input.reviewPrompt || '',
+        '',
+        'How to respond',
+        input.actionInstruction,
+        ...responseWindow,
+        ...(input.replyOnly ? [] : [input.actionUrl || '', '', 'Optional Author Operating Center access', `Optional Author Operating Center access: ${input.actionUrl}`, '']),
+        'What happens next',
+        ...(input.timelineItems || []).map((item) => `- ${item}`),
+        '',
+        'Support',
+        input.supportNote || '',
+        '',
+        input.operationalNote || '',
+        '',
+        signatureForBrand(input.brand),
+    ].filter((line) => line !== '').join('\n');
+}
+function renderHtml(input) {
+    if (input.presentationStyle === 'CORRESPONDENCE')
+        return renderCorrespondenceHtml(input);
+    const standard = exports.JM1_ENTERPRISE_COMMUNICATION_STANDARD;
+    const colors = standard.colors;
+    const type = standard.typography;
+    const brand = exports.JM1_COMMUNICATION_BRANDS[input.brand];
+    const summary = (input.summaryItems || []).map((item) => `<li>${escapeHtml(item)}</li>`).join('');
+    const attachments = (input.attachments || ['No files are attached.']).map((item) => `<li>${escapeHtml(item)}</li>`).join('');
+    const timeline = (input.timelineItems || []).map((item) => `<li>${escapeHtml(item)}</li>`).join('');
+    const review = input.reviewPrompt
+        ? section('What we need from you', input.reviewPrompt, colors.textSecondary, type.body, colors.textPrimary, type.headingM)
+        : '';
+    const responseWindow = input.responseWindow && input.executionAuthority.responseClockAuthorized
+        ? `<p style="margin:12px 0 0;color:${colors.textSecondary};font-size:14px;line-height:1.6;"><strong>Response window:</strong> ${escapeHtml(input.responseWindow)}</p>`
+        : '';
+    return `<!doctype html>
+<html lang="en">
+  <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escapeHtml(input.subject)}</title></head>
+  <body style="margin:0;padding:0;background:${colors.neutralBackground};color:${colors.textPrimary};font-family:Arial,Helvetica,sans-serif;">
+    <div style="display:none;max-height:0;overflow:hidden;opacity:0;color:transparent;">${escapeHtml(input.preheader)}</div>
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;background:${colors.neutralBackground};">
+      <tr>
+        <td align="center" style="padding:28px 16px;">
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:680px;border-collapse:collapse;background:${colors.surfaceWhite};border:1px solid ${colors.border};">
+            <tr>
+              <td style="padding:18px 28px;background:${colors.enterpriseNavy};color:${colors.surfaceWhite};">
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;">
+                  <tr><td style="font-size:11px;line-height:1.4;letter-spacing:1.4px;text-transform:uppercase;color:${colors.enterpriseGold};font-weight:700;">${brand.brandName}</td></tr>
+                  <tr><td style="padding-top:4px;font-size:${type.metadata};line-height:1.4;color:#E5E7EB;">${brand.divisionRelationship}</td></tr>
+                </table>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:28px;">
+                <h1 style="margin:0 0 6px;font-size:${type.headingXL};line-height:1.3;color:${colors.textPrimary};">${escapeHtml(input.title)}</h1>
+                ${input.subtitle ? `<p style="margin:0 0 18px;font-size:${type.headingL};line-height:1.4;color:${colors.textSecondary};">${escapeHtml(input.subtitle)}</p>` : ''}
+                <p style="margin:0 0 18px;font-size:16px;line-height:1.7;">Good day, ${escapeHtml(input.recipientName)},</p>
+                ${section('Why you are receiving this', input.reason, colors.textSecondary, type.body, colors.textPrimary, type.headingM)}
+                ${listSection('What has been completed', summary, colors.textSecondary, type.body, colors.textPrimary, type.headingM)}
+                ${listSection("What's attached", attachments, colors.textSecondary, type.body, colors.textPrimary, type.headingM)}
+                ${review}
+                <div style="margin:24px 0;padding:18px;border-left:4px solid ${colors.primaryCta};background:#EFF6FF;">
+                  <h2 style="margin:0 0 8px;font-size:${type.headingM};color:${colors.textPrimary};">How to respond</h2>
+                  <p style="margin:0 0 14px;font-size:${type.body};line-height:1.7;color:${colors.textSecondary};">${escapeHtml(input.actionInstruction)}</p>
+                  ${responseWindow}
+                </div>
+                ${input.replyOnly ? '' : `<p style="margin:0 0 22px;"><a href="${escapeHtml(input.actionUrl || '')}" style="display:inline-block;background:${colors.primaryCta};color:${colors.surfaceWhite};padding:11px 16px;font-size:14px;font-weight:700;text-decoration:none;">${escapeHtml(input.actionLabel || '')}</a></p>
+                <h2 style="margin:24px 0 10px;font-size:${type.headingM};color:${colors.textPrimary};">Optional Author Operating Center access</h2>
+                <p style="margin:0 0 18px;font-size:${type.body};line-height:1.7;color:${colors.textSecondary};">Your Author Operating Center is secondary to email and available when you want another copy of these review materials.</p>`}
+                ${listSection('What happens next', timeline, colors.textSecondary, type.body, colors.textPrimary, type.headingM)}
+                ${section('Support', input.supportNote || '', colors.textSecondary, type.body, colors.textPrimary, type.headingM)}
+                ${input.operationalNote ? `<p style="margin:22px 0 0;font-size:${type.caption};line-height:1.6;color:${colors.textSecondary};">${escapeHtml(input.operationalNote)}</p>` : ''}
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:22px 28px;background:#F3F4F6;border-top:1px solid ${colors.border};">
+                <p style="margin:0 0 4px;font-size:14px;font-weight:700;color:${colors.textPrimary};">${brand.teamName}</p>
+                <p style="margin:0;font-size:${type.caption};line-height:1.6;color:${colors.textSecondary};">${brand.legalEntityName}<br>${brand.divisionRelationship}<br>${brand.phone} · ${brand.email} · ${brand.website}<br>${brand.tagline}</p>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>`;
+}
+function renderCorrespondenceText(input) {
+    const responseWindow = input.responseWindow && input.executionAuthority.responseClockAuthorized
+        ? responseWindowSentence(input.responseWindow)
+        : '';
+    const attachments = naturalList(input.attachments || []);
+    const prepared = input.correspondenceParagraphs?.join('\n\n') || naturalParagraph(input.summaryItems || []);
+    const next = naturalParagraph(input.timelineItems || []);
+    return [
+        input.title,
+        input.subtitle || '',
+        '',
+        `Good day, ${input.recipientName},`,
+        '',
+        input.reason,
+        prepared,
+        attachments ? `We've included ${attachments}.` : '',
+        input.reviewPrompt || '',
+        input.actionInstruction,
+        responseWindow,
+        ...(input.replyOnly ? [] : [input.correspondenceParagraphs ? `Use the secure link: ${input.actionUrl}` : `You may also view the materials in your Author Operating Center: ${input.actionUrl}`]),
+        next,
+        input.supportNote || '',
+        input.operationalNote || '',
+        '',
+        signatureForBrand(input.brand),
+    ].filter(Boolean).join('\n\n');
+}
+function renderCorrespondenceHtml(input) {
+    const standard = exports.JM1_ENTERPRISE_COMMUNICATION_STANDARD;
+    const colors = standard.colors;
+    const type = standard.typography;
+    const brand = exports.JM1_COMMUNICATION_BRANDS[input.brand];
+    const responseWindow = input.responseWindow && input.executionAuthority.responseClockAuthorized
+        ? `<p style="margin:0 0 18px;font-size:${type.body};line-height:1.7;color:${colors.textSecondary};">${escapeHtml(responseWindowSentence(input.responseWindow))}</p>`
+        : '';
+    const attachments = naturalList(input.attachments || []);
+    const paragraphs = [
+        input.reason,
+        ...(input.correspondenceParagraphs || [naturalParagraph(input.summaryItems || [])]),
+        attachments ? `We've included ${attachments}.` : '',
+        input.reviewPrompt || '',
+        input.actionInstruction,
+    ].filter(Boolean).map((value) => `<p style="margin:0 0 18px;font-size:${type.body};line-height:1.7;color:${colors.textSecondary};">${escapeHtml(value).replace(/\n/g, '<br>')}</p>`).join('');
+    const next = naturalParagraph(input.timelineItems || []);
+    return `<!doctype html>
+<html lang="en">
+  <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escapeHtml(input.subject)}</title></head>
+  <body style="margin:0;padding:0;background:${colors.neutralBackground};color:${colors.textPrimary};font-family:Arial,Helvetica,sans-serif;">
+    <div style="display:none;max-height:0;overflow:hidden;opacity:0;color:transparent;">${escapeHtml(input.preheader)}</div>
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;background:${colors.neutralBackground};">
+      <tr><td align="center" style="padding:28px 16px;">
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:680px;border-collapse:collapse;background:${colors.surfaceWhite};border:1px solid ${colors.border};">
+          <tr><td style="padding:18px 28px;background:${colors.enterpriseNavy};color:${colors.surfaceWhite};">
+            <strong style="font-size:11px;letter-spacing:1.4px;color:${colors.enterpriseGold};">${brand.brandName}</strong><br>
+            <span style="font-size:${type.metadata};color:#E5E7EB;">${brand.divisionRelationship}</span>
+          </td></tr>
+          <tr><td style="padding:28px;">
+            <h1 style="margin:0 0 6px;font-size:${type.headingXL};line-height:1.3;color:${colors.textPrimary};">${escapeHtml(input.title)}</h1>
+            ${input.subtitle ? `<p style="margin:0 0 18px;font-size:${type.headingL};line-height:1.4;color:${colors.textSecondary};">${escapeHtml(input.subtitle)}</p>` : ''}
+            <p style="margin:0 0 18px;font-size:16px;line-height:1.7;">Good day, ${escapeHtml(input.recipientName)},</p>
+            ${paragraphs}
+            ${responseWindow}
+            ${input.replyOnly ? '' : `<p style="margin:0 0 22px;"><a href="${escapeHtml(input.actionUrl || '')}" style="display:inline-block;background:${colors.primaryCta};color:${colors.surfaceWhite};padding:11px 16px;font-size:14px;font-weight:700;text-decoration:none;">${escapeHtml(input.actionLabel || '')}</a></p>`}
+            ${next ? `<p style="margin:0 0 18px;font-size:${type.body};line-height:1.7;color:${colors.textSecondary};">${escapeHtml(next)}</p>` : ''}
+            ${input.supportNote ? `<p style="margin:0 0 18px;font-size:${type.body};line-height:1.7;color:${colors.textSecondary};">${escapeHtml(input.supportNote)}</p>` : ''}
+            ${input.operationalNote ? `<p style="margin:0;font-size:${type.caption};line-height:1.6;color:${colors.textSecondary};">${escapeHtml(input.operationalNote)}</p>` : ''}
+          </td></tr>
+          <tr><td style="padding:22px 28px;background:#F3F4F6;border-top:1px solid ${colors.border};">
+            <p style="margin:0 0 4px;font-size:14px;font-weight:700;color:${colors.textPrimary};">${brand.teamName}</p>
+            <p style="margin:0;font-size:${type.caption};line-height:1.6;color:${colors.textSecondary};">${brand.legalEntityName}<br>${brand.divisionRelationship}<br>${brand.phone} · ${brand.email} · ${brand.website}<br>${brand.tagline}</p>
+          </td></tr>
+        </table>
+      </td></tr>
+    </table>
+  </body>
+</html>`;
+}
+function naturalParagraph(items) {
+    return items.map((item) => item.trim()).filter(Boolean).join(' ');
+}
+function naturalList(items) {
+    const values = items.map((item) => item.trim()).filter(Boolean);
+    if (values.length < 2)
+        return values[0] || '';
+    if (values.length === 2)
+        return `${values[0]} and ${values[1]}`;
+    return `${values.slice(0, -1).join(', ')}, and ${values.at(-1)}`;
+}
+function responseWindowSentence(value) {
+    const normalized = value.trim().replace(/[.]+$/, '');
+    return /^please respond by\b/i.test(normalized) ? `${normalized}.` : `Please respond by ${normalized}.`;
+}
+function validateExecutionAuthority(input) {
+    if (!input.executionAuthority || input.executionAuthority.authoritySource !== 'JM1 Governed Bootstrap') {
+        return { ok: false, blocker: 'ECR_EXECUTION_AUTHORITY_MISSING' };
+    }
+    if (!input.executionAuthority.renderAllowed)
+        return { ok: false, blocker: 'ECR_RENDER_AUTHORITY_DENIED' };
+    if (input.responseWindow && !input.executionAuthority.responseClockAuthorized) {
+        return { ok: false, blocker: 'RESPONSE_WINDOW_AUTHORITY_MISSING' };
+    }
+    return { ok: true };
+}
+function validateBrandSignatureConfiguration(brandKey) {
+    const brand = exports.JM1_COMMUNICATION_BRANDS[brandKey];
+    if (!brand || !brand.teamName || !brand.legalEntityName || !brand.divisionRelationship || !brand.phone || !brand.email || !brand.website || !brand.tagline) {
+        return { ok: false, blocker: 'BRAND_SIGNATURE_CONFIGURATION_MISSING' };
+    }
+    return { ok: true };
+}
+function section(label, body, textColor, bodySize, headingColor, headingSize) {
+    return [
+        `<h2 style="margin:24px 0 10px;font-size:${headingSize};color:${headingColor};">${escapeHtml(label)}</h2>`,
+        `<p style="margin:0 0 18px;font-size:${bodySize};line-height:1.7;color:${textColor};">${escapeHtml(body)}</p>`,
+    ].join('');
+}
+function listSection(label, items, textColor, bodySize, headingColor, headingSize) {
+    return `<h2 style="margin:24px 0 10px;font-size:${headingSize};color:${headingColor};">${escapeHtml(label)}</h2><ul style="margin:0 0 18px 22px;padding:0;font-size:${bodySize};line-height:1.7;color:${textColor};">${items}</ul>`;
+}
+function required(value, name) {
+    const normalized = value?.trim() || '';
+    if (!normalized)
+        throw new Error(`JM1_ECR_BLOCKED - ${name.toUpperCase()}_MISSING`);
+    return normalized;
+}
+function validateUrl(value) {
+    const url = new URL(value);
+    if (url.protocol !== 'https:')
+        throw new Error('JM1_ECR_BLOCKED - PRIMARY_ACTION_URL_NOT_HTTPS');
+    return url.toString();
+}
+function escapeRegExp(value) {
+    return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+function escapeHtml(value) {
+    return value
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#39;');
+}
+function sha256(value) {
+    return (0, node_crypto_1.createHash)('sha256').update(value, 'utf8').digest('hex');
+}
