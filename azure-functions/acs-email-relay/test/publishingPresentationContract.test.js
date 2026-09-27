@@ -37,6 +37,11 @@ for (const [name, body] of [
     assert.match(rendered.html, /The Publishing Team/);
     assert.match(rendered.html, /Helping Authors Help Themselves/);
     assert.match(rendered.text, /J Merrill Publishing, Inc\./);
+    for (const output of [rendered.html, rendered.text]) {
+      assert.equal(output.split("Please reply to the message if you have any questions or need further assistance.").length - 1, 1);
+      assert.equal(output.includes("Please reply to this email if you need assistance."), false);
+      assert.equal(output.includes("Reply to this email and the team will help."), false);
+    }
     assert.equal(rendered.metadata.htmlSha256, hash(rendered.html));
     assert.equal(rendered.metadata.textSha256, hash(rendered.text));
     assert.deepEqual({ htmlSha256: rendered.metadata.htmlSha256, textSha256: rendered.metadata.textSha256 }, golden[name]);

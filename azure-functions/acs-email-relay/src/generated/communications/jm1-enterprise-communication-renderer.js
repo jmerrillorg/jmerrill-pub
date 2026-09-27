@@ -99,7 +99,7 @@ function renderPublishingServiceCorrespondence(input) {
         reason: paragraphs[0] || '',
         correspondenceParagraphs: paragraphs.slice(1),
         presentationStyle: 'CORRESPONDENCE',
-        actionInstruction: 'Please reply to this email if you need assistance.',
+        actionInstruction: PUBLISHING_CANONICAL_CLOSE,
         replyOnly: !url,
         operationalNote: '',
         ...(url ? { actionUrl: url, actionLabel: input.actionLabel || 'Open Your Secure Link' } : {}),
@@ -159,7 +159,20 @@ function validateJm1EnterpriseCommunication(input) {
     }
     return blockers.length ? { ok: false, blocker: `JM1_ECR_BLOCKED - ${blockers.join(',')}` } : { ok: true };
 }
+const PUBLISHING_CANONICAL_CLOSE = 'Please reply to the message if you have any questions or need further assistance.';
+const LEGACY_ASSISTANCE_CLOSE = 'Please reply to this email if you need assistance.';
+const LEGACY_SUPPORT_CLOSE = 'Reply to this email and the team will help.';
 function normalizeInput(input) {
+    let actionInstruction = required(input.actionInstruction, 'actionInstruction');
+    let supportNote = input.supportNote?.trim() || LEGACY_SUPPORT_CLOSE;
+    if (input.brand === 'publishing') {
+        if ([LEGACY_ASSISTANCE_CLOSE, LEGACY_SUPPORT_CLOSE].includes(actionInstruction))
+            actionInstruction = PUBLISHING_CANONICAL_CLOSE;
+        if ([LEGACY_ASSISTANCE_CLOSE, LEGACY_SUPPORT_CLOSE].includes(supportNote))
+            supportNote = PUBLISHING_CANONICAL_CLOSE;
+        if (actionInstruction === PUBLISHING_CANONICAL_CLOSE && supportNote === PUBLISHING_CANONICAL_CLOSE)
+            supportNote = '';
+    }
     return {
         ...input,
         brand: input.brand,
@@ -174,10 +187,10 @@ function normalizeInput(input) {
         reason: required(input.reason, 'reason'),
         actionLabel: input.replyOnly ? input.actionLabel?.trim() : required(input.actionLabel, 'actionLabel'),
         actionUrl: input.replyOnly ? input.actionUrl?.trim() : validateUrl(required(input.actionUrl, 'actionUrl')),
-        actionInstruction: required(input.actionInstruction, 'actionInstruction'),
+        actionInstruction,
         replyOnly: Boolean(input.replyOnly),
         responseWindow: input.responseWindow?.trim(),
-        supportNote: input.supportNote?.trim() || 'Reply to this email and the team will help.',
+        supportNote,
         operationalNote: input.operationalNote === '' ? '' : input.operationalNote?.trim() || 'This message follows the JM1 Enterprise Communication Standard v1.0.',
         presentationStyle: input.presentationStyle || 'STRUCTURED',
     };
