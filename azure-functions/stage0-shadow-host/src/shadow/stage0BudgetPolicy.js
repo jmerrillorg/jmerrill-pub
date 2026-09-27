@@ -45,7 +45,7 @@ function budgetDecision({ spentCents, reservedCents, projectedCents }) {
   };
 }
 
-function reserve(state, { sourceEventId, policyVersion, projectedCents, now }) {
+function reserve(state, { sourceEventId, policyVersion, projectedCents, now, shadowExecutionId }) {
   const month = monthKey(now);
   const key = eventKey(sourceEventId, policyVersion);
   const current = state || { month, spentCents: 0, reservedCents: 0, events: {} };
@@ -61,6 +61,7 @@ function reserve(state, { sourceEventId, policyVersion, projectedCents, now }) {
     projectedCents,
   });
   const event = {
+    ...(shadowExecutionId ? { shadowExecutionId } : {}),
     sourceEventId: sourceEventId.toLowerCase(),
     policyVersion,
     workload: WORKLOAD,

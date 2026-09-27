@@ -2,7 +2,23 @@
 
 const test = require("node:test");
 const assert = require("node:assert/strict");
-const { authorizeRoute, evaluateStructure, processStage0Event, CANARY_EVENT_ID } = require("../../src/shadow/stage0ShadowRuntime");
+const { authorizeRoute, evaluateStructure, processStage0Event: processEvent, CANARY_EVENT_ID } = require("../../src/shadow/stage0ShadowRuntime");
+
+const fixtureVerdict = { monitorRunId: "synthetic-monitor-run", baselineVersion: "synthetic-baseline",
+  baselineChecksum: "a".repeat(64), runtimeIdentityId: "synthetic-principal" };
+function processStage0Event(event, route, ports) {
+  return processEvent(event, route, {
+    requireInferenceAuthority: async () => fixtureVerdict,
+    ...ports,
+  });
+}
+
+test("missing producing permission gate fails before ledger or model use", async () => {
+  await assert.rejects(processEvent(event, route, {
+    identityClientId: "isolated-identity", modelResourceId, modelRegisterId,
+    now: () => "2026-09-24T12:00:00Z",
+  }), /SHADOW_PERMISSION_GATE_NOT_BOUND/);
+});
 
 const modelResourceId = "/subscriptions/9ee13245-2303-4010-8b6d-35f7cbcfdc0e/resourceGroups/rg-jm1-ai/providers/Microsoft.CognitiveServices/accounts/oai-jm1-diagnostic";
 const modelRegisterId = "AZURE:OAI-JM1-DIAGNOSTIC:JM1-PUB-DIAGNOSTIC-PRIMARY";

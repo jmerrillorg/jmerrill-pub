@@ -22,6 +22,23 @@ const RISK_REGISTER_ID = "JM1-AI-RISK-STAGE0-SHADOW-001";
 const POLICY_VERSION = "STAGE0-SHADOW-C11-v1";
 const CANARY_EXCERPT = "Synthetic publishing diagnostic sample. A fictional manuscript excerpt has a clear opening, an unresolved transition, and no real author or client information.";
 
+async function requireInferenceAuthority(env) {
+  const admission = await readPermissionState({
+    accountName: env.JM1_SHADOW_PERMISSION_STATE_ACCOUNT,
+    clientId: env.JM1_SHADOW_MANAGED_IDENTITY_CLIENT_ID,
+    expected: {
+      appId: env.JM1_SHADOW_MANAGED_IDENTITY_CLIENT_ID,
+      principalId: "e9f59316-f3ae-4ec0-a7e7-10edcb25d9ae",
+      siteId: TARGET_SITE, grantId: env.JM1_SHADOW_EXPECTED_SITE_GRANT_ID,
+      baselineVersion: env.JM1_SHADOW_PERMISSION_BASELINE_VERSION,
+      baselineChecksum: env.JM1_SHADOW_PERMISSION_BASELINE_CHECKSUM,
+      modelResourceId: model.RESOURCE_ID, deploymentName: model.DEPLOYMENT_NAME,
+    },
+  });
+  await probeWithManagedIdentity(admission.personalSiteIds, env.JM1_SHADOW_MANAGED_IDENTITY_CLIENT_ID);
+  return admission.verdict;
+}
+
 function routeFromEnvironment(env) {
   if (env.JM1_SHADOW_MODEL_REGISTER_ID !== MODEL_REGISTER_ID ||
       env.JM1_SHADOW_RISK_REGISTER_ID !== RISK_REGISTER_ID ||
@@ -73,6 +90,7 @@ function productionPorts(env, context) {
     readApprovedInput: (event) => readApprovedInput(event, { clientId }),
     infer: (input, selection) => model.infer(input, selection, { clientId }),
     evaluate: evaluator.evaluate,
+    requireInferenceAuthority: () => requireInferenceAuthority(env),
     metric: (name, value) => context.log(JSON.stringify({ event: name, value })),
     alert: async (name, details) => context.error(JSON.stringify({ event: name, ...details })),
   };
@@ -94,18 +112,9 @@ app.timer("stage0-shadow-authority-probe", {
       shadowEnabled: process.env.JM1_SHADOW_ENABLED === "true",
     });
     try {
-      const personalSiteIds = await readPermissionState({
-        accountName: process.env.JM1_SHADOW_PERMISSION_STATE_ACCOUNT,
-        clientId,
-        expected: {
-          appId: clientId,
-          siteId: TARGET_SITE,
-          grantId: process.env.JM1_SHADOW_EXPECTED_SITE_GRANT_ID,
-        },
-      });
-      await probeWithManagedIdentity(personalSiteIds, clientId);
+      const verdict = await requireInferenceAuthority(process.env);
       state.states.opsPermissionVerdict = "PASS";
-      state.personalSitesDenied = personalSiteIds.length;
+      state.permissionMonitorRunId = verdict.monitorRunId;
     } catch (error) {
       state.states.opsPermissionVerdict = `FAIL_${String(error.message || error).replace(/[^A-Z0-9_]/gi, "_").slice(0, 60)}`;
     }
@@ -289,16 +298,7 @@ app.timer("stage0-shadow-poll", {
       return;
     }
     try {
-      const personalSiteIds = await readPermissionState({
-        accountName: process.env.JM1_SHADOW_PERMISSION_STATE_ACCOUNT,
-        clientId: process.env.JM1_SHADOW_MANAGED_IDENTITY_CLIENT_ID,
-        expected: {
-          appId: process.env.JM1_SHADOW_MANAGED_IDENTITY_CLIENT_ID,
-          siteId: TARGET_SITE,
-          grantId: process.env.JM1_SHADOW_EXPECTED_SITE_GRANT_ID,
-        },
-      });
-      await probeWithManagedIdentity(personalSiteIds, process.env.JM1_SHADOW_MANAGED_IDENTITY_CLIENT_ID);
+      await requireInferenceAuthority(process.env);
       await readAuthorityProbe({
         accountName: process.env.JM1_SHADOW_STORAGE_ACCOUNT,
         clientId: process.env.JM1_SHADOW_MANAGED_IDENTITY_CLIENT_ID,
