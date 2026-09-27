@@ -4,7 +4,7 @@ const fs = require("node:fs");
 const path = require("node:path");
 const vm = require("node:vm");
 
-function loadEnterpriseRelayModule() {
+function loadEnterpriseRelayModule(options = {}) {
   const routes = {};
   const filePath = path.join(__dirname, "..", "src", "functions", "sendEnterpriseGovernedEmail.js");
   const source = fs.readFileSync(filePath, "utf8");
@@ -23,20 +23,22 @@ function loadEnterpriseRelayModule() {
         };
       }
       if (name === "@azure/communication-email") {
-        return { EmailClient: class EmailClient {} };
+        return { EmailClient: class EmailClient { constructor() { return options.client || this; } } };
       }
       if (name === "@azure/identity") {
         return { DefaultAzureCredential: class DefaultAzureCredential {} };
       }
       if (name.startsWith("../")) {
-        return require(path.join(path.dirname(filePath), name));
+        const dependency = require(path.join(path.dirname(filePath), name));
+        return name === "../state/messageLedger" && options.ledger
+          ? { ...dependency, getMessageLedger: () => options.ledger } : dependency;
       }
       return require(name);
     },
-    process
+    process: { env: { ...process.env, ...(options.env || {}) } }
   };
 
-  vm.runInNewContext(`${source}\nmodule.exports.__test = { routes, buildEnterpriseEmail, validateEnterprisePayload };`, sandbox, { filename: filePath });
+  vm.runInNewContext(`${source}\nmodule.exports.__test = { routes, buildEnterpriseEmail, validateEnterprisePayload, sendAcsMessage };`, sandbox, { filename: filePath });
   return sandbox.module.exports.__test;
 }
 
@@ -57,6 +59,38 @@ function validPayload(overrides = {}) {
     ...overrides
   };
 }
+
+test("provider acceptance requires completed ACS operation and immutable provider ID", async () => {
+  const { sendAcsMessage } = loadEnterpriseRelayModule();
+  let completed = false;
+  const client = { beginSend: async () => ({ pollUntilDone: async () => {
+    completed = true;
+    return { status: "Succeeded", id: "provider-proof-1" };
+  } }) };
+  assert.equal(await sendAcsMessage({}, client), "provider-proof-1");
+  assert.equal(completed, true);
+  for (const result of [{ status: "Running", id: "pending" }, { status: "Succeeded" }, { status: "Failed", id: "failed" }]) {
+    await assert.rejects(() => sendAcsMessage({}, { beginSend: async () => ({ pollUntilDone: async () => result }) }),
+      error => error.safeCode === "ACS_DELIVERY_UNPROVEN");
+  }
+  await assert.rejects(() => sendAcsMessage({}, { beginSend: async () => ({ getOperationState: () => ({ id: "pending" }) }) }),
+    error => error.safeCode === "ACS_DELIVERY_UNPROVEN");
+});
+
+test("ambiguous provider completion retains the reservation and cannot record acceptance or retryable failure", async () => {
+  let reserved = 0;
+  const forbidden = () => { throw new Error("UNPROVEN_PROVIDER_STATE_MUST_NOT_BE_PERSISTED"); };
+  const relay = loadEnterpriseRelayModule({ env: { ACS_CONNECTION_STRING: "fixture-only" },
+    client: { beginSend: async () => ({ pollUntilDone: async () => { throw new Error("ambiguous completion"); } }) },
+    ledger: { reserve: async () => { reserved++; return { kind: "RESERVED", entity: { jm1MessageId: "fixture" } }; },
+      recordAccepted: forbidden, recordFailure: forbidden } });
+  const result = await relay.routes["send-enterprise-governed-email"].handler(
+    routeRequest(governedPublishingPayload(), workloadHeaders("ce363f5a-94f3-4ea9-9ba3-061404fca098")),
+    { warn() {}, info() {}, error() {} });
+  assert.equal(result.status, 502);
+  assert.equal(reserved, 1);
+  assert.equal(result.jsonBody.accepted, false);
+});
 
 function governedPublishingPayload(overrides = {}) {
   return validPayload({

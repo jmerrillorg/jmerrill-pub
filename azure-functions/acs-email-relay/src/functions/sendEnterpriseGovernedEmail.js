@@ -284,11 +284,16 @@ function buildEnterpriseEmail(value) {
   };
 }
 
-async function sendAcsMessage(message) {
-  const poller = await getEmailClient().beginSend(message);
-  if (!poller || typeof poller.getOperationState !== "function") return undefined;
-  const state = poller.getOperationState();
-  return state && (state.id || state.operationId);
+async function sendAcsMessage(message, client = getEmailClient()) {
+  const poller = await client.beginSend(message);
+  if (!poller || typeof poller.pollUntilDone !== "function") {
+    throw Object.assign(new Error("ACS completion unavailable."), { safeCode: "ACS_DELIVERY_UNPROVEN" });
+  }
+  const result = await poller.pollUntilDone();
+  if (result?.status !== "Succeeded" || !safeTrim(result?.id)) {
+    throw Object.assign(new Error("ACS completion unproven."), { safeCode: "ACS_DELIVERY_UNPROVEN" });
+  }
+  return result.id;
 }
 
 function safeErrorCode(error) {
@@ -380,8 +385,10 @@ app.http("send-enterprise-governed-email", {
       }
 
       const email = buildEnterpriseEmail(validation.value);
-      const providerMessageId = await sendAcsMessage(email);
+      // Once transport starts, an exception cannot prove that nothing was sent.
+      // Preserve the reservation for reconciliation rather than permitting retry.
       providerAccepted = true;
+      const providerMessageId = await sendAcsMessage(email);
       const trace = await getMessageLedger().recordAccepted(reservation.entity, providerMessageId);
       context.info(`Enterprise ACS relay accepted send; caller=${authentication.caller.callerId}; brand=${validation.value.brand}; jm1MessageId=${trace.jm1MessageId}`);
       return response(202, {
@@ -451,5 +458,6 @@ app.http("relay-authority-probe", {
 
 module.exports = {
   buildEnterpriseEmail,
+  sendAcsMessage,
   validateEnterprisePayload
 };

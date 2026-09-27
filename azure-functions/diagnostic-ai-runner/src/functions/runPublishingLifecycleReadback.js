@@ -42,10 +42,15 @@ async function lifecycleReadback(body, deps) {
     queries.push({ filter, complete: !next, rows: rows.map(message => ({ ...message, authorReply: authorReplyText(message) })) });
   }
   const presentationEvidence = [];
+  let presentationComplete = null;
   if (body.includePresentation === true) {
     const outbound = queries[1].rows.filter(message =>
       ["publishing@email.jmerrill.one", "publishing@jmerrill.one"].includes(message.from?.emailAddress?.address?.toLowerCase()) &&
-      message.toRecipients?.some(recipient => recipient.emailAddress?.address?.toLowerCase() === contact.emailaddress1.toLowerCase()));
+      (message.toRecipients?.some(recipient => recipient.emailAddress?.address?.toLowerCase() === contact.emailaddress1.toLowerCase()) ||
+        (body.includeInternalProof === true && message.subject === `Publishing Internal Presentation Check - ${title.jm1pub_titlename}` &&
+          message.toRecipients?.length > 0 && [...message.toRecipients, ...(message.ccRecipients || [])].every(recipient =>
+            recipient.emailAddress?.address?.toLowerCase() === "publishing@jmerrill.one"))));
+    presentationComplete = queries[1].complete && outbound.length <= 50;
     for (const message of outbound.slice(0, 50)) {
       const path = `/users/publishing@jmerrill.one/messages/${encodeURIComponent(message.id)}`;
       const native = await deps.graphClient.request("GET", `${path}?$select=id,subject,body,sentDateTime,internetMessageId`, null,
@@ -59,6 +64,7 @@ async function lifecycleReadback(body, deps) {
     authorName: "Test Operator", body: "Good day, Test,\n\nThis is an effect-free rendering fixture.\n\nJ Merrill Publishing",
     templateName: "PUBLISHING_SERVICE_RENDER_PROOF", templateVersion: "1.0" });
   return { status: 200, jsonBody: { mode: "READ_ONLY", authorId, titleId, authorTitleBinding: "PASS", queries, presentationEvidence,
+    presentationComplete,
     rendering, effects: 0, communicationsSent: 0, noSend: true } };
 }
 
