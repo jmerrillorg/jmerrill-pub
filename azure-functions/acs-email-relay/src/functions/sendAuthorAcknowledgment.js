@@ -1573,7 +1573,11 @@ app.http("send-author-acknowledgment", {
 
     try {
       const message = buildAcknowledgmentEmail(validation.value);
-      const receipt = await sendAcsMessageWithReceipt(message);
+      const { executeRenderedPublishingDelivery } = require("../state/renderedPublishingDelivery");
+      const receipt = await executeRenderedPublishingDelivery({
+        reference, purpose: "PUBLISHING_INQUIRY_ACKNOWLEDGMENT",
+        metadata: validation.value.renderMetadata, message
+      }, { sendMessage: sendAcsMessageWithReceipt });
       const operationId = receipt.providerMessageId;
 
       context.info(`ACS relay accepted acknowledgment send; reference=${reference}`);
@@ -1584,6 +1588,8 @@ app.http("send-author-acknowledgment", {
           status: "accepted",
           operationId,
           providerStatus: receipt.providerStatus,
+          communicationRecordId: receipt.communicationRecordId,
+          replay: receipt.replay,
           renderMetadata: validation.value.renderMetadata,
           reference
         }
