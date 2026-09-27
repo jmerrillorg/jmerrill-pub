@@ -223,7 +223,7 @@ function validInternalPayload(overrides = {}) {
 }
 
 function validAuthorResponsePayload(overrides = {}) {
-  return {
+  const value = {
     messageType: "APPROVED_AUTHOR_RESPONSE",
     diagnosticId,
     intakeReferenceCode,
@@ -241,7 +241,27 @@ function validAuthorResponsePayload(overrides = {}) {
     futureSendRequiresDataverseLog: true,
     ...overrides
   };
+  // Replace historical fixture stand-ins with digests of the actual fixture.
+  if (value.templateMetadata) {
+    for (const [field, content] of [["htmlSha256", value.htmlBody], ["textSha256", value.body]]) {
+      if (/^([a-f])\1{63}$/.test(value.templateMetadata[field] || "")) {
+        value.templateMetadata[field] = createHash("sha256").update(String(content || "").trim()).digest("hex");
+      }
+    }
+  }
+  return value;
 }
+
+test("certified package cannot carry HTML or text different from its approved rendering digests", () => {
+  const { validateApprovedAuthorResponsePayload } = loadRelayModule();
+  for (const field of ["body", "htmlBody"]) {
+    const value = validDevelopmentalV2Payload();
+    value[field] += " Extra words not in the approved render.";
+    const result = validateApprovedAuthorResponsePayload(value);
+    assert.equal(result.ok, false);
+    assert.equal(result.reason, "AUTHOR_CERTIFIED_RENDER_DIGEST_MISMATCH");
+  }
+});
 
 function communicationObservability(attachments) {
   const manifest = attachments.map((attachment) => ({
@@ -1015,11 +1035,13 @@ test("Developmental V2 accepts only a complete typed package and preserves canon
 test("Developmental V2 accepts the conversational Author Operating Center reference", () => {
   const { validateApprovedAuthorResponsePayload } = loadRelayModule();
   const base = validDevelopmentalV2Payload();
+  const body = base.body.replace(
+    "Optional Author Operating Center access: https://",
+    "You may also view the materials in your Author Operating Center: https://"
+  );
   const result = validateApprovedAuthorResponsePayload(validDevelopmentalV2Payload({
-    body: base.body.replace(
-      "Optional Author Operating Center access: https://",
-      "You may also view the materials in your Author Operating Center: https://"
-    )
+    body,
+    templateMetadata: { ...base.templateMetadata, textSha256: createHash("sha256").update(body).digest("hex") }
   }));
 
   assert.equal(result.ok, true);
@@ -1180,7 +1202,7 @@ test("approved editorial recommendation builds ACS email with HTML and plain-tex
 
   assert.equal(valid.ok, true);
   assert.equal(valid.value.templateVersion, "1.1.0");
-  assert.equal(valid.value.templateMetadata.htmlSha256, "a".repeat(64));
+  assert.equal(valid.value.templateMetadata.htmlSha256, createHash("sha256").update(valid.value.htmlBody).digest("hex"));
   const email = relay.buildApprovedAuthorResponseEmail(valid.value);
   assert.equal(email.senderAddress, "publishing@email.jmerrill.one");
   assert.equal(email.content.subject, "Your Editorial Review & Publishing Recommendation | J Merrill Publishing");
@@ -1236,8 +1258,8 @@ test("package-acceptance payment-options payload requires canonical HTML, subjec
     templateName: "PACKAGE_ACCEPTANCE_PAYMENT_OPTIONS_V1",
     templateVersion: "1.0.0",
     templateMetadata: {
-      htmlSha256: "a".repeat(64),
-      textSha256: "b".repeat(64),
+      htmlSha256: createHash("sha256").update(html.trim()).digest("hex"),
+      textSha256: createHash("sha256").update(body).digest("hex"),
       qualityGate: "PASS",
       renderer: "JM1 Enterprise Communication Renderer",
       rendererVersion: "1.0.0",

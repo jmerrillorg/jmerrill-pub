@@ -935,7 +935,11 @@ function validateApprovedAuthorResponsePayload(payload = {}) {
   }
 
   const certifiedPackage = [AUTHOR_REVIEW_PACKAGE_TEMPLATE, DEVELOPMENTAL_REVIEW_PACKAGE_TEMPLATE, FINAL_DEVELOPMENTAL_REVIEW_TEMPLATE,
-    PACKAGE_ACCEPTANCE_TEMPLATE, "EDITORIAL_RECOMMENDATION_LETTER_V1"].includes(normalizeText(payload.templateName));
+    PACKAGE_ACCEPTANCE_TEMPLATE].includes(normalizeText(payload.templateName));
+  if (certifiedPackage && (canonicalMetadata.htmlSha256 !== createHash("sha256").update(htmlBody).digest("hex") ||
+      canonicalMetadata.textSha256 !== createHash("sha256").update(body).digest("hex"))) {
+    return { ok: false, reason: "AUTHOR_CERTIFIED_RENDER_DIGEST_MISMATCH" };
+  }
   if (!certifiedPackage && !routineService) {
     try {
       if (canonicalMetadata?.renderer === CANONICAL_AUTHOR_RENDERER) {
