@@ -3,8 +3,9 @@
 const { createHash } = require("node:crypto");
 const { getBrandProfile } = require("./brandRegistry");
 const { ACTIVE, PAYMENT_CODES, findTemplate, isGovernedNamespace } = require("./templateRegistry");
+const { renderPublishingServiceCorrespondence } = require("../generated/communications/jm1-enterprise-communication-renderer");
 
-const RENDERER_VERSION = "JM1-EMAIL-RENDERER-v1.0.0";
+const RENDERER_VERSION = "1.0.1";
 const SAFE_TEXT = /^[^\r\n<>]{1,200}$/;
 const MAX_AMOUNT_CENTS = 100_000_000;
 const PAYMENT_LABELS = Object.freeze({
@@ -115,7 +116,6 @@ function paymentSummary(option) {
 }
 
 function renderPaymentElection(template, brand, data) {
-  const tokens = brand.tokens;
   const subject = template.subject.replace("{{projectTitle}}", data.projectTitle);
   const optionText = data.options.map((option) => `- ${PAYMENT_LABELS[option.code]}: ${paymentSummary(option)} before applicable tax. Total before tax: ${money(option.totalBeforeTaxCents)}.`).join("\n");
   const text = [
@@ -138,67 +138,12 @@ function renderPaymentElection(template, brand, data) {
     brand.footer,
     brand.publicUrl
   ].join("\n");
-  const rows = data.options.map((option) => `
-                    <tr>
-                      <td class="option-cell" style="padding:12px;border:1px solid ${tokens["border.subtle"]};font-weight:700;color:${tokens["text.primary"]};">${escapeHtml(PAYMENT_LABELS[option.code])}</td>
-                      <td class="option-cell" style="padding:12px;border:1px solid ${tokens["border.subtle"]};color:${tokens["text.primary"]};">${escapeHtml(paymentSummary(option))}</td>
-                      <td class="option-cell" style="padding:12px;border:1px solid ${tokens["border.subtle"]};color:${tokens["text.primary"]};">${escapeHtml(money(option.totalBeforeTaxCents))}</td>
-                    </tr>`).join("");
-  const optionsLabel = data.options.map((option) => PAYMENT_LABELS[option.code]).join(", ");
-  const html = `<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="color-scheme" content="light dark">
-  <meta name="supported-color-schemes" content="light dark">
-  <title>${escapeHtml(subject)}</title>
-  <style>
-    @media only screen and (max-width: 620px) {
-      .email-container { width: 100% !important; }
-      .email-padding { padding-left: 18px !important; padding-right: 18px !important; }
-      .option-table { table-layout: fixed !important; }
-      .option-cell { padding: 8px !important; font-size: 12px !important; overflow-wrap: anywhere !important; word-break: break-word !important; }
-      .email-footer { overflow-wrap: anywhere !important; word-break: break-word !important; }
-    }
-  </style>
-</head>
-<body style="margin:0;padding:0;background:${tokens["surface.muted"]};font-family:${tokens["font.stack"]};color:${tokens["text.primary"]};">
-  <div style="display:none;max-height:0;overflow:hidden;opacity:0;color:transparent;">${escapeHtml(template.preheader)}</div>
-  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;background:${tokens["surface.muted"]};">
-    <tr><td align="center" style="padding:24px 12px;">
-      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" class="email-container" style="width:100%;max-width:600px;background:${tokens["surface.background"]};border:1px solid ${tokens["border.subtle"]};">
-        <tr><td style="padding:24px 28px;border-top:6px solid ${tokens["brand.primary"]};text-align:center;">
-          <a href="${brand.publicUrl}" style="text-decoration:none;"><img src="${brand.logo.url}" width="96" height="96" alt="${escapeHtml(brand.logo.alt)}" style="display:inline-block;width:96px;height:96px;max-width:100%;border:0;object-fit:contain;"></a>
-        </td></tr>
-        <tr><td class="email-padding" style="padding:4px 28px 28px;">
-          <h1 style="margin:0 0 20px;font-size:26px;line-height:1.25;color:${tokens["text.primary"]};">Choose Your Payment Option</h1>
-          <p style="margin:0 0 16px;font-size:16px;line-height:1.6;">Good day, ${escapeHtml(data.authorFirstName)},</p>
-          <p style="margin:0 0 16px;font-size:16px;line-height:1.6;">Thank you for letting us know you are ready to move forward with <strong>${escapeHtml(data.projectTitle)}</strong>. We have prepared the payment choices for your ${escapeHtml(data.packageName)} so you can choose the option that works best for you.</p>
-          <p style="margin:0 0 20px;font-size:16px;line-height:1.6;">Your ${escapeHtml(data.packageName)} has a base package fee of <strong>${escapeHtml(money(data.baseAmountCents))}</strong>. Tax is not calculated here and remains applicable where required.</p>
-          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" class="option-table" style="width:100%;border-collapse:collapse;table-layout:fixed;margin:0 0 20px;font-size:14px;">
-            <tr>
-              <th scope="col" align="left" class="option-cell" style="padding:12px;border:1px solid ${tokens["border.subtle"]};background:${tokens["brand.secondary"]};color:#FFFFFF;">Option</th>
-              <th scope="col" align="left" class="option-cell" style="padding:12px;border:1px solid ${tokens["border.subtle"]};background:${tokens["brand.secondary"]};color:#FFFFFF;">Payment</th>
-              <th scope="col" align="left" class="option-cell" style="padding:12px;border:1px solid ${tokens["border.subtle"]};background:${tokens["brand.secondary"]};color:#FFFFFF;">Total Before Tax</th>
-            </tr>${rows}
-          </table>
-          <div role="group" aria-label="Action required" style="margin:20px 0;padding:18px;border-left:5px solid ${tokens["action.primary.background"]};background:${tokens["surface.muted"]};">
-            <p style="margin:0 0 8px;font-size:16px;line-height:1.5;font-weight:700;">Reply with your selection</p>
-            <p style="margin:0;font-size:15px;line-height:1.55;">Please reply to this email and let us know whether you prefer ${escapeHtml(optionsLabel)}.</p>
-          </div>
-          <p style="margin:0 0 18px;font-size:16px;line-height:1.6;">Once you choose your payment option, we will lock the pricing from this offer snapshot and prepare the next commercial step.</p>
-          <p style="margin:0;font-size:16px;line-height:1.6;">Warm regards,<br><br><strong>${escapeHtml(brand.signatureName)}</strong></p>
-        </td></tr>
-        <tr><td class="email-footer email-padding" style="padding:20px 28px;background:${tokens["footer.background"]};color:${tokens["footer.text"]};text-align:center;font-size:13px;line-height:1.6;">
-          J Merrill Publishing | <a href="${brand.publicUrl}" style="color:${tokens["footer.text"]};">jmerrill.pub</a> | <a href="mailto:publishing@jmerrill.one" style="color:${tokens["footer.text"]};">publishing@jmerrill.one</a>
-        </td></tr>
-      </table>
-    </td></tr>
-  </table>
-</body>
-</html>`;
-  return { subject, preheader: template.preheader, html, plainText: text };
+  const rendered = renderPublishingServiceCorrespondence({
+    subject, authorName: data.authorFirstName,
+    body: text.slice(0, text.indexOf("\nWarm regards,")),
+    templateName: template.templateId, templateVersion: template.templateVersion
+  });
+  return { subject, preheader: template.preheader, html: rendered.html, plainText: rendered.text, renderMetadata: rendered.metadata };
 }
 
 function validateAuthorOnboardingData(data) {
@@ -222,7 +167,6 @@ function validateAuthorOnboardingData(data) {
 }
 
 function renderAuthorOnboarding(template, brand, data) {
-  const tokens = brand.tokens;
   const subject = template.subject.replace("{{projectTitle}}", data.projectTitle);
   const plainText = [
     `Good day, ${data.authorFirstName},`, "",
@@ -233,8 +177,12 @@ function renderAuthorOnboarding(template, brand, data) {
     "If you have any trouble signing in or completing the form, reply to this email and the Publishing Team will help.", "",
     "Warm regards,", "", brand.signatureName, brand.footer, brand.publicUrl
   ].join("\n");
-  const html = `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escapeHtml(subject)}</title></head><body style="margin:0;padding:0;background:${tokens["surface.muted"]};font-family:${tokens["font.stack"]};color:${tokens["text.primary"]};"><div style="display:none;max-height:0;overflow:hidden;opacity:0;color:transparent;">${escapeHtml(template.preheader)}</div><table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;background:${tokens["surface.muted"]};"><tr><td align="center" style="padding:24px 12px;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;max-width:600px;background:${tokens["surface.background"]};border:1px solid ${tokens["border.subtle"]};"><tr><td style="padding:24px 28px;border-top:6px solid ${tokens["brand.primary"]};text-align:center;"><a href="${brand.publicUrl}" style="text-decoration:none;"><img src="${brand.logo.url}" width="96" height="96" alt="${escapeHtml(brand.logo.alt)}" style="display:inline-block;width:96px;height:96px;border:0;object-fit:contain;"></a></td></tr><tr><td style="padding:4px 28px 28px;"><h1 style="margin:0 0 20px;font-size:26px;line-height:1.25;">Begin Author Onboarding</h1><p style="margin:0 0 16px;font-size:16px;line-height:1.6;">Good day, ${escapeHtml(data.authorFirstName)},</p><p style="margin:0 0 16px;font-size:16px;line-height:1.6;">Your publishing agreement and payment for <strong>${escapeHtml(data.projectTitle)}</strong> are complete, so you can now begin author onboarding.</p><p style="margin:0 0 22px;font-size:16px;line-height:1.6;">Sign in with the email address that received this invitation, request your one-time code, and complete the form for this title.</p><p style="margin:0 0 24px;text-align:center;"><a href="${escapeHtml(data.onboardingUrl)}" style="display:inline-block;background:${tokens["action.primary.background"]};color:${tokens["action.primary.text"]};padding:13px 22px;text-decoration:none;font-weight:700;">Begin Author Onboarding</a></p><p style="margin:0 0 18px;font-size:16px;line-height:1.6;">After you submit the form, the Publishing Team will review your information and confirm the next step.</p><p style="margin:0;font-size:16px;line-height:1.6;">Warm regards,<br><br><strong>${escapeHtml(brand.signatureName)}</strong></p></td></tr><tr><td style="padding:20px 28px;background:${tokens["footer.background"]};color:${tokens["footer.text"]};text-align:center;font-size:13px;line-height:1.6;">J Merrill Publishing | <a href="${brand.publicUrl}" style="color:${tokens["footer.text"]};">jmerrill.pub</a> | <a href="mailto:publishing@jmerrill.one" style="color:${tokens["footer.text"]};">publishing@jmerrill.one</a></td></tr></table></td></tr></table></body></html>`;
-  return { subject, preheader: template.preheader, html, plainText };
+  const rendered = renderPublishingServiceCorrespondence({
+    subject, authorName: data.authorFirstName,
+    body: plainText.slice(0, plainText.indexOf("\nWarm regards,")),
+    templateName: template.templateId, templateVersion: template.templateVersion
+  });
+  return { subject, preheader: template.preheader, html: rendered.html, plainText: rendered.text, renderMetadata: rendered.metadata };
 }
 
 function renderTemplate(input = {}) {
@@ -262,7 +210,8 @@ function renderTemplate(input = {}) {
     value: {
       ...output,
       metadata: {
-        rendererVersion: RENDERER_VERSION,
+        ...output.renderMetadata,
+        rendererVersion: output.renderMetadata.rendererVersion,
         templateId: template.templateId,
         templateVersion: template.templateVersion,
         brandId: template.brandId,
@@ -276,13 +225,11 @@ function renderTemplate(input = {}) {
   };
 }
 
-function renderServiceCorrespondence(body) {
-  const brand = getBrandProfile('PUBLISHING');
-  if (!brand.ok || typeof body !== 'string' || !body.trim() || body.length > 6000) throw new Error('SERVICE_CORRESPONDENCE_INVALID');
-  const tokens = brand.profile.tokens;
-  const paragraphs = body.trim().split(/\n\s*\n/).map(paragraph =>
-    `<p style="margin:0 0 16px;font-size:16px;line-height:1.6;">${escapeHtml(paragraph).replace(/\n/g, '<br>')}</p>`).join('');
-  return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head><body style="margin:0;padding:24px;font-family:${tokens['font.stack']};color:${tokens['text.primary']};background:${tokens['surface.background']};"><table role="presentation" width="100%" style="max-width:600px;border-collapse:collapse;"><tr><td>${paragraphs}</td></tr></table></body></html>`;
+function renderServiceCorrespondence(body, options = {}) {
+  return renderPublishingServiceCorrespondence({ body, subject: options.subject || 'Your Publishing Project',
+    authorName: options.authorName || body?.match(/^Good day,\s*([^,\n]+)/i)?.[1] || 'Author',
+    templateName: options.templateName || 'PUBLISHING_SERVICE_CORRESPONDENCE',
+    templateVersion: options.templateVersion || '1.0' }).html;
 }
 
 module.exports = {

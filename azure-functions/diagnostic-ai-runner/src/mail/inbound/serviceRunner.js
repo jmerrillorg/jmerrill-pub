@@ -15,6 +15,7 @@ const { normalizeString, redactBodyForEvidence, sha256Hex } = require("./util");
 const { verifiedServiceDelivery } = require("./deliveryLedger");
 const { prepareObservedService } = require("../../payment/observedPaymentServiceConsumer");
 const { htmlProjectionHashes, textProjectionHash } = require("./mailboxBodyProjection");
+const { renderPublishingServiceCorrespondence } = require("../../generated/communications/jm1-enterprise-communication-renderer");
 
 const INTERNAL_MAILBOX = "publishing@jmerrill.one";
 const SYSTEM_SENDER = "publishing@email.jmerrill.one";
@@ -202,8 +203,13 @@ async function prepareService(queueItem, deps) {
       eventId: queueItem.evidenceLink, linkStatus: linkResult?.status || "UNVERIFIED",
       linkReason: linkResult?.reason || "CURRENT_LINK_UNVERIFIED", transitionHeld: true };
   }
-  const copy = serviceCopy(classified.intent, contact.fullname, movement.title, message.subject, linkResult);
-  if (!copy || !authorReplyText(graphMessage)) return safeError("SERVICE_COPY_UNAVAILABLE");
+  const content = serviceCopy(classified.intent, contact.fullname, movement.title, message.subject, linkResult);
+  if (!content || !authorReplyText(graphMessage)) return safeError("SERVICE_COPY_UNAVAILABLE");
+  let rendered;
+  try { rendered = renderPublishingServiceCorrespondence({ ...content, authorName: contact.fullname,
+    templateName: `INBOUND_SERVICE_${classified.intent}_V1`, templateVersion: "1.0" }); }
+  catch { return safeError("SERVICE_CANONICAL_RENDER_FAILED"); }
+  const copy = { subject: rendered.subject, body: rendered.text, html: rendered.html, metadata: rendered.metadata };
   return {
     outcome: "ROUTINE_SERVICE_READY", intent: classified.intent, humanGate: false,
     eventId: queueItem.evidenceLink, route, message, movement, recipient,
@@ -434,6 +440,7 @@ async function executeService(queueItem, deps) {
       draftSubject: prepared.copy.subject,
       draftBody: prepared.copy.body,
       draftHtmlBody: prepared.copy.html || null,
+      templateMetadata: prepared.copy.metadata || null,
       templateName: `INBOUND_SERVICE_${prepared.intent}_V1`,
       templateVersion: "1.0",
       approvedBy: `publishing-service-rule:${prepared.intent}:v1`,
@@ -456,11 +463,12 @@ async function executeService(queueItem, deps) {
     const sentAt = new Date().toISOString();
     const copyHash = createHash("sha256").update(`${prepared.copy.subject}\n${prepared.copy.body}`).digest("hex");
     const bodyHash = createHash("sha256").update(normalizedMailText(prepared.copy.body)).digest("hex");
-    const htmlBodyProjectionHashes = prepared.intent === "AUTHOR_ONBOARDING_SERVICE_RECOVERY"
-      ? [textProjectionHash(prepared.copy.body)] : htmlProjectionHashes(prepared.copy.html);
+    const htmlBodyProjectionHashes = htmlProjectionHashes(prepared.copy.html);
     await store.updateBusinessRoute({ ...route, service: { intent: prepared.intent, status: "SEND_ACCEPTED_AUDIT_PENDING",
       outboxIntent: intent, semanticIdempotencyKey: reserve.semanticIdempotencyKey,
       htmlBodyProjectionHashes,
+      rendererVersion: prepared.copy.metadata?.rendererVersion || null,
+      templateVersion: prepared.copy.metadata?.templateVersion || "1.0",
       communicationRecordId: reserve.communicationRecordId, providerMessageId: result.providerMessageId, sentAt, copyHash,
       subject: prepared.copy.subject, bodyHash, recipient: prepared.recipient,
       sourceConversationId: prepared.message.conversationId || null } });
@@ -474,6 +482,8 @@ async function executeService(queueItem, deps) {
       communicationRecordId: reserve.communicationRecordId, sentRecordId: sent.sentRecordId,
       providerMessageId: result.providerMessageId, sentAt, copyHash, bodyHash,
       htmlBodyProjectionHashes,
+      rendererVersion: prepared.copy.metadata?.rendererVersion || null,
+      templateVersion: prepared.copy.metadata?.templateVersion || "1.0",
       subject: prepared.copy.subject, recipient: prepared.recipient,
       sourceConversationId: prepared.message.conversationId || null,
       linkStatus: prepared.linkStatus, linkReason: prepared.linkReason,

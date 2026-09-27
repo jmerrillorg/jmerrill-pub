@@ -56,7 +56,7 @@ function loadRelayModule() {
       if (name === '../policy/canonPolicyLayer') {
         return require(path.join(process.cwd(), 'azure-functions', 'acs-email-relay', 'src', 'policy', 'canonPolicyLayer.js'))
       }
-      return require(name)
+      return createRequire(filePath)(name)
     },
     process,
     Buffer,
@@ -73,7 +73,7 @@ function loadRelayModule() {
 
 function validRelayPayload(overrides = {}) {
   const rendered = renderCoverReview()
-  return {
+  const payload = {
     messageType: 'APPROVED_AUTHOR_RESPONSE',
     diagnosticId: '64e387e0-7e6a-f111-a826-00224820105b',
     intakeReferenceCode: 'JMP-INT-202606-UFYG60',
@@ -101,6 +101,15 @@ function validRelayPayload(overrides = {}) {
     ],
     ...overrides,
   }
+  const manifest = payload.attachments.map(item => ({ role: item.role || '', filename: item.name,
+    version: item.version || '', checksum: item.sha256 || '' }))
+  payload.communicationObservability = {
+    from: 'publishing@email.jmerrill.one', replyTo: 'publishing@jmerrill.one', cc: ['publishing@jmerrill.one'],
+    dataverseCommunicationRecordRequired: true, publishingMailboxCopyRequired: true,
+    semanticAttachmentParityRequired: true, authorAttachmentManifest: manifest,
+    publishingCopyAttachmentManifest: manifest, dataverseArtifactManifest: manifest,
+  }
+  return payload
 }
 
 test('canonical renderer stamps render-enforcement metadata', () => {
@@ -367,7 +376,7 @@ test('relay rejects author review package with internal language', () => {
   const relay = loadRelayModule()
   const rendered = renderCoverReview()
   const result = relay.validateApprovedAuthorResponsePayload(validRelayPayload({
-    htmlBody: rendered.html.replace('Support', 'Support Dataverse'),
+    htmlBody: rendered.html.replace('</body>', '<p>Dataverse internal note</p></body>'),
   }))
 
   assert.equal(result.ok, false)

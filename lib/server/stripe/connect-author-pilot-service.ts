@@ -1,3 +1,5 @@
+import { renderPublishingServiceCorrespondence } from '../jm1-enterprise-communication-renderer'
+
 import { createHash } from 'node:crypto'
 
 import {
@@ -340,6 +342,7 @@ async function sendAuthorInvitation(identity: AuthorConnectIdentity, linkUrl: st
   const relayUrl = clean(process.env.JM1_JOIN_INTERNAL_NOTIFICATION_RELAY_URL || process.env.JM1_INTERNAL_NOTIFICATION_RELAY_URL)
   const relayKey = clean(process.env.JM1_JOIN_INTERNAL_NOTIFICATION_RELAY_KEY || process.env.JM1_INTERNAL_NOTIFICATION_RELAY_KEY)
   if (!relayUrl || !relayKey) throw new Error('relay_configuration_missing')
+  const rendered = buildInvitation(identity, linkUrl)
 
   const response = await fetch(`${relayUrl.replace(/\/$/, '')}/api/send-approved-author-response`, {
     method: 'POST',
@@ -356,18 +359,11 @@ async function sendAuthorInvitation(identity: AuthorConnectIdentity, linkUrl: st
       authorName: identity.authorName,
       projectTitle: 'Stripe Connect Setup',
       subject: STRIPE_CONNECT_AUTHOR_PILOT_SUBJECT,
-      body: buildTextInvitation(identity, linkUrl),
-      htmlBody: buildHtmlInvitation(identity, linkUrl),
+      body: rendered.text,
+      htmlBody: rendered.html,
       templateName: STRIPE_CONNECT_AUTHOR_PILOT_TEMPLATE,
       templateVersion: 'v1.0',
-      templateMetadata: {
-        qualityGate: 'CONNECT_AUTHOR_PILOT',
-        brandSystem: 'J Merrill Publishing',
-        enterpriseStandard: 'JM1-COM-001',
-        renderer: 'connect-author-pilot-service',
-        rendererVersion: STRIPE_CONNECT_AUTHOR_PILOT_VERSION,
-        renderMode: 'CANONICAL_HTML',
-      },
+      templateMetadata: rendered.metadata,
       approvedBy: 'Jackie Smith, Jr.',
       approvedOn: new Date().toISOString(),
       internalVisibilityMailbox: 'publishing@jmerrill.one',
@@ -401,8 +397,12 @@ function buildTextInvitation(identity: AuthorConnectIdentity, linkUrl: string) {
   ].join('\n')
 }
 
-function buildHtmlInvitation(identity: AuthorConnectIdentity, linkUrl: string) {
-  return `<!doctype html><html><body style="margin:0;background:#f6f7f9;font-family:Arial,Helvetica,sans-serif;color:#111827;"><div style="max-width:680px;margin:0 auto;background:#ffffff;"><div style="background:#111827;color:#ffffff;padding:24px 28px;"><div style="font-size:18px;font-weight:700;">J Merrill Publishing</div><div style="font-size:13px;margin-top:4px;">A Division of J Merrill One</div></div><div style="padding:28px;"><p>Good day ${escapeHtml(firstName(identity.authorName))},</p><p>J Merrill Publishing uses Stripe Connect as the secure setup process for direct deposit and payout information.</p><p>Please use the secure Stripe-hosted link below to complete your banking, tax, and identity setup inside Stripe. Please do not send banking or tax information by email.</p><p style="margin:28px 0;"><a href="${escapeHtml(linkUrl)}" style="display:inline-block;background:#1d4ed8;color:#ffffff;text-decoration:none;font-weight:700;padding:12px 18px;border-radius:6px;">Complete Stripe Connect Setup</a></p><p>If you have trouble with the setup link, reply to this message and the Publishing Team will help with Stripe Connect setup.</p><p>With care,<br>J Merrill Publishing</p></div></div></body></html>`
+function buildInvitation(identity: AuthorConnectIdentity, linkUrl: string) {
+  return renderPublishingServiceCorrespondence({
+    subject: STRIPE_CONNECT_AUTHOR_PILOT_SUBJECT, body: buildTextInvitation(identity, linkUrl),
+    authorName: identity.authorName, templateName: STRIPE_CONNECT_AUTHOR_PILOT_TEMPLATE,
+    templateVersion: 'v1.0', actionLabel: 'Complete Stripe Connect Setup',
+  })
 }
 
 function buildNegativeProof(

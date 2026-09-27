@@ -7,9 +7,13 @@ const { authorReplyText } = require("../src/mail/inbound/replyText");
 const { renderServiceCorrespondence } = require("../../acs-email-relay/src/templates/renderer");
 const { htmlProjectionHashes, textProjectionHash } = require("../src/mail/inbound/mailboxBodyProjection");
 
-test("relay HTML preserves the exact plain-text recovery correspondence for mailbox readback", () => {
+test("recovery uses the canonical branded shell rather than the retired paragraph-only wrapper", () => {
   const copy = serviceCopy("AUTHOR_ONBOARDING_SERVICE_RECOVERY", "Jackuline Fly", "Whole", "Onboarding help");
-  assert.ok(htmlProjectionHashes(renderServiceCorrespondence(copy.body)).includes(textProjectionHash(copy.body)));
+  const html = renderServiceCorrespondence(copy.body);
+  assert.match(html, /J MERRILL PUBLISHING/);
+  assert.match(html, /The Publishing Team/);
+  assert.match(html, /Helping Authors Help Themselves/);
+  assert.ok(htmlProjectionHashes(html).length > 0);
 });
 
 test("quoted iPhone correspondence cannot manufacture a contact-change request", () => {

@@ -79,12 +79,13 @@ test("renders deterministic subject, preheader, HTML, plain text, and metadata",
   assert.equal(first.value.subject, "Your Publishing Payment Options for A New Beginning");
   assert.equal(first.value.preheader, "Choose the payment option that works best for you.");
   assert.match(first.value.html, /^<!doctype html>/);
-  assert.match(first.value.html, /alt="J Merrill Publishing"/);
-  assert.match(first.value.html, /class="email-container"/);
-  assert.match(first.value.html, /max-width:600px/);
-  assert.match(first.value.html, /meta name="color-scheme"/);
+  assert.match(first.value.html, /J Merrill Publishing/);
+  assert.match(first.value.html, /The Publishing Team/);
+  assert.match(first.value.html, /max-width:680px/);
+  assert.match(first.value.html, /meta charset="utf-8"/);
+  assert.equal(first.value.metadata.renderer, "JM1 Enterprise Communication Renderer");
   assert.match(first.value.plainText, /Reply with|Please reply/);
-  assert.match(first.value.plainText, /https?:\/\//, "plain text footer should retain a usable public destination");
+  assert.match(first.value.plainText, /jmerrill\.pub/, "plain text footer should retain the canonical public destination");
   assert.equal(first.value.metadata.rendererVersion, RENDERER_VERSION);
   assert.equal(first.value.metadata.htmlSha256, second.value.metadata.htmlSha256);
   assert.equal(first.value.metadata.plainTextSha256, second.value.metadata.plainTextSha256);
