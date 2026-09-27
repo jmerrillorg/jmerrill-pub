@@ -2,7 +2,6 @@
 // Reusable? Y
 // Stage-specific exception? N
 
-import { EmailClient, type EmailAttachment, type EmailMessage } from '@azure/communication-email'
 import { createHash } from 'node:crypto'
 import { strFromU8, unzipSync } from 'fflate'
 import {
@@ -472,73 +471,6 @@ export function buildAuthorReviewNotificationCopy(input: {
     templateName: rendered.metadata.templateName,
     templateVersion: rendered.metadata.templateVersion,
     templateMetadata: rendered.metadata,
-  }
-}
-
-export async function sendAuthorPackageNotificationViaAcs(input: {
-  connectionString: string
-  from: string
-  to: string
-  replyTo: string
-  cc?: string[]
-  bcc: string[]
-  subject: string
-  textBody: string
-  htmlBody: string
-  attachments: GovernedPackageAttachment[]
-}) {
-  const headerValidation = validateAuthorNotificationHeaders({
-    from: input.from,
-    to: input.to,
-    replyTo: input.replyTo,
-    cc: input.cc,
-    bcc: input.bcc,
-  })
-  if (!headerValidation.ok) throw new Error(headerValidation.blocker)
-  const bodyValidation = validateAuthorCommunicationEmail({
-    html: input.htmlBody,
-    text: input.textBody,
-    templateName: 'AUTHOR_REVIEW_PACKAGE_NOTIFICATION_V1',
-    templateVersion: '1.0.0',
-  })
-  if (!bodyValidation.ok) throw new Error(bodyValidation.blocker)
-
-  const exposedInternalArtifact = input.attachments.map(authorFacingAttachmentBlocker).find(Boolean)
-  if (exposedInternalArtifact) throw new Error(`AUTHOR_PACKAGE_NOTIFICATION_BLOCKED - ${exposedInternalArtifact}`)
-  for (const attachment of input.attachments.filter((item) => isPhysicalEmailAttachmentRole(item.role))) {
-    const binaryValidation = validateGovernedPackageAttachmentBinary(attachment)
-    if (!binaryValidation.ok) throw new Error(`AUTHOR_PACKAGE_NOTIFICATION_BLOCKED - ${binaryValidation.blocker}`)
-  }
-
-  const client = new EmailClient(input.connectionString)
-  const message: EmailMessage = {
-    senderAddress: input.from,
-    replyTo: [{ address: input.replyTo, displayName: AUTHOR_PUBLISHING_COMMUNICATION_POLICY.transactionalFromName }],
-    content: {
-      subject: input.subject,
-      plainText: input.textBody,
-      html: input.htmlBody,
-    },
-    recipients: {
-      to: [{ address: input.to }],
-      cc: Array.from(new Set((input.cc || []).map((address) => address.trim().toLowerCase()).filter(Boolean))).map((address) => ({ address })),
-      bcc: input.bcc.map((address) => ({ address })),
-    },
-    attachments: input.attachments
-      .filter((attachment) => isPhysicalEmailAttachmentRole(attachment.role))
-      .map((attachment): EmailAttachment => ({
-        name: attachment.fileName,
-        contentType: attachment.contentType,
-        contentInBase64: attachment.contentBytesBase64 || '',
-      })),
-  }
-
-  const poller = await client.beginSend(message)
-  const result = await poller.pollUntilDone()
-  return {
-    messageId: result.id || 'not-returned-by-provider',
-    providerStatus: result.status || 'accepted',
-    sentAt: new Date().toISOString(),
   }
 }
 
