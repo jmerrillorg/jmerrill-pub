@@ -73,3 +73,19 @@ test("internal presentation proof reads only the fixed internal subject and cont
     assert.equal(result.jsonBody.effects, 0);
   }
 });
+
+test("recent system census is explicitly requested and bounded independently of a title subject", async () => {
+  const deps = dependencies();
+  const paths = [];
+  deps.graphClient.request = async (method, path) => {
+    assert.equal(method, "GET");
+    paths.push(decodeURIComponent(path));
+    return { value: [] };
+  };
+  const result = await lifecycleReadback({ authorId, titleId,
+    afterIso: new Date(Date.now() - 86400000).toISOString(), includePresentation: true, includeSystemCensus: true }, deps);
+  assert.equal(result.jsonBody.queries.length, 3);
+  assert.match(paths[2], /publishing@email\.jmerrill\.one/);
+  assert.equal(result.jsonBody.systemPresentationComplete, true);
+  assert.equal(result.jsonBody.effects, 0);
+});
