@@ -1,0 +1,175 @@
+name: Stage 0 Shadow Route Activation
+
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        description: "Choose the single approved shadow-only action"
+        type: choice
+        required: true
+        default: no-op
+        options:
+          - no-op
+          - activate-stage0-shadow-only
+
+permissions:
+  contents: read
+
+concurrency:
+  group: stage0-shadow-route-activation
+  cancel-in-progress: false
+
+env:
+  APP: func-jm1-pub-stage0-shadow
+  RESOURCE_GROUP: rg-jm1-ai
+  INSIGHTS_APP_ID: ab6245b2-2b19-4ba3-9a41-6dc8b2ebbc27
+  EXPECTED_RELEASE_SHA: 630ed3da39449e3e857be681e558506cf7109cf3
+  EXPECTED_RUNTIME_CLIENT_ID: ee2d3f1e-f0b9-4576-becc-10c40062efa4
+  EXPECTED_BASELINE_VERSION: STAGE0-AUTHORITY-C15-v1
+  EXPECTED_BASELINE_CHECKSUM: 2125bc1193e36e13a3f8d58d2200de4ca9c0e1789e011caee4ac85761689ee84
+  EXPECTED_POLICY_VERSION: STAGE0-SHADOW-C11-v1
+  EXPECTED_MODEL_REGISTER_ID: AZURE:OAI-JM1-DIAGNOSTIC:JM1-PUB-DIAGNOSTIC-PRIMARY
+  EXPECTED_RISK_REGISTER_ID: JM1-AI-RISK-STAGE0-SHADOW-001
+  ROUTE_REVIEW_EXPIRES_AT: "2026-10-23T00:00:00Z"
+  STAGE0_ACTION_GROUP_RESOURCE_GROUP: rg-jm1-pub-prod-appsvc
+  STAGE0_ACTION_GROUP: ag-jm1-pub-infra006-ops
+
+jobs:
+  activate:
+    if: github.event.inputs.action == 'activate-stage0-shadow-only'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment: jmerrill-pub-production
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Authenticate using protected environment identity
+        uses: azure/login@v3
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Validate fresh C15 authority and exact current runtime
+        id: preflight
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(az functionapp show -g "$RESOURCE_GROUP" -n "$APP" --query state -o tsv)" = Running
+          setting() {
+            az functionapp config appsettings list -g "$RESOURCE_GROUP" -n "$APP" \
+              --query "[?name=='$1'].value | [0]" -o tsv
+          }
+          test "$(setting JM1_RELEASE_SHA)" = "$EXPECTED_RELEASE_SHA"
+          test "$(setting JM1_SHADOW_ENABLED)" = false
+          test "$(setting JM1_SHADOW_CANARY_ENABLED)" = false
+          test "$(setting JM1_SHADOW_BUDGET_CERTIFICATION_ENABLED)" = false
+          test "$(setting JM1_SHADOW_ROUTE_STATUS)" = CANARY_ONLY
+          test "$(setting JM1_SHADOW_ROUTE_POLICY_VERSION)" = "$EXPECTED_POLICY_VERSION"
+          test "$(setting JM1_SHADOW_ROUTE_EXPIRES_AT)" = 2026-09-26T00:00:00Z
+          test "$(setting JM1_SHADOW_EXECUTION_CERTIFIED)" != true
+          test "$(setting JM1_SHADOW_MANAGED_IDENTITY_CLIENT_ID)" = "$EXPECTED_RUNTIME_CLIENT_ID"
+          test "$(setting JM1_SHADOW_PERMISSION_BASELINE_VERSION)" = "$EXPECTED_BASELINE_VERSION"
+          test "$(setting JM1_SHADOW_PERMISSION_BASELINE_CHECKSUM)" = "$EXPECTED_BASELINE_CHECKSUM"
+          test "$(setting JM1_SHADOW_MODEL_REGISTER_ID)" = "$EXPECTED_MODEL_REGISTER_ID"
+          test "$(setting JM1_SHADOW_RISK_REGISTER_ID)" = "$EXPECTED_RISK_REGISTER_ID"
+
+          for rule in jm1-stage0-shadow-permission-health jm1-stage0-shadow-runtime-failures; do
+            test "$(az monitor scheduled-query show -g "$RESOURCE_GROUP" -n "$rule" --query enabled -o tsv)" = true
+          done
+          test "$(az monitor action-group show -g "$STAGE0_ACTION_GROUP_RESOURCE_GROUP" -n "$STAGE0_ACTION_GROUP" --query enabled -o tsv)" = true
+
+          query="traces | where timestamp > ago(24h) | extend d=parse_json(message) | where tostring(d.event) == 'stage0_permission_monitor' and tostring(d.overallResult) == 'PASS' and tostring(d.monitorReleaseSha) == 'c2c8a287969e5a5fada83308452cafbc124beaf9' and tostring(d.results.sharepoint) == 'PASS' and tostring(d.results.entra) == 'PASS' and tostring(d.results.azureRbac) == 'PASS' and tostring(d.results.dataverse) == 'PASS' and tostring(d.results.model) == 'PASS' and tostring(d.results.monitorSelf) == 'PASS' | summarize runCount=dcount(tostring(d.runId)), latest=max(timestamp) | project runCount, latest"
+          result="$(az monitor app-insights query --app "$INSIGHTS_APP_ID" --analytics-query "$query" -o json)"
+          count="$(jq -r '.tables[0].rows[0][0] // 0' <<<"$result")"
+          latest="$(jq -r '.tables[0].rows[0][1] // empty' <<<"$result")"
+          test "$count" -ge 2
+          test -n "$latest"
+          python3 - "$latest" <<'PY'
+          from datetime import datetime, timezone
+          import sys
+          latest = datetime.fromisoformat(sys.argv[1].replace("Z", "+00:00"))
+          age = (datetime.now(timezone.utc) - latest).total_seconds()
+          if age < 0 or age > 25 * 60:
+              raise SystemExit(f"latest full-scope monitor PASS is outside 25-minute activation margin: age={age:.0f}s")
+          PY
+
+          runtime_query="traces | where timestamp > ago(10m) | where message in ('stage0_shadow_permission_probe=PASS personal=0', 'stage0_shadow_probe=PASS') | summarize permissionPass=countif(message startswith 'stage0_shadow_permission_probe=PASS'), aggregatePass=countif(message == 'stage0_shadow_probe=PASS'), latest=max(timestamp)"
+          runtime_result="$(az monitor app-insights query --app ab6245b2-2b19-4ba3-9a41-6dc8b2ebbc27 --analytics-query "$runtime_query" -o json)"
+          jq -e '.tables[0].rows[0][0] >= 1 and .tables[0].rows[0][1] >= 1' <<<"$runtime_result" >/dev/null
+          printf 'C15 preflight PASS: %s full-scope scheduled runs in 24h; latest=%s; runtime permission/authority probes PASS; alerts enabled\n' "$count" "$latest"
+
+      - name: Activate the one bounded read-only shadow route
+        id: activate
+        shell: bash
+        env:
+          ACTIVATION_ID: C15-${{ github.run_id }}-${{ github.run_attempt }}
+        run: |
+          set -euo pipefail
+          activated_at="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          az functionapp config appsettings set -g "$RESOURCE_GROUP" -n "$APP" --settings \
+            JM1_SHADOW_ENABLED=true \
+            JM1_SHADOW_ROUTE_STATUS=ACTIVE \
+            JM1_SHADOW_EXECUTION_CERTIFIED=true \
+            JM1_SHADOW_ROUTE_EXPIRES_AT="$ROUTE_REVIEW_EXPIRES_AT" \
+            JM1_SHADOW_ACTIVATION_ID="$ACTIVATION_ID" \
+            JM1_SHADOW_ACTIVATED_AT="$activated_at" \
+            JM1_SHADOW_ACTIVATION_UTC="$activated_at" \
+            --output none
+          echo "activation_id=$ACTIVATION_ID" >> "$GITHUB_OUTPUT"
+          echo "activated_at=$activated_at" >> "$GITHUB_OUTPUT"
+          az functionapp restart -g "$RESOURCE_GROUP" -n "$APP" --output none
+
+      - name: Independently read back activation and preserve code release
+        shell: bash
+        env:
+          ACTIVATION_ID: C15-${{ github.run_id }}-${{ github.run_attempt }}
+        run: |
+          set -euo pipefail
+          for attempt in $(seq 1 20); do
+            state="$(az functionapp show -g "$RESOURCE_GROUP" -n "$APP" --query state -o tsv)"
+            if [ "$state" = Running ]; then break; fi
+            sleep 15
+          done
+          test "$state" = Running
+          setting() {
+            az functionapp config appsettings list -g "$RESOURCE_GROUP" -n "$APP" \
+              --query "[?name=='$1'].value | [0]" -o tsv
+          }
+          test "$(setting JM1_SHADOW_ENABLED)" = true
+          test "$(setting JM1_SHADOW_ROUTE_STATUS)" = ACTIVE
+          test "$(setting JM1_SHADOW_EXECUTION_CERTIFIED)" = true
+          test "$(setting JM1_SHADOW_ACTIVATION_ID)" = "$ACTIVATION_ID"
+          test "$(setting JM1_SHADOW_ACTIVATION_UTC)" = "$(setting JM1_SHADOW_ACTIVATED_AT)"
+          test "$(setting JM1_SHADOW_ROUTE_EXPIRES_AT)" = "$ROUTE_REVIEW_EXPIRES_AT"
+          test "$(setting JM1_RELEASE_SHA)" = "$EXPECTED_RELEASE_SHA"
+          test "$(setting JM1_SHADOW_MANAGED_IDENTITY_CLIENT_ID)" = "$EXPECTED_RUNTIME_CLIENT_ID"
+          test "$(setting JM1_SHADOW_PERMISSION_BASELINE_CHECKSUM)" = "$EXPECTED_BASELINE_CHECKSUM"
+          functions="$(az functionapp function list -g "$RESOURCE_GROUP" -n "$APP" --query '[].name' -o tsv)"
+          for expected in stage0-shadow-poll stage0-shadow-authority-probe stage0-shadow-commissioning-canary stage0-shadow-budget-certification; do
+            printf '%s\n' "$functions" | grep -Fx "$APP/$expected"
+          done
+          test "$(printf '%s\n' "$functions" | wc -l | tr -d ' ')" = 4
+          printf 'POST_ACTIVATION_READBACK=PASS activation=%s release=%s route=STAGE_0_DIAGNOSTIC_SHADOW_ONLY\n' "$ACTIVATION_ID" "$EXPECTED_RELEASE_SHA"
+
+      - name: Fail closed if activation/readback failed
+        if: failure() && steps.preflight.outcome == 'success'
+        shell: bash
+        run: |
+          set -euo pipefail
+          az functionapp config appsettings set -g "$RESOURCE_GROUP" -n "$APP" --settings \
+            JM1_SHADOW_ENABLED=false \
+            JM1_SHADOW_ROUTE_STATUS=CANARY_ONLY \
+            JM1_SHADOW_EXECUTION_CERTIFIED=false \
+            --output none
+          az functionapp restart -g "$RESOURCE_GROUP" -n "$APP" --output none
+          for attempt in $(seq 1 20); do
+            state="$(az functionapp show -g "$RESOURCE_GROUP" -n "$APP" --query state -o tsv)"
+            if [ "$state" = Running ]; then break; fi
+            sleep 15
+          done
+          test "$state" = Running
+          test "$(az functionapp config appsettings list -g "$RESOURCE_GROUP" -n "$APP" --query "[?name=='JM1_SHADOW_ENABLED'].value | [0]" -o tsv)" = false
+          test "$(az functionapp config appsettings list -g "$RESOURCE_GROUP" -n "$APP" --query "[?name=='JM1_SHADOW_EXECUTION_CERTIFIED'].value | [0]" -o tsv)" = false
+          echo "ROUTE_ACTIVATION_FAIL_CLOSED=PASS"
