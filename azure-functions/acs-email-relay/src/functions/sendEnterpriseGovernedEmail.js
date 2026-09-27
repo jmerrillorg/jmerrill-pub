@@ -5,6 +5,7 @@ const { authenticateCaller } = require("../security/callerAuthentication");
 const { authorizeCallerForBrand, authorizeCallerForTemplate, normalizeBrand } = require("../policy/callerRegistry");
 const { DELIVERY_STATE, getMessageLedger } = require("../state/messageLedger");
 const { renderTemplate } = require("../templates/renderer");
+const { sendWithCompletedReceipt } = require("../provider/acsCompletion");
 const { renderPublishingServiceCorrespondence } = require("../generated/communications/jm1-enterprise-communication-renderer");
 const { isGovernedNamespace } = require("../templates/templateRegistry");
 const {
@@ -285,15 +286,7 @@ function buildEnterpriseEmail(value) {
 }
 
 async function sendAcsMessage(message, client = getEmailClient()) {
-  const poller = await client.beginSend(message);
-  if (!poller || typeof poller.pollUntilDone !== "function") {
-    throw Object.assign(new Error("ACS completion unavailable."), { safeCode: "ACS_DELIVERY_UNPROVEN" });
-  }
-  const result = await poller.pollUntilDone();
-  if (result?.status !== "Succeeded" || !safeTrim(result?.id)) {
-    throw Object.assign(new Error("ACS completion unproven."), { safeCode: "ACS_DELIVERY_UNPROVEN" });
-  }
-  return result.id;
+  return (await sendWithCompletedReceipt(client, message)).providerMessageId;
 }
 
 function safeErrorCode(error) {

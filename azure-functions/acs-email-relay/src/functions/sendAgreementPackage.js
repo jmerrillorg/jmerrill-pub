@@ -1,4 +1,5 @@
 const { app } = require("@azure/functions");
+const { sendWithCompletedReceipt } = require("../provider/acsCompletion");
 const { EmailClient } = require("@azure/communication-email");
 const { DefaultAzureCredential } = require("@azure/identity");
 const {
@@ -324,6 +325,7 @@ function buildAgreementPackageSendEmail(value) {
     templateName: "AGREEMENT_PACKAGE_SEND", templateVersion: "1.0"
   });
   const htmlBody = rendered.html;
+  value.renderMetadata = rendered.metadata;
   const email = {
     senderAddress: getAuthorResponseSenderAddress(),
     content: {
@@ -408,8 +410,8 @@ app.http("send-agreement-package", {
 
     try {
       const message = buildAgreementPackageSendEmail(validation.value);
-      const poller = await getEmailClient().beginSend(message);
-      const providerMessageId = getOperationId(poller);
+      const receipt = await sendWithCompletedReceipt(getEmailClient(), message);
+      const providerMessageId = receipt.providerMessageId;
 
       context.info(`ACS relay accepted agreement package send; reference=${validation.value.intakeReferenceCode}; diagnosticId=${validation.value.diagnosticId}`);
 
@@ -424,7 +426,9 @@ app.http("send-agreement-package", {
           intakeReferenceCode: validation.value.intakeReferenceCode,
           diagnosticId: validation.value.diagnosticId,
           provider: ACS_PROVIDER_NAME,
-          providerMessageId
+          providerMessageId,
+          providerStatus: receipt.providerStatus,
+          renderMetadata: validation.value.renderMetadata
         }
       };
     } catch (error) {

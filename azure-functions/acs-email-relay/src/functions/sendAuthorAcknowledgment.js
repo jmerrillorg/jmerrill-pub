@@ -3,6 +3,7 @@ const { EmailClient } = require("@azure/communication-email");
 const { DefaultAzureCredential } = require("@azure/identity");
 const { createHash } = require("node:crypto");
 const { executeApprovedAuthorResponse } = require("../state/approvedAuthorDelivery");
+const { sendWithCompletedReceipt } = require("../provider/acsCompletion");
 const { renderPublishingServiceCorrespondence, validateJm1EnterpriseCommunication } = require("../generated/communications/jm1-enterprise-communication-renderer");
 const {
   assertPolicyAllows,
@@ -459,6 +460,7 @@ function buildAcknowledgmentEmail(payload) {
   const rendered = renderPublishingServiceCorrespondence({ subject, body: plainText,
     authorName: payload.firstName, templateName: "PUBLISHING_INQUIRY_ACKNOWLEDGMENT", templateVersion: "1.0", actionLabel: copy.ctaLabel });
   const html = rendered.html;
+  payload.renderMetadata = rendered.metadata;
   const email = {
     senderAddress,
     content: {
@@ -1502,17 +1504,7 @@ async function sendAcsMessage(message) {
 }
 
 async function sendAcsMessageWithReceipt(message) {
-  const poller = await getEmailClient().beginSend(message);
-  if (!poller || typeof poller.pollUntilDone !== "function") {
-    throw Object.assign(new Error("ACS completion poller unavailable."), { safeCode: "ACS_DELIVERY_UNPROVEN" });
-  }
-  const result = await poller.pollUntilDone();
-  const providerStatus = normalizeText(result?.status);
-  const providerMessageId = normalizeText(result?.id || getOperationId(poller));
-  if (providerStatus !== "Succeeded" || !providerMessageId) {
-    throw Object.assign(new Error("ACS delivery did not reach Succeeded state."), { safeCode: "ACS_DELIVERY_UNPROVEN" });
-  }
-  return { providerMessageId, providerStatus };
+  return sendWithCompletedReceipt(getEmailClient(), message);
 }
 
 function getOperationId(poller) {
@@ -1577,8 +1569,8 @@ app.http("send-author-acknowledgment", {
 
     try {
       const message = buildAcknowledgmentEmail(validation.value);
-      const poller = await getEmailClient().beginSend(message);
-      const operationId = getOperationId(poller);
+      const receipt = await sendAcsMessageWithReceipt(message);
+      const operationId = receipt.providerMessageId;
 
       context.info(`ACS relay accepted acknowledgment send; reference=${reference}`);
 
@@ -1587,6 +1579,8 @@ app.http("send-author-acknowledgment", {
         jsonBody: {
           status: "accepted",
           operationId,
+          providerStatus: receipt.providerStatus,
+          renderMetadata: validation.value.renderMetadata,
           reference
         }
       };
