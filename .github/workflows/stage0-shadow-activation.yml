@@ -11,6 +11,10 @@ on:
         options:
           - no-op
           - activate-stage0-shadow-only
+      expected-release-sha:
+        description: "Exact approved repaired runtime release SHA"
+        type: string
+        required: true
 
 permissions:
   contents: read
@@ -22,10 +26,10 @@ concurrency:
 env:
   APP: func-jm1-pub-stage0-shadow
   RESOURCE_GROUP: rg-jm1-ai
-  EXPECTED_RELEASE_SHA: 630ed3da39449e3e857be681e558506cf7109cf3
+  EXPECTED_RELEASE_SHA: ${{ inputs.expected-release-sha }}
   EXPECTED_RUNTIME_CLIENT_ID: ee2d3f1e-f0b9-4576-becc-10c40062efa4
-  EXPECTED_BASELINE_VERSION: STAGE0-AUTHORITY-C15-v1
-  EXPECTED_BASELINE_CHECKSUM: 2125bc1193e36e13a3f8d58d2200de4ca9c0e1789e011caee4ac85761689ee84
+  EXPECTED_BASELINE_VERSION: STAGE0-AUTHORITY-C15-v2
+  EXPECTED_BASELINE_CHECKSUM: f09ccaaa4865b80faec04d21bb739c622f41460f7006e2bb2cad54391586d4dd
   EXPECTED_POLICY_VERSION: STAGE0-SHADOW-C11-v1
   EXPECTED_MODEL_REGISTER_ID: AZURE:OAI-JM1-DIAGNOSTIC:JM1-PUB-DIAGNOSTIC-PRIMARY
   EXPECTED_RISK_REGISTER_ID: JM1-AI-RISK-STAGE0-SHADOW-001
@@ -53,6 +57,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          [[ "$EXPECTED_RELEASE_SHA" =~ ^[a-f0-9]{40}$ ]]
           test "$(az functionapp show -g "$RESOURCE_GROUP" -n "$APP" --query state -o tsv)" = Running
           setting() {
             az functionapp config appsettings list -g "$RESOURCE_GROUP" -n "$APP" \
@@ -128,7 +133,7 @@ jobs:
           printf 'POST_ACTIVATION_READBACK=PASS activation=%s release=%s route=STAGE_0_DIAGNOSTIC_SHADOW_ONLY\n' "$ACTIVATION_ID" "$EXPECTED_RELEASE_SHA"
 
       - name: Fail closed if activation/readback failed
-        if: failure() && steps.preflight.outcome == 'success'
+        if: always() && (failure() || cancelled()) && steps.preflight.outcome == 'success'
         shell: bash
         run: |
           set -euo pipefail

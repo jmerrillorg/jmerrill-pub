@@ -7,6 +7,16 @@ const CONTAINER = "shadow-permission-state";
 const BLOB = "authority-current.json";
 const MAX_AGE_MS = 30 * 60 * 1000;
 const SURFACES = ["sharepoint", "entra", "azureRbac", "dataverse", "model", "monitorSelf"];
+const ALERT_CHECKSUM = "ba9d18eb9ab843080116841b7f347dd6de1699a6b6c6b74ac25a2f83a1da176b";
+
+function validateAlertHealth(health, now = Date.now()) {
+  const observed = Date.parse(health?.observedAt);
+  if (health?.schemaVersion !== "1.0.0" || health.configurationResult !== "PASS" ||
+      health.configurationChecksum !== ALERT_CHECKSUM || !Number.isFinite(observed) ||
+      observed > now || now - observed > MAX_AGE_MS) {
+    throw new Error("SHADOW_ALERT_HEALTH_UNVERIFIED");
+  }
+}
 
 function validatePermissionState(state, expected, now = Date.now()) {
   const sharepoint = state?.sharepoint;
@@ -38,6 +48,7 @@ function validatePermissionState(state, expected, now = Date.now()) {
       !Number.isFinite(validUntil) || validUntil !== observed + MAX_AGE_MS || now > validUntil) {
     throw new Error("SHADOW_PERMISSION_STATE_STALE");
   }
+  validateAlertHealth(state.alertHealth, now);
   return { personalSiteIds: sharepoint.personalSiteIds,
     verdict: { monitorRunId: state.monitorRunId, baselineVersion: state.baselineVersion,
       baselineChecksum: state.baselineChecksum, runtimeIdentityId: state.runtimeIdentityId,
@@ -66,4 +77,4 @@ async function readPermissionState({ accountName, clientId, expected }) {
   return validatePermissionState(JSON.parse(bytes.toString("utf8")), expected);
 }
 
-module.exports = { CONTAINER, BLOB, MAX_AGE_MS, validatePermissionState, readPermissionState };
+module.exports = { CONTAINER, BLOB, MAX_AGE_MS, validatePermissionState, validateAlertHealth, readPermissionState };
