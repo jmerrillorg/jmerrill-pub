@@ -18,6 +18,9 @@ const state = {
     targetSiteId: expected.siteId, grantId: expected.grantId, modelResourceId: expected.modelResourceId,
     deploymentName: expected.deploymentName },
   results: { sharepoint: "PASS", entra: "PASS", azureRbac: "PASS", dataverse: "PASS", model: "PASS", monitorSelf: "PASS" },
+  alertHealth: { schemaVersion: "1.0.0", configurationResult: "PASS",
+    configurationChecksum: "ba9d18eb9ab843080116841b7f347dd6de1699a6b6c6b74ac25a2f83a1da176b",
+    observedAt: new Date(now).toISOString() },
   sharepoint: { runtimeAppId: expected.appId, targetSiteId: expected.siteId, grantId: expected.grantId,
     role: "read", tenantWideSharePointAccess: false, unrelatedSiteGrants: 0,
     siteEnumerationComplete: true, personalSiteIds: [] },
@@ -29,6 +32,17 @@ test("fresh all-surface verdict returns correlation and effective-probe inputs",
   assert.deepEqual(result.personalSiteIds, []);
   assert.equal(result.verdict.monitorRunId, state.monitorRunId);
 });
+
+for (const change of [undefined, { configurationResult: "FAIL" },
+  { configurationResult: "UNVERIFIED" }, { configurationChecksum: "wrong" },
+  { observedAt: new Date(now - MAX_AGE_MS - 1).toISOString() },
+  { observedAt: new Date(now + 1).toISOString() }]) {
+  test(`unhealthy alert admission denies ${JSON.stringify(change)}`, () => {
+    assert.throws(() => validatePermissionState({ ...state,
+      alertHealth: change === undefined ? undefined : { ...state.alertHealth, ...change } }, expected, now),
+    /SHADOW_ALERT_HEALTH_UNVERIFIED/);
+  });
+}
 
 for (const surface of Object.keys(state.results)) {
   test(`missing, drifted or unverified ${surface} denies`, () => {
