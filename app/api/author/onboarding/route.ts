@@ -18,7 +18,8 @@ import {
   resolveOption,
   w9StatusOptions,
 } from '@/lib/publishing/onboarding-production-options'
-import { requireAuthorAccess, getAuthorPortalContextFromContactId } from '@/lib/server/author-portal-context'
+import { requireAuthorAccess } from '@/lib/server/author-portal-context'
+import { resolveOnboardingAuthority } from '@/lib/server/author-onboarding-authority'
 import { writeAuthorOnboardingDataverseFallback } from '@/lib/server/author-onboarding-dataverse'
 import { submitWebsiteForm, type Jm1PubInternalClassification } from '@/lib/server/form-integrations'
 import { cleanString, missingFields, requiredFieldsResponse } from '@/lib/server/form-validation'
@@ -53,13 +54,12 @@ export async function POST(req: NextRequest) {
       'publishingGoal',
       'governedFormatSelection',
     ]
-    const missing = missingFields(body, required)
-    if (missing.length) return requiredFieldsResponse(missing)
-
     const continuityApplies = isWholeOnboardingContact(access.session.contactId, access.session.contactEmail)
     const authority = continuityApplies
-      ? await getAuthorPortalContextFromContactId(WHOLE_ONBOARDING_CONTINUITY.contactId, {
+      ? await resolveOnboardingAuthority({
+          contactId: access.session.contactId || '',
           titleId: WHOLE_ONBOARDING_CONTINUITY.titleId,
+          email: WHOLE_ONBOARDING_CONTINUITY.authorEmail,
         })
       : null
     if (continuityApplies && !isWholeAuthority(authority)) {
@@ -68,6 +68,21 @@ export async function POST(req: NextRequest) {
         { status: 409 },
       )
     }
+
+    if (continuityApplies) {
+      // Receipts preserve partial answers without satisfying the business gate.
+      const receipt = await writeAuthorOnboardingDataverseFallback({
+        authorName: WHOLE_ONBOARDING_CONTINUITY.authorName,
+        email: WHOLE_ONBOARDING_CONTINUITY.authorEmail,
+        bookTitle: WHOLE_ONBOARDING_CONTINUITY.title,
+        governedAuthority: { contactId: authority!.contactId, titleId: authority!.titleId,
+          engagementId: WHOLE_ONBOARDING_CONTINUITY.engagementId },
+        rawFormData: body,
+      }, 'Authenticated attempt receipt; business completeness not yet evaluated.', true)
+      if (receipt.status !== 'success') console.error('Author onboarding attempt receipt unavailable:', receipt.detail)
+    }
+    const missing = missingFields(body, required)
+    if (missing.length) return requiredFieldsResponse(missing)
 
     const legalName = continuityApplies ? WHOLE_ONBOARDING_CONTINUITY.authorName : cleanString(body.legalName)
     const { firstName, lastName } = splitName(legalName)
@@ -231,7 +246,7 @@ export async function POST(req: NextRequest) {
         ? {
             policyVersion: WHOLE_ONBOARDING_CONTINUITY.policyVersion,
             contactId: WHOLE_ONBOARDING_CONTINUITY.contactId,
-            authorProfileId: authority?.relationship.authorProfileId,
+            authorProfileId: authority?.authorProfileId,
             titleId: WHOLE_ONBOARDING_CONTINUITY.titleId,
             engagementId: WHOLE_ONBOARDING_CONTINUITY.engagementId,
             lifecycleId: WHOLE_ONBOARDING_CONTINUITY.lifecycleId,
@@ -383,7 +398,7 @@ export async function POST(req: NextRequest) {
 
       return NextResponse.json(
         {
-          error: 'We could not submit your onboarding form at this time. Please try again or contact publishing@jmerrill.one.',
+          error: 'We could not confirm receipt of your onboarding information. Please contact publishing@jmerrill.one for assistance; you do not need to complete the form again.',
           integration,
           dataverseFallback: fallback,
         },
@@ -395,18 +410,16 @@ export async function POST(req: NextRequest) {
   } catch (error) {
     console.error('Author onboarding form error:', error)
     return NextResponse.json(
-      { error: 'We could not submit your onboarding form at this time. Please try again or contact publishing@jmerrill.one.' },
+      { error: 'We could not confirm receipt of your onboarding information. Please contact publishing@jmerrill.one for assistance; you do not need to complete the form again.' },
       { status: 500 },
     )
   }
 }
 
-function isWholeAuthority(authority: Awaited<ReturnType<typeof getAuthorPortalContextFromContactId>>) {
+function isWholeAuthority(authority: Awaited<ReturnType<typeof resolveOnboardingAuthority>>) {
   if (!authority) return false
-  return authority.author.contactId?.toLowerCase() === WHOLE_ONBOARDING_CONTINUITY.contactId &&
-    authority.author.email.toLowerCase() === WHOLE_ONBOARDING_CONTINUITY.authorEmail &&
-    authority.currentProject.titleId?.toLowerCase() === WHOLE_ONBOARDING_CONTINUITY.titleId &&
-    authority.currentProject.title === WHOLE_ONBOARDING_CONTINUITY.title
+  return authority.contactId === WHOLE_ONBOARDING_CONTINUITY.contactId &&
+    authority.titleId === WHOLE_ONBOARDING_CONTINUITY.titleId
 }
 
 function asBoolean(value: unknown) {

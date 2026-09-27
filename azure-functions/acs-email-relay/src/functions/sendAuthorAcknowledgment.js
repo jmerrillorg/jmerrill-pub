@@ -3,6 +3,7 @@ const { EmailClient } = require("@azure/communication-email");
 const { DefaultAzureCredential } = require("@azure/identity");
 const { createHash } = require("node:crypto");
 const { executeApprovedAuthorResponse } = require("../state/approvedAuthorDelivery");
+const { renderServiceCorrespondence } = require("../templates/renderer");
 const {
   assertPolicyAllows,
   resolveCommunicationAuthority
@@ -819,6 +820,7 @@ function validateJoinedFamilyInternalNotificationPayload(payload = {}) {
 }
 
 function validateApprovedAuthorResponsePayload(payload = {}) {
+  const onboardingRecovery = normalizeText(payload.templateName) === "INBOUND_SERVICE_AUTHOR_ONBOARDING_SERVICE_RECOVERY_V1";
   const paymentServiceTemplate = /^INBOUND_SERVICE_(ADDITIONAL_PAYMENT_REQUEST|PAYMENT_ACCESS_REQUEST|INSTALLMENT_INFORMATION_REQUEST|PAYMENT_LINK_ACCESS_PROBLEM)_V1$/.test(normalizeText(payload.templateName));
   const common = validateCommonMilestoneFields(payload, { allowEngagementReference: paymentServiceTemplate });
   if (paymentServiceTemplate && payload.workstream &&
@@ -828,6 +830,11 @@ function validateApprovedAuthorResponsePayload(payload = {}) {
     return { ok: false, reason: "PAYMENT_SERVICE_SEMANTIC_IDENTITY_INVALID" };
   }
   if (!common.ok) return common;
+  if (onboardingRecovery && (!DIAGNOSTIC_ID_PATTERN.test(normalizeText(payload.authorId)) ||
+      normalizeText(payload.communicationType) !== "INBOUND_SERVICE_AUTHOR_ONBOARDING_SERVICE_RECOVERY" ||
+      normalizeText(payload.workstream) !== `onboarding-service-recovery:${normalizeText(payload.authorId)}:${common.diagnosticId}:v1`)) {
+    return { ok: false, reason: "ONBOARDING_SERVICE_SEMANTIC_IDENTITY_INVALID" };
+  }
 
   const authorEmail = normalizeText(payload.authorEmail).toLowerCase();
   const to = normalizeRecipients(payload.to === undefined ? authorEmail : payload.to);
@@ -941,14 +948,14 @@ function validateApprovedAuthorResponsePayload(payload = {}) {
       messageType: APPROVED_AUTHOR_RESPONSE_TYPE,
       diagnosticId: common.diagnosticId,
       intakeReferenceCode: common.intakeReferenceCode,
-      ...(paymentServiceTemplate && payload.workstream ? { workstream: normalizeText(payload.workstream),
+      ...((paymentServiceTemplate || onboardingRecovery) && payload.workstream ? { workstream: normalizeText(payload.workstream),
         authorId: normalizeText(payload.authorId), communicationType: normalizeText(payload.communicationType) } : {}),
       authorEmail,
       authorName: normalizeText(payload.authorName),
       projectTitle: normalizeText(payload.projectTitle),
       subject,
       body,
-      htmlBody: htmlBody || null,
+      htmlBody: onboardingRecovery ? renderServiceCorrespondence(body) : htmlBody || null,
       templateName: normalizeText(payload.templateName),
       templateVersion: normalizeText(payload.templateVersion),
       templateMetadata: payload.templateMetadata && typeof payload.templateMetadata === "object" ? {

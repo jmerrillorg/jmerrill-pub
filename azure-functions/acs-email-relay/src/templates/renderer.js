@@ -276,9 +276,19 @@ function renderTemplate(input = {}) {
   };
 }
 
+function renderServiceCorrespondence(body) {
+  const brand = getBrandProfile('PUBLISHING');
+  if (!brand.ok || typeof body !== 'string' || !body.trim() || body.length > 6000) throw new Error('SERVICE_CORRESPONDENCE_INVALID');
+  const tokens = brand.profile.tokens;
+  const paragraphs = body.trim().split(/\n\s*\n/).map(paragraph =>
+    `<p style="margin:0 0 16px;font-size:16px;line-height:1.6;">${escapeHtml(paragraph).replace(/\n/g, '<br>')}</p>`).join('');
+  return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head><body style="margin:0;padding:24px;font-family:${tokens['font.stack']};color:${tokens['text.primary']};background:${tokens['surface.background']};"><table role="presentation" width="100%" style="max-width:600px;border-collapse:collapse;"><tr><td>${paragraphs}</td></tr></table></body></html>`;
+}
+
 module.exports = {
   RENDERER_VERSION,
   escapeHtml,
+  renderServiceCorrespondence,
   renderTemplate,
   validatePaymentElectionData
 };
