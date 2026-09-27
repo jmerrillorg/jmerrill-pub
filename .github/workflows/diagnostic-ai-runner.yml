@@ -308,6 +308,7 @@ jobs:
             run-governed-agreement-generation \
             run-manual-signature-handoff \
             publishing/inbound/business-router/replay \
+            publishing/lifecycle/readback \
             run-stripe-connect-reminder-monitor-certification; do
             probe_name="${route//\//-}"
             status="$(curl --silent --show-error --max-time 30 \
