@@ -10,7 +10,7 @@ const name = 'jm1-publishing-communication-acceptance-failure'
 if (process.argv.includes('--apply')) {
   az(['monitor', 'scheduled-query', 'create', '-g', 'rg-jm1-ai', '-n', name,
     '--scopes', ...anchor.scopes, '--action-groups', ...anchor.actions.actionGroups,
-    '--condition', 'count acceptanceFailure > 0', '--condition-query', `acceptanceFailure=${query}`,
+    '--condition', "count 'acceptanceFailure' > 0", '--condition-query', `acceptanceFailure=${query}`,
     '--evaluation-frequency', '5m', '--window-size', '15m', '--severity', '1',
     '--description', 'Publishing communication acceptance: expired mailbox verification or runtime failure. No resend authority.',
     '--tags', 'owner=jmerrill-pub', 'packet=JMP-COMMUNICATION-CANON-REGRESSION-001-C1', '-o', 'none'])
