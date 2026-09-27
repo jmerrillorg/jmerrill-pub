@@ -66,7 +66,7 @@ export type AuthorOtpEmailSender = (input: {
   code: string
   expiresAt: string
   correlationId: string
-}) => Promise<{ provider: string; providerMessageId: string }>
+}) => Promise<{ provider: string; providerMessageId: string; communicationComplete?: boolean; communicationState?: string }>
 
 export type AuthorOtpDeps = {
   now?: () => Date
@@ -489,6 +489,8 @@ export async function sendAuthorOtpEmail(input: {
   return {
     provider: result.provider || 'acs-email-relay',
     providerMessageId: result.providerMessageId || 'not-returned-by-provider',
+    communicationComplete: result.communicationComplete === true,
+    communicationState: result.communicationState || 'PROVIDER_ACCEPTED',
   }
 }
 

@@ -7,6 +7,7 @@ const { correlateMessage } = require("./correlator");
 const { buildQueueItem } = require("./queueProjection");
 const { resolveSender } = require("./senderResolver");
 const { replyMessageIds } = require("./deliveryLedger");
+const { recoverAcceptanceFromMailboxEvent } = require("../outbound/acceptanceRuntime");
 
 async function captureAttachments(graphClient, store, messageEvidence) {
   if (!messageEvidence.hasAttachments) return [];
@@ -43,6 +44,12 @@ async function processGraphMessage(graphMessage, options = {}) {
     detectedAt = new Date().toISOString()
   } = options;
   if (!store) throw new Error("store is required");
+  if (detectionSource !== DETECTION_SOURCE.SYNTHETIC && process.env.JM1_PUBLISHING_INBOUND_SERVICE_ENABLED === "true"
+      && graphMessage.from?.emailAddress?.address?.toLowerCase() === "publishing@email.jmerrill.one") {
+    try { await recoverAcceptanceFromMailboxEvent(graphMessage); }
+    catch { await store.put("communication-acceptance/ingress-exception.json", {
+      code: "MAILBOX_ACCEPTANCE_RECOVERY_UNAVAILABLE", detectedAt, requiresResend: false }); }
+  }
 
   let messageEvidence = buildMessageEvidence(graphMessage, {
     detectedAt,

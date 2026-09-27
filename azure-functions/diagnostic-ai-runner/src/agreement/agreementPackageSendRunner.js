@@ -303,6 +303,9 @@ async function sendAgreementPackage(input = {}, deps = {}) {
   } catch (err) {
     return blocked("SEND_FAILED", { detail: err.safeCode || null });
   }
+  if (sendResult.communicationComplete !== true) return blocked("MAILBOX_EVIDENCE_UNVERIFIED_NO_RESEND", {
+    providerMessageId: sendResult.providerMessageId, providerAccepted: Boolean(sendResult.providerMessageId),
+    communicationComplete: false });
 
   // Step 5: update existing Opportunity status fields — no new schema.
   const apiBase = process.env.DATAVERSE_WEB_API_BASE_URL;

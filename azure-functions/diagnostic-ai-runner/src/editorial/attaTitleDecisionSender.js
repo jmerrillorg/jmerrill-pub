@@ -103,10 +103,12 @@ async function sendAttaTitleDecision(input = {}, deps = {}) {
       }
       return blocked("RELAY_SEND_FAILED", failureCode, { relayResponse: body });
     }
-    relayResult = { status: body.deliveryStatus === "ALREADY_DELIVERED" ? "ALREADY_DELIVERED" : "SENT", ...body };
+    relayResult = { status: body.communicationComplete ? (body.deliveryStatus === "ALREADY_DELIVERED" ? "ALREADY_DELIVERED" : "SENT") : "PROVIDER_ACCEPTED", ...body };
   }
+  if (relayResult.communicationComplete !== true) return blocked("MAILBOX_VERIFICATION_PENDING", "Provider acceptance is not verified mailbox evidence.", { relayResult, requiresResend: false });
   if (relayResult.status !== "SENT" && relayResult.status !== "ALREADY_DELIVERED") return blocked("RELAY_SEND_FAILED", "Relay did not prove delivery.", { relayResult });
   await markSent(client, {
+    communicationComplete: true,
     ...intent, semanticIdempotencyKey: reserve.semanticIdempotencyKey, communicationRecordId: reserve.communicationRecordId,
     providerMessageId: relayResult.providerMessageId, sentAt: relayResult.sentAt, artifactChecksums: [], artifactManifest: [], observability: relayResult.observability
   });

@@ -374,6 +374,7 @@ async function sendAuthorInvitation(identity: AuthorConnectIdentity, linkUrl: st
   })
   const body = await response.json().catch(() => ({}))
   if (!response.ok || body.accepted !== true) throw new Error(body?.code || body?.reason || `relay_rejected:${response.status}`)
+  if (body.communicationComplete !== true) throw new Error('MAILBOX_EVIDENCE_UNVERIFIED_NO_RESEND')
   return {
     provider: body.provider || 'acs-email',
     providerMessageId: body.providerMessageId || '',

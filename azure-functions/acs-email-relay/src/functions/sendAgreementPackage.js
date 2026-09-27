@@ -425,9 +425,10 @@ app.http("send-agreement-package", {
       return {
         status: 202,
         jsonBody: {
+          ...receipt,
           accepted: true,
           messageType: AGREEMENT_PACKAGE_SEND_TYPE,
-          deliveryStatus: AGREEMENT_PACKAGE_SENT,
+          deliveryStatus: receipt.communicationComplete ? AGREEMENT_PACKAGE_SENT : "PROVIDER_ACCEPTED",
           recipient: validation.value.to,
           internalVisibilityMailbox: INTERNAL_VISIBILITY_MAILBOX,
           intakeReferenceCode: validation.value.intakeReferenceCode,

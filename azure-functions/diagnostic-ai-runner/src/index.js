@@ -1,4 +1,5 @@
 "use strict";
+require("./functions/runPublishingCommunicationAcceptance");
 
 require("./functions/health");
 require("./functions/getPublisherRecommendationReview");

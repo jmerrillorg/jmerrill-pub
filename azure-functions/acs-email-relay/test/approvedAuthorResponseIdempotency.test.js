@@ -51,6 +51,7 @@ function memoryLedger() {
     async reserve(input) {
       if (entity) return { kind: "REPLAY", entity };
       entity = {
+        ...input,
         jm1MessageId: "communication-record-1",
         deliveryState: DELIVERY_STATE.RESERVED,
         idempotencyKey: input.idempotencyKey
@@ -93,15 +94,15 @@ test("relay atomically accepts the first effect and returns the original deliver
   };
   const first = await executeApprovedAuthorResponse(approvedValue(), deps);
   const replay = await executeApprovedAuthorResponse(approvedValue({ idempotencyKey: "different-caller-prefix" }), deps);
-  assert.equal(first.status, "SENT");
+  assert.equal(first.status, "PROVIDER_ACCEPTED");
   assert.equal(first.providerStatus, "Succeeded");
   assert.deepEqual(first.observability, {
-    acsDelivery: "PASS",
-    publishingMailboxCopy: "PASS",
-    semanticAttachmentParity: "PASS",
-    evidenceClass: "ACS_SUCCEEDED_SINGLE_ENVELOPE_WITH_CANONICAL_CC"
+    acsAcceptance: "PASS",
+    publishingMailboxCopy: "UNPROVEN",
+    recipientDelivery: "NOT_PROVEN"
   });
-  assert.equal(replay.status, "ALREADY_DELIVERED");
+  assert.equal(first.communicationComplete, false);
+  assert.equal(replay.status, "PROVIDER_ACCEPTED");
   assert.equal(replay.communicationRecordId, "communication-record-1");
   assert.equal(replay.sentAt, "2026-09-18T09:00:13.000Z");
   assert.equal(replay.providerMessageId, "acs-original-message");

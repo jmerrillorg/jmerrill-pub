@@ -3,6 +3,7 @@
 const { createHash } = require("node:crypto");
 const { DELIVERY_STATE, getMessageLedger } = require("./messageLedger");
 const { buildCommunicationIdentity } = require("./communicationIdentity");
+const { resolvePublishingAcceptance } = require("./publishingAcceptance");
 
 const AUTHOR_COMMUNICATION_LEDGER_CALLER = "jm1-publishing-author-communications";
 
@@ -38,8 +39,10 @@ async function executeApprovedAuthorResponse(value, deps = {}) {
   if (reservation.kind === "REPLAY") {
     const existing = reservation.entity;
     if (existing.deliveryState === DELIVERY_STATE.ACCEPTED) {
+      const acceptance = await resolvePublishingAcceptance(existing, ledger, deps);
       return {
-        status: "ALREADY_DELIVERED",
+        ...acceptance,
+        status: acceptance.communicationComplete ? "ALREADY_DELIVERED" : "PROVIDER_ACCEPTED",
         communicationRecordId: existing.jm1MessageId,
         sentAt: existing.acceptedAt,
         providerMessageId: existing.providerMessageId,
@@ -56,25 +59,23 @@ async function executeApprovedAuthorResponse(value, deps = {}) {
   }
 
   try {
-    const providerReceipt = await deps.sendMessage(deps.buildMessage(value));
+    if (ledger.recordSubmitted) await ledger.recordSubmitted(reservation.entity);
+    const message = deps.buildMessage(value);
+    const providerReceipt = await deps.sendMessage(message);
     const providerMessageId = typeof providerReceipt === "string" ? providerReceipt : providerReceipt?.providerMessageId;
     const providerStatus = typeof providerReceipt === "string" ? "Succeeded" : providerReceipt?.providerStatus;
     if (!providerMessageId || providerStatus !== "Succeeded") {
       throw Object.assign(new Error("ACS delivery did not reach Succeeded state."), { safeCode: "ACS_DELIVERY_UNPROVEN" });
     }
-    const accepted = await ledger.recordAccepted(reservation.entity, providerMessageId);
+    const accepted = await ledger.recordAccepted(reservation.entity, providerMessageId, message);
+    const acceptance = await resolvePublishingAcceptance(accepted, ledger, deps);
     return {
-      status: "SENT",
+      ...acceptance,
+      status: acceptance.communicationComplete ? "SENT" : "PROVIDER_ACCEPTED",
       communicationRecordId: accepted.jm1MessageId,
       sentAt: accepted.acceptedAt,
       providerMessageId,
       providerStatus,
-      observability: {
-        acsDelivery: "PASS",
-        publishingMailboxCopy: "PASS",
-        semanticAttachmentParity: "PASS",
-        evidenceClass: "ACS_SUCCEEDED_SINGLE_ENVELOPE_WITH_CANONICAL_CC"
-      },
       semanticIdempotencyKey: ledgerInput.idempotencyKey,
       recipient: value.authorEmail,
       artifactChecksums: value.attachments.map((attachment) => attachment.sha256)

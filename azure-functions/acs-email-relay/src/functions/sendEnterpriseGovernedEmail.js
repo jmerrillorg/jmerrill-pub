@@ -6,6 +6,7 @@ const { authorizeCallerForBrand, authorizeCallerForTemplate, normalizeBrand } = 
 const { DELIVERY_STATE, getMessageLedger } = require("../state/messageLedger");
 const { renderTemplate } = require("../templates/renderer");
 const { sendWithCompletedReceipt } = require("../provider/acsCompletion");
+const { resolvePublishingAcceptance } = require("../state/publishingAcceptance");
 const { renderPublishingServiceCorrespondence } = require("../generated/communications/jm1-enterprise-communication-renderer");
 const { isGovernedNamespace } = require("../templates/templateRegistry");
 const {
@@ -367,6 +368,7 @@ app.http("send-enterprise-governed-email", {
           });
         }
         return response(prior.deliveryState === DELIVERY_STATE.ACCEPTED ? 200 : 202, {
+          ...await resolvePublishingAcceptance(prior, getMessageLedger()),
           accepted: prior.deliveryState === DELIVERY_STATE.ACCEPTED,
           replay: true,
           inProgress: prior.deliveryState === DELIVERY_STATE.RESERVED,
@@ -381,10 +383,12 @@ app.http("send-enterprise-governed-email", {
       // Once transport starts, an exception cannot prove that nothing was sent.
       // Preserve the reservation for reconciliation rather than permitting retry.
       providerAccepted = true;
+      if (getMessageLedger().recordSubmitted) await getMessageLedger().recordSubmitted(reservation.entity);
       const providerMessageId = await sendAcsMessage(email);
-      const trace = await getMessageLedger().recordAccepted(reservation.entity, providerMessageId);
+      const trace = await getMessageLedger().recordAccepted(reservation.entity, providerMessageId, email);
       context.info(`Enterprise ACS relay accepted send; caller=${authentication.caller.callerId}; brand=${validation.value.brand}; jm1MessageId=${trace.jm1MessageId}`);
       return response(202, {
+        ...await resolvePublishingAcceptance(trace, getMessageLedger()),
         accepted: true,
         replay: false,
         jm1MessageId: trace.jm1MessageId,

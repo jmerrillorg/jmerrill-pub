@@ -218,6 +218,7 @@ async function sendRelay(row, decision, message, current, deps) {
   });
   const body = await response.json().catch(() => ({}));
   if (!response.ok || body.accepted !== true) throw coded(body.code || body.reason || `RELAY_HTTP_${response.status}`);
+  if (body.communicationComplete !== true) throw coded("MAILBOX_EVIDENCE_UNVERIFIED_NO_RESEND");
   return body;
 }
 

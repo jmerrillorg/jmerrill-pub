@@ -206,7 +206,7 @@ test("routine clarification sends once through governed provider and preserves h
   assert.equal(replay.outcome, "IDEMPOTENT");
   assert.equal(effects.sends.length, 1);
   assert.equal(effects.reserves, 1);
-  assert.equal(effects.sentRecords, 1);
+  assert.equal(effects.sentRecords, 2);
   assert.deepEqual(effects.sends[0].input.cc, ["publishing@jmerrill.one"]);
   assert.equal((await store.getBusinessRoute(queue.evidenceLink)).status, "HELD_EDITORIAL_AUTHORITY");
   assert.equal((await store.getBusinessRoute(queue.evidenceLink)).service.mailboxCopy, "PASS");
@@ -242,12 +242,14 @@ test("timer reconstructs a prior verified service delivery without another send"
   const { queue, store, deps, effects } = await setup("Approved with questions");
   assert.equal((await executeService(queue, deps)).outcome, "SENT");
   const route = await store.getBusinessRoute(queue.evidenceLink);
+  route.service.providerMessageId = "11111111-1111-1111-1111-111111111111";
+  route.service.htmlBodyProjectionHashes = [];
   await store.updateBusinessRoute({ ...route, service: { ...route.service, deliveryId: null } });
   const currentQueue = await store.getQueueItem(queue.queueItemId);
   await store.updateQueueItem({ ...currentQueue, serviceDeliveryId: null, businessEventId: "route-1" });
   store.deliveries.clear();
   deps.enabled = true;
-  deps.graphClient.getMessage = async () => ({ id: "graph-1", internetMessageId: "<system-reply@example.com>",
+  deps.graphClient.getMessage = async () => ({ id: "graph-1", internetMessageId: "<202609261200.11111111111111111111111111111111-copy@microsoft.com>",
     conversationId: "thread-1", subject: route.service.subject,
     from: { emailAddress: { address: "publishing@email.jmerrill.one" } },
     toRecipients: [{ emailAddress: { address: route.service.recipient } }],
@@ -288,8 +290,8 @@ test("replay corrects an acknowledgment wait owner without resending", async () 
 test("mailbox copy readback requires exact sender, recipient, and body", async () => {
   const body = "Good day, Author,\n\nPlease send your questions.\n\nJ Merrill Publishing";
   const hash = require("node:crypto").createHash("sha256").update(body).digest("hex");
-  const service = { sentAt: "2026-09-22T18:11:14Z", subject: "Re: Indomitable review", recipient: "author@example.com", bodyHash: hash };
-  const copy = { id: "graph-1", internetMessageId: "<system-reply@example.com>", conversationId: "conversation-1", subject: service.subject,
+  const service = { communicationRecordId: "command-1", providerMessageId: "11111111-1111-1111-1111-111111111111", sentAt: "2026-09-22T18:11:14Z", subject: "Re: Indomitable review", recipient: "author@example.com", bodyHash: hash };
+  const copy = { id: "graph-1", internetMessageId: "<202609221811.11111111111111111111111111111111-copy@microsoft.com>", conversationId: "conversation-1", subject: service.subject,
     from: { emailAddress: { address: "publishing@email.jmerrill.one" } },
     toRecipients: [{ emailAddress: { address: service.recipient } }],
     ccRecipients: [{ emailAddress: { address: "publishing@jmerrill.one" } }],

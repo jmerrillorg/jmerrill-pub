@@ -80,7 +80,7 @@ async function sendEmailViaRelay(message) {
     throw Object.assign(new Error("Agreement package send relay rejected the request."), { safeCode: body.code || `RELAY_HTTP_${response.status}` });
   }
 
-  return { providerMessageId: body.providerMessageId || null };
+  return { providerMessageId: body.providerMessageId || null, communicationComplete: body.communicationComplete === true };
 }
 
 app.http("run-agreement-package-send", {

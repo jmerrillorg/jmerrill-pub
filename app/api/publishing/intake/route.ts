@@ -373,7 +373,7 @@ async function handlePublishingIntakePost(req: NextRequest) {
       const acknowledgmentFailure = acknowledgment.status === 'failed'
         ? acknowledgment.reason
         : `acknowledgment_${acknowledgment.reason}`
-      if (dataverse.status === 'success') {
+      if (dataverse.status === 'success' && acknowledgment.status !== 'pending') {
         const failedWriteback = await markPublishingIntakeAcknowledgmentFailed(dataverse.recordId, acknowledgmentFailure)
         if (failedWriteback.status !== 'success') {
           const writebackFailure = failedWriteback.status === 'failed'
@@ -400,7 +400,7 @@ async function handlePublishingIntakePost(req: NextRequest) {
         safeErrorCode: acknowledgmentFailure,
       })
 
-      console.warn('Publishing intake author acknowledgment did not send after intake acceptance.', {
+      console.warn('Publishing intake author acknowledgment is not communication-complete after intake acceptance.', {
         status: acknowledgment.status,
         reason: acknowledgment.reason,
         recoveryStatus: recovery.status,

@@ -206,7 +206,8 @@ async function sendGovernedCommunication(payload, deps = {}) {
   });
   const body = await response.json().catch(() => ({}));
   if (!response.ok) return { ok: false, reason: body.reason || body.code || `ENTERPRISE_RELAY_HTTP_${response.status}`, status: response.status, body };
-  return { ok: body.accepted === true, pending: body.inProgress === true, status: response.status, body };
+  return { ok: body.communicationComplete === true, pending: body.accepted === true && body.communicationComplete !== true,
+    status: response.status, body };
 }
 
 async function writeEffectLog(client, requestId, actionType, description, failed = false) {

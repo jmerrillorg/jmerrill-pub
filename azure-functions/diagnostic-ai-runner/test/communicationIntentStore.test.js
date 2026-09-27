@@ -62,7 +62,7 @@ test("Naughty Tales historical send suppresses replay and preserves original clo
     async create() { creates += 1; return "unexpected"; }
   };
   const result = await reserveCommunicationIntent(dataverse, input());
-  assert.equal(result.status, "ALREADY_DELIVERED");
+  assert.equal(result.status, "DELIVERY_UNVERIFIED");
   assert.equal(result.communicationRecordId, "2a9ae47a-3fb3-f111-aaac-00224820105b");
   assert.equal(result.sentAt, "2026-09-18T09:00:13.000Z");
   assert.equal(creates, 0);
@@ -103,7 +103,7 @@ test("reconciled sent intent returns its original provider acceptance time", asy
     }
   };
   const result = await reserveCommunicationIntent(dataverse, input());
-  assert.equal(result.status, "ALREADY_DELIVERED");
+  assert.equal(result.status, "DELIVERY_UNVERIFIED");
   assert.equal(result.sentAt, "2026-09-18T09:00:13.000Z");
 });
 
@@ -121,5 +121,5 @@ test("sent authority wins even when a later failure row exists", async () => {
     { jm1_executionlogid: "failed-1", jm1_actiontype: FAILED_ACTION, createdon: "2026-09-21T03:00:00Z" },
     { jm1_executionlogid: "sent-1", jm1_actiontype: SENT_ACTION, createdon: "2026-09-21T02:59:30Z" }
   ]), semantic);
-  assert.equal(state.status, "ALREADY_DELIVERED");
+  assert.equal(state.status, "DELIVERY_UNVERIFIED");
 });

@@ -9,6 +9,7 @@ type AuthorAcknowledgmentResult =
   | { status: 'sent'; provider: string; providerMessageId?: string; recipient: string }
   | { status: 'skipped'; reason: 'relay_configuration_missing' }
   | { status: 'failed'; reason: string }
+  | { status: 'pending'; reason: 'mailbox_verification_pending'; providerMessageId?: string }
 
 const RELAY_ROUTE = 'send-author-acknowledgment'
 
@@ -31,6 +32,8 @@ export async function sendJoinAuthorAcknowledgment(
 
     if (response.status === 200 || response.status === 202) {
       const body = await safeJson(response)
+      if (body?.communicationComplete !== true) return { status: 'pending', reason: 'mailbox_verification_pending',
+        providerMessageId: stringValue(body?.providerMessageId || body?.operationId) }
       return {
         status: 'sent',
         provider: stringValue(body?.provider) || 'acs-email-relay',

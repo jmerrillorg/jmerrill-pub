@@ -122,7 +122,7 @@ test("system renderer creates conversational Indomitable copy from a complete go
     downloadArtifact,
     sendRelay: async (value) => {
       payload = value;
-      return { status: "DRY_RUN_ACCEPTED" };
+      return { status: "DRY_RUN_ACCEPTED", communicationComplete: true };
     }
   });
 

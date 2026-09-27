@@ -15,6 +15,8 @@ const { normalizeString, redactBodyForEvidence, sha256Hex } = require("./util");
 const { verifiedServiceDelivery } = require("./deliveryLedger");
 const { prepareObservedService } = require("../../payment/observedPaymentServiceConsumer");
 const { htmlProjectionHashes, textProjectionHash } = require("./mailboxBodyProjection");
+const { relayRequest } = require("../outbound/acceptanceRuntime");
+const { verifyPublishingMailboxEvidence } = require("../../generated/communications/publishing-communication-acceptance");
 const { renderPublishingServiceCorrespondence } = require("../../generated/communications/jm1-enterprise-communication-renderer");
 
 const INTERNAL_MAILBOX = "publishing@jmerrill.one";
@@ -52,6 +54,12 @@ function normalizedMailText(value) {
 
 async function verifyMailboxCopy(graphClient, service) {
   try {
+    if (service.relayCommunicationId) {
+      const { acceptance } = await relayRequest({ action: "verify", communicationId: service.relayCommunicationId });
+      return acceptance?.communicationComplete ? { status: "PASS", communicationComplete: true,
+        graphMessageId: acceptance.mailboxMessageId, internetMessageId: acceptance.mailboxInternetMessageId }
+        : { status: acceptance?.communicationState === "DELIVERY_UNVERIFIED" ? "UNVERIFIED" : "PENDING" };
+    }
     const after = new Date(new Date(service.sentAt).getTime() - 120000).toISOString();
     const rows = (await graphClient.listInboxMessagesSince(after, 100)).value || [];
     const matched = rows.find((row) => matchesMailboxCopy(row, service));
@@ -64,12 +72,17 @@ async function verifyMailboxCopy(graphClient, service) {
 }
 
 function matchesMailboxCopy(row, service) {
-  return emailAddress(row.from) === SYSTEM_SENDER &&
-    (row.toRecipients || []).some((item) => emailAddress(item) === service.recipient) &&
-    (row.ccRecipients || []).some((item) => emailAddress(item) === INTERNAL_MAILBOX) &&
-    normalizedMailText(row.subject) === service.subject &&
-    (createHash("sha256").update(normalizedMailText(row.body?.content)).digest("hex") === service.bodyHash ||
-      (service.htmlBodyProjectionHashes || []).includes(textProjectionHash(row.body?.content)));
+  const identityMatches = verifyPublishingMailboxEvidence({ jm1MessageId: service.communicationRecordId,
+    correlationId: service.communicationRecordId, businessObjectId: service.communicationRecordId,
+    providerMessageId: service.providerMessageId, acceptedAt: service.sentAt,
+    recipient: service.recipient, subject: service.subject,
+    rendererVersion: service.rendererVersion, templateVersion: service.templateVersion }, row, INTERNAL_MAILBOX).verified;
+  if (!identityMatches) return false;
+  const body = row.body?.content || "";
+  if (service.htmlBodyProjectionHashes?.length) {
+    return service.htmlBodyProjectionHashes.includes(textProjectionHash(body));
+  }
+  return Boolean(service.bodyHash && sha256Hex(normalizedMailText(body)) === service.bodyHash);
 }
 
 async function completeMailboxReadback(queueItem, deps) {
@@ -112,12 +125,30 @@ async function completeMailboxReadback(queueItem, deps) {
   }
   if (service?.status !== "SENT_READBACK_PENDING") return { outcome: "HELD_AMBIGUOUS_SEND_STATE", eventId: queueItem.evidenceLink };
   const readback = await (deps.verifyMailboxCopy || verifyMailboxCopy)(deps.graphClient, service);
+  if (readback.status === "UNVERIFIED") {
+    await deps.store.updateBusinessRoute({ ...route, service: { ...service,
+      status: "DELIVERY_UNVERIFIED", communicationComplete: false, serviceException: true,
+      waitingOn: "JMP_DELIVERY_VERIFICATION", authorWaitingOn: "JMP_DELIVERY_VERIFICATION" } });
+    const currentQueue = await deps.store.getQueueItem(queueItem.queueItemId);
+    await deps.store.updateQueueItem({ ...currentQueue, serviceStatus: "DELIVERY_UNVERIFIED",
+      serviceWaitingOn: "JMP_DELIVERY_VERIFICATION", waitingOn: "JMP_DELIVERY_VERIFICATION" });
+    return { outcome: "DELIVERY_UNVERIFIED", eventId: queueItem.evidenceLink,
+      providerMessageId: service.providerMessageId, requiresResend: false };
+  }
   if (readback.status !== "PASS") return { outcome: "SENT_READBACK_PENDING", eventId: queueItem.evidenceLink,
     reason: readback.status, providerMessageId: service.providerMessageId };
   if (!readback.internetMessageId) return { outcome: "SENT_READBACK_PENDING", eventId: queueItem.evidenceLink,
     reason: "OUTBOUND_INTERNET_MESSAGE_ID_MISSING", providerMessageId: service.providerMessageId };
   const delivery = verifiedServiceDelivery(route, service, readback);
   await deps.store.upsertDelivery(delivery);
+  if (service.outboxIntent && service.semanticIdempotencyKey) {
+    await (deps.markCommunicationSent || markCommunicationSent)(deps.client, {
+      ...service.outboxIntent, semanticIdempotencyKey: service.semanticIdempotencyKey,
+      communicationRecordId: service.communicationRecordId, providerMessageId: service.providerMessageId,
+      sentAt: service.sentAt, artifactChecksums: [], artifactManifest: [], communicationComplete: true,
+      observability: { acsAcceptance: "PASS", publishingMailboxCopy: "PASS", semanticAttachmentParity: "PASS" }
+    });
+  }
   await (deps.writeLog || writeLog)(deps.client, {
     name: "AUTHOR_COMMUNICATION_MAILBOX_COPY_VERIFIED",
     actionType: "AUTHOR_COMMUNICATION_MAILBOX_COPY_VERIFIED",
@@ -384,6 +415,10 @@ async function executeService(queueItem, deps) {
   if (["SENT_READBACK_PENDING", "SENT"].includes(priorRoute?.service?.status)) {
     return deps.store.withBusinessRouteLease(queueItem.evidenceLink, () => completeMailboxReadback(queueItem, deps));
   }
+  if (priorRoute?.service?.status === "DELIVERY_UNVERIFIED") {
+    return { outcome: "DELIVERY_UNVERIFIED", eventId: queueItem.evidenceLink,
+      providerMessageId: priorRoute.service.providerMessageId, requiresResend: false };
+  }
   let prepared = await prepareService(queueItem, deps);
   if (prepared.outcome === "HELD_EDITORIAL_AUTHORITY") return reconcileEditorialAuthorityHold(queueItem, prepared, deps);
   if (prepared.outcome === "HUMAN_JUDGMENT_REQUIRED") return persistHumanGate(queueItem, prepared, deps);
@@ -455,7 +490,7 @@ async function executeService(queueItem, deps) {
       input: { sendApproval: approval, to: [prepared.recipient], cc: [INTERNAL_MAILBOX], bcc: [], attachments: [] },
       env: deps.env || process.env, providers: deps.providers || {}
     });
-    if (!result.ok || result.authorEmailStatus !== "AUTHOR_RESPONSE_SENT" || !result.providerMessageId) {
+    if (!result.ok || !["AUTHOR_RESPONSE_SENT", "PROVIDER_ACCEPTED"].includes(result.authorEmailStatus) || !result.providerMessageId) {
       await store.updateBusinessRoute({ ...route, service: { intent: prepared.intent, status: "AMBIGUOUS_SEND_STATE",
         communicationRecordId: reserve.communicationRecordId, relayIdentityVersion, reason: result.reason || "SEND_READBACK_UNPROVEN" } });
       return { ...publicServiceResult(prepared), outcome: "HELD_AMBIGUOUS_SEND_STATE" };
@@ -470,6 +505,7 @@ async function executeService(queueItem, deps) {
       rendererVersion: prepared.copy.metadata?.rendererVersion || null,
       templateVersion: prepared.copy.metadata?.templateVersion || "1.0",
       communicationRecordId: reserve.communicationRecordId, providerMessageId: result.providerMessageId, sentAt, copyHash,
+      relayCommunicationId: result.relayCommunicationId,
       subject: prepared.copy.subject, bodyHash, recipient: prepared.recipient,
       sourceConversationId: prepared.message.conversationId || null } });
     const sent = await (deps.markCommunicationSent || markCommunicationSent)(client, {
@@ -479,7 +515,9 @@ async function executeService(queueItem, deps) {
       observability: { acsDelivery: "PASS", publishingMailboxCopy: "UNPROVEN", semanticAttachmentParity: "PASS" }
     });
     await store.updateBusinessRoute({ ...route, service: { intent: prepared.intent, status: "SENT_READBACK_PENDING",
+      outboxIntent: intent, semanticIdempotencyKey: reserve.semanticIdempotencyKey,
       communicationRecordId: reserve.communicationRecordId, sentRecordId: sent.sentRecordId,
+      relayCommunicationId: result.relayCommunicationId,
       providerMessageId: result.providerMessageId, sentAt, copyHash, bodyHash,
       htmlBodyProjectionHashes,
       rendererVersion: prepared.copy.metadata?.rendererVersion || null,
@@ -487,7 +525,7 @@ async function executeService(queueItem, deps) {
       subject: prepared.copy.subject, recipient: prepared.recipient,
       sourceConversationId: prepared.message.conversationId || null,
       linkStatus: prepared.linkStatus, linkReason: prepared.linkReason,
-      waitingOn: serviceWaitOwner(prepared.intent), authorWaitingOn: serviceWaitOwner(prepared.intent) } });
+      waitingOn: "JMP_DELIVERY_VERIFICATION", authorWaitingOn: "JMP_DELIVERY_VERIFICATION" } });
     const currentQueue = await store.getQueueItem(queueItem.queueItemId);
     await store.updateQueueItem({ ...currentQueue, serviceIntent: prepared.intent, serviceStatus: "SENT_READBACK_PENDING",
       serviceSentAt: sentAt });

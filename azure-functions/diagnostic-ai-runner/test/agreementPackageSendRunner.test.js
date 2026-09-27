@@ -86,7 +86,7 @@ async function fakeDeps(overrides = {}) {
     getToken: async () => "fake-token",
     readAuthorContact: async () => ({ ok: true, code: null, opportunityId: REAL_OPPORTUNITY_ID, authorName: "Jackie Smith Jr.", authorEmail: "chosen2k7@gmail.com" }),
     readGeneratedDocument: async () => validDocx,
-    sendEmail: async () => ({ providerMessageId: "fake-provider-message-id" }),
+    sendEmail: async () => ({ providerMessageId: "fake-provider-message-id", communicationComplete: true }),
     ...overrides
   };
 }
@@ -144,7 +144,7 @@ describe("sendAgreementPackage — recipient confirmed from source of truth", ()
     process.env[GATE_NAME] = "true";
     mockFetchAlwaysOk();
     let sentTo = null;
-    const deps = await fakeDeps({ sendEmail: async (msg) => { sentTo = msg.to; return { providerMessageId: "x" }; } });
+    const deps = await fakeDeps({ sendEmail: async (msg) => { sentTo = msg.to; return { providerMessageId: "x", communicationComplete: true }; } });
     const result = await sendAgreementPackage(controlledInput(), deps);
     assert.equal(result.ok, true);
     assert.equal(sentTo, "chosen2k7@gmail.com");
@@ -173,7 +173,7 @@ describe("sendAgreementPackage — confirms the generated package and validates 
     process.env[GATE_NAME] = "true";
     mockFetchAlwaysOk();
     let sentAttachments = null;
-    const deps = await fakeDeps({ sendEmail: async (msg) => { sentAttachments = msg.attachments; return { providerMessageId: "x" }; } });
+    const deps = await fakeDeps({ sendEmail: async (msg) => { sentAttachments = msg.attachments; return { providerMessageId: "x", communicationComplete: true }; } });
     const result = await sendAgreementPackage(controlledInput(), deps);
     assert.equal(result.ok, true);
     assert.equal(sentAttachments.length, 3);
@@ -191,7 +191,7 @@ describe("sendAgreementPackage — confirms the generated package and validates 
     process.env[GATE_NAME] = "true";
     mockFetchAlwaysOk();
     let sentAttachments = null;
-    const deps = await fakeDeps({ sendEmail: async (msg) => { sentAttachments = msg.attachments; return { providerMessageId: "x" }; } });
+    const deps = await fakeDeps({ sendEmail: async (msg) => { sentAttachments = msg.attachments; return { providerMessageId: "x", communicationComplete: true }; } });
     const result = await sendAgreementPackage(controlledInput({
       packageLabel: "Starter Publishing Package (JMP-PKG-STARTER)",
       paymentSchedule: { installments: 0, perInstallmentUsd: 0, totalUsd: 0, internalCommissioning: true },
@@ -225,7 +225,7 @@ describe("sendAgreementPackage — no payment link, no Stripe, never implies pro
     process.env[GATE_NAME] = "true";
     mockFetchAlwaysOk();
     let sentBody = null;
-    const deps = await fakeDeps({ sendEmail: async (msg) => { sentBody = msg.bodyText; return { providerMessageId: "x" }; } });
+    const deps = await fakeDeps({ sendEmail: async (msg) => { sentBody = msg.bodyText; return { providerMessageId: "x", communicationComplete: true }; } });
     await sendAgreementPackage(controlledInput(), deps);
     const lower = sentBody.toLowerCase();
     assert.ok(!lower.includes("stripe"));
@@ -282,7 +282,7 @@ describe("sendAgreementPackage — sender/replyTo/cc archive match the approved 
     process.env[GATE_NAME] = "true";
     mockFetchAlwaysOk();
     let capturedMessage = null;
-    const deps = await fakeDeps({ sendEmail: async (msg) => { capturedMessage = msg; return { providerMessageId: "x" }; } });
+    const deps = await fakeDeps({ sendEmail: async (msg) => { capturedMessage = msg; return { providerMessageId: "x", communicationComplete: true }; } });
     const result = await sendAgreementPackage(controlledInput(), deps);
     assert.equal(capturedMessage.cc, INTERNAL_VISIBILITY_MAILBOX);
     assert.equal(capturedMessage.bcc, undefined);
