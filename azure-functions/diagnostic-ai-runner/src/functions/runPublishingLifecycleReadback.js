@@ -19,12 +19,17 @@ async function lifecycleReadback(body, deps) {
   if (!Number.isFinite(after.getTime()) || Date.now() - after.getTime() > 90 * 86400000 || after.getTime() > Date.now()) {
     return { status: 400, jsonBody: { error: "BOUNDED_READ_WINDOW_REQUIRED", effects: 0 } };
   }
+  if (body.includeSystemCensus === true && Date.now() - after.getTime() > 7 * 86400000) {
+    return { status: 400, jsonBody: { error: "RECENT_SYSTEM_CENSUS_WINDOW_REQUIRED", effects: 0 } };
+  }
   const email = contact.emailaddress1.toLowerCase().replace(/'/g, "''");
   const literalTitle = title.jm1pub_titlename.replace(/'/g, "''");
   const filters = [
     `receivedDateTime ge ${after.toISOString()} and from/emailAddress/address eq '${email}'`,
     `receivedDateTime ge ${after.toISOString()} and contains(subject,'${literalTitle}')`,
   ];
+  if (body.includeSystemCensus === true) filters.push(
+    `receivedDateTime ge ${after.toISOString()} and from/emailAddress/address eq 'publishing@email.jmerrill.one'`);
   const queries = [];
   for (const filter of filters) {
     const rows = [];
@@ -42,10 +47,16 @@ async function lifecycleReadback(body, deps) {
     queries.push({ filter, complete: !next, rows: rows.map(message => ({ ...message, authorReply: authorReplyText(message) })) });
   }
   const presentationEvidence = [];
+  const systemPresentationEvidence = [];
+  let presentationComplete = null;
   if (body.includePresentation === true) {
     const outbound = queries[1].rows.filter(message =>
       ["publishing@email.jmerrill.one", "publishing@jmerrill.one"].includes(message.from?.emailAddress?.address?.toLowerCase()) &&
-      message.toRecipients?.some(recipient => recipient.emailAddress?.address?.toLowerCase() === contact.emailaddress1.toLowerCase()));
+      (message.toRecipients?.some(recipient => recipient.emailAddress?.address?.toLowerCase() === contact.emailaddress1.toLowerCase()) ||
+        (body.includeInternalProof === true && message.subject === `Publishing Internal Presentation Check - ${title.jm1pub_titlename}` &&
+          message.toRecipients?.length > 0 && [...message.toRecipients, ...(message.ccRecipients || [])].every(recipient =>
+            recipient.emailAddress?.address?.toLowerCase() === "publishing@jmerrill.one"))));
+    presentationComplete = queries[1].complete && outbound.length <= 50;
     for (const message of outbound.slice(0, 50)) {
       const path = `/users/publishing@jmerrill.one/messages/${encodeURIComponent(message.id)}`;
       const native = await deps.graphClient.request("GET", `${path}?$select=id,subject,body,sentDateTime,internetMessageId`, null,
@@ -55,10 +66,22 @@ async function lifecycleReadback(body, deps) {
       presentationEvidence.push({ ...native, attachments: attachments.value });
     }
   }
+  if (body.includeSystemCensus === true && body.includePresentation === true) {
+    for (const message of queries[2].rows.slice(0, 50)) {
+      const path = `/users/publishing@jmerrill.one/messages/${encodeURIComponent(message.id)}`;
+      const native = await deps.graphClient.request("GET", `${path}?$select=id,subject,body,sentDateTime,internetMessageId`, null,
+        { Prefer: 'outlook.body-content-type="html"' });
+      systemPresentationEvidence.push({ ...native, from: message.from, toRecipients: message.toRecipients,
+        ccRecipients: message.ccRecipients, text: message.body?.content || "" });
+    }
+  }
   const rendering = renderPublishingServiceCorrespondence({ subject: "Publishing Service Rendering Proof",
     authorName: "Test Operator", body: "Good day, Test,\n\nThis is an effect-free rendering fixture.\n\nJ Merrill Publishing",
     templateName: "PUBLISHING_SERVICE_RENDER_PROOF", templateVersion: "1.0" });
   return { status: 200, jsonBody: { mode: "READ_ONLY", authorId, titleId, authorTitleBinding: "PASS", queries, presentationEvidence,
+    presentationComplete, systemPresentationEvidence,
+    systemPresentationComplete: body.includeSystemCensus === true && body.includePresentation === true
+      ? queries[2].complete && queries[2].rows.length <= 50 : null,
     rendering, effects: 0, communicationsSent: 0, noSend: true } };
 }
 

@@ -5,6 +5,7 @@ const { authenticateCaller } = require("../security/callerAuthentication");
 const { authorizeCallerForBrand, authorizeCallerForTemplate, normalizeBrand } = require("../policy/callerRegistry");
 const { DELIVERY_STATE, getMessageLedger } = require("../state/messageLedger");
 const { renderTemplate } = require("../templates/renderer");
+const { sendWithCompletedReceipt } = require("../provider/acsCompletion");
 const { renderPublishingServiceCorrespondence } = require("../generated/communications/jm1-enterprise-communication-renderer");
 const { isGovernedNamespace } = require("../templates/templateRegistry");
 const {
@@ -284,11 +285,8 @@ function buildEnterpriseEmail(value) {
   };
 }
 
-async function sendAcsMessage(message) {
-  const poller = await getEmailClient().beginSend(message);
-  if (!poller || typeof poller.getOperationState !== "function") return undefined;
-  const state = poller.getOperationState();
-  return state && (state.id || state.operationId);
+async function sendAcsMessage(message, client = getEmailClient()) {
+  return (await sendWithCompletedReceipt(client, message)).providerMessageId;
 }
 
 function safeErrorCode(error) {
@@ -380,8 +378,10 @@ app.http("send-enterprise-governed-email", {
       }
 
       const email = buildEnterpriseEmail(validation.value);
-      const providerMessageId = await sendAcsMessage(email);
+      // Once transport starts, an exception cannot prove that nothing was sent.
+      // Preserve the reservation for reconciliation rather than permitting retry.
       providerAccepted = true;
+      const providerMessageId = await sendAcsMessage(email);
       const trace = await getMessageLedger().recordAccepted(reservation.entity, providerMessageId);
       context.info(`Enterprise ACS relay accepted send; caller=${authentication.caller.callerId}; brand=${validation.value.brand}; jm1MessageId=${trace.jm1MessageId}`);
       return response(202, {
@@ -451,5 +451,6 @@ app.http("relay-authority-probe", {
 
 module.exports = {
   buildEnterpriseEmail,
+  sendAcsMessage,
   validateEnterprisePayload
 };

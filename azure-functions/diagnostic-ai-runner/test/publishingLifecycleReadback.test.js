@@ -52,3 +52,40 @@ test("pagination cannot follow another origin or mailbox", async () => {
     await assert.rejects(() => lifecycleReadback({ authorId, titleId, afterIso: new Date(Date.now() - 86400000).toISOString() }, deps), /MAILBOX_PAGINATION_SCOPE_DENIED/);
   }
 });
+
+test("internal presentation proof reads only the fixed internal subject and contained recipients", async () => {
+  for (const recipient of ["publishing@jmerrill.one", "other@example.com"]) {
+    const deps = dependencies();
+    let reads = 0;
+    deps.graphClient.request = async (method, path) => {
+      assert.equal(method, "GET");
+      reads++;
+      if (reads === 1) return { value: [] };
+      if (reads === 2) return { value: [{ id: "internal-proof", subject: "Publishing Internal Presentation Check - Test Project",
+        from: { emailAddress: { address: "publishing@email.jmerrill.one" } },
+        toRecipients: [{ emailAddress: { address: recipient } }], body: { content: "Internal check" } }] };
+      assert.match(path, /messages\/internal-proof/);
+      return { id: "internal-proof", body: { contentType: "html", content: "Proof" } };
+    };
+    const result = await lifecycleReadback({ authorId, titleId,
+      afterIso: new Date(Date.now() - 86400000).toISOString(), includePresentation: true, includeInternalProof: true }, deps);
+    assert.equal(result.jsonBody.presentationEvidence.length, recipient === "publishing@jmerrill.one" ? 1 : 0);
+    assert.equal(result.jsonBody.effects, 0);
+  }
+});
+
+test("recent system census is explicitly requested and bounded independently of a title subject", async () => {
+  const deps = dependencies();
+  const paths = [];
+  deps.graphClient.request = async (method, path) => {
+    assert.equal(method, "GET");
+    paths.push(decodeURIComponent(path));
+    return { value: [] };
+  };
+  const result = await lifecycleReadback({ authorId, titleId,
+    afterIso: new Date(Date.now() - 86400000).toISOString(), includePresentation: true, includeSystemCensus: true }, deps);
+  assert.equal(result.jsonBody.queries.length, 3);
+  assert.match(paths[2], /publishing@email\.jmerrill\.one/);
+  assert.equal(result.jsonBody.systemPresentationComplete, true);
+  assert.equal(result.jsonBody.effects, 0);
+});
