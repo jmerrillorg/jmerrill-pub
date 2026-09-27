@@ -5,6 +5,7 @@ const { writeLog } = require("./editorialExecutionRuntime");
 
 const RESERVED_ACTION = "AUTHOR_COMMUNICATION_INTENT_RESERVED";
 const SENT_ACTION = "AUTHOR_COMMUNICATION_INTENT_SENT";
+const ACCEPTED_ACTION = "AUTHOR_COMMUNICATION_PROVIDER_ACCEPTED";
 const FAILED_ACTION = "AUTHOR_COMMUNICATION_INTENT_FAILED";
 
 function clean(value) {
@@ -61,13 +62,16 @@ async function findIntentState(client, semantic) {
   const rows = await client.list("jm1_executionlogs", {
     $select: "jm1_executionlogid,jm1_actiontype,jm1_actiondescription,jm1_sourcerecordid,createdon",
     $filter:
-      `(jm1_actiontype eq '${RESERVED_ACTION}' or jm1_actiontype eq '${SENT_ACTION}' or jm1_actiontype eq '${FAILED_ACTION}') and ` +
+      `(jm1_actiontype eq '${RESERVED_ACTION}' or jm1_actiontype eq '${SENT_ACTION}' or jm1_actiontype eq '${ACCEPTED_ACTION}' or jm1_actiontype eq '${FAILED_ACTION}') and ` +
       `contains(jm1_actiondescription,'${escapeODataText(semantic.key)}')`,
     $orderby: "createdon desc",
     $top: "10"
   });
   const sent = rows.find((row) => row.jm1_actiontype === SENT_ACTION);
-  if (sent) return { status: "ALREADY_DELIVERED", record: sent, source: "CANONICAL_INTENT" };
+  if (sent) return { status: /COMMUNICATION_COMPLETE=YES/.test(sent.jm1_actiondescription || "")
+    ? "ALREADY_DELIVERED" : "DELIVERY_UNVERIFIED", record: sent, source: "CANONICAL_INTENT" };
+  const accepted = rows.find(row => row.jm1_actiontype === ACCEPTED_ACTION);
+  if (accepted) return { status: "PROVIDER_ACCEPTED", record: accepted, source: "CANONICAL_INTENT" };
   const latest = rows[0];
   if (latest?.jm1_actiontype === FAILED_ACTION) {
     return { status: "AVAILABLE", record: latest, source: "PROVEN_PRE_DELIVERY_FAILURE" };
@@ -83,7 +87,7 @@ async function findIntentState(client, semantic) {
   });
   const existing = historical.find((row) => /SENT|DELIVERED|READBACK/.test(String(row.jm1_actiontype || "")) && describesSameDelivery(row, semantic));
   return existing
-    ? { status: "ALREADY_DELIVERED", record: existing, source: "HISTORICAL_SEMANTIC_MATCH" }
+    ? { status: "DELIVERY_UNVERIFIED", record: existing, source: "HISTORICAL_SEMANTIC_MATCH" }
     : { status: "AVAILABLE" };
 }
 
@@ -120,8 +124,9 @@ async function reserveCommunicationIntent(client, input) {
 async function markCommunicationSent(client, input) {
   const manifest = Array.isArray(input.artifactManifest) ? input.artifactManifest : [];
   const observability = input.observability || {};
+  const complete = input.communicationComplete === true;
   const description =
-    `Idempotency ${input.semanticIdempotencyKey}. DELIVERY_STATE=SENT; communicationRecordId=${input.communicationRecordId}; ` +
+    `Idempotency ${input.semanticIdempotencyKey}. COMMUNICATION_COMPLETE=${complete ? "YES" : "NO"}; DELIVERY_STATE=${complete ? "MAILBOX_VERIFIED" : "PROVIDER_ACCEPTED"}; communicationRecordId=${input.communicationRecordId}; ` +
     `providerMessageId=${input.providerMessageId || "UNKNOWN"}; sentAt=${input.sentAt || new Date().toISOString()}; ` +
     `recipient=${clean(input.recipient)}; artifacts=${(input.artifactChecksums || []).join("|")}; ` +
     `artifactManifest=${JSON.stringify(manifest)}; DATAVERSE_RECORD=PASS; ` +
@@ -130,7 +135,7 @@ async function markCommunicationSent(client, input) {
     `ATTACHMENT_PARITY=${observability.semanticAttachmentParity || "UNPROVEN"}.`;
   const sentRecordId = await writeLog(client, {
     name: `AUTHOR_COMMUNICATION_INTENT_SENT - ${input.titleName || input.titleId}`,
-    actionType: SENT_ACTION,
+    actionType: complete ? SENT_ACTION : ACCEPTED_ACTION,
     description,
     sourceEntity: "jm1pub_title",
     sourceRecordId: input.titleId

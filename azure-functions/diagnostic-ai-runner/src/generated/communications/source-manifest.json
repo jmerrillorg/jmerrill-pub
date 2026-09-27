@@ -8,6 +8,10 @@
     "jm1-enterprise-communication-renderer": {
       "sourceSha256": "ce554953f5afc2c3c2d4800710f37ff55ca793ed9a305edb9d99165d3258afc1",
       "runtimeSha256": "efd35a1c8208fd7f1ee23e2a389aaf80bb943bbde0b39a211a77cbd9775a962a"
+    },
+    "publishing-communication-acceptance": {
+      "sourceSha256": "21da53bc4fd9fd689364fcd62de828c4ff02755735ef671de372540e68cf7b80",
+      "runtimeSha256": "8736f518ae9984674cb09520952eb97817025cd7c73a7346a2dfb3034abef1e1"
     }
   }
 }

@@ -142,6 +142,7 @@ function senderDeps(extra = {}) {
       sends.push(payload);
       return {
         status: "SENT",
+        communicationComplete: true,
         providerMessageId: "acs-message-1",
         attachmentCount: payload.attachments.length,
         attachmentChecksums: payload.attachments.map((attachment) => `${attachment.role}:${attachment.sha256}`),

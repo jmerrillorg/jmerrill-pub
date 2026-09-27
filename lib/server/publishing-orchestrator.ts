@@ -328,12 +328,14 @@ export async function sendProofreadingNotification(input: NotificationInput): Pr
     },
     body: JSON.stringify(payload),
   })
-  const relayBody = (await relayResponse.json().catch(() => null)) as { providerMessageId?: string; accepted?: boolean; code?: string; reason?: string } | null
+  const relayBody = (await relayResponse.json().catch(() => null)) as { providerMessageId?: string; accepted?: boolean; communicationComplete?: boolean; code?: string; reason?: string } | null
   const relayAccepted = relayResponse.ok && (relayResponse.status === 202 || relayBody?.accepted === true || Boolean(relayBody?.providerMessageId))
   if (!relayAccepted) {
     const reason = relayBody?.reason || relayBody?.code || `RELAY_HTTP_${relayResponse.status}`
     return notificationBlocked(config, input.gateId, input.correlationId, `PROOFREADING_NOTIFICATION_BLOCKED - ${reason}`)
   }
+  if (relayBody?.communicationComplete !== true) return notificationBlocked(config, input.gateId, input.correlationId,
+    'PROOFREADING_NOTIFICATION_MAILBOX_UNVERIFIED_NO_RESEND')
   const providerMessageId = relayBody?.providerMessageId || 'not-returned-by-relay'
   const providerEvidenceStatus = relayBody?.providerMessageId ? 'captured' : 'not-returned-by-relay'
   const providerEvidenceText =

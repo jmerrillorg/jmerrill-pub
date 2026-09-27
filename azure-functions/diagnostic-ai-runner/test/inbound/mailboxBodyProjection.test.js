@@ -10,8 +10,8 @@ test("HTML mailbox projection preserves all visible content and tolerates transp
   const visible = 'Good day, Author,\r\n\r\nReceived $519.76. Balance $1,559.23.\r\nJ Merrill Publishing';
   assert.ok(hashes.includes(textProjectionHash(visible)));
   assert.ok(hashes.includes(textProjectionHash(`Preview ${visible}`)));
-  const service = { subject: "Your account", recipient: "author@example.com", sentAt: "2026-09-26T12:00:00Z", htmlBodyProjectionHashes: hashes };
-  const message = { id: "copy-1", subject: service.subject, from: { emailAddress: { address: "publishing@email.jmerrill.one" } },
+  const service = { communicationRecordId: "command-1", providerMessageId: "11111111-1111-1111-1111-111111111111", subject: "Your account", recipient: "author@example.com", sentAt: "2026-09-26T12:00:00Z", htmlBodyProjectionHashes: hashes };
+  const message = { id: "copy-1", internetMessageId: "<202609261200.11111111111111111111111111111111-copy@microsoft.com>", subject: service.subject, from: { emailAddress: { address: "publishing@email.jmerrill.one" } },
     toRecipients: [{ emailAddress: { address: service.recipient } }], ccRecipients: [{ emailAddress: { address: "publishing@jmerrill.one" } }],
     body: { content: visible } };
   const graphClient = { listInboxMessagesSince: async () => ({ value: [message] }) };

@@ -2,6 +2,7 @@
 
 const { createHash } = require("node:crypto");
 const { DELIVERY_STATE, getMessageLedger } = require("./messageLedger");
+const { resolvePublishingAcceptance } = require("./publishingAcceptance");
 
 async function executeRenderedPublishingDelivery(input, deps) {
   const metadata = input.metadata;
@@ -43,16 +44,17 @@ async function executeRenderedPublishingDelivery(input, deps) {
     if (prior.deliveryState !== DELIVERY_STATE.ACCEPTED || !prior.providerMessageId) {
       throw Object.assign(new Error("Prior transport outcome requires reconciliation."), { safeCode: "AMBIGUOUS_SEND_STATE" });
     }
-    return { providerMessageId: prior.providerMessageId, providerStatus: "Succeeded",
+    return { ...await resolvePublishingAcceptance(prior, ledger, deps), providerMessageId: prior.providerMessageId, providerStatus: "Succeeded",
       communicationRecordId: prior.jm1MessageId, replay: true };
   }
   // Preserve the reservation on transport/audit ambiguity; never auto-resend.
+  if (ledger.recordSubmitted) await ledger.recordSubmitted(reservation.entity);
   const receipt = await deps.sendMessage(message);
   if (receipt?.providerStatus !== "Succeeded" || !receipt?.providerMessageId) {
     throw Object.assign(new Error("Provider completion is unproven."), { safeCode: "ACS_DELIVERY_UNPROVEN" });
   }
-  const accepted = await ledger.recordAccepted(reservation.entity, receipt.providerMessageId);
-  return { ...receipt, communicationRecordId: accepted.jm1MessageId, replay: false };
+  const accepted = await ledger.recordAccepted(reservation.entity, receipt.providerMessageId, message);
+  return { ...await resolvePublishingAcceptance(accepted, ledger, deps), ...receipt, communicationRecordId: accepted.jm1MessageId, replay: false };
 }
 
 module.exports = { executeRenderedPublishingDelivery };

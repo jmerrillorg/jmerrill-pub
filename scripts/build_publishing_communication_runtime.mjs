@@ -6,7 +6,7 @@ import path from 'node:path'
 const root = fileURLToPath(new URL('../', import.meta.url))
 const require = createRequire(import.meta.url)
 const ts = require('typescript')
-const names = ['jm1-enterprise-design-tokens', 'jm1-enterprise-communication-renderer']
+const names = ['jm1-enterprise-design-tokens', 'jm1-enterprise-communication-renderer', 'publishing-communication-acceptance']
 const hash = value => createHash('sha256').update(value).digest('hex')
 for (const runtime of ['acs-email-relay', 'diagnostic-ai-runner']) {
   const directory = path.join(root, 'azure-functions', runtime, 'src', 'generated', 'communications')

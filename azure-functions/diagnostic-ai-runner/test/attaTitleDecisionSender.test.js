@@ -55,7 +55,7 @@ test("Atta sender uses ACS canon, Publishing mailbox observability, and semantic
     reserveCommunicationIntent: async () => ({ status: "RESERVED", semanticIdempotencyKey: "communication:v1:key", communicationRecordId: "communication-1" }),
     sendRelay: async (payload) => {
       relayPayload = payload;
-      return { status: "SENT", providerMessageId: "provider-1", sentAt: "2026-09-20T12:00:00Z", observability: { acsDelivery: "PASS", publishingMailboxCopy: "PASS" } };
+      return { status: "SENT", communicationComplete: true, providerMessageId: "provider-1", sentAt: "2026-09-20T12:00:00Z", observability: { acsDelivery: "PASS", publishingMailboxCopy: "PASS" } };
     },
     markCommunicationSent: async (_client, payload) => { marked = payload; }
   });

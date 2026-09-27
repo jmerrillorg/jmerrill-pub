@@ -612,7 +612,7 @@ async function sendCadenceAuthorReviewPackage(input, deps = {}) {
     : deps.client
       ? await reserveCommunicationIntent(deps.client, intentInput)
       : { status: "RESERVED", semanticIdempotencyKey: "unit-test-no-store", communicationRecordId: "unit-test-no-store" };
-  if (reserve.status === "ALREADY_DELIVERED" || reserve.status === "AMBIGUOUS_SEND_STATE") {
+  if (!["RESERVED", "PROVIDER_ACCEPTED"].includes(reserve.status)) {
     return {
       status: reserve.status,
       communicationRecordId: reserve.communicationRecordId,
@@ -627,8 +627,12 @@ async function sendCadenceAuthorReviewPackage(input, deps = {}) {
 
   if (typeof deps.sendRelay === "function") {
     const result = await deps.sendRelay(payload);
+    if (result.communicationComplete !== true) return { ...result, status: "PROVIDER_ACCEPTED",
+      communicationComplete: false, blockers: ["MAILBOX_VERIFICATION_PENDING"],
+      semanticIdempotencyKey: reserve.semanticIdempotencyKey, communicationRecordId: reserve.communicationRecordId };
     if ((result.status === "SENT" || result.status === "ALREADY_DELIVERED") && deps.client) {
       await markCommunicationSent(deps.client, {
+        communicationComplete: true,
         ...intentInput,
         semanticIdempotencyKey: reserve.semanticIdempotencyKey,
         communicationRecordId: reserve.communicationRecordId,
@@ -667,9 +671,21 @@ async function sendCadenceAuthorReviewPackage(input, deps = {}) {
     }
     return { status: "FAILED", blockers: [`RELAY_SEND_FAILED:${body?.reason || body?.code || response.status}`], relayResponse: body };
   }
+  if (body.communicationComplete !== true) {
+    if (deps.client) await markCommunicationSent(deps.client, {
+      ...intentInput, semanticIdempotencyKey: reserve.semanticIdempotencyKey,
+      communicationRecordId: reserve.communicationRecordId, providerMessageId: body.providerMessageId,
+      sentAt: body.sentAt, communicationComplete: false, artifactChecksums: attachments.map(item => item.sha256),
+      artifactManifest: governedAttachmentManifest, observability: body.observability
+    });
+    return { status: "PROVIDER_ACCEPTED", communicationComplete: false,
+      providerMessageId: body.providerMessageId, relayCommunicationId: body.communicationRecordId,
+      blockers: ["MAILBOX_VERIFICATION_PENDING"], relayResponse: body };
+  }
   const status = body.deliveryStatus === "ALREADY_DELIVERED" ? "ALREADY_DELIVERED" : "SENT";
   if (deps.client) {
     await markCommunicationSent(deps.client, {
+      communicationComplete: true,
       ...intentInput,
       semanticIdempotencyKey: reserve.semanticIdempotencyKey,
       communicationRecordId: body.communicationRecordId || reserve.communicationRecordId,

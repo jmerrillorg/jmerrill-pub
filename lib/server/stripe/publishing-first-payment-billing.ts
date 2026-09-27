@@ -230,7 +230,8 @@ export async function runIndomitableBillingContinuation(request: BillingContinua
 
   const email = buildFirstPaymentEmail({ hostedInvoiceUrl })
   const sendResult = await (deps.sendAuthorEmail || sendFirstPaymentAuthorEmail)(email)
-  if (!sendResult.accepted) return blocked('AUTHOR_EMAIL_SEND_FAILED', { detail: sendResult.code || null })
+  if (!sendResult.accepted) return blocked(sendResult.code === 'MAILBOX_EVIDENCE_UNVERIFIED_NO_RESEND'
+    ? 'MAILBOX_EVIDENCE_UNVERIFIED_NO_RESEND' : 'AUTHOR_EMAIL_SEND_FAILED', { detail: sendResult.code || null })
 
   await dataversePatchOpportunity(config, token, {
     jm1_m6agreementpreparationstatus: 'AGREEMENT_SIGNED_ACTIVE',
@@ -348,7 +349,8 @@ async function sendFirstPaymentAuthorEmail(email: ReturnType<typeof buildFirstPa
   if (!response.ok || body.accepted !== true) {
     return { accepted: false, code: body?.code || body?.reason || `AUTHOR_EMAIL_RELAY_FAILED_${response.status}` }
   }
-  return { accepted: true, providerMessageId: body.providerMessageId || null, code: body.deliveryStatus || 'AUTHOR_RESPONSE_SENT' }
+  return { accepted: body.communicationComplete === true, providerMessageId: body.providerMessageId || null,
+    code: body.communicationComplete ? body.deliveryStatus : 'MAILBOX_EVIDENCE_UNVERIFIED_NO_RESEND' }
 }
 
 async function stripeRequest(path: string, input: { method: string; body: URLSearchParams; idempotencyKey: string; secret: string }) {

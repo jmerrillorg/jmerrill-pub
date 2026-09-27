@@ -953,11 +953,12 @@ async function sendAuthorPackageThroughRelay(input: {
       bcc: [],
     }),
   })
-  const body = (await response.json().catch(() => null)) as { providerMessageId?: string; accepted?: boolean; reason?: string; code?: string } | null
+  const body = (await response.json().catch(() => null)) as { providerMessageId?: string; accepted?: boolean; communicationComplete?: boolean; reason?: string; code?: string } | null
   if (!response.ok || (!body?.accepted && !body?.providerMessageId)) {
     throw new Error(`RELAY_SEND_FAILED:${body?.reason || body?.code || response.status}`)
   }
-  return { providerMessageId: body.providerMessageId || 'accepted-without-provider-message-id' }
+  if (body?.communicationComplete !== true) throw new Error('MAILBOX_EVIDENCE_UNVERIFIED_NO_RESEND')
+  return { providerMessageId: body.providerMessageId || '' }
 }
 
 async function materializeRequiredAttachments(stageCode: AuthorReviewPackageType, titleName: string, artifacts: DataverseRow[]): Promise<GovernedPackageAttachment[]> {

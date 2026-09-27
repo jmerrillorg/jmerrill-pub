@@ -1585,7 +1585,8 @@ app.http("send-author-acknowledgment", {
       return {
         status: 202,
         jsonBody: {
-          status: "accepted",
+          ...receipt,
+          status: receipt.communicationComplete ? "mailbox_verified" : "provider_accepted",
           operationId,
           providerStatus: receipt.providerStatus,
           communicationRecordId: receipt.communicationRecordId,
@@ -1853,7 +1854,12 @@ app.http("send-approved-author-response", {
         jsonBody: {
           accepted: true,
           messageType: APPROVED_AUTHOR_RESPONSE_TYPE,
-          deliveryStatus: result.status === "ALREADY_DELIVERED" ? "ALREADY_DELIVERED" : AUTHOR_RESPONSE_SENT,
+          communicationComplete: result.communicationComplete === true,
+          communicationState: result.communicationState || "PROVIDER_ACCEPTED",
+          mailboxEvidenceVerified: result.mailboxEvidenceVerified === true,
+          mailboxMessageId: result.mailboxMessageId,
+          mailboxVerifiedAt: result.mailboxVerifiedAt,
+          deliveryStatus: result.communicationComplete ? (result.status === "ALREADY_DELIVERED" ? "ALREADY_DELIVERED" : AUTHOR_RESPONSE_SENT) : "PROVIDER_ACCEPTED",
           recipient: validation.value.authorEmail,
           internalVisibilityMailbox: INTERNAL_VISIBILITY_MAILBOX,
           intakeReferenceCode: validation.value.intakeReferenceCode,

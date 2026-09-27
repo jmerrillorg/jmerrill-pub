@@ -262,7 +262,9 @@ function resolveAuthorResponseSendProvider(config, providers = {}, env = process
             env[ENV_VARS.relayKey],
             buildAuthorResponseRelayPayload(email)
           );
-          return { messageId: result.providerMessageId };
+          return { messageId: result.providerMessageId, communicationComplete: result.communicationComplete === true,
+            communicationState: result.communicationState, relayCommunicationId: result.communicationRecordId,
+            mailboxMessageId: result.mailboxMessageId, mailboxVerifiedAt: result.mailboxVerifiedAt };
         }
       }
     };
@@ -374,9 +376,12 @@ async function sendConfiguredAuthorResponse({
     const result = await providerResolution.provider.send(emailResult.email);
     return {
       ok: true,
-      deliveryStatus: AUTHOR_RESPONSE_SEND_STATUS.SENT,
-      authorEmailStatus: AUTHOR_RESPONSE_SEND_STATUS.SENT,
-      internalVisibilityStatus: AUTHOR_RESPONSE_SEND_STATUS.INTERNAL_VISIBILITY_SATISFIED,
+      deliveryStatus: result.communicationComplete === true ? AUTHOR_RESPONSE_SEND_STATUS.SENT : "PROVIDER_ACCEPTED",
+      authorEmailStatus: result.communicationComplete === true ? AUTHOR_RESPONSE_SEND_STATUS.SENT : "PROVIDER_ACCEPTED",
+      internalVisibilityStatus: result.communicationComplete === true ? AUTHOR_RESPONSE_SEND_STATUS.INTERNAL_VISIBILITY_SATISFIED : "MAILBOX_EVIDENCE_UNVERIFIED",
+      communicationComplete: result.communicationComplete === true,
+      communicationState: result.communicationState || "PROVIDER_ACCEPTED",
+      relayCommunicationId: result.relayCommunicationId,
       providerName: config.providerName,
       providerMessageId: normalizeString(result?.messageId || result?.operationId) || null,
       providerCalled: true,

@@ -197,7 +197,7 @@ describe("author response provider boundary", () => {
         injected: {
           async send(message) {
             calls.push(message);
-            return { messageId: "author-response-message-id" };
+            return { messageId: "author-response-message-id", communicationComplete: true };
           }
         }
       }
