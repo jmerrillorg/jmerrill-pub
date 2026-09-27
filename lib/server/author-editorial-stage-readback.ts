@@ -1,7 +1,14 @@
-import { dataverseFirst, stringValue, type DataverseServerConfig } from './dataverse-server'
+import { dataverseFirst, stringValue, type DataverseServerConfig, type DataverseRow } from './dataverse-server'
 
 const GUID = /^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i
 const SELECT = 'jm1pub_editorialstageid,jm1pub_authorsafesummary,jm1pub_stagestatus,jm1pub_stagetype,_jm1pub_titleid_value,_jm1pub_publishingassetid_value,createdon'
+
+export function selectTitleBoundEditorialStage(rows: DataverseRow[], titleId: string) {
+  if (!GUID.test(titleId)) return null
+  return rows.filter(row => stringValue(row._jm1pub_titleid_value).toLowerCase() === titleId.toLowerCase() &&
+    (row.statecode == null || Number(row.statecode) === 0))
+    .sort((a, b) => (Date.parse(stringValue(b.createdon)) || 0) - (Date.parse(stringValue(a.createdon)) || 0))[0] || null
+}
 
 // Current stages can belong directly to a title without a format-specific asset.
 // An older asset lookup must not hide the title's active editorial record.

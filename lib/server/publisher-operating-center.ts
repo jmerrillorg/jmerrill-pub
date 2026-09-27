@@ -16,6 +16,7 @@ import {
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { randomUUID } from 'node:crypto'
+import { selectTitleBoundEditorialStage } from './author-editorial-stage-readback'
 import {
   classifyTitlePortfolio,
   isActivePipeline,
@@ -1652,7 +1653,7 @@ function buildQueueItem(
   const title = titles.find((row) => normalizeTitle(stringValue(row.jm1pub_titlename || row.jm1pub_name)) === normalized)
   const titleId = stringValue(title?.jm1pub_titleid)
   const asset = assets.find((row) => titleId && dataverseLookupId(row, '_jm1pub_titleid_value') === titleId)
-  const editorialStage = editorialStages.find(
+  const editorialStage = selectTitleBoundEditorialStage(editorialStages, titleId) || editorialStages.find(
     (row) => asset && dataverseLookupId(row, '_jm1pub_publishingassetid_value') === stringValue(asset.jm1pub_publishingassetid),
   )
   const diagnosticId = dataverseLookupId(intake, '_jm1_stage0diagnostic_value')
