@@ -22,7 +22,9 @@ function message(body, id = "mail-1") {
   };
 }
 
-async function setup(body, classification = "EDITORIAL_RESPONSE") {
+async function setup(body, classification = "EDITORIAL_RESPONSE", identity = {}) {
+  const authorId = identity.authorId || "11111111-1111-4111-8111-111111111111";
+  const titleId = identity.titleId || "22222222-2222-4222-8222-222222222222";
   const graphMessage = message(body);
   const context = {
     contacts: [{ email: "author@example.com", authorId, contactId: authorId, name: "Author Example" }],
@@ -58,6 +60,44 @@ async function setup(body, classification = "EDITORIAL_RESPONSE") {
   };
   return { queue, route, store, deps, effects };
 }
+
+test("normal timer serves the delivered-review continuation once and preserves the original event", async () => {
+  const { CONTINUITY_AUTHORITY } = require("../../src/mail/inbound/editorialReviewContinuity");
+  const { queue, route, store, deps, effects } = await setup(
+    "I answered all onboarding questions but my relationship could not be verified.", "AUTHOR_ACCESS_REQUEST", CONTINUITY_AUTHORITY);
+  const previous = { intent: "AUTHOR_ONBOARDING_SERVICE_RECOVERY", status: "SENT", providerMessageId: "old-provider" };
+  await store.updateBusinessRoute({ ...route, service: previous });
+  await store.updateQueueItem({ ...queue, serviceIntent: previous.intent, serviceStatus: "SENT", businessEventId: "route-1", serviceDeliveryId: "old-delivery" });
+  deps.enabled = true;
+  deps.prepareEditorialReviewContinuity = async () => ({ status: "READY", deliveredAt: "2026-09-21T09:02:36Z", providerMessageId: "original-delivery" });
+  const first = await runInboundService({}, deps);
+  assert.equal(first.results[0].outcome, "SENT");
+  assert.equal(first.results[0].intent, "DELIVERED_EDITORIAL_REVIEW_CONTINUITY");
+  assert.equal(effects.sends.length, 1);
+  assert.match(effects.sends[0].input.sendApproval.draftBody, /September 21/);
+  const current = await store.getBusinessRoute(queue.evidenceLink);
+  assert.equal(current.inboundMessageEventId, queue.evidenceLink);
+  assert.deepEqual(current.serviceHistory, [previous]);
+  assert.equal(current.service.waitingOn, "AUTHOR");
+  await runInboundService({}, deps);
+  assert.equal(effects.sends.length, 1);
+  assert.equal((await executeService(queue, deps)).outcome, "IDEMPOTENT");
+});
+
+test("an incomplete response search leaves prior correspondence intact and sends nothing", async () => {
+  const { CONTINUITY_AUTHORITY } = require("../../src/mail/inbound/editorialReviewContinuity");
+  const { queue, route, store, deps, effects } = await setup(
+    "I answered all onboarding questions but my relationship could not be verified.", "AUTHOR_ACCESS_REQUEST", CONTINUITY_AUTHORITY);
+  const previous = { intent: "AUTHOR_ONBOARDING_SERVICE_RECOVERY", status: "SENT" };
+  await store.updateBusinessRoute({ ...route, service: previous });
+  deps.prepareEditorialReviewContinuity = async () => ({ status: "HELD", reason: "AUTHOR_RESPONSE_SEARCH_INCOMPLETE" });
+  const held = await executeService(queue, deps);
+  assert.equal(held.outcome, "HELD_SERVICE_AUTHORITY");
+  assert.equal(held.reason, "AUTHOR_RESPONSE_SEARCH_INCOMPLETE");
+  assert.deepEqual((await store.getBusinessRoute(queue.evidenceLink)).service, previous);
+  assert.equal(effects.sends.length, 0);
+  assert.equal(effects.reserves, 0);
+});
 
 test("questions missing is routine, but supplied questions require judgment", () => {
   assert.equal(serviceIntent(message("Approved with questions"), "EDITORIAL_RESPONSE").intent, "AUTHOR_QUESTIONS_MISSING");

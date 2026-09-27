@@ -112,6 +112,27 @@ async function listStageArtifacts(client, stage) {
   });
 }
 
+async function pendingDeliveredReview(client, stage) {
+  const deliveries = await client.list("jm1_executionlogs", {
+    $filter: `jm1_sourcerecordid eq '${escapeODataText(stage.jm1pub_editorialstageid)}' and jm1_actiontype eq 'PACKAGE_CADENCE_RELEASE_AUTHOR_PACKAGE_SENT'`,
+    $top: "100"
+  });
+  for (const delivery of deliveries) {
+    const gateId = normalizeString(delivery.jm1_actiondescription).match(/(?:^|[; ])gate=([a-f0-9-]{36})(?:;| |$)/i)?.[1];
+    if (!gateId) continue;
+    const gates = await client.list("jm1pub_editorialapprovalgates", {
+      $filter: `jm1pub_editorialapprovalgateid eq ${gateId} and _jm1pub_titleid_value eq ${stage._jm1pub_titleid_value}`,
+      $top: "1"
+    });
+    const gate = gates[0];
+    if (Number(gate?.jm1pub_gatestatus) === 196650002 && !gate.jm1pub_authordecision && !gate.jm1pub_authordecisionon) {
+      return { gateId, deliveryLogId: delivery.jm1_executionlogid };
+    }
+  }
+  if (deliveries.length >= 100) throw new Error("DELIVERED_REVIEW_SEARCH_INCOMPLETE");
+  return null;
+}
+
 async function blockHandoff(client, stage, reason, correlationId, idempotencyKey) {
   const existing = await findExecutionLog(client, "EDITORIAL_PACKAGE_HANDOFF_BLOCKED", idempotencyKey);
   if (existing) return { status: "BLOCKED", reason, idempotent: true, logId: existing.jm1_executionlogid };
@@ -139,6 +160,11 @@ async function processQaLog(client, qaLog, correlationId) {
   const stageCode = normalizeStageCode(stage);
   const requiredRoles = requiredPackageRoles(stageCode);
   if (!requiredRoles.length) return { status: "SKIPPED", reason: "PACKAGE_POLICY_NOT_CONFIGURED", stageId, stageCode };
+
+  // New QA cannot replace a package still under author review. Closed gates and
+  // distinct route-back stage instances continue through the normal handoff.
+  const review = await pendingDeliveredReview(client, stage);
+  if (review) return { status: "AUTHOR_REVIEW_PRESERVED", stageId, stageCode, ...review };
 
   const sourceArtifact = await findSourceArtifact(client, stage);
   if (!sourceArtifact) {

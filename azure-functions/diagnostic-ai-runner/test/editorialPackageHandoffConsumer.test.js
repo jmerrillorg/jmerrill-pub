@@ -38,7 +38,7 @@ function artifact(name, extra = {}) {
   };
 }
 
-function createClient({ existingCompleted = false, omitLedger = false, omitMemo = false } = {}) {
+function createClient({ existingCompleted = false, omitLedger = false, omitMemo = false, deliveredGateStatus = null } = {}) {
   const calls = { created: [], patched: [] };
   const stage = createStage();
   const source = artifact("Governed Source Manuscript - Before You Were Born", {
@@ -84,12 +84,16 @@ function createClient({ existingCompleted = false, omitLedger = false, omitMemo 
     async list(entitySet, query = {}) {
       const filter = query.$filter || "";
       if (entitySet === "jm1_executionlogs") {
+        if (filter.includes("PACKAGE_CADENCE_RELEASE_AUTHOR_PACKAGE_SENT") && deliveredGateStatus !== null) {
+          return [{ jm1_executionlogid: "sent-log", jm1_actiondescription: "gate=11111111-1111-1111-1111-111111111111;" }];
+        }
         if (filter.includes("EDITORIAL_PACKAGE_HANDOFF_COMPLETED") && existingCompleted) {
           return [{ jm1_executionlogid: "completed-log", jm1_actiondescription: "existing" }];
         }
         return [];
       }
       if (entitySet === "jm1pub_editorialstages") return [stage];
+      if (entitySet === "jm1pub_editorialapprovalgates") return [{ jm1pub_gatestatus: deliveredGateStatus }];
       if (entitySet === "jm1pub_editorialartifacts" && filter.includes("jm1pub_editorialartifactname eq")) return [];
       if (entitySet === "jm1pub_editorialartifacts") return [source, ...outputs];
       throw new Error(`Unexpected list ${entitySet} ${JSON.stringify(query)}`);
@@ -111,6 +115,21 @@ test("developmental handoff selects the edited manuscript as the durable deliver
   ]);
   const deliverable = deliverableForStage("DEVELOPMENTAL_EDITING", outputs);
   assert.equal(deliverable.artifactId, "edited");
+});
+
+test("later QA preserves delivered review authority without manifest or stage writes", async () => {
+  const client = createClient({ deliveredGateStatus: 196650002 });
+  const result = await runEditorialPackageHandoffConsumer({}, { client, qaLogs: [{ jm1_sourcerecordid: "stage-1" }] });
+  assert.equal(result.results[0].status, "AUTHOR_REVIEW_PRESERVED");
+  assert.equal(result.results[0].deliveryLogId, "sent-log");
+  assert.equal(client.calls.patched.length, 0);
+  assert.equal(client.calls.created.some(call => call.entitySet === "jm1pub_editorialartifacts"), false);
+});
+
+test("closed author gate does not impose a blindly monotonic handoff hold", async () => {
+  const client = createClient({ deliveredGateStatus: 196650003, existingCompleted: true });
+  const result = await runEditorialPackageHandoffConsumer({}, { client, qaLogs: [{ jm1_sourcerecordid: "stage-1" }] });
+  assert.equal(result.results[0].status, "IDEMPOTENT");
 });
 
 test("QA-complete developmental output creates governed package v2 without direct stage transition", async () => {

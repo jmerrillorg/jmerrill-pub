@@ -66,6 +66,14 @@ function serviceCopy(intent, authorName, title, sourceSubject, linkResult = {}) 
   const endings = "\n\nJ Merrill Publishing";
   let message;
   switch (intent) {
+    case "DELIVERED_EDITORIAL_REVIEW_CONTINUITY": {
+      if (linkResult.status !== "READY" || !linkResult.deliveredAt) return null;
+      const date = new Date(linkResult.deliveredAt).toLocaleDateString("en-US", {
+        month: "long", day: "numeric", timeZone: "America/New_York",
+      });
+      message = `We are handling your onboarding issue internally, and you do not need to repeat the form. The Developmental Editing materials for ${title} were sent to you on ${date}. The next step is to review the edited manuscript and editorial review guide from that message. Please reply with Approved, Approved with corrections and the specific corrections, or any questions you would like us to address before moving forward.`;
+      break;
+    }
     case "AUTHOR_ONBOARDING_SERVICE_RECOVERY":
       message = `Thank you for letting us know about the difficulty with onboarding for ${title}. We are sorry that you have had to repeat the process. You do not need to complete the onboarding form again or request another code. We are reviewing your project records and handling the verification issue on our side. If any specific information is still needed, we will ask only for that information rather than sending you through the form again. We will keep you updated as we continue your project.`;
       break;

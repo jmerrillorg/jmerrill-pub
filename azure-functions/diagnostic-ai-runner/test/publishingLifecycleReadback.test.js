@@ -89,3 +89,45 @@ test("recent system census is explicitly requested and bounded independently of 
   assert.equal(result.jsonBody.systemPresentationComplete, true);
   assert.equal(result.jsonBody.effects, 0);
 });
+
+test("response search follows exact threads and alternate addresses from new author text only", async () => {
+  const deps = dependencies();
+  const filters = [];
+  deps.graphClient.request = async (method, path) => {
+    assert.equal(method, "GET");
+    const filter = new URL(path, "https://graph.microsoft.com").searchParams.get("$filter");
+    filters.push(filter);
+    if (filters.length === 1) return { value: [{ id: "author-request",
+      from: { emailAddress: { address: "test@example.com" } },
+      body: { content: "Please use new-author@example.net for email.\n\nOn Sep 21, 2026, Publishing wrote:\nSend email to quoted@example.net" } }] };
+    if (filters.length === 2) return { value: [{ id: "delivery", conversationId: "exact-thread",
+      from: { emailAddress: { address: "publishing@email.jmerrill.one" } },
+      toRecipients: [{ emailAddress: { address: "test@example.com" } }], body: { content: "Review materials" } }] };
+    return { value: [] };
+  };
+  const result = await lifecycleReadback({ authorId, titleId, includeResponseSearch: true,
+    afterIso: new Date(Date.now() - 86400000).toISOString() }, deps);
+  assert.deepEqual(result.jsonBody.responseSearch.aliases, ["new-author@example.net"]);
+  assert.equal(result.jsonBody.responseSearch.complete, true);
+  assert.equal(result.jsonBody.responseSearch.identityChanges, 0);
+  assert.match(filters[2], /new-author@example.net/);
+  assert.match(filters[3], /conversationId eq 'exact-thread'/);
+  assert.equal(filters.some(filter => filter.includes("quoted@example.net")), false);
+  assert.equal(result.jsonBody.effects, 0);
+});
+
+test("truncated thread read cannot establish absence of author response", async () => {
+  const deps = dependencies();
+  let reads = 0;
+  deps.graphClient.request = async () => {
+    reads++;
+    if (reads === 2) return { value: [{ id: "delivery", conversationId: "thread",
+      from: { emailAddress: { address: "publishing@email.jmerrill.one" } },
+      toRecipients: [{ emailAddress: { address: "test@example.com" } }] }] };
+    if (reads > 2) return { value: [], "@odata.nextLink": "https://graph.microsoft.com/v1.0/users/publishing@jmerrill.one/messages?$skip=100" };
+    return { value: [] };
+  };
+  const result = await lifecycleReadback({ authorId, titleId, includeResponseSearch: true,
+    afterIso: new Date(Date.now() - 86400000).toISOString() }, deps);
+  assert.equal(result.jsonBody.responseSearch.complete, false);
+});

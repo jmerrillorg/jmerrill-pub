@@ -31,7 +31,7 @@ async function lifecycleReadback(body, deps) {
   if (body.includeSystemCensus === true) filters.push(
     `receivedDateTime ge ${after.toISOString()} and from/emailAddress/address eq 'publishing@email.jmerrill.one'`);
   const queries = [];
-  for (const filter of filters) {
+  async function readFilter(filter) {
     const rows = [];
     let next = `/users/publishing@jmerrill.one/messages?${new URLSearchParams({ $filter: filter, $top: "100", $select: "id,subject,from,toRecipients,ccRecipients,receivedDateTime,sentDateTime,body,conversationId,internetMessageId,hasAttachments" })}`;
     for (let page = 0; next && page < 10; page++) {
@@ -44,7 +44,42 @@ async function lifecycleReadback(body, deps) {
       rows.push(...response.value);
       next = response["@odata.nextLink"] || null;
     }
-    queries.push({ filter, complete: !next, rows: rows.map(message => ({ ...message, authorReply: authorReplyText(message) })) });
+    return { filter, complete: !next, rows: rows.map(message => ({ ...message, authorReply: authorReplyText(message) })) };
+  }
+  for (const filter of filters) queries.push(await readFilter(filter));
+  const responseSearch = { requested: body.includeResponseSearch === true, complete: null,
+    aliases: [], threadCount: 0, identityChanges: 0 };
+  if (responseSearch.requested) {
+    // Alternate addresses are search leads from the author's new text, not
+    // verified account identities or permission to change the recipient.
+    const authorMessages = queries[0].rows.filter(message =>
+      message.from?.emailAddress?.address?.toLowerCase() === contact.emailaddress1.toLowerCase());
+    const aliases = new Set();
+    for (const message of authorMessages) {
+      const reply = authorReplyText(message);
+      if (!/\b(?:email|address|correspondence)\b/i.test(reply)) continue;
+      for (const match of reply.matchAll(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi)) {
+        const address = match[0].toLowerCase();
+        if (address !== contact.emailaddress1.toLowerCase() && !address.endsWith("@jmerrill.one") &&
+            !address.endsWith("@email.jmerrill.one")) aliases.add(address);
+      }
+    }
+    const threads = [...new Set(queries[1].rows.filter(message =>
+      ["publishing@email.jmerrill.one", "publishing@jmerrill.one"].includes(message.from?.emailAddress?.address?.toLowerCase()) &&
+      message.toRecipients?.some(recipient => recipient.emailAddress?.address?.toLowerCase() === contact.emailaddress1.toLowerCase()))
+      .map(message => message.conversationId).filter(Boolean))];
+    if (aliases.size > 5 || threads.length > 50) {
+      responseSearch.complete = false;
+      responseSearch.reason = "RESPONSE_SEARCH_SCOPE_LIMIT";
+    } else {
+      responseSearch.aliases = [...aliases];
+      responseSearch.threadCount = threads.length;
+      for (const address of aliases) queries.push(await readFilter(
+        `receivedDateTime ge ${after.toISOString()} and from/emailAddress/address eq '${address.replace(/'/g, "''")}'`));
+      for (const thread of threads) queries.push(await readFilter(
+        `receivedDateTime ge ${after.toISOString()} and conversationId eq '${thread.replace(/'/g, "''")}'`));
+      responseSearch.complete = queries.every(query => query.complete);
+    }
   }
   const presentationEvidence = [];
   const systemPresentationEvidence = [];
@@ -78,7 +113,7 @@ async function lifecycleReadback(body, deps) {
   const rendering = renderPublishingServiceCorrespondence({ subject: "Publishing Service Rendering Proof",
     authorName: "Test Operator", body: "Good day, Test,\n\nThis is an effect-free rendering fixture.\n\nJ Merrill Publishing",
     templateName: "PUBLISHING_SERVICE_RENDER_PROOF", templateVersion: "1.0" });
-  return { status: 200, jsonBody: { mode: "READ_ONLY", authorId, titleId, authorTitleBinding: "PASS", queries, presentationEvidence,
+  return { status: 200, jsonBody: { mode: "READ_ONLY", authorId, titleId, authorEmail: contact.emailaddress1.toLowerCase(), authorTitleBinding: "PASS", queries, responseSearch, presentationEvidence,
     presentationComplete, systemPresentationEvidence,
     systemPresentationComplete: body.includeSystemCensus === true && body.includePresentation === true
       ? queries[2].complete && queries[2].rows.length <= 50 : null,

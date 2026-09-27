@@ -1,10 +1,19 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
 import createJiti from 'jiti'
-const { readAuthorEditorialStage } = createJiti(import.meta.url)('../lib/server/author-editorial-stage-readback.ts')
+const { readAuthorEditorialStage, selectTitleBoundEditorialStage } = createJiti(import.meta.url)('../lib/server/author-editorial-stage-readback.ts')
 const titleId = 'daf8180f-85a3-f111-b8de-000d3a14673b'
 const assetId = '7272744e-85a3-f111-b8de-6045bdd69678'
 const config = {}
+
+test('Operating Center consumes the directly title-bound record without requiring an asset', () => {
+  const old = { _jm1pub_titleid_value: titleId, jm1pub_stagesequence: 1, createdon: '2026-08-29T08:40:45Z' }
+  const current = { _jm1pub_titleid_value: titleId, jm1pub_stagesequence: 2, createdon: '2026-09-21T02:51:41Z' }
+  const other = { _jm1pub_titleid_value: assetId, createdon: '2026-09-27T02:51:41Z' }
+  assert.equal(selectTitleBoundEditorialStage([old, other, current], titleId), current)
+  assert.equal(selectTitleBoundEditorialStage([other], titleId), null)
+  assert.equal(selectTitleBoundEditorialStage([current], 'Whole'), null)
+});
 
 test('title-bound Developmental record supersedes an older asset-bound Review projection', async () => {
   const current = { _jm1pub_titleid_value: titleId, _jm1pub_publishingassetid_value: null,
