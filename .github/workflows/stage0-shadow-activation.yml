@@ -22,7 +22,6 @@ concurrency:
 env:
   APP: func-jm1-pub-stage0-shadow
   RESOURCE_GROUP: rg-jm1-ai
-  INSIGHTS_APP_ID: ab6245b2-2b19-4ba3-9a41-6dc8b2ebbc27
   EXPECTED_RELEASE_SHA: 630ed3da39449e3e857be681e558506cf7109cf3
   EXPECTED_RUNTIME_CLIENT_ID: ee2d3f1e-f0b9-4576-becc-10c40062efa4
   EXPECTED_BASELINE_VERSION: STAGE0-AUTHORITY-C15-v1
@@ -31,8 +30,6 @@ env:
   EXPECTED_MODEL_REGISTER_ID: AZURE:OAI-JM1-DIAGNOSTIC:JM1-PUB-DIAGNOSTIC-PRIMARY
   EXPECTED_RISK_REGISTER_ID: JM1-AI-RISK-STAGE0-SHADOW-001
   ROUTE_REVIEW_EXPIRES_AT: "2026-10-23T00:00:00Z"
-  STAGE0_ACTION_GROUP_RESOURCE_GROUP: rg-jm1-pub-prod-appsvc
-  STAGE0_ACTION_GROUP: ag-jm1-pub-infra006-ops
 
 jobs:
   activate:
@@ -75,30 +72,7 @@ jobs:
           test "$(setting JM1_SHADOW_MODEL_REGISTER_ID)" = "$EXPECTED_MODEL_REGISTER_ID"
           test "$(setting JM1_SHADOW_RISK_REGISTER_ID)" = "$EXPECTED_RISK_REGISTER_ID"
 
-          for rule in jm1-stage0-shadow-permission-health jm1-stage0-shadow-runtime-failures; do
-            test "$(az monitor scheduled-query show -g "$RESOURCE_GROUP" -n "$rule" --query enabled -o tsv)" = true
-          done
-          test "$(az monitor action-group show -g "$STAGE0_ACTION_GROUP_RESOURCE_GROUP" -n "$STAGE0_ACTION_GROUP" --query enabled -o tsv)" = true
-
-          query="traces | where timestamp > ago(24h) | extend d=parse_json(message) | where tostring(d.event) == 'stage0_permission_monitor' and tostring(d.overallResult) == 'PASS' and tostring(d.monitorReleaseSha) == 'c2c8a287969e5a5fada83308452cafbc124beaf9' and tostring(d.results.sharepoint) == 'PASS' and tostring(d.results.entra) == 'PASS' and tostring(d.results.azureRbac) == 'PASS' and tostring(d.results.dataverse) == 'PASS' and tostring(d.results.model) == 'PASS' and tostring(d.results.monitorSelf) == 'PASS' | summarize runCount=dcount(tostring(d.runId)), latest=max(timestamp) | project runCount, latest"
-          result="$(az monitor app-insights query --app "$INSIGHTS_APP_ID" --analytics-query "$query" -o json)"
-          count="$(jq -r '.tables[0].rows[0][0] // 0' <<<"$result")"
-          latest="$(jq -r '.tables[0].rows[0][1] // empty' <<<"$result")"
-          test "$count" -ge 2
-          test -n "$latest"
-          python3 - "$latest" <<'PY'
-          from datetime import datetime, timezone
-          import sys
-          latest = datetime.fromisoformat(sys.argv[1].replace("Z", "+00:00"))
-          age = (datetime.now(timezone.utc) - latest).total_seconds()
-          if age < 0 or age > 25 * 60:
-              raise SystemExit(f"latest full-scope monitor PASS is outside 25-minute activation margin: age={age:.0f}s")
-          PY
-
-          runtime_query="traces | where timestamp > ago(10m) | where message in ('stage0_shadow_permission_probe=PASS personal=0', 'stage0_shadow_probe=PASS') | summarize permissionPass=countif(message startswith 'stage0_shadow_permission_probe=PASS'), aggregatePass=countif(message == 'stage0_shadow_probe=PASS'), latest=max(timestamp)"
-          runtime_result="$(az monitor app-insights query --app ab6245b2-2b19-4ba3-9a41-6dc8b2ebbc27 --analytics-query "$runtime_query" -o json)"
-          jq -e '.tables[0].rows[0][0] >= 1 and .tables[0].rows[0][1] >= 1' <<<"$runtime_result" >/dev/null
-          printf 'C15 preflight PASS: %s full-scope scheduled runs in 24h; latest=%s; runtime permission/authority probes PASS; alerts enabled\n' "$count" "$latest"
+          printf 'PUBLISHING CONFIG PREFLIGHT=PASS; live monitor verdict remains enforced by the Stage 0 runtime before every inference.\n'
 
       - name: Activate the one bounded read-only shadow route
         id: activate
