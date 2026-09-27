@@ -18,6 +18,7 @@ const { htmlProjectionHashes, textProjectionHash } = require("./mailboxBodyProje
 const { relayRequest } = require("../outbound/acceptanceRuntime");
 const { verifyPublishingMailboxEvidence } = require("../../generated/communications/publishing-communication-acceptance");
 const { renderPublishingServiceCorrespondence } = require("../../generated/communications/jm1-enterprise-communication-renderer");
+const { continuityAuthorized, prepareEditorialReviewContinuity } = require("./editorialReviewContinuity");
 
 const INTERNAL_MAILBOX = "publishing@jmerrill.one";
 const SYSTEM_SENDER = "publishing@email.jmerrill.one";
@@ -25,6 +26,7 @@ const ROUTINE_INTENTS = new Set([
   "AUTHOR_QUESTIONS_MISSING", "PAYMENT_LINK_ACCESS",
   "AUTHOR_ONBOARDING_ACCESS",
   "AUTHOR_ONBOARDING_SERVICE_RECOVERY",
+  "DELIVERED_EDITORIAL_REVIEW_CONTINUITY",
   "AUTHOR_ONBOARDING_CONTACT_CHANGE",
   "TITLE_CHANGE_ACKNOWLEDGMENT", "EDITORIAL_CORRECTIONS_ACKNOWLEDGMENT"
 ]);
@@ -35,6 +37,7 @@ function safeError(code) {
 }
 
 function serviceWaitOwner(intent) {
+  if (intent === "DELIVERED_EDITORIAL_REVIEW_CONTINUITY") return "AUTHOR";
   if (intent === "AUTHOR_ONBOARDING_SERVICE_RECOVERY") return "JMP_ONBOARDING_RECOVERY";
   if (["ADDITIONAL_PAYMENT_REQUEST", "PAYMENT_ACCESS_REQUEST", "INSTALLMENT_INFORMATION_REQUEST", "PAYMENT_LINK_ACCESS_PROBLEM"].includes(intent)) return "AUTHOR";
   if (intent === "AUTHOR_ONBOARDING_ACCESS") return "AUTHOR";
@@ -203,6 +206,12 @@ async function prepareService(queueItem, deps) {
     return safeError("SOURCE_MESSAGE_MISMATCH");
   }
   const classified = serviceIntent(graphMessage, queueItem.classification);
+  let editorialContinuity = null;
+  if (classified.intent === "AUTHOR_ONBOARDING_SERVICE_RECOVERY" && continuityAuthorized(queueItem)) {
+    editorialContinuity = await (deps.prepareEditorialReviewContinuity || prepareEditorialReviewContinuity)(queueItem, deps);
+    if (editorialContinuity.status !== "READY") return safeError(editorialContinuity.reason);
+    classified.intent = "DELIVERED_EDITORIAL_REVIEW_CONTINUITY";
+  }
   if (classified.intent === "PAYMENT_SCHEDULE_DETAILS") {
     return { outcome: "HELD_PAYMENT_SCHEDULE_AUTHORITY", intent: classified.intent, humanGate: false,
       eventId: queueItem.evidenceLink, transitionHeld: true };
@@ -234,7 +243,7 @@ async function prepareService(queueItem, deps) {
       eventId: queueItem.evidenceLink, linkStatus: linkResult?.status || "UNVERIFIED",
       linkReason: linkResult?.reason || "CURRENT_LINK_UNVERIFIED", transitionHeld: true };
   }
-  const content = serviceCopy(classified.intent, contact.fullname, movement.title, message.subject, linkResult);
+  const content = serviceCopy(classified.intent, contact.fullname, movement.title, message.subject, editorialContinuity || linkResult);
   if (!content || !authorReplyText(graphMessage)) return safeError("SERVICE_COPY_UNAVAILABLE");
   let rendered;
   try { rendered = renderPublishingServiceCorrespondence({ ...content, authorName: contact.fullname,
@@ -243,7 +252,7 @@ async function prepareService(queueItem, deps) {
   const copy = { subject: rendered.subject, body: rendered.text, html: rendered.html, metadata: rendered.metadata };
   return {
     outcome: "ROUTINE_SERVICE_READY", intent: classified.intent, humanGate: false,
-    eventId: queueItem.evidenceLink, route, message, movement, recipient,
+    eventId: queueItem.evidenceLink, route, message, movement, recipient, editorialContinuity,
     authorName: contact.fullname, copy, linkStatus: linkResult?.status || "NOT_APPLICABLE",
     linkReason: linkResult?.reason || null, linkInvoiceId: linkResult?.invoiceId || null,
     transitionHeld: Boolean(classified.transitionHeld || route.status !== "HUMAN_REVIEW_READY")
@@ -368,6 +377,22 @@ async function reconcileEditorialAuthorityHold(queueItem, prepared, deps) {
 
 async function executeService(queueItem, deps) {
   let priorRoute = await deps.store.getBusinessRoute(queueItem.evidenceLink);
+  if (continuityAuthorized(queueItem) && priorRoute?.service?.intent === "AUTHOR_ONBOARDING_SERVICE_RECOVERY" &&
+      priorRoute.service.status === "SENT") {
+    const prepared = await prepareService(queueItem, deps);
+    if (prepared.outcome !== "ROUTINE_SERVICE_READY" || prepared.intent !== "DELIVERED_EDITORIAL_REVIEW_CONTINUITY") {
+      return publicServiceResult(prepared);
+    }
+    await deps.store.withBusinessRouteLease(queueItem.evidenceLink, async () => {
+      const route = await deps.store.getBusinessRoute(queueItem.evidenceLink);
+      if (route.service?.intent !== "AUTHOR_ONBOARDING_SERVICE_RECOVERY" || route.service.status !== "SENT") return;
+      await deps.store.updateBusinessRoute({ ...route, serviceHistory: [...(route.serviceHistory || []), route.service],
+        editorialContinuity: prepared.editorialContinuity, service: null });
+      const queue = await deps.store.getQueueItem(queueItem.queueItemId);
+      await deps.store.updateQueueItem({ ...queue, serviceStatus: null, serviceDeliveryId: null });
+    });
+    priorRoute = await deps.store.getBusinessRoute(queueItem.evidenceLink);
+  }
   if (ACCESS_INTENTS.has(priorRoute?.service?.intent) &&
       ["SENT", "SENT_READBACK_PENDING"].includes(priorRoute.service.status)) {
     const recovery = await prepareService(queueItem, deps);
@@ -445,7 +470,9 @@ async function executeService(queueItem, deps) {
       titleId: queueItem.titleId, titleName: prepared.movement.title,
       authorId: queueItem.authorId, communicationType: `INBOUND_SERVICE_${prepared.intent}`,
       workstream: prepared.intent === "AUTHOR_ONBOARDING_SERVICE_RECOVERY"
-        ? `onboarding-service-recovery:${queueItem.authorId}:${queueItem.titleId}:v1` : queueItem.evidenceLink,
+        ? `onboarding-service-recovery:${queueItem.authorId}:${queueItem.titleId}:v1`
+        : prepared.editorialContinuity ? `delivered-review-continuity:${queueItem.stageId}:${prepared.editorialContinuity.providerMessageId}:v1`
+          : queueItem.evidenceLink,
       recipient: prepared.recipient, attachments: []
     };
     const reserve = await (deps.reserveCommunicationIntent || reserveCommunicationIntent)(client, intent);
@@ -549,6 +576,7 @@ async function runInboundService(input = {}, deps = {}) {
     : await store.listQueueItems(Number.MAX_SAFE_INTEGER);
   const rows = allRows.filter((row) => targetEventId || (row.receivedAt >= "2026-09-22T00:00:00Z" && row.businessEventId &&
       (!row.serviceStatus || row.serviceStatus === "SENT_READBACK_PENDING" ||
+        (continuityAuthorized(row) && row.serviceIntent === "AUTHOR_ONBOARDING_SERVICE_RECOVERY" && row.serviceStatus === "SENT") ||
         (ACCESS_INTENTS.has(row.serviceIntent) && !allRows.some(other => other.authorId === row.authorId &&
           other.titleId === row.titleId && other.classification === "AUTHOR_ACCESS_REQUEST" && other.receivedAt > row.receivedAt)) ||
         (row.serviceStatus === "SENT" && !row.serviceDeliveryId) ||

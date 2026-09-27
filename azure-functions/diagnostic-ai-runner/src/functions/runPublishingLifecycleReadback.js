@@ -113,7 +113,7 @@ async function lifecycleReadback(body, deps) {
   const rendering = renderPublishingServiceCorrespondence({ subject: "Publishing Service Rendering Proof",
     authorName: "Test Operator", body: "Good day, Test,\n\nThis is an effect-free rendering fixture.\n\nJ Merrill Publishing",
     templateName: "PUBLISHING_SERVICE_RENDER_PROOF", templateVersion: "1.0" });
-  return { status: 200, jsonBody: { mode: "READ_ONLY", authorId, titleId, authorTitleBinding: "PASS", queries, responseSearch, presentationEvidence,
+  return { status: 200, jsonBody: { mode: "READ_ONLY", authorId, titleId, authorEmail: contact.emailaddress1.toLowerCase(), authorTitleBinding: "PASS", queries, responseSearch, presentationEvidence,
     presentationComplete, systemPresentationEvidence,
     systemPresentationComplete: body.includeSystemCensus === true && body.includePresentation === true
       ? queries[2].complete && queries[2].rows.length <= 50 : null,
