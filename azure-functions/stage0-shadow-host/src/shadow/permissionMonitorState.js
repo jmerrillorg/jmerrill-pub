@@ -4,27 +4,45 @@ const { BlobServiceClient } = require("@azure/storage-blob");
 const { ManagedIdentityCredential } = require("@azure/identity");
 
 const CONTAINER = "shadow-permission-state";
-const BLOB = "current.json";
+const BLOB = "authority-current.json";
 const MAX_AGE_MS = 30 * 60 * 1000;
+const SURFACES = ["sharepoint", "entra", "azureRbac", "dataverse", "model", "monitorSelf"];
 
 function validatePermissionState(state, expected, now = Date.now()) {
-  if (state?.schemaVersion !== "1.0.0" ||
-      !["PASS", "CONTROL_PLANE_PASS_RUNTIME_PERSONAL_PROBE_REQUIRED"].includes(state.status) ||
+  const sharepoint = state?.sharepoint;
+  if (state?.schemaVersion !== "2.0.0" || state.overallResult !== "PASS" ||
+      !expected.baselineVersion || !/^[a-f0-9]{64}$/.test(expected.baselineChecksum || "") ||
+      !expected.principalId || !expected.modelResourceId || !expected.deploymentName ||
+      state.baselineVersion !== expected.baselineVersion || state.baselineChecksum !== expected.baselineChecksum ||
+      state.runtimeIdentityId !== expected.principalId ||
+      state.bindings?.runtimePrincipalId !== expected.principalId ||
+      state.bindings?.runtimeAppId !== expected.appId || state.bindings?.targetSiteId !== expected.siteId ||
+      state.bindings?.grantId !== expected.grantId ||
+      state.bindings?.modelResourceId !== expected.modelResourceId.toLowerCase() ||
+      state.bindings?.deploymentName !== expected.deploymentName ||
+      !state.monitorRunId || !/^[a-f0-9]{40}$/.test(state.monitorReleaseSha || "") ||
+      !Array.isArray(state.correlationIds) || state.correlationIds.length === 0 ||
+      Object.keys(state.results || {}).length !== SURFACES.length ||
+      !SURFACES.every(surface => state.results[surface] === "PASS") ||
       !expected.appId || !expected.siteId || !expected.grantId ||
-      state.runtimeAppId !== expected.appId || state.targetSiteId !== expected.siteId ||
-      state.grantId !== expected.grantId || state.role !== "read" ||
-      state.tenantWideSharePointAccess !== false || state.unrelatedSiteGrants !== 0 ||
-      state.siteEnumerationComplete !== true || !Array.isArray(state.personalSiteIds) ||
-      state.personalSiteIds.length > 500 ||
-      (state.status === "PASS" && state.personalSiteIds.length !== 0) ||
-      (state.status !== "PASS" && state.personalSiteIds.length === 0)) {
+      sharepoint?.runtimeAppId !== expected.appId || sharepoint.targetSiteId !== expected.siteId ||
+      sharepoint.grantId !== expected.grantId || sharepoint.role !== "read" ||
+      sharepoint.tenantWideSharePointAccess !== false || sharepoint.unrelatedSiteGrants !== 0 ||
+      sharepoint.siteEnumerationComplete !== true || !Array.isArray(sharepoint.personalSiteIds) ||
+      sharepoint.personalSiteIds.length > 500) {
     throw new Error("SHADOW_PERMISSION_STATE_UNVERIFIED");
   }
   const observed = Date.parse(state.observedAt);
-  if (!Number.isFinite(observed) || observed > now + 60_000 || now - observed > MAX_AGE_MS) {
+  const validUntil = Date.parse(state.validUntil);
+  if (!Number.isFinite(observed) || observed > now || now - observed > MAX_AGE_MS ||
+      !Number.isFinite(validUntil) || validUntil !== observed + MAX_AGE_MS || now > validUntil) {
     throw new Error("SHADOW_PERMISSION_STATE_STALE");
   }
-  return state.personalSiteIds;
+  return { personalSiteIds: sharepoint.personalSiteIds,
+    verdict: { monitorRunId: state.monitorRunId, baselineVersion: state.baselineVersion,
+      baselineChecksum: state.baselineChecksum, runtimeIdentityId: state.runtimeIdentityId,
+      observedAt: state.observedAt, validUntil: state.validUntil, bindings: state.bindings,
+      monitorReleaseSha: state.monitorReleaseSha } };
 }
 
 async function readPermissionState({ accountName, clientId, expected }) {
@@ -37,9 +55,14 @@ async function readPermissionState({ accountName, clientId, expected }) {
   const blob = service.getContainerClient(CONTAINER).getBlobClient(BLOB);
   const download = await blob.download();
   const chunks = [];
-  for await (const chunk of download.readableStreamBody) chunks.push(chunk);
+  let length = 0;
+  for await (const chunk of download.readableStreamBody) {
+    length += chunk.length;
+    if (length > 65536) throw new Error("SHADOW_PERMISSION_STATE_OVERSIZE");
+    chunks.push(chunk);
+  }
   const bytes = Buffer.concat(chunks);
-  if (bytes.length > 8192) throw new Error("SHADOW_PERMISSION_STATE_OVERSIZE");
+  if (bytes.length > 65536) throw new Error("SHADOW_PERMISSION_STATE_OVERSIZE");
   return validatePermissionState(JSON.parse(bytes.toString("utf8")), expected);
 }
 

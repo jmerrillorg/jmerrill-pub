@@ -67,6 +67,7 @@ class BlobBudgetLedger {
         sourceEventId: args.sourceEventId.toLowerCase(),
         policyVersion: args.policyVersion,
         workload: policy.WORKLOAD,
+        ...(args.shadowExecutionId ? { shadowExecutionId: args.shadowExecutionId } : {}),
         claimedAt: new Date(args.now).toISOString(),
       })), {
         conditions: { ifNoneMatch: "*" },
@@ -105,6 +106,11 @@ class BlobBudgetLedger {
     const blob = this.container.getBlockBlobClient(`evidence/${key}.json`);
     const allowed = {
       shadowExecutionId: evidence.shadowExecutionId,
+      permissionVerdict: evidence.permissionVerdict,
+      runtimeIdentityClientId: evidence.runtimeIdentityClientId,
+      azureResourceId: evidence.azureResourceId,
+      riskRegisterId: evidence.riskRegisterId,
+      budgetReservationAt: evidence.budgetReservationAt,
       sourceEventId,
       policyVersion,
       routeId: evidence.routeId,

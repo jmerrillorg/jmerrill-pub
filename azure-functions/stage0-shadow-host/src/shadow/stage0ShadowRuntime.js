@@ -70,14 +70,19 @@ async function processStage0Event(event, route, ports) {
   const selection = authorizeRoute(event, route, ports.identityClientId,
     ports.modelResourceId, ports.modelRegisterId);
   const now = ports.now();
+  if (typeof ports.requireInferenceAuthority !== "function") throw new Error("SHADOW_PERMISSION_GATE_NOT_BOUND");
+  let permissionVerdict = await ports.requireInferenceAuthority();
+  const shadowExecutionId = randomUUID();
   const projectedCents = await ports.projectMaximumCost(event, selection);
   const reservation = await ports.ledger.reserve({
     sourceEventId: event.sourceEventId,
     policyVersion: selection.policyVersion,
     projectedCents,
     now,
+    shadowExecutionId,
   });
-  if (reservation.outcome === "IDEMPOTENT_REPLAY") return { status: "IDEMPOTENT_REPLAY" };
+  if (reservation.outcome === "IDEMPOTENT_REPLAY") return { status: "IDEMPOTENT_REPLAY",
+    shadowExecutionId: reservation.event?.shadowExecutionId || null };
   if (reservation.outcome === "INDETERMINATE_CLAIM") {
     await ports.alert("stage0_shadow_claim_reconciliation_required", { sourceEventId: event.sourceEventId });
     return { status: "INDETERMINATE_CLAIM" };
@@ -88,12 +93,12 @@ async function processStage0Event(event, route, ports) {
     return { status: "BUDGET_DENIED" };
   }
 
-  const shadowExecutionId = randomUUID();
   const start = Date.now();
   let providerUsage = null;
   let input = null;
   try {
     input = await ports.readApprovedInput(event);
+    permissionVerdict = await ports.requireInferenceAuthority();
     const result = await ports.infer(input, selection);
     providerUsage = result.tokenCounts;
     const evaluation = evaluateStructure(event.currentOutcome, result.output);
@@ -120,6 +125,11 @@ async function processStage0Event(event, route, ports) {
     const evaluationFailed = !evaluation.structureValid || !evaluation.independent.pass;
     await ports.ledger.recordEvidence(event.sourceEventId, selection.policyVersion, {
       shadowExecutionId,
+      permissionVerdict,
+      runtimeIdentityClientId: ports.identityClientId,
+      azureResourceId: selection.azureResourceId,
+      riskRegisterId: route.riskRegisterId,
+      budgetReservationAt: reservation.event.recordedAt,
       routeId: selection.routeId,
       deploymentId: selection.deploymentId,
       modelRegisterId: selection.modelRegisterId,
@@ -168,6 +178,11 @@ async function processStage0Event(event, route, ports) {
         const actualCents = ports.actualCostCents(providerUsage);
         await ports.ledger.recordEvidence(event.sourceEventId, selection.policyVersion, {
           shadowExecutionId,
+          permissionVerdict,
+          runtimeIdentityClientId: ports.identityClientId,
+          azureResourceId: selection.azureResourceId,
+          riskRegisterId: route.riskRegisterId,
+          budgetReservationAt: reservation.event.recordedAt,
           routeId: selection.routeId,
           deploymentId: selection.deploymentId,
           modelRegisterId: selection.modelRegisterId,
