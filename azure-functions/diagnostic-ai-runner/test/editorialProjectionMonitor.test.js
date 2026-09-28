@@ -9,13 +9,16 @@ const stageId = "ae3c9d5e-67b5-f111-aaab-000d3a10aa9c";
 const gateId = "4d04daa2-67b5-f111-aaac-000d3a14673b";
 const artifactId = "8ed48c9c-67b5-f111-aaab-000d3a10aa9c";
 
-function fixture(stageStatus = 100000002, folderStage = "07 - Developmental Editing", stageType = 100000001) {
+function fixture(stageStatus = 100000002, folderStage = "07 - Developmental Editing", stageType = 100000001, nested = false) {
   const alerts = [];
   const patches = [];
-  const nodes = { anchor: { id: "anchor", parentReference: { id: "editorial" } },
+  const nodes = { anchor: { id: "anchor", parentReference: { id: nested ? "original" : "editorial" } },
     editorial: { id: "editorial", name: "02_Editorial", parentReference: { id: "folder" } },
+    original: { id: "original", name: "Original", folder: {}, parentReference: { id: "manuscript" } },
+    manuscript: { id: "manuscript", name: "01_Manuscript", folder: {}, parentReference: { id: "folder" } },
     folder: { id: "folder", name: "Fly, Jackuline - Whole", folder: {}, parentReference: { id: "parent" } },
-    parent: { id: "parent", name: folderStage, folder: {} } };
+    parent: { id: "parent", name: folderStage, folder: {}, parentReference: { id: "pipeline" } },
+    pipeline: { id: "pipeline", name: "01_Pipeline_A-Z", folder: {} } };
   const client = { async list(set, query) {
     if (set === "jm1pub_editorialstages") return [{ jm1pub_editorialstageid: stageId,
       _jm1pub_titleid_value: titleId, jm1pub_stagetype: stageType,
@@ -47,6 +50,13 @@ test("healthy delivered review stays quiet", async () => {
   assert.equal(result.status, "HEALTHY");
   assert.equal(result.newAlerts, 0);
   assert.equal(alerts.length, 0);
+});
+
+test("a title already in Stage 07 is healthy when its artifact uses a nested manuscript folder", async () => {
+  const { deps } = fixture(100000002, "07 - Developmental Editing", 100000001, true);
+  const result = await runEditorialProjectionMonitor(deps);
+  assert.equal(result.status, "HEALTHY");
+  assert.equal(result.newAlerts, 0);
 });
 
 test("delivered stage and workspace lag alert once without changing business state", async () => {
