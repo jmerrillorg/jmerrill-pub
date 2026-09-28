@@ -109,6 +109,11 @@ function sentChecksums(row) {
       return [];
     }
   }
+  const cadenceChecksums = description.match(/(?:^|;)\s*checksums=([^;]+)(?:;|$)/i)?.[1];
+  if (row.jm1_actiontype === "PACKAGE_CADENCE_RELEASE_AUTHOR_PACKAGE_SENT" && cadenceChecksums) {
+    return cadenceChecksums.split("|").map((entry) => entry.match(/^[a-zA-Z][a-zA-Z0-9]*:([0-9a-f]{64})$/)?.[1]?.toLowerCase())
+      .filter(Boolean);
+  }
   return [...description.matchAll(/(?:^|;)\s*checksum=([0-9a-f]{64})(?:;|$)/gi)].map((match) => match[1].toLowerCase());
 }
 
@@ -125,8 +130,8 @@ async function resolveEditorialGate(client, queueItem, message, graphMessage) {
   const replyQualification = /\bapproved? with questions\b/i.test(reply) && !/\?/.test(reply)
     ? "QUESTIONS_NOT_SUPPLIED" : null;
   const rows = await client.list("jm1pub_editorialapprovalgates", {
-    $select: "jm1pub_editorialapprovalgateid,_jm1pub_titleid_value,_jm1pub_editorialstageid_value,_jm1pub_deliverableartifactid_value,jm1pub_authordecisionon",
-    $filter: `_jm1pub_titleid_value eq ${titleId} and _jm1pub_editorialstageid_value eq ${stageId} and jm1pub_authordecisionon eq null`,
+    $select: "jm1pub_editorialapprovalgateid,jm1pub_gatestatus,_jm1pub_titleid_value,_jm1pub_editorialstageid_value,_jm1pub_deliverableartifactid_value,jm1pub_authordecision,jm1pub_authordecisionon",
+    $filter: `_jm1pub_titleid_value eq ${titleId} and _jm1pub_editorialstageid_value eq ${stageId} and jm1pub_gatestatus eq 196650002 and jm1pub_authordecision eq null and jm1pub_authordecisionon eq null`,
     $top: "3"
   });
   if (rows.length === 0) return { status: "MISSING", gateId: null, artifactId: null };
@@ -139,7 +144,7 @@ async function resolveEditorialGate(client, queueItem, message, graphMessage) {
   });
   const sentRows = await client.list("jm1_executionlogs", {
     $select: "jm1_executionlogid,jm1_actiontype,jm1_actiondescription,jm1_sourcerecordid,createdon",
-    $filter: `jm1_sourcerecordid eq '${titleId.replace(/'/g, "''")}' and (jm1_actiontype eq 'AUTHOR_COMMUNICATION_INTENT_SENT' or jm1_actiontype eq 'PACKAGE_CADENCE_RELEASE_AUTHOR_PACKAGE_SENT')`,
+    $filter: `(jm1_sourcerecordid eq '${titleId.replace(/'/g, "''")}' or jm1_sourcerecordid eq '${stageId.replace(/'/g, "''")}') and (jm1_actiontype eq 'AUTHOR_COMMUNICATION_INTENT_SENT' or jm1_actiontype eq 'PACKAGE_CADENCE_RELEASE_AUTHOR_PACKAGE_SENT')`,
     $orderby: "createdon desc",
     $top: "100"
   });

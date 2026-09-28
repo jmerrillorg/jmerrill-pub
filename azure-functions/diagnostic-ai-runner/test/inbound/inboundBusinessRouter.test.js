@@ -65,6 +65,40 @@ async function setup(messages) {
 }
 
 describe("Inbound business route", () => {
+  test("Developmental cadence delivery is found by exact stage and checksum without promoting an unproven reply", async () => {
+    const queue = {
+      titleId: "daf8180f-85a3-f111-b8de-000d3a14673b",
+      stageId: "ae3c9d5e-67b5-f111-aaab-000d3a10aa9c"
+    };
+    const gateId = "4d04daa2-67b5-f111-aaac-000d3a14673b";
+    const artifactId = "8ed48c9c-67b5-f111-aaab-000d3a10aa9c";
+    const hash = "a".repeat(64);
+    const queries = [];
+    const client = { async list(set, query) {
+      queries.push({ set, filter: query.$filter });
+      if (set === "jm1pub_editorialapprovalgates") return [{
+        jm1pub_editorialapprovalgateid: gateId, _jm1pub_deliverableartifactid_value: artifactId
+      }];
+      if (set === "jm1pub_editorialartifacts") return [{
+        jm1pub_editorialartifactid: artifactId, jm1pub_sha256: hash,
+        _jm1pub_titleid_value: queue.titleId, _jm1pub_editorialstageid_value: queue.stageId
+      }];
+      return [{
+        jm1_executionlogid: "sent-1", jm1_actiontype: "PACKAGE_CADENCE_RELEASE_AUTHOR_PACKAGE_SENT",
+        jm1_sourcerecordid: queue.stageId, createdon: "2026-09-21T09:02:37Z",
+        jm1_actiondescription: `DELIVERY_STATUS=SENT; gate=${gateId}; checksums=editedManuscript:${hash}|reviewInstructions:${"b".repeat(64)};`
+      }];
+    } };
+    const matched = await resolveEditorialGate(client, queue, { receivedAt: "2026-09-22T18:11:14Z" },
+      { body: { content: "I approve." } });
+    assert.equal(matched.gateId, gateId);
+    assert.equal(matched.artifactChecksum, hash);
+    assert.equal(matched.status, "PROBABLE_DELIVERY_MATCH");
+    assert.match(queries[0].filter, /jm1pub_gatestatus eq 196650002/);
+    assert.match(queries[2].filter, new RegExp(queue.stageId));
+    assert.deepEqual(sentChecksums({ jm1_actiontype: "PACKAGE_CADENCE_RELEASE_AUTHOR_PACKAGE_SENT",
+      jm1_actiondescription: `DELIVERY_STATUS=SENT; checksums=editedManuscript:${hash};` }), [hash]);
+  });
   test("onboarding access help routes without editorial, commercial, or founder gates", async () => {
     const deps = await setup([authorMessage("access-1", "Re: Begin Author Onboarding for Whole",
       "I found the email in junk and need assistance with onboarding.\n\nOn Sep 17, 2026 at 9:15 PM Publisher wrote:\nPayment is complete.")]);

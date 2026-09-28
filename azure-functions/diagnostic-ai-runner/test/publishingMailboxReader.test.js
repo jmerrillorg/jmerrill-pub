@@ -2,6 +2,7 @@
 
 const { describe, test, beforeEach, afterEach } = require("node:test");
 const assert = require("node:assert/strict");
+const { classifyAuthorReviewResponse, DECISION } = require("../src/orchestration/authorReviewResponseConsumer");
 const {
   readPublishingMailboxReply,
   readPublishingMailboxDeliveryEvidence,
@@ -198,6 +199,25 @@ describe("readPublishingMailboxReply — author-response filtering", () => {
       extractAuthorReplyText("I approve!\n\nFrom: J Merrill Publishing <publishing@email.jmerrill.one>\nPlease review."),
       "I approve!"
     );
+    assert.equal(
+      extractAuthorReplyText("Please make changes.\n\n> On September 21, J Merrill Publishing wrote:\n> I approve the manuscript."),
+      "Please make changes."
+    );
+    assert.equal(
+      extractAuthorReplyText("I have a question.\n\n> From: J Merrill Publishing <publishing@email.jmerrill.one>\n> Approved."),
+      "I have a question."
+    );
+  });
+
+  test("quoted approval cannot override a new changes request", async () => {
+    process.env[GATE_NAME] = "true";
+    mockFetchSequence([graphMessagesResponse([message({
+      body: { content: "Please make these changes.\n\n> On September 21, J Merrill Publishing wrote:\n> I approve the manuscript.", contentType: "text" }
+    })])]);
+    const reply = await readPublishingMailboxReply({ subjectContains: SUBJECT, afterIso: AFTER_ISO }, FAKE_TOKEN_DEPS);
+    assert.equal(reply.found, true);
+    assert.equal(reply.bodyText, "Please make these changes.");
+    assert.equal(classifyAuthorReviewResponse(reply.bodyText), DECISION.CHANGES_REQUESTED);
   });
 });
 

@@ -18,6 +18,7 @@ require("./functions/runBlock09FinalCertificationProbe");
 require("./functions/runWholeLifecycleClosureProbe");
 require("./functions/runEditorialPackageHandoffConsumer");
 require("./functions/runEditorialCadenceReleaseConsumer");
+require("./functions/runEditorialProjectionMonitor");
 require("./functions/runEditorialNextStageMaterialization");
 require("./functions/runDevelopmentalEntryMaterialization");
 require("./functions/runAttaTitleDecisionSend");

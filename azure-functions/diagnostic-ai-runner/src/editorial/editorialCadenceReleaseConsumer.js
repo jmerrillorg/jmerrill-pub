@@ -3,6 +3,7 @@
 const {
   createDataverseClient,
   findExecutionLog,
+  graphRequest,
   requireDataverseConfig,
   writeLog
 } = require("./editorialExecutionRuntime");
@@ -16,6 +17,7 @@ const {
   sendCadenceAuthorReviewPackage,
   validateDueSendInput
 } = require("./editorialCadenceAuthorPackageSender");
+const { reconcileDevelopmentalWorkspace } = require("./developmentalWorkspaceReconciliation");
 
 const POLICY_VERSION = "JMP Editorial Cadence Doctrine v1.0";
 const CONSUMER_VERSION = "editorial-cadence-release-consumer:v1.1.0";
@@ -98,7 +100,7 @@ function parsePackage(summary, logDescription) {
 async function getStage(client, stageId) {
   const rows = await client.list("jm1pub_editorialstages", {
     $select:
-      "jm1pub_editorialstageid,jm1pub_name,jm1pub_stagetype,jm1pub_stagestatus,jm1pub_internaloperationalsummary,jm1pub_authorsafesummary,jm1pub_intakereference,jm1pub_publishingintakereference,_jm1pub_titleid_value,_jm1pub_contactid_value,modifiedon,createdon",
+      "jm1pub_editorialstageid,jm1pub_name,jm1pub_stagetype,jm1pub_stagesequence,jm1pub_stagestatus,jm1pub_internaloperationalsummary,jm1pub_authorsafesummary,jm1pub_intakereference,jm1pub_publishingintakereference,_jm1pub_titleid_value,_jm1pub_contactid_value,modifiedon,createdon",
     $filter: `jm1pub_editorialstageid eq ${stageId}`,
     $top: "1"
   });
@@ -182,7 +184,7 @@ async function packageAlreadySent(client, stageId, packageId) {
   const clauses = SENT_ACTION_TYPES.map((actionType) => `jm1_actiontype eq '${actionType}'`).join(" or ");
   const packageClause = packageId ? ` or contains(jm1_actiondescription,'${escapeODataText(packageId)}')` : "";
   const rows = await client.list("jm1_executionlogs", {
-    $select: "jm1_executionlogid,jm1_actiontype,jm1_actiondescription,createdon",
+    $select: "jm1_executionlogid,jm1_actiontype,jm1_actiondescription,jm1_sourcerecordid,createdon",
     $filter: `(${clauses}) and (jm1_sourcerecordid eq '${escapeODataText(stageId)}'${packageClause})`,
     $orderby: "createdon desc",
     $top: "5"
@@ -193,6 +195,50 @@ async function packageAlreadySent(client, stageId, packageId) {
 function gateShowsDelivered(gate) {
   const summary = normalizeString(gate?.jm1pub_authorresponsesummary);
   return Number(gate?.jm1pub_gatestatus || 0) === 196650002 && /OPERATIONALLY_CERTIFIED|package sent|awaiting author response/i.test(summary);
+}
+
+async function reconcileDeliveredReviewStage(client, stage, sent) {
+  const stageId = normalizeString(stage?.jm1pub_editorialstageid);
+  const titleId = normalizeString(stage?._jm1pub_titleid_value);
+  if (Number(stage?.jm1pub_stagestatus) !== 100000001 ||
+      sent?.jm1_actiontype !== "PACKAGE_CADENCE_RELEASE_AUTHOR_PACKAGE_SENT" ||
+      !/DELIVERY_STATUS=SENT(?:;|$)/.test(normalizeString(sent.jm1_actiondescription))) return { status: "NOT_REQUIRED" };
+  const gateId = normalizeString(sent.jm1_actiondescription).match(/(?:^|[; ])gate=([a-f0-9-]{36})(?:;| |$)/i)?.[1];
+  if (!gateId || normalizeString(sent.jm1_sourcerecordid) !== stageId || !titleId) {
+    return { status: "HELD", reason: "DELIVERY_STAGE_GATE_BINDING_UNPROVEN" };
+  }
+  const gate = (await client.list("jm1pub_editorialapprovalgates", {
+    $select: "jm1pub_editorialapprovalgateid,jm1pub_gatestatus,jm1pub_authordecision,jm1pub_authordecisionon,_jm1pub_titleid_value,_jm1pub_editorialstageid_value",
+    $filter: `jm1pub_editorialapprovalgateid eq ${gateId}`, $top: "1"
+  }))[0];
+  if (normalizeString(gate?.jm1pub_editorialapprovalgateid) !== gateId ||
+      normalizeString(gate?._jm1pub_titleid_value) !== titleId ||
+      normalizeString(gate?._jm1pub_editorialstageid_value) !== stageId ||
+      Number(gate?.jm1pub_gatestatus) !== 196650002 || gate?.jm1pub_authordecision || gate?.jm1pub_authordecisionon) {
+    return { status: "HELD", reason: "DELIVERED_REVIEW_GATE_NOT_CURRENT" };
+  }
+  if (!Number.isInteger(Number(stage.jm1pub_stagesequence)) || Number(stage.jm1pub_stagesequence) < 1) {
+    return { status: "HELD", reason: "EDITORIAL_STAGE_SEQUENCE_UNPROVEN" };
+  }
+  const laterStages = await client.list("jm1pub_editorialstages", {
+    $select: "jm1pub_editorialstageid,jm1pub_stagesequence",
+    $filter: `_jm1pub_titleid_value eq ${titleId} and jm1pub_stagesequence gt ${Number(stage.jm1pub_stagesequence)}`,
+    $top: "1"
+  });
+  if (laterStages.length) {
+    return { status: "HELD", reason: "LATER_EDITORIAL_STAGE_REQUIRES_REVIEW" };
+  }
+  const idempotencyKey = `delivered-review-stage:${stageId}:${gateId}:${sent.jm1_executionlogid}`;
+  await client.patch("jm1pub_editorialstages", stageId, { jm1pub_stagestatus: 100000002 });
+  const existing = await findExecutionLog(client, "EDITORIAL_DELIVERED_REVIEW_STAGE_RECONCILED", idempotencyKey);
+  const logId = existing?.jm1_executionlogid || await writeLog(client, {
+    name: `EDITORIAL_DELIVERED_REVIEW_STAGE_RECONCILED - ${stageId}`,
+    actionType: "EDITORIAL_DELIVERED_REVIEW_STAGE_RECONCILED",
+    description: `titleId=${titleId}; engagementId=NONE_LEGACY_TITLE_AUTHORITY; stageId=${stageId}; priorProjectedStage=IN_PROGRESS; authoritativeEventSet=${sent.jm1_executionlogid},${gateId}; reconciledStage=DEVELOPMENTAL_AUTHOR_REVIEW; reason=DELIVERED_PENDING_REVIEW; reconciliationId=${idempotencyKey}; result=PASS; timestamp=${new Date().toISOString()}; releaseSha=${process.env.JM1_RELEASE_SHA || "UNAVAILABLE"}; authorCommunications=0.`,
+    sourceEntity: "jm1pub_editorialstage",
+    sourceRecordId: stageId
+  });
+  return { status: "RECONCILED", gateId, logId };
 }
 
 function cadenceLogIsAuthorReleaseEligible(cadenceLog) {
@@ -486,6 +532,7 @@ async function recordCadenceSent(client, stage, title, gate, packageInfo, schedu
       jm1pub_authordecisionsource: `cadence-send:${idempotencyKey}`.slice(0, 100)
     }),
     client.patch("jm1pub_editorialstages", stage.jm1pub_editorialstageid, {
+      jm1pub_stagestatus: 100000002,
       jm1pub_internaloperationalsummary: description,
       jm1pub_authorsafesummary: "Your review package has been sent through the governed Publishing mailbox. Please review it and reply when ready."
     })
@@ -544,12 +591,25 @@ async function processCadenceLog(client, cadenceLog, now, correlationId, deps = 
   const packageInfo = parsePackage(stage.jm1pub_internaloperationalsummary, completionLog?.jm1_actiondescription || cadenceLog.jm1_actiondescription);
   const sent = await packageAlreadySent(client, stageId, packageInfo.packageId);
   if (sent || gateShowsDelivered(gate)) {
+    const stageReconciliation = await reconcileDeliveredReviewStage(client, stage, sent);
+    let workspaceReconciliation = { status: "NOT_APPLICABLE" };
+    if (sent?.jm1_actiontype === "PACKAGE_CADENCE_RELEASE_AUTHOR_PACKAGE_SENT" &&
+        stageReconciliation.status !== "HELD" && Number(stage.jm1pub_stagetype) === 100000001) {
+      try {
+        workspaceReconciliation = await reconcileDevelopmentalWorkspace({ client, graph: deps.graph || graphRequest,
+          writeLog, stage, sent }, deps);
+      } catch (error) {
+        workspaceReconciliation = { status: "HELD", reason: error?.safeCode || "WORKSPACE_RECONCILIATION_FAILED" };
+      }
+    }
     return {
       status: "ALREADY_RELEASED",
       stageId,
       title: title?.jm1pub_titlename || title?.jm1pub_name || "",
       packageId: packageInfo.packageId,
-      sentActionType: sent?.jm1_actiontype || "GATE_AWAITING_AUTHOR_RESPONSE"
+      sentActionType: sent?.jm1_actiontype || "GATE_AWAITING_AUTHOR_RESPONSE",
+      stageReconciliation,
+      workspaceReconciliation
     };
   }
 
@@ -675,6 +735,7 @@ async function runEditorialCadenceReleaseConsumer(options = {}, deps = {}) {
 }
 
 module.exports = {
+  reconcileDeliveredReviewStage,
   CONSUMER_VERSION,
   POLICY_VERSION,
   STAGE_BASELINE_BUSINESS_DAYS,
