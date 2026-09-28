@@ -17,14 +17,23 @@ function exactDelivery(logs, stageId, gateId) {
 async function inspectWorkspace(graph, driveId, itemId) {
   if (!driveId || !itemId) return { status: "UNPROVEN" };
   const get = (id) => graph(`drives/${encodeURIComponent(driveId)}/items/${encodeURIComponent(id)}?$select=id,name,folder,parentReference`);
-  const anchor = await get(itemId);
-  const editorial = await get(anchor?.parentReference?.id);
-  const title = await get(editorial?.parentReference?.id);
-  const stage = await get(title?.parentReference?.id);
-  if (clean(anchor?.id) !== itemId || clean(editorial?.name) !== "02_Editorial" || !title?.folder || !stage?.folder) {
-    return { status: "UNPROVEN" };
+  let item = await get(itemId);
+  if (clean(item?.id) !== itemId) return { status: "UNPROVEN" };
+  let child = null;
+  for (let depth = 0; depth < 6 && item; depth += 1) {
+    if (item.folder && ["06 - Onboarding", "07 - Developmental Editing"].includes(clean(item.name))) {
+      const pipeline = item.parentReference?.id ? await get(item.parentReference.id) : null;
+      if (clean(pipeline?.name) !== "01_Pipeline_A-Z" || !pipeline?.folder || !child?.folder) {
+        return { status: "UNPROVEN" };
+      }
+      return { status: "PROVEN", stage: clean(item.name), folderId: clean(child.id) };
+    }
+    const parentId = clean(item.parentReference?.id);
+    if (!parentId) break;
+    child = item;
+    item = await get(parentId);
   }
-  return { status: "PROVEN", stage: clean(stage.name), folderId: clean(title.id) };
+  return { status: "UNPROVEN" };
 }
 
 async function runEditorialProjectionMonitor(deps = {}) {
