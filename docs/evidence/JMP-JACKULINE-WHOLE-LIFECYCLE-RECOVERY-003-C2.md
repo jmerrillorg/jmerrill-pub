@@ -199,3 +199,68 @@ PACKET: JMP-JACKULINE-WHOLE-LIFECYCLE-RECOVERY-003-C2
 ORIGIN_THREAD: JM1 Repo Level Set
 EXECUTION_THREAD: PUB — Review repo and suggest next steps
 RETURN_THREAD: JM1 Repo Level Set
+
+## SEPTEMBER 28 PRODUCTION READBACK (LATER ADDENDUM)
+
+This section supersedes only the earlier *status* statements, not the historical
+observations. No C3 packet was opened.
+
+- PR 892 merged as `77b1798325fbfecc5c392d4e7be3fd9f97f4ca6a` and deployed
+  the exact delivered-gate read model, guarded stage/workspace reconciliation,
+  and hourly monitor. PR 894 merged as
+  `1f382f826fe99ecf69069cf332466459f72ce0c8` and corrected the
+  monitor's read-only nested-artifact ancestry check. The production Function
+  health readback matched the latter release.
+- The normal production timer reconciled Whole's same Stage 07 record
+  `ae3c9d5e-67b5-f111-aaab-000d3a10aa9c` to Plan Delivered. Stage audit
+  `52b4124b-e0ba-f111-aaaf-000d3a9eacee` was created at
+  2026-09-28T02:00:02Z. It moved the original Whole folder ID
+  `01DF3SEQMAUJPNMVSYYNAJHWCYEFSEVLLO` into Stage 07 without copying it.
+  Workspace audit `f0d9e350-e0ba-f111-aaaf-000d3a10aa9c` followed at
+  02:00:06Z and updated four artifact paths. The original gate
+  `4d04daa2-67b5-f111-aaac-000d3a14673b` remains pending, decision null.
+- The same monitor reconciled two other exact delivered-stage lags. Four
+  system-actionable findings were repaired in total, including Whole's folder.
+  Its 02:15 UTC scan examined 38 stages and 10 pending gates and emitted one
+  deduplicated, zero-effect ambiguous exception for Before You Were Born:
+  `3c55bb69-e2ba-f111-aaaf-6045bdd69738`, reason
+  `PENDING_GATE_HAS_AUTHOR_DECISION`. That title alone remains held for exact
+  evidence review; the rest of Publishing is not frozen.
+- PR 895 (`b55b38f0a8127ae7493bd1e0bad3d171a3b6d34a`) made an exact
+  delivered pending author gate count as active portfolio work. PR 896
+  (`be8c73b235e1e32bad9fe7ea08c15fcaa4e3949d`) included the full active
+  workload in title-board construction. Both deployed but revealed a further
+  source collision: the September 1 frozen W1-308 snapshot mapped the *same*
+  title ID to `WHOLENESS - BECOMING`, Post-Publication, and
+  `CANONICAL_PUBLISHED_TITLE`, despite the current Whole title, draft asset,
+  delivered Developmental gate, and Stage 07 workspace.
+- PR 897 (`8724255275e949338bb8404f2bb44a497321ecba`) deployed the exact
+  gate/title/stage/artifact/checksum/version delivery binding into the live
+  workload. Only a title with that stronger evidence displaces its frozen
+  projection. Production web health returned that SHA. An authenticated
+  Pipeline readback at 2026-09-28T02:38Z showed **Whole / Jackuline Fly in
+  Stage 07 Developmental Editing**, waiting on Author, next action "Await
+  author response." The title still shows a generic blocked attention badge
+  because an author decision is outstanding; this is not a JMP service hold.
+- The production title's September 1 `jm1_canonicalstatus` remains
+  `CANONICAL_PUBLISHED_TITLE`. It was not overwritten without a separate
+  source-authority reconciliation. The current title has one draft asset and
+  no ISBN in the bounded Dataverse read. The live projection is now driven by
+  the newer exact delivery chain, while the stale legacy classification is
+  recorded here as a remaining metadata conflict.
+- PR 898 (`384187640fdb87def4384932c0e94752f6863734`) merged a
+  fail-closed inbound worker check for cadence-delivered author replies:
+  exact gate, title, stage, artifact checksum, and delivery timestamp must
+  match before a decision can be persisted. Synthetic valid, stale-time,
+  checksum-mismatch, cross-title, and duplicate-delivery cases passed. The
+  existing quote-stripping tests passed. The production Function deployment
+  run `36371070847` validated and packaged successfully but was **waiting on
+  the protected `jmerrill-pub-production` environment approval** at this
+  readback. This source change is not yet claimed as deployed.
+
+Current bounded classification: client service and live Whole Stage 07
+projection are production-proven; the Function reply-binding deployment and
+its post-deploy health readback remain open. No C2 author communication,
+payment effect, duplicate workspace, or author decision was created. Phase 7
+remains held. Do not mark C2 commissioned until the protected deployment and
+final readback pass.
