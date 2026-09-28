@@ -83,11 +83,13 @@ export function classifyTitlePortfolio({
   title,
   assets,
   stages,
+  approvalGates = [],
   productionProjects = [],
 }: {
   title: DataverseRow
   assets: DataverseRow[]
   stages: DataverseRow[]
+  approvalGates?: DataverseRow[]
   productionProjects?: DataverseRow[]
 }): CatalogPortfolioClassification {
   const titleStage = formatted(title, 'jm1pub_stage')
@@ -103,7 +105,8 @@ export function classifyTitlePortfolio({
   const normalizedPublicationStatus = normalizeWorkspaceText(publicationStatus)
   const normalizedCatalog = normalizeWorkspaceText(publicCatalogStatus)
   const relatedStages = stages.filter((stage) => belongsToTitle(stage, title, assets))
-  const activeStage = relatedStages.find((stage) => isActiveEditorialStage(stage))
+  const titleId = dataverseLookupId(title, 'jm1pub_titleid')
+  const activeStage = relatedStages.find((stage) => isActiveEditorialStage(stage, approvalGates, titleId))
   const activeProductionProject = productionProjects.find((project) => belongsToProductionTitle(project, title))
   const assetsWithIsbn = assets.filter((asset) => stringValue(asset.jm1pub_isbn13))
   const distributionStatuses = unique(
@@ -421,11 +424,19 @@ function belongsToProductionTitle(project: DataverseRow, title: DataverseRow) {
   return !status.includes('complete') && !status.includes('cancel') && !name.includes('synthetic')
 }
 
-function isActiveEditorialStage(stage: DataverseRow) {
+function isActiveEditorialStage(stage: DataverseRow, approvalGates: DataverseRow[], titleId: string) {
   const type = normalizeWorkspaceText(formatted(stage, 'jm1pub_stagetype') || stringValue(stage.jm1pub_name))
   const status = normalizeWorkspaceText(formatted(stage, 'jm1pub_stagestatus'))
   if (!type || type.includes('archive')) return false
   if (ACTIVE_STAGE_STATUSES.has(status)) return true
+  if (status === 'plan delivered') {
+    const stageId = dataverseLookupId(stage, 'jm1pub_editorialstageid')
+    return Boolean(titleId && stageId && approvalGates.some((gate) =>
+      dataverseLookupId(gate, '_jm1pub_titleid_value') === titleId &&
+      dataverseLookupId(gate, '_jm1pub_editorialstageid_value') === stageId &&
+      Number(gate.jm1pub_gatestatus) === 196650002 &&
+      !gate.jm1pub_authordecision && !gate.jm1pub_authordecisionon))
+  }
   if (COMPLETED_STAGE_STATUSES.has(status)) {
     const summary = normalizeWorkspaceText(stringValue(stage.jm1pub_authorsafesummary))
     return summary.includes('author review') || summary.includes('ready for your review')

@@ -955,7 +955,7 @@ export async function buildPublisherOperatingCenterSnapshot(): Promise<Publisher
       ),
     )
     .slice(0, 2)
-  const portfolio = buildPortfolioItems(titles, assets, editorialStages, productionProjects)
+  const portfolio = buildPortfolioItems(titles, assets, editorialStages, approvalGates, productionProjects)
   const deliveryLogs = await getDeliveredReviewLogs(config, approvalGates)
   const workload = buildWorkloadItems(titles, assets, editorialStages, intakes, [...logs, ...deliveryLogs], portfolio, approvalGates)
   const productionCommand = buildProductionCommand(workload, portfolio, productionProjects, productionTasks)
@@ -2007,6 +2007,7 @@ function buildPortfolioItems(
   titles: DataverseRow[],
   assets: DataverseRow[],
   editorialStages: DataverseRow[],
+  approvalGates: DataverseRow[],
   productionProjects: DataverseRow[] = [],
 ): PublisherPortfolioItem[] {
   return titles
@@ -2017,6 +2018,7 @@ function buildPortfolioItems(
         title,
         assets: titleAssets,
         stages: editorialStages,
+        approvalGates,
         productionProjects,
       })
       const titleName = stringValue(title.jm1pub_titlename || title.jm1pub_name) || '(Untitled)'
