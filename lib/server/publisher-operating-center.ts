@@ -3270,6 +3270,7 @@ function buildTitleOperatingView(input: {
   const certifiedProjectionItems = loadCertifiedTitleProjectionItems()
   const allTodayItems = [
     ...certifiedProjectionItems,
+    ...input.workload.map(workloadToTodayItem),
     ...input.today.waitingForJackie,
     ...input.today.waitingForAuthors,
     ...input.today.activeEditorial,
