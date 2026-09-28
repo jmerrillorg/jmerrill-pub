@@ -264,3 +264,60 @@ its post-deploy health readback remain open. No C2 author communication,
 payment effect, duplicate workspace, or author decision was created. Phase 7
 remains held. Do not mark C2 commissioned until the protected deployment and
 final readback pass.
+
+## SEPTEMBER 28 COMMISSIONING READBACK (FINAL ADDENDUM)
+
+The previous section records the state before protected-environment approval.
+Jackie then expressly approved only production run `36371070847`. The run's
+packaged source was PR 898 merge `384187640fdb87def4384932c0e94752f6863734`,
+which changes the inbound author-review reply-binding consumer and its tests.
+The target was `jmerrill-pub-production`; package validation and deployment
+both completed successfully. The production Function `/api/health` independently
+returned `status=ready` and `release=productionRelease=384187640fdb87def4384932c0e94752f6863734`.
+
+The deployed Function registers `run-author-review-response-consumer` as a
+five-minute timer. Neither its disable setting nor the capture-disable setting
+is present in the production Function configuration. This is the durable
+runtime owner for the next author reply, not a Cody heartbeat or direct send.
+No live author reply was manufactured for certification.
+
+Fresh read-only production Dataverse evidence still shows original gate
+`4d04daa2-67b5-f111-aaac-000d3a14673b` pending with no author decision,
+bound to title `daf8180f-85a3-f111-b8de-000d3a14673b`, Stage 07 record
+`ae3c9d5e-67b5-f111-aaab-000d3a10aa9c`, and manuscript artifact
+`8ed48c9c-67b5-f111-aaab-000d3a10aa9c`. The artifact's title and stage
+match, and its SHA-256 remains
+`0fe4d9d65a6eae859a4d8dcd9688dae7d61d89105938078b14a7de2430aaeecd`.
+The same stage's current cadence-send query returned exactly one sent event,
+`ab13762b-9bb5-f111-aaac-6045bdd69435`, created
+`2026-09-21T09:02:38Z`; it contains the exact gate and artifact checksum.
+The deployed consumer requires the received reply timestamp to be no earlier
+than that event. It holds checksum, cross-title, or duplicate-delivery
+mismatches before decision persistence. The focused non-client suite passed
+79 tests, including quoted-prior-approval denial and cadence-binding negatives.
+This is a deployed-code plus live-authority readback, not a claim that Jackuline
+has replied or that a production reply effect was exercised.
+
+The September 1 `CANONICAL_PUBLISHED_TITLE` metadata conflict is **A: safely
+quarantined from the current lifecycle projection**. PR 897's deployed
+projector suppresses a frozen projection for a title only when newer, exact
+gate/title/stage/artifact/checksum/version delivery evidence backs its active
+workload. The authenticated live Pipeline readback showed Whole in Stage 07
+waiting on Jackuline. The legacy field remains unchanged for a separate
+source-authority review; it cannot regress the current projection. The isolated
+Before You Were Born `PENDING_GATE_HAS_AUTHOR_DECISION` alert does not block
+Whole or Publishing globally.
+
+For C2's lifecycle/projection scope, the protected deployment gate is closed:
+the original workspace is in Stage 07, the exact author-review gate is still
+pending, the monitoring and reply consumer are system-owned, and no
+Whole-related technical projection blocker remains. Historical onboarding
+reconstruction under issue 880 and the legacy metadata conflict are separate
+work; neither authorizes a new Whole client gate. C2 performed no new author
+communication, stage advancement beyond Stage 07, payment effect, manuscript
+regeneration, or Phase 7 activation.
+
+**C2 lifecycle/projection wave status: COMMISSIONED.** This classification
+does not certify the separate historical commercial/onboarding reconstruction
+or an actual future author reply, neither of which is required to keep Whole
+correctly waiting at its current Developmental author-review gate.
