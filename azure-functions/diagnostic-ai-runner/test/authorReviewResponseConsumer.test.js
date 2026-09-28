@@ -20,7 +20,8 @@ const {
   stablePackageSelectionIdempotencyKey,
   validateAuthorIdentity,
   resolveGateAuthorIdentity,
-  validateReplyCorrelation
+  validateReplyCorrelation,
+  verifyCadenceDeliveryBinding
 } = require("../src/orchestration/authorReviewResponseConsumer");
 
 const gateId = "be079017-0983-f111-ab0f-000d3a14673b";
@@ -977,6 +978,36 @@ test("message id exact match is accepted before weaker evidence", () => {
   const result = validateReplyCorrelation(createGate(), createReply(), "Proofreading Review Package");
   assert.equal(result.ok, true);
   assert.equal(result.mode, "MESSAGE_THREAD_EXACT");
+});
+
+test("cadence reply binds to one delivered artifact and refuses stale or mismatched evidence", async () => {
+  const title = "daf8180f-85a3-f111-b8de-000d3a14673b";
+  const stage = "ae3c9d5e-67b5-f111-aaab-000d3a10aa9c";
+  const gate = "4d04daa2-67b5-f111-aaac-000d3a14673b";
+  const artifact = "8ed48c9c-67b5-f111-aaab-000d3a10aa9c";
+  const checksum = "a".repeat(64);
+  const gateRow = { jm1pub_editorialapprovalgateid: gate, _jm1pub_titleid_value: title,
+    _jm1pub_editorialstageid_value: stage, _jm1pub_deliverableartifactid_value: artifact };
+  const row = { jm1_executionlogid: "send-1", jm1_actiontype: "PACKAGE_CADENCE_RELEASE_AUTHOR_PACKAGE_SENT",
+    jm1_sourcerecordid: stage, createdon: "2026-09-21T09:02:38Z",
+    jm1_actiondescription: `DELIVERY_STATUS=SENT; gate=${gate}; checksums=editedManuscript:${checksum};` };
+  const artifactRow = { jm1pub_editorialartifactid: artifact, jm1pub_sha256: checksum,
+    _jm1pub_titleid_value: title, _jm1pub_editorialstageid_value: stage };
+  const client = { list: async () => [row], first: async () => artifactRow };
+  const reply = { receivedDateTime: "2026-09-22T18:11:14Z" };
+  assert.deepEqual(await verifyCadenceDeliveryBinding(client, gateRow, reply), {
+    status: "EXACT", deliveryEventId: "send-1", artifactId: artifact, checksum
+  });
+  assert.equal((await verifyCadenceDeliveryBinding(client, gateRow,
+    { receivedDateTime: "2026-09-20T18:11:14Z" })).status, "HELD_DELIVERY_BINDING");
+  artifactRow.jm1pub_sha256 = "b".repeat(64);
+  assert.equal((await verifyCadenceDeliveryBinding(client, gateRow, reply)).status, "HELD_DELIVERY_BINDING");
+  artifactRow.jm1pub_sha256 = checksum;
+  artifactRow._jm1pub_titleid_value = "wrong-title";
+  assert.equal((await verifyCadenceDeliveryBinding(client, gateRow, reply)).status, "HELD_ARTIFACT_BINDING");
+  artifactRow._jm1pub_titleid_value = title;
+  client.list = async () => [row, { ...row, jm1_executionlogid: "send-2" }];
+  assert.equal((await verifyCadenceDeliveryBinding(client, gateRow, reply)).status, "HELD_DELIVERY_BINDING");
 });
 
 test("duplicate execution event blocks a duplicate response", async () => {
