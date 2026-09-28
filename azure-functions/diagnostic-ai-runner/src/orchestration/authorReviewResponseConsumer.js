@@ -420,6 +420,47 @@ function validateReplyCorrelation(gate, reply, subjectContains) {
   return { ok: false, reason: "UNMATCHED_REPLY_REVIEW_REQUIRED" };
 }
 
+async function verifyCadenceDeliveryBinding(client, gate, reply) {
+  const gateId = normalizeString(gate.jm1pub_editorialapprovalgateid);
+  const titleId = normalizeString(gate._jm1pub_titleid_value);
+  const stageId = normalizeString(gate._jm1pub_editorialstageid_value);
+  const artifactId = normalizeString(gate._jm1pub_deliverableartifactid_value);
+  if (![gateId, titleId, stageId, artifactId].every((value) => /^[a-f0-9-]{36}$/i.test(value))) {
+    return { status: "NOT_APPLICABLE" };
+  }
+  const logs = await client.list("jm1_executionlogs", {
+    $select: "jm1_executionlogid,jm1_actiontype,jm1_actiondescription,jm1_sourcerecordid,createdon",
+    $filter: `jm1_actiontype eq 'PACKAGE_CADENCE_RELEASE_AUTHOR_PACKAGE_SENT' and jm1_sourcerecordid eq '${stageId}'`,
+    $orderby: "createdon desc", $top: "100"
+  });
+  if (!logs.length) return { status: "NOT_APPLICABLE" };
+  const artifact = await client.first("jm1pub_editorialartifacts", {
+    $select: "jm1pub_editorialartifactid,jm1pub_sha256,_jm1pub_titleid_value,_jm1pub_editorialstageid_value",
+    $filter: `jm1pub_editorialartifactid eq ${artifactId}`
+  });
+  const checksum = normalizeString(artifact?.jm1pub_sha256).toLowerCase();
+  if (normalizeString(artifact?.jm1pub_editorialartifactid).toLowerCase() !== artifactId.toLowerCase() ||
+      normalizeString(artifact?._jm1pub_titleid_value).toLowerCase() !== titleId.toLowerCase() ||
+      normalizeString(artifact?._jm1pub_editorialstageid_value).toLowerCase() !== stageId.toLowerCase() ||
+      !/^[a-f0-9]{64}$/.test(checksum)) return { status: "HELD_ARTIFACT_BINDING" };
+  const receivedAt = Date.parse(normalizeString(reply.receivedDateTime));
+  const matching = logs.filter((log) =>
+    normalizeString(log.jm1_sourcerecordid).toLowerCase() === stageId.toLowerCase() &&
+    new RegExp(`(?:^|[; ])gate=${gateId}(?:;| |$)`, "i").test(normalizeString(log.jm1_actiondescription)) &&
+    Number.isFinite(receivedAt) && Date.parse(normalizeString(log.createdon)) <= receivedAt &&
+    cadenceDeliveryChecksums(log.jm1_actiondescription).includes(checksum)
+  );
+  if (matching.length !== 1) return { status: "HELD_DELIVERY_BINDING" };
+  return { status: "EXACT", deliveryEventId: matching[0].jm1_executionlogid, artifactId, checksum };
+}
+
+function cadenceDeliveryChecksums(description) {
+  const text = normalizeString(description);
+  if (!/DELIVERY_STATUS=SENT(?:;|$)/.test(text)) return [];
+  const field = text.match(/(?:^|;)\s*checksums=([^;]+)(?:;|$)/i)?.[1];
+  return field ? field.split("|").map((entry) => entry.match(/^[a-zA-Z][a-zA-Z0-9]*:([0-9a-f]{64})$/)?.[1]?.toLowerCase()).filter(Boolean) : [];
+}
+
 function isManualRecoveryGate(gate) {
   return Boolean(
     gate.manualRecovery === true ||
@@ -1197,6 +1238,8 @@ async function processGateReply(client, gate, deps, triggerSource) {
   if (!identity.ok) return { gateId, outcome: "HELD_IDENTITY_VALIDATION", detail: identity.reason, processingState: RESPONSE_STATES.BLOCKED };
   const correlation = validateReplyCorrelation(gate, reply, subjectContains);
   if (!correlation.ok) return { gateId, outcome: "HELD_CORRELATION_VALIDATION", detail: correlation.reason, processingState: RESPONSE_STATES.BLOCKED };
+  const delivery = await (deps.verifyCadenceDeliveryBinding || verifyCadenceDeliveryBinding)(client, gate, reply);
+  if (delivery.status.startsWith("HELD_")) return { gateId, outcome: "HELD_DELIVERY_VALIDATION", detail: delivery.status, processingState: RESPONSE_STATES.BLOCKED };
 
   const inboundMessageId = durableInboundMessageId(reply);
   const idempotencyKey = stableIdempotencyKey(gateId, inboundMessageId);
@@ -1235,7 +1278,7 @@ async function processGateReply(client, gate, deps, triggerSource) {
     gateId,
     inboundMessageId,
     idempotencyKey,
-    description: `Inbound response correlated with CORRELATED_HIGH_CONFIDENCE; subjectProbe="${subjectContains}".`
+    description: `Inbound response correlated with CORRELATED_HIGH_CONFIDENCE; subjectProbe="${subjectContains}"; cadenceDelivery=${delivery.deliveryEventId || "NOT_APPLICABLE"}.`
   });
   const decisionResolution = resolveAuthorReviewDecision(gate, reply);
   const classification = decisionResolution.classification;
@@ -1437,6 +1480,7 @@ module.exports = {
   validateAuthorIdentity,
   resolveGateAuthorIdentity,
   validateReplyCorrelation,
+  verifyCadenceDeliveryBinding,
   findOpenAuthorReviewGates,
   findOpenPackageSelectionDiagnostics,
   findOpenPaymentElectionActionRequests,
