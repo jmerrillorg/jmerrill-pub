@@ -55,6 +55,38 @@ test('W1-301 governed current-authority projection remains commercial activation
   assert.equal(projection.systemAttention.code, 'NONE')
 })
 
+test('live Whole editorial review is not projected as its frozen published snapshot', () => {
+  const projection = projectCanonicalPublisherLifecycle({
+    author: 'Jackuline Fly',
+    bookTitle: 'Whole',
+    titleId: 'daf8180f-85a3-f111-b8de-000d3a14673b',
+    legacySourceState: 'Developmental Editing - Author Review Author Review Editorial',
+    pipelineStage: 'Editorial',
+    editorialStage: 'Developmental Editing - Author Review',
+    substage: 'Author Review',
+    owner: 'Author',
+    awaiting: 'Author',
+    executionState: 'WAITING_FOR_EXTERNAL_PARTY',
+    packageState: 'Released to author',
+    evidenceLinks: [{
+      label: 'Delivered developmental manuscript',
+      href: '8ed48c9c-67b5-f111-aaab-000d3a10aa9c',
+      artifactId: '8ed48c9c-67b5-f111-aaab-000d3a10aa9c',
+      titleId: 'daf8180f-85a3-f111-b8de-000d3a14673b',
+      checksum: 'a'.repeat(64),
+      artifactType: 'DEVELOPMENTAL_EDIT',
+      version: 'v1.0',
+      current: true,
+    }],
+    canonicalAuthorityClassification: 'CANONICAL_PUBLISHED_TITLE',
+    canonicalTitleReference: 'daf8180f-85a3-f111-b8de-000d3a14673b',
+    canonicalAuthorContactReference: 'contact:106a78d0-fb9a-f111-b8dc-6045bdd69738',
+    sourceAuthority: 'PUBLISHING_OPERATING_CENTER_WAVE1_2026_09_01:W1-308',
+  })
+  assert.equal(projection.titleLifecycleStage.code, 'EDITORIAL_PRODUCTION')
+  assert.equal(projection.titleLifecycleSubstage.code, 'DEVELOPMENTAL_EDITING')
+})
+
 test('title card construction selects governed projection before stage and waiting fields are assigned', () => {
   assert.match(server, /const selected = selectGovernedProjectionPrimaryItem\(items, authorResponses\)/)
   assert.match(server, /const primary = selected\.item/)

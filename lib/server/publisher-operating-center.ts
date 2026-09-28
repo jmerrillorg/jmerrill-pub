@@ -265,6 +265,7 @@ export type PublisherWorkloadItem = {
     message: string
   }
   latestExecutionEvidence: string
+  evidenceLinks?: PublisherTodayItem['evidenceLinks']
   canonicalAuthorityClassification?: string
   canonicalTitleReference?: string
   canonicalAuthorContactReference?: string
@@ -335,6 +336,8 @@ export type PublisherTodayItem = {
   evidenceLinks: Array<{
     label: string
     href: string
+    artifactId?: string
+    titleId?: string
     checksum?: string
     artifactType?: string
     version?: string
@@ -957,7 +960,8 @@ export async function buildPublisherOperatingCenterSnapshot(): Promise<Publisher
     .slice(0, 2)
   const portfolio = buildPortfolioItems(titles, assets, editorialStages, approvalGates, productionProjects)
   const deliveryLogs = await getDeliveredReviewLogs(config, approvalGates)
-  const workload = buildWorkloadItems(titles, assets, editorialStages, intakes, [...logs, ...deliveryLogs], portfolio, approvalGates)
+  const deliveredReviewArtifacts = await getDeliveredReviewArtifacts(config, approvalGates, deliveryLogs)
+  const workload = buildWorkloadItems(titles, assets, editorialStages, intakes, [...logs, ...deliveryLogs], portfolio, approvalGates, deliveredReviewArtifacts)
   const productionCommand = buildProductionCommand(workload, portfolio, productionProjects, productionTasks)
   const authorResponses = buildAuthorResponseQueue(approvalGates, titles, logs)
   const metrics = buildMetrics(queue, logs, workload, portfolio)
@@ -1637,6 +1641,80 @@ async function getDeliveredReviewLogs(config: DataverseServerConfig, gates: Data
   })
 }
 
+async function getDeliveredReviewArtifacts(
+  config: DataverseServerConfig,
+  gates: DataverseRow[],
+  deliveryLogs: DataverseRow[],
+): Promise<Map<string, PublisherTodayItem['evidenceLinks'][number]>> {
+  const pending = gates.filter((gate) =>
+    Number(gate.jm1pub_gatestatus) === 196650002 &&
+    !gate.jm1pub_authordecision && !gate.jm1pub_authordecisionon &&
+    dataverseLookupId(gate, '_jm1pub_titleid_value') &&
+    dataverseLookupId(gate, '_jm1pub_editorialstageid_value') &&
+    dataverseLookupId(gate, '_jm1pub_deliverableartifactid_value'),
+  )
+  const artifactIds = [...new Set(pending.map((gate) => dataverseLookupId(gate, '_jm1pub_deliverableartifactid_value')))]
+  if (!artifactIds.length) return new Map()
+  const artifacts = await dataverseList(config, 'jm1pub_editorialartifacts', {
+    $select: 'jm1pub_editorialartifactid,jm1pub_editorialartifactname,jm1pub_filename,jm1pub_versionlabel,jm1pub_sha256,jm1pub_supersededon,_jm1pub_titleid_value,_jm1pub_editorialstageid_value',
+    $filter: artifactIds.map((id) => `jm1pub_editorialartifactid eq ${id}`).join(' or '),
+    $top: String(artifactIds.length),
+  })
+  const byStage = new Map<string, PublisherTodayItem['evidenceLinks'][number]>()
+  const ambiguousStages = new Set<string>()
+  for (const gate of pending) {
+    const titleId = dataverseLookupId(gate, '_jm1pub_titleid_value')
+    const stageId = dataverseLookupId(gate, '_jm1pub_editorialstageid_value')
+    const artifactId = dataverseLookupId(gate, '_jm1pub_deliverableartifactid_value')
+    const artifact = artifacts.find((row) =>
+      sameProjectionTitle(stringValue(row.jm1pub_editorialartifactid), artifactId) &&
+      sameProjectionTitle(dataverseLookupId(row, '_jm1pub_titleid_value'), titleId) &&
+      sameProjectionTitle(dataverseLookupId(row, '_jm1pub_editorialstageid_value'), stageId) &&
+      !row.jm1pub_supersededon,
+    )
+    const checksum = stringValue(artifact?.jm1pub_sha256).toLowerCase()
+    const version = stringValue(artifact?.jm1pub_versionlabel)
+    if (!/^[0-9a-f]{64}$/.test(checksum) || !version) continue
+    const sent = deliveryLogs.some((row) =>
+      sameProjectionTitle(stringValue(row.jm1_sourcerecordid), stageId) &&
+      sameProjectionTitle(stringValue(row.jm1_actiondescription).match(/(?:^|[; ])gate=([a-f0-9-]{36})(?:;| |$)/i)?.[1], stringValue(gate.jm1pub_editorialapprovalgateid)) &&
+      deliveredReviewChecksums(stringValue(row.jm1_actiondescription)).includes(checksum)
+    )
+    if (!sent) continue
+    const link = {
+      label: stringValue(artifact?.jm1pub_editorialartifactname || artifact?.jm1pub_filename) || 'Delivered author-review artifact',
+      href: artifactId,
+      artifactId,
+      titleId,
+      checksum,
+      artifactType: 'DEVELOPMENTAL_EDIT',
+      version,
+      current: true,
+    }
+    if (byStage.has(stageId)) {
+      ambiguousStages.add(stageId)
+      byStage.delete(stageId)
+    }
+    else if (!ambiguousStages.has(stageId)) byStage.set(stageId, link)
+  }
+  return byStage
+}
+
+function deliveredReviewChecksums(description: string): string[] {
+  if (!/DELIVERY_STATUS=SENT;/.test(description)) return []
+  const manifest = description.match(/artifactManifest=(\[[\s\S]*?\]);/i)?.[1]
+  if (manifest) {
+    try {
+      const rows: unknown = JSON.parse(manifest)
+      if (Array.isArray(rows)) return rows.map((row) => String(row?.checksum || '').toLowerCase()).filter((value) => /^[0-9a-f]{64}$/.test(value))
+    } catch {
+      return []
+    }
+  }
+  const field = description.match(/(?:^|;)\s*checksums=([^;]+)(?:;|$)/i)?.[1]
+  return field ? field.split('|').map((entry) => entry.match(/^[a-zA-Z][a-zA-Z0-9]*:([0-9a-f]{64})$/)?.[1]?.toLowerCase() || '').filter(Boolean) : []
+}
+
 async function getRecentProductionProjects(config: DataverseServerConfig) {
   return dataverseList(config, 'jm1_productionprojects', {
     $select:
@@ -1896,6 +1974,7 @@ function buildWorkloadItems(
   logs: DataverseRow[],
   portfolio: PublisherPortfolioItem[],
   approvalGates: DataverseRow[] = [],
+  deliveredReviewArtifacts: Map<string, PublisherTodayItem['evidenceLinks'][number]> = new Map(),
 ): PublisherWorkloadItem[] {
   const draftItems = (titles
     .map((title) => {
@@ -1986,6 +2065,9 @@ function buildWorkloadItems(
         latestExecutionEvidence: latestLog
           ? `${stringValue(latestLog.jm1_actiontype)} (${stringValue(latestLog.jm1_executionlogid)})`
           : 'No recent execution evidence found',
+        evidenceLinks: pendingDeliveredReview && latestStage
+          ? [deliveredReviewArtifacts.get(stringValue(latestStage.jm1pub_editorialstageid))].filter((link): link is PublisherTodayItem['evidenceLinks'][number] => Boolean(link))
+          : [],
         canonicalAuthorityClassification: canonicalAuthorityClassificationForTitle(title),
         canonicalTitleReference: stringValue(title.jm1_canonicaltitlereference),
         canonicalAuthorContactReference: stringValue(title.jm1_canonicalauthorcontactreference),
@@ -3267,7 +3349,10 @@ function buildTitleOperatingView(input: {
   const unslicedJackieQueueItems = input.queue
     .filter((item) => item.actionOwner === 'publisher')
     .map(queueToTodayItem)
-  const certifiedProjectionItems = loadCertifiedTitleProjectionItems()
+  const activeWorkloadTitleIds = new Set(input.workload.filter((item) => item.evidenceLinks?.length).map((item) => item.titleId).filter(Boolean))
+  const certifiedProjectionItems = loadCertifiedTitleProjectionItems().filter(
+    (item) => !item.titleId || !activeWorkloadTitleIds.has(item.titleId),
+  )
   const allTodayItems = [
     ...certifiedProjectionItems,
     ...input.workload.map(workloadToTodayItem),
@@ -4167,7 +4252,7 @@ function workloadToTodayItem(item: PublisherWorkloadItem): PublisherTodayItem {
     packageState: item.packageReadiness,
     qaState: item.internalQaState,
     dependency: item.holdReason || item.readinessGuard.message,
-    evidenceLinks: [],
+    evidenceLinks: item.evidenceLinks || [],
     canonicalAuthorityClassification: item.canonicalAuthorityClassification,
     canonicalTitleReference: item.canonicalTitleReference,
     canonicalAuthorContactReference: item.canonicalAuthorContactReference,
