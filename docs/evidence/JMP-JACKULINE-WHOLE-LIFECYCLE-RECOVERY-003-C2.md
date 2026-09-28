@@ -164,6 +164,35 @@ Private readbacks remain beneath
 `delivered-stage-census-2026-09-27T13-49-00.010Z.json`.
 Raw correspondence and credentials are not copied into repository evidence.
 
+## SEPTEMBER 28 CONTINUATION
+
+This addendum preserves the September 27 intermediate readback above. It does
+not recast source-ready work as production-commissioned.
+
+- A fresh paginated Whole authority read returned 79 stage execution logs, 12
+  title-bound artifacts, two gates, and no production V2 engagement. The
+  original delivered gate remains pending with no author disposition.
+- The delivered manuscript checksum matches the cadence send. Live Graph
+  ancestry confirms the original artifact under `02_Editorial`, the existing
+  Whole folder `01DF3SEQMAUJPNMVSYYNAJHWCYEFSEVLLO`, and Stage 06. The
+  governed Stage 07 destination resolves in the same drive. No folder was
+  moved in this readback.
+- A new bounded census examined 38 editorial stages and 10 pending gates. It
+  classified three exact delivered-stage lags, Whole's Stage 06 workspace
+  lag, and one ambiguous workspace ancestry. No unclassified finding was
+  returned within that bounded current corpus. The ambiguous title remains
+  held; no cross-title mutation was made by the read-only census.
+- The source repair now includes an exact gate/status audit reconciliation,
+  a guarded move of the original title folder, author identity from the
+  canonical contact reference, quoted-text stripping, delivery-checksum
+  matching, a route-back-aware stage read model, and an hourly system-owned
+  monitor. The monitor's deterministic repair path is enabled only after a
+  governed production deployment; source presence is not production proof.
+- Focused mover/monitor/response tests, the full Azure Functions suite and
+  lint, root type-check, seven projection tests, and the production web build
+  passed. The build reported only existing framework/bundling warnings. No
+  author communication was sent by this pass.
+
 ## ROUTING ECHO
 
 PACKET: JMP-JACKULINE-WHOLE-LIFECYCLE-RECOVERY-003-C2

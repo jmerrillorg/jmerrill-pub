@@ -12,12 +12,14 @@ const {
   evaluateAcknowledgementPolicy,
   runAuthorReviewResponseConsumer,
   findOpenPackageSelectionDiagnostics,
+  findOpenAuthorReviewGates,
   packageSelectionSubjectProbes,
   processPackageSelectionReply,
   processPaymentElectionReply,
   stableIdempotencyKey,
   stablePackageSelectionIdempotencyKey,
   validateAuthorIdentity,
+  resolveGateAuthorIdentity,
   validateReplyCorrelation
 } = require("../src/orchestration/authorReviewResponseConsumer");
 
@@ -159,6 +161,72 @@ test("author review classifier recognizes concise approval", () => {
   assert.equal(classifyAuthorReviewResponse("Received, thank you"), DECISION.ACKNOWLEDGMENT_ONLY);
   assert.equal(classifyAuthorReviewResponse("I approve with minor corrections"), DECISION.APPROVED_WITH_CORRECTIONS);
   assert.equal(classifyAuthorReviewResponse("I approve. Please review these notes."), DECISION.APPROVED_WITH_CORRECTIONS);
+});
+
+test("author-review scan includes only delivered gates awaiting a decision", async () => {
+  let filter = "";
+  await findOpenAuthorReviewGates({
+    async list(entitySet, query) {
+      assert.equal(entitySet, "jm1pub_editorialapprovalgates");
+      filter = query.$filter;
+      return [];
+    }
+  }, 10);
+  assert.match(filter, /jm1pub_gatestatus eq 196650002/);
+  assert.match(filter, /jm1pub_authordecision eq null/);
+  assert.match(filter, /jm1pub_authordecisionon eq null/);
+});
+
+test("a prepared but undelivered gate cannot capture an author reply", async () => {
+  const { client, result } = await runOne({ gateOverrides: { jm1pub_gatestatus: 196650001 } });
+  assert.equal(result.results[0].outcome, "HELD_GATE_NOT_AWAITING_AUTHOR");
+  assert.equal(client.calls.patched.length, 0);
+  assert.equal(client.calls.created.length, 0);
+});
+
+test("author identity resolves only from agreeing title, stage, and contact IDs", async () => {
+  const stageId = "ae3c9d5e-67b5-f111-aaab-000d3a10aa9c";
+  const contactId = "106a78d0-fb9a-f111-b8dc-6045bdd69738";
+  const gate = createGate({ jm1pub_authoremail: undefined, _jm1pub_editorialstageid_value: stageId });
+  const client = {
+    async first(entitySet) {
+      if (entitySet === "jm1pub_titles") return { jm1pub_titleid: titleId, _jm1_author_value: contactId };
+      if (entitySet === "jm1pub_editorialstages") return {
+        jm1pub_editorialstageid: stageId,
+        _jm1pub_titleid_value: titleId,
+        _jm1pub_contactid_value: contactId
+      };
+      if (entitySet === "contacts") return { contactid: contactId, emailaddress1: authorEmail };
+      return null;
+    }
+  };
+  const resolved = await resolveGateAuthorIdentity(client, gate);
+  assert.equal(resolved.ok, true);
+  const canonicalReference = await resolveGateAuthorIdentity({ ...client, async first(entitySet, query) {
+    if (entitySet === "jm1pub_titles") return { jm1pub_titleid: titleId, _jm1_author_value: null,
+      jm1_canonicalauthorcontactreference: `contact:${contactId}` };
+    return client.first(entitySet, query);
+  } }, gate);
+  assert.equal(canonicalReference.ok, true);
+  const conflictingReferences = await resolveGateAuthorIdentity({ ...client, async first(entitySet, query) {
+    if (entitySet === "jm1pub_titles") return { jm1pub_titleid: titleId, _jm1_author_value: contactId,
+      jm1_canonicalauthorcontactreference: "contact:00000000-0000-0000-0000-000000000001" };
+    return client.first(entitySet, query);
+  } }, gate);
+  assert.equal(conflictingReferences.reason, "GATE_AUTHOR_TITLE_STAGE_BINDING_MISMATCH");
+  assert.equal(validateAuthorIdentity(resolved.gate, createReply()).ok, true);
+  const mismatch = await resolveGateAuthorIdentity({
+    ...client,
+    async first(entitySet) {
+      if (entitySet === "jm1pub_editorialstages") return {
+        jm1pub_editorialstageid: stageId,
+        _jm1pub_titleid_value: titleId,
+        _jm1pub_contactid_value: "00000000-0000-0000-0000-000000000001"
+      };
+      return client.first(entitySet);
+    }
+  }, gate);
+  assert.equal(mismatch.reason, "GATE_AUTHOR_TITLE_STAGE_BINDING_MISMATCH");
 });
 
 test("author decision source fits Dataverse field limit", () => {

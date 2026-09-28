@@ -17,7 +17,7 @@ import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { randomUUID } from 'node:crypto'
 import { selectTitleBoundEditorialStage } from './author-editorial-stage-readback'
-import { hasDeliveredPendingReview, isBoundEditorialTransition, sameProjectionTitle } from '../publishing/lifecycle/editorial-projection-evidence'
+import { hasDeliveredPendingReview, isBoundEditorialTransition, sameProjectionTitle, selectCurrentEditorialStage } from '../publishing/lifecycle/editorial-projection-evidence'
 import {
   classifyTitlePortfolio,
   isActivePipeline,
@@ -1912,8 +1912,7 @@ function buildWorkloadItems(
             dataverseLookupId(stage, '_jm1pub_titleid_value') === titleId ||
             (assetId && dataverseLookupId(stage, '_jm1pub_publishingassetid_value') === assetId),
         )
-        .sort((a, b) => Number(b.jm1pub_stagesequence || 0) - Number(a.jm1pub_stagesequence || 0))
-      const latestStage = stages[0]
+      const latestStage = selectCurrentEditorialStage(stages) || undefined
       const stageType = `${dataverseFormatted(latestStage || {}, 'jm1pub_stagetype')} ${stringValue(latestStage?.jm1pub_name)}`
       const stageStatus = dataverseFormatted(latestStage || {}, 'jm1pub_stagestatus') || ''
       const pipelineStage = dataverseFormatted(title, 'jm1pub_stage') || 'Unstaged'

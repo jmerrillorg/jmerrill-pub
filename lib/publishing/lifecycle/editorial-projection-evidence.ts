@@ -9,6 +9,17 @@ export function sameProjectionTitle(left: unknown, right: unknown): boolean {
   return /^[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}$/.test(canonical) && canonical === id(right)
 }
 
+export function selectCurrentEditorialStage(stages: EvidenceRow[]): EvidenceRow | null {
+  if (!stages.length) return null
+  return [...stages].sort((a, b) => {
+    const left = Date.parse(String(a.createdon || ''))
+    const right = Date.parse(String(b.createdon || ''))
+    if (Number.isFinite(left) && Number.isFinite(right) && left !== right) return right - left
+    if (Number.isFinite(left) !== Number.isFinite(right)) return Number.isFinite(right) ? 1 : -1
+    return Number(b.jm1pub_stagesequence || 0) - Number(a.jm1pub_stagesequence || 0)
+  })[0]
+}
+
 export function hasDeliveredPendingReview(stage: EvidenceRow, gates: EvidenceRow[], logs: EvidenceRow[]): boolean {
   const stageId = id(stage.jm1pub_editorialstageid)
   const titleId = id(stage._jm1pub_titleid_value)

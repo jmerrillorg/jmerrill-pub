@@ -344,6 +344,45 @@ function validateAuthorIdentity(gate, reply) {
   return { ok: true, sender, candidates };
 }
 
+async function resolveGateAuthorIdentity(client, gate) {
+  if (extractEmailCandidates(gate).length) return { ok: true, gate };
+  const titleId = normalizeString(gate._jm1pub_titleid_value);
+  const stageId = normalizeString(gate._jm1pub_editorialstageid_value);
+  const guid = /^[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}$/i;
+  if (!guid.test(titleId) || !guid.test(stageId)) {
+    return { ok: false, reason: "GATE_TITLE_STAGE_BINDING_MISSING" };
+  }
+  const [title, stage] = await Promise.all([
+    client.first("jm1pub_titles", {
+      $select: "jm1pub_titleid,_jm1_author_value,jm1_canonicalauthorcontactreference",
+      $filter: `jm1pub_titleid eq ${titleId}`
+    }),
+    client.first("jm1pub_editorialstages", {
+      $select: "jm1pub_editorialstageid,_jm1pub_titleid_value,_jm1pub_contactid_value",
+      $filter: `jm1pub_editorialstageid eq ${stageId}`
+    })
+  ]);
+  const titleLookupId = normalizeString(title?._jm1_author_value).toLowerCase();
+  const titleReferenceId = normalizeString(title?.jm1_canonicalauthorcontactreference)
+    .match(/^contact:([a-f0-9-]{36})$/i)?.[1]?.toLowerCase() || "";
+  const titleContactId = titleLookupId || titleReferenceId;
+  const stageContactId = normalizeString(stage?._jm1pub_contactid_value).toLowerCase();
+  if (normalizeString(title?.jm1pub_titleid).toLowerCase() !== titleId.toLowerCase() ||
+      normalizeString(stage?._jm1pub_titleid_value).toLowerCase() !== titleId.toLowerCase() ||
+      (titleLookupId && titleReferenceId && titleLookupId !== titleReferenceId) ||
+      !titleContactId || titleContactId !== stageContactId) {
+    return { ok: false, reason: "GATE_AUTHOR_TITLE_STAGE_BINDING_MISMATCH" };
+  }
+  const contact = await client.first("contacts", {
+    $select: "contactid,emailaddress1",
+    $filter: `contactid eq ${titleContactId}`
+  });
+  if (normalizeString(contact?.contactid).toLowerCase() !== titleContactId || !normalizeString(contact?.emailaddress1)) {
+    return { ok: false, reason: "CANONICAL_AUTHOR_EMAIL_MISSING" };
+  }
+  return { ok: true, gate: { ...gate, jm1pub_authoremail: contact.emailaddress1 } };
+}
+
 function gateValue(gate, names) {
   for (const name of names) {
     const value = normalizeString(gate[name]);
@@ -870,7 +909,7 @@ async function findOpenAuthorReviewGates(client, maxGates) {
   return client.list("jm1pub_editorialapprovalgates", {
     $select:
       "jm1pub_editorialapprovalgateid,jm1pub_editorialapprovalgatename,jm1pub_gatecode,jm1pub_gatestatus,jm1pub_authordecision,jm1pub_authordecisionon,jm1pub_authorresponsesummary,jm1pub_authordecisionsource,jm1pub_awaitingsince,_jm1pub_titleid_value,_jm1pub_editorialstageid_value,_jm1pub_deliverableartifactid_value,modifiedon",
-    $filter: "jm1pub_authordecisionon eq null",
+    $filter: "jm1pub_gatestatus eq 196650002 and jm1pub_authordecision eq null and jm1pub_authordecisionon eq null",
     $orderby: "modifiedon desc",
     $top: String(Math.min(Math.max(Number(maxGates || 10), 1), 25))
   });
@@ -1141,6 +1180,13 @@ function subjectProbeForGate(gate) {
 async function processGateReply(client, gate, deps, triggerSource) {
   const gateId = normalizeString(gate.jm1pub_editorialapprovalgateid);
   if (!captureEnabled()) return { gateId, outcome: "CAPTURE_DISABLED", detail: "JM1_AUTHOR_RESPONSE_CAPTURE_DISABLED" };
+  if (gate.jm1pub_gatestatus !== undefined && Number(gate.jm1pub_gatestatus) !== 196650002) {
+    return { gateId, outcome: "HELD_GATE_NOT_AWAITING_AUTHOR", processingState: RESPONSE_STATES.BLOCKED };
+  }
+
+  const authorIdentity = await resolveGateAuthorIdentity(client, gate);
+  if (!authorIdentity.ok) return { gateId, outcome: "HELD_IDENTITY_VALIDATION", detail: authorIdentity.reason, processingState: RESPONSE_STATES.BLOCKED };
+  gate = authorIdentity.gate;
 
   const subjectContains = subjectProbeForGate(gate);
   const afterIso = normalizeString(gate.modifiedon) || "2026-01-01T00:00:00Z";
@@ -1389,7 +1435,9 @@ module.exports = {
   normalizeConfiguredSecret,
   compactDecisionSource,
   validateAuthorIdentity,
+  resolveGateAuthorIdentity,
   validateReplyCorrelation,
+  findOpenAuthorReviewGates,
   findOpenPackageSelectionDiagnostics,
   findOpenPaymentElectionActionRequests,
   packageSelectionSubjectProbes,

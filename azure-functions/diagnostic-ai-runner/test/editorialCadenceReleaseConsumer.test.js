@@ -9,6 +9,7 @@ const {
   buildSchedule,
   normalizeStageCode,
   parsePackage,
+  reconcileDeliveredReviewStage,
   remainingHoldDuration,
   runEditorialCadenceReleaseConsumer
 } = require("../src/editorial/editorialCadenceReleaseConsumer");
@@ -18,6 +19,51 @@ const titleId = "title-before-you-were-born";
 const gateId = "gate-before-you-were-born";
 const contactId = "dfb397e7-3b7c-f111-ab0f-6045bdd69435";
 const packageId = "pkg-before-you-were-born-developmental-v1";
+
+test("historical delivered review repairs stage status only against its exact pending gate", async () => {
+  const stage = { jm1pub_editorialstageid: "ae3c9d5e-67b5-f111-aaab-000d3a10aa9c",
+    _jm1pub_titleid_value: "daf8180f-85a3-f111-b8de-000d3a14673b", jm1pub_stagesequence: 2,
+    jm1pub_stagestatus: 100000001 };
+  const deliveredGateId = "4d04daa2-67b5-f111-aaac-000d3a14673b";
+  const sent = { jm1_executionlogid: "sent-1", jm1_sourcerecordid: stage.jm1pub_editorialstageid,
+    jm1_actiontype: "PACKAGE_CADENCE_RELEASE_AUTHOR_PACKAGE_SENT",
+    jm1_actiondescription: `DELIVERY_STATUS=SENT; gate=${deliveredGateId};` };
+  const calls = { patched: [], created: [] };
+  const client = {
+    async list(set) {
+      if (set === "jm1pub_editorialapprovalgates") return [{ jm1pub_editorialapprovalgateid: deliveredGateId,
+        _jm1pub_titleid_value: stage._jm1pub_titleid_value,
+        _jm1pub_editorialstageid_value: stage.jm1pub_editorialstageid,
+        jm1pub_gatestatus: 196650002, jm1pub_authordecision: null, jm1pub_authordecisionon: null }];
+      return [];
+    },
+    async patch(set, id, payload) { calls.patched.push({ set, id, payload }); },
+    async create(set, payload) { calls.created.push({ set, payload }); return "audit-1"; }
+  };
+  const result = await reconcileDeliveredReviewStage(client, stage, sent);
+  assert.equal(result.status, "RECONCILED");
+  assert.deepEqual(calls.patched, [{ set: "jm1pub_editorialstages", id: stage.jm1pub_editorialstageid,
+    payload: { jm1pub_stagestatus: 100000002 } }]);
+  assert.equal(calls.created[0].payload.jm1_actiontype, "EDITORIAL_DELIVERED_REVIEW_STAGE_RECONCILED");
+  const stale = await reconcileDeliveredReviewStage(client, { ...stage, jm1pub_stagestatus: 100000002 }, sent);
+  assert.equal(stale.status, "NOT_REQUIRED");
+  assert.equal(calls.created.length, 1);
+  const blocked = await reconcileDeliveredReviewStage({ ...client, async list(set) {
+    if (set === "jm1pub_editorialapprovalgates") return [{ jm1pub_editorialapprovalgateid: deliveredGateId,
+      _jm1pub_titleid_value: stage._jm1pub_titleid_value,
+      _jm1pub_editorialstageid_value: stage.jm1pub_editorialstageid,
+      jm1pub_gatestatus: 196650001 }];
+    return [];
+  } }, stage, sent);
+  assert.equal(blocked.status, "HELD");
+  assert.equal(calls.patched.length, 1);
+  const later = await reconcileDeliveredReviewStage({ ...client, async list(set) {
+    if (set === "jm1pub_editorialstages") return [{ jm1pub_editorialstageid: "later", jm1pub_stagesequence: 3 }];
+    return client.list(set);
+  } }, stage, sent);
+  assert.equal(later.reason, "LATER_EDITORIAL_STAGE_REQUIRES_REVIEW");
+  assert.equal(calls.patched.length, 1);
+});
 
 function makeClient(overrides = {}) {
   const calls = { listed: [], created: [], patched: [] };
@@ -334,6 +380,7 @@ test("due package with no canonical or mailbox delivery evidence sends once thro
   assert.match(stageRead.query.$select, /jm1pub_publishingintakereference/);
   assert.ok(client.calls.created.some((call) => call.payload.jm1_actiontype === "PACKAGE_CADENCE_RELEASE_AUTHOR_PACKAGE_SENT"));
   assert.ok(client.calls.patched.some((call) => call.entitySet === "jm1pub_editorialapprovalgates" && call.payload.jm1pub_gatestatus === 196650002));
+  assert.ok(client.calls.patched.some((call) => call.entitySet === "jm1pub_editorialstages" && call.payload.jm1pub_stagestatus === 100000002));
 });
 
 test("due package with missing contact fails closed as ambiguous and does not send", async () => {

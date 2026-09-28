@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
-import { sameProjectionTitle, isBoundEditorialTransition, hasDeliveredPendingReview } from '../lib/publishing/lifecycle/editorial-projection-evidence.ts'
+import { sameProjectionTitle, isBoundEditorialTransition, hasDeliveredPendingReview, selectCurrentEditorialStage } from '../lib/publishing/lifecycle/editorial-projection-evidence.ts'
 
 const binding = {
   titleId: 'daf8180f-85a3-f111-b8de-000d3a14673b',
@@ -44,4 +44,16 @@ test('later preparation cannot hide a delivered exact-version pending review', (
   assert.equal(hasDeliveredPendingReview(stage, [gate], []), false)
   assert.equal(hasDeliveredPendingReview({ ...stage, jm1pub_editorialstageid: binding.gateId }, [gate], [delivery]), false)
   assert.equal(hasDeliveredPendingReview(stage, [{ ...gate, _jm1pub_titleid_value: binding.stageId }], [delivery]), false)
+})
+
+test('newer downstream stage outranks stale earlier state without regressing', () => {
+  const stale = { jm1pub_editorialstageid: 'earlier', jm1pub_stagesequence: 2, createdon: '2026-09-01T00:00:00Z' }
+  const downstream = { jm1pub_editorialstageid: 'downstream', jm1pub_stagesequence: 3, createdon: '2026-09-02T00:00:00Z' }
+  assert.equal(selectCurrentEditorialStage([stale, downstream]).jm1pub_editorialstageid, 'downstream')
+})
+
+test('a newer governed route-back instance is not hidden by an older higher stage number', () => {
+  const downstream = { jm1pub_editorialstageid: 'downstream', jm1pub_stagesequence: 3, createdon: '2026-09-02T00:00:00Z' }
+  const rework = { jm1pub_editorialstageid: 'rework', jm1pub_stagesequence: 2, createdon: '2026-09-03T00:00:00Z' }
+  assert.equal(selectCurrentEditorialStage([downstream, rework]).jm1pub_editorialstageid, 'rework')
 })

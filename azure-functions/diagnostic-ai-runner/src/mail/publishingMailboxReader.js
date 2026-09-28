@@ -70,9 +70,9 @@ function extractAuthorReplyText(bodyText) {
   const lines = text.split(/\r?\n/);
   const replyLines = [];
   for (const line of lines) {
-    if (/^\s*from:\s+/i.test(line)) break;
-    if (/^\s*on .+ wrote:\s*$/i.test(line)) break;
-    if (/^\s*-{2,}\s*original message\s*-{2,}\s*$/i.test(line)) break;
+    if (/^\s*(?:>\s*)*from:\s+/i.test(line)) break;
+    if (/^\s*(?:>\s*)*on .+ wrote:\s*$/i.test(line)) break;
+    if (/^\s*(?:>\s*)*-{2,}\s*original message\s*-{2,}\s*$/i.test(line)) break;
     replyLines.push(line);
   }
   return normalizeString(replyLines.join("\n"));
