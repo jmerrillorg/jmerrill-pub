@@ -74,7 +74,7 @@ async function sendFollowup(client, projection, position, now, deps = {}) {
   if (prepared.status !== "READY") return prepared;
   const reserved = await (deps.reserveCommunicationIntent || reserveCommunicationIntent)(client, prepared.intent);
   if (reserved.status === "ALREADY_DELIVERED") return { status: "IDEMPOTENT" };
-  if (!["RESERVED", "PROVIDER_ACCEPTED", "AMBIGUOUS_SEND_STATE", "DELIVERY_UNVERIFIED"].includes(reserved.status)) {
+  if (reserved.status !== "RESERVED") {
     return { status: "HELD", reason: `OUTBOX_${reserved.status}` };
   }
   const input = { sendApproval: {

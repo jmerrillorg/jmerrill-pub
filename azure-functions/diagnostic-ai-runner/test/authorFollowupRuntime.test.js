@@ -79,6 +79,16 @@ test("changed action and delivered replay do not send", async () => {
   assert.equal(replay.calls.sent, 0);
 });
 
+test("ambiguous or provider-accepted prior send never invokes the relay again", async () => {
+  for (const status of ["PROVIDER_ACCEPTED", "AMBIGUOUS_SEND_STATE", "DELIVERY_UNVERIFIED"]) {
+    const { calls, deps } = mockDeps({ enabled: true,
+      reserveCommunicationIntent: async () => ({ status }) });
+    const result = await runAuthorFollowupCadence({ now: "2026-09-29T17:00:00Z" }, deps);
+    assert.equal(result.results[0].reason, `OUTBOX_${status}`);
+    assert.equal(calls.sent, 0);
+  }
+});
+
 test("copy states action, deadline, and hold without internal identifiers", () => {
   const copy = authorCopy("Whole", "Jackuline Fly", projection.actionDueAt, 7);
   assert.match(copy.body, /edited manuscript/);
