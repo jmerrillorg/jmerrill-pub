@@ -12,6 +12,10 @@ app.timer("run-author-followup-cadence", {
       `sent=${result.results.filter((row) => row.status === "SENT").length}; ` +
       `held=${result.results.filter((row) => row.status === "HELD").length}; ` +
       `newReview=${result.reviewQueue.filter((row) => row.recordStatus === "RECORDED").length}`);
+    const escalations = result.results.filter((row) => row.day20Escalation === "RECORDED");
+    if (escalations.length) {
+      context.warn(`AUTHOR_FOLLOWUP_DAY20_ESCALATION: count=${escalations.length}; Publishing review required.`);
+    }
     if (result.results.some((row) => row.status === "HELD" || row.status === "MAILBOX_VERIFICATION_PENDING") ||
         result.reviewQueue.some((row) => row.recordStatus === "FAILED")) {
       context.error("AUTHOR_FOLLOWUP_MATERIAL_FAILURE: system reconciliation required; do not resend manually.");
