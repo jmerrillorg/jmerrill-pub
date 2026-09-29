@@ -54,10 +54,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: "24"
           cache: npm
@@ -105,7 +105,7 @@ jobs:
             --packagetype Unmanaged
 
       - name: Preserve validation evidence
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: power-platform-solution-validation
           path: powerplatform/solutions/JM1PublishingSales/artifacts/workflow/*.zip
@@ -119,10 +119,10 @@ jobs:
     environment: jm1-power-platform-production
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: "24"
           cache: npm
@@ -131,7 +131,7 @@ jobs:
         uses: microsoft/powerplatform-actions/actions-install@v1
 
       - name: Download validation artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: power-platform-solution-validation
           path: powerplatform/solutions/JM1PublishingSales/artifacts/workflow
@@ -187,7 +187,7 @@ jobs:
           grep -F "JM1PublishingSales" "$SOLUTION_PATH/artifacts/workflow/readback/solution-list.txt"
 
       - name: Preserve production deployment evidence
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: power-platform-production-deployment-evidence
           path: powerplatform/solutions/JM1PublishingSales/artifacts/workflow/readback/*

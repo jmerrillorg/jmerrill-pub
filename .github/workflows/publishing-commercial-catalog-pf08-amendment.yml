@@ -51,10 +51,10 @@ jobs:
     environment: jmerrill-pub-production
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: "24"
           cache: npm
@@ -222,7 +222,7 @@ jobs:
 
       - name: Preserve PF-08 Amendment Evidence
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: publishing-commercial-catalog-pf08-amendment-evidence
           path: catalog-pf08-authority-*.json
