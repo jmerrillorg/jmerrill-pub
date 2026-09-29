@@ -35,6 +35,7 @@ function mockDeps(overrides = {}) {
       assert.equal(input.workstream, `author-followup:${titleId}:${stageId}:${gateId}:7`);
       return { status: "RESERVED", semanticIdempotencyKey: "semantic-key", communicationRecordId: "record-1" };
     },
+    findIntentState: async () => ({ status: "AVAILABLE" }),
     sendConfiguredAuthorResponse: async ({ input }) => {
       calls.sent += 1;
       assert.equal(input.sendApproval.templateName, "AUTHOR_FOLLOWUP_STANDARD_ACTION_V1");
@@ -79,14 +80,109 @@ test("changed action and delivered replay do not send", async () => {
   assert.equal(replay.calls.sent, 0);
 });
 
-test("ambiguous or provider-accepted prior send never invokes the relay again", async () => {
-  for (const status of ["PROVIDER_ACCEPTED", "AMBIGUOUS_SEND_STATE", "DELIVERY_UNVERIFIED"]) {
+test("ambiguous prior send never invokes the send relay again", async () => {
+  for (const status of ["AMBIGUOUS_SEND_STATE", "DELIVERY_UNVERIFIED"]) {
     const { calls, deps } = mockDeps({ enabled: true,
       reserveCommunicationIntent: async () => ({ status }) });
     const result = await runAuthorFollowupCadence({ now: "2026-09-29T17:00:00Z" }, deps);
     assert.equal(result.results[0].reason, `OUTBOX_${status}`);
     assert.equal(calls.sent, 0);
   }
+});
+
+test("provider-accepted follow-up reconciles verified mailbox evidence without resending", async () => {
+  const providerMessageId = "b954c104-b037-48ba-bd9e-e80fe842d54a";
+  let lookups = 0;
+  let marked;
+  const { calls, deps } = mockDeps({ enabled: true,
+    reserveCommunicationIntent: async () => ({ status: "PROVIDER_ACCEPTED", semanticIdempotencyKey: "semantic-key",
+      communicationRecordId: "record-1", sentAt: "2026-09-29T17:00:00Z",
+      record: { jm1_actiondescription: `Idempotency semantic-key; providerMessageId=${providerMessageId}; sentAt=2026-09-29T17:00:00Z;` } }),
+    relayRequest: async (request) => {
+      lookups += 1;
+      assert.deepEqual(request, { action: "recover-provider", providerMessageId });
+      return { acceptance: { providerMessageId, communicationComplete: true, mailboxEvidenceVerified: true,
+        mailboxMessageId: "mailbox-1", mailboxVerifiedAt: "2026-09-29T17:01:00Z" } };
+    },
+    markCommunicationSent: async (_client, record) => { marked = record; }
+  });
+  const result = await runAuthorFollowupCadence({ now: "2026-09-29T17:03:00Z" }, deps);
+  assert.equal(result.results[0].status, "SENT_RECONCILED");
+  assert.equal(lookups, 1);
+  assert.equal(calls.sent, 0);
+  assert.equal(marked.communicationComplete, true);
+  assert.equal(marked.providerMessageId, providerMessageId);
+  assert.equal(marked.sentAt, "2026-09-29T17:00:00Z");
+});
+
+test("provider-accepted follow-up holds on pending or mismatched mailbox proof", async () => {
+  const providerMessageId = "b954c104-b037-48ba-bd9e-e80fe842d54a";
+  for (const acceptance of [null, { providerMessageId, communicationComplete: false },
+    { providerMessageId: "f954c104-b037-48ba-bd9e-e80fe842d54a", communicationComplete: true,
+      mailboxEvidenceVerified: true, mailboxMessageId: "mailbox-1", mailboxVerifiedAt: "2026-09-29T17:01:00Z" }]) {
+    const { calls, deps } = mockDeps({ enabled: true,
+      reserveCommunicationIntent: async () => ({ status: "PROVIDER_ACCEPTED",
+        record: { jm1_actiondescription: `providerMessageId=${providerMessageId};` } }),
+      relayRequest: async () => ({ acceptance })
+    });
+    const result = await runAuthorFollowupCadence({ now: "2026-09-29T17:03:00Z" }, deps);
+    assert.equal(result.results[0].reason, "MAILBOX_VERIFICATION_PENDING");
+    assert.equal(calls.sent, 0);
+    assert.equal(calls.marked, 0);
+  }
+});
+
+test("proven pre-provider failure releases the outbox for a later timer retry", async () => {
+  let failure;
+  const { calls, deps } = mockDeps({ enabled: true,
+    sendConfiguredAuthorResponse: async () => ({ ok: false, providerCalled: false,
+      reason: "AUTHOR_RESPONSE_SEND_RELAY_KEY_MISSING" }),
+    markCommunicationFailed: async (_client, record) => { failure = record; }
+  });
+  const result = await runAuthorFollowupCadence({ now: "2026-09-29T17:03:00Z" }, deps);
+  assert.equal(result.results[0].status, "HELD");
+  assert.equal(failure.semanticIdempotencyKey, "semantic-key");
+  assert.equal(failure.failureCode, "AUTHOR_RESPONSE_SEND_RELAY_KEY_MISSING");
+  assert.equal(calls.marked, 0);
+});
+
+test("uncertain provider failure remains reserved and never declares a safe retry", async () => {
+  let failed = 0;
+  const { deps } = mockDeps({ enabled: true,
+    sendConfiguredAuthorResponse: async () => ({ ok: false, providerCalled: null,
+      reason: "AUTHOR_RESPONSE_SEND_PROVIDER_REJECTED" }),
+    markCommunicationFailed: async () => { failed += 1; }
+  });
+  const result = await runAuthorFollowupCadence({ now: "2026-09-29T17:03:00Z" }, deps);
+  assert.equal(result.results[0].status, "HELD");
+  assert.equal(failed, 0);
+});
+
+test("later cadence position waits while an earlier provider-accepted send is reconciled", async () => {
+  const providerMessageId = "b954c104-b037-48ba-bd9e-e80fe842d54a";
+  let checked = 0;
+  let reconciled = 0;
+  const { calls, deps } = mockDeps({ enabled: true,
+    findIntentState: async (_client, semantic) => {
+      checked += 1;
+      return semantic.identity.workstream.endsWith(":7")
+        ? { status: "PROVIDER_ACCEPTED" } : { status: "ALREADY_DELIVERED" };
+    },
+    reserveCommunicationIntent: async (_client, input) => {
+      assert.ok(input.workstream.endsWith(":7"));
+      return { status: "PROVIDER_ACCEPTED", semanticIdempotencyKey: "semantic-key", communicationRecordId: "record-1",
+        sentAt: "2026-09-29T17:00:00Z", record: { jm1_actiondescription: `providerMessageId=${providerMessageId};` } };
+    },
+    relayRequest: async () => ({ acceptance: { providerMessageId, communicationComplete: true,
+      mailboxEvidenceVerified: true, mailboxMessageId: "mailbox-1", mailboxVerifiedAt: "2026-09-29T17:01:00Z" } }),
+    markCommunicationSent: async () => { reconciled += 1; }
+  });
+  const result = await runAuthorFollowupCadence({ now: "2026-10-06T17:03:00Z" }, deps);
+  assert.equal(result.results[0].status, "HELD");
+  assert.equal(result.results[0].reason, "EARLIER_FOLLOWUP_RECONCILIATION");
+  assert.equal(checked, 2);
+  assert.equal(reconciled, 1);
+  assert.equal(calls.sent, 0);
 });
 
 test("copy states action, deadline, and hold without internal identifiers", () => {

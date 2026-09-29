@@ -113,6 +113,7 @@ function safeFailure(reason, input = null) {
   const approval = input?.sendApproval || input;
   return {
     ok: false,
+    providerCalled: false,
     code: CONFIG_ERROR_CODE,
     reason,
     diagnosticId: normalizeString(approval?.diagnosticId) || null,
@@ -391,6 +392,7 @@ async function sendConfiguredAuthorResponse({
   } catch (_err) {
     return {
       ...safeFailure("AUTHOR_RESPONSE_SEND_PROVIDER_REJECTED", input),
+      providerCalled: null,
       deliveryStatus: AUTHOR_RESPONSE_SEND_STATUS.FAILED,
       authorEmailStatus: AUTHOR_RESPONSE_SEND_STATUS.NOT_SENT
     };
