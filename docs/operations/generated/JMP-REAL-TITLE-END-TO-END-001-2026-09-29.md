@@ -4,6 +4,16 @@ Date: 2026-09-29 ET
 Mode: controlled-title reconciliation and non-submitting distribution preflight
 Production mutations: one ETag-guarded Dataverse title metadata update. Provider submissions and author communications: 0.
 
+## Continue-03 production-source readback
+
+Sean's September 11 approval of the exact combined layout/proof is accepted as the current manuscript-content approval. The ISBN-only v1.2 PDF change does not reopen that approval, and correcting the already-ratified subtitle and byline does not itself require a new author decision. A new author review is warranted only if a corrected export changes manuscript content or material layout beyond those authorized corrections.
+
+Fresh Dataverse readback on September 29 confirms the title subtitle and display byline match founder authority. It also shows only two editorial-stage rows for this title: Developmental (`88189235-8f80-f111-ab0f-6045bdd69435`, status `Plan Delivered`) and historical Editorial Review (`624a5e5f-4d80-f111-ab0f-6045bdd69738`). The contradictory Developmental approval gate (`e996abe7-2f8e-f111-8077-000d3a14673b`) has `nextstageauthorized=false`. It is historical evidence, not authority to override Sean's later exact proof approval or to manufacture missing Line/Copy/Proof stage transitions. The title-level `CANONICAL_PUBLISHED_TITLE` label is likewise not publication proof. Stage projection remains unreconciled; no stage or workspace move was made.
+
+The approved print proof identifies Vellum 4.1.4 as its creator. No Vellum source project or front-cover image/design source was found in the single current numbered title workspace; a search of the indexed Vellum projects found no Crowley/Before You Were Born source. The current v1.2 PDF was produced by `pypdf`, and its checksum still matches the prior certified readback. This does not authorize binary patching or a layout recreation that could silently change pagination. The governed production source and approved cover inputs must be recovered or established before corrected Paperback/eBook re-export and full-wrap QA can pass.
+
+The inspected Crowley people-agreement folder contains agreements for three other titles, but no Before You Were Born agreement. That is not proof that rights are absent elsewhere; distribution-rights authority remains unproven until the exact executed title agreement/current governed record is bound. Provider submission remains denied. No author communication, provider effect, or additional Dataverse mutation occurred in this continuation.
+
 ## Controlled title selection
 
 **Before You Were Born**, by Sean Crowley / Sean Arron Crowley, is the closest substantiated active production candidate. Its existing numbered workspace is under `09 - Copyediting`; it has copyedited and proofread manuscript files, a 102-page 6 x 9 print interior, five eBook exports, and registered Starter-package Paperback and eBook ISBN assets. The two ISBN-bearing Dataverse assets are still `Staged / Draft`.
@@ -31,7 +41,7 @@ The Long Watch has a Copyedit stage row marked Complete but no ISBN-bearing dist
 
 The Dataverse display update changed only `jm1pub_authordisplayname` and `jm1pub_subtitle` on title `91c5e1ef-2980-f111-ab0f-7c1e525b15c2`, using the current ETag. The post-write readback matches founder authority; `jm1pub_stage` and publication status remain unchanged. `CURRENT_TITLE_STATE=FAIL` for automated advancement: the historical gate and stage projection remain inconsistent, and provider-ready files are incomplete. No historical `CANONICAL_PUBLISHED_TITLE` label may be used as publication proof.
 
-The v1.1 approval supports the existing layout and text. V1.2 differs only on PDF page 4, where pending Paperback/Hardcover/eBook identifiers became the governed Paperback and eBook ISBNs. The later subtitle/byline correction is **not** part of that identifier-only refresh. Corrected print/eBook exports need their own versioned QA and author-release assessment before publication.
+The v1.1 approval supports the existing layout and text. V1.2 differs only on PDF page 4, where pending Paperback/Hardcover/eBook identifiers became the governed Paperback and eBook ISBNs. The later subtitle/byline correction is **not** part of that identifier-only refresh. Corrected print/eBook exports need versioned content/layout parity QA before publication; metadata-only corrections do not trigger another author approval.
 
 ## Remaining 16-stage path
 
