@@ -335,6 +335,30 @@ test("onboarding recovery retains exact semantic identity and renders the same c
   assert.equal(validateApprovedAuthorResponsePayload({ ...input, workstream: '' }).ok, false);
 });
 
+test("author follow-up positions retain distinct relay identities and reject malformed scope", () => {
+  const { validateApprovedAuthorResponsePayload } = loadRelayModule();
+  const { buildCommunicationIdentity } = require("../src/state/communicationIdentity");
+  const titleId = "daf8180f-85a3-f111-b8de-000d3a14673b";
+  const stageId = "ae3c9d5e-67b5-f111-aaab-000d3a10aa9c";
+  const gateId = "4d04daa2-67b5-f111-aaac-000d3a14673b";
+  const make = position => validateApprovedAuthorResponsePayload(validAuthorResponsePayload({
+    diagnosticId: titleId, authorId: "106a78d0-fb9a-f111-b8dc-6045bdd69738",
+    templateName: "AUTHOR_FOLLOWUP_STANDARD_ACTION_V1",
+    communicationType: "AUTHOR_FOLLOWUP_STANDARD_ACTION",
+    workstream: `author-followup:${titleId}:${stageId}:${gateId}:${position}`
+  }));
+  assert.equal(make(3).ok, true);
+  assert.notEqual(buildCommunicationIdentity(make(3).value).key, buildCommunicationIdentity(make(7).value).key);
+  assert.equal(buildCommunicationIdentity(make(3).value).key, buildCommunicationIdentity(make(3).value).key);
+  assert.equal(make(4).ok, false);
+  assert.equal(validateApprovedAuthorResponsePayload(validAuthorResponsePayload({
+    diagnosticId: stageId, authorId: "106a78d0-fb9a-f111-b8dc-6045bdd69738",
+    templateName: "AUTHOR_FOLLOWUP_STANDARD_ACTION_V1",
+    communicationType: "AUTHOR_FOLLOWUP_STANDARD_ACTION",
+    workstream: `author-followup:${titleId}:${stageId}:${gateId}:3`
+  })).ok, false);
+});
+
 function validEditorialRecommendationPayload(overrides = {}) {
   return validAuthorResponsePayload({
     subject: "Your Editorial Review & Publishing Recommendation | J Merrill Publishing",

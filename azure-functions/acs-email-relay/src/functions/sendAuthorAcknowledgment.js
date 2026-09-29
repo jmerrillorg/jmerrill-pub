@@ -791,7 +791,15 @@ function validateJoinedFamilyInternalNotificationPayload(payload = {}) {
 function validateApprovedAuthorResponsePayload(payload = {}) {
   const onboardingRecovery = normalizeText(payload.templateName) === "INBOUND_SERVICE_AUTHOR_ONBOARDING_SERVICE_RECOVERY_V1";
   const paymentServiceTemplate = /^INBOUND_SERVICE_(ADDITIONAL_PAYMENT_REQUEST|PAYMENT_ACCESS_REQUEST|INSTALLMENT_INFORMATION_REQUEST|PAYMENT_LINK_ACCESS_PROBLEM)_V1$/.test(normalizeText(payload.templateName));
+  const authorFollowup = normalizeText(payload.templateName) === "AUTHOR_FOLLOWUP_STANDARD_ACTION_V1";
+  const followupParts = normalizeText(payload.workstream).match(/^author-followup:([^:]+):([^:]+):([^:]+):(3|7|14)$/i);
   const common = validateCommonMilestoneFields(payload, { allowEngagementReference: paymentServiceTemplate });
+  if (authorFollowup && (!DIAGNOSTIC_ID_PATTERN.test(normalizeText(payload.authorId)) ||
+      normalizeText(payload.communicationType) !== "AUTHOR_FOLLOWUP_STANDARD_ACTION" ||
+      !followupParts || !followupParts.slice(1, 4).every((part) => DIAGNOSTIC_ID_PATTERN.test(part)) ||
+      normalizeText(payload.diagnosticId).toLowerCase() !== followupParts[1].toLowerCase())) {
+    return { ok: false, reason: "AUTHOR_FOLLOWUP_SEMANTIC_IDENTITY_INVALID" };
+  }
   if (paymentServiceTemplate && payload.workstream &&
       (!/^observed_payment_[a-f0-9]{40}$/.test(normalizeText(payload.workstream)) ||
        !DIAGNOSTIC_ID_PATTERN.test(normalizeText(payload.authorId)) ||
@@ -968,7 +976,7 @@ function validateApprovedAuthorResponsePayload(payload = {}) {
       messageType: APPROVED_AUTHOR_RESPONSE_TYPE,
       diagnosticId: common.diagnosticId,
       intakeReferenceCode: common.intakeReferenceCode,
-      ...((paymentServiceTemplate || onboardingRecovery) && payload.workstream ? { workstream: normalizeText(payload.workstream),
+      ...((paymentServiceTemplate || onboardingRecovery || authorFollowup) && payload.workstream ? { workstream: normalizeText(payload.workstream),
         authorId: normalizeText(payload.authorId), communicationType: normalizeText(payload.communicationType) } : {}),
       authorEmail,
       authorName: normalizeText(payload.authorName),
