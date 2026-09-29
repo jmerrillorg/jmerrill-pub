@@ -3,9 +3,11 @@
 const { createDataverseClient } = require("../orchestration/authorReviewResponseConsumer");
 const { PublishingMailboxGraphClient } = require("../mail/inbound/graphClient");
 const { sendConfiguredAuthorResponse } = require("./authorResponseSendProviderConfig");
-const { reserveCommunicationIntent, markCommunicationSent } = require("../editorial/communicationIntentStore");
+const { buildCommunicationIdentity, findIntentState, reserveCommunicationIntent,
+  markCommunicationSent, markCommunicationFailed } = require("../editorial/communicationIntentStore");
+const { relayRequest } = require("../mail/outbound/acceptanceRuntime");
 const { findExecutionLog, writeLog } = require("../editorial/editorialExecutionRuntime");
-const { evaluateAuthorFollowup } = require("./authorFollowupPolicy");
+const { CADENCE_DAYS, evaluateAuthorFollowup } = require("./authorFollowupPolicy");
 const { elapsedGovernedBusinessDays } = require("./authorBusinessCalendar");
 const { scanCurrentAuthorActions } = require("./currentAuthorActionCensus");
 const { createCurrentAuthorResponseSearch } = require("./currentAuthorResponseSearch");
@@ -74,6 +76,25 @@ async function sendFollowup(client, projection, position, now, deps = {}) {
   if (prepared.status !== "READY") return prepared;
   const reserved = await (deps.reserveCommunicationIntent || reserveCommunicationIntent)(client, prepared.intent);
   if (reserved.status === "ALREADY_DELIVERED") return { status: "IDEMPOTENT" };
+  if (reserved.status === "PROVIDER_ACCEPTED") {
+    const providerMessageId = String(reserved.record?.jm1_actiondescription || "")
+      .match(/(?:^|[;\s])providerMessageId=([a-f0-9-]{36})(?:[;\s]|$)/i)?.[1];
+    if (!providerMessageId) return { status: "HELD", reason: "PROVIDER_ACCEPTANCE_ID_UNPROVEN" };
+    const { acceptance } = await (deps.relayRequest || relayRequest)(
+      { action: "recover-provider", providerMessageId }, deps);
+    if (acceptance?.providerMessageId !== providerMessageId || acceptance.communicationComplete !== true ||
+        acceptance.mailboxEvidenceVerified !== true || !acceptance.mailboxMessageId || !acceptance.mailboxVerifiedAt) {
+      return { status: "HELD", reason: "MAILBOX_VERIFICATION_PENDING" };
+    }
+    await (deps.markCommunicationSent || markCommunicationSent)(client, {
+      ...prepared.intent, semanticIdempotencyKey: reserved.semanticIdempotencyKey,
+      communicationRecordId: reserved.communicationRecordId,
+      providerMessageId, sentAt: reserved.sentAt, communicationComplete: true,
+      artifactChecksums: [], artifactManifest: [],
+      observability: { acsDelivery: "PASS", publishingMailboxCopy: "PASS", semanticAttachmentParity: "PASS" }
+    });
+    return { status: "SENT_RECONCILED", providerMessageId, position, workstream: prepared.workstream };
+  }
   if (reserved.status !== "RESERVED") {
     return { status: "HELD", reason: `OUTBOX_${reserved.status}` };
   }
@@ -92,6 +113,13 @@ async function sendFollowup(client, projection, position, now, deps = {}) {
   const sent = await (deps.sendConfiguredAuthorResponse || sendConfiguredAuthorResponse)({ input,
     env: deps.env || process.env, providers: deps.providers || {} });
   if (!sent.ok || !sent.providerMessageId) {
+    if (sent.providerCalled === false) {
+      await (deps.markCommunicationFailed || markCommunicationFailed)(client, {
+        ...prepared.intent, semanticIdempotencyKey: reserved.semanticIdempotencyKey,
+        communicationRecordId: reserved.communicationRecordId,
+        failureCode: sent.reason || "PROVIDER_NOT_CALLED"
+      });
+    }
     return { status: "HELD", reason: sent.reason || "RELAY_ACCEPTANCE_UNPROVEN" };
   }
   await (deps.markCommunicationSent || markCommunicationSent)(client, {
@@ -104,6 +132,23 @@ async function sendFollowup(client, projection, position, now, deps = {}) {
   });
   return { status: sent.communicationComplete ? "SENT" : "MAILBOX_VERIFICATION_PENDING",
     providerMessageId: sent.providerMessageId, position, workstream: prepared.workstream };
+}
+
+async function earlierFollowupPending(client, projection, decision, now, deps = {}) {
+  for (const position of (CADENCE_DAYS[decision.cadenceClass] || []).filter((day) => day > 0 && day < decision.position)) {
+    const prepared = await prepareFollowup(client, projection, position);
+    if (prepared.status !== "READY") return prepared;
+    const state = await (deps.findIntentState || findIntentState)(client,
+      buildCommunicationIdentity(prepared.intent));
+    if (state.status === "PROVIDER_ACCEPTED") {
+      await sendFollowup(client, projection, position, now, deps);
+      return { status: "HELD", reason: "EARLIER_FOLLOWUP_RECONCILIATION" };
+    }
+    if (["AMBIGUOUS_SEND_STATE", "DELIVERY_UNVERIFIED"].includes(state.status)) {
+      return { status: "HELD", reason: "EARLIER_FOLLOWUP_UNVERIFIED" };
+    }
+  }
+  return null;
 }
 
 async function recordDay20Escalation(client, projection, deps = {}) {
@@ -178,8 +223,10 @@ async function runAuthorFollowupCadence(input = {}, deps = {}) {
       }
       const escalation = decision.day20Escalation
         ? await recordDay20Escalation(client, current, deps) : null;
+      const prior = decision.status === "DUE"
+        ? await earlierFollowupPending(client, current, decision, now, deps) : null;
       const delivery = decision.status === "DUE"
-        ? await sendFollowup(client, current, decision.position, now, deps)
+        ? prior || await sendFollowup(client, current, decision.position, now, deps)
         : { status: decision.status };
       results.push({ titleId: projection.titleId, ...delivery, day20Escalation: escalation });
     } catch (error) {
