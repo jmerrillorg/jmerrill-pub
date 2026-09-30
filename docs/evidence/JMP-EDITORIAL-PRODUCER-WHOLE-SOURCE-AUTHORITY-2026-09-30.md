@@ -79,8 +79,13 @@ accepting a plan. It has no fallback to the generic provider router.
 
 This proves a live specialized agent endpoint, **not** production editorial
 assignment. The normal Developmental executor still calls the generic model
-router. The shadow path still needs a live authority resolver, persisted
-snapshot adapter, current Whole style guide and voice profile, and a governed
-end-to-end invocation before output or visual QA can be claimed. Protected
+router. PR #906 now contains an exact-ID authority resolver contract that
+requires current approved source records, verifies manuscript bytes, checks
+each authority source's scope and checksum, and runs before the shadow agent.
+That contract has synthetic positive and denial tests. It does **not** yet
+have the production Dataverse/SharePoint repository adapter, current approved
+Whole style guide and voice profile, or a durable snapshot adapter. A governed
+end-to-end invocation remains necessary before output or visual QA can be
+claimed. Protected
 deployment run `36660765615` remains waiting; no Whole run or author send was
 performed by this packet.

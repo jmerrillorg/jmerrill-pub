@@ -3,6 +3,7 @@
 const crypto = require("node:crypto");
 const { AGENT_ID, validateAuthorityBundle, validateAgentEditPlan } = require("./editorialAgentContract");
 const { createFoundryEditorialAgentRuntime } = require("./foundryEditorialAgentRuntime");
+const { resolveGovernedEditorialAuthority } = require("./governedEditorialAuthorityResolver");
 const { produceGovernedAuthorReviewDocx } = require("./governedWordEditorialProducer");
 
 function fail(code) {
@@ -56,4 +57,13 @@ async function runGovernedEditorialShadow(input = {}, deps = {}) {
   };
 }
 
-module.exports = { runGovernedEditorialShadow };
+async function runResolvedGovernedEditorialShadow(input = {}, deps = {}) {
+  const resolved = await resolveGovernedEditorialAuthority(input, deps.authorityRepository);
+  return runGovernedEditorialShadow({
+    sourceBuffer: resolved.sourceBuffer,
+    authority: resolved.authority,
+    timestamp: input.timestamp
+  }, deps);
+}
+
+module.exports = { runGovernedEditorialShadow, runResolvedGovernedEditorialShadow };
