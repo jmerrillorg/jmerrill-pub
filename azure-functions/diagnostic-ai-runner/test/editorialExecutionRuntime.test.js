@@ -1938,7 +1938,7 @@ test("runtime materializes outputs by updating existing artifact records", async
   }
 });
 
-test("developmental editing materializes a package-grade manuscript docx artifact", async () => {
+test("developmental editing holds rebuilt author DOCX before upload or package handoff", async () => {
   const created = [];
   const patched = [];
   const logs = [];
@@ -2057,54 +2057,13 @@ test("developmental editing materializes a package-grade manuscript docx artifac
         ]
       }
     );
-    assert.equal(result.results[0].status, "VALIDATING");
-    const manuscript = created.find((item) =>
-      item.entitySet === "jm1pub_editorialartifacts" &&
-      item.payload.jm1pub_editorialartifactname.startsWith("Author-Review Edited Manuscript")
-    );
-    const memo = created.find((item) =>
-      item.entitySet === "jm1pub_editorialartifacts" &&
-      item.payload.jm1pub_editorialartifactname.startsWith("Developmental Editorial Review")
-    );
-    const clean = created.find((item) =>
-      item.entitySet === "jm1pub_editorialartifacts" &&
-      item.payload.jm1pub_editorialartifactname.startsWith("Clean Edited Manuscript")
-    );
-    const manifest = created.find((item) =>
-      item.entitySet === "jm1pub_editorialartifacts" &&
-      item.payload.jm1pub_editorialartifactname.startsWith("Package Manifest")
-    );
-    assert.ok(manuscript);
-    assert.equal(manuscript.payload.jm1pub_fileextension, "docx");
-    assert.ok(memo);
-    assert.equal(memo.payload.jm1pub_fileextension, "docx");
-    assert.ok(clean);
-    assert.equal(clean.payload.jm1pub_fileextension, "docx");
-    const evidenceEntry = [...uploadedBodies.entries()].find(([name]) => name.includes("Internal-Evidence-Manifest"));
-    assert.ok(evidenceEntry);
-    const evidence = JSON.parse(evidenceEntry[1].toString("utf8"));
-    assert.equal(evidence.audience, "SYSTEM_EVIDENCE");
-    assert.equal(evidence.outputArtifacts.length, 3);
-    assert.deepEqual(evidence.outputArtifacts.map((artifact) => artifact.artifactRole), [
-      "editedManuscript",
-      "cleanEditedManuscript",
-      "developmentalMemo"
-    ]);
-    assert.equal(evidence.outputArtifacts.every((artifact) => artifact.artifactId && artifact.checksum), true);
-    assert.ok(manifest);
-    assert.equal(manifest.payload.jm1pub_fileextension, "json");
-    const manuscriptPersistedBody = persistedBodies.get(
-      [...persistedBodies.keys()].find((id) =>
-        require("node:crypto").createHash("sha256").update(persistedBodies.get(id)).digest("hex") === manuscript.payload.jm1pub_sha256
-      )
-    );
-    assert.ok(manuscriptPersistedBody);
-    assert.equal(manuscript.payload.jm1pub_filesizebytes, manuscriptPersistedBody.length);
+    assert.equal(result.results[0].status, "EXCEPTION");
+    assert.match(result.results[0].exactBlocker, /WORD_NATIVE_AUTHOR_DOCUMENT_NOT_COMMISSIONED/);
+    assert.equal(uploadedBodies.size, 0);
+    assert.equal(created.some((item) => item.entitySet === "jm1pub_editorialartifacts"), false);
     assert.equal(logs.some((log) => log.jm1_actiontype === "EDITORIAL_SOURCE_VALIDATED"), true);
-    assert.equal(logs.some((log) => log.jm1_actiontype === "ACTIVE_EDITORIAL_OUTPUT_CREATED"), true);
-    assert.equal(logs.some((log) => log.jm1_actiontype === "PACKAGE_MANIFEST_CREATED"), true);
-    assert.equal(logs.some((log) => log.jm1_actiontype === "PACKAGE_QA_COMPLETED"), true);
-    assert.equal(logs.some((log) => log.jm1_actiontype === "AUTHOR_REVIEW_GATE_CREATED"), true);
+    assert.equal(logs.some((log) => log.jm1_actiontype === "ACTIVE_EDITORIAL_OUTPUT_CREATED"), false);
+    assert.equal(logs.some((log) => log.jm1_actiontype === "AUTHOR_REVIEW_GATE_CREATED"), false);
   } finally {
     graphRequest.override = null;
     extractSourceText.override = null;
@@ -2112,7 +2071,7 @@ test("developmental editing materializes a package-grade manuscript docx artifac
   }
 });
 
-test("line editing materializes model-supplied edited manuscript and opens author gate", async () => {
+test("line editing holds rebuilt author DOCX while retaining model and upstream checks", async () => {
   const created = [];
   const patched = [];
   const logs = [];
@@ -2227,30 +2186,13 @@ test("line editing materializes model-supplied edited manuscript and opens autho
         ]
       }
     );
-    assert.equal(result.results[0].status, "VALIDATING");
-    const manuscript = created.find((item) =>
-      item.entitySet === "jm1pub_editorialartifacts" &&
-      item.payload.jm1pub_editorialartifactname.startsWith("Edited Manuscript")
-    );
-    const qaEvidence = created.find((item) =>
-      item.entitySet === "jm1pub_editorialartifacts" &&
-      item.payload.jm1pub_editorialartifactname.startsWith("QA Evidence")
-    );
-    assert.ok(manuscript);
-    assert.equal(manuscript.payload.jm1pub_fileextension, "docx");
-    assert.match(manuscript.payload.jm1pub_notes, /actual model output/);
-    assert.ok(qaEvidence);
-    const docText = await mammoth.extractRawText({ buffer: uploadedBodies.get(manuscript.payload.jm1pub_filename) });
-    assert.match(docText.value, /This sentence reads more clearly/);
-    assert.doesNotMatch(docText.value, /Developmental Editing Output/);
-    const qaBody = uploadedBodies.get(qaEvidence.payload.jm1pub_filename).toString("utf8");
-    assert.match(qaBody, /Retention \/ Drift QA/);
-    assert.match(qaBody, /Model provider: microsoft-foundry-claude/);
-    assert.match(qaBody, /Model fallback: NO/);
+    assert.equal(result.results[0].status, "EXCEPTION");
+    assert.match(result.results[0].exactBlocker, /WORD_NATIVE_AUTHOR_DOCUMENT_NOT_COMMISSIONED/);
+    assert.equal(uploadedBodies.size, 0);
+    assert.equal(created.some((item) => item.entitySet === "jm1pub_editorialartifacts"), false);
     assert.equal(capturedUpstreamContext.approvedArtifactId, "artifact-dev");
     assert.equal(capturedUpstreamContext.gates[0]._jm1pub_deliverableartifactid_value, "artifact-dev");
-    assert.equal(logs.some((log) => log.jm1_actiontype === "AUTHOR_REVIEW_GATE_CREATED"), true);
-    assert.equal(logs.some((log) => log.jm1_actiondescription?.includes("Copyediting is not authorized")), true);
+    assert.equal(logs.some((log) => log.jm1_actiontype === "AUTHOR_REVIEW_GATE_CREATED"), false);
   } finally {
     graphRequest.override = null;
     extractSourceText.override = null;

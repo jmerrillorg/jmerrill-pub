@@ -543,6 +543,9 @@ async function sendCadenceAuthorReviewPackage(input, deps = {}) {
       throw Object.assign(new Error(contentTruth.code), { safeCode: contentTruth.code, nextAction: contentTruth.nextAction });
     }
   }
+  if (["DEVELOPMENTAL_EDITING_REVIEW", "LINE_EDITING_REVIEW", "COPYEDITING_REVIEW", "PROOFREADING_REVIEW"].includes(stageCodeForNotification(input.schedule.stageCode))) {
+    return { status: "BLOCKED", blockers: ["WORD_NATIVE_AUTHOR_DOCUMENT_NOT_COMMISSIONED"] };
+  }
   const governedAttachmentManifest = semanticAttachmentManifest(attachments);
   const artifactManifest = developmental ? {
     packageId: input.packageInfo.packageId,

@@ -318,9 +318,11 @@ test("metadata-refresh package completion does not restart an already due cadenc
     { now: "2026-08-28T15:00:00Z", correlationId: "test-metadata-refresh-does-not-reset-cadence" },
     { client, ...deps }
   );
-  assert.equal(result.packageSent, 1);
+  assert.equal(result.packageSent, 0);
+  assert.equal(result.nonSendable, 1);
   assert.equal(result.results[0].schedule.cadenceStartedAt, "2026-08-20T15:00:00Z");
-  assert.equal(deps.sends.length, 1);
+  assert.deepEqual(result.results[0].blockers, ["WORD_NATIVE_AUTHOR_DOCUMENT_NOT_COMMISSIONED"]);
+  assert.equal(deps.sends.length, 0);
 });
 
 test("repeated package handoff for same output does not restart cadence hold", async () => {
@@ -355,7 +357,7 @@ test("repeated package handoff for same output does not restart cadence hold", a
   assert.equal(result.results[0].status, "SCHEDULED_AUTOMATIC_FUTURE");
 });
 
-test("due package with no canonical or mailbox delivery evidence sends once through governed ACS relay", async () => {
+test("due package with no delivery evidence holds until Word-native producer is commissioned", async () => {
   const client = makeClient();
   const deps = senderDeps();
   const result = await runEditorialCadenceReleaseConsumer(
@@ -364,23 +366,17 @@ test("due package with no canonical or mailbox delivery evidence sends once thro
   );
   assert.equal(result.dueSystemAttention, 0);
   assert.equal(result.deliveredRepaired, 0);
-  assert.equal(result.packageSent, 1);
-  assert.equal(result.results[0].status, "PACKAGE_SENT");
-  assert.equal(deps.sends.length, 1);
-  assert.equal(deps.sends[0].authorEmail, "sean@example.com");
-  assert.equal(deps.sends[0].internalVisibilityMailbox, "publishing@jmerrill.one");
-  assert.deepEqual(deps.sends[0].cc, ["publishing@jmerrill.one"]);
-  assert.equal(deps.sends[0].templateName, "DEVELOPMENTAL_EDITORIAL_REVIEW_READY_V2");
-  assert.equal(deps.sends[0].attachments.length, 2);
-  assert.equal(deps.sends[0].artifactManifest.devPackageComplete, true);
-  assert.equal(deps.sends[0].artifactManifest.versionParity, "PASS");
-  assert.doesNotMatch(`${deps.sends[0].body}\n${deps.sends[0].htmlBody}`, /Why you are receiving this|What has been completed|What's attached|What we need from you|How to respond|What happens next/i);
+  assert.equal(result.packageSent, 0);
+  assert.equal(result.nonSendable, 1);
+  assert.equal(result.results[0].status, "AMBIGUOUS");
+  assert.deepEqual(result.results[0].blockers, ["WORD_NATIVE_AUTHOR_DOCUMENT_NOT_COMMISSIONED"]);
+  assert.equal(deps.sends.length, 0);
   const stageRead = client.calls.listed.find((call) => call.entitySet === "jm1pub_editorialstages");
   assert.match(stageRead.query.$select, /jm1pub_intakereference/);
   assert.match(stageRead.query.$select, /jm1pub_publishingintakereference/);
-  assert.ok(client.calls.created.some((call) => call.payload.jm1_actiontype === "PACKAGE_CADENCE_RELEASE_AUTHOR_PACKAGE_SENT"));
-  assert.ok(client.calls.patched.some((call) => call.entitySet === "jm1pub_editorialapprovalgates" && call.payload.jm1pub_gatestatus === 196650002));
-  assert.ok(client.calls.patched.some((call) => call.entitySet === "jm1pub_editorialstages" && call.payload.jm1pub_stagestatus === 100000002));
+  assert.ok(client.calls.created.some((call) => call.payload.jm1_actiontype === "PACKAGE_CADENCE_RELEASE_SEND_BLOCKED"));
+  assert.ok(!client.calls.created.some((call) => call.payload.jm1_actiontype === "PACKAGE_CADENCE_RELEASE_AUTHOR_PACKAGE_SENT"));
+  assert.ok(!client.calls.patched.some((call) => call.entitySet === "jm1pub_editorialapprovalgates" && call.payload.jm1pub_gatestatus === 196650002));
 });
 
 test("due package with missing contact fails closed as ambiguous and does not send", async () => {
