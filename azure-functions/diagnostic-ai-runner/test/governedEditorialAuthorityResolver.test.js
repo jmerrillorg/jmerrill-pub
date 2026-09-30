@@ -58,3 +58,23 @@ test("resolver denies manuscript byte drift and unapproved source", async () => 
   unapproved.repository.readSourceArtifact = async () => ({ id: "source-1", titleId: "title-1", currentApproved: false, sha256: "a".repeat(64) });
   await assert.rejects(resolveGovernedEditorialAuthority(unapproved.input, unapproved.repository), /CONTROLLING_MANUSCRIPT_UNPROVEN/);
 });
+
+test("review-ready authority is usable only for an explicitly shadow-only resolution", async () => {
+  const data = fixture();
+  data.rows["voiceProfile-1"].approved = false;
+  data.rows["voiceProfile-1"].reviewReady = true;
+  await assert.rejects(resolveGovernedEditorialAuthority(data.input, data.repository),
+    /EDITORIAL_AUTHORITY_VOICEPROFILE_NOT_CURRENT_APPROVED/);
+  const resolved = await resolveGovernedEditorialAuthority({ ...data.input, shadowOnly: true }, data.repository);
+  assert.equal(resolved.releaseEligible, false);
+  assert.equal(resolved.authority.voiceProfile.approvalStatus, "SHADOW_REVIEW_ONLY");
+  const shadowSnapshot = resolved.snapshotSha256;
+  data.rows["voiceProfile-1"].approved = true;
+  const approved = await resolveGovernedEditorialAuthority(data.input, data.repository);
+  assert.equal(approved.releaseEligible, true);
+  assert.notEqual(approved.snapshotSha256, shadowSnapshot);
+  data.rows["voiceProfile-1"].approved = false;
+  data.rows["voiceProfile-1"].current = false;
+  await assert.rejects(resolveGovernedEditorialAuthority({ ...data.input, shadowOnly: true }, data.repository),
+    /EDITORIAL_AUTHORITY_VOICEPROFILE_NOT_CURRENT_APPROVED/);
+});

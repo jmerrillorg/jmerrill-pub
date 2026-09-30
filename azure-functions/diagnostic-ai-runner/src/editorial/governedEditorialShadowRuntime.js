@@ -58,12 +58,13 @@ async function runGovernedEditorialShadow(input = {}, deps = {}) {
 }
 
 async function runResolvedGovernedEditorialShadow(input = {}, deps = {}) {
-  const resolved = await resolveGovernedEditorialAuthority(input, deps.authorityRepository);
-  return runGovernedEditorialShadow({
+  const resolved = await resolveGovernedEditorialAuthority({ ...input, shadowOnly: true }, deps.authorityRepository);
+  const result = await runGovernedEditorialShadow({
     sourceBuffer: resolved.sourceBuffer,
     authority: resolved.authority,
     timestamp: input.timestamp
   }, deps);
+  return { ...result, authorityReleaseEligible: resolved.releaseEligible, authorDeliveryEligible: false };
 }
 
 module.exports = { runGovernedEditorialShadow, runResolvedGovernedEditorialShadow };

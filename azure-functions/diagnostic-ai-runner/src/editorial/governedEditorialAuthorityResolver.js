@@ -18,7 +18,10 @@ function exactId(value) {
 }
 
 function validAuthoritySource(row, label, input) {
-  if (!row || row.id !== input.authorityRefs[label] || row.approved !== true || row.current !== true ||
+  const approved = row?.approved === true && row?.current === true;
+  const shadowReview = input.shadowOnly === true && row?.reviewReady === true &&
+    row?.approved === false && row?.current === true;
+  if (!row || row.id !== input.authorityRefs[label] || (!approved && !shadowReview) ||
       !SOURCE_SYSTEMS.has(row.sourceSystem)) fail(`EDITORIAL_AUTHORITY_${label.toUpperCase()}_NOT_CURRENT_APPROVED`);
   if (TITLE_BOUND.has(label)) {
     if (row.scope !== "TITLE" || row.titleId !== input.titleId) {
@@ -34,7 +37,8 @@ function validAuthoritySource(row, label, input) {
   if (row.stageCode && row.stageCode !== input.stageCode) {
     fail(`EDITORIAL_AUTHORITY_${label.toUpperCase()}_STAGE_CODE_MISMATCH`);
   }
-  return { id: row.id, version: row.version, content: row.content, sha256: row.sha256 };
+  return { id: row.id, version: row.version, content: row.content, sha256: row.sha256,
+    approvalStatus: approved ? "APPROVED" : "SHADOW_REVIEW_ONLY" };
 }
 
 async function resolveGovernedEditorialAuthority(input = {}, repository = {}) {
@@ -70,7 +74,10 @@ async function resolveGovernedEditorialAuthority(input = {}, repository = {}) {
     authority[label] = validAuthoritySource(row, label, input);
   }
   const { snapshot, snapshotSha256 } = validateAuthorityBundle(authority);
-  return { sourceBuffer, authority, snapshot, snapshotSha256 };
+  return {
+    sourceBuffer, authority, snapshot, snapshotSha256,
+    releaseEligible: AUTHORITY_LABELS.every((label) => authority[label].approvalStatus === "APPROVED")
+  };
 }
 
 module.exports = { AUTHORITY_LABELS, resolveGovernedEditorialAuthority };

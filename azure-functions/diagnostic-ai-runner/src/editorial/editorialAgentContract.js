@@ -35,9 +35,13 @@ function validateSource(source, label) {
   if (!source || !nonempty(source.id) || !nonempty(source.version) || !nonempty(source.content)) {
     fail(`EDITORIAL_AUTHORITY_${label}_MISSING`);
   }
+  const approvalStatus = source.approvalStatus || "APPROVED";
+  if (!["APPROVED", "SHADOW_REVIEW_ONLY"].includes(approvalStatus)) {
+    fail(`EDITORIAL_AUTHORITY_${label}_APPROVAL_STATUS_INVALID`);
+  }
   const checksum = crypto.createHash("sha256").update(source.content, "utf8").digest("hex");
   if (source.sha256 !== checksum) fail(`EDITORIAL_AUTHORITY_${label}_CHECKSUM_MISMATCH`);
-  return { id: source.id, version: source.version, sha256: checksum };
+  return { id: source.id, version: source.version, sha256: checksum, approvalStatus };
 }
 
 function validateAuthorityBundle(bundle) {
