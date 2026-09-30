@@ -45,6 +45,8 @@ function plan(bundle) {
       anchor: "This passage needs a clearer transition.",
       sourceText: "needs a clearer transition",
       proposedText: "flows more clearly",
+      rationale: "Clarify the transition without changing the argument.",
+      authorVisibility: "AUTHOR",
       authorityClass: "SYSTEM_AUTHORIZED_EDIT"
     }]
   };
@@ -81,4 +83,33 @@ test("specialized editorial contract rejects full-manuscript blobs and unauthori
   delete candidate.editedManuscript;
   candidate.edits[0].authorityClass = "AUTHOR_DECISION_REQUIRED";
   assert.throws(() => validateAgentEditPlan(candidate, bundle), /EDITORIAL_AGENT_EDIT_AUTHORITY_DENIED/);
+});
+
+test("structured plans require a rationale, edit content, and explicit audience", () => {
+  const bundle = authority();
+  const candidate = plan(bundle);
+  delete candidate.edits[0].rationale;
+  assert.throws(() => validateAgentEditPlan(candidate, bundle), /EDITORIAL_AGENT_EDIT_RATIONALE_MISSING/);
+  candidate.edits[0].rationale = "Keep the source meaning.";
+  candidate.edits[0].authorVisibility = "INTERNAL";
+  assert.throws(() => validateAgentEditPlan(candidate, bundle), /EDITORIAL_AGENT_EDIT_VISIBILITY_INVALID/);
+  candidate.edits[0].authorVisibility = "AUTHOR";
+  delete candidate.edits[0].proposedText;
+  assert.throws(() => validateAgentEditPlan(candidate, bundle), /EDITORIAL_AGENT_PROPOSED_TEXT_MISSING/);
+});
+
+test("internal rights findings stay internal at the agent contract", () => {
+  const bundle = authority();
+  const candidate = plan(bundle);
+  candidate.edits = [{
+    editId: "rights-1",
+    editClass: "RIGHTS_LEGAL_INTERNAL",
+    authorityClass: "RIGHTS_LEGAL_REVIEW_REQUIRED",
+    authorVisibility: "INTERNAL",
+    rationale: "Rights ownership is not yet proven.",
+    commentText: "Verify permission before publication."
+  }];
+  assert.equal(validateAgentEditPlan(candidate, bundle).edits.length, 1);
+  candidate.edits[0].authorVisibility = "AUTHOR";
+  assert.throws(() => validateAgentEditPlan(candidate, bundle), /EDITORIAL_AGENT_EDIT_VISIBILITY_INVALID/);
 });

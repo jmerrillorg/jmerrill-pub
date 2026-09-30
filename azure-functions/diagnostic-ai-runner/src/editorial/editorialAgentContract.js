@@ -6,7 +6,9 @@ const AGENT_ID = "jm1-agent-pub-editorial-01";
 const STAGES = new Set(["EDITORIAL_REVIEW", "DEVELOPMENTAL_EDITING", "LINE_EDITING", "COPYEDITING", "PROOFREADING"]);
 const EDIT_CLASSES = new Set([
   "REPLACE_TEXT", "INSERT_TEXT", "DELETE_TEXT", "MOVE_SECTION_RECOMMENDATION",
-  "EDITOR_COMMENT", "AUTHOR_QUESTION", "AUTHOR_DECISION_REQUIRED", "PUBLISHER_INTERNAL", "NO_CHANGE"
+  "EDITOR_COMMENT", "AUTHOR_QUESTION", "AUTHOR_DECISION_REQUIRED", "PUBLISHER_INTERNAL",
+  "RIGHTS_LEGAL_INTERNAL", "FACT_CHECK_INTERNAL", "PRODUCTION_INTERNAL", "PROVIDER_INTERNAL",
+  "SYSTEM_INTERNAL", "AI_INTERNAL", "NO_CHANGE"
 ]);
 const AUTHORITY_CLASSES = new Set([
   "SYSTEM_AUTHORIZED_EDIT", "AUTHOR_DECISION_REQUIRED", "PUBLISHER_DECISION_REQUIRED",
@@ -72,10 +74,19 @@ function validateAgentEditPlan(result, authority) {
     if (!edit || !nonempty(edit.editId) || ids.has(edit.editId) || !EDIT_CLASSES.has(edit.editClass) ||
         !AUTHORITY_CLASSES.has(edit.authorityClass)) fail("EDITORIAL_AGENT_EDIT_INVALID");
     ids.add(edit.editId);
+    if (!nonempty(edit.rationale)) fail("EDITORIAL_AGENT_EDIT_RATIONALE_MISSING");
     if (["REPLACE_TEXT", "INSERT_TEXT", "DELETE_TEXT"].includes(edit.editClass) &&
         edit.authorityClass !== "SYSTEM_AUTHORIZED_EDIT") fail("EDITORIAL_AGENT_EDIT_AUTHORITY_DENIED");
     if (["REPLACE_TEXT", "INSERT_TEXT", "DELETE_TEXT", "EDITOR_COMMENT", "AUTHOR_QUESTION", "AUTHOR_DECISION_REQUIRED"].includes(edit.editClass) &&
         !nonempty(edit.anchor || edit.sourceText)) fail("EDITORIAL_AGENT_EDIT_ANCHOR_MISSING");
+    if (["REPLACE_TEXT", "INSERT_TEXT"].includes(edit.editClass) && !nonempty(edit.proposedText)) {
+      fail("EDITORIAL_AGENT_PROPOSED_TEXT_MISSING");
+    }
+    if (["EDITOR_COMMENT", "AUTHOR_QUESTION", "AUTHOR_DECISION_REQUIRED"].includes(edit.editClass) &&
+        !nonempty(edit.commentText)) fail("EDITORIAL_AGENT_COMMENT_TEXT_MISSING");
+    if (edit.authorVisibility !== (edit.editClass.endsWith("_INTERNAL") ? "INTERNAL" : "AUTHOR")) {
+      fail("EDITORIAL_AGENT_EDIT_VISIBILITY_INVALID");
+    }
   }
   return { snapshot, snapshotSha256, edits: result.edits };
 }
