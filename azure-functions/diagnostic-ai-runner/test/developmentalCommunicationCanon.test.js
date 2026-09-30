@@ -5,6 +5,7 @@ const test = require("node:test");
 const {
   DEVELOPMENTAL_REVIEW_PACKAGE_TEMPLATE,
   materializeAttachments,
+  renderReviewCopy,
   sendCadenceAuthorReviewPackage,
   validateDevelopmentalContentTruth
 } = require("../src/editorial/editorialCadenceAuthorPackageSender");
@@ -113,36 +114,27 @@ test("exact September 12 Atta review-only state blocks the false completed-packa
   assert.equal(relayCalls, 0);
 });
 
-test("system renderer creates conversational Indomitable copy from a complete governed package", async () => {
-  let payload;
-  const result = await sendCadenceAuthorReviewPackage(input([
-    artifact("editedManuscript"),
-    artifact("reviewInstructions")
-  ]), {
-    downloadArtifact,
-    sendRelay: async (value) => {
-      payload = value;
-      return { status: "DRY_RUN_ACCEPTED", communicationComplete: true };
-    }
+test("system renderer retains conversational copy while manuscript send is held", () => {
+  const payload = renderReviewCopy({
+    stageCode: "DEVELOPMENTAL_EDITING",
+    titleName: "Indomitable",
+    titleId,
+    authorName: "Quanisha Dockery",
+    stageId,
+    packageId,
+    gateId,
+    attachments: [
+      { role: "editedManuscript", name: "Indomitable - Edited Manuscript.docx", sha256: "a".repeat(64) },
+      { role: "developmentalReview", name: "Indomitable - Editorial Review.pdf", sha256: "b".repeat(64) }
+    ]
   });
-
-  assert.equal(result.status, "DRY_RUN_ACCEPTED");
   assert.equal(payload.templateName, DEVELOPMENTAL_REVIEW_PACKAGE_TEMPLATE);
-  assert.equal(payload.artifactManifest.devPackageComplete, true);
-  assert.equal(payload.artifactManifest.versionParity, "PASS");
-  assert.deepEqual(payload.artifactManifest.artifacts, payload.communicationObservability.authorAttachmentManifest);
-  assert.deepEqual(payload.communicationObservability.authorAttachmentManifest, payload.communicationObservability.publishingCopyAttachmentManifest);
-  assert.deepEqual(payload.communicationObservability.authorAttachmentManifest, payload.communicationObservability.dataverseArtifactManifest);
-  assert.equal(payload.communicationObservability.from, "publishing@email.jmerrill.one");
-  assert.deepEqual(payload.attachments.map((item) => item.role).sort(), ["developmentalReview", "editedManuscript"]);
   assert.doesNotMatch(`${payload.body}\n${payload.htmlBody}`, /Why you are receiving this|What has been completed|What's attached|What we need from you|How to respond|What happens next/i);
   assert.match(payload.body, /We've attached .*Edited Manuscript.* together with .*Editorial Review/i);
   assert.match(payload.body, /^Good day Quanisha,/);
-  assert.equal(payload.replyTo, "publishing@jmerrill.one");
-  assert.deepEqual(payload.cc, ["publishing@jmerrill.one"]);
 });
 
-test("deterministic relay denial records a pre-delivery failure before retry", async () => {
+test("uncommissioned producer blocks relay before reserving a communication", async () => {
   const created = [];
   const priorKey = process.env.JM1_RELAY_API_KEY;
   process.env.JM1_RELAY_API_KEY = "test-relay-key";
@@ -166,10 +158,8 @@ test("deterministic relay denial records a pre-delivery failure before retry", a
   if (priorKey === undefined) delete process.env.JM1_RELAY_API_KEY;
   else process.env.JM1_RELAY_API_KEY = priorKey;
 
-  assert.equal(result.status, "FAILED");
-  assert.equal(created.length, 1);
-  assert.equal(created[0].body.jm1_actiontype, "AUTHOR_COMMUNICATION_INTENT_FAILED");
-  assert.match(created[0].body.jm1_actiondescription, /DELIVERY_STATE=FAILED_PRE_DELIVERY/);
+  assert.deepEqual(result, { status: "BLOCKED", blockers: ["WORD_NATIVE_AUTHOR_DOCUMENT_NOT_COMMISSIONED"] });
+  assert.equal(created.length, 0);
 });
 
 test("Developmental package rejects wrong title binding and version drift", async () => {

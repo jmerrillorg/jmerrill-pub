@@ -3605,6 +3605,11 @@ async function materializeEditorialOutputs(
               : buildOutputDocument(stage, stageCode, sourceArtifact, outputName, extracted.value || "", correlationId),
             "utf8"
           );
+    if (shouldBuildDocx && (isDevelopmentalAuthorReview || isDevelopmentalClean || isEditedManuscript || isProofreadManuscript)) {
+      throw Object.assign(new Error("Word-native editorial producer is not commissioned"), {
+        safeCode: `${stageCode}_BLOCKED — WORD_NATIVE_AUTHOR_DOCUMENT_NOT_COMMISSIONED`
+      });
+    }
     const audience = artifactAudience(stageCode, outputName);
     if (isAuthorVisibleAudience(audience) || isDevelopmentalClean) {
       const projectedText = shouldBuildDocx
