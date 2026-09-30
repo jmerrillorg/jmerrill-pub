@@ -67,7 +67,9 @@ function findSingleRun(doc, sourceText) {
   }
   if (matches.length !== 1) fail(matches.length ? "EDITORIAL_ANCHOR_AMBIGUOUS" : "EDITORIAL_ANCHOR_NOT_IN_SINGLE_RUN");
   const match = matches[0];
-  if (descendants(match.run, W, "t").length !== 1 || match.run.parentNode.namespaceURI !== W || match.run.parentNode.localName !== "p") {
+  const children = Array.from(match.run.childNodes).filter((node) => node.nodeType === 1);
+  const simpleRun = children.every((node) => node.namespaceURI === W && ["rPr", "t"].includes(node.localName));
+  if (!simpleRun || descendants(match.run, W, "t").length !== 1 || match.run.parentNode.namespaceURI !== W || match.run.parentNode.localName !== "p") {
     fail("EDITORIAL_ANCHOR_COMPLEX_RUN");
   }
   return match;

@@ -25,6 +25,7 @@ async function fixture() {
         new Paragraph({ text: "Structure and voice", heading: HeadingLevel.HEADING_2 }),
         new Paragraph({ children: [new TextRun({ text: "This passage needs a clearer transition.", bold: true })] }),
         new Paragraph({ children: [new TextRun({ text: "Keep the author's intent here.", italics: true })] }),
+        new Paragraph({ children: [new TextRun({ text: "Line with a preserved break", break: 1 })] }),
         new Paragraph("Please clarify the intended audience."),
         new Paragraph({ text: "First numbered item", numbering: { reference: "ordered", level: 0 } }),
         new Paragraph({ text: "First bulleted item", bullet: { level: 0 } }),
@@ -91,4 +92,7 @@ test("native editor rejects ambiguous and unauthorized edits without producing o
   await assert.rejects(applyNativeEditorialPlan(source, [
     { editId: "e4", editClass: "AUTHOR_QUESTION", anchor: "Please clarify the intended audience.", commentText: "The AI model needs a response.", authorityClass: "AUTHOR_DECISION_REQUIRED" }
   ]), /EDITORIAL_AUTHOR_PROJECTION_FAILED/);
+  await assert.rejects(applyNativeEditorialPlan(source, [
+    { editId: "e5", editClass: "REPLACE_TEXT", sourceText: "Line with a preserved break", proposedText: "Changed line", authorityClass: "SYSTEM_AUTHORIZED_EDIT" }
+  ]), /EDITORIAL_ANCHOR_COMPLEX_RUN/);
 });
