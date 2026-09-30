@@ -5,6 +5,7 @@ const { AGENT_ID, validateAuthorityBundle, validateAgentEditPlan } = require("./
 const { createFoundryEditorialAgentRuntime } = require("./foundryEditorialAgentRuntime");
 const { resolveGovernedEditorialAuthority } = require("./governedEditorialAuthorityResolver");
 const { produceGovernedAuthorReviewDocx } = require("./governedWordEditorialProducer");
+const { createEditorialShadowEvidenceStore } = require("./editorialShadowEvidenceStore");
 
 function fail(code) {
   throw Object.assign(new Error(code), { safeCode: code });
@@ -16,6 +17,8 @@ async function runGovernedEditorialShadow(input = {}, deps = {}) {
   const sourceSha256 = crypto.createHash("sha256").update(input.sourceBuffer).digest("hex");
   if (sourceSha256 !== snapshot.sourceSha256) fail("EDITORIAL_SHADOW_SOURCE_CHECKSUM_MISMATCH");
   if (typeof deps.persistAuthoritySnapshot !== "function") fail("EDITORIAL_SHADOW_DURABLE_SNAPSHOT_REQUIRED");
+  if (typeof deps.readAuthoritySnapshot !== "function") fail("EDITORIAL_SHADOW_SNAPSHOT_READBACK_REQUIRED");
+  if (typeof deps.readCurrentAuthority !== "function") fail("EDITORIAL_SHADOW_AUTHORITY_REFRESH_REQUIRED");
   const agentRuntime = deps.agentRuntime || createFoundryEditorialAgentRuntime(deps.foundry || {});
   if (agentRuntime.agentId !== AGENT_ID ||
       typeof agentRuntime.prepareEditPlan !== "function") fail("EDITORIAL_SHADOW_SPECIALIZED_AGENT_REQUIRED");
@@ -27,6 +30,16 @@ async function runGovernedEditorialShadow(input = {}, deps = {}) {
   });
   if (!persisted?.recordId || persisted.snapshotSha256 !== snapshotSha256) {
     fail("EDITORIAL_SHADOW_AUTHORITY_SNAPSHOT_NOT_PERSISTED");
+  }
+  const readback = await deps.readAuthoritySnapshot(persisted.recordId);
+  if (readback?.recordId !== persisted.recordId ||
+      readback.snapshotSha256 !== snapshotSha256 ||
+      crypto.createHash("sha256").update(JSON.stringify(readback.snapshot)).digest("hex") !== snapshotSha256) {
+    fail("EDITORIAL_SHADOW_AUTHORITY_SNAPSHOT_READBACK_MISMATCH");
+  }
+  const currentAuthority = await deps.readCurrentAuthority();
+  if (validateAuthorityBundle(currentAuthority).snapshotSha256 !== snapshotSha256) {
+    fail("EDITORIAL_SHADOW_AUTHORITY_CHANGED");
   }
 
   const plan = await agentRuntime.prepareEditPlan({
@@ -59,11 +72,19 @@ async function runGovernedEditorialShadow(input = {}, deps = {}) {
 
 async function runResolvedGovernedEditorialShadow(input = {}, deps = {}) {
   const resolved = await resolveGovernedEditorialAuthority({ ...input, shadowOnly: true }, deps.authorityRepository);
+  const evidenceStore = deps.evidenceStore || createEditorialShadowEvidenceStore(deps.evidenceStoreOptions);
   const result = await runGovernedEditorialShadow({
     sourceBuffer: resolved.sourceBuffer,
     authority: resolved.authority,
     timestamp: input.timestamp
-  }, deps);
+  }, {
+    ...deps,
+    persistAuthoritySnapshot: deps.persistAuthoritySnapshot || evidenceStore.persistAuthoritySnapshot,
+    readAuthoritySnapshot: deps.readAuthoritySnapshot || evidenceStore.readAuthoritySnapshot,
+    readCurrentAuthority: async () => (await resolveGovernedEditorialAuthority(
+      { ...input, shadowOnly: true }, deps.authorityRepository
+    )).authority
+  });
   return { ...result, authorityReleaseEligible: resolved.releaseEligible, authorDeliveryEligible: false };
 }
 

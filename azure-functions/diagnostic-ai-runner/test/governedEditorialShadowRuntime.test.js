@@ -45,13 +45,19 @@ test("shadow output requires a persisted exact authority snapshot and a speciali
       assert.equal(authority.sourceArtifactId, "artifact-1");
       return { recordId: "snapshot-1", snapshotSha256 };
     },
+    readAuthoritySnapshot: async (recordId) => {
+      calls.push("readback");
+      return { recordId, snapshotSha256: input.snapshotSha256,
+        snapshot: validateAuthorityBundle(input.authority).snapshot };
+    },
+    readCurrentAuthority: async () => { calls.push("refresh"); return input.authority; },
     agentRuntime: { agentId: AGENT_ID, prepareEditPlan: async ({ authoritySnapshotRecordId }) => {
       calls.push("agent");
       assert.equal(authoritySnapshotRecordId, "snapshot-1");
       return input.plan;
     } }
   });
-  assert.deepEqual(calls, ["snapshot", "agent"]);
+  assert.deepEqual(calls, ["snapshot", "readback", "refresh", "agent"]);
   assert.equal(result.status, "SHADOW_OUTPUT_READY");
   assert.equal(result.trackedRevisionCount, 2);
   assert.equal(result.wordCommentCount, 1);
@@ -63,13 +69,18 @@ test("shadow rejects missing persistence, substituted agent, and stale source be
   const input = await fixture();
   let invoked = false;
   const agentRuntime = { agentId: AGENT_ID, prepareEditPlan: async () => { invoked = true; return input.plan; } };
+  const readAuthoritySnapshot = async () => ({ recordId: "snapshot-1", snapshotSha256: input.snapshotSha256,
+    snapshot: validateAuthorityBundle(input.authority).snapshot });
+  const readCurrentAuthority = async () => input.authority;
   await assert.rejects(runGovernedEditorialShadow(input, { agentRuntime }), /EDITORIAL_SHADOW_DURABLE_SNAPSHOT_REQUIRED/);
   await assert.rejects(runGovernedEditorialShadow(input, {
     persistAuthoritySnapshot: async () => ({ recordId: "snapshot-1", snapshotSha256: input.snapshotSha256 }),
+    readAuthoritySnapshot, readCurrentAuthority,
     agentRuntime: { ...agentRuntime, agentId: "generic-diagnostic-runtime" }
   }), /EDITORIAL_SHADOW_SPECIALIZED_AGENT_REQUIRED/);
   await assert.rejects(runGovernedEditorialShadow({ ...input, sourceBuffer: Buffer.concat([input.sourceBuffer, Buffer.from("changed")]) }, {
-    persistAuthoritySnapshot: async () => ({ recordId: "snapshot-1", snapshotSha256: input.snapshotSha256 }), agentRuntime
+    persistAuthoritySnapshot: async () => ({ recordId: "snapshot-1", snapshotSha256: input.snapshotSha256 }),
+    readAuthoritySnapshot, readCurrentAuthority, agentRuntime
   }), /EDITORIAL_SHADOW_SOURCE_CHECKSUM_MISMATCH/);
   assert.equal(invoked, false);
 });
@@ -79,7 +90,34 @@ test("shadow refuses a failed authority snapshot acknowledgement before agent wo
   let invoked = false;
   await assert.rejects(runGovernedEditorialShadow(input, {
     persistAuthoritySnapshot: async () => ({ recordId: "snapshot-1", snapshotSha256: "wrong" }),
+    readAuthoritySnapshot: async () => null,
+    readCurrentAuthority: async () => input.authority,
     agentRuntime: { agentId: AGENT_ID, prepareEditPlan: async () => { invoked = true; return input.plan; } }
   }), /EDITORIAL_SHADOW_AUTHORITY_SNAPSHOT_NOT_PERSISTED/);
+  assert.equal(invoked, false);
+});
+
+test("shadow refuses tampered readback and approval changes before agent work", async () => {
+  const input = await fixture();
+  let invoked = false;
+  const persistAuthoritySnapshot = async () => ({ recordId: "snapshot-1", snapshotSha256: input.snapshotSha256 });
+  const agentRuntime = { agentId: AGENT_ID, prepareEditPlan: async () => {
+    invoked = true;
+    return input.plan;
+  } };
+  await assert.rejects(runGovernedEditorialShadow(input, {
+    persistAuthoritySnapshot,
+    readAuthoritySnapshot: async () => ({ recordId: "snapshot-1", snapshotSha256: input.snapshotSha256, snapshot: {} }),
+    readCurrentAuthority: async () => input.authority,
+    agentRuntime
+  }), /EDITORIAL_SHADOW_AUTHORITY_SNAPSHOT_READBACK_MISMATCH/);
+  await assert.rejects(runGovernedEditorialShadow(input, {
+    persistAuthoritySnapshot,
+    readAuthoritySnapshot: async () => ({ recordId: "snapshot-1", snapshotSha256: input.snapshotSha256,
+      snapshot: validateAuthorityBundle(input.authority).snapshot }),
+    readCurrentAuthority: async () => ({ ...input.authority,
+      voiceProfile: { ...input.authority.voiceProfile, approvalStatus: "SHADOW_REVIEW_ONLY" } }),
+    agentRuntime
+  }), /EDITORIAL_SHADOW_AUTHORITY_CHANGED/);
   assert.equal(invoked, false);
 });
