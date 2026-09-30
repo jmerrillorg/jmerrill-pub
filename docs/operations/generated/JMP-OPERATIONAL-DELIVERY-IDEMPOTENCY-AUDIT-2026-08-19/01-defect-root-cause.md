@@ -1,0 +1,7 @@
+# Defect Root Cause
+
+`writeExecutionLog()`'s `safeDetail()` helper truncates every `jm1_actiondescription` to 1000 characters. The idempotency key was interpolated near the *end* of each description (after several sentences of boilerplate: operator, gate ID, portal status, natural key, etc.). For any title/stage/package combination whose natural key pushed the preamble past ~800-900 characters, the key never survived truncation.
+
+`findTechnicalReleaseLog()` / `findOperationalCertificationLog()` both look up prior writes via `contains(jm1_actiondescription, '<idempotencyKey>')`. When the key wasn't present in the stored (truncated) description, the lookup could never match — so every replay of `dispatchAuthorPackage()` / `certifyOperationalDelivery()` / `recordExternalDeliveryEvidence()` silently created a new duplicate execution log and reset `jm1pub_awaitingsince` (the review-clock start) instead of detecting the prior write.
+
+**Fix (PR #518, merged c8c98d0a...):** idempotency key moved to the first sentence of all three affected description writes, via a shared pure helper `buildIdempotencySafeExecutionLogDescription()`. Deterministic regression tests added (`lib/server/__tests__/publishing-dispatch-idempotency.test.mts`), including a test that reconstructs the exact pre-fix pattern and proves it fails truncation-survival — confirming the suite detects the real defect, not a strawman.

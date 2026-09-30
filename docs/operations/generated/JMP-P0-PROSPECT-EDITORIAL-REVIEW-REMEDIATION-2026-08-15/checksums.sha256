@@ -1,4 +1,4 @@
-0adb0ccec27071463afad4283dc24cb010745430dc4f9edf58e9da0324c8eac5  docs/operations/generated/JMP-P0-PROSPECT-EDITORIAL-REVIEW-REMEDIATION-2026-08-15/00-executive-summary.md
+e033b0c4640f576c0247fa64bf4d9a432be546a2e59a234eb4948d5d11f98b71  docs/operations/generated/JMP-P0-PROSPECT-EDITORIAL-REVIEW-REMEDIATION-2026-08-15/00-executive-summary.md
 2af4dbada7b64bd284fb1b365e89b7592d83f1da4e142a554f5b797fe2c8953a  docs/operations/generated/JMP-P0-PROSPECT-EDITORIAL-REVIEW-REMEDIATION-2026-08-15/01-incident-description.md
 c9e05d33c84185a861e8357c12c0450d3a0870e6c2288c987ef16d299dd5ea5d  docs/operations/generated/JMP-P0-PROSPECT-EDITORIAL-REVIEW-REMEDIATION-2026-08-15/02-root-cause.md
 15741bc96ba852c946348c015bf4b2c97dc8fab688f1c302778a5477686429df  docs/operations/generated/JMP-P0-PROSPECT-EDITORIAL-REVIEW-REMEDIATION-2026-08-15/03-lifecycle-context-canon.md
@@ -11,8 +11,8 @@ ee1a85da2b0d4fc81109ef7c87c6ecbf084e4b2c598441e30b7043cb84b1e619  docs/operation
 b804c47a84db4cf579f39ead92bf3c668f51fa04e034c043c9cdc1840b419c00  docs/operations/generated/JMP-P0-PROSPECT-EDITORIAL-REVIEW-REMEDIATION-2026-08-15/10-attachment-certification.md
 25d538ff1bfa95de49e2c115c8ba7f75a5c3e8af0ac93810f1f292c9397f7b06  docs/operations/generated/JMP-P0-PROSPECT-EDITORIAL-REVIEW-REMEDIATION-2026-08-15/11-email-rendering-certification.md
 96fc1660ca6c53d77cb8e8e7c1d7ac15bd41ac059ce48c84724ee94f995bb1fc  docs/operations/generated/JMP-P0-PROSPECT-EDITORIAL-REVIEW-REMEDIATION-2026-08-15/12-atta-original-send.md
-b931b5c8ae1464f2a3fabb8077dc2a6d004952f18284a72c0f66ade86601766d  docs/operations/generated/JMP-P0-PROSPECT-EDITORIAL-REVIEW-REMEDIATION-2026-08-15/13-atta-corrected-review.md
-1e03e6c5122068336afdee04df93f89586e5ce439e3d2909d260b5c3ef65f164  docs/operations/generated/JMP-P0-PROSPECT-EDITORIAL-REVIEW-REMEDIATION-2026-08-15/14-atta-corrective-send-proof.md
+c2f3a379639051f5bfe77b8118da78fc636c353d89b02e4c6d15495cf3c6a468  docs/operations/generated/JMP-P0-PROSPECT-EDITORIAL-REVIEW-REMEDIATION-2026-08-15/13-atta-corrected-review.md
+b15bbcd4a6f48ace0022b2c3e0d071a2da0efbb8f5e98afc09d84e8ce5d89996  docs/operations/generated/JMP-P0-PROSPECT-EDITORIAL-REVIEW-REMEDIATION-2026-08-15/14-atta-corrective-send-proof.md
 40a5ccdb397d0dd78b2abb672d67eaf730a302d55420ecc5d0e25aac2c12ff13  docs/operations/generated/JMP-P0-PROSPECT-EDITORIAL-REVIEW-REMEDIATION-2026-08-15/15-prospect-audit.csv
 1e430d96314a1f4176af7eaea12a969f2b36cf7e78b3347b97c6ccf9fa8b266e  docs/operations/generated/JMP-P0-PROSPECT-EDITORIAL-REVIEW-REMEDIATION-2026-08-15/16-affected-prospect-remediation.csv
 dad240c28e10154bafe5f70a28ec322e38574b49940afcbc361c07ca0196b39f  docs/operations/generated/JMP-P0-PROSPECT-EDITORIAL-REVIEW-REMEDIATION-2026-08-15/17-active-author-gate-audit.csv
@@ -20,7 +20,7 @@ fa19abc2b8ea9e134615ec6f213c6b37943b0e1515b89b64734b5087d74c8f57  docs/operation
 08b24b03be314ac74118389cdd6a78c90a60493190066f6314325b0b9d7f7338  docs/operations/generated/JMP-P0-PROSPECT-EDITORIAL-REVIEW-REMEDIATION-2026-08-15/19-commercial-conversion-boundary.md
 459008bf424b5d4d5913baca3a4105281b6c41ab59c72b9ce9561d226b80d0e3  docs/operations/generated/JMP-P0-PROSPECT-EDITORIAL-REVIEW-REMEDIATION-2026-08-15/20-response-correlation.md
 6f4729cecc3b8a9650de9f245abdc81b27927d1ab7d5faf952b8239b8d00c83a  docs/operations/generated/JMP-P0-PROSPECT-EDITORIAL-REVIEW-REMEDIATION-2026-08-15/21-regression-tests.md
-8a791fdbfd0c52fb6a0d79819e144de6377c83070b66bcd42b9f1d2c964835d9  docs/operations/generated/JMP-P0-PROSPECT-EDITORIAL-REVIEW-REMEDIATION-2026-08-15/22-production-deployment.md
-cf8839e0850c3b1ba23d3a50d71df07e227e7f3a834657382e1e5d9638871ab0  docs/operations/generated/JMP-P0-PROSPECT-EDITORIAL-REVIEW-REMEDIATION-2026-08-15/23-post-deploy-proof.md
-fc98e7fb3e47986194a2327d2662fc4150692defeca946b7631c58d924bfefdf  docs/operations/generated/JMP-P0-PROSPECT-EDITORIAL-REVIEW-REMEDIATION-2026-08-15/24-prospect-hold-lift.md
-98e833aba897f1e8ebf260ab38dffc751732a1633ecf12644c0a6d24518c9394  docs/operations/generated/JMP-P0-PROSPECT-EDITORIAL-REVIEW-REMEDIATION-2026-08-15/25-final-state.md
+ca05aba83e20e5a5e383c4bdb0a17f50f79ee66d010804eb608929518abde5fd  docs/operations/generated/JMP-P0-PROSPECT-EDITORIAL-REVIEW-REMEDIATION-2026-08-15/22-production-deployment.md
+e8abf0756f8b2e8a8a0ed025f771e7c8070c132fdc1ccd7eee0d39d7accba7f1  docs/operations/generated/JMP-P0-PROSPECT-EDITORIAL-REVIEW-REMEDIATION-2026-08-15/23-post-deploy-proof.md
+ee06810a031024b50affef98b839e6cf947b3ba871414d5c467a25427d3119f4  docs/operations/generated/JMP-P0-PROSPECT-EDITORIAL-REVIEW-REMEDIATION-2026-08-15/24-prospect-hold-lift.md
+c6456b7ef8b92b5fdc6a18b9038d9bdec89bcfab6170396958fcf80d3536d1ee  docs/operations/generated/JMP-P0-PROSPECT-EDITORIAL-REVIEW-REMEDIATION-2026-08-15/25-final-state.md
