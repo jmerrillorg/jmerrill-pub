@@ -35,6 +35,10 @@ between August 21 and August 29 is not itself documented as an editorial
 decision, so this proof does not authorize any textual change beyond the
 identical manuscript body.
 
+The older intake manifest is **historical**, not a competing controlling
+manuscript. This classification concerns source-text authority only; it does
+not certify a later editorial output.
+
 ## Author-response authority
 
 Read-only Publishing mailbox inspection found Jackuline's response to
@@ -59,3 +63,24 @@ No source file, Dataverse record, SharePoint item, author communication, or
 production state was changed by this readback. Style-guide, voice-profile,
 author-decision runtime binding, specialized-agent assignment, shadow output,
 and visual QA remain separate open gates.
+
+## Specialized runtime readback
+
+The Foundry project `ais-jm1-foundry/jm1-editorial-foundry` had no agents on
+readback. A dedicated no-tools prompt agent, `jm1-agent-pub-editorial-01`, was
+created as version `1` against the existing `jm1-editorial-devline-primary`
+deployment. Foundry returned agent GUID
+`50ba5d40-65f8-47ec-a1e0-dc67ae076244da` and a distinct managed agent
+identity. A synthetic, no-business-data request completed through the
+agent-scoped Responses endpoint and identified version `1`. The definition is
+tracked in `azure-functions/diagnostic-ai-runner/config/editorial-agent-definition.json`;
+the shadow-only adapter now checks the returned agent name and version before
+accepting a plan. It has no fallback to the generic provider router.
+
+This proves a live specialized agent endpoint, **not** production editorial
+assignment. The normal Developmental executor still calls the generic model
+router. The shadow path still needs a live authority resolver, persisted
+snapshot adapter, current Whole style guide and voice profile, and a governed
+end-to-end invocation before output or visual QA can be claimed. Protected
+deployment run `36660765615` remains waiting; no Whole run or author send was
+performed by this packet.
