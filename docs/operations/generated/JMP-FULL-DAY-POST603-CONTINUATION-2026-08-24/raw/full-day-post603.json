@@ -1,0 +1,21 @@
+{
+  "generatedOn": "2026-08-24T22:06:44.361Z",
+  "out": "docs/operations/generated/JMP-FULL-DAY-EXECUTION-EXHAUSTION-2026-08-24",
+  "recordsEvaluated": 424,
+  "waitingOnJmp": 250,
+  "autoExecutable": 3,
+  "taskClassCounts": {
+    "DETERMINISTIC_DATA_REPAIR_OR_EVIDENCE_BINDING": 58,
+    "TERMINAL_OR_LEGACY_RECONCILIATION": 179,
+    "TRUE_JMP_HUMAN_GATE": 5,
+    "LEGACY_RECONCILIATION": 1,
+    "RUNTIME_REPAIR_REQUIRED": 7
+  },
+  "health": {
+    "status": "ready",
+    "release": "c48661150f541747e205701328707d9eeae08c92",
+    "productionRelease": "c48661150f541747e205701328707d9eeae08c92",
+    "node": "v22.23.2"
+  },
+  "finalClassification": "JMP_FULL_DAY_EXECUTION_EXHAUSTION_CONTROLLED_COMMISSIONING"
+}

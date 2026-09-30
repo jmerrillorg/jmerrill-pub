@@ -1,0 +1,17 @@
+0b979e6bbf1d39fc2ab309c91ec4b4afd19252598f3334fb171fc4f29efe3d49  ./00-executive-summary.md
+3b9613da40555b898e15feceaa0eebd29c6577ccf0613602d44c1fdf21c8d8f5  ./01-pr603-merge-and-runtime.md
+3bfcfe027ea4d89b4ff6be568d3d55443e5c62de1927cf61a36accd24a691d21  ./02-editorial-runtime-continuation.md
+ccc248356ec96737a6897d034213f9764edcea5551f282fa04fc0e3eccbd5b2b  ./03-production-continuation.md
+09cd97bfc3a073d859bc93d24cc60f4c6afcc07bd87672c4bef15ba623a1bece  ./04-portfolio-readback.md
+08217a6c29eb1096da1046ca1b0cbdc001a090a9da8d257f9bdabc6bb233f7e3  ./05-founder-named-title-readback.md
+9d9cf550100599798a09995518fb487dd6af60e9bf7bbf50d357958785514d73  ./06-negative-proof.md
+75849f477e4522aca71027cb5240dc2ae2d706f86cfd3b505543cfc18016c16d  ./raw/controller-scan-post603.json
+c854a9aa3e926085a63ff1dbc47670356ccc2bd7067f1f17be33ea70ae2fb7c5  ./raw/full-day-post603.json
+8ff85093d37ca16b2b4f8414f9fe559e3ca3dfc0e2af39c83cdf51cf5a1bd61d  ./raw/general-line-retry-after603.raw
+774c1238fa1b9542dcb26121b26d3ec5602f18bfb9ec4b7e7a4ce52605053e94  ./raw/longwatch-checksum-repair.json
+9f95e0c9cef85d17f0a885dad060611ef040819bdf23c15c81d73f127aebae6f  ./raw/longwatch-line-execute-after-repair.raw
+b8a4b31e4608d93c10e9ae734cb0002f991ed5a9fc377fbfc816c48712700d2c  ./raw/longwatch-line-materialize-execute.raw
+e98938b9302d86edfd1f184554e1b07f150ed3e7f1cc045454464d115de5a277  ./raw/longwatch-source-checksum-readback.json
+29b051a17990010b8444dbc9ea4d2615790511e597a81f912ba939eca760b0f9  ./raw/longwatch-stage-blocker-clear.json
+61383336e5799d9ba319bd416e4dcece87d79b41c86f8dc8f963d3fd2fb332af  ./raw/older-title-dataverse-search.json
+d65d829e2311ba643dd80644fe8f41c4cd95d61f6c81f7cf0035ca35d9954901  ./raw/wave3-post603.json

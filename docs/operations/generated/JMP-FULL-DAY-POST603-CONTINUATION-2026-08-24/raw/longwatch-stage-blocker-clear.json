@@ -1,0 +1,13 @@
+{
+  "ok": true,
+  "stageId": "de969f33-06a0-f111-b8dc-6045bdd69435",
+  "logId": "64bcc2bc-06a0-f111-b8dc-7c1e525b15c2",
+  "readback": {
+    "@odata.context": "https://jm1hq.crm.dynamics.com/api/data/v9.2/$metadata#jm1pub_editorialstages(jm1pub_editorialstageid,jm1pub_name,jm1pub_stagestatus,jm1pub_internaloperationalsummary)/$entity",
+    "@odata.etag": "W/\"49054982\"",
+    "jm1pub_internaloperationalsummary": "Line Editing retry authorized after deterministic source checksum metadata repair. Prior SOURCE_CHECKSUM_MISMATCH was caused by stale Dataverse checksum; Graph and governed OneDrive bytes now match artifact checksum 0d9ff1b6cf700a1decff16e4c5c442307c037101f0280b8937e9f84cc878d599. No author communication sent.",
+    "jm1pub_editorialstageid": "de969f33-06a0-f111-b8dc-6045bdd69435",
+    "jm1pub_name": "Line Editing - The Long Watch",
+    "jm1pub_stagestatus": 100000001
+  }
+}
