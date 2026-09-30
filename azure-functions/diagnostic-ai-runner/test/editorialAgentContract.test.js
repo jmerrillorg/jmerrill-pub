@@ -1,0 +1,84 @@
+"use strict";
+
+const assert = require("node:assert/strict");
+const crypto = require("node:crypto");
+const test = require("node:test");
+const { AGENT_ID, validateAuthorityBundle, validateAgentEditPlan } = require("../src/editorial/editorialAgentContract");
+
+function source(label) {
+  const content = `Governed ${label} content for this fixture.`;
+  return {
+    id: `fixture-${label}`,
+    version: "1.0",
+    content,
+    sha256: crypto.createHash("sha256").update(content).digest("hex")
+  };
+}
+
+function authority(stageCode = "DEVELOPMENTAL_EDITING") {
+  return {
+    agentId: AGENT_ID,
+    titleId: "title-1",
+    stageId: "stage-7",
+    stageCode,
+    sourceSha256: "a".repeat(64),
+    stageCanon: source(stageCode),
+    styleGuide: source("style guide"),
+    authorPreferences: source("author preferences"),
+    voiceProfile: source("voice profile"),
+    titleRulings: source("title rulings"),
+    priorAuthorDecisions: source("prior author decisions")
+  };
+}
+
+function plan(bundle) {
+  return {
+    agentId: AGENT_ID,
+    titleId: bundle.titleId,
+    stageId: bundle.stageId,
+    stageCode: bundle.stageCode,
+    sourceSha256: bundle.sourceSha256,
+    authoritySnapshotSha256: validateAuthorityBundle(bundle).snapshotSha256,
+    edits: [{
+      editId: "edit-1",
+      editClass: "REPLACE_TEXT",
+      anchor: "This passage needs a clearer transition.",
+      sourceText: "needs a clearer transition",
+      proposedText: "flows more clearly",
+      authorityClass: "SYSTEM_AUTHORIZED_EDIT"
+    }]
+  };
+}
+
+test("specialized editorial contract binds actual authority contents and a structured plan", () => {
+  for (const stage of ["EDITORIAL_REVIEW", "DEVELOPMENTAL_EDITING", "LINE_EDITING", "COPYEDITING", "PROOFREADING"]) {
+    const bundle = authority(stage);
+    const validated = validateAgentEditPlan(plan(bundle), bundle);
+    assert.equal(validated.snapshot.stageCode, stage);
+    assert.equal(validated.snapshot.sources.authorPreferences.sha256, bundle.authorPreferences.sha256);
+    assert.equal(validated.snapshot.sources.voiceProfile.sha256, bundle.voiceProfile.sha256);
+  }
+});
+
+test("specialized editorial contract fails closed on missing, substituted, or changed authority", () => {
+  const bundle = authority();
+  delete bundle.authorPreferences.content;
+  assert.throws(() => validateAuthorityBundle(bundle), /EDITORIAL_AUTHORITY_AUTHORPREFERENCES_MISSING/);
+  const restored = authority();
+  const candidate = plan(restored);
+  restored.voiceProfile.content = "Changed after preparation";
+  assert.throws(() => validateAgentEditPlan(candidate, restored), /EDITORIAL_AUTHORITY_VOICEPROFILE_CHECKSUM_MISMATCH/);
+  const substituted = authority();
+  candidate.titleId = "wrong-title";
+  assert.throws(() => validateAgentEditPlan(candidate, substituted), /EDITORIAL_AGENT_OUTPUT_BINDING_MISMATCH/);
+});
+
+test("specialized editorial contract rejects full-manuscript blobs and unauthorized direct edits", () => {
+  const bundle = authority();
+  const candidate = plan(bundle);
+  candidate.editedManuscript = "Replacement document";
+  assert.throws(() => validateAgentEditPlan(candidate, bundle), /EDITORIAL_AGENT_OUTPUT_EFFECT_FORBIDDEN/);
+  delete candidate.editedManuscript;
+  candidate.edits[0].authorityClass = "AUTHOR_DECISION_REQUIRED";
+  assert.throws(() => validateAgentEditPlan(candidate, bundle), /EDITORIAL_AGENT_EDIT_AUTHORITY_DENIED/);
+});
