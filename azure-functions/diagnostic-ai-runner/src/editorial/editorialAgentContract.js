@@ -14,6 +14,10 @@ const AUTHORITY_CLASSES = new Set([
   "SYSTEM_AUTHORIZED_EDIT", "AUTHOR_DECISION_REQUIRED", "PUBLISHER_DECISION_REQUIRED",
   "FACT_CHECK_REQUIRED", "RIGHTS_LEGAL_REVIEW_REQUIRED"
 ]);
+const INTERNAL_EDIT_CLASSES = new Set([
+  "MOVE_SECTION_RECOMMENDATION", "NO_CHANGE", "PUBLISHER_INTERNAL", "RIGHTS_LEGAL_INTERNAL",
+  "FACT_CHECK_INTERNAL", "PRODUCTION_INTERNAL", "PROVIDER_INTERNAL", "SYSTEM_INTERNAL", "AI_INTERNAL"
+]);
 const FORBIDDEN_EFFECT_KEYS = new Set([
   "editedManuscript", "docx", "documentBuffer", "send", "email", "stageTransition",
   "dataverseWrite", "graphUpload", "providerCall"
@@ -84,7 +88,7 @@ function validateAgentEditPlan(result, authority) {
     }
     if (["EDITOR_COMMENT", "AUTHOR_QUESTION", "AUTHOR_DECISION_REQUIRED"].includes(edit.editClass) &&
         !nonempty(edit.commentText)) fail("EDITORIAL_AGENT_COMMENT_TEXT_MISSING");
-    if (edit.authorVisibility !== (edit.editClass.endsWith("_INTERNAL") ? "INTERNAL" : "AUTHOR")) {
+    if (edit.authorVisibility !== (INTERNAL_EDIT_CLASSES.has(edit.editClass) ? "INTERNAL" : "AUTHOR")) {
       fail("EDITORIAL_AGENT_EDIT_VISIBILITY_INVALID");
     }
   }

@@ -113,3 +113,16 @@ test("internal rights findings stay internal at the agent contract", () => {
   candidate.edits[0].authorVisibility = "AUTHOR";
   assert.throws(() => validateAgentEditPlan(candidate, bundle), /EDITORIAL_AGENT_EDIT_VISIBILITY_INVALID/);
 });
+
+test("recommendations and no-change findings cannot masquerade as author-visible edits", () => {
+  const bundle = authority();
+  const candidate = plan(bundle);
+  candidate.edits = [{
+    editId: "move-1", editClass: "MOVE_SECTION_RECOMMENDATION",
+    rationale: "The author must decide whether to move the section.",
+    authorityClass: "AUTHOR_DECISION_REQUIRED", authorVisibility: "AUTHOR"
+  }];
+  assert.throws(() => validateAgentEditPlan(candidate, bundle), /EDITORIAL_AGENT_EDIT_VISIBILITY_INVALID/);
+  candidate.edits[0].authorVisibility = "INTERNAL";
+  assert.equal(validateAgentEditPlan(candidate, bundle).edits.length, 1);
+});
