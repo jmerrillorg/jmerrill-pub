@@ -42,7 +42,8 @@ function validateSource(source, label) {
 
 function validateAuthorityBundle(bundle) {
   if (!bundle || bundle.agentId !== AGENT_ID || !STAGES.has(bundle.stageCode)) fail("EDITORIAL_AGENT_AUTHORITY_INVALID");
-  if (!nonempty(bundle.titleId) || !nonempty(bundle.stageId) || !/^[a-f0-9]{64}$/i.test(bundle.sourceSha256 || "")) {
+  if (!nonempty(bundle.titleId) || !nonempty(bundle.stageId) || !nonempty(bundle.sourceArtifactId) ||
+      !/^[a-f0-9]{64}$/i.test(bundle.sourceSha256 || "")) {
     fail("EDITORIAL_AGENT_SOURCE_BINDING_INVALID");
   }
   const sources = {};
@@ -54,6 +55,7 @@ function validateAuthorityBundle(bundle) {
     titleId: bundle.titleId,
     stageId: bundle.stageId,
     stageCode: bundle.stageCode,
+    sourceArtifactId: bundle.sourceArtifactId,
     sourceSha256: bundle.sourceSha256.toLowerCase(),
     sources
   };
@@ -67,6 +69,7 @@ function validateAgentEditPlan(result, authority) {
   const { snapshot, snapshotSha256 } = validateAuthorityBundle(authority);
   if (!result || result.agentId !== AGENT_ID || result.titleId !== snapshot.titleId ||
       result.stageId !== snapshot.stageId || result.stageCode !== snapshot.stageCode ||
+      result.sourceArtifactId !== snapshot.sourceArtifactId ||
       result.sourceSha256?.toLowerCase() !== snapshot.sourceSha256 ||
       result.authoritySnapshotSha256 !== snapshotSha256) {
     fail("EDITORIAL_AGENT_OUTPUT_BINDING_MISMATCH");

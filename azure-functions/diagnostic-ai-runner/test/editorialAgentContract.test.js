@@ -21,6 +21,7 @@ function authority(stageCode = "DEVELOPMENTAL_EDITING") {
     titleId: "title-1",
     stageId: "stage-7",
     stageCode,
+    sourceArtifactId: "artifact-1",
     sourceSha256: "a".repeat(64),
     stageCanon: source(stageCode),
     styleGuide: source("style guide"),
@@ -37,6 +38,7 @@ function plan(bundle) {
     titleId: bundle.titleId,
     stageId: bundle.stageId,
     stageCode: bundle.stageCode,
+    sourceArtifactId: bundle.sourceArtifactId,
     sourceSha256: bundle.sourceSha256,
     authoritySnapshotSha256: validateAuthorityBundle(bundle).snapshotSha256,
     edits: [{
@@ -73,6 +75,9 @@ test("specialized editorial contract fails closed on missing, substituted, or ch
   assert.throws(() => validateAgentEditPlan(candidate, restored), /EDITORIAL_AUTHORITY_VOICEPROFILE_CHECKSUM_MISMATCH/);
   const substituted = authority();
   candidate.titleId = "wrong-title";
+  assert.throws(() => validateAgentEditPlan(candidate, substituted), /EDITORIAL_AGENT_OUTPUT_BINDING_MISMATCH/);
+  candidate.titleId = substituted.titleId;
+  candidate.sourceArtifactId = "wrong-artifact";
   assert.throws(() => validateAgentEditPlan(candidate, substituted), /EDITORIAL_AGENT_OUTPUT_BINDING_MISMATCH/);
 });
 

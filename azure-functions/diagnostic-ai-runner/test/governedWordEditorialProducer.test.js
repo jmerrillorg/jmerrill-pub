@@ -23,13 +23,13 @@ async function fixture() {
   ] }] }));
   const sourceSha256 = crypto.createHash("sha256").update(buffer).digest("hex");
   const authority = {
-    agentId: AGENT_ID, titleId: "title-1", stageId: "stage-7", stageCode: "DEVELOPMENTAL_EDITING", sourceSha256,
+    agentId: AGENT_ID, titleId: "title-1", stageId: "stage-7", stageCode: "DEVELOPMENTAL_EDITING", sourceArtifactId: "artifact-1", sourceSha256,
     stageCanon: source("stageCanon"), styleGuide: source("styleGuide"), authorPreferences: source("authorPreferences"),
     voiceProfile: source("voiceProfile"), titleRulings: source("titleRulings"), priorAuthorDecisions: source("priorAuthorDecisions")
   };
   const result = {
     agentId: AGENT_ID, titleId: authority.titleId, stageId: authority.stageId,
-    stageCode: authority.stageCode, sourceSha256,
+    stageCode: authority.stageCode, sourceArtifactId: authority.sourceArtifactId, sourceSha256,
     authoritySnapshotSha256: validateAuthorityBundle(authority).snapshotSha256,
     edits: [
       { editId: "edit-1", editClass: "REPLACE_TEXT", sourceText: "needs more clarity", proposedText: "would benefit from a clearer link", rationale: "Improve reader orientation.", authorityClass: "SYSTEM_AUTHORIZED_EDIT", authorVisibility: "AUTHOR", decisionRequired: false },
