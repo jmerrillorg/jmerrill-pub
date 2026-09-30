@@ -47,6 +47,7 @@ function plan(bundle) {
       proposedText: "flows more clearly",
       rationale: "Clarify the transition without changing the argument.",
       authorVisibility: "AUTHOR",
+      decisionRequired: false,
       authorityClass: "SYSTEM_AUTHORIZED_EDIT"
     }]
   };
@@ -82,6 +83,7 @@ test("specialized editorial contract rejects full-manuscript blobs and unauthori
   assert.throws(() => validateAgentEditPlan(candidate, bundle), /EDITORIAL_AGENT_OUTPUT_EFFECT_FORBIDDEN/);
   delete candidate.editedManuscript;
   candidate.edits[0].authorityClass = "AUTHOR_DECISION_REQUIRED";
+  candidate.edits[0].decisionRequired = true;
   assert.throws(() => validateAgentEditPlan(candidate, bundle), /EDITORIAL_AGENT_EDIT_AUTHORITY_DENIED/);
 });
 
@@ -106,6 +108,7 @@ test("internal rights findings stay internal at the agent contract", () => {
     editClass: "RIGHTS_LEGAL_INTERNAL",
     authorityClass: "RIGHTS_LEGAL_REVIEW_REQUIRED",
     authorVisibility: "INTERNAL",
+    decisionRequired: true,
     rationale: "Rights ownership is not yet proven.",
     commentText: "Verify permission before publication."
   }];
@@ -120,9 +123,18 @@ test("recommendations and no-change findings cannot masquerade as author-visible
   candidate.edits = [{
     editId: "move-1", editClass: "MOVE_SECTION_RECOMMENDATION",
     rationale: "The author must decide whether to move the section.",
-    authorityClass: "AUTHOR_DECISION_REQUIRED", authorVisibility: "AUTHOR"
+    authorityClass: "AUTHOR_DECISION_REQUIRED", authorVisibility: "AUTHOR", decisionRequired: true
   }];
   assert.throws(() => validateAgentEditPlan(candidate, bundle), /EDITORIAL_AGENT_EDIT_VISIBILITY_INVALID/);
   candidate.edits[0].authorVisibility = "INTERNAL";
   assert.equal(validateAgentEditPlan(candidate, bundle).edits.length, 1);
+});
+
+test("decision flag is explicit and agrees with the authority class", () => {
+  const bundle = authority();
+  const candidate = plan(bundle);
+  delete candidate.edits[0].decisionRequired;
+  assert.throws(() => validateAgentEditPlan(candidate, bundle), /EDITORIAL_AGENT_DECISION_FLAG_MISSING/);
+  candidate.edits[0].decisionRequired = true;
+  assert.throws(() => validateAgentEditPlan(candidate, bundle), /EDITORIAL_AGENT_DECISION_FLAG_MISMATCH/);
 });

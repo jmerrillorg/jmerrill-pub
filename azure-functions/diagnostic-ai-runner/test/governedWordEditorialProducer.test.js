@@ -32,9 +32,9 @@ async function fixture() {
     stageCode: authority.stageCode, sourceSha256,
     authoritySnapshotSha256: validateAuthorityBundle(authority).snapshotSha256,
     edits: [
-      { editId: "edit-1", editClass: "REPLACE_TEXT", sourceText: "needs more clarity", proposedText: "would benefit from a clearer link", rationale: "Improve reader orientation.", authorityClass: "SYSTEM_AUTHORIZED_EDIT", authorVisibility: "AUTHOR" },
-      { editId: "edit-2", editClass: "AUTHOR_QUESTION", anchor: "intended audience", commentText: "Author question: Is this section intended for first-time readers?", rationale: "Confirm audience before restructuring.", authorityClass: "AUTHOR_DECISION_REQUIRED", authorVisibility: "AUTHOR" },
-      { editId: "edit-3", editClass: "RIGHTS_LEGAL_INTERNAL", commentText: "Check any quoted text rights.", rationale: "Rights review remains internal.", authorityClass: "RIGHTS_LEGAL_REVIEW_REQUIRED", authorVisibility: "INTERNAL" }
+      { editId: "edit-1", editClass: "REPLACE_TEXT", sourceText: "needs more clarity", proposedText: "would benefit from a clearer link", rationale: "Improve reader orientation.", authorityClass: "SYSTEM_AUTHORIZED_EDIT", authorVisibility: "AUTHOR", decisionRequired: false },
+      { editId: "edit-2", editClass: "AUTHOR_QUESTION", anchor: "intended audience", commentText: "Author question: Is this section intended for first-time readers?", rationale: "Confirm audience before restructuring.", authorityClass: "AUTHOR_DECISION_REQUIRED", authorVisibility: "AUTHOR", decisionRequired: true },
+      { editId: "edit-3", editClass: "RIGHTS_LEGAL_INTERNAL", commentText: "Check any quoted text rights.", rationale: "Rights review remains internal.", authorityClass: "RIGHTS_LEGAL_REVIEW_REQUIRED", authorVisibility: "INTERNAL", decisionRequired: true }
     ]
   };
   return { buffer, authority, result };

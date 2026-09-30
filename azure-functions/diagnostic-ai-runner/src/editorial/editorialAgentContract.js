@@ -79,6 +79,10 @@ function validateAgentEditPlan(result, authority) {
         !AUTHORITY_CLASSES.has(edit.authorityClass)) fail("EDITORIAL_AGENT_EDIT_INVALID");
     ids.add(edit.editId);
     if (!nonempty(edit.rationale)) fail("EDITORIAL_AGENT_EDIT_RATIONALE_MISSING");
+    if (typeof edit.decisionRequired !== "boolean") fail("EDITORIAL_AGENT_DECISION_FLAG_MISSING");
+    if (edit.decisionRequired !== (edit.authorityClass !== "SYSTEM_AUTHORIZED_EDIT")) {
+      fail("EDITORIAL_AGENT_DECISION_FLAG_MISMATCH");
+    }
     if (["REPLACE_TEXT", "INSERT_TEXT", "DELETE_TEXT"].includes(edit.editClass) &&
         edit.authorityClass !== "SYSTEM_AUTHORIZED_EDIT") fail("EDITORIAL_AGENT_EDIT_AUTHORITY_DENIED");
     if (["REPLACE_TEXT", "INSERT_TEXT", "DELETE_TEXT", "EDITOR_COMMENT", "AUTHOR_QUESTION", "AUTHOR_DECISION_REQUIRED"].includes(edit.editClass) &&
