@@ -4,6 +4,7 @@ const { app } = require("@azure/functions");
 const { createDataverseClient } = require("../orchestration/authorReviewResponseConsumer");
 const { processStageEvent } = require("../lifecycle/stageRuntimeProcessor");
 const { readStageAuthority } = require("../lifecycle/stageRuntimeAuthority");
+const { resumePublishingWait } = require("../lifecycle/publishingWaitContract");
 
 const QUEUE = "jm1-publishing-stage-events";
 
@@ -17,11 +18,14 @@ function parseEvent(message) {
 }
 
 async function processPublishingStageMessage(message, deps = {}) {
+  const event = parseEvent(message);
+  if (event.eventType === "WAIT_RESOLVED") {
+    return resumePublishingWait(event, deps.waitAdapters);
+  }
   const client = deps.client || createDataverseClient({
     apiBase: process.env.DATAVERSE_WEB_API_BASE_URL,
     resourceUrl: process.env.DATAVERSE_RESOURCE_URL
   });
-  const event = parseEvent(message);
   return processStageEvent(event, {
     ...deps,
     authorize: deps.authorize || ((item) => readStageAuthority(item, client))
@@ -34,7 +38,7 @@ if ((process.env.JM1_PUBLISHING_STAGE_RUNTIME_ENABLED || "").toLowerCase() === "
     connection: "AzureWebJobsStorage",
     handler: async (message, context) => {
       const result = await processPublishingStageMessage(message);
-      context.info(`Publishing stage event ${result.status}; phase=${result.phase}.`);
+      context.info(`Publishing stage event ${result.status}; phase=${result.phase || "WAIT_RESUME"}.`);
     }
   });
 }
