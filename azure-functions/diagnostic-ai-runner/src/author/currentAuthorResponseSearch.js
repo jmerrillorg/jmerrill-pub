@@ -53,7 +53,8 @@ function createCurrentAuthorResponseSearch(client, graphClient, deps = {}) {
     }
     try {
       const result = await readback({ authorId, titleId: title.jm1pub_titleid,
-        afterIso: new Date(after - 86400000).toISOString(), includeResponseSearch: true },
+        afterIso: new Date(after - 86400000).toISOString(), deliverySentAtIso: send.createdon,
+        includeResponseSearch: true },
       { client, graphClient });
       return evaluateMailboxResponseSearch(result, { send, titleName: title.jm1pub_titlename });
     } catch (error) {

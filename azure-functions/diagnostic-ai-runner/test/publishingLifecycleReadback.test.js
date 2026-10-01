@@ -32,6 +32,8 @@ test("wrong immutable author-title pair is denied before mailbox access", async 
 test("unbounded reads and text-only identity are denied", async () => {
   assert.equal((await lifecycleReadback({ authorId: "Test Author", titleId }, dependencies())).status, 400);
   assert.equal((await lifecycleReadback({ authorId, titleId, afterIso: "2020-01-01" }, dependencies())).status, 400);
+  assert.equal((await lifecycleReadback({ authorId, titleId, includeResponseSearch: true,
+    afterIso: new Date(Date.now() - 86400000).toISOString() }, dependencies())).status, 400);
 });
 test("encoded mailbox pagination remains bounded to the canonical Graph mailbox", async () => {
   const deps = dependencies();
@@ -106,12 +108,14 @@ test("response search follows exact threads and alternate addresses from new aut
     return { value: [] };
   };
   const result = await lifecycleReadback({ authorId, titleId, includeResponseSearch: true,
-    afterIso: new Date(Date.now() - 86400000).toISOString() }, deps);
+    afterIso: new Date(Date.now() - 86400000).toISOString(), deliverySentAtIso: new Date().toISOString() }, deps);
   assert.deepEqual(result.jsonBody.responseSearch.aliases, ["new-author@example.net"]);
   assert.equal(result.jsonBody.responseSearch.complete, true);
   assert.equal(result.jsonBody.responseSearch.identityChanges, 0);
   assert.match(filters[2], /new-author@example.net/);
   assert.match(filters[3], /conversationId eq 'exact-thread'/);
+  assert.match(filters[1], /from\/emailAddress\/address eq 'publishing@email\.jmerrill\.one'/);
+  assert.doesNotMatch(filters[1], /Test Project/);
   assert.equal(filters.some(filter => filter.includes("quoted@example.net")), false);
   assert.equal(result.jsonBody.effects, 0);
 });
@@ -128,6 +132,6 @@ test("truncated thread read cannot establish absence of author response", async 
     return { value: [] };
   };
   const result = await lifecycleReadback({ authorId, titleId, includeResponseSearch: true,
-    afterIso: new Date(Date.now() - 86400000).toISOString() }, deps);
+    afterIso: new Date(Date.now() - 86400000).toISOString(), deliverySentAtIso: new Date().toISOString() }, deps);
   assert.equal(result.jsonBody.responseSearch.complete, false);
 });
