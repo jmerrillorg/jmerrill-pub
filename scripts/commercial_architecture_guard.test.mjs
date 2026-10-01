@@ -89,6 +89,16 @@ const checks = [
       catalog.includes('editionSlots: 4'),
   },
   {
+    name: 'public payment presentation has no unapproved schedules or discount',
+    pass: () =>
+      packagesPage.includes('Flexible payment options may be available.') &&
+      packagesPage.includes('Final payment terms are provided with your publishing agreement.') &&
+      ['$1,999', '$4,500', '$7,500'].every((price) => packagesPage.includes(price)) &&
+      !/Pay in Full \(7% off\)|(?:2|4|8|12)-Month|Per Payment|perPayment|paymentOptions|\$1,859|\$4,185|\$6,975/.test(
+        packagesPage.match(/<PageSection\s+eyebrow="Payment Options"[\s\S]*?<\/PageSection>/)?.[0] || '',
+      ),
+  },
+  {
     name: 'Pathfinder names the active Premier package rather than legacy Signature',
     pass: () =>
       homeSections.includes('Starter, Professional, or Premier') &&
