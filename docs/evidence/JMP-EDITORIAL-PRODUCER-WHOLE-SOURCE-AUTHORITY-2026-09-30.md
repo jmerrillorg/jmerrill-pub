@@ -113,3 +113,5 @@ waiting for approval at source SHA `9f65e130897793ca4b4a395531f1f0773b40b670`.
 The editorial branch's 23 focused authority, shadow, agent, Word-native, and
 evidence-store tests pass. No system-path Whole shadow run, author delivery,
 stage advancement, or approval-state mutation occurred in this readback.
+The full diagnostic Function suite also passed: 2,622 tests, 458 suites,
+zero failures.
