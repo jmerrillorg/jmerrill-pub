@@ -28,7 +28,8 @@ function snapshot() {
     sourceRevision: "revision-9",
     sourceReadAt: "2026-10-01T16:00:00.000Z",
     entitlementsComplete: true,
-    proofApproval: { titleId, evidenceId: "proof-1", version: "v1", current: true, status: "APPROVED" },
+    proofArtifact: { titleId, authorId, artifactId: "proof-asset-1", evidenceId: "proof-artifact-1", version: "v1", current: true, checksum, qaStatus: "PASS" },
+    proofApproval: { titleId, authorId, artifactId: "proof-asset-1", evidenceId: "proof-1", version: "v1", current: true, checksum, status: "APPROVED" },
     entitlements: formats.map((format) => ({ ...record(format, `entitlement-${format}`), authorId, status: "AUTHORIZED", distributionAuthority: "PASS", qa: { ...record(format, `qa-${format}`), status: "PASS" } })),
     rights: formats.map((format) => ({ ...record(format, `rights-${format}`), authorId, status: "CLEARED", territories: "WORLD" })),
     identifiers: formats.map((format, index) => ({ ...record(format, `isbn-${format}`), authorId, isbn13: index ? "9781950719938" : "9781954414266", sourceAuthority: "BOWKER" })),
@@ -42,6 +43,15 @@ test("binds both entitled formats to rights, ISBN, retail metadata, exact assets
   assert.equal(result.ready, true);
   assert.deepEqual(result.formatResults.map((item) => item.productFormCode), ["PF-01", "PF-03"]);
   assert.deepEqual(result.blockers, []);
+});
+
+test("requires exact approved proof artifact, version, and checksum", () => {
+  const input = snapshot();
+  input.proofApproval.checksum = "b".repeat(64);
+  assert.ok(evaluateStage13Preflight(input).blockers.includes("EXACT_PROOF_APPROVAL_MISSING"));
+  input.proofApproval.checksum = checksum;
+  input.proofApproval.artifactId = "another-proof";
+  assert.ok(evaluateStage13Preflight(input).blockers.includes("EXACT_PROOF_APPROVAL_MISSING"));
 });
 
 test("fails closed when any format loses governed evidence", () => {

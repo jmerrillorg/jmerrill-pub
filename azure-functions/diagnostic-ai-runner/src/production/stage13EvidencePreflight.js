@@ -43,6 +43,8 @@ function evaluateStage13Preflight(snapshot) {
   const rights = Array.isArray(snapshot?.rights) ? snapshot.rights : [];
   const formatResults = [];
   const usedIsbns = new Map();
+  const proof = snapshot?.proofArtifact;
+  const approval = snapshot?.proofApproval;
 
   if (!GUID.test(titleId)) blockers.add("TITLE_ID_INVALID");
   if (!GUID.test(authorId)) blockers.add("AUTHOR_ID_INVALID");
@@ -50,7 +52,11 @@ function evaluateStage13Preflight(snapshot) {
   if (!revision || !value(snapshot?.sourceReadAt) || !Number.isFinite(Date.parse(snapshot.sourceReadAt))) blockers.add("CANONICAL_SNAPSHOT_NOT_VERSIONED");
   if (!Array.isArray(entitlements) || entitlements.length === 0) blockers.add("ENTITLEMENTS_NOT_RESOLVED");
   if (snapshot?.entitlementsComplete !== true) blockers.add("ENTITLEMENTS_NOT_CERTIFIED_COMPLETE");
-  if (snapshot?.proofApproval?.status !== "APPROVED" || !isCurrent(snapshot.proofApproval) || snapshot.proofApproval.titleId !== titleId) {
+  if (!isCurrent(proof) || proof.titleId !== titleId || proof.authorId !== authorId ||
+      !SHA256.test(value(proof.checksum)) || proof.qaStatus !== "PASS" ||
+      !isCurrent(approval) || approval.titleId !== titleId || approval.authorId !== authorId ||
+      approval.status !== "APPROVED" || approval.artifactId !== proof.artifactId ||
+      approval.version !== proof.version || approval.checksum !== proof.checksum) {
     blockers.add("EXACT_PROOF_APPROVAL_MISSING");
   }
 
