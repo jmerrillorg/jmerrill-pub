@@ -4,7 +4,7 @@ import { readFileSync } from 'node:fs'
 import createJiti from 'jiti'
 
 const jiti = createJiti(import.meta.url)
-const { observedPaymentRequestIdentity, assertObservedRequestReplay } = jiti('../lib/server/stripe/publishing-observed-payment-service.ts')
+const { observedPaymentRequestIdentity, assertObservedRequestReplay, assertObservedAdditionalPaymentSource } = jiti('../lib/server/stripe/publishing-observed-payment-service.ts')
 const { paymentLedgerGuid } = jiti('../lib/server/stripe/publishing-payment-adapters.ts')
 
 const request = {
@@ -39,6 +39,14 @@ test('replay cannot change the amount, title, agreement or settled-payment attri
     { agreementId: 'another-agreement' }, { settlementObservations: [] }]) {
     assert.throws(() => assertObservedRequestReplay({ ...request, ...change }, request), /OBSERVED_REQUEST_BINDING_CONFLICT/)
   }
+})
+
+test('a paid subscription invoice cannot be imported as an additional payment', () => {
+  assert.throws(
+    () => assertObservedAdditionalPaymentSource({ subscription: 'sub_attas_schedule' }),
+    /OBSERVED_SCHEDULED_INVOICE_NOT_ADDITIONAL/,
+  )
+  assert.doesNotThrow(() => assertObservedAdditionalPaymentSource({ subscription: null }))
 })
 
 test('uncommissioned prototype fails closed and contains no direct communication provider', () => {

@@ -188,6 +188,8 @@ async function readObservedSettlement(request: ObservedAdditionalRequest, paymen
   if (invoice.status !== 'paid' || invoice.livemode !== true || invoice.customer !== customerId || invoice.amount_paid !== payment.amountCents) {
     throw new Error('OBSERVED_SETTLEMENT_INVOICE_PARITY_FAILED')
   }
+  // A subscription invoice settles a scheduled installment, regardless of how an observation labels it.
+  assertObservedAdditionalPaymentSource(invoice)
   const subscription = await stripeSettlementRead(`/subscriptions/${encodeURIComponent(text(invoice.subscription))}`)
   if (subscription.customer !== customerId || subscription.schedule !== scheduleId) throw new Error('OBSERVED_SETTLEMENT_SCHEDULE_BINDING_FAILED')
   const paidAt = Number(invoice.status_transitions?.paid_at)
@@ -197,6 +199,10 @@ async function readObservedSettlement(request: ObservedAdditionalRequest, paymen
   const event = events.find((candidate: { data?: { object?: { id?: string } } }) => candidate.data?.object?.id === invoice.id)
   if (!/^evt_[A-Za-z0-9]+$/.test(text(event?.id))) throw new Error('OBSERVED_SETTLEMENT_PROVIDER_EVENT_REQUIRED')
   return { payment, invoiceId: invoice.id as string, eventId: event.id as string, paidAt: new Date(paidAt * 1000).toISOString(), requestId: request.requestId }
+}
+
+export function assertObservedAdditionalPaymentSource(invoice: { subscription?: unknown }) {
+  if (text(invoice.subscription)) throw new Error('OBSERVED_SCHEDULED_INVOICE_NOT_ADDITIONAL')
 }
 
 export async function reconcileObservedSettlements(requestId: string) {
