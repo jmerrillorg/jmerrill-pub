@@ -42,8 +42,13 @@ function digest(input) {
 
 function validValue(field, input) {
   if (field === "authorId") return typeof input === "string" && GUID.test(input);
-  if (["titleThemes", "formatEntitlements", "preferences", "titleRulings", "prohibitedVisuals", "approvedBrandAssets"].includes(field)) {
-    return Array.isArray(input) && (field === "titleThemes" || field === "formatEntitlements" ? input.length > 0 : true);
+  if (["titleThemes", "formatEntitlements", "preferences", "titleRulings", "prohibitedVisuals"].includes(field)) {
+    return Array.isArray(input) && (field === "titleThemes" || field === "formatEntitlements" ? input.length > 0 : true) &&
+      input.every((entry) => typeof entry === "string" && entry.trim().length > 0);
+  }
+  if (field === "approvedBrandAssets") {
+    return Array.isArray(input) && input.every((entry) => entry && typeof entry.id === "string" &&
+      entry.id.trim().length > 0 && SHA256.test(entry.sha256 || ""));
   }
   if (field === "pageCount") return Number.isInteger(input) && input > 0;
   if (field === "isbn") return input && typeof input === "object" && !Array.isArray(input) &&

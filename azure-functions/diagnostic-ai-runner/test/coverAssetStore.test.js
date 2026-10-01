@@ -26,7 +26,10 @@ test("concept bytes are immutable, replayable, and read back by checksum", async
     containerName: "cover-assets", service });
   const first = await store.uploadAsset(input);
   assert.equal(first.assetId, sha256);
+  assert.deepEqual(await store.fetchAssetBytes(first), bytes);
   assert.deepEqual(await store.uploadAsset(input), first);
   assert.equal(blobs.size, 1);
+  await assert.rejects(store.fetchAssetBytes({ ...first, location: "https://other.example.com/asset.png" }),
+    /COVER_ASSET_LOCATION_INVALID/);
   await assert.rejects(store.uploadAsset({ ...input, sha256: "a".repeat(64) }), /COVER_ASSET_INVALID/);
 });

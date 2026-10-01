@@ -53,7 +53,26 @@ function createCoverAssetStore(options = {}) {
       location: `${url.origin}/${containerName}/${name}` };
   }
 
-  return { uploadAsset };
+  async function fetchAssetBytes(concept) {
+    if (!SHA256.test(concept?.sha256 || "") || concept.assetId !== concept.sha256 ||
+        typeof concept.location !== "string") throw new Error("COVER_ASSET_IDENTITY_INVALID");
+    let location;
+    try { location = new URL(concept.location); } catch { throw new Error("COVER_ASSET_LOCATION_INVALID"); }
+    const prefix = `${url.origin}/${containerName}/publishing/cover/v1/concepts/`;
+    if (location.protocol !== "https:" || location.username || location.password || location.search ||
+        location.hash || !concept.location.startsWith(prefix) ||
+        !location.pathname.endsWith(`-${concept.sha256}.png`)) {
+      throw new Error("COVER_ASSET_LOCATION_INVALID");
+    }
+    const name = concept.location.slice(`${url.origin}/${containerName}/`.length);
+    const bytes = await bytesFrom(container.getBlockBlobClient(name));
+    if (createHash("sha256").update(bytes).digest("hex") !== concept.sha256) {
+      throw new Error("COVER_ASSET_READBACK_MISMATCH");
+    }
+    return bytes;
+  }
+
+  return { uploadAsset, fetchAssetBytes };
 }
 
 module.exports = { createCoverAssetStore };

@@ -61,4 +61,7 @@ test("print page count needs current artifact checksum and ISBN follows entitlem
   const missingEbook = records().map((record) => record.field === "isbn"
     ? { ...record, value: { paperback: "9781961475861" } } : record);
   assert.equal(resolveCoverAuthorityBundle(titleId, missingEbook, { now }).code, "COVER_FORMAT_IDENTIFIER_CONFLICT");
+  const invalidBrandAsset = records().map((record) => record.field === "approvedBrandAssets"
+    ? { ...record, value: [{ id: "asset", sha256: "not-a-checksum" }] } : record);
+  assert.ok(resolveCoverAuthorityBundle(titleId, invalidBrandAsset, { now }).missing.includes("approvedBrandAssets"));
 });

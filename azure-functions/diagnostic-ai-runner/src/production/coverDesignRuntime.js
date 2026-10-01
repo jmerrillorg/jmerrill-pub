@@ -287,9 +287,12 @@ async function prepareReviewPackage(record, deps) {
     return { ok: false, code: "COVER_CONCEPT_SET_NOT_READY" };
   }
   if (!deps || typeof deps.composeReviewPackage !== "function" ||
-      typeof deps.preflightReviewPackage !== "function" || typeof deps.saveReviewPackage !== "function") {
+      typeof deps.preflightReviewPackage !== "function" || typeof deps.saveReviewPackage !== "function" ||
+      typeof deps.readCurrentAuthorityDigest !== "function") {
     return { ok: false, code: "COVER_REVIEW_RUNTIME_NOT_COMMISSIONED" };
   }
+  const currentDigest = await deps.readCurrentAuthorityDigest(record.titleId);
+  if (currentDigest !== record.briefVersion) return { ok: false, code: "COVER_REVIEW_AUTHORITY_STALE" };
   const reviewPackage = await deps.composeReviewPackage({
     titleId: record.titleId,
     brief: record.brief,
@@ -313,8 +316,12 @@ async function prepareReviewPackage(record, deps) {
       preflightEvidenceId: preflight.evidenceId
     }
   };
-  await deps.saveReviewPackage(result);
-  return result;
+  const saved = await deps.saveReviewPackage(result);
+  if (!saved || saved.titleId !== result.titleId || saved.briefVersion !== result.briefVersion ||
+      saved.reviewPackage?.sha256 !== result.reviewPackage.sha256 || saved.state !== STATES.AWAITING_REVIEW) {
+    return { ok: false, code: "COVER_REVIEW_PACKAGE_READBACK_FAILED" };
+  }
+  return saved;
 }
 
 function reviewConceptSet(record, decision, operator) {

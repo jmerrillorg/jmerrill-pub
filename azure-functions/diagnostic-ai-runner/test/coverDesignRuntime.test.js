@@ -133,9 +133,10 @@ test("concept runtime is idempotent and review remains a genuine human gate", as
   assert.equal(calls, 2);
   assert.equal(reviewConceptSet(first, { action: "APPROVE", assetId: "asset-1" }).code, "COVER_REVIEW_NOT_CURRENT");
   const packageRecord = await prepareReviewPackage(first, {
+    readCurrentAuthorityDigest: async () => first.briefVersion,
     composeReviewPackage: async () => ({ assetId: "review-1", location: "sharepoint://review.pdf", sha256: "a".repeat(64) }),
     preflightReviewPackage: async () => ({ passed: true, evidenceId: "review-qa-1" }),
-    saveReviewPackage: async () => {}
+    saveReviewPackage: async (result) => result
   });
   assert.equal(packageRecord.state, STATES.AWAITING_REVIEW);
   const operator = { reviewerId: AUTHOR_ID, authenticated: true, coverReviewAuthorized: true };
@@ -153,6 +154,20 @@ test("concept runtime is idempotent and review remains a genuine human gate", as
     briefVersion: "prior", reviewPackageSha256: packageRecord.reviewPackage.sha256
   }, operator);
   assert.equal(stale.code, "COVER_REVIEW_STALE");
+});
+
+test("review handoff denies stale authority before composition", async () => {
+  let compositions = 0;
+  const record = { state: STATES.CONCEPTS_READY, titleId: TITLE_ID, briefVersion: "a".repeat(64),
+    concepts: [{ assetId: "a" }, { assetId: "b" }] };
+  const result = await prepareReviewPackage(record, {
+    readCurrentAuthorityDigest: async () => "b".repeat(64),
+    composeReviewPackage: async () => { compositions++; },
+    preflightReviewPackage: async () => ({ passed: true }),
+    saveReviewPackage: async () => {}
+  });
+  assert.equal(result.code, "COVER_REVIEW_AUTHORITY_STALE");
+  assert.equal(compositions, 0);
 });
 
 test("same runtime accepts another title and revisions need an earlier execution", async () => {
