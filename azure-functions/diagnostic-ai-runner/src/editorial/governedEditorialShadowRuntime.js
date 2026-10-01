@@ -76,7 +76,11 @@ async function runGovernedEditorialShadow(input = {}, deps = {}) {
 }
 
 async function runResolvedGovernedEditorialShadow(input = {}, deps = {}) {
-  const resolved = await resolveGovernedEditorialAuthority({ ...input, shadowOnly: true }, deps.authorityRepository);
+  const authorityRepository = {
+    ...deps.authorityRepository,
+    verificationTimestamp: deps.authorityRepository?.verificationTimestamp || new Date().toISOString()
+  };
+  const resolved = await resolveGovernedEditorialAuthority({ ...input, shadowOnly: true }, authorityRepository);
   const evidenceStore = deps.evidenceStore || createEditorialShadowEvidenceStore(deps.evidenceStoreOptions);
   const result = await runGovernedEditorialShadow({
     sourceBuffer: resolved.sourceBuffer,
@@ -87,7 +91,7 @@ async function runResolvedGovernedEditorialShadow(input = {}, deps = {}) {
     persistAuthoritySnapshot: deps.persistAuthoritySnapshot || evidenceStore.persistAuthoritySnapshot,
     readAuthoritySnapshot: deps.readAuthoritySnapshot || evidenceStore.readAuthoritySnapshot,
     readCurrentAuthority: async () => (await resolveGovernedEditorialAuthority(
-      { ...input, shadowOnly: true }, deps.authorityRepository
+      { ...input, shadowOnly: true }, authorityRepository
     )).authority
   });
   return { ...result, authorityReleaseEligible: resolved.releaseEligible, authorDeliveryEligible: false };

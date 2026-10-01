@@ -79,3 +79,46 @@ test("review-ready authority is usable only for an explicitly shadow-only resolu
   await assert.rejects(resolveGovernedEditorialAuthority({ ...data.input, shadowOnly: true }, data.repository),
     /EDITORIAL_AUTHORITY_VOICEPROFILE_NOT_CURRENT_APPROVED/);
 });
+
+test("resolver binds registered title style, voice, and rulings without caller-supplied IDs", async () => {
+  const data = fixture();
+  data.input.titleId = "daf8180f-85a3-f111-b8de-000d3a14673b";
+  data.input.stageId = "ae3c9d5e-67b5-f111-aaab-000d3a10aa9c";
+  for (const label of ["styleGuide", "titleStyleSheet", "voiceProfile", "titleRulings"]) delete data.input.authorityRefs[label];
+  const definitions = [
+    ["style-registered", "Whole - Project Style Sheet v1.0", 196650007, "titleStyleSheet"],
+    ["voice-registered", "Whole - Voice Profile v1.0", 196650018, "voiceProfile"],
+    ["rulings-registered", "Whole - Author Revision Rulings v1.0", 196650013, "titleRulings"]
+  ];
+  const content = new Map();
+  const rows = definitions.map(([id, name, type, label]) => {
+    const bytes = Buffer.from(`Governed ${label} content.`);
+    content.set(id, bytes);
+    return {
+      jm1pub_editorialartifactid: id, jm1pub_editorialartifactname: name,
+      jm1pub_artifacttype: type, jm1pub_artifactstatus: 196650001,
+      jm1pub_iscurrentapproved: false, jm1pub_versionlabel: "v1.0-shadow-authority-review",
+      jm1pub_sha256: crypto.createHash("sha256").update(bytes).digest("hex"),
+      jm1pub_repositorydriveid: "drive", jm1pub_repositoryitemid: id,
+      jm1pub_repositorypath: `https://sharepoint.example/JM1-PUB/01_Pipeline_A-Z/07%20-%20Developmental%20Editing/Whole/${id}.md`,
+      _jm1pub_titleid_value: data.input.titleId, _jm1pub_editorialstageid_value: data.input.stageId
+    };
+  });
+  data.repository.client = { list: async () => rows };
+  data.repository.downloadArtifact = async (row) => content.get(row.jm1pub_repositoryitemid);
+  const guide = "Existing governed knowledge.md content.";
+  data.repository.verifyKnowledgeBlob = async () => ({ reachable: true, hashMatched: true, content: guide,
+    calculatedSha256: crypto.createHash("sha256").update(guide).digest("hex") });
+  data.repository.readSourceArtifact = async () => ({ id: "source-1", titleId: data.input.titleId,
+    currentApproved: true, sha256: crypto.createHash("sha256").update(Buffer.from("fixture manuscript")).digest("hex") });
+  for (const label of ["authorPreferences", "priorAuthorDecisions"]) data.rows[`${label}-1`].titleId = data.input.titleId;
+  const resolved = await resolveGovernedEditorialAuthority({ ...data.input, shadowOnly: true }, data.repository);
+  assert.equal(resolved.authority.titleStyleSheet.id, "style-registered");
+  assert.equal(resolved.authority.styleGuide.id, "JM1-PUB-Editorial-Knowledge-v1.0");
+  assert.equal(resolved.authority.voiceProfile.id, "voice-registered");
+  assert.equal(resolved.authority.titleRulings.id, "rulings-registered");
+  assert.equal(resolved.releaseEligible, false);
+  await assert.rejects(resolveGovernedEditorialAuthority(data.input, data.repository), /NOT_APPROVED/);
+  await assert.rejects(resolveGovernedEditorialAuthority({ ...data.input, shadowOnly: true,
+    authorityRefs: { ...data.input.authorityRefs, voiceProfile: "wrong-source" } }, data.repository), /REGISTERED_SOURCE_MISMATCH/);
+});

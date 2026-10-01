@@ -2,12 +2,13 @@
 
 const crypto = require("node:crypto");
 const { AGENT_ID, validateAuthorityBundle } = require("./editorialAgentContract");
+const { readExistingTitleAuthorities, readExistingGlobalStyleGuide } = require("./productionTitleAuthorityReader");
 
 const AUTHORITY_LABELS = Object.freeze([
   "stageCanon", "styleGuide", "titleStyleSheet", "authorPreferences", "voiceProfile", "titleRulings", "priorAuthorDecisions"
 ]);
 const TITLE_BOUND = new Set(["titleStyleSheet", "authorPreferences", "voiceProfile", "titleRulings", "priorAuthorDecisions"]);
-const SOURCE_SYSTEMS = new Set(["DATAVERSE", "SHAREPOINT", "GOVERNED_REPO"]);
+const SOURCE_SYSTEMS = new Set(["DATAVERSE", "SHAREPOINT", "GOVERNED_REPO", "GOVERNED_BLOB"]);
 
 function fail(code) {
   throw Object.assign(new Error(code), { safeCode: code });
@@ -42,8 +43,23 @@ function validAuthoritySource(row, label, input) {
 }
 
 async function resolveGovernedEditorialAuthority(input = {}, repository = {}) {
-  if (![input.titleId, input.stageId, input.stageCode, input.sourceArtifactId].every(exactId) ||
-      !input.authorityRefs || !AUTHORITY_LABELS.every((label) => exactId(input.authorityRefs[label]))) {
+  if (![input.titleId, input.stageId, input.stageCode, input.sourceArtifactId].every(exactId)) {
+    fail("EDITORIAL_AUTHORITY_EXACT_REFERENCES_REQUIRED");
+  }
+  const existingTitleSources = repository.client
+    ? await readExistingTitleAuthorities({ titleId: input.titleId, stageId: input.stageId, shadowOnly: input.shadowOnly }, repository)
+    : {};
+  if (repository.client) {
+    existingTitleSources.styleGuide = await readExistingGlobalStyleGuide(repository);
+  }
+  const authorityRefs = { ...(input.authorityRefs || {}) };
+  for (const [label, source] of Object.entries(existingTitleSources)) {
+    if (authorityRefs[label] && authorityRefs[label] !== source.id) {
+      fail(`EDITORIAL_AUTHORITY_${label.toUpperCase()}_REGISTERED_SOURCE_MISMATCH`);
+    }
+    authorityRefs[label] = source.id;
+  }
+  if (!AUTHORITY_LABELS.every((label) => exactId(authorityRefs[label]))) {
     fail("EDITORIAL_AUTHORITY_EXACT_REFERENCES_REQUIRED");
   }
   if (typeof repository.readSourceArtifact !== "function" ||
@@ -70,8 +86,8 @@ async function resolveGovernedEditorialAuthority(input = {}, repository = {}) {
     sourceSha256: sourceRecord.sha256.toLowerCase()
   };
   for (const label of AUTHORITY_LABELS) {
-    const row = await repository.readAuthoritySource(input.authorityRefs[label]);
-    authority[label] = validAuthoritySource(row, label, input);
+    const row = existingTitleSources[label] || await repository.readAuthoritySource(authorityRefs[label]);
+    authority[label] = validAuthoritySource(row, label, { ...input, authorityRefs });
   }
   const { snapshot, snapshotSha256 } = validateAuthorityBundle(authority);
   return {
