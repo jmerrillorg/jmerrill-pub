@@ -45,4 +45,65 @@ async function readEditorialStageAuthority(event, client) {
   };
 }
 
-module.exports = { readEditorialStageAuthority };
+async function readCanonicalStageAuthority(event, client) {
+  const [stage, definition, title] = await Promise.all([
+    client.first("jmpv2_stageinstances", {
+      $select: "jmpv2_stageinstanceid,jmpv2_stageinstancekey,jmpv2_lifecyclekey,jmpv2_stagecode,jmpv2_status",
+      $filter: `jmpv2_stageinstanceid eq ${event.stageId}`
+    }),
+    client.list("jmpv2_stagedefinitions", {
+      $select: "jmpv2_stagecode,jmpv2_isactive",
+      $filter: `jmpv2_stagecode eq '${event.stageCode}'`, $top: "2"
+    }),
+    client.first("jm1pub_titles", {
+      $select: "jm1pub_titleid,_jm1_primaryauthor_value",
+      $filter: `jm1pub_titleid eq ${event.titleId}`
+    })
+  ]);
+  if (!stage || definition.length !== 1 || definition[0].jmpv2_isactive !== true || !title) {
+    return { titleId: "", stageId: "", stageCode: "", current: false };
+  }
+  const lifecycleKey = String(stage.jmpv2_lifecyclekey || "");
+  if (!lifecycleKey || !/^[0-9a-f-]{36}$/i.test(lifecycleKey)) {
+    return { titleId: "", stageId: "", stageCode: "", current: false };
+  }
+  const lifecycles = await client.list("jmpv2_lifecycleinstances", {
+    $select: "jmpv2_lifecycleinstanceid,jmpv2_lifecyclekey,jmpv2_currentstagecode,jmpv2_currentstageinstancekey",
+    $filter: `jmpv2_lifecyclekey eq '${lifecycleKey}'`, $top: "2"
+  });
+  const lifecycle = lifecycles.length === 1 ? lifecycles[0] : null;
+  if (!lifecycle || !/^[0-9a-f-]{36}$/i.test(String(lifecycle.jmpv2_lifecycleinstanceid || ""))) {
+    return { titleId: "", stageId: "", stageCode: "", current: false };
+  }
+  const engagements = await client.list("jmpv2_publishingengagements", {
+    $select: "jmpv2_canonicaltitleid,jmpv2_canonicalauthorid,jmpv2_lifecycleinstanceid,jmpv2_currentstage",
+    $filter: `jmpv2_lifecycleinstanceid eq '${lifecycle.jmpv2_lifecycleinstanceid}'`, $top: "2"
+  });
+  const engagement = engagements.length === 1 ? engagements[0] : null;
+  const authorId = String(title._jm1_primaryauthor_value || "").toLowerCase();
+  return {
+    titleId: String(title.jm1pub_titleid || "").toLowerCase(),
+    stageId: String(stage.jmpv2_stageinstanceid || "").toLowerCase(),
+    stageCode: stage.jmpv2_stagecode,
+    authorId,
+    current: Boolean(engagement && authorId &&
+      stage.jmpv2_status === "OPEN" &&
+      stage.jmpv2_stagecode === event.stageCode &&
+      lifecycle.jmpv2_lifecyclekey === lifecycleKey &&
+      lifecycle.jmpv2_currentstagecode === event.stageCode &&
+      lifecycle.jmpv2_currentstageinstancekey === stage.jmpv2_stageinstancekey &&
+      String(engagement.jmpv2_lifecycleinstanceid || "").toLowerCase() ===
+        lifecycle.jmpv2_lifecycleinstanceid.toLowerCase() &&
+      String(engagement.jmpv2_canonicaltitleid || "").toLowerCase() === event.titleId.toLowerCase() &&
+      String(engagement.jmpv2_canonicalauthorid || "").toLowerCase() === authorId &&
+      engagement.jmpv2_currentstage === event.stageCode)
+  };
+}
+
+function readStageAuthority(event, client) {
+  return Object.hasOwn(STAGE_TYPES, event.stageCode)
+    ? readEditorialStageAuthority(event, client)
+    : readCanonicalStageAuthority(event, client);
+}
+
+module.exports = { readEditorialStageAuthority, readCanonicalStageAuthority, readStageAuthority };
