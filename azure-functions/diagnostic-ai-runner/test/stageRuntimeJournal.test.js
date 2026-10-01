@@ -86,7 +86,7 @@ test("rejects a replay whose evidence or actor changed under the same idempotenc
   }, deps), /IDEMPOTENCY_PAYLOAD_MISMATCH/);
   await assert.rejects(persistStageEvent({
     ...original, actorClass: "HUMAN"
-  }, deps), /IDEMPOTENCY_PAYLOAD_MISMATCH/);
+  }, deps), /EVENT_ACTOR_MISMATCH/);
   assert.equal(JSON.parse([...containerClient.values.values()][0].data).events.length, 1);
 });
 

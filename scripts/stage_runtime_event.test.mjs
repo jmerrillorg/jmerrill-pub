@@ -41,6 +41,8 @@ test('missing correlation, tampering, and impossible stage events fail closed', 
   assert.throws(() => buildPublishingStageEvent({ ...base, titleId: 'Whole' }), /CORRELATION_INVALID/)
   assert.throws(() => buildPublishingStageEvent({ ...base, evidenceReference: '' }), /EVIDENCE_REFERENCE_INVALID/)
   assert.throws(() => buildPublishingStageEvent({ ...base, actorClass: 'AGENT' }), /ACTOR_CLASS_INVALID/)
+  assert.throws(() => buildPublishingStageEvent({ ...base, actorClass: 'HUMAN' }), /ACTOR_CLASS_MISMATCH/)
+  assert.throws(() => buildPublishingStageEvent({ ...base, eventType: 'HUMAN_ACTION_COMPLETED' }), /ACTOR_CLASS_MISMATCH/)
   assert.throws(() => buildPublishingStageEvent({ ...base, eventType: 'PUBLICATION_CONFIRMED' }), /PUBLICATION_STAGE_MISMATCH/)
   assert.throws(() => validatePublishingStageEvent({ ...buildPublishingStageEvent(base), idempotencyKey: 'wrong' }),
     /IDEMPOTENCY_KEY_MISMATCH/)

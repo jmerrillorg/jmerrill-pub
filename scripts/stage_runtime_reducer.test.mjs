@@ -19,7 +19,11 @@ const base = {
 }
 const initial = { titleId: base.titleId, stageId: base.stageId, stageCode: base.stageCode,
   executionId: base.executionId, phase: 'WAITING' }
-const event = (eventType, sourceEventId) => buildPublishingStageEvent({ ...base, eventType, sourceEventId })
+const event = (eventType, sourceEventId) => buildPublishingStageEvent({
+  ...base, eventType, sourceEventId,
+  actorClass: eventType === 'HUMAN_ACTION_COMPLETED' ? 'HUMAN' :
+    eventType === 'EXTERNAL_ACTION_COMPLETED' ? 'EXTERNAL_PROVIDER' : 'SYSTEM',
+})
 
 test('human gate pauses and resumes the same stage without author decision inference', () => {
   const eligible = reducePublishingStageEvent(initial, event('STAGE_ELIGIBLE', 'eligible'))

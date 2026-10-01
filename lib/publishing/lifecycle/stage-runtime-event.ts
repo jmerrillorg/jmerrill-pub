@@ -74,6 +74,11 @@ export function buildPublishingStageEvent(input: EventInput): PublishingStageEve
   requireExact(input.sourceEventId, 'SOURCE_EVENT_ID')
   requireExact(input.evidenceReference, 'EVIDENCE_REFERENCE')
   if (!ACTOR_CLASSES.has(input.actorClass)) throw new Error('PUBLISHING_EVENT_ACTOR_CLASS_INVALID')
+  if ((input.eventType === 'HUMAN_ACTION_COMPLETED' && input.actorClass !== 'HUMAN') ||
+      (input.eventType === 'EXTERNAL_ACTION_COMPLETED' && input.actorClass !== 'EXTERNAL_PROVIDER') ||
+      (!['HUMAN_ACTION_COMPLETED', 'EXTERNAL_ACTION_COMPLETED'].includes(input.eventType) && input.actorClass !== 'SYSTEM')) {
+    throw new Error('PUBLISHING_EVENT_ACTOR_CLASS_MISMATCH')
+  }
   if (!Number.isFinite(Date.parse(input.timestamp)) || input.timestamp !== new Date(input.timestamp).toISOString()) {
     throw new Error('PUBLISHING_EVENT_TIMESTAMP_INVALID')
   }

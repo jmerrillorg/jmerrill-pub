@@ -53,7 +53,9 @@ function validateEvent(event) {
     throw safeCode("PUBLISHING_STAGE_EVENT_STAGE_MISMATCH");
   }
   if ((event.eventType === "HUMAN_ACTION_COMPLETED" && event.actorClass !== "HUMAN") ||
-      (event.eventType === "EXTERNAL_ACTION_COMPLETED" && event.actorClass !== "EXTERNAL_PROVIDER")) {
+      (event.eventType === "EXTERNAL_ACTION_COMPLETED" && event.actorClass !== "EXTERNAL_PROVIDER") ||
+      (!["HUMAN_ACTION_COMPLETED", "EXTERNAL_ACTION_COMPLETED"].includes(event.eventType) &&
+        event.actorClass !== "SYSTEM")) {
     throw safeCode("PUBLISHING_STAGE_EVENT_ACTOR_MISMATCH");
   }
   return event;

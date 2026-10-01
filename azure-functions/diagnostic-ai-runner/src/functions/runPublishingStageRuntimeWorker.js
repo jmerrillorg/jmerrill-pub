@@ -2,7 +2,7 @@
 
 const { app } = require("@azure/functions");
 const { createDataverseClient } = require("../orchestration/authorReviewResponseConsumer");
-const { persistStageEvent } = require("../lifecycle/stageRuntimeJournal");
+const { processStageEvent } = require("../lifecycle/stageRuntimeProcessor");
 const { readEditorialStageAuthority } = require("../lifecycle/stageRuntimeAuthority");
 
 const QUEUE = "jm1-publishing-stage-events";
@@ -22,7 +22,7 @@ async function processPublishingStageMessage(message, deps = {}) {
     resourceUrl: process.env.DATAVERSE_RESOURCE_URL
   });
   const event = parseEvent(message);
-  return persistStageEvent(event, {
+  return processStageEvent(event, {
     ...deps,
     authorize: deps.authorize || ((item) => readEditorialStageAuthority(item, client))
   });
