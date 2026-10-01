@@ -7,6 +7,7 @@ const { buildPublishingStageEvent, validatePublishingStageEvent, PUBLISHING_STAG
   jiti('../lib/publishing/lifecycle/stage-runtime-event.ts')
 
 const base = {
+  schemaVersion: 1,
   eventType: 'STAGE_ELIGIBLE',
   titleId: 'daf8180f-85a3-f111-b8de-000d3a14673b',
   stageId: 'ae3c9d5e-67b5-f111-aaab-000d3a10aa9c',
@@ -35,6 +36,8 @@ test('replay has stable identity while a distinct source event is distinct', () 
 })
 
 test('missing correlation, tampering, and impossible stage events fail closed', () => {
+  assert.throws(() => buildPublishingStageEvent({ ...base, schemaVersion: 2 }), /SCHEMA_VERSION_UNSUPPORTED/)
+  assert.throws(() => buildPublishingStageEvent({ ...base, schemaVersion: undefined }), /SCHEMA_VERSION_UNSUPPORTED/)
   assert.throws(() => buildPublishingStageEvent({ ...base, titleId: 'Whole' }), /CORRELATION_INVALID/)
   assert.throws(() => buildPublishingStageEvent({ ...base, evidenceReference: '' }), /EVIDENCE_REFERENCE_INVALID/)
   assert.throws(() => buildPublishingStageEvent({ ...base, actorClass: 'AGENT' }), /ACTOR_CLASS_INVALID/)

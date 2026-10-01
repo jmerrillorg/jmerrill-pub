@@ -7,6 +7,7 @@ const { buildPublishingStageEvent } = jiti('../lib/publishing/lifecycle/stage-ru
 const { reducePublishingStageEvent } = jiti('../lib/publishing/lifecycle/stage-runtime-reducer.ts')
 
 const base = {
+  schemaVersion: 1,
   titleId: 'daf8180f-85a3-f111-b8de-000d3a14673b',
   stageId: 'ae3c9d5e-67b5-f111-aaab-000d3a10aa9c',
   stageCode: '07_DEVELOPMENTAL_EDITING',

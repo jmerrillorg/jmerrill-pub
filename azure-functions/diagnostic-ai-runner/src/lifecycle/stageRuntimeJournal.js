@@ -29,14 +29,14 @@ function exact(value) {
 
 function keyFor(event) {
   return createHash("sha256").update(JSON.stringify([
-    event.eventType, event.titleId.toLowerCase(), event.stageId.toLowerCase(),
+    event.schemaVersion, event.eventType, event.titleId.toLowerCase(), event.stageId.toLowerCase(),
     event.stageCode, event.executionId, (event.artifactId || "").toLowerCase(),
     event.sourceEventId
   ])).digest("hex");
 }
 
 function validateEvent(event) {
-  if (!event || !EVENTS.has(event.eventType) ||
+  if (!event || event.schemaVersion !== 1 || !EVENTS.has(event.eventType) ||
       !GUID.test(event.titleId || "") || !GUID.test(event.stageId || "") ||
       (event.artifactId && !GUID.test(event.artifactId)) ||
       !exact(event.stageCode) || !STAGES.has(event.stageCode) ||
@@ -94,7 +94,7 @@ async function readJournal(blob) {
 
 function applyEvent(previous, event) {
   const journal = previous || {
-    version: 1,
+    version: event.schemaVersion,
     titleId: event.titleId.toLowerCase(),
     stageId: event.stageId.toLowerCase(),
     stageCode: event.stageCode,
@@ -102,7 +102,8 @@ function applyEvent(previous, event) {
     phase: "WAITING",
     events: []
   };
-  if (journal.titleId !== event.titleId.toLowerCase() ||
+  if (journal.version !== event.schemaVersion ||
+      journal.titleId !== event.titleId.toLowerCase() ||
       journal.stageId !== event.stageId.toLowerCase() ||
       journal.stageCode !== event.stageCode || journal.executionId !== event.executionId) {
     throw safeCode("PUBLISHING_STAGE_JOURNAL_CORRELATION_MISMATCH");

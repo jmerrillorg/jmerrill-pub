@@ -25,6 +25,7 @@ export type PublishingStageEventType = typeof PUBLISHING_STAGE_EVENT_TYPES[numbe
 export type PublishingActorClass = 'SYSTEM' | 'HUMAN' | 'EXTERNAL_PROVIDER'
 
 export type PublishingStageEvent = {
+  schemaVersion: 1
   eventType: PublishingStageEventType
   titleId: string
   stageId: string
@@ -50,6 +51,7 @@ function requireExact(value: string | undefined, field: string): string {
 
 export function publishingStageIdempotencyKey(input: EventInput): string {
   return createHash('sha256').update(JSON.stringify([
+    input.schemaVersion,
     input.eventType,
     input.titleId.toLowerCase(),
     input.stageId.toLowerCase(),
@@ -61,6 +63,7 @@ export function publishingStageIdempotencyKey(input: EventInput): string {
 }
 
 export function buildPublishingStageEvent(input: EventInput): PublishingStageEvent {
+  if (input.schemaVersion !== 1) throw new Error('PUBLISHING_EVENT_SCHEMA_VERSION_UNSUPPORTED')
   if (!EVENT_TYPES.has(input.eventType)) throw new Error('PUBLISHING_EVENT_TYPE_UNSUPPORTED')
   if (!UUID.test(input.titleId) || !UUID.test(input.stageId) ||
       (input.artifactId && !UUID.test(input.artifactId))) {

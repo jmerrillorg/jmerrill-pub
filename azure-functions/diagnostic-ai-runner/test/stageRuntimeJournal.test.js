@@ -11,7 +11,7 @@ const STAGE = "ae3c9d5e-67b5-f111-aaab-000d3a10aa9c";
 
 function event(eventType, sourceEventId, actorClass = "SYSTEM") {
   const value = {
-    eventType, titleId: TITLE, stageId: STAGE,
+    schemaVersion: 1, eventType, titleId: TITLE, stageId: STAGE,
     stageCode: "07_DEVELOPMENTAL_EDITING", executionId: "test-execution",
     sourceEventId, timestamp: "2026-10-01T00:00:00.000Z", actorClass,
     evidenceReference: `dataverse://jm1_executionlogs/${sourceEventId}`
@@ -103,6 +103,8 @@ test("does not record completion, advancement or gate resolution without live ve
 
 test("rejects changed keys and mismatched live stage", async () => {
   const valid = event("STAGE_ELIGIBLE", "source-1");
+  assert.throws(() => validateEvent({ ...valid, schemaVersion: 2 }), /EVENT_INVALID/);
+  assert.throws(() => validateEvent({ ...valid, schemaVersion: undefined }), /EVENT_INVALID/);
   assert.throws(() => validateEvent({ ...valid, stageCode: "08_LINE_EDITING" }), /EVENT_INVALID/);
   await assert.rejects(persistStageEvent(valid, {
     containerClient: fakeContainer(),
