@@ -141,23 +141,27 @@ async function callAutostart(intake) {
   };
 }
 
-async function runPublishingIntakeAutostartRecovery(timer, context) {
+async function runPublishingIntakeAutostartRecovery(timer, context, deps = {}) {
   if (!isEnabled()) {
     context.info("Publishing intake autostart recovery skipped: disabled.");
     return;
   }
 
+  const list = deps.listReadyIntakes || listReadyIntakes;
+  const hasSuccess = deps.hasDispatchSuccessLog || hasDispatchSuccessLog;
+  const dispatch = deps.callAutostart || callAutostart;
   let intakes;
   try {
-    intakes = await listReadyIntakes();
+    intakes = await list();
   } catch (error) {
     context.error(`Publishing intake autostart recovery list failed: ${error.safeCode || error.message}`);
-    return;
+    throw error;
   }
 
   let attempted = 0;
   let dispatched = 0;
   let skipped = 0;
+  let failed = 0;
 
   for (const intake of intakes) {
     const intakeId = safeTrim(intake.jm1_publishingintakeid);
@@ -168,23 +172,30 @@ async function runPublishingIntakeAutostartRecovery(timer, context) {
     }
 
     try {
-      if (await hasDispatchSuccessLog(intakeId)) {
+      if (await hasSuccess(intakeId)) {
         skipped += 1;
         continue;
       }
 
       attempted += 1;
-      const result = await callAutostart(intake);
+      const result = await dispatch(intake);
       if (result.ok) dispatched += 1;
+      else failed += 1;
       context.info(
         `Publishing intake autostart recovery attempted; reference=${reference}; status=${result.status}; code=${result.code}; diagnosticId=${result.diagnosticId || "none"}; sent=${result.authorRecommendationSent === true ? "yes" : "no"}`
       );
     } catch (error) {
+      failed += 1;
       context.warn(`Publishing intake autostart recovery failed for reference=${reference}; reason=${error.safeCode || error.name || "unknown"}`);
     }
   }
 
-  context.info(`Publishing intake autostart recovery complete; scanned=${intakes.length}; attempted=${attempted}; dispatched=${dispatched}; skipped=${skipped}.`);
+  context.info(`Publishing intake autostart recovery complete; scanned=${intakes.length}; attempted=${attempted}; dispatched=${dispatched}; skipped=${skipped}; failed=${failed}.`);
+  if (failed > 0) {
+    throw Object.assign(new Error("PUBLISHING_INTAKE_AUTOSTART_RECOVERY_INCOMPLETE"), {
+      safeCode: "PUBLISHING_INTAKE_AUTOSTART_RECOVERY_INCOMPLETE"
+    });
+  }
 }
 
 app.timer("run-publishing-intake-autostart-recovery", {
