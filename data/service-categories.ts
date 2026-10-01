@@ -107,7 +107,7 @@ export const serviceCategories = [
     description:
       'Picture books, illustrated stories, and middle-grade titles built to last and built to grow.',
     services: [
-      { name: "Children's Book Publishing Package", desc: 'Full-service publishing path with editorial, illustration coordination, layout, ISBN, and distribution.' },
+      { name: "Children's Book Publishing Package", desc: 'Specialty publishing package for author-supplied, production-usable illustrations or artwork. Original illustration creation is priced separately.' },
       { name: 'Illustrated Book Layout', desc: 'Typography, image placement, and print-ready formatting for illustrated titles.' },
       { name: 'Illustrated Book Production Setup', desc: 'Color profile verification, bleed setup, and printer-ready production prep.' },
       { name: "Children's Book Illustration", desc: 'Character development, scene illustration, and print-ready artwork.' },
