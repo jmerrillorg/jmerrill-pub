@@ -60,6 +60,10 @@ function approval(item, overrides = {}) {
   }
 }
 
+function gate(sourceRecordId, overrides = {}) {
+  return { status: 'PASS', sourceRecordId, titleId, authorId, verifiedAt: '2026-09-30T12:00:00Z', ...overrides }
+}
+
 test('all 16 human pipeline stages have executable completion contracts', () => {
   const contracts = Object.values(EDITORIAL_SYSTEM_STAGE_CONTRACTS)
   assert.equal(contracts.length, 16)
@@ -160,4 +164,42 @@ test('Developmental completion requires both direction and exact-version manuscr
   assert.equal(result.complete, true)
   assert.equal(result.nextTransitionAuthorized, true)
   assert.equal(result.nextSystemAction, 'EXECUTE_GOVERNED_NEXT_TRANSITION')
+})
+
+test('Production cannot advance without independently proven rights and metadata authority', () => {
+  const source = [artifact('AUTHOR_PROOF'), artifact('COVER_PROOF')]
+  const interior = artifact('FINAL_INTERIOR', { format: 'PAPERBACK', identifier: '9780000000001', distributionAuthority: 'PASS' })
+  const cover = artifact('FINAL_COVER', { format: 'PAPERBACK', identifier: '9780000000001', distributionAuthority: 'PASS' })
+  const distribution = artifact('DISTRIBUTION_ARTIFACT', { format: 'PAPERBACK', identifier: '9780000000001', distributionAuthority: 'PASS' })
+  const input = evidence('13_PRODUCTION', source, [interior, cover, distribution], [approval(interior), approval(cover)], {
+    entitledFormats: ['PAPERBACK'],
+  })
+  const blocked = evaluateStageCompletion(EDITORIAL_SYSTEM_STAGE_CONTRACTS['13_PRODUCTION'], input)
+  assert.ok(blocked.blockers.includes('RIGHTS_AUTHORITY_NOT_PROVEN'))
+  assert.ok(blocked.blockers.includes('RETAIL_METADATA_AUTHORITY_NOT_PROVEN'))
+  const ready = evaluateStageCompletion(EDITORIAL_SYSTEM_STAGE_CONTRACTS['13_PRODUCTION'], {
+    ...input, rightsAuthority: gate('executed-rights-1'), retailMetadataAuthority: gate('metadata-1'),
+  })
+  assert.equal(ready.complete, true)
+  const wrongTitle = evaluateStageCompletion(EDITORIAL_SYSTEM_STAGE_CONTRACTS['13_PRODUCTION'], {
+    ...input, rightsAuthority: gate('executed-rights-1', { titleId: 'other-title' }),
+    retailMetadataAuthority: gate('metadata-1'),
+  })
+  assert.ok(wrongTitle.blockers.includes('RIGHTS_AUTHORITY_NOT_PROVEN'))
+})
+
+test('Publication requires provider and public availability readbacks separately', () => {
+  const input = evidence('15_PUBLICATION', [artifact('DISTRIBUTION_SUBMISSION_EVIDENCE')],
+    [artifact('PUBLIC_CATALOG_PROJECTION')])
+  const contract = EDITORIAL_SYSTEM_STAGE_CONTRACTS['15_PUBLICATION']
+  const blocked = evaluateStageCompletion(contract, input)
+  assert.ok(blocked.blockers.includes('PROVIDER_PUBLICATION_NOT_CONFIRMED'))
+  assert.ok(blocked.blockers.includes('PUBLIC_AVAILABILITY_NOT_CONFIRMED'))
+  assert.equal(evaluateStageCompletion(contract, {
+    ...input, providerPublicationReadback: gate('provider-status-1'), publicAvailabilityReadback: gate('retailer-page-1'),
+  }).complete, true)
+  assert.ok(evaluateStageCompletion(contract, {
+    ...input, providerPublicationReadback: gate('provider-status-1'),
+    publicAvailabilityReadback: gate('retailer-page-1', { sourceRecordId: '' }),
+  }).blockers.includes('PUBLIC_AVAILABILITY_NOT_CONFIRMED'))
 })

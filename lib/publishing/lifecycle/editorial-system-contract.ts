@@ -79,6 +79,14 @@ export type ExactVersionApprovalEvidence = {
   directionApproved?: boolean
 }
 
+export type GovernedGateEvidence = {
+  status: 'PASS' | 'FAIL' | 'UNPROVEN'
+  sourceRecordId: string
+  titleId: string
+  authorId: string
+  verifiedAt: string
+}
+
 export type StageCompletionEvidence = {
   titleId: string
   authorId: string
@@ -93,6 +101,10 @@ export type StageCompletionEvidence = {
   }
   completionSignals?: string[]
   entitledFormats?: Array<'PAPERBACK' | 'HARDCOVER' | 'EBOOK' | 'AUDIOBOOK'>
+  rightsAuthority?: GovernedGateEvidence
+  retailMetadataAuthority?: GovernedGateEvidence
+  providerPublicationReadback?: GovernedGateEvidence
+  publicAvailabilityReadback?: GovernedGateEvidence
 }
 
 export type StageCompletionEvaluation = {
@@ -223,6 +235,15 @@ export function evaluateStageCompletion(
     }
   }
 
+  if (contract.stageId === '13_PRODUCTION') {
+    if (!isBoundPassingGate(evidence.rightsAuthority, evidence)) blockers.push('RIGHTS_AUTHORITY_NOT_PROVEN')
+    if (!isBoundPassingGate(evidence.retailMetadataAuthority, evidence)) blockers.push('RETAIL_METADATA_AUTHORITY_NOT_PROVEN')
+  }
+  if (contract.stageId === '15_PUBLICATION') {
+    if (!isBoundPassingGate(evidence.providerPublicationReadback, evidence)) blockers.push('PROVIDER_PUBLICATION_NOT_CONFIRMED')
+    if (!isBoundPassingGate(evidence.publicAvailabilityReadback, evidence)) blockers.push('PUBLIC_AVAILABILITY_NOT_CONFIRMED')
+  }
+
   const uniqueBlockers = [...new Set(blockers)]
   return {
     complete: uniqueBlockers.length === 0,
@@ -239,6 +260,16 @@ function matchingArtifacts(
 ) {
   return artifacts.filter((artifact) =>
     artifact.role === role && artifact.titleId === evidence.titleId && artifact.authorId === evidence.authorId && artifact.current !== false,
+  )
+}
+
+function isBoundPassingGate(
+  gate: GovernedGateEvidence | undefined,
+  evidence: Pick<StageCompletionEvidence, 'titleId' | 'authorId'>,
+) {
+  return Boolean(
+    gate?.status === 'PASS' && gate.sourceRecordId && gate.titleId === evidence.titleId &&
+    gate.authorId === evidence.authorId && gate.verifiedAt && Number.isFinite(Date.parse(gate.verifiedAt)),
   )
 }
 
