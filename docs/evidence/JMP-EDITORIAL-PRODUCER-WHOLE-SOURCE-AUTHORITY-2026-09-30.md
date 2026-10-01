@@ -89,3 +89,27 @@ end-to-end invocation remains necessary before output or visual QA can be
 claimed. Protected
 deployment run `36660765615` remains waiting; no Whole run or author send was
 performed by this packet.
+
+## October 1 readback for Continue-09
+
+The current Whole Developmental stage has exactly one review-ready record for
+each existing project style sheet, voice profile, and author revision rulings.
+The registered SharePoint bytes were independently retrieved and SHA-256
+checked against Dataverse:
+
+| Authority | Dataverse artifact | Verified SHA-256 |
+| --- | --- | --- |
+| Project style sheet | `5fa8b46c-f0bc-f111-aaaf-6045bdd69678` | `d96ff43e938ad3afbc0d34b1c5a05401cb095c8288857d2c5b9a0f68ca5a9a3e` |
+| Voice profile | `982b8096-f0bc-f111-aaaf-000d3a14673b` | `6ca27ef0417597dc85345e014346bf7147ced049bfbc00548bd388aedcefbd02` |
+| Author revision rulings | `988442aa-f0bc-f111-aaaf-6045bdd69678` | `977b4aa090d6dabc751b92b31b50a6e6dda0bb0bfdf84dc69a536590090376e2` |
+
+All three remain `REVIEW_READY`, not author-release-approved. The registered
+knowledge Blob URL and expected checksum are present in production Function
+configuration, but the local operator identity lacks Blob Data Reader access;
+this pass did not verify its live bytes. Production Function managed-identity
+readback remains required. Protected deployment run `36798326226` is still
+waiting for approval at source SHA `9f65e130897793ca4b4a395531f1f0773b40b670`.
+
+The editorial branch's 23 focused authority, shadow, agent, Word-native, and
+evidence-store tests pass. No system-path Whole shadow run, author delivery,
+stage advancement, or approval-state mutation occurred in this readback.
