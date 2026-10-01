@@ -15,7 +15,7 @@ Safe fixes in this PR are intentionally narrow:
 
 Jackie has since resolved the open publisher-decision items:
 
-- Keep `125+` catalog language unchanged because it includes published titles plus active production pipeline titles.
+- Historical decision, now superseded: the former lower portfolio language was retained at the time. Founder-confirmed public authority is 130+ published titles; the live catalog listing count is separate.
 - Preserve `Focus, Trust, and Follow` as one visible title record with both paperback and ebook metadata.
 - Route missing covers to a future Catalog Asset Recovery Initiative.
 - Route verified direct purchase links to a future Catalog Commerce Modernization project.
@@ -96,8 +96,8 @@ Jackie has since resolved the open publisher-decision items:
    - Decision: group the duplicate-format records into one visible title card while preserving both format ISBNs. The incorrect `Focus, Trust, & Follow` title does not remain in public catalog data.
 
 2. Catalog count language
-   - The UI says `125+ titles`, while the canonical JSON currently has 122 visible title records after grouping duplicate-format Focus records.
-   - Decision: no action required. The label includes published titles plus active production pipeline titles.
+   - At the time of this audit, the UI showed a lower portfolio claim while the canonical JSON had 122 visible title records after grouping duplicate-format Focus records.
+   - The historical no-action decision is superseded. Current public portfolio authority is 130+ published titles, distinct from the live catalog listing count.
 
 3. Author fallback profile copy
    - Generated author bios still include broad brand-positioning claims when no source bio exists.

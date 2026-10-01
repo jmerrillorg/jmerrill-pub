@@ -58,7 +58,7 @@ Strengths:
 - Strongly communicates retained rights, care, guidance, and trust.
 - The "Where are you in the journey?" section supports intent-based author navigation.
 - The trust section connects publishing choice to care, ownership, guidance, and family.
-- Uses stable public proof points such as 125+ titles, five imprints, Ingram distribution, and registered publisher status.
+- Historical audit observation: the then-current lower title claim appeared alongside five imprints, Ingram distribution, and registered publisher status. Founder authority now supersedes that claim with 130+ published titles.
 
 Weaknesses:
 

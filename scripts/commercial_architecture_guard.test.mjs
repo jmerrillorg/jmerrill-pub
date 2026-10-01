@@ -2,7 +2,15 @@ import { existsSync, readFileSync } from 'node:fs'
 
 const catalog = readFileSync('lib/commercial/catalog.ts', 'utf8')
 const packagesPage = readFileSync('app/packages/page.tsx', 'utf8')
+const homeSections = readFileSync('components/sections/UpgradedSections.tsx', 'utf8')
+const homeHero = readFileSync('components/sections/HeroSection.tsx', 'utf8')
+const analyzeRoute = readFileSync('app/api/analyze/route.ts', 'utf8')
+const booksPage = readFileSync('app/books/page.tsx', 'utf8')
+const booksClient = readFileSync('app/books/BooksClient.tsx', 'utf8')
+const siteMetadata = readFileSync('app/layout.tsx', 'utf8')
 const tokens = readFileSync('lib/tokens.ts', 'utf8')
+const portfolio = readFileSync('lib/publishing/public-portfolio.ts', 'utf8')
+const liveStats = readFileSync('app/api/live-stats/route.ts', 'utf8')
 const activationReport = readFileSync('docs/operations/generated/2026-07-20-JMP-Commercial-Architecture-Activation-Report.md', 'utf8')
 const lifecycleSpec = readFileSync('docs/operations/generated/2026-07-20-JMP-Edition-Lifecycle-Executionlog-Event-Specification.md', 'utf8')
 const dataverseExportPath = 'data/commercial/dataverse-commercial-catalog-export.json'
@@ -79,6 +87,37 @@ const checks = [
       catalog.includes("sku: 'JMP-PKG-PREMIER'") &&
       catalog.includes('amount: 7500') &&
       catalog.includes('editionSlots: 4'),
+  },
+  {
+    name: 'public payment presentation has no unapproved schedules or discount',
+    pass: () =>
+      packagesPage.includes('Flexible payment options may be available.') &&
+      packagesPage.includes('Final payment terms are provided with your publishing agreement.') &&
+      ['$1,999', '$4,500', '$7,500'].every((price) => packagesPage.includes(price)) &&
+      !/Pay in Full \(7% off\)|(?:2|4|8|12)-Month|Per Payment|perPayment|paymentOptions|\$1,859|\$4,185|\$6,975/.test(
+        packagesPage.match(/<PageSection\s+eyebrow="Payment Options"[\s\S]*?<\/PageSection>/)?.[0] || '',
+      ),
+  },
+  {
+    name: 'Pathfinder names the active Premier package rather than legacy Signature',
+    pass: () =>
+      homeSections.includes('Starter, Professional, or Premier') &&
+      !homeSections.includes('Starter, Professional, or Signature') &&
+      homeSections.includes("'Starter' | 'Professional' | 'Premier'") &&
+      analyzeRoute.includes("['Starter', 'Professional', 'Premier'].includes(result.packageSuggestion)"),
+  },
+  {
+    name: 'published portfolio claim remains separate from live catalog listing counts',
+    pass: () =>
+      [homeSections, homeHero, booksPage, booksClient, siteMetadata, tokens, liveStats].every((source) => !source.includes(['125', '+'].join(''))) &&
+      portfolio.includes("publishedPortfolioCountPublic = '130+'") &&
+      homeHero.includes("'Published Titles'") &&
+      homeSections.includes('publishedPortfolioCountPublic} published titles') &&
+      booksPage.includes('publishedPortfolioCountPublic} published titles') &&
+      booksPage.includes('books.length} catalog titles') &&
+      !liveStats.includes('totalTitles:') &&
+      homeHero.includes('catalogCount') &&
+      booksClient.includes('books.length'),
   },
   {
     name: 'pricing rules include approved add-ons, premiums, AI overage, and quote-only human narration',
