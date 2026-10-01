@@ -14,25 +14,25 @@ The package correction was applied and read back through `scripts/catalog_packag
 | `JMP-PKG-PRO` | CAT-106 | Active, sellable, quotable, contractable | $4,500 | Package Addendum v4.1 |
 | `JMP-PKG-PREMIER` | CAT-121 | Active, sellable, quotable, contractable | $7,500 | Package Addendum v4.1 |
 | `JMP-PKG-SIGNATURE` | CAT-107 | Superseded, not sellable, not quotable, not contractable | Historical $7,500 | Package Addendum v4.1; preserve executed agreements |
-| `JMP-PKG-CHILD` | CAT-105 | Active, sellable, quotable, contractable in live August-based catalog | $2,495 | August 5 ruling; later three-tier addendum is silent |
+| `JMP-PKG-CHILD` | CAT-105 | Active, public, sellable, quotable, contractable specialty package | $2,495 | October 1 founder ruling; author supplies production-usable art |
 
-The Children's record is not presented as a fourth standard tier in the successor drafts. Its continuing specialty-offer status requires an explicit commercial ruling. No unapproved retirement or repricing was performed.
+The three core packages are Starter, Professional, and Premier. Children's Book Publishing is separately classified as `SPECIALTY_PUBLISHING`, not a fourth tier. Original illustration creation is not included in its base price and remains separately priced. No retirement or repricing is required.
 
 ## Payment-rule boundary
 
-The internal `paymentPolicyEngine.js` supports contract-bound Full Pay and 2, 4, 8, 12, 18, and 24 payments. New financing v1.1 uses 6% annual simple plan charge prorated to financed months, no compounding, final-cent adjustment, and early payoff without penalty or unearned future charge. Older contracts may select the separately versioned 4% transaction-fee policy. The engine's no-version default remains legacy; callers must bind the agreement's exact policy version rather than infer it from the package or website. Tax is external to the calculator. A 7% Full Pay discount is not approved. Late-payment and final-delivery terms must come from the executed agreement or explicit current policy, not the public catalog.
+The existing `paymentPolicyEngine.js` implements an earlier simple-charge model; the October 1 founder correction explicitly rejects promoting that model as current payment canon. A prior founder-provided Starter schedule is reproduced numerically by `round(1999 * 1.06^N / N, 2)` for N = 2, 4, 8, 12, 18, and 24, but that arithmetic alone does not establish the charge period, total/final-payment reconciliation, early payoff, tax, late-payment, or final-delivery rules. Do not substitute this inferred formula for a versioned policy or apply it to contracts without exact authority. A 7% Full Pay discount remains unapproved.
 
 Public `/packages` payment presentation remains `SUMMARY_ONLY`. No universal installment schedule, financing amount, or 7% Full Pay discount is authorized for public display. The three base package prices remain $1,999, $4,500, and $7,500.
 
 ## Successor document state
 
-Two source-backed review drafts were generated from the live Dataverse rows under `Developer/evidence/JMP-PRODUCT-CATALOG-CANON-RECONCILIATION-2026-10-01`. Both were rendered and visually checked. They carry the founder-confirmed **130+ published titles** statement, three standard package prices, actual service statuses, and summary-only public payment language. The old `JMP_Full_Catalog_v2_1.docx` and `JMP_Product_Reference_Guide_v1_1.docx` remain unchanged historical documents. The successor drafts are not yet promoted to current canon while the Children's package remains unresolved.
+The successor generator now separates core and specialty packages, preserves **130+ published titles**, replaces the disputed simple-interest description with a payment-authority boundary, and uses named service families rather than an Uncategorized bucket. The six currently public AI-named offers are classified as intentionally AI-assisted products, not generic internal runtime labels: `JMP-AI-ANALYSIS`, `JMP-AI-COVER`, `JMP-AI-LAUNCH`, `JMP-AI-MARKETING`, `JMP-AI-METADATA`, and `JMP-AI-SENSITIVITY` are `PUBLIC_SELLABLE_AS_NAMED` under the August 5 SKU rulings and current public service descriptions. That classification preserves truthful disclosure of the service characteristic without exposing internal tools or models. The historical `JMP_Full_Catalog_v2_1.docx` and `JMP_Product_Reference_Guide_v1_1.docx` remain unchanged.
 
 ## QBO product canon handoff
 
-`QBO_UPDATE_STATUS=PAUSED`. The package crosswalk above and the live 120-row status comparison are ready for review. New QBO mapping should select Premier, not historical Signature, for new $7,500 package business; preserve existing transactions and references to Signature. Never create a QBO item from a provisional, retired, superseded, or internal-only record; never infer a fixed price for any of the 36 active records with null unit price. The Children's specialty decision must be bound before a complete product-canon handoff is declared. No QBO mutation occurred in this packet.
+`QBO_UPDATE_STATUS=PAUSED`. The package crosswalk above and the live 120-row status comparison are ready for handoff. New QBO mapping should select Premier, not historical Signature, for new $7,500 package business; preserve existing transactions and references to Signature. Include `JMP-PKG-CHILD` at $2,495 as active `SPECIALTY_PUBLISHING`, with author-provided art required. Never create a QBO item from a provisional, retired, superseded, or internal-only record; never infer a fixed price for any of the 36 active records with null unit price. No QBO mutation occurred in this packet.
 
-`QBO_PRODUCT_CANON_HANDOFF=PARTIAL_PENDING_CHILD_PACKAGE_RULING`
+`QBO_PRODUCT_CANON_HANDOFF=PASS` for product identity/status/price mapping; `QBO_UPDATE_STATUS=PAUSED`.
 
 ## Independent lifecycle lane
 
