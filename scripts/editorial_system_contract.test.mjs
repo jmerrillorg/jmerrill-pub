@@ -188,18 +188,49 @@ test('Production cannot advance without independently proven rights and metadata
   assert.ok(wrongTitle.blockers.includes('RIGHTS_AUTHORITY_NOT_PROVEN'))
 })
 
+test('Production requires every governed asset role for every entitled format', () => {
+  const source = [artifact('AUTHOR_PROOF'), artifact('COVER_PROOF')]
+  const interior = artifact('FINAL_INTERIOR', { format: 'PAPERBACK', identifier: '9780000000001', distributionAuthority: 'PASS' })
+  const cover = artifact('FINAL_COVER', { format: 'PAPERBACK', identifier: '9780000000001', distributionAuthority: 'PASS' })
+  const distribution = artifact('DISTRIBUTION_ARTIFACT', { format: 'PAPERBACK', identifier: '9780000000001', distributionAuthority: 'PASS' })
+  const input = evidence('13_PRODUCTION', source, [interior, cover, distribution], [approval(interior), approval(cover)], {
+    rightsAuthority: gate('executed-rights-1'), retailMetadataAuthority: gate('metadata-1'),
+  })
+  const contract = EDITORIAL_SYSTEM_STAGE_CONTRACTS['13_PRODUCTION']
+  assert.ok(evaluateStageCompletion(contract, input).blockers.includes('GOVERNED_FORMAT_ENTITLEMENT_MISSING_OR_DUPLICATE'))
+  const ebookMissing = evaluateStageCompletion(contract, { ...input, entitledFormats: ['PAPERBACK', 'EBOOK'] })
+  assert.ok(ebookMissing.blockers.includes('ENTITLED_FORMAT_ROLE_MISSING:EBOOK:FINAL_INTERIOR'))
+  assert.ok(ebookMissing.blockers.includes('ENTITLED_FORMAT_ROLE_MISSING:EBOOK:FINAL_COVER'))
+  assert.ok(ebookMissing.blockers.includes('ENTITLED_FORMAT_ROLE_MISSING:EBOOK:DISTRIBUTION_ARTIFACT'))
+  const wrongIsbn = evaluateStageCompletion(contract, {
+    ...input, entitledFormats: ['PAPERBACK'], outputArtifacts: [interior, cover, { ...distribution, identifier: '9780000000002' }],
+  })
+  assert.ok(wrongIsbn.blockers.includes('FORMAT_IDENTIFIER_MISSING_OR_CONFLICTING:PAPERBACK'))
+})
+
 test('Publication requires provider and public availability readbacks separately', () => {
-  const input = evidence('15_PUBLICATION', [artifact('DISTRIBUTION_SUBMISSION_EVIDENCE')],
-    [artifact('PUBLIC_CATALOG_PROJECTION')])
+  const publication = { format: 'PAPERBACK', identifier: '9780000000001' }
+  const input = evidence('15_PUBLICATION', [artifact('DISTRIBUTION_SUBMISSION_EVIDENCE', publication)],
+    [artifact('PUBLIC_CATALOG_PROJECTION', publication)], [], { entitledFormats: ['PAPERBACK'] })
   const contract = EDITORIAL_SYSTEM_STAGE_CONTRACTS['15_PUBLICATION']
   const blocked = evaluateStageCompletion(contract, input)
-  assert.ok(blocked.blockers.includes('PROVIDER_PUBLICATION_NOT_CONFIRMED'))
-  assert.ok(blocked.blockers.includes('PUBLIC_AVAILABILITY_NOT_CONFIRMED'))
+  assert.ok(blocked.blockers.includes('PROVIDER_PUBLICATION_NOT_CONFIRMED:PAPERBACK'))
+  assert.ok(blocked.blockers.includes('PUBLIC_AVAILABILITY_NOT_CONFIRMED:PAPERBACK'))
   assert.equal(evaluateStageCompletion(contract, {
-    ...input, providerPublicationReadback: gate('provider-status-1'), publicAvailabilityReadback: gate('retailer-page-1'),
+    ...input, providerPublicationReadbacks: [gate('provider-status-1', publication)],
+    publicAvailabilityReadbacks: [gate('retailer-page-1', publication)],
   }).complete, true)
   assert.ok(evaluateStageCompletion(contract, {
-    ...input, providerPublicationReadback: gate('provider-status-1'),
-    publicAvailabilityReadback: gate('retailer-page-1', { sourceRecordId: '' }),
-  }).blockers.includes('PUBLIC_AVAILABILITY_NOT_CONFIRMED'))
+    ...input, providerPublicationReadbacks: [gate('provider-status-1', publication)],
+    publicAvailabilityReadbacks: [gate('retailer-page-1', { ...publication, sourceRecordId: '' })],
+  }).blockers.includes('PUBLIC_AVAILABILITY_NOT_CONFIRMED:PAPERBACK'))
+  assert.ok(evaluateStageCompletion(contract, {
+    ...input, providerPublicationReadbacks: [gate('provider-status-1', { ...publication, identifier: '9780000000002' })],
+    publicAvailabilityReadbacks: [gate('retailer-page-1', publication)],
+  }).blockers.includes('PROVIDER_PUBLICATION_NOT_CONFIRMED:PAPERBACK'))
+  assert.ok(evaluateStageCompletion(contract, {
+    ...input, sourceArtifacts: [artifact('DISTRIBUTION_SUBMISSION_EVIDENCE', { ...publication, identifier: '9780000000002' })],
+    providerPublicationReadbacks: [gate('provider-status-1', publication)],
+    publicAvailabilityReadbacks: [gate('retailer-page-1', publication)],
+  }).blockers.includes('PUBLICATION_SUBMISSION_BINDING_MISSING:PAPERBACK'))
 })
