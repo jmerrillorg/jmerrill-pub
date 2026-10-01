@@ -51,6 +51,17 @@ function validValue(field, input) {
   return typeof input === "string" && input.trim().length > 0;
 }
 
+function validAuthorityClass(item) {
+  if (["APPROVED_CATEGORY", "APPROVED_EDITORIAL_POSITIONING", "APPROVED_RETAIL_DESCRIPTION",
+    "APPROVED_MARKETING_DESCRIPTION", "BRAND_ASSET_REGISTRY", "TITLE_RULING"].includes(item.sourceType)) {
+    return ["AUTHOR_APPROVED", "PUBLISHER_APPROVED"].includes(item.authorityClass);
+  }
+  if (item.sourceType === "SYSTEM_DERIVED_INTERNAL_CREATIVE") {
+    return item.authorityClass === "SYSTEM_DERIVED_GOVERNED";
+  }
+  return ["CANONICAL_RECORD", "AUTHOR_APPROVED", "PUBLISHER_APPROVED"].includes(item.authorityClass);
+}
+
 function resolveCoverAuthorityBundle(titleId, candidates, options = {}) {
   const now = options.now || new Date().toISOString();
   const nowMs = Date.parse(now);
@@ -63,7 +74,7 @@ function resolveCoverAuthorityBundle(titleId, candidates, options = {}) {
   for (const [field, priority] of Object.entries(AUTHORITY)) {
     const relevant = candidates.filter((item) => item.field === field && item.current === true && item.titleId === titleId &&
       priority.includes(item.sourceType) && validValue(field, item.value) && item.sourceId && item.sourceVersion &&
-      ["CANONICAL_RECORD", "AUTHOR_APPROVED", "PUBLISHER_APPROVED", "SYSTEM_DERIVED_GOVERNED"].includes(item.authorityClass) &&
+      validAuthorityClass(item) &&
       Number.isFinite(Date.parse(item.lastVerified)) && Math.abs(nowMs - Date.parse(item.lastVerified)) <= MAX_READ_AGE_MS &&
       (!item.sourceChecksum || SHA256.test(item.sourceChecksum)) &&
       (!["CURRENT_INTERIOR_PROOF", "BRAND_ASSET_REGISTRY"].includes(item.sourceType) || SHA256.test(item.sourceChecksum || "")));

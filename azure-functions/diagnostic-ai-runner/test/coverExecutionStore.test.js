@@ -5,7 +5,7 @@ const test = require("node:test");
 const { Readable } = require("node:stream");
 const { createCoverExecutionStore } = require("../src/production/coverExecutionStore");
 
-function fixture() {
+function fixture(options = {}) {
   const blobs = new Map();
   let version = 0;
   const service = { getContainerClient: () => ({ getBlockBlobClient: (name) => ({
@@ -23,7 +23,7 @@ function fixture() {
     }
   }) }) };
   return createCoverExecutionStore({ serviceUrl: "https://stjm1diagrunner.blob.core.windows.net",
-    containerName: "cover-audit", service });
+    containerName: "cover-audit", service, ...options });
 }
 
 const key = "a".repeat(64);
@@ -41,6 +41,18 @@ test("failed attempt retries under a new execution ID; stale completion is denie
   const store = fixture();
   const first = await store.reserveExecution(key);
   await store.failExecution(key, { executionId: first.executionId, code: "COVER_IMAGE_PROVIDER_FAILED" });
+  const retry = await store.reserveExecution(key);
+  assert.equal(retry.status, "ACQUIRED");
+  assert.notEqual(retry.executionId, first.executionId);
+  await assert.rejects(store.completeExecution(key, { executionId: first.executionId }), /COVER_EXECUTION_STALE_TRANSITION/);
+  await store.completeExecution(key, { executionId: retry.executionId });
+});
+
+test("expired in-progress attempt can be atomically superseded", async () => {
+  let current = new Date("2026-09-30T12:00:00.000Z");
+  const store = fixture({ now: () => current, staleAfterMs: 5 * 60 * 1000 });
+  const first = await store.reserveExecution(key);
+  current = new Date("2026-09-30T12:05:01.000Z");
   const retry = await store.reserveExecution(key);
   assert.equal(retry.status, "ACQUIRED");
   assert.notEqual(retry.executionId, first.executionId);

@@ -57,13 +57,12 @@ test("generation request is written once before an image call", async () => {
   assert.equal(blobs.size, 1);
 });
 
-test("same idempotency key cannot be reused for a different execution", async () => {
-  const { store } = fixtureStore();
+test("a retry has its own immutable request while replay of one attempt stays guarded", async () => {
+  const { store, blobs } = fixtureStore();
   await store.persistGenerationRequest(request);
-  await assert.rejects(
-    store.persistGenerationRequest({ ...request, executionId: "adcdb772-8d4b-45bd-b021-d428a0827205" }),
-    /COVER_GENERATION_REQUEST_CONFLICT/
-  );
+  const retry = { ...request, executionId: "adcdb772-8d4b-45bd-b021-d428a0827205", requestedAt: "2026-09-30T13:00:00.000Z" };
+  assert.deepEqual(await store.persistGenerationRequest(retry), retry);
+  assert.equal(blobs.size, 2);
   await assert.rejects(
     store.persistGenerationRequest({ ...request, modelDeployment: "other-model" }),
     /COVER_GENERATION_REQUEST_CONFLICT/

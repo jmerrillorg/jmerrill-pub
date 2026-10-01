@@ -221,6 +221,11 @@ async function generateConceptSet(titleId, deps, options = {}) {
         persisted.titleId !== brief.titleId || persisted.creativeBriefVersion !== brief.authorityDigest) {
       throw new Error("COVER_GENERATION_REQUEST_NOT_PERSISTED");
     }
+    const currentCandidates = await deps.loadTitleAuthority(titleId);
+    const currentAuthority = resolveCoverAuthorityBundle(titleId, currentCandidates);
+    if (!currentAuthority.ok || currentAuthority.bundle.sha256 !== resolved.bundle.sha256) {
+      throw new Error("COVER_AUTHORITY_STALE_BEFORE_GENERATION");
+    }
     const concepts = [];
     for (let index = 0; index < count; index++) {
       const prompt = conceptPrompt(brief, index, feedback);

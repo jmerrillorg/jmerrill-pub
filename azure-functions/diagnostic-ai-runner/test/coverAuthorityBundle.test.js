@@ -49,6 +49,9 @@ test("conflicting approved values and unapproved category fail closed", () => {
   const derived = records().map((record) => record.field === "genre"
     ? { ...record, authorityClass: "SYSTEM_DERIVED_GOVERNED" } : record);
   assert.ok(resolveCoverAuthorityBundle(titleId, derived, { now }).missing.includes("genre"));
+  const merelyCanonical = records().map((record) => record.field === "genre"
+    ? { ...record, authorityClass: "CANONICAL_RECORD" } : record);
+  assert.ok(resolveCoverAuthorityBundle(titleId, merelyCanonical, { now }).missing.includes("genre"));
 });
 
 test("print page count needs current artifact checksum and ISBN follows entitlements", () => {

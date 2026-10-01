@@ -41,7 +41,7 @@ function createCoverGenerationRequestStore(options = {}) {
 
   async function persistGenerationRequest(request) {
     if (!validateRequest(request)) throw new Error("COVER_GENERATION_REQUEST_INVALID");
-    const blob = container.getBlockBlobClient(`publishing/cover/v1/requests/${request.titleId}/${request.idempotencyKey}.json`);
+    const blob = container.getBlockBlobClient(`publishing/cover/v1/requests/${request.titleId}/${request.idempotencyKey}/${request.executionId}.json`);
     const payload = `${JSON.stringify(request)}\n`;
     try {
       await blob.upload(payload, Buffer.byteLength(payload), {

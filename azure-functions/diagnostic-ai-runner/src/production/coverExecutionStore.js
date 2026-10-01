@@ -30,6 +30,11 @@ function createCoverExecutionStore(options = {}) {
       !url.hostname.endsWith(".blob.core.windows.net")) throw new Error("COVER_EXECUTION_STORE_URL_INVALID");
   const service = options.service || new BlobServiceClient(url.origin, options.credential || new DefaultAzureCredential());
   const container = service.getContainerClient(containerName);
+  const now = options.now || (() => new Date());
+  const staleAfterMs = options.staleAfterMs || 2 * 60 * 60 * 1000;
+  if (!Number.isSafeInteger(staleAfterMs) || staleAfterMs < 5 * 60 * 1000) {
+    throw new Error("COVER_EXECUTION_STALE_WINDOW_INVALID");
+  }
   const blobFor = (key) => {
     if (!SHA256.test(key)) throw new Error("COVER_EXECUTION_KEY_INVALID");
     return container.getBlockBlobClient(`publishing/cover/v1/executions/${key}.json`);
@@ -38,7 +43,7 @@ function createCoverExecutionStore(options = {}) {
   async function reserveExecution(key) {
     const blob = blobFor(key);
     const record = { key, state: "IN_PROGRESS", executionId: randomUUID(), attempt: 1,
-      startedAt: new Date().toISOString(), finishedAt: null, result: null };
+      startedAt: now().toISOString(), finishedAt: null, result: null, previousAttempts: [] };
     try {
       await writeRecord(blob, record, { ifNoneMatch: "*" });
       return { status: "ACQUIRED", executionId: record.executionId };
@@ -48,9 +53,19 @@ function createCoverExecutionStore(options = {}) {
     const current = await readRecord(blob);
     if (current.record.key !== key) throw new Error("COVER_EXECUTION_RECORD_CONFLICT");
     if (current.record.state === "COMPLETE") return { status: "EXISTING", record: current.record.result };
-    if (current.record.state === "IN_PROGRESS") return { status: "IN_PROGRESS" };
-    if (current.record.state !== "FAILED" || !current.etag) throw new Error("COVER_EXECUTION_RECORD_INVALID");
-    const retry = { ...record, attempt: current.record.attempt + 1 };
+    const stale = current.record.state === "IN_PROGRESS" &&
+      Number.isFinite(Date.parse(current.record.startedAt)) &&
+      now().getTime() - Date.parse(current.record.startedAt) >= staleAfterMs;
+    if (current.record.state === "IN_PROGRESS" && !stale) return { status: "IN_PROGRESS" };
+    if (!(["FAILED", "IN_PROGRESS"].includes(current.record.state)) || !current.etag ||
+        !Number.isSafeInteger(current.record.attempt) || current.record.attempt < 1) {
+      throw new Error("COVER_EXECUTION_RECORD_INVALID");
+    }
+    const prior = { executionId: current.record.executionId, state: stale ? "STALE" : "FAILED",
+      startedAt: current.record.startedAt, finishedAt: current.record.finishedAt,
+      result: current.record.result };
+    const retry = { ...record, attempt: current.record.attempt + 1,
+      previousAttempts: [...(current.record.previousAttempts || []), prior] };
     try {
       await writeRecord(blob, retry, { ifMatch: current.etag });
       return { status: "ACQUIRED", executionId: retry.executionId };
@@ -67,7 +82,7 @@ function createCoverExecutionStore(options = {}) {
         current.record.executionId !== executionId || !current.etag) {
       throw new Error("COVER_EXECUTION_STALE_TRANSITION");
     }
-    await writeRecord(blob, { ...current.record, state, finishedAt: new Date().toISOString(), result },
+    await writeRecord(blob, { ...current.record, state, finishedAt: now().toISOString(), result },
       { ifMatch: current.etag });
   }
 

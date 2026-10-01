@@ -220,6 +220,24 @@ test("missing durable request storage blocks the Foundry call", async () => {
   assert.equal(providerCalls, 0);
 });
 
+test("changed authority after request persistence blocks Foundry before an image call", async () => {
+  let reads = 0;
+  let providerCalls = 0;
+  const result = await generateConceptSet(TITLE_ID, {
+    modelDeployment: "jm1-pub-cover-image-primary",
+    loadTitleAuthority: async () => authorityCandidates(reads++ === 0 ? {} : { subtitle: "Changed subtitle" }),
+    persistAuthoritySnapshot: async (bundle, executionId) => snapshot(bundle, executionId),
+    reserveExecution: async () => ({ status: "ACQUIRED", executionId: EXECUTION_ID }),
+    persistGenerationRequest: async (request) => request,
+    completeExecution: async () => {},
+    failExecution: async () => {},
+    generateImage: async () => { providerCalls++; },
+    preflightConcept: async () => ({ passed: true })
+  });
+  assert.equal(result.code, "COVER_AUTHORITY_STALE_BEFORE_GENERATION");
+  assert.equal(providerCalls, 0);
+});
+
 test("missing or mismatched authority snapshot blocks the brief and Foundry call", async () => {
   let providerCalls = 0;
   let requestCalls = 0;
