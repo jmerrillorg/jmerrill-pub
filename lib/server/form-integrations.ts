@@ -172,6 +172,10 @@ export function hasConfirmedNotificationDelivery(result: FormIntegrationResult) 
   return result.notification.status === 'sent'
 }
 
+export function hasConfirmedCanonicalFormCapture(result: FormIntegrationResult) {
+  return result.ingestion.status === 'sent' && hasConfirmedNotificationDelivery(result)
+}
+
 export function notificationNotConfiguredMessage() {
   return 'Submission received, but staff notification delivery is not fully configured. Please email publishing@jmerrill.one directly so the team can follow up.'
 }
