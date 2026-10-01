@@ -167,7 +167,7 @@ async function generateConceptSet(titleId, deps, options = {}) {
     return { ok: false, code: "COVER_TITLE_AUTHORITY_READER_NOT_CONFIGURED" };
   }
   const candidates = await deps.loadTitleAuthority(titleId);
-  const resolved = resolveCoverAuthorityBundle(titleId, candidates);
+  const resolved = resolveCoverAuthorityBundle(titleId, candidates, { executionMode: "INTERNAL_CONCEPT" });
   if (!resolved.ok) return resolved;
   if (typeof deps.reserveExecution !== "function" || typeof deps.persistAuthoritySnapshot !== "function" ||
       typeof deps.persistGenerationRequest !== "function" ||
@@ -222,7 +222,7 @@ async function generateConceptSet(titleId, deps, options = {}) {
       throw new Error("COVER_GENERATION_REQUEST_NOT_PERSISTED");
     }
     const currentCandidates = await deps.loadTitleAuthority(titleId);
-    const currentAuthority = resolveCoverAuthorityBundle(titleId, currentCandidates);
+    const currentAuthority = resolveCoverAuthorityBundle(titleId, currentCandidates, { executionMode: "INTERNAL_CONCEPT" });
     if (!currentAuthority.ok || currentAuthority.bundle.sha256 !== resolved.bundle.sha256) {
       throw new Error("COVER_AUTHORITY_STALE_BEFORE_GENERATION");
     }

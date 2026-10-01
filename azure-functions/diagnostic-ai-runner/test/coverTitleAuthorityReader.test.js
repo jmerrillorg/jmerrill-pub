@@ -25,6 +25,7 @@ function fixture(overrides = {}) {
     apiBase: "https://jm1hq.crm.dynamics.com/api/data/v9.2",
     resourceUrl: "https://jm1hq.crm.dynamics.com",
     credential: { getToken: async () => ({ token: "test-token" }) },
+    ...(overrides.evidence ? { loadInternalCategoryEvidence: async () => overrides.evidence } : {}),
     fetch: async (url, options) => {
       calls.push({ url, options });
       return { ok: true, json: async () => url.includes("jm1pub_titles") ? title : assets };
@@ -44,6 +45,21 @@ test("reader binds live title, canonical author, formatted imprint, and current 
   assert.equal(values.pageCount, undefined);
   assert.equal(calls.length, 2);
   assert.ok(calls.every((call) => call.options.headers.Authorization === "Bearer test-token"));
+});
+
+test("reader derives internal creative category from title-bound governed evidence", async () => {
+  const now = new Date().toISOString();
+  const evidence = [{
+    titleId, sourceType: "CONTROLLING_MANUSCRIPT", sourceId: "current-interior",
+    sourceVersion: "v1", sourceChecksum: "a".repeat(64), current: true, lastVerified: now,
+    text: "Christian faith and Scripture inform spiritual encouragement, purpose, and a life of obedience."
+  }];
+  const { reader } = fixture({ evidence });
+  const candidates = await reader(titleId);
+  const genre = candidates.find((item) => item.field === "genre");
+  assert.equal(genre.value, "Christian Living / Spiritual Growth");
+  assert.equal(genre.authorityClass, "SYSTEM_DERIVED_GOVERNED_INTERNAL");
+  assert.equal(candidates.find((item) => item.field === "marketContext").value, genre.value);
 });
 
 test("reader refuses cross-title data and duplicate current ISBN authority", async () => {

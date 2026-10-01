@@ -3,6 +3,14 @@
 Status: CONTINUE_INTERNAL_IMPLEMENTATION
 Scope: OP-006 within Production and Distribution
 
+## Continue-03 internal-category correction
+
+- `COVER-INTERNAL-CATEGORY-1` derives a narrow internal creative-working category only from title-bound, current, checksum-identified governed evidence. It records the source IDs, versions, checksums, rule version, confidence, and verification time. It is not a BISAC or retail-category classifier.
+- The cover authority resolver accepts `SYSTEM_DERIVED_GOVERNED_INTERNAL` for internal concept `genre` and `marketContext` only. `PROVIDER_SUBMISSION` and `PUBLIC_METADATA` modes reject that authority class. The execution mode participates in the bundle digest, so an internal bundle cannot be reused as a public-mode bundle.
+- The Dataverse title reader accepts a governed evidence loader for this derivation. Its default remains fail-closed: it does not manufacture category evidence from title text or an unapproved reference cover brief.
+- The live BYWB title row has null genre, audience, and description values. The `jmpv2_coverinputauthority` and `jmpv2_interiorartifact` tables returned no rows on the October 1 readback. The current Paperback publishing-asset row points to the September 15 v1.2 interior, while the canonical workspace contains a September 29 102-page, 6-by-9 print export with SHA-256 `b84b89d86fcf1930ee251879512bad283e01c5a5d1fd6e60b2c96976b22e047b`. Source-authority registration and a production evidence loader are still required before a bundle can be persisted.
+- No production caller, Foundry generation, review package, SharePoint persistence, or live cover readback was executed by Continue-03. Public category authority remains separate and unresolved.
+
 ## Reused authority
 
 - OP-006 remains the cover readiness and BP-09 gate surface. No competing top-level cover architecture was introduced.

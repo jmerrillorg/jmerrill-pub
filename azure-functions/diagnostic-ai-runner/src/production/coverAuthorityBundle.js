@@ -5,12 +5,13 @@ const { createHash } = require("node:crypto");
 const GUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const SHA256 = /^[a-f0-9]{64}$/i;
 const MAX_READ_AGE_MS = 15 * 60 * 1000;
+const EXECUTION_MODES = Object.freeze(["INTERNAL_CONCEPT", "PROVIDER_SUBMISSION", "PUBLIC_METADATA"]);
 const AUTHORITY = Object.freeze({
   authorId: ["TITLE_AUTHOR_BINDING"],
   title: ["TITLE_RECORD"],
   subtitle: ["TITLE_RECORD"],
   authorDisplay: ["TITLE_RECORD"],
-  genre: ["APPROVED_CATEGORY", "APPROVED_EDITORIAL_POSITIONING"],
+  genre: ["APPROVED_CATEGORY", "APPROVED_EDITORIAL_POSITIONING", "SYSTEM_DERIVED_INTERNAL_COVER_CATEGORY"],
   audience: ["AUTHOR_ONBOARDING", "APPROVED_EDITORIAL_POSITIONING", "SYSTEM_DERIVED_INTERNAL_CREATIVE"],
   bookDescription: ["APPROVED_RETAIL_DESCRIPTION", "APPROVED_MARKETING_DESCRIPTION", "SYSTEM_DERIVED_INTERNAL_CREATIVE"],
   positioning: ["APPROVED_EDITORIAL_POSITIONING", "SYSTEM_DERIVED_INTERNAL_CREATIVE"],
@@ -21,7 +22,7 @@ const AUTHORITY = Object.freeze({
   pageCount: ["CURRENT_INTERIOR_PROOF"],
   isbn: ["GOVERNED_IDENTIFIER_RECORD"],
   imprint: ["TITLE_RECORD", "APPROVED_EDITORIAL_POSITIONING"],
-  marketContext: ["APPROVED_CATEGORY", "SYSTEM_DERIVED_INTERNAL_CREATIVE"],
+  marketContext: ["APPROVED_CATEGORY", "SYSTEM_DERIVED_INTERNAL_COVER_CATEGORY", "SYSTEM_DERIVED_INTERNAL_CREATIVE"],
   preferences: ["AUTHOR_PROFILE"],
   titleRulings: ["TITLE_RULING"],
   prohibitedVisuals: ["TITLE_RULING", "COVER_POLICY"],
@@ -64,13 +65,24 @@ function validAuthorityClass(item) {
   if (item.sourceType === "SYSTEM_DERIVED_INTERNAL_CREATIVE") {
     return item.authorityClass === "SYSTEM_DERIVED_GOVERNED";
   }
+  if (item.sourceType === "SYSTEM_DERIVED_INTERNAL_COVER_CATEGORY") {
+    return item.authorityClass === "SYSTEM_DERIVED_GOVERNED_INTERNAL" &&
+      typeof item.derivationRule === "string" && item.derivationRule.length > 0 &&
+      Number.isFinite(item.confidence) && item.confidence >= 0 && item.confidence <= 1 &&
+      Array.isArray(item.sourceIds) && item.sourceIds.length > 0 &&
+      Array.isArray(item.sourceVersions) && item.sourceVersions.length === item.sourceIds.length &&
+      Array.isArray(item.sourceChecksums) && item.sourceChecksums.length === item.sourceIds.length &&
+      item.sourceChecksums.every((checksum) => SHA256.test(checksum));
+  }
   return ["CANONICAL_RECORD", "AUTHOR_APPROVED", "PUBLISHER_APPROVED"].includes(item.authorityClass);
 }
 
 function resolveCoverAuthorityBundle(titleId, candidates, options = {}) {
   const now = options.now || new Date().toISOString();
+  const executionMode = options.executionMode || "INTERNAL_CONCEPT";
   const nowMs = Date.parse(now);
-  if (!GUID.test(titleId) || !Number.isFinite(nowMs) || !Array.isArray(candidates)) {
+  if (!GUID.test(titleId) || !Number.isFinite(nowMs) || !Array.isArray(candidates) ||
+      !EXECUTION_MODES.includes(executionMode)) {
     return { ok: false, code: "COVER_AUTHORITY_INPUT_INVALID" };
   }
   const fields = {};
@@ -80,6 +92,7 @@ function resolveCoverAuthorityBundle(titleId, candidates, options = {}) {
     const relevant = candidates.filter((item) => item.field === field && item.current === true && item.titleId === titleId &&
       priority.includes(item.sourceType) && validValue(field, item.value) && item.sourceId && item.sourceVersion &&
       validAuthorityClass(item) &&
+      (executionMode === "INTERNAL_CONCEPT" || item.authorityClass !== "SYSTEM_DERIVED_GOVERNED_INTERNAL") &&
       Number.isFinite(Date.parse(item.lastVerified)) && Math.abs(nowMs - Date.parse(item.lastVerified)) <= MAX_READ_AGE_MS &&
       (!item.sourceChecksum || SHA256.test(item.sourceChecksum)) &&
       (!["CURRENT_INTERIOR_PROOF", "BRAND_ASSET_REGISTRY"].includes(item.sourceType) || SHA256.test(item.sourceChecksum || "")));
@@ -111,7 +124,14 @@ function resolveCoverAuthorityBundle(titleId, candidates, options = {}) {
       sourceType: selected.sourceType,
       authorityClass: selected.authorityClass,
       sourceChecksum: selected.sourceChecksum || null,
-      lastVerified: selected.lastVerified
+      lastVerified: selected.lastVerified,
+      ...(selected.authorityClass === "SYSTEM_DERIVED_GOVERNED_INTERNAL" ? {
+        sourceIds: selected.sourceIds,
+        sourceVersions: selected.sourceVersions,
+        sourceChecksums: selected.sourceChecksums,
+        derivationRule: selected.derivationRule,
+        confidence: selected.confidence
+      } : {})
     };
   }
   if (missing.length || conflicts.length) return { ok: false, code: "COVER_AUTHORITY_UNRESOLVED", missing, conflicts };
@@ -120,9 +140,9 @@ function resolveCoverAuthorityBundle(titleId, candidates, options = {}) {
       formats.some((format) => !fields.isbn.value[format.toLowerCase()])) {
     return { ok: false, code: "COVER_FORMAT_IDENTIFIER_CONFLICT" };
   }
-  const bundle = { schemaVersion: "COVER-AUTHORITY-1", titleId, fields, verifiedAt: now };
+  const bundle = { schemaVersion: "COVER-AUTHORITY-1", titleId, executionMode, fields, verifiedAt: now };
   const stableFields = Object.fromEntries(Object.entries(fields).map(([field, { lastVerified, ...record }]) => [field, record]));
-  return { ok: true, bundle: { ...bundle, sha256: digest({ schemaVersion: bundle.schemaVersion, titleId, fields: stableFields }) } };
+  return { ok: true, bundle: { ...bundle, sha256: digest({ schemaVersion: bundle.schemaVersion, titleId, executionMode, fields: stableFields }) } };
 }
 
 function projectCoverAuthority(bundle) {
@@ -134,4 +154,4 @@ function projectCoverAuthority(bundle) {
   return projected;
 }
 
-module.exports = { AUTHORITY, canonicalJson, digest, resolveCoverAuthorityBundle, projectCoverAuthority };
+module.exports = { AUTHORITY, EXECUTION_MODES, canonicalJson, digest, resolveCoverAuthorityBundle, projectCoverAuthority };

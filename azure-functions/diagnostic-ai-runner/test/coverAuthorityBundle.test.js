@@ -54,6 +54,36 @@ test("conflicting approved values and unapproved category fail closed", () => {
   assert.ok(resolveCoverAuthorityBundle(titleId, merelyCanonical, { now }).missing.includes("genre"));
 });
 
+test("provenance-backed internal category is usable only for internal concepts", () => {
+  const category = {
+    ...records().find((record) => record.field === "genre"),
+    sourceType: "SYSTEM_DERIVED_INTERNAL_COVER_CATEGORY",
+    authorityClass: "SYSTEM_DERIVED_GOVERNED_INTERNAL",
+    sourceId: "derived-category-1",
+    sourceVersion: "v1",
+    sourceChecksum: "b".repeat(64),
+    sourceIds: ["editorial-review-1"],
+    sourceVersions: ["v2"],
+    sourceChecksums: ["a".repeat(64)],
+    derivationRule: "COVER_CATEGORY_RULE_1",
+    confidence: 0.9
+  };
+  const inputs = records().filter((record) => record.field !== "genre").concat(category);
+  const internal = resolveCoverAuthorityBundle(titleId, inputs, { now, executionMode: "INTERNAL_CONCEPT" });
+  assert.equal(internal.ok, true);
+  assert.equal(internal.bundle.fields.genre.authorityClass, "SYSTEM_DERIVED_GOVERNED_INTERNAL");
+  assert.equal(internal.bundle.fields.genre.derivationRule, "COVER_CATEGORY_RULE_1");
+  assert.deepEqual(internal.bundle.fields.genre.sourceIds, ["editorial-review-1"]);
+  for (const executionMode of ["PROVIDER_SUBMISSION", "PUBLIC_METADATA"]) {
+    const result = resolveCoverAuthorityBundle(titleId, inputs, { now, executionMode });
+    assert.equal(result.ok, false);
+    assert.ok(result.missing.includes("genre"));
+  }
+  const incomplete = resolveCoverAuthorityBundle(titleId, inputs.map((record) => record === category
+    ? { ...category, sourceChecksums: [] } : record), { now });
+  assert.ok(incomplete.missing.includes("genre"));
+});
+
 test("print page count needs current artifact checksum and ISBN follows entitlements", () => {
   const missingChecksum = records().map((record) => record.field === "pageCount"
     ? { ...record, sourceChecksum: null } : record);

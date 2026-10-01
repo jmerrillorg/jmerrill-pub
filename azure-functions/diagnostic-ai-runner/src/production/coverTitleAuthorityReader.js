@@ -1,6 +1,7 @@
 "use strict";
 
 const { DefaultAzureCredential } = require("@azure/identity");
+const { deriveInternalCoverCategory } = require("./coverInternalCategory");
 
 const GUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const TITLE_SELECT = [
@@ -75,6 +76,13 @@ function createCoverTitleAuthorityReader(options = {}) {
       sourceId: assetIds.sort().join(","), sourceVersion: assetVersions.sort().join(","),
       authorityClass: "CANONICAL_RECORD", current: true, lastVerified: now
     });
+    if (typeof options.loadInternalCategoryEvidence === "function") {
+      const evidence = await options.loadInternalCategoryEvidence(titleId);
+      const category = deriveInternalCoverCategory(titleId, evidence, { now });
+      if (category.ok) {
+        candidates.push(category.candidate, { ...category.candidate, field: "marketContext" });
+      }
+    }
     return candidates;
   };
 }
