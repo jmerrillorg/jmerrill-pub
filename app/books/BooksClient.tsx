@@ -90,9 +90,9 @@ export default function BooksClient({ books, imprints, unavailable = false }: Bo
   const isDefaultView = !activeImprint?.name && genre === 'All Genres' && format === 'All Formats' && !search
 
   const counts = useMemo(() => {
-    const countMap: Record<string, string | number> = { all: '125+' }
+    const countMap: Record<string, string | number> = { all: books.length }
     return countMap
-  }, [])
+  }, [books.length])
 
   const clearFilters = () => {
     setGenre('All Genres')
@@ -228,7 +228,7 @@ export default function BooksClient({ books, imprints, unavailable = false }: Bo
 
           <div className="font-mono text-[12px] text-white/20">
             {isDefaultView
-              ? '125+ titles in a living catalog of voices'
+              ? `${books.length} titles in a living catalog of voices`
               : `${filtered.length} title${filtered.length !== 1 ? 's' : ''}`}
             {activeImprint?.name && ` · ${activeImprint.name}`}
             {genre !== 'All Genres' && ` · ${genre}`}

@@ -85,7 +85,7 @@ export const division = {
   founderTitle: 'Founder & CEO · J Merrill One',
   established: 'Columbus, OH',
   stats: {
-    titles:    '125+',
+    titles:    'Catalog',
     services:  '95+',
     categories:'16',
     reach:     'Global',
@@ -261,7 +261,7 @@ export const imprints = [
     color:       '#1E90FF',
     textColor:   'white',
     bg:          '#0F1C2E',
-    titleCount:  '125+',
+    titleCount:  'Catalog',
     href:        '/books?imprint=publishing',
   },
   {

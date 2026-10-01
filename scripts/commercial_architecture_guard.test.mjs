@@ -2,6 +2,12 @@ import { existsSync, readFileSync } from 'node:fs'
 
 const catalog = readFileSync('lib/commercial/catalog.ts', 'utf8')
 const packagesPage = readFileSync('app/packages/page.tsx', 'utf8')
+const homeSections = readFileSync('components/sections/UpgradedSections.tsx', 'utf8')
+const homeHero = readFileSync('components/sections/HeroSection.tsx', 'utf8')
+const analyzeRoute = readFileSync('app/api/analyze/route.ts', 'utf8')
+const booksPage = readFileSync('app/books/page.tsx', 'utf8')
+const booksClient = readFileSync('app/books/BooksClient.tsx', 'utf8')
+const siteMetadata = readFileSync('app/layout.tsx', 'utf8')
 const tokens = readFileSync('lib/tokens.ts', 'utf8')
 const activationReport = readFileSync('docs/operations/generated/2026-07-20-JMP-Commercial-Architecture-Activation-Report.md', 'utf8')
 const lifecycleSpec = readFileSync('docs/operations/generated/2026-07-20-JMP-Edition-Lifecycle-Executionlog-Event-Specification.md', 'utf8')
@@ -79,6 +85,21 @@ const checks = [
       catalog.includes("sku: 'JMP-PKG-PREMIER'") &&
       catalog.includes('amount: 7500') &&
       catalog.includes('editionSlots: 4'),
+  },
+  {
+    name: 'Pathfinder names the active Premier package rather than legacy Signature',
+    pass: () =>
+      homeSections.includes('Starter, Professional, or Premier') &&
+      !homeSections.includes('Starter, Professional, or Signature') &&
+      homeSections.includes("'Starter' | 'Professional' | 'Premier'") &&
+      analyzeRoute.includes("['Starter', 'Professional', 'Premier'].includes(result.packageSuggestion)"),
+  },
+  {
+    name: 'public title counts come from catalog data rather than the historical 125+ claim',
+    pass: () =>
+      [homeSections, homeHero, booksPage, booksClient, siteMetadata, tokens].every((source) => !source.includes('125+')) &&
+      homeHero.includes('catalogCount') &&
+      booksClient.includes('books.length'),
   },
   {
     name: 'pricing rules include approved add-ons, premiums, AI overage, and quote-only human narration',

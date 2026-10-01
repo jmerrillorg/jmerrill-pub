@@ -58,7 +58,7 @@ export default async function BooksPage() {
 
           <div className="mt-8 flex flex-wrap gap-3">
             {[
-              '125+ titles',
+              ...(catalogResult.ok ? [`${books.length} catalog titles`] : []),
               imprints.length ? `${imprints.length} official imprints` : 'Official imprints',
               'Real authors and visible book pages',
             ].map((item) => (

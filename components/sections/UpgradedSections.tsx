@@ -26,7 +26,6 @@ export function CredibilityStrip() {
       <div className="max-w-[1280px] mx-auto px-12 py-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div className="flex items-center gap-8 flex-wrap">
           {[
-            { n: '125+',     l: 'Titles in print globally' },
             { n: '45,000+',  l: 'Global retail outlets via Ingram' },
             { n: '450+',     l: 'Ingram Content digital partners' },
             { n: 'GPO',      l: 'Registered publisher' },
@@ -128,7 +127,7 @@ export function ChooseYourPathSection() {
   )
 }
 
-export function WhyAuthorsChooseSection() {
+export function WhyAuthorsChooseSection({ catalogCount }: { catalogCount: number | null }) {
   const pillars = [
     {
       title: 'Your work stays yours',
@@ -149,7 +148,7 @@ export function WhyAuthorsChooseSection() {
   ]
 
   const proofPoints = [
-    '125+ titles',
+    ...(catalogCount === null ? [] : [`${catalogCount} catalog titles`]),
     'Five official imprints',
     'Global distribution through Ingram’s retail and library network',
     'Registered publisher',
@@ -353,7 +352,7 @@ export function PublishingSystemSection() {
 // ─────────────────────────────────────────────────────────────
 // FIX 2: FEATURED TITLES — sorted desc by year w/ imprint badges + filter
 // ─────────────────────────────────────────────────────────────
-export function FeaturedTitlesSection({ titles, unavailable = false }: { titles: BookCardRecord[]; unavailable?: boolean }) {
+export function FeaturedTitlesSection({ titles, catalogCount, unavailable = false }: { titles: BookCardRecord[]; catalogCount: number | null; unavailable?: boolean }) {
   const [activeImprint, setActiveImprint] = useState<string>('all')
   const [showCount, setShowCount] = useState(6)
 
@@ -377,7 +376,7 @@ export function FeaturedTitlesSection({ titles, unavailable = false }: { titles:
   }
 
   const filters = [
-    { id: 'all', label: 'All Titles', count: '125+', showCount: true },
+    { id: 'all', label: 'All Titles', count: catalogCount === null ? '' : String(catalogCount), showCount: catalogCount !== null },
     ...imprints.map((imprintName) => ({
       id: imprintName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, ''),
       label: imprintName,
@@ -513,7 +512,7 @@ export function FeaturedTitlesSection({ titles, unavailable = false }: { titles:
         <div className="flex items-center justify-center gap-4 mt-8">
           <p className="text-[13px] text-white/25">
             {activeImprint === 'all'
-              ? 'Showing featured titles from a catalog of 125+ books.'
+              ? catalogCount === null ? 'Showing featured titles.' : `Showing featured titles from a catalog of ${catalogCount} books.`
               : `Showing ${displayed.length} of ${filtered.length} titles · ${imprintIdToName[activeImprint] || activeImprint}`}
           </p>
           {displayed.length < filtered.length && (
@@ -539,7 +538,7 @@ type AnalysisResult = {
   distributionReadiness: string
   primaryInsight: string
   recommendation: string
-  packageSuggestion: 'Starter' | 'Professional' | 'Signature'
+  packageSuggestion: 'Starter' | 'Professional' | 'Premier'
   packageReason: string
 }
 
@@ -608,7 +607,7 @@ export function BookAnalyzerSection() {
           <div className="flex flex-col gap-3 reveal reveal-delay-2">
             {[
               { icon: '🧭', label: 'Publishing path',        sub: 'Right entry point for your stage and goals' },
-              { icon: '📦', label: 'Guided recommendation',  sub: 'Starter, Professional, or Signature — and why' },
+              { icon: '📦', label: 'Guided recommendation',  sub: 'Starter, Professional, or Premier — and why' },
               { icon: '🌐', label: 'Reader reach',           sub: 'What your title may need to reach its audience' },
               { icon: '💡', label: 'Genre-specific insight', sub: 'Advice tuned to your category, not generic advice' },
               { icon: '➡️', label: 'Your next step',         sub: 'One clear action to move forward today' },
@@ -872,7 +871,7 @@ export function ImprintsSection() {
                   ))}
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-[11px] font-semibold" style={{ color: imp.color }}>{imp.titleCount} titles</span>
+                  <span className="text-[11px] font-semibold" style={{ color: imp.color }}>{imp.titleCount === 'Catalog' ? 'Catalog' : `${imp.titleCount} titles`}</span>
                   <span className="text-[11px] text-gray-300 group-hover:text-blue-500 transition-colors">Explore →</span>
                 </div>
               </div>

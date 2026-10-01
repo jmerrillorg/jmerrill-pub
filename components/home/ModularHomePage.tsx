@@ -21,6 +21,7 @@ export async function ModularHomePage() {
     listPublicAuthors(),
   ])
   const featuredTitles = catalogResult.ok ? catalogResult.data.slice(0, 12).map(catalogTitleToBookCardRecord) : []
+  const catalogCount = catalogResult.ok ? catalogResult.data.length : null
   const currentFeaturedAuthor = getCurrentFeaturedAuthorExperience()
   const currentFeaturedAuthorRecord = currentFeaturedAuthor && authorsResult.ok
     ? authorsResult.data.find((author) => author.slug === currentFeaturedAuthor.slug) || null
@@ -31,7 +32,7 @@ export async function ModularHomePage() {
 
   return (
     <>
-      <HeroSection />
+      <HeroSection catalogCount={catalogCount} />
       {currentFeaturedAuthor && currentFeaturedAuthorRecord && currentFeaturedTitle ? (
         <FeaturedAuthorPromotion
           featured={currentFeaturedAuthor}
@@ -40,11 +41,11 @@ export async function ModularHomePage() {
         />
       ) : null}
       <ChooseYourPathSection />
-      <WhyAuthorsChooseSection />
+      <WhyAuthorsChooseSection catalogCount={catalogCount} />
       <HowPublishingWorksSection />
       <BookAnalyzerSection />
       <PackagesSection />
-      <FeaturedTitlesSection titles={featuredTitles} unavailable={!catalogResult.ok} />
+      <FeaturedTitlesSection titles={featuredTitles} catalogCount={catalogCount} unavailable={!catalogResult.ok} />
       <ClosingCTA />
     </>
   )

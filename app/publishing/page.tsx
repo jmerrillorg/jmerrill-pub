@@ -192,7 +192,7 @@ export default function PublishingPage() {
 
         <div className="mt-10 flex flex-wrap gap-3">
           {[
-            '125+ titles',
+            'A living book catalog',
             'Five official imprints',
             "Global distribution through Ingram's retail and library network",
             'Registered publisher',
