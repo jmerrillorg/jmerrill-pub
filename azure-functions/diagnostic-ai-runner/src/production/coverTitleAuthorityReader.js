@@ -9,7 +9,8 @@ const TITLE_SELECT = [
   "jm1_canonicalauthorcontactreference", "jm1pub_imprint", "modifiedon"
 ].join(",");
 const ASSET_SELECT = [
-  "jm1pub_publishingassetid", "jm1pub_assetformat", "jm1pub_isbn13", "jm1pub_iscurrentedition", "modifiedon"
+  "jm1pub_publishingassetid", "jm1pub_assetformat", "jm1pub_isbn13", "jm1pub_iscurrentedition",
+  "_jm1pub_titleid_value", "modifiedon"
 ].join(",");
 const FORMAT_CODE = Object.freeze({ 100000000: "paperback", 100000002: "ebook" });
 
@@ -64,6 +65,10 @@ function createCoverTitleAuthorityReader(options = {}) {
     const assetVersions = [];
     const assetIds = [];
     for (const asset of assets.value) {
+      if (asset._jm1pub_titleid_value?.toLowerCase() !== titleId.toLowerCase() ||
+          !asset["@odata.etag"] || asset.jm1pub_iscurrentedition !== true) {
+        throw new Error("COVER_IDENTIFIER_READBACK_UNBOUND");
+      }
       const format = FORMAT_CODE[asset.jm1pub_assetformat];
       if (!format || !asset.jm1pub_isbn13) continue;
       if (isbn[format]) throw new Error("COVER_DUPLICATE_CURRENT_IDENTIFIER");

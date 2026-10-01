@@ -17,9 +17,11 @@ function fixture(overrides = {}) {
   };
   const assets = { value: [
     { "@odata.etag": 'W/"2"', jm1pub_publishingassetid: "24716f8b-f4b0-f111-aaac-00224820105b",
-      jm1pub_assetformat: 100000000, jm1pub_isbn13: "978-1-961475-86-1", jm1pub_iscurrentedition: true },
+      _jm1pub_titleid_value: titleId, jm1pub_assetformat: 100000000,
+      jm1pub_isbn13: "978-1-961475-86-1", jm1pub_iscurrentedition: true },
     { "@odata.etag": 'W/"3"', jm1pub_publishingassetid: "07f99887-f4b0-f111-aaac-6045bdd69678",
-      jm1pub_assetformat: 100000002, jm1pub_isbn13: "978-1-961475-87-8", jm1pub_iscurrentedition: true }
+      _jm1pub_titleid_value: titleId, jm1pub_assetformat: 100000002,
+      jm1pub_isbn13: "978-1-961475-87-8", jm1pub_iscurrentedition: true }
   ], ...overrides.assets };
   const reader = createCoverTitleAuthorityReader({
     apiBase: "https://jm1hq.crm.dynamics.com/api/data/v9.2",
@@ -67,9 +69,24 @@ test("reader refuses cross-title data and duplicate current ISBN authority", asy
     /COVER_TITLE_READBACK_UNBOUND/);
   const { reader } = fixture({ assets: { value: [
     { "@odata.etag": 'W/"2"', jm1pub_publishingassetid: titleId, jm1pub_assetformat: 100000000,
-      jm1pub_isbn13: "9781961475861", jm1pub_iscurrentedition: true },
+      _jm1pub_titleid_value: titleId, jm1pub_isbn13: "9781961475861", jm1pub_iscurrentedition: true },
     { "@odata.etag": 'W/"3"', jm1pub_publishingassetid: titleId, jm1pub_assetformat: 100000000,
-      jm1pub_isbn13: "9781961475862", jm1pub_iscurrentedition: true }
+      _jm1pub_titleid_value: titleId, jm1pub_isbn13: "9781961475862", jm1pub_iscurrentedition: true }
   ] } });
   await assert.rejects(reader(titleId), /COVER_DUPLICATE_CURRENT_IDENTIFIER/);
+});
+
+test("reader rejects cross-title and unversioned identifier rows", async () => {
+  const wrongTitle = fixture({ assets: { value: [{
+    "@odata.etag": 'W/"2"', jm1pub_publishingassetid: "24716f8b-f4b0-f111-aaac-00224820105b",
+    _jm1pub_titleid_value: "6bd7e606-cb8d-4aab-a07b-0463536b9869",
+    jm1pub_assetformat: 100000000, jm1pub_isbn13: "9781961475861", jm1pub_iscurrentedition: true
+  }] } });
+  await assert.rejects(wrongTitle.reader(titleId), /COVER_IDENTIFIER_READBACK_UNBOUND/);
+  const unversioned = fixture({ assets: { value: [{
+    jm1pub_publishingassetid: "24716f8b-f4b0-f111-aaac-00224820105b",
+    _jm1pub_titleid_value: titleId, jm1pub_assetformat: 100000000,
+    jm1pub_isbn13: "9781961475861", jm1pub_iscurrentedition: true
+  }] } });
+  await assert.rejects(unversioned.reader(titleId), /COVER_IDENTIFIER_READBACK_UNBOUND/);
 });
