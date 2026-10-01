@@ -24,9 +24,18 @@ async function lifecycleReadback(body, deps) {
   }
   const email = contact.emailaddress1.toLowerCase().replace(/'/g, "''");
   const literalTitle = title.jm1pub_titlename.replace(/'/g, "''");
+  const deliveryTime = body.includeResponseSearch === true ? new Date(body.deliverySentAtIso) : null;
+  if (deliveryTime && (!Number.isFinite(deliveryTime.getTime()) ||
+      deliveryTime.getTime() < after.getTime() || deliveryTime.getTime() > Date.now())) {
+    return { status: 400, jsonBody: { error: "BOUNDED_DELIVERY_TIME_REQUIRED", effects: 0 } };
+  }
+  const deliveryStart = deliveryTime && new Date(deliveryTime.getTime() - 86400000).toISOString();
+  const deliveryEnd = deliveryTime && new Date(Math.min(Date.now(), deliveryTime.getTime() + 86400000)).toISOString();
   const filters = [
     `receivedDateTime ge ${after.toISOString()} and from/emailAddress/address eq '${email}'`,
-    `receivedDateTime ge ${after.toISOString()} and contains(subject,'${literalTitle}')`,
+    deliveryTime
+      ? `receivedDateTime ge ${deliveryStart} and receivedDateTime le ${deliveryEnd} and from/emailAddress/address eq 'publishing@email.jmerrill.one'`
+      : `receivedDateTime ge ${after.toISOString()} and contains(subject,'${literalTitle}')`,
   ];
   if (body.includeSystemCensus === true) filters.push(
     `receivedDateTime ge ${after.toISOString()} and from/emailAddress/address eq 'publishing@email.jmerrill.one'`);

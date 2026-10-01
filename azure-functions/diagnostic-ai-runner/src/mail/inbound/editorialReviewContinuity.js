@@ -56,7 +56,7 @@ async function prepareEditorialReviewContinuity(row, deps) {
   }
   const result = await (deps.lifecycleReadback || lifecycleReadback)({ authorId: row.authorId,
     titleId: row.titleId, afterIso: new Date(Date.parse(sent.createdon) - 86400000).toISOString(),
-    includeResponseSearch: true }, deps);
+    deliverySentAtIso: sent.createdon, includeResponseSearch: true }, deps);
   const search = result.jsonBody;
   if (result.status !== 200 || search?.responseSearch?.complete !== true) return held("AUTHOR_RESPONSE_SEARCH_INCOMPLETE");
   const messages = [...new Map(search.queries.flatMap(query => query.rows).map(message => [message.id, message])).values()];
