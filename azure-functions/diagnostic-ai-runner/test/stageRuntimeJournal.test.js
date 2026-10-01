@@ -76,6 +76,20 @@ test("concurrent duplicate messages commit only one journal event", async () => 
   assert.equal(JSON.parse([...containerClient.values.values()][0].data).events.length, 1);
 });
 
+test("rejects a replay whose evidence or actor changed under the same idempotency key", async () => {
+  const containerClient = fakeContainer();
+  const deps = { containerClient, authorize: authorized };
+  const original = event("STAGE_ELIGIBLE", "source-1");
+  await persistStageEvent(original, deps);
+  await assert.rejects(persistStageEvent({
+    ...original, evidenceReference: "dataverse://jm1_executionlogs/other"
+  }, deps), /IDEMPOTENCY_PAYLOAD_MISMATCH/);
+  await assert.rejects(persistStageEvent({
+    ...original, actorClass: "HUMAN"
+  }, deps), /IDEMPOTENCY_PAYLOAD_MISMATCH/);
+  assert.equal(JSON.parse([...containerClient.values.values()][0].data).events.length, 1);
+});
+
 test("does not record completion, advancement or gate resolution without live verification", async () => {
   const containerClient = fakeContainer();
   const deps = { containerClient, authorize: authorized };

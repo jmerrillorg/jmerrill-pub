@@ -107,7 +107,11 @@ function applyEvent(previous, event) {
       journal.stageCode !== event.stageCode || journal.executionId !== event.executionId) {
     throw safeCode("PUBLISHING_STAGE_JOURNAL_CORRELATION_MISMATCH");
   }
-  if (journal.events.some((item) => item.idempotencyKey === event.idempotencyKey)) {
+  const priorEvent = journal.events.find((item) => item.idempotencyKey === event.idempotencyKey);
+  if (priorEvent) {
+    if (JSON.stringify(priorEvent) !== JSON.stringify(event)) {
+      throw safeCode("PUBLISHING_STAGE_IDEMPOTENCY_PAYLOAD_MISMATCH");
+    }
     return { journal, duplicate: true };
   }
   if (journal.events.length >= 1000) throw safeCode("PUBLISHING_STAGE_JOURNAL_CAPACITY_REACHED");
