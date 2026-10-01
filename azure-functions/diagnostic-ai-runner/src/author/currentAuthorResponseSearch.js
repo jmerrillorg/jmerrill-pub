@@ -28,18 +28,16 @@ function evaluateMailboxResponseSearch(readback, input) {
   }
   const copy = copies[0];
   const addresses = new Set([body.authorEmail, ...(body.responseSearch.aliases || [])].map((value) => value.toLowerCase()));
-  const titleName = String(input.titleName || "").trim().toLowerCase();
   const candidateMessageIds = messages.filter((message) =>
     addresses.has(message.from?.emailAddress?.address?.toLowerCase()) &&
     Number.isFinite(Date.parse(message.receivedDateTime)) &&
-    Date.parse(message.receivedDateTime) >= Date.parse(copy.sentDateTime) &&
-    (Boolean(copy.conversationId && message.conversationId === copy.conversationId) ||
-      /\b(?:approv(?:e|ed|al)|corrections?|edited manuscript|editorial review|developmental)\b/i.test(message.authorReply || "") ||
-      Boolean(titleName && message.subject?.toLowerCase().includes(titleName) &&
-        !/\b(?:onboarding|invoice|payment|agreement|access)\b/i.test(message.subject))))
+    Date.parse(message.receivedDateTime) >= Date.parse(copy.sentDateTime))
     .map((message) => message.internetMessageId || message.id);
+  const titleNameHistory = [field(input.send.jm1_actiondescription, "title"), input.currentTitleName]
+    .map((value) => String(value || "").trim()).filter((value, index, labels) =>
+      value && labels.findIndex((label) => label.toLowerCase() === value.toLowerCase()) === index);
   return { complete: true, candidateMessageIds, deliveryMessageId: copy.internetMessageId,
-    deliveredAt: copy.sentDateTime };
+    deliveredAt: copy.sentDateTime, titleNameHistory };
 }
 
 function createCurrentAuthorResponseSearch(client, graphClient, deps = {}) {
@@ -56,7 +54,7 @@ function createCurrentAuthorResponseSearch(client, graphClient, deps = {}) {
         afterIso: new Date(after - 86400000).toISOString(), deliverySentAtIso: send.createdon,
         includeResponseSearch: true },
       { client, graphClient });
-      return evaluateMailboxResponseSearch(result, { send, titleName: title.jm1pub_titlename });
+      return evaluateMailboxResponseSearch(result, { send, currentTitleName: title.jm1pub_titlename });
     } catch (error) {
       return { complete: false, candidateMessageIds: [], reason: error.safeCode || "MAILBOX_READBACK_FAILED" };
     }
