@@ -9,7 +9,7 @@ const { produceGovernedAuthorReviewDocx } = require("../src/editorial/governedWo
 
 function source(id) {
   const content = `Current ${id} authority.`;
-  return { id, version: "1.0", content, sha256: crypto.createHash("sha256").update(content).digest("hex") };
+  return { id, version: "1.0", lastVerified: "2026-09-30T12:00:00Z", content, sha256: crypto.createHash("sha256").update(content).digest("hex") };
 }
 
 async function fixture() {
@@ -24,7 +24,7 @@ async function fixture() {
   const sourceSha256 = crypto.createHash("sha256").update(buffer).digest("hex");
   const authority = {
     agentId: AGENT_ID, titleId: "title-1", stageId: "stage-7", stageCode: "DEVELOPMENTAL_EDITING", sourceArtifactId: "artifact-1", sourceSha256,
-    stageCanon: source("stageCanon"), styleGuide: source("styleGuide"), authorPreferences: source("authorPreferences"),
+    stageCanon: source("stageCanon"), styleGuide: source("styleGuide"), titleStyleSheet: source("titleStyleSheet"), authorPreferences: source("authorPreferences"),
     voiceProfile: source("voiceProfile"), titleRulings: source("titleRulings"), priorAuthorDecisions: source("priorAuthorDecisions")
   };
   const result = {

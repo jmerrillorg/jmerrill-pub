@@ -23,6 +23,11 @@ async function runGovernedEditorialShadow(input = {}, deps = {}) {
   if (agentRuntime.agentId !== AGENT_ID ||
       typeof agentRuntime.prepareEditPlan !== "function") fail("EDITORIAL_SHADOW_SPECIALIZED_AGENT_REQUIRED");
 
+  const freshBeforePersistence = await deps.readCurrentAuthority();
+  if (validateAuthorityBundle(freshBeforePersistence).snapshotSha256 !== snapshotSha256) {
+    fail("EDITORIAL_SHADOW_AUTHORITY_CHANGED");
+  }
+
   const persisted = await deps.persistAuthoritySnapshot({
     snapshot,
     snapshotSha256,

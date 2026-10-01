@@ -11,9 +11,9 @@ function authorityFor(buffer) {
     agentId: AGENT_ID, titleId: "title", stageId: "stage", stageCode: "DEVELOPMENTAL_EDITING",
     sourceArtifactId: "artifact", sourceSha256: crypto.createHash("sha256").update(buffer).digest("hex")
   };
-  for (const name of ["stageCanon", "styleGuide", "authorPreferences", "voiceProfile", "titleRulings", "priorAuthorDecisions"]) {
+  for (const name of ["stageCanon", "styleGuide", "titleStyleSheet", "authorPreferences", "voiceProfile", "titleRulings", "priorAuthorDecisions"]) {
     const content = `Governed ${name}`;
-    authority[name] = { id: name, version: "1", content, sha256: crypto.createHash("sha256").update(content).digest("hex") };
+    authority[name] = { id: name, version: "1", lastVerified: "2026-09-30T12:00:00Z", content, sha256: crypto.createHash("sha256").update(content).digest("hex") };
   }
   return authority;
 }

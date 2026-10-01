@@ -32,7 +32,8 @@ function nonempty(value) {
 }
 
 function validateSource(source, label) {
-  if (!source || !nonempty(source.id) || !nonempty(source.version) || !nonempty(source.content)) {
+  if (!source || !nonempty(source.id) || !nonempty(source.version) || !nonempty(source.content) ||
+      !nonempty(source.lastVerified) || !Number.isFinite(Date.parse(source.lastVerified))) {
     fail(`EDITORIAL_AUTHORITY_${label}_MISSING`);
   }
   const approvalStatus = source.approvalStatus || "APPROVED";
@@ -41,7 +42,7 @@ function validateSource(source, label) {
   }
   const checksum = crypto.createHash("sha256").update(source.content, "utf8").digest("hex");
   if (source.sha256 !== checksum) fail(`EDITORIAL_AUTHORITY_${label}_CHECKSUM_MISMATCH`);
-  return { id: source.id, version: source.version, sha256: checksum, approvalStatus };
+  return { id: source.id, version: source.version, sha256: checksum, approvalStatus, lastVerified: source.lastVerified };
 }
 
 function validateAuthorityBundle(bundle) {
@@ -51,7 +52,7 @@ function validateAuthorityBundle(bundle) {
     fail("EDITORIAL_AGENT_SOURCE_BINDING_INVALID");
   }
   const sources = {};
-  for (const label of ["stageCanon", "styleGuide", "authorPreferences", "voiceProfile", "titleRulings", "priorAuthorDecisions"]) {
+  for (const label of ["stageCanon", "styleGuide", "titleStyleSheet", "authorPreferences", "voiceProfile", "titleRulings", "priorAuthorDecisions"]) {
     sources[label] = validateSource(bundle[label], label.toUpperCase());
   }
   const snapshot = {

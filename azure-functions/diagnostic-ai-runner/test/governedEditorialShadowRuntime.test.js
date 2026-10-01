@@ -9,7 +9,7 @@ const { runGovernedEditorialShadow } = require("../src/editorial/governedEditori
 
 function source(id) {
   const content = `Approved ${id} for the fixture.`;
-  return { id, version: "1.0", content, sha256: crypto.createHash("sha256").update(content).digest("hex") };
+  return { id, version: "1.0", lastVerified: "2026-09-30T12:00:00Z", content, sha256: crypto.createHash("sha256").update(content).digest("hex") };
 }
 
 async function fixture() {
@@ -20,7 +20,7 @@ async function fixture() {
   const authority = {
     agentId: AGENT_ID, titleId: "title-1", stageId: "stage-7", stageCode: "DEVELOPMENTAL_EDITING",
     sourceArtifactId: "artifact-1", sourceSha256: crypto.createHash("sha256").update(sourceBuffer).digest("hex"),
-    stageCanon: source("stage canon"), styleGuide: source("style guide"), authorPreferences: source("author preferences"),
+    stageCanon: source("stage canon"), styleGuide: source("style guide"), titleStyleSheet: source("title style sheet"), authorPreferences: source("author preferences"),
     voiceProfile: source("voice profile"), titleRulings: source("title rulings"), priorAuthorDecisions: source("prior decisions")
   };
   const snapshotSha256 = validateAuthorityBundle(authority).snapshotSha256;
@@ -57,7 +57,7 @@ test("shadow output requires a persisted exact authority snapshot and a speciali
       return input.plan;
     } }
   });
-  assert.deepEqual(calls, ["snapshot", "readback", "refresh", "agent"]);
+  assert.deepEqual(calls, ["refresh", "snapshot", "readback", "refresh", "agent"]);
   assert.equal(result.status, "SHADOW_OUTPUT_READY");
   assert.equal(result.trackedRevisionCount, 2);
   assert.equal(result.wordCommentCount, 1);
@@ -94,6 +94,21 @@ test("shadow refuses a failed authority snapshot acknowledgement before agent wo
     readCurrentAuthority: async () => input.authority,
     agentRuntime: { agentId: AGENT_ID, prepareEditPlan: async () => { invoked = true; return input.plan; } }
   }), /EDITORIAL_SHADOW_AUTHORITY_SNAPSHOT_NOT_PERSISTED/);
+  assert.equal(invoked, false);
+});
+
+test("shadow refuses stale authority before creating a durable snapshot", async () => {
+  const input = await fixture();
+  let persisted = false;
+  let invoked = false;
+  await assert.rejects(runGovernedEditorialShadow(input, {
+    persistAuthoritySnapshot: async () => { persisted = true; return null; },
+    readAuthoritySnapshot: async () => null,
+    readCurrentAuthority: async () => ({ ...input.authority,
+      voiceProfile: { ...input.authority.voiceProfile, approvalStatus: "SHADOW_REVIEW_ONLY" } }),
+    agentRuntime: { agentId: AGENT_ID, prepareEditPlan: async () => { invoked = true; return input.plan; } }
+  }), /EDITORIAL_SHADOW_AUTHORITY_CHANGED/);
+  assert.equal(persisted, false);
   assert.equal(invoked, false);
 });
 

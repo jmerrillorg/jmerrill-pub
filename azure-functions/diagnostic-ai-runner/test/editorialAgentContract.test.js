@@ -10,6 +10,7 @@ function source(label) {
   return {
     id: `fixture-${label}`,
     version: "1.0",
+    lastVerified: "2026-09-30T12:00:00Z",
     content,
     sha256: crypto.createHash("sha256").update(content).digest("hex")
   };
@@ -25,6 +26,7 @@ function authority(stageCode = "DEVELOPMENTAL_EDITING") {
     sourceSha256: "a".repeat(64),
     stageCanon: source(stageCode),
     styleGuide: source("style guide"),
+    titleStyleSheet: source("title style sheet"),
     authorPreferences: source("author preferences"),
     voiceProfile: source("voice profile"),
     titleRulings: source("title rulings"),
@@ -79,6 +81,15 @@ test("specialized editorial contract fails closed on missing, substituted, or ch
   candidate.titleId = substituted.titleId;
   candidate.sourceArtifactId = "wrong-artifact";
   assert.throws(() => validateAgentEditPlan(candidate, substituted), /EDITORIAL_AGENT_OUTPUT_BINDING_MISMATCH/);
+});
+
+test("title style sheet and verification time are required authority", () => {
+  const missingSheet = authority();
+  delete missingSheet.titleStyleSheet;
+  assert.throws(() => validateAuthorityBundle(missingSheet), /EDITORIAL_AUTHORITY_TITLESTYLESHEET_MISSING/);
+  const unverified = authority();
+  delete unverified.voiceProfile.lastVerified;
+  assert.throws(() => validateAuthorityBundle(unverified), /EDITORIAL_AUTHORITY_VOICEPROFILE_MISSING/);
 });
 
 test("specialized editorial contract rejects full-manuscript blobs and unauthorized direct edits", () => {

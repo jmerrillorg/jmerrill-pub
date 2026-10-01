@@ -4,9 +4,9 @@ const crypto = require("node:crypto");
 const { AGENT_ID, validateAuthorityBundle } = require("./editorialAgentContract");
 
 const AUTHORITY_LABELS = Object.freeze([
-  "stageCanon", "styleGuide", "authorPreferences", "voiceProfile", "titleRulings", "priorAuthorDecisions"
+  "stageCanon", "styleGuide", "titleStyleSheet", "authorPreferences", "voiceProfile", "titleRulings", "priorAuthorDecisions"
 ]);
-const TITLE_BOUND = new Set(["authorPreferences", "voiceProfile", "titleRulings", "priorAuthorDecisions"]);
+const TITLE_BOUND = new Set(["titleStyleSheet", "authorPreferences", "voiceProfile", "titleRulings", "priorAuthorDecisions"]);
 const SOURCE_SYSTEMS = new Set(["DATAVERSE", "SHAREPOINT", "GOVERNED_REPO"]);
 
 function fail(code) {
@@ -37,7 +37,7 @@ function validAuthoritySource(row, label, input) {
   if (row.stageCode && row.stageCode !== input.stageCode) {
     fail(`EDITORIAL_AUTHORITY_${label.toUpperCase()}_STAGE_CODE_MISMATCH`);
   }
-  return { id: row.id, version: row.version, content: row.content, sha256: row.sha256,
+  return { id: row.id, version: row.version, content: row.content, sha256: row.sha256, lastVerified: row.lastVerified,
     approvalStatus: approved ? "APPROVED" : "SHADOW_REVIEW_ONLY" };
 }
 

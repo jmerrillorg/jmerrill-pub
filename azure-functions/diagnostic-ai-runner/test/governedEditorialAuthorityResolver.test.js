@@ -15,7 +15,7 @@ function fixture() {
   const rows = Object.fromEntries(AUTHORITY_LABELS.map((label) => {
     const content = `Approved ${label} content.`;
     return [`${label}-1`, {
-      id: `${label}-1`, version: "1", content, sha256: crypto.createHash("sha256").update(content).digest("hex"),
+      id: `${label}-1`, version: "1", lastVerified: "2026-09-30T12:00:00Z", content, sha256: crypto.createHash("sha256").update(content).digest("hex"),
       approved: true, current: true, sourceSystem: "DATAVERSE",
       scope: ["stageCanon", "styleGuide"].includes(label) ? "GLOBAL" : "TITLE", titleId: "title-1"
     }];
@@ -40,6 +40,7 @@ test("resolver denies missing, stale, cross-title, and changed authority before 
   const cases = [
     ({ rows }) => { delete rows["voiceProfile-1"]; },
     ({ rows }) => { rows["voiceProfile-1"].current = false; },
+    ({ rows }) => { delete rows["titleStyleSheet-1"]; },
     ({ rows }) => { rows["authorPreferences-1"].titleId = "other-title"; },
     ({ rows }) => { rows["titleRulings-1"].content = "changed"; }
   ];
