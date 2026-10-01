@@ -42,6 +42,7 @@ require("./functions/runPreContractEditorialReview");
 require("./functions/runPublisherRecommendationAction");
 require("./functions/runPublisherReviewDecision");
 require("./functions/runPublishingIntakeAutostartRecovery");
+require("./functions/runPublishingStageRuntimeWorker");
 require("./functions/runPublishingInboundDeltaReconciliation");
 require("./functions/runPublishingInboundNotification");
 require("./functions/runPublishingInboundReadback");
