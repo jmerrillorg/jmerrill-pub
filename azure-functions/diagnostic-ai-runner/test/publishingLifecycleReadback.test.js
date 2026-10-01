@@ -13,7 +13,8 @@ test("production startup explicitly registers the read-only route", () => {
 function dependencies(wrongAuthor = false) {
   return { client: { first: async entity => entity === "contacts"
     ? { contactid: authorId, fullname: "Test Author", emailaddress1: "test@example.com" }
-    : { jm1pub_titleid: titleId, _jm1_primaryauthor_value: wrongAuthor ? titleId : authorId, jm1pub_titlename: "Test Project" } },
+    : { jm1pub_titleid: titleId, _jm1_primaryauthor_value: wrongAuthor ? titleId : authorId, jm1pub_titlename: "Test Project" },
+    list: async () => [] },
     graphClient: { request: async method => { assert.equal(method, "GET"); return { value: [] }; } } };
 }
 test("bounded production identity readback is effect-free and renders the canonical fixture", async () => {
@@ -92,7 +93,7 @@ test("recent system census is explicitly requested and bounded independently of 
   assert.equal(result.jsonBody.effects, 0);
 });
 
-test("response search follows exact threads and alternate addresses from new author text only", async () => {
+test("response search preserves alternate-address leads without verifying them", async () => {
   const deps = dependencies();
   const filters = [];
   deps.graphClient.request = async (method, path) => {
@@ -109,8 +110,10 @@ test("response search follows exact threads and alternate addresses from new aut
   };
   const result = await lifecycleReadback({ authorId, titleId, includeResponseSearch: true,
     afterIso: new Date(Date.now() - 86400000).toISOString(), deliverySentAtIso: new Date().toISOString() }, deps);
-  assert.deepEqual(result.jsonBody.responseSearch.aliases, ["new-author@example.net"]);
-  assert.equal(result.jsonBody.responseSearch.complete, true);
+  assert.deepEqual(result.jsonBody.responseSearch.aliases, []);
+  assert.deepEqual(result.jsonBody.responseSearch.unverifiedAliasLeads, ["new-author@example.net"]);
+  assert.equal(result.jsonBody.responseSearch.complete, false);
+  assert.equal(result.jsonBody.responseSearch.reason, "ALTERNATE_SENDER_IDENTITY_UNVERIFIED");
   assert.equal(result.jsonBody.responseSearch.identityChanges, 0);
   assert.match(filters[2], /new-author@example.net/);
   assert.match(filters[3], /conversationId eq 'exact-thread'/);
@@ -118,6 +121,29 @@ test("response search follows exact threads and alternate addresses from new aut
   assert.doesNotMatch(filters[1], /Test Project/);
   assert.equal(filters.some(filter => filter.includes("quoted@example.net")), false);
   assert.equal(result.jsonBody.effects, 0);
+});
+
+test("registered alternate requires primary-address verification evidence before response search trusts it", async () => {
+  for (const verified of [false, true]) {
+    const deps = dependencies();
+    const first = deps.client.first;
+    deps.client.first = async entity => entity === "contacts"
+      ? { contactid: authorId, fullname: "Test Author", emailaddress1: "test@example.com",
+        emailaddress2: "author@example.net" } : first(entity);
+    deps.client.list = async () => verified ? [{ jm1_sourceentity: "contact", jm1_sourcerecordid: authorId,
+      jm1_actiondescription: `address=author@example.net; status=VERIFIED; verificationMethod=PRIMARY_EMAIL_EXPLICIT_STATEMENT; sourceMessageId=source-1; verifiedAt=${new Date().toISOString()};` }] : [];
+    const filters = [];
+    deps.graphClient.request = async (method, path) => {
+      const filter = new URL(path, "https://graph.microsoft.com").searchParams.get("$filter");
+      filters.push(filter);
+      return { value: [] };
+    };
+    const result = await lifecycleReadback({ authorId, titleId, includeResponseSearch: true,
+      afterIso: new Date(Date.now() - 86400000).toISOString(), deliverySentAtIso: new Date().toISOString() }, deps);
+    assert.deepEqual(result.jsonBody.responseSearch.aliases, verified ? ["author@example.net"] : []);
+    assert.equal(result.jsonBody.responseSearch.complete, verified);
+    assert.ok(filters.some(filter => filter.includes("author@example.net")));
+  }
 });
 
 test("truncated thread read cannot establish absence of author response", async () => {
