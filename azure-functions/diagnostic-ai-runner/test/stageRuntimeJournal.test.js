@@ -90,6 +90,17 @@ test("rejects a replay whose evidence or actor changed under the same idempotenc
   assert.equal(JSON.parse([...containerClient.values.values()][0].data).events.length, 1);
 });
 
+test("denies a duplicate action when live authority becomes stale", async () => {
+  const containerClient = fakeContainer();
+  const eligible = event("STAGE_ELIGIBLE", "source-1");
+  await persistStageEvent(eligible, { containerClient, authorize: authorized });
+  await assert.rejects(persistStageEvent(eligible, {
+    containerClient,
+    authorize: async () => ({ titleId: TITLE, stageId: STAGE, stageCode: eligible.stageCode, current: false })
+  }), /LIVE_AUTHORITY_MISMATCH/);
+  assert.equal(JSON.parse([...containerClient.values.values()][0].data).events.length, 1);
+});
+
 test("does not record completion, advancement or gate resolution without live verification", async () => {
   const containerClient = fakeContainer();
   const deps = { containerClient, authorize: authorized };

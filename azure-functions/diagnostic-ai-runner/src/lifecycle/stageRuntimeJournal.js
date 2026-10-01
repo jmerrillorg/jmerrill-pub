@@ -156,7 +156,6 @@ async function persistStageEvent(event, deps = {}) {
     try { snapshot = await readJournal(blob); }
     catch (error) { if (isConflict(error)) continue; throw error; }
     const applied = applyEvent(snapshot.value, event);
-    if (applied.duplicate) return { status: "DUPLICATE", phase: applied.journal.phase, blobName: blobName(event) };
     const authority = await deps.authorize(event);
     if (authority?.titleId?.toLowerCase() !== event.titleId.toLowerCase() ||
         authority?.stageId?.toLowerCase() !== event.stageId.toLowerCase() ||
@@ -173,6 +172,7 @@ async function persistStageEvent(event, deps = {}) {
         throw safeCode("PUBLISHING_STAGE_GATE_NOT_VERIFIED");
       }
     }
+    if (applied.duplicate) return { status: "DUPLICATE", phase: applied.journal.phase, blobName: blobName(event) };
     try {
       await blob.uploadData(Buffer.from(JSON.stringify(applied.journal)), {
         blobHTTPHeaders: { blobContentType: "application/json" },
