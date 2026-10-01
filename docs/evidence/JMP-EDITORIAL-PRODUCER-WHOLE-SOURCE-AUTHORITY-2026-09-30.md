@@ -115,3 +115,10 @@ evidence-store tests pass. No system-path Whole shadow run, author delivery,
 stage advancement, or approval-state mutation occurred in this readback.
 The full diagnostic Function suite also passed: 2,622 tests, 458 suites,
 zero failures.
+
+The branch now includes an exact-ID Dataverse/SharePoint repository adapter for
+the controlling manuscript and registered authority artifacts. Its fixture
+proof covers byte verification, title/stage isolation, review-ready shadow
+gating, and stale or noncanonical source denial. It is not yet wired to the
+normal Developmental trigger; the stage canon, author-preference, and prior
+decision authority bindings must be completed before a live Whole shadow run.
