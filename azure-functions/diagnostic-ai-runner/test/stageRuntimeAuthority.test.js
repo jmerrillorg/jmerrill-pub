@@ -105,6 +105,9 @@ test("canonical stage authority uses verified contact reference when title looku
     canonicalClient({ jm1pub_titles: [{ ...title, jm1_canonicalauthorcontactreference:
       "contact:22222222-2222-4222-8222-222222222222" }] }));
   assert.equal(mismatch.current, false);
+  const malformed = await readCanonicalStageAuthority(canonicalEvent,
+    canonicalClient({ jm1pub_titles: [{ ...title, jm1_canonicalauthorcontactreference: "not-a-contact" }] }));
+  assert.equal(malformed.current, false);
 });
 
 test("canonical stage authority denies absent and conflicting records", async () => {

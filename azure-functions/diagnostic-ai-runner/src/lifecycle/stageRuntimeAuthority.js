@@ -17,8 +17,10 @@ const GUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 function canonicalAuthorId(title) {
   const lookup = String(title?._jm1_primaryauthor_value || "").toLowerCase();
-  const reference = /^contact:([0-9a-f-]{36})$/i.exec(String(title?.jm1_canonicalauthorcontactreference || ""));
+  const referenceText = String(title?.jm1_canonicalauthorcontactreference || "");
+  const reference = /^contact:([0-9a-f-]{36})$/i.exec(referenceText);
   if (lookup && !GUID.test(lookup)) return "";
+  if (referenceText && !reference) return "";
   if (reference && !GUID.test(reference[1])) return "";
   if (lookup && reference && lookup !== reference[1].toLowerCase()) return "";
   return lookup || (reference ? reference[1].toLowerCase() : "");
