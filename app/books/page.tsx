@@ -4,6 +4,7 @@ import { Suspense } from 'react'
 import BooksClient from './BooksClient'
 import { listPublicCatalogTitles } from '@/lib/server/dataverse/catalog'
 import { CTASection } from '@/components/content/CTASection'
+import { publishedPortfolioCountPublic } from '@/lib/publishing/public-portfolio'
 
 export const metadata: Metadata = {
   title: 'Books',
@@ -58,6 +59,7 @@ export default async function BooksPage() {
 
           <div className="mt-8 flex flex-wrap gap-3">
             {[
+              `${publishedPortfolioCountPublic} published titles`,
               ...(catalogResult.ok ? [`${books.length} catalog titles`] : []),
               imprints.length ? `${imprints.length} official imprints` : 'Official imprints',
               'Real authors and visible book pages',

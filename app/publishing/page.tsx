@@ -4,6 +4,7 @@ import { CTASection } from '@/components/content/CTASection'
 import { PageHero } from '@/components/site/PageHero'
 import { PageSection } from '@/components/site/PageSection'
 import { publishingPackages } from '@/lib/marketing-content'
+import { publishedPortfolioCountPublic } from '@/lib/publishing/public-portfolio'
 
 export const metadata: Metadata = {
   title: 'Publishing',
@@ -192,6 +193,7 @@ export default function PublishingPage() {
 
         <div className="mt-10 flex flex-wrap gap-3">
           {[
+            `${publishedPortfolioCountPublic} published titles`,
             'A living book catalog',
             'Five official imprints',
             "Global distribution through Ingram's retail and library network",

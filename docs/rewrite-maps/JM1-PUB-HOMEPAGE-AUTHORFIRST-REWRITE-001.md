@@ -46,7 +46,7 @@ Tone target:
 - family-first
 
 Approved public proof points:
-- `125+ titles`
+- `130+ published titles`
 - five official imprints
 - global distribution through Ingram’s retail and library network
 - registered publisher
@@ -172,7 +172,7 @@ Authors choose JMP because it combines professional publishing support with reta
 
 **Recommended copy direction**  
 Frame proof points around trust:
-- `125+ titles`
+- `130+ published titles`
 - five official imprints
 - global distribution through Ingram’s retail and library network
 - registered publisher
@@ -192,7 +192,7 @@ Optional soft CTA toward `/publishing` or `/about`, but the main function is pro
 
 **Codex implementation notes**  
 - Make proof points read as reasons to trust, not system specs
-- Ensure `125+ titles` is the homepage standard
+- Ensure `130+ published titles` is the homepage portfolio standard; label live catalog listing counts separately
 
 ---
 
@@ -339,7 +339,7 @@ Primary action should be `View full catalog`.
 - data-heavy framing that weakens the emotional effect
 
 **Codex implementation notes**  
-- Preserve the `125+` public standard in homepage-facing catalog copy
+- Preserve the `130+ published titles` public portfolio standard in homepage-facing copy
 - Keep filtered or deeper catalog logic on `/books`
 
 ---

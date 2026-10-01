@@ -9,6 +9,8 @@ const booksPage = readFileSync('app/books/page.tsx', 'utf8')
 const booksClient = readFileSync('app/books/BooksClient.tsx', 'utf8')
 const siteMetadata = readFileSync('app/layout.tsx', 'utf8')
 const tokens = readFileSync('lib/tokens.ts', 'utf8')
+const portfolio = readFileSync('lib/publishing/public-portfolio.ts', 'utf8')
+const liveStats = readFileSync('app/api/live-stats/route.ts', 'utf8')
 const activationReport = readFileSync('docs/operations/generated/2026-07-20-JMP-Commercial-Architecture-Activation-Report.md', 'utf8')
 const lifecycleSpec = readFileSync('docs/operations/generated/2026-07-20-JMP-Edition-Lifecycle-Executionlog-Event-Specification.md', 'utf8')
 const dataverseExportPath = 'data/commercial/dataverse-commercial-catalog-export.json'
@@ -95,9 +97,15 @@ const checks = [
       analyzeRoute.includes("['Starter', 'Professional', 'Premier'].includes(result.packageSuggestion)"),
   },
   {
-    name: 'public title counts come from catalog data rather than the historical 125+ claim',
+    name: 'published portfolio claim remains separate from live catalog listing counts',
     pass: () =>
-      [homeSections, homeHero, booksPage, booksClient, siteMetadata, tokens].every((source) => !source.includes('125+')) &&
+      [homeSections, homeHero, booksPage, booksClient, siteMetadata, tokens, liveStats].every((source) => !source.includes(['125', '+'].join(''))) &&
+      portfolio.includes("publishedPortfolioCountPublic = '130+'") &&
+      homeHero.includes("'Published Titles'") &&
+      homeSections.includes('publishedPortfolioCountPublic} published titles') &&
+      booksPage.includes('publishedPortfolioCountPublic} published titles') &&
+      booksPage.includes('books.length} catalog titles') &&
+      !liveStats.includes('totalTitles:') &&
       homeHero.includes('catalogCount') &&
       booksClient.includes('books.length'),
   },

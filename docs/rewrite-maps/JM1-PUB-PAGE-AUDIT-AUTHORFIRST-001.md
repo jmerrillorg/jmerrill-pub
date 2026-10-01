@@ -384,7 +384,7 @@ This catalog is the visible proof of authors who trusted JMP with their words.
 
 **Content to keep**  
 - catalog filters and utility
-- 125+ public standard
+- 130+ published titles public portfolio standard
 - strong visual catalog grid
 - connection to authors
 

@@ -228,7 +228,7 @@ export default function BooksClient({ books, imprints, unavailable = false }: Bo
 
           <div className="font-mono text-[12px] text-white/20">
             {isDefaultView
-              ? `${books.length} titles in a living catalog of voices`
+              ? `${books.length} titles currently listed in the catalog`
               : `${filtered.length} title${filtered.length !== 1 ? 's' : ''}`}
             {activeImprint?.name && ` · ${activeImprint.name}`}
             {genre !== 'All Genres' && ` · ${genre}`}

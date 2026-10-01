@@ -5,6 +5,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import type { BookCardRecord } from '@/components/content/BookCard'
 import { imprints } from '@/lib/tokens'
+import { publishedPortfolioCountPublic } from '@/lib/publishing/public-portfolio'
 
 // ─────────────────────────────────────────────────────────────
 // CREDIBILITY STRIP
@@ -148,6 +149,7 @@ export function WhyAuthorsChooseSection({ catalogCount }: { catalogCount: number
   ]
 
   const proofPoints = [
+    `${publishedPortfolioCountPublic} published titles`,
     ...(catalogCount === null ? [] : [`${catalogCount} catalog titles`]),
     'Five official imprints',
     'Global distribution through Ingram’s retail and library network',

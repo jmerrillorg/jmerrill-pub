@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
+import { publishedPortfolioCountPublic } from '@/lib/publishing/public-portfolio'
 
 export function HeroSection({ catalogCount }: { catalogCount: number | null }) {
   const [mousePos, setMousePos] = useState({ x: 0.5, y: 0.5 })
@@ -70,7 +71,7 @@ export function HeroSection({ catalogCount }: { catalogCount: number | null }) {
         </div>
 
         <div className="flex gap-10 mt-14 pt-8 border-t border-gray-100 animate-[fadeUp_0.7s_0.85s_both]">
-          {[[catalogCount === null ? 'Books' : String(catalogCount), '', catalogCount === null ? 'In Our Catalog' : 'Catalog Titles'], ['5', '', 'Official Imprints'], ['Ingram', '', 'Global Distribution']].map(([n, suf, l]) => (
+          {[[publishedPortfolioCountPublic, '', 'Published Titles'], ['5', '', 'Official Imprints'], ['Ingram', '', 'Global Distribution']].map(([n, suf, l]) => (
             <div key={l}>
               <div className="leading-none mb-1 text-charcoal" style={{ fontFamily: "'Libre Baskerville', serif", fontSize: '34px', fontWeight: 700, letterSpacing: '-0.02em' }}>
                 {n}<span className="text-blue-500">{suf}</span>

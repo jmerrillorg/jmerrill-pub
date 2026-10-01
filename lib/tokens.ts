@@ -1,4 +1,5 @@
 import { packages as commercialPackages } from './commercial/catalog'
+import { publishedPortfolioCountPublic } from './publishing/public-portfolio'
 
 // ─────────────────────────────────────────────────────────────
 // lib/tokens.ts
@@ -85,7 +86,7 @@ export const division = {
   founderTitle: 'Founder & CEO · J Merrill One',
   established: 'Columbus, OH',
   stats: {
-    titles:    'Catalog',
+    titles:    publishedPortfolioCountPublic,
     services:  '95+',
     categories:'16',
     reach:     'Global',
