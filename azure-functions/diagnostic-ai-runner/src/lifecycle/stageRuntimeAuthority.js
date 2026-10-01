@@ -13,6 +13,16 @@ const ACTIVE_STAGE_STATUSES = new Set([
 ]);
 const EDITORIAL_TITLE_STAGE = 100000006;
 const REVIEW_TITLE_STAGES = new Set([100000001, 100000002]);
+const GUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+function canonicalAuthorId(title) {
+  const lookup = String(title?._jm1_primaryauthor_value || "").toLowerCase();
+  const reference = /^contact:([0-9a-f-]{36})$/i.exec(String(title?.jm1_canonicalauthorcontactreference || ""));
+  if (lookup && !GUID.test(lookup)) return "";
+  if (reference && !GUID.test(reference[1])) return "";
+  if (lookup && reference && lookup !== reference[1].toLowerCase()) return "";
+  return lookup || (reference ? reference[1].toLowerCase() : "");
+}
 
 async function readEditorialStageAuthority(event, client) {
   const expectedType = STAGE_TYPES[event.stageCode];
@@ -27,21 +37,26 @@ async function readEditorialStageAuthority(event, client) {
       $filter: `jm1pub_editorialstageid eq ${event.stageId}`
     }),
     client.first("jm1pub_titles", {
-      $select: "jm1pub_titleid,_jm1_primaryauthor_value,jm1pub_stage",
+      $select: "jm1pub_titleid,_jm1_primaryauthor_value,jm1_canonicalauthorcontactreference,jm1pub_stage",
       $filter: `jm1pub_titleid eq ${event.titleId}`
     })
   ]);
+  const authorId = canonicalAuthorId(title);
+  const contact = authorId ? await client.first("contacts", {
+    $select: "contactid", $filter: `contactid eq ${authorId}`
+  }) : null;
   return {
     titleId: String(title?.jm1pub_titleid || "").toLowerCase(),
     stageId: String(stage?.jm1pub_editorialstageid || "").toLowerCase(),
     stageCode: Number(stage?.jm1pub_stagetype) === expectedType ? event.stageCode : "",
-    current: Boolean(title?.jm1pub_titleid &&
+    current: Boolean(title?.jm1pub_titleid && authorId &&
+      String(contact?.contactid || "").toLowerCase() === authorId &&
       String(stage?._jm1pub_titleid_value || "").toLowerCase() === event.titleId.toLowerCase() &&
       ACTIVE_STAGE_STATUSES.has(Number(stage?.jm1pub_stagestatus)) &&
       (event.stageCode === "03_EDITORIAL_REVIEW"
         ? REVIEW_TITLE_STAGES.has(Number(title?.jm1pub_stage))
         : Number(title?.jm1pub_stage) === EDITORIAL_TITLE_STAGE)),
-    authorId: String(title?._jm1_primaryauthor_value || "").toLowerCase()
+    authorId
   };
 }
 
@@ -56,7 +71,7 @@ async function readCanonicalStageAuthority(event, client) {
       $filter: `jmpv2_stagecode eq '${event.stageCode}'`, $top: "2"
     }),
     client.first("jm1pub_titles", {
-      $select: "jm1pub_titleid,_jm1_primaryauthor_value",
+      $select: "jm1pub_titleid,_jm1_primaryauthor_value,jm1_canonicalauthorcontactreference",
       $filter: `jm1pub_titleid eq ${event.titleId}`
     })
   ]);
@@ -64,7 +79,7 @@ async function readCanonicalStageAuthority(event, client) {
     return { titleId: "", stageId: "", stageCode: "", current: false };
   }
   const lifecycleKey = String(stage.jmpv2_lifecyclekey || "");
-  if (!lifecycleKey || !/^[0-9a-f-]{36}$/i.test(lifecycleKey)) {
+  if (!GUID.test(lifecycleKey)) {
     return { titleId: "", stageId: "", stageCode: "", current: false };
   }
   const lifecycles = await client.list("jmpv2_lifecycleinstances", {
@@ -72,7 +87,7 @@ async function readCanonicalStageAuthority(event, client) {
     $filter: `jmpv2_lifecyclekey eq '${lifecycleKey}'`, $top: "2"
   });
   const lifecycle = lifecycles.length === 1 ? lifecycles[0] : null;
-  if (!lifecycle || !/^[0-9a-f-]{36}$/i.test(String(lifecycle.jmpv2_lifecycleinstanceid || ""))) {
+  if (!lifecycle || !GUID.test(String(lifecycle.jmpv2_lifecycleinstanceid || ""))) {
     return { titleId: "", stageId: "", stageCode: "", current: false };
   }
   const engagements = await client.list("jmpv2_publishingengagements", {
@@ -80,13 +95,16 @@ async function readCanonicalStageAuthority(event, client) {
     $filter: `jmpv2_lifecycleinstanceid eq '${lifecycle.jmpv2_lifecycleinstanceid}'`, $top: "2"
   });
   const engagement = engagements.length === 1 ? engagements[0] : null;
-  const authorId = String(title._jm1_primaryauthor_value || "").toLowerCase();
+  const authorId = canonicalAuthorId(title);
+  const contact = authorId ? await client.first("contacts", {
+    $select: "contactid", $filter: `contactid eq ${authorId}`
+  }) : null;
   return {
     titleId: String(title.jm1pub_titleid || "").toLowerCase(),
     stageId: String(stage.jmpv2_stageinstanceid || "").toLowerCase(),
     stageCode: stage.jmpv2_stagecode,
     authorId,
-    current: Boolean(engagement && authorId &&
+    current: Boolean(engagement && authorId && String(contact?.contactid || "").toLowerCase() === authorId &&
       stage.jmpv2_status === "OPEN" &&
       stage.jmpv2_stagecode === event.stageCode &&
       lifecycle.jmpv2_lifecyclekey === lifecycleKey &&
