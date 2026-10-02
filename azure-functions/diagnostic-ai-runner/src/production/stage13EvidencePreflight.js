@@ -45,6 +45,7 @@ function evaluateStage13Preflight(snapshot) {
   const usedIsbns = new Map();
   const proof = snapshot?.proofArtifact;
   const approval = snapshot?.proofApproval;
+  const agreement = snapshot?.agreementGate;
 
   if (!GUID.test(titleId)) blockers.add("TITLE_ID_INVALID");
   if (!GUID.test(authorId)) blockers.add("AUTHOR_ID_INVALID");
@@ -52,6 +53,11 @@ function evaluateStage13Preflight(snapshot) {
   if (!revision || !value(snapshot?.sourceReadAt) || !Number.isFinite(Date.parse(snapshot.sourceReadAt))) blockers.add("CANONICAL_SNAPSHOT_NOT_VERSIONED");
   if (!Array.isArray(entitlements) || entitlements.length === 0) blockers.add("ENTITLEMENTS_NOT_RESOLVED");
   if (snapshot?.entitlementsComplete !== true) blockers.add("ENTITLEMENTS_NOT_CERTIFIED_COMPLETE");
+  if (!isCurrent(agreement) || agreement.titleId !== titleId || agreement.authorId !== authorId ||
+      !["SIGNED", "NOT_APPLICABLE_WITH_AUTHORITY"].includes(agreement.status) ||
+      !value(agreement.sourceRecordId) || !value(agreement.sourceAuthority)) {
+    blockers.add("AGREEMENT_AUTHORITY_MISSING");
+  }
   if (!isCurrent(proof) || proof.titleId !== titleId || proof.authorId !== authorId ||
       !SHA256.test(value(proof.checksum)) || proof.qaStatus !== "PASS" ||
       !isCurrent(approval) || approval.titleId !== titleId || approval.authorId !== authorId ||

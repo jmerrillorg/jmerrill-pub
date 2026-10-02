@@ -27,6 +27,8 @@ function snapshot() {
     stageId: "13_PRODUCTION",
     sourceRevision: "revision-9",
     sourceReadAt: "2026-10-01T16:00:00.000Z",
+    agreementGate: { titleId, authorId, evidenceId: "agreement-evidence-1", version: "v1",
+      current: true, status: "SIGNED", sourceRecordId: "executed-agreement-1", sourceAuthority: "ADOBE_SIGN" },
     entitlementsComplete: true,
     proofArtifact: { titleId, authorId, artifactId: "proof-asset-1", evidenceId: "proof-artifact-1", version: "v1", current: true, checksum, qaStatus: "PASS" },
     proofApproval: { titleId, authorId, artifactId: "proof-asset-1", evidenceId: "proof-1", version: "v1", current: true, checksum, status: "APPROVED" },
@@ -52,6 +54,18 @@ test("requires exact approved proof artifact, version, and checksum", () => {
   input.proofApproval.checksum = checksum;
   input.proofApproval.artifactId = "another-proof";
   assert.ok(evaluateStage13Preflight(input).blockers.includes("EXACT_PROOF_APPROVAL_MISSING"));
+});
+
+test("holds Stage 13 for a pending or cross-title agreement", () => {
+  const input = snapshot();
+  input.agreementGate.status = "PARALLEL_PENDING";
+  assert.ok(evaluateStage13Preflight(input).blockers.includes("AGREEMENT_AUTHORITY_MISSING"));
+  input.agreementGate.status = "SIGNED";
+  input.agreementGate.titleId = "33333333-3333-4333-8333-333333333333";
+  assert.ok(evaluateStage13Preflight(input).blockers.includes("AGREEMENT_AUTHORITY_MISSING"));
+  input.agreementGate.titleId = titleId;
+  input.agreementGate.sourceRecordId = "";
+  assert.ok(evaluateStage13Preflight(input).blockers.includes("AGREEMENT_AUTHORITY_MISSING"));
 });
 
 test("fails closed when any format loses governed evidence", () => {

@@ -79,14 +79,31 @@ function buildHistoricalMigrationPlan(input) {
     if (evidence.sourceChecksum && !SHA256.test(evidence.sourceChecksum)) {
       deny("HISTORICAL_MIGRATION_EVIDENCE_CHECKSUM_INVALID");
     }
+    const status = currentStage === "12_COVER_DESIGN" ? evidence.status : evidence.status || "COMPLETED";
+    if (currentStage === "12_COVER_DESIGN" &&
+        (status !== "COMPLETED" && !(stageCode === "05_AGREEMENT_PAYMENT" && status === "PARALLEL_PENDING"))) {
+      deny("HISTORICAL_MIGRATION_PRIOR_STAGE_STATUS_INVALID");
+    }
+    if (stageCode === "05_AGREEMENT_PAYMENT" && currentStage === "12_COVER_DESIGN" &&
+        ((status === "PARALLEL_PENDING") !== (input.agreementStatus === "PARALLEL_PENDING"))) {
+      deny("HISTORICAL_MIGRATION_AGREEMENT_STAGE_MISMATCH");
+    }
+    if (status === "PARALLEL_PENDING" && evidence.completedAt) {
+      deny("HISTORICAL_MIGRATION_PENDING_STAGE_COMPLETION_INVALID");
+    }
     return {
-      recordType: "MIGRATED_HISTORICAL_STAGE_EVIDENCE",
+      recordType: status === "PARALLEL_PENDING" ? "MIGRATED_HISTORICAL_GATE" : "MIGRATED_HISTORICAL_STAGE_EVIDENCE",
+      status,
       stageCode, sourceSystem, sourceRecordId, sourceArtifactId,
       sourceChecksum: evidence.sourceChecksum?.toLowerCase() || null,
       authorApprovalEvidence: evidence.authorApprovalEvidence || null,
-      completedAt: timestamp(evidence.completedAt)
+      completedAt: status === "PARALLEL_PENDING" ? null : timestamp(evidence.completedAt)
     };
   }).sort((a, b) => STAGES.indexOf(a.stageCode) - STAGES.indexOf(b.stageCode));
+  if (currentStage === "12_COVER_DESIGN" &&
+      STAGES.slice(0, currentIndex).some((stageCode) => !seen.has(stageCode))) {
+    deny("HISTORICAL_MIGRATION_PRIOR_STAGE_EVIDENCE_MISSING");
+  }
   const migrationKey = createHash("sha256").update(JSON.stringify({
     titleId, authorId, contactId, identitySourceRecordId: binding.sourceRecordId,
     packageCode, formats: [...formats].sort(), currentStage,
@@ -101,6 +118,8 @@ function buildHistoricalMigrationPlan(input) {
       itemId: workspace.itemId, path: workspace.path },
     agreementGate: input.agreementStatus, commercialStatus: input.commercialStatus,
     historicalEvidenceRecords: records,
+    stage13BlockedUntil: currentStage === "12_COVER_DESIGN" ?
+      ["STAGE_12_COMPLETED", "AGREEMENT_SIGNED", "EXACT_PROOF_PREFLIGHT_PASS"] : [],
     syntheticStageEvents: []
   };
 }
