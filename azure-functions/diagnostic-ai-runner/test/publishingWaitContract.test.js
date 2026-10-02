@@ -2,7 +2,7 @@
 
 const { test } = require("node:test");
 const assert = require("node:assert/strict");
-const { validatePublishingWait, resumePublishingWait } = require("../src/lifecycle/publishingWaitContract");
+const { RESUME_ACTION, validatePublishingWait, resumePublishingWait } = require("../src/lifecycle/publishingWaitContract");
 const { processPublishingStageMessage } = require("../src/functions/runPublishingStageRuntimeWorker");
 
 const id = (n) => `${String(n).padStart(8, "0")}-1111-4111-8111-111111111111`;
@@ -15,7 +15,7 @@ function wait() {
     waitOwner: "AUTHOR", sourceSystem: "DATAVERSE", sourceRecordId: id(7), sourceEventId: id(8),
     createdAt: "2026-10-01T12:00:00.000Z", nextCheckAt: "2026-10-01T13:00:00.000Z",
     expiresAt: null, resumeCondition: "exact author decision bound to delivered artifact",
-    resumeAction: "EDITORIAL_AUTHOR_REVIEW_RESUME", idempotencyKey: "review-resume-1", status: "PENDING"
+    resumeAction: RESUME_ACTION, idempotencyKey: "review-resume-1", status: "PENDING"
   };
 }
 
@@ -45,6 +45,9 @@ test("requires exact scoped wait authority and permits explicit verified legacy 
   assert.equal(validatePublishingWait(legacy).authorityMode, "VERIFIED_LEGACY_BRIDGE");
   assert.throws(() => validatePublishingWait({ ...legacy, legacyEngagementReference: "" }), /ENGAGEMENT_AUTHORITY_MISSING/);
   assert.throws(() => validatePublishingWait({ ...wait(), titleId: "Whole" }), /CONTRACT_INVALID/);
+  for (const resumeAction of ["ADVANCE_STAGE", "SEND_AUTHOR_EMAIL", "CHANGE_PAYMENT", "MOVE_FOLDER"]) {
+    assert.throws(() => validatePublishingWait({ ...wait(), resumeAction }), /CONTRACT_INVALID/);
+  }
 });
 
 test("resume rechecks live authority and source condition before dispatch", async () => {

@@ -7,6 +7,7 @@ const WAIT_TYPES = new Set([
 ]);
 const WAIT_OWNERS = new Set(["AUTHOR", "JM_PUBLISHING", "FOUNDER", "PROVIDER", "EXTERNAL_SYSTEM", "JMP_IDENTITY_REVIEW"]);
 const STATUSES = new Set(["PENDING", "READY_TO_RESUME", "RESUMED", "CANCELLED", "SUPERSEDED", "FAILED"]);
+const RESUME_ACTION = "DISPATCH_OWNING_RUNTIME";
 
 function fail(code) {
   throw Object.assign(new Error(code), { safeCode: code });
@@ -28,7 +29,7 @@ function validatePublishingWait(wait) {
       !exact(wait.sourceSystem) || !exact(wait.sourceRecordId) || !exact(wait.sourceEventId) ||
       !iso(wait.createdAt) || !iso(wait.nextCheckAt) ||
       (wait.expiresAt !== null && wait.expiresAt !== undefined && !iso(wait.expiresAt)) ||
-      !exact(wait.resumeCondition) || !exact(wait.resumeAction) || !exact(wait.idempotencyKey) ||
+      !exact(wait.resumeCondition) || wait.resumeAction !== RESUME_ACTION || !exact(wait.idempotencyKey) ||
       !STATUSES.has(wait.status)) fail("PUBLISHING_WAIT_CONTRACT_INVALID");
   if (Date.parse(wait.nextCheckAt) < Date.parse(wait.createdAt) ||
       (wait.expiresAt && Date.parse(wait.expiresAt) < Date.parse(wait.createdAt))) {
@@ -84,4 +85,4 @@ async function resumePublishingWait(signal, deps) {
   return { status: "RESUMED", waitId: wait.waitId, evidenceReference: proof.evidenceReference };
 }
 
-module.exports = { validatePublishingWait, resumePublishingWait };
+module.exports = { RESUME_ACTION, validatePublishingWait, resumePublishingWait };
