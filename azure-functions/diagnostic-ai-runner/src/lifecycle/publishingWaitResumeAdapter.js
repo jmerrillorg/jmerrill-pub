@@ -1,6 +1,6 @@
 "use strict";
 
-const { createHash } = require("node:crypto");
+const { createHash, randomUUID } = require("node:crypto");
 const { validatePublishingWait } = require("./publishingWaitContract");
 
 const OWNER_BY_TYPE = Object.freeze({
@@ -66,18 +66,20 @@ function createPublishingWaitResumeAdapter(deps) {
         if (!["PENDING", "READY_TO_RESUME"].includes(current.status)) return { claimed: false };
         const prior = current.resume;
         const timestamp = now().toISOString();
+        if (Date.parse(current.nextCheckAt) > Date.parse(timestamp)) return { claimed: false };
         if (prior && prior.sourceEventId !== signal.sourceEventId) {
           fail("PUBLISHING_WAIT_COMPETING_SIGNAL");
         }
         if (prior && Date.parse(prior.claimExpiresAt) > Date.parse(timestamp)) {
           return { claimed: false };
         }
-        const claimId = claimIdFor(wait);
+        // A stable business key is not a lease fence. Every attempt gets a new fence.
+        const claimId = randomUUID();
         const next = { ...current, status: "READY_TO_RESUME", resume: {
           claimId, sourceEventId: signal.sourceEventId, owningRuntime: owner,
           evidenceReference: proof.evidenceReference, claimedAt: timestamp,
           claimExpiresAt: new Date(Date.parse(timestamp) + CLAIM_MS).toISOString()
-        } };
+        }, attempts: (current.attempts || 0) + 1 };
         if (await deps.store.compareAndSwap(wait.waitId, snapshot.etag, next)) {
           return { claimed: true, claimId, owningRuntime: owner };
         }
@@ -129,4 +131,4 @@ function createPublishingWaitResumeAdapter(deps) {
   };
 }
 
-module.exports = { OWNER_BY_TYPE, claimIdFor, createPublishingWaitResumeAdapter };
+module.exports = { OWNER_BY_TYPE, claimIdFor, authorityFingerprint, createPublishingWaitResumeAdapter };

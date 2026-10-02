@@ -85,4 +85,4 @@ async function resumePublishingWait(signal, deps) {
   return { status: "RESUMED", waitId: wait.waitId, evidenceReference: proof.evidenceReference };
 }
 
-module.exports = { RESUME_ACTION, validatePublishingWait, resumePublishingWait };
+module.exports = { RESUME_ACTION, validatePublishingWait, resumePublishingWait, exactAuthority };

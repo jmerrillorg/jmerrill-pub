@@ -23,6 +23,14 @@ function createPublishingWaitStore(deps = {}) {
       .getContainerClient(CONTAINER);
   }
   return {
+    async *list() {
+      for await (const blob of container.listBlobsFlat({ prefix: "waits/" })) {
+        const match = /^waits\/([0-9a-f-]{36})\.json$/.exec(blob.name);
+        if (!match) continue;
+        const snapshot = await this.read(match[1]);
+        if (snapshot.value) yield snapshot;
+      }
+    },
     async read(waitId) {
       const blob = container.getBlockBlobClient(blobName(waitId));
       try {

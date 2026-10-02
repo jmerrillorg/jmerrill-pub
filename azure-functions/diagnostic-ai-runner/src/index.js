@@ -43,6 +43,7 @@ require("./functions/runPublisherRecommendationAction");
 require("./functions/runPublisherReviewDecision");
 require("./functions/runPublishingIntakeAutostartRecovery");
 require("./functions/runPublishingStageRuntimeWorker");
+require("./functions/runPublishingWaitRuntime");
 require("./functions/runPublishingInboundDeltaReconciliation");
 require("./functions/runPublishingInboundNotification");
 require("./functions/runPublishingInboundReadback");
