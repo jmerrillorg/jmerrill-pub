@@ -197,12 +197,18 @@ function enrichWithDeliveryLedger(events, deliveries) {
 
 function enrichWithInboundEvents(events, inboundEvents) {
   const byIdentity = new Map();
+  const identityLinks = new Map();
   const poisoned = new Set();
   const conflicts = [];
   for (const inbound of inboundEvents) {
     if (inbound.correlationStatus !== "DETERMINISTIC" || !inbound.titleId || !inbound.authorId) continue;
     const keys = [inbound.internetMessageId && `internet:${internetIdentity(inbound.internetMessageId)}`,
       inbound.graphMessageId && `graph:${String(inbound.mailbox || "").toLowerCase()}:${inbound.graphMessageId}`].filter(Boolean);
+    for (const key of keys) {
+      const neighbors = identityLinks.get(key) || new Set();
+      for (const other of keys) if (other !== key) neighbors.add(other);
+      identityLinks.set(key, neighbors);
+    }
     for (const key of keys) {
       if (poisoned.has(key)) continue;
       const prior = byIdentity.get(key) || [];
@@ -213,6 +219,13 @@ function enrichWithInboundEvents(events, inboundEvents) {
       } else {
         byIdentity.set(key, [...prior, inbound]);
       }
+    }
+  }
+  // A conflicting exact identity poisons every linked copy, not just the first key.
+  const pending = [...poisoned];
+  for (let index = 0; index < pending.length; index += 1) {
+    for (const key of identityLinks.get(pending[index]) || []) {
+      if (!poisoned.has(key)) { poisoned.add(key); pending.push(key); }
     }
   }
   let linked = 0;

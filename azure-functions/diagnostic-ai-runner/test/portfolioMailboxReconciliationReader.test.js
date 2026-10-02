@@ -146,6 +146,20 @@ test("partial delivery and inbound evidence cannot mask conflicting later bindin
     .events[0].correlationStatus, "CONFLICT_HELD");
 });
 
+test("a poisoned inbound Graph identity holds every linked Internet copy", () => {
+  const event = messageRecord(message("copy"), "jackie@jmerrill.one", "receivedDateTime", "now");
+  const inbound = { internetMessageId: event.internetMessageId, graphMessageId: "original",
+    mailbox: "publishing@jmerrill.one", correlationStatus: "DETERMINISTIC", titleId: "title",
+    authorId: "author", stageId: "one" };
+  const contradictory = { ...inbound, internetMessageId: "<other@example.org>", stageId: "two" };
+  for (const rows of [[inbound, contradictory], [contradictory, inbound]]) {
+    const result = enrichWithInboundEvents([event], rows);
+    assert.equal(result.events[0].correlationStatus, "CONFLICT_HELD");
+    assert.equal(result.events[0].titleId, undefined);
+    assert.equal(result.linkedInboundCount, 0);
+  }
+});
+
 test("import rejects body leakage, out-of-window observations and forged query coverage", async () => {
   const { writes, deps } = harness();
   const manifest = await runPortfolioMailboxReconciliation(deps);
