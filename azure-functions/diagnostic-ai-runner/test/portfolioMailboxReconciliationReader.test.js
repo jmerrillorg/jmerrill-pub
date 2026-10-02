@@ -3,7 +3,7 @@
 const { test } = require("node:test");
 const assert = require("node:assert/strict");
 const { firstUrl, messageRecord, scanQuery, scanFolders, deduplicateRecords, enrichWithDeliveryLedger,
-  enrichWithInboundEvents,
+  enrichWithInboundEvents, readInboundEvidencePrefix,
   runPortfolioMailboxReconciliation } =
   require("../src/mail/portfolioMailboxReconciliationReader");
 
@@ -245,4 +245,24 @@ test("lost manifest write is recovered from durable evidence without rescanning"
   writes.delete(`runs/${deps.runId}/manifest.json`);
   const result = await runPortfolioMailboxReconciliation({ ...deps, fetchImpl: async () => { throw Error("unexpected fresh read"); } });
   assert.equal(result.mailEventCount, 1);
+});
+
+test("inbound evidence restart reuses per-record metadata without copying bodies", async () => {
+  const cache = new Map();
+  let reads = 0;
+  const deps = { readCheckpoint: async (key) => cache.get(key),
+    writeCheckpoint: async (key, value) => { cache.set(key, value); return value; },
+    inboundContainerClient: {
+      async *listBlobsFlat() { yield { name: "messages/a.json" }; yield { name: "messages/b.json" }; },
+      getBlockBlobClient: (name) => ({ downloadToBuffer: async () => {
+        reads += 1;
+        if (reads === 2) throw Error("interrupted");
+        return Buffer.from(JSON.stringify({ titleId: name, body: "private full body" }));
+      } })
+    } };
+  await assert.rejects(readInboundEvidencePrefix("messages/", null, deps), /interrupted/);
+  const records = await readInboundEvidencePrefix("messages/", null, deps);
+  assert.equal(reads, 3);
+  assert.equal(records.length, 2);
+  assert.equal(JSON.stringify(records).includes("private full body"), false);
 });

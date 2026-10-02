@@ -221,11 +221,15 @@ async function readInboundEvidencePrefix(prefix, connectionString, deps = {}) {
     .getContainerClient(process.env.JM1_PUBLISHING_INBOUND_EVIDENCE_CONTAINER || DELIVERY_CONTAINER);
   const records = [];
   for await (const blob of container.listBlobsFlat({ prefix })) {
+    const checkpointPath = `evidence-rows/${hash(blob.name)}.json`;
+    const cached = await deps.readCheckpoint?.(checkpointPath);
+    if (cached) { records.push(cached); continue; }
     const bytes = await container.getBlockBlobClient(blob.name).downloadToBuffer();
     const record = JSON.parse(bytes.toString("utf8"));
     const fields = [...BINDING_FIELDS, "internetMessageId", "graphMessageId", "mailbox", "correlationStatus",
       "outboundMessageId", "communicationRecordId", "deliveryId", "inboundMessageEventId"];
-    records.push(Object.fromEntries(fields.filter((field) => record[field] !== undefined).map((field) => [field, record[field]])));
+    const projected = Object.fromEntries(fields.filter((field) => record[field] !== undefined).map((field) => [field, record[field]]));
+    records.push(deps.writeCheckpoint ? await deps.writeCheckpoint(checkpointPath, projected) : projected);
   }
   return records;
 }
@@ -375,8 +379,8 @@ async function runPortfolioMailboxReconciliation(deps = {}) {
   }
   const deduplication = deduplicateRecords(records);
   const evidence = await read("source-evidence.json") || await write("source-evidence.json", {
-    deliveries: deps.deliveryRecords || await readInboundEvidencePrefix("deliveries/", connectionString, deps),
-    inboundEvents: deps.inboundEvents || await readInboundEvidencePrefix("messages/", connectionString, deps)
+    deliveries: deps.deliveryRecords || await readInboundEvidencePrefix("deliveries/", connectionString, runtimeDeps),
+    inboundEvents: deps.inboundEvents || await readInboundEvidencePrefix("messages/", connectionString, runtimeDeps)
   });
   const deliveries = evidence.deliveries;
   const linkage = enrichWithDeliveryLedger(deduplication.events, deliveries);
