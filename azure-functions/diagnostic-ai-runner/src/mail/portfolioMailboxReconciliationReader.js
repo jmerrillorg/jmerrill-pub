@@ -11,6 +11,7 @@ const WINDOW = Object.freeze({ start: "2026-07-03T04:00:00Z", endExclusive: "202
   businessTimeZone: "America/New_York", businessStartDate: "2026-07-03", businessEndDate: "2026-10-01" });
 const FIELDS = "id,internetMessageId,conversationId,parentFolderId,from,toRecipients,ccRecipients,bccRecipients,receivedDateTime,sentDateTime,createdDateTime,lastModifiedDateTime,subject,bodyPreview,body,hasAttachments";
 const CONTAINER = "jm1-publishing-portfolio-evidence";
+const DELIVERY_CONTAINER = "jm1-publishing-inbound-evidence";
 const READER_VERSION = "2.0.0";
 const INTERNAL_SENDERS = new Set([...MAILBOXES, "publishing@email.jmerrill.one"]);
 
@@ -115,6 +116,90 @@ function deduplicateRecords(records) {
   return { events, conflicts, graphDistinctCount: byGraph.size };
 }
 
+function enrichWithDeliveryLedger(events, deliveries) {
+  const byInternet = new Map();
+  const conflicts = [];
+  for (const delivery of deliveries) {
+    const key = String(delivery.internetMessageId || "").trim().toLowerCase();
+    if (!key) continue;
+    const previous = byInternet.get(key);
+    if (previous && (previous.communicationRecordId !== delivery.communicationRecordId ||
+        previous.outboundMessageId !== delivery.outboundMessageId)) {
+      conflicts.push({ type: "DELIVERY_IDENTITY_CONFLICT", internetMessageId: key });
+      continue;
+    }
+    byInternet.set(key, delivery);
+  }
+  let linked = 0;
+  const enriched = events.map((event) => {
+    const key = String(event.internetMessageId || "").trim().toLowerCase();
+    const delivery = key ? byInternet.get(key) : null;
+    if (!delivery) return event;
+    linked += 1;
+    return { ...event, providerMessageId: delivery.outboundMessageId || null,
+      communicationRecordId: delivery.communicationRecordId || null,
+      titleId: delivery.titleId || null, authorId: delivery.authorId || null,
+      engagementId: delivery.engagementId || null, stageId: delivery.stageId || null,
+      deliveryLedgerId: delivery.deliveryId || null };
+  });
+  return { events: enriched, conflicts, linkedDeliveryCount: linked,
+    deliveryLedgerRowCount: deliveries.length };
+}
+
+function enrichWithInboundEvents(events, inboundEvents) {
+  const byIdentity = new Map();
+  const poisoned = new Set();
+  const conflicts = [];
+  for (const inbound of inboundEvents) {
+    if (inbound.correlationStatus !== "DETERMINISTIC" || !inbound.titleId || !inbound.authorId) continue;
+    const keys = [inbound.internetMessageId && `internet:${inbound.internetMessageId.trim().toLowerCase()}`,
+      inbound.graphMessageId && `graph:${String(inbound.mailbox || "").toLowerCase()}:${inbound.graphMessageId}`].filter(Boolean);
+    for (const key of keys) {
+      if (poisoned.has(key)) continue;
+      const prior = byIdentity.get(key);
+      if (prior && (prior.titleId !== inbound.titleId || prior.authorId !== inbound.authorId)) {
+        conflicts.push({ type: "INBOUND_CORRELATION_CONFLICT", key });
+        byIdentity.delete(key);
+        poisoned.add(key);
+      } else if (!prior) {
+        byIdentity.set(key, inbound);
+      }
+    }
+  }
+  let linked = 0;
+  const enriched = events.map((event) => {
+    const internetKey = event.internetMessageId && `internet:${event.internetMessageId.trim().toLowerCase()}`;
+    const graphKey = `graph:${event.sourceMailbox}:${event.graphMessageId}`;
+    if (poisoned.has(internetKey) || poisoned.has(graphKey)) return event;
+    const inbound = (internetKey && byIdentity.get(internetKey)) || byIdentity.get(graphKey);
+    if (!inbound) return event;
+    if ((event.titleId && event.titleId !== inbound.titleId) ||
+        (event.authorId && event.authorId !== inbound.authorId)) {
+      conflicts.push({ type: "MAIL_SOURCE_CORRELATION_CONFLICT", graphMessageId: event.graphMessageId,
+        sourceMailbox: event.sourceMailbox });
+      return event;
+    }
+    linked += 1;
+    return { ...event, authorId: inbound.authorId, titleId: inbound.titleId,
+      engagementId: event.engagementId || inbound.engagementId || null,
+      stageId: event.stageId || inbound.stageId || null,
+      inboundMessageEventId: inbound.inboundMessageEventId };
+  });
+  return { events: enriched, conflicts, linkedInboundCount: linked,
+    inboundEvidenceRowCount: inboundEvents.length };
+}
+
+async function readInboundEvidencePrefix(prefix, connectionString, deps = {}) {
+  const container = deps.inboundContainerClient || BlobServiceClient.fromConnectionString(connectionString)
+    .getContainerClient(process.env.JM1_PUBLISHING_INBOUND_EVIDENCE_CONTAINER || DELIVERY_CONTAINER);
+  const records = [];
+  for await (const blob of container.listBlobsFlat({ prefix })) {
+    const bytes = await container.getBlockBlobClient(blob.name).downloadToBuffer();
+    records.push(JSON.parse(bytes.toString("utf8")));
+  }
+  return records;
+}
+
 async function scanQuery(mailbox, field, token, onPage, deps = {}) {
   const request = deps.fetchImpl || fetch;
   const seenLinks = new Set();
@@ -172,20 +257,35 @@ async function runPortfolioMailboxReconciliation(deps = {}) {
     }
   }
   const deduplication = deduplicateRecords(records);
-  await write("mail-events.json", deduplication);
+  const deliveries = deps.deliveryRecords || await readInboundEvidencePrefix("deliveries/", connectionString, deps);
+  const linkage = enrichWithDeliveryLedger(deduplication.events, deliveries);
+  const inboundEvents = deps.inboundEvents || await readInboundEvidencePrefix("messages/", connectionString, deps);
+  const inboundLinkage = enrichWithInboundEvents(linkage.events, inboundEvents);
+  const identityConflicts = [...deduplication.conflicts, ...linkage.conflicts, ...inboundLinkage.conflicts];
+  await write("mail-events.json", { events: inboundLinkage.events, conflicts: identityConflicts });
   const manifest = { status: "EXTRACTED", runId, readerVersion: READER_VERSION,
     sourceMailboxes: MAILBOXES, window: WINDOW, queries,
     rawRowCountBeforeSameMailboxDeduplication: queries.reduce((sum, query) => sum + query.count, 0),
     graphDistinctCount: deduplication.graphDistinctCount,
-    mailEventCount: deduplication.events.length,
-    missingInternetMessageIdCount: deduplication.events.filter((event) => !event.internetMessageId).length,
-    missingConversationIdCount: deduplication.events.filter((event) => !event.conversationId).length,
-    unresolvedIdentityConflicts: deduplication.conflicts.length,
-    deduplicationStatus: deduplication.conflicts.length === 0 ? "PASS" : "IN_PROGRESS",
+    mailEventCount: inboundLinkage.events.length,
+    durableIdentityCompleteCount: inboundLinkage.events.filter((event) =>
+      Boolean(event.internetMessageId || (event.graphMessageId && event.sourceMailbox))).length,
+    exactTitleCorrelatedCount: inboundLinkage.events.filter((event) =>
+      Boolean(event.titleId && event.authorId)).length,
+    missingInternetMessageIdCount: inboundLinkage.events.filter((event) => !event.internetMessageId).length,
+    missingConversationIdCount: inboundLinkage.events.filter((event) => !event.conversationId).length,
+    deliveryLedgerRowCount: linkage.deliveryLedgerRowCount,
+    linkedDeliveryCount: linkage.linkedDeliveryCount,
+    inboundEvidenceRowCount: inboundLinkage.inboundEvidenceRowCount,
+    linkedInboundCount: inboundLinkage.linkedInboundCount,
+    unresolvedIdentityConflicts: identityConflicts.length,
+    deduplicationStatus: identityConflicts.length === 0 ? "EXACT_ID_PASS_FALLBACK_PENDING" : "IN_PROGRESS",
     completedAt: (deps.now || (() => new Date()))().toISOString() };
   await write("manifest.json", manifest);
   return manifest;
 }
 
 module.exports = { MAILBOXES, WINDOW, READER_VERSION, firstUrl, messageRecord,
-  scanQuery, deduplicateRecords, runPortfolioMailboxReconciliation };
+  scanQuery, deduplicateRecords, enrichWithDeliveryLedger, enrichWithInboundEvents,
+  readInboundEvidencePrefix,
+  runPortfolioMailboxReconciliation };

@@ -2,7 +2,9 @@
 
 const { test } = require("node:test");
 const assert = require("node:assert/strict");
-const { firstUrl, messageRecord, scanQuery, deduplicateRecords, runPortfolioMailboxReconciliation } =
+const { firstUrl, messageRecord, scanQuery, deduplicateRecords, enrichWithDeliveryLedger,
+  enrichWithInboundEvents,
+  runPortfolioMailboxReconciliation } =
   require("../src/mail/portfolioMailboxReconciliationReader");
 
 function message(id) {
@@ -67,6 +69,40 @@ test("deduplication uses provider identity, preserving every mailbox source", ()
   assert.equal(collision.conflicts[0].type, "INTERNET_IDENTITY_CONFLICT");
 });
 
+test("delivery ledger enriches only exact Internet Message ID matches", () => {
+  const matched = messageRecord(message("m1"), "publishing@jmerrill.one", "sentDateTime", "2026-10-02T12:00:00Z");
+  const unrelated = messageRecord(message("m2"), "jackie@jmerrill.one", "sentDateTime", "2026-10-02T12:00:00Z");
+  const delivery = { internetMessageId: "<m1@example.org>", outboundMessageId: "acs-1",
+    communicationRecordId: "comm-1", titleId: "title-1", authorId: "author-1",
+    engagementId: "engagement-1", stageId: "stage-1", deliveryId: "delivery-1" };
+  const result = enrichWithDeliveryLedger([matched, unrelated], [delivery]);
+  assert.equal(result.linkedDeliveryCount, 1);
+  assert.equal(result.events[0].communicationRecordId, "comm-1");
+  assert.equal(result.events[0].titleId, "title-1");
+  assert.equal(result.events[1].communicationRecordId, undefined);
+  assert.deepEqual(result.conflicts, []);
+  const conflicting = enrichWithDeliveryLedger([matched], [delivery,
+    { ...delivery, communicationRecordId: "other" }]);
+  assert.equal(conflicting.conflicts[0].type, "DELIVERY_IDENTITY_CONFLICT");
+});
+
+test("inbound event join uses deterministic exact IDs and preserves conflicts", () => {
+  const event = messageRecord(message("m1"), "publishing@jmerrill.one", "receivedDateTime", "2026-10-02T12:00:00Z");
+  const inbound = { mailbox: "publishing@jmerrill.one", graphMessageId: "m1",
+    internetMessageId: "<m1@example.org>", correlationStatus: "DETERMINISTIC",
+    titleId: "title-1", authorId: "author-1", stageId: "stage-1",
+    inboundMessageEventId: "event-1" };
+  const linked = enrichWithInboundEvents([event], [inbound]);
+  assert.equal(linked.linkedInboundCount, 1);
+  assert.equal(linked.events[0].titleId, "title-1");
+  assert.equal(linked.events[0].inboundMessageEventId, "event-1");
+  const held = enrichWithInboundEvents([event], [{ ...inbound, correlationStatus: "UNRESOLVED" }]);
+  assert.equal(held.linkedInboundCount, 0);
+  const conflict = enrichWithInboundEvents([{ ...event, titleId: "other-title" }], [inbound]);
+  assert.equal(conflict.linkedInboundCount, 0);
+  assert.equal(conflict.conflicts[0].type, "MAIL_SOURCE_CORRELATION_CONFLICT");
+});
+
 test("complete manifest is written only after both mailboxes and both timestamp scans finish", async () => {
   const writes = new Map();
   const containerClient = {
@@ -76,7 +112,8 @@ test("complete manifest is written only after both mailboxes and both timestamp 
       writes.set(path, JSON.parse(bytes.toString("utf8")));
     } })
   };
-  const deps = { containerClient, credential: { getToken: async () => ({ token: "secret" }) },
+  const deps = { containerClient, deliveryRecords: [], inboundEvents: [],
+    credential: { getToken: async () => ({ token: "secret" }) },
     runId: "11111111-1111-4111-8111-111111111111",
     now: () => new Date("2026-10-02T12:00:00Z"),
     fetchImpl: async () => ({ ok: true, json: async () => ({ value: [message("m1")] }) }) };
@@ -84,6 +121,8 @@ test("complete manifest is written only after both mailboxes and both timestamp 
   assert.equal(result.queries.length, 4);
   assert.equal(result.rawRowCountBeforeSameMailboxDeduplication, 4);
   assert.equal(result.mailEventCount, 1);
+  assert.equal(result.durableIdentityCompleteCount, 1);
+  assert.equal(result.deduplicationStatus, "EXACT_ID_PASS_FALLBACK_PENDING");
   assert.equal(writes.size, 6);
   assert.equal([...writes.keys()].some((key) => key.endsWith("manifest.json")), true);
   writes.clear();
