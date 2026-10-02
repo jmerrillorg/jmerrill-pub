@@ -5,6 +5,7 @@ const { createDataverseClient } = require("../orchestration/authorReviewResponse
 const { processStageEvent } = require("../lifecycle/stageRuntimeProcessor");
 const { readStageAuthority } = require("../lifecycle/stageRuntimeAuthority");
 const { resumePublishingWait } = require("../lifecycle/publishingWaitContract");
+const { createPublishingWaitResumeAdapter } = require("../lifecycle/publishingWaitResumeAdapter");
 
 const QUEUE = "jm1-publishing-stage-events";
 
@@ -20,7 +21,8 @@ function parseEvent(message) {
 async function processPublishingStageMessage(message, deps = {}) {
   const event = parseEvent(message);
   if (event.eventType === "WAIT_RESOLVED") {
-    return resumePublishingWait(event, deps.waitAdapters);
+    const adapters = deps.waitAdapters || (deps.waitRuntime && createPublishingWaitResumeAdapter(deps.waitRuntime));
+    return resumePublishingWait(event, adapters);
   }
   const client = deps.client || createDataverseClient({
     apiBase: process.env.DATAVERSE_WEB_API_BASE_URL,
