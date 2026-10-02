@@ -6,6 +6,12 @@ const GUID = /^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i;
 const email = (value) => String(value || "").trim().toLowerCase();
 const hash = (value) => createHash("sha256").update(value).digest("hex");
 function fail(code) { throw Object.assign(new Error(code), { safeCode: code }); }
+function declaredCorrespondenceEmail(source) {
+  const text = extractAuthorReplyText(source.body?.content || source.bodyPreview);
+  const plain = text.replace(/\[([^\]]+)\]\(mailto:[^)]+\)/gi, "$1");
+  const declarations = [...plain.matchAll(/\bit is\s+(?:mailto:)?([a-z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-z0-9.-]+\.[a-z]{2,})/gi)].map((m) => email(m[1]));
+  return /\bcorrespondence\b/i.test(plain) && declarations.length === 1 ? declarations[0] : null;
+}
 function identityKey(authorId, address) {
   if (!GUID.test(authorId)) fail("CORRESPONDENCE_AUTHOR_INVALID");
   return `author-correspondence-${authorId.toLowerCase()}-${hash(email(address))}`;
@@ -16,12 +22,11 @@ async function bindCorrespondenceIdentity({ authorId, alternateEmail, sourceMess
   const contact = await client.first("contacts", { $filter: `contactid eq ${authorId}`, $select: "contactid,emailaddress1" });
   const source = await graph.getMessage(sourceMessageId);
   const primary = email(contact?.emailaddress1);
-  if (!primary || email(source.from?.emailAddress?.address) !== primary || !source.internetMessageId || !source.receivedDateTime) fail("CORRESPONDENCE_CANONICAL_SOURCE_UNPROVEN");
+  if (!primary || source.id !== sourceMessageId || email(source.from?.emailAddress?.address) !== primary || !source.internetMessageId || !source.receivedDateTime) fail("CORRESPONDENCE_CANONICAL_SOURCE_UNPROVEN");
   const text = extractAuthorReplyText(source.body?.content || source.bodyPreview);
   const alternate = email(alternateEmail);
   // This deliberately narrow author declaration does not interpret quoted addresses as authority.
-  const declarations = [...text.matchAll(/\bit is\s+(?:mailto:)?([a-z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-z0-9.-]+\.[a-z]{2,})/gi)].map((m) => email(m[1]));
-  if (!/\bcorrespondence\b/i.test(text) || declarations.length !== 1 || declarations[0] !== alternate || alternate === primary) fail("CORRESPONDENCE_DECLARATION_UNPROVEN");
+  if (declaredCorrespondenceEmail(source) !== alternate || alternate === primary) fail("CORRESPONDENCE_DECLARATION_UNPROVEN");
   const key = identityKey(authorId, alternate);
   const record = { schemaVersion: 1, scope: "AUTHOR_CORRESPONDENCE_ONLY", authorId: authorId.toLowerCase(),
     primaryEmail: primary, alternateEmail: alternate, sourceMessageId: source.id,
@@ -30,7 +35,7 @@ async function bindCorrespondenceIdentity({ authorId, alternateEmail, sourceMess
     portalAuthenticationAuthorized: false, verifiedAt: now().toISOString() };
   const existing = await store.getCheckpoint(key);
   if (existing) {
-    if (existing.sourceInternetMessageId !== record.sourceInternetMessageId || existing.sourceBodyHash !== record.sourceBodyHash || existing.scope !== record.scope) fail("CORRESPONDENCE_AUTHORITY_CONFLICT");
+    if (existing.sourceInternetMessageId !== record.sourceInternetMessageId || existing.alternateEmail !== record.alternateEmail || existing.primaryEmail !== record.primaryEmail || existing.scope !== record.scope) fail("CORRESPONDENCE_AUTHORITY_CONFLICT");
     return existing;
   }
   if (typeof store.setCheckpointOnce !== "function") fail("CORRESPONDENCE_IMMUTABLE_STORE_REQUIRED");
@@ -51,4 +56,4 @@ async function verifyCorrespondenceIdentity(authorId, sender, { client, store })
       !record.sourceInternetMessageId || !/^[0-9a-f]{64}$/.test(record.sourceBodyHash || "")) return { verified: false };
   return { verified: true, email: record.alternateEmail, source: record.sourceInternetMessageId };
 }
-module.exports = { bindCorrespondenceIdentity, verifyCorrespondenceIdentity, identityKey };
+module.exports = { bindCorrespondenceIdentity, verifyCorrespondenceIdentity, identityKey, declaredCorrespondenceEmail };

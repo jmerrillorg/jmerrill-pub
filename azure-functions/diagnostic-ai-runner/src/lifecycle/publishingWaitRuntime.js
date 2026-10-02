@@ -7,9 +7,10 @@ const { registerPublishingWait } = require("./publishingWaitCoordinator");
 const { createDataverseClient } = require("../orchestration/authorReviewResponseConsumer");
 const { BlobInboundEvidenceStore } = require("../mail/inbound/blobEvidenceStore");
 const { PublishingMailboxGraphClient } = require("../mail/inbound/graphClient");
-const { verifyCorrespondenceIdentity } = require("../mail/inbound/correspondenceIdentity");
+const { verifyCorrespondenceIdentity, bindCorrespondenceIdentity, declaredCorrespondenceEmail } = require("../mail/inbound/correspondenceIdentity");
 const { OWNER_BY_TYPE } = require("./publishingWaitResumeAdapter");
 const { waitRuntimeOwnsTitle } = require("./publishingWaitEnablement");
+const { recoverCadenceDelivery } = require("../mail/inbound/cadenceDeliveryRecovery");
 const PROJECTION_CONTAINER = "jm1-publishing-wait-projections";
 const SIGNAL_QUEUE = "jm1-publishing-wait-signals";
 
@@ -39,28 +40,52 @@ function createPublishingWaitRuntime(deps = {}) {
       const gates = await client.list("jm1pub_editorialapprovalgates", { $filter: "statecode eq 0 and jm1pub_gatestatus eq 196650002", $top: "5000" });
       const messages = await inbound.listPrefix("messages/");
       let registered = 0;
+      const failures = [];
+      const recordFailure = (gate, message, error) => {
+        const failure = { gateId: gate.jm1pub_editorialapprovalgateid, sourceEventId: message?.eventId || null,
+          code: error.safeCode || "PUBLISHING_WAIT_PRODUCER_FAILED" };
+        failures.push(failure);
+        runtime.observe?.({ ...failure, status: "PRODUCER_FAILED" });
+      };
       for (const gate of gates) {
         if (!waitRuntimeOwnsTitle(gate._jm1pub_titleid_value)) continue;
+        try {
         const stage = await client.first("jm1pub_editorialstages", { $filter: `jm1pub_editorialstageid eq ${gate._jm1pub_editorialstageid_value}` });
         if (!stage?._jm1pub_contactid_value || !stage.jm1pub_publishingintakereference) continue;
+        const contact = await client.first("contacts", { $filter: `contactid eq ${stage._jm1pub_contactid_value}`, $select: "contactid,emailaddress1" });
+        // Recover explicit declarations before evaluating alternate-address replies, independent of blob order.
+        for (const message of messages) {
+          if (!contact?.emailaddress1 || message.fromAddress?.toLowerCase() !== contact.emailaddress1.toLowerCase() || !message.graphMessageId) continue;
+          try {
+          const source = await graph.getMessage(message.graphMessageId);
+          if (source.internetMessageId !== message.internetMessageId || source.receivedDateTime !== message.receivedAt) continue;
+          const alternateEmail = declaredCorrespondenceEmail(source);
+          if (alternateEmail) await bindCorrespondenceIdentity({ authorId: stage._jm1pub_contactid_value, alternateEmail, sourceMessageId: message.graphMessageId },
+            { client, graph, store: inbound, now: deps.now });
+          } catch (error) { recordFailure(gate, message, error); }
+        }
         for (const message of messages) {
           if (!message.fromAddress || !message.internetMessageId || !Number.isFinite(Date.parse(message.receivedAt)) ||
               Date.parse(message.receivedAt) < Date.parse(gate.jm1pub_awaitingsince || gate.createdon)) continue;
+          try {
           const identity = await verifyCorrespondenceIdentity(stage._jm1pub_contactid_value, message.fromAddress, { client, store: inbound });
           if (!identity.verified) continue;
           const wait = authorWaitFor(gate, stage, message, deps.now?.() || new Date());
           const authority = await author.readAuthority(wait);
           if (!authority) continue;
+          await recoverCadenceDelivery(wait, authority, message, { client, inbound, graph });
           // Neither subject nor quoted title text establishes this event's title.
           const proof = await author.verifyCondition(wait, authority);
           if (!proof.satisfied) { runtime.observe?.({ waitId: wait.waitId, status: "HELD", reason: proof.reason }); continue; }
           if ((await registerPublishingWait(wait, runtime)).status === "REGISTERED") registered += 1;
+          } catch (error) { recordFailure(gate, message, error); }
         }
+        } catch (error) { recordFailure(gate, null, error); }
       }
-      return { registered };
+      return { registered, failures };
     },
-    async publishHealth(results) {
-      const health = { observedAt: (deps.now?.() || new Date()).toISOString(), counts: {}, failures: [] };
+    async publishHealth(results, producerFailures = []) {
+      const health = { observedAt: (deps.now?.() || new Date()).toISOString(), counts: {}, failures: [...producerFailures] };
       for (const item of results) {
         health.counts[item.status] = (health.counts[item.status] || 0) + 1;
         if (["FAILURE_RECORDED", "FAILED"].includes(item.status)) health.failures.push({ waitId: item.waitId, code: item.code });

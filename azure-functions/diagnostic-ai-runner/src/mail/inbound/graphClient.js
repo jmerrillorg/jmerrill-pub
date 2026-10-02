@@ -71,6 +71,14 @@ class PublishingMailboxGraphClient {
     );
   }
 
+  async findByInternetMessageId(internetMessageId) {
+    if (!/^<[^<>\s]+>$/.test(internetMessageId || "")) return [];
+    const filter = encodeURIComponent(`internetMessageId eq '${internetMessageId.replace(/'/g, "''")}'`);
+    const result = await this.request("GET", `/users/${encodeURIComponent(this.mailbox)}/messages?$filter=${filter}&$select=${encodeURIComponent(this.messageSelect())}&$top=2`,
+      null, { Prefer: 'outlook.body-content-type="text"' });
+    return result["@odata.nextLink"] ? [] : result.value || [];
+  }
+
   async listInboxMessagesSince(afterIso, top = 25) {
     const select = encodeURIComponent(this.messageSelect());
     const filter = afterIso ? `&$filter=${encodeURIComponent(`receivedDateTime ge ${afterIso}`)}` : "";

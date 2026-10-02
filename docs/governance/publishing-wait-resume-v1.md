@@ -18,7 +18,7 @@ UTF-8 JSON, exactly six fields; unknown fields rejected:
 
 `waitId` is lowercase GUID. `sourceEventId` is `resolved_` plus SHA-256 of `waitId:idempotencyKey:evidenceReference`. Evidence is a nonempty, trimmed, single-line reference of at most 1024 characters. Publishing recomputes it from its current canonical condition reader before dispatch. Repeated delivery of the same signal is harmless; altered proof/replay is denied.
 
-Publishing projects ready signals to `jm1-publishing-wait-projections/ready/{waitId}.json`. OPS reads them with Entra workload identity and sends base64-encoded JSON to Azure Storage queue `jm1-publishing-wait-signals`. It never writes the wait journal. Publishing's dedicated queue worker rechecks authority and condition. The existing broader stage queue is not enabled by this path.
+Publishing projects ready signals to `jm1-publishing-wait-projections/ready/{waitId}.json`. OPS reads them with Entra workload identity and sends raw UTF-8 JSON (XML-escaped in the Storage REST envelope) to Azure Storage queue `jm1-publishing-wait-signals`. This matches the existing Publishing host's `messageEncoding=none`; no base64 layer is added. It never writes the wait journal. Publishing's dedicated queue worker rechecks authority and condition. The existing broader stage queue is not enabled by this path.
 
 ## Durable Behavior
 
@@ -37,6 +37,8 @@ Publishing projects ready signals to `jm1-publishing-wait-projections/ready/{wai
 The consumer still performs classification and persists the actual reply; the integration supplies no decision, generates no reply and sends no mail. Its scoped conditional gate update uses the Dataverse ETag. A partial capture log is not a completion receipt. A different prior author decision is held, not overwritten. Existing package and payment consumers stay with their owners.
 
 Correspondence identity is separately scoped `AUTHOR_CORRESPONDENCE_ONLY`, with the canonical-primary declaration source, timestamp and hash. No contact email2/email3 or portal login authority is changed. Source declaration recovery is fail-closed; arbitrary/quoted email addresses cannot authorize a new identity.
+
+For historical cadence deliveries missing from the inbound delivery ledger, recovery requires the exact provider message in the reply headers, one shared-mailbox copy from the canonical ACS sender with the author recipient and Publishing CC, an exact canonical gate/stage/title/artifact, the original successful sent execution log, and the downloaded attachment checksum matching its manifest. The system registers that proven existing delivery; it does not send again. A missing or ambiguous proof remains held. Producer errors are isolated per source/gate and persisted in health while existing waits continue reconciling.
 
 Other registered owner adapters use the same contract. Unregistered editorial, cover, payment, provider and general-stage owners fail closed. A provider/system fixture proves the contract, not live commissioning of those capabilities.
 

@@ -5,9 +5,11 @@ const { createPublishingWaitRuntime, SIGNAL_QUEUE } = require("../lifecycle/publ
 const { dispatchPublishingWait, reconcilePublishingWaits } = require("../lifecycle/publishingWaitCoordinator");
 
 async function runWaitReconciliation(runtime) {
-  const produced = await runtime.produceAuthorWaits();
+  let produced;
+  try { produced = await runtime.produceAuthorWaits(); }
+  catch (error) { produced = { registered: 0, failures: [{ code: error.safeCode || "PUBLISHING_WAIT_PRODUCER_FAILED" }] }; }
   const results = await reconcilePublishingWaits(runtime);
-  const health = await runtime.publishHealth(results);
+  const health = await runtime.publishHealth(results, produced.failures);
   return { ...produced, health, results };
 }
 if (process.env.JM1_PUBLISHING_WAIT_RUNTIME_ENABLED === "true") {
