@@ -115,3 +115,14 @@ test("forged resolution proof cannot spend a legitimate wait's retry budget",asy
   assert.equal((await dispatchPublishingWait(signal,f.runtime)).status,"SIGNAL_REJECTED");
   assert.equal(f.current().attempts,undefined);assert.equal(f.effects(),0);
 });
+test("removing canary scope pauses queued dispatch and reconciliation without losing history",async()=>{
+  const f=fixture();await registerPublishingWait(f.wait,f.runtime);
+  f.runtime.canDispatch=async()=>false;
+  const before=structuredClone(f.current());
+  assert.equal((await dispatchPublishingWait(signalFor(f.wait,"canonical-proof1"),f.runtime)).status,"PAUSED_BY_SCOPE");
+  assert.equal((await reconcilePublishingWaits(f.runtime))[0].status,"PAUSED_BY_SCOPE");
+  assert.deepEqual(f.current(),before);assert.equal(f.effects(),0);
+  f.runtime.canDispatch=async()=>true;
+  assert.equal((await dispatchPublishingWait(signalFor(f.wait,"canonical-proof1"),f.runtime)).status,"RESUMED");
+  assert.equal(f.effects(),1);
+});

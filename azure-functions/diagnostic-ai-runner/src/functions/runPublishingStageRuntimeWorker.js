@@ -4,8 +4,9 @@ const { app } = require("@azure/functions");
 const { createDataverseClient } = require("../orchestration/authorReviewResponseConsumer");
 const { processStageEvent } = require("../lifecycle/stageRuntimeProcessor");
 const { readStageAuthority } = require("../lifecycle/stageRuntimeAuthority");
-const { resumePublishingWait } = require("../lifecycle/publishingWaitContract");
-const { createPublishingWaitResumeAdapter } = require("../lifecycle/publishingWaitResumeAdapter");
+const { dispatchPublishingWait } = require("../lifecycle/publishingWaitCoordinator");
+const { validateWaitSignal } = require("../lifecycle/publishingWaitSignal");
+const { createPublishingWaitRuntime } = require("../lifecycle/publishingWaitRuntime");
 
 const QUEUE = "jm1-publishing-stage-events";
 
@@ -21,8 +22,11 @@ function parseEvent(message) {
 async function processPublishingStageMessage(message, deps = {}) {
   const event = parseEvent(message);
   if (event.eventType === "WAIT_RESOLVED") {
-    const adapters = deps.waitAdapters || (deps.waitRuntime && createPublishingWaitResumeAdapter(deps.waitRuntime));
-    return resumePublishingWait(event, adapters);
+    validateWaitSignal(event);
+    if (!deps.waitRuntime && process.env.JM1_PUBLISHING_WAIT_RUNTIME_ENABLED !== "true") {
+      throw Object.assign(new Error("PUBLISHING_WAIT_RUNTIME_DISABLED"), { safeCode: "PUBLISHING_WAIT_RUNTIME_DISABLED" });
+    }
+    return dispatchPublishingWait(event, deps.waitRuntime || createPublishingWaitRuntime());
   }
   const client = deps.client || createDataverseClient({
     apiBase: process.env.DATAVERSE_WEB_API_BASE_URL,

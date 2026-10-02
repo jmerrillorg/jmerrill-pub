@@ -47,6 +47,7 @@ async function dispatchPublishingWait(input, runtime) {
   const signal = validateWaitSignal(input);
   const before = (await runtime.store.read(signal.waitId)).value;
   if (!before) fail("PUBLISHING_WAIT_NOT_FOUND");
+  if (runtime.canDispatch && !await runtime.canDispatch(before)) return { status: "PAUSED_BY_SCOPE", waitId: signal.waitId };
   const now = runtime.now ? runtime.now() : new Date();
   if (["CANCELLED", "SUPERSEDED", "FAILED"].includes(before.status)) return { status: "NOT_RESUMABLE", waitId: signal.waitId };
   if (before.status === "RESUMED") {
@@ -84,6 +85,10 @@ async function reconcilePublishingWaits(runtime) {
     const wait = validatePublishingWait(snapshot.value);
     const now = runtime.now ? runtime.now() : new Date();
     if (!["PENDING", "READY_TO_RESUME"].includes(wait.status)) continue;
+    if (runtime.canDispatch && !await runtime.canDispatch(wait)) {
+      results.push({ waitId: wait.waitId, status: "PAUSED_BY_SCOPE" });
+      continue;
+    }
     if (Date.parse(wait.nextCheckAt) > now.getTime()) continue;
     if (wait.resume && Date.parse(wait.resume.claimExpiresAt) > now.getTime()) continue;
     try {

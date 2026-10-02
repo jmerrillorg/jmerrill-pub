@@ -20,6 +20,8 @@ UTF-8 JSON, exactly six fields; unknown fields rejected:
 
 Publishing projects ready signals to `jm1-publishing-wait-projections/ready/{waitId}.json`. OPS reads them with Entra workload identity and sends raw UTF-8 JSON (XML-escaped in the Storage REST envelope) to Azure Storage queue `jm1-publishing-wait-signals`. This matches the existing Publishing host's `messageEncoding=none`; no base64 layer is added. It never writes the wait journal. Publishing's dedicated queue worker rechecks authority and condition. The existing broader stage queue is not enabled by this path.
 
+The broader stage worker's WAIT_RESOLVED branch uses this same coordinator, versioned signal validator and runtime factory. It cannot bypass retry/proof guards through the older adapter-only route. Production wait dispatch still requires dedicated wait enablement; enabling the stage worker alone is insufficient. Removing a title from the scoped allowlist pauses queued resumes and reconciliation without altering its durable wait history. Scope restoration permits revalidation, not unconditional execution.
+
 ## Durable Behavior
 
 - Wait producer is idempotent and rejects changes to the original authority tuple.
@@ -28,6 +30,7 @@ Publishing projects ready signals to `jm1-publishing-wait-projections/ready/{wai
 - Failed attempts retain a safe error code, attempt count and exponential backoff, capped at one hour. Five failures require owner review.
 - The five-minute reconciler scans all store pages, retries expired claims, recovers missing completion through the owner's idempotency and supersedes stale authority. It never manufactures approvals.
 - Owner-authorized dead-letter recovery retains previous attempt/claim/failure history and requires a verified recovery evidence adapter. OPS cannot authorize recovery.
+- Process-restart fixtures exercise the production wait-store adapter over a disk-backed Blob API double: owner failure, persisted backoff, process exit after owner effect but before worker receipt, expired-claim recovery with a new fence, and replay with one owner effect. These are representative human/system proofs, not live Azure acceptance.
 - `health.json` and `receipts/{waitId}.json` expose failures and exact owner completion receipts. GitHub dispatch exceptions route to an existing-style work-packet exception issue.
 
 ## Existing Author Owner

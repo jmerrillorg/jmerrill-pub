@@ -29,6 +29,7 @@ function createPublishingWaitRuntime(deps = {}) {
   const projection = deps.projection || BlobServiceClient.fromConnectionString(process.env.AzureWebJobsStorage).getContainerClient(PROJECTION_CONTAINER);
   const runtime = {
     store, handlers: owners, now: deps.now, observe: deps.observe,
+    canDispatch: (wait) => waitRuntimeOwnsTitle(wait.titleId),
     readAuthority: (wait) => owner(wait).readAuthority(wait),
     verifyCondition: (wait, authority) => owner(wait).verifyCondition(wait, authority),
     async publishReady(signal) {

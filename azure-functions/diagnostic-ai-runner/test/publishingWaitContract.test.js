@@ -6,6 +6,7 @@ const { RESUME_ACTION, validatePublishingWait, resumePublishingWait } = require(
 const { createPublishingWaitResumeAdapter } = require("../src/lifecycle/publishingWaitResumeAdapter");
 const { blobName, createPublishingWaitStore } = require("../src/lifecycle/publishingWaitStore");
 const { processPublishingStageMessage } = require("../src/functions/runPublishingStageRuntimeWorker");
+const { signalFor } = require("../src/lifecycle/publishingWaitSignal");
 
 const id = (n) => `${String(n).padStart(8, "0")}-1111-4111-8111-111111111111`;
 
@@ -83,13 +84,12 @@ test("adapter absence, duplicate claim and uncorrelated dispatch fail closed", a
     /RESUME_NOT_PERSISTED/);
 });
 
-test("queue WAIT_RESOLVED route does not create Dataverse client or bypass Publishing adapters", async () => {
+test("stage queue rejects legacy unversioned signals without creating clients or bypassing guards", async () => {
   const event = { eventType: "WAIT_RESOLVED", waitId: id(1), sourceEventId: id(9) };
-  await assert.rejects(processPublishingStageMessage(event), /ADAPTER_MISSING/);
+  await assert.rejects(processPublishingStageMessage(event), /WAIT_SIGNAL_INVALID/);
   const adapters = deps();
-  const result = await processPublishingStageMessage(JSON.stringify(event), { waitAdapters: adapters });
-  assert.equal(result.status, "RESUMED");
-  assert.deepEqual(adapters.calls, ["dispatch", "resumed"]);
+  await assert.rejects(processPublishingStageMessage(JSON.stringify(event), { waitAdapters: adapters }), /WAIT_SIGNAL_INVALID/);
+  assert.deepEqual(adapters.calls, []);
 });
 
 function durableDeps(overrides = {}) {
@@ -130,13 +130,28 @@ function durableDeps(overrides = {}) {
 
 test("durable resume records exact owner, result, evidence and idempotent replay", async () => {
   const fixture = durableDeps();
-  const signal = { eventType: "WAIT_RESOLVED", waitId: id(1), sourceEventId: id(9) };
+  const signal = signalFor(wait(), "decision-record-1");
   assert.equal((await processPublishingStageMessage(signal, { waitRuntime: fixture.config })).status, "RESUMED");
   assert.equal(fixture.current().resumeResult.owningRuntime, "AUTHOR_RESPONSE_CONSUMER");
   assert.equal(fixture.current().resumeResult.evidenceId, "author-decision-1");
-  assert.equal(fixture.current().resumeResult.sourceEventId, id(9));
+  assert.equal(fixture.current().resumeResult.sourceEventId, signal.sourceEventId);
   assert.equal((await processPublishingStageMessage(signal, { waitRuntime: fixture.config })).status, "IDEMPOTENT");
   assert.deepEqual(fixture.calls, ["author-response"]);
+});
+
+test("stage worker wait route denies changed proof and respects dedicated enablement", async () => {
+  const fixture = durableDeps();
+  const forged = signalFor(wait(), "forged-proof");
+  assert.equal((await processPublishingStageMessage(forged, { waitRuntime: fixture.config })).status, "SIGNAL_REJECTED");
+  assert.equal(fixture.current().attempts, undefined);
+  assert.deepEqual(fixture.calls, []);
+  const prior = process.env.JM1_PUBLISHING_WAIT_RUNTIME_ENABLED;
+  process.env.JM1_PUBLISHING_WAIT_RUNTIME_ENABLED = "false";
+  try { await assert.rejects(processPublishingStageMessage(signalFor(wait(), "decision-record-1")), /RUNTIME_DISABLED/); }
+  finally {
+    if (prior === undefined) delete process.env.JM1_PUBLISHING_WAIT_RUNTIME_ENABLED;
+    else process.env.JM1_PUBLISHING_WAIT_RUNTIME_ENABLED = prior;
+  }
 });
 
 test("uncommissioned owner, unproven condition and missing durable result cannot resume", async () => {
