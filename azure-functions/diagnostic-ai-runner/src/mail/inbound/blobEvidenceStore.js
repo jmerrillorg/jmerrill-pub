@@ -58,6 +58,19 @@ class BlobInboundEvidenceStore {
     return readJson(this.blob(path));
   }
 
+  async setCheckpointOnce(name, value) {
+    await this.ensureReady();
+    const blob = this.blob(this.checkpointPath(name));
+    try {
+      await blob.uploadData(Buffer.from(safeJson(value)), { conditions: { ifNoneMatch: "*" },
+        blobHTTPHeaders: { blobContentType: "application/json" } });
+      return value;
+    } catch (error) {
+      if (![409, 412].includes(error.statusCode)) throw error;
+      return this.getCheckpoint(name);
+    }
+  }
+
   messagePath(key) {
     return `messages/${encodePathPart(key)}.json`;
   }
