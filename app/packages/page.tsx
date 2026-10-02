@@ -417,7 +417,7 @@ export default function PackagesPage() {
       </PageSection>
 
       <PageSection
-        eyebrow="Ghostwriting + Publishing Bundle"
+        eyebrow="Ghostwriting Services"
         title={
           <>
             Need help writing
@@ -425,12 +425,12 @@ export default function PackagesPage() {
             <em className="not-italic italic text-blue-500">the book first?</em>
           </>
         }
-        description="Some authors have the message, story, or expertise, but need help turning it into a finished manuscript. The Ghostwriting + Publishing Bundle is for authors who need writing support before the publishing path begins."
+        description="Some authors have the message, story, or expertise, but need help turning it into a finished manuscript before publishing begins."
         surface="dark"
       >
         <div className="rounded-[28px] border border-blue-500/20 bg-blue-500/[0.06] px-8 py-7">
           <p className="max-w-[940px] text-[16px] font-light leading-[1.8] text-white/72">
-            Commission your manuscript with JMP and publish it here — your publishing package is 10% off when contracted together or within 90 days of ghostwriting completion.
+            Ghostwriting scope and fees are agreed separately from a publishing package. Once your manuscript is accepted, you can choose the publishing path that fits your book.
           </p>
           <Link href="/services#ghostwriting" className="mt-4 inline-flex text-[14px] font-semibold text-blue-400 transition-colors hover:text-blue-300">
             Learn more about ghostwriting →

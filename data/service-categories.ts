@@ -174,7 +174,7 @@ export const serviceCategories = [
       { name: 'Ghostwriting – Standard', desc: 'Full-length nonfiction, faith-based books, memoir, self-help. 25,000–50,000 words.' },
       { name: 'Ghostwriting – Extended', desc: 'Extended nonfiction, trade books, comprehensive ministry and leadership titles. 50,000–75,000 words.' },
       { name: 'Ghostwriting – Premium', desc: 'Major trade books, legacy projects, flagship ministry titles. 75,000–100,000 words.' },
-      { name: 'Anthology Creation', desc: 'Multi-contributor compilations — churches, author collectives, memorial volumes. Scope varies; Publisher-reviewed.' },
+      { name: 'Anthology Development & Coordination', desc: 'Multi-contributor projects with scope and pricing set by an approved statement of work.' },
     ],
   },
 ] as const

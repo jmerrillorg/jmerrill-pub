@@ -2,6 +2,7 @@ import { existsSync, readFileSync } from 'node:fs'
 
 const catalog = readFileSync('lib/commercial/catalog.ts', 'utf8')
 const packagesPage = readFileSync('app/packages/page.tsx', 'utf8')
+const serviceCategories = readFileSync('data/service-categories.ts', 'utf8')
 const homeSections = readFileSync('components/sections/UpgradedSections.tsx', 'utf8')
 const homeHero = readFileSync('components/sections/HeroSection.tsx', 'utf8')
 const analyzeRoute = readFileSync('app/api/analyze/route.ts', 'utf8')
@@ -97,6 +98,14 @@ const checks = [
       !/Pay in Full \(7% off\)|(?:2|4|8|12)-Month|Per Payment|perPayment|paymentOptions|\$1,859|\$4,185|\$6,975/.test(
         packagesPage.match(/<PageSection\s+eyebrow="Payment Options"[\s\S]*?<\/PageSection>/)?.[0] || '',
       ),
+  },
+  {
+    name: 'ghostwriting remains a separate service without an unapproved publishing discount',
+    pass: () =>
+      packagesPage.includes('eyebrow="Ghostwriting Services"') &&
+      packagesPage.includes('Ghostwriting scope and fees are agreed separately from a publishing package.') &&
+      serviceCategories.includes('Anthology Development & Coordination') &&
+      !/Ghostwriting \+ Publishing Bundle|publishing package is 10% off/.test(packagesPage),
   },
   {
     name: 'Pathfinder names the active Premier package rather than legacy Signature',
