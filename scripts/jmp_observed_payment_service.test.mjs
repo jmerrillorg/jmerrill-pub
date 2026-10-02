@@ -5,7 +5,7 @@ import createJiti from 'jiti'
 
 const jiti = createJiti(import.meta.url)
 const { observedPaymentRequestIdentity, assertObservedRequestReplay, assertObservedAdditionalPaymentSource,
-  assertNoObservedSettlementInvoice,
+  assertNoObservedSettlementInvoice, assertObservedReplaySettlement,
   assertObservedCheckoutSource } = jiti('../lib/server/stripe/publishing-observed-payment-service.ts')
 const { paymentLedgerGuid } = jiti('../lib/server/stripe/publishing-payment-adapters.ts')
 
@@ -83,6 +83,23 @@ test('invoice-free Checkout settlement requires exact additional-payment metadat
     { payment_intent: 'pi_other' }, { amount_total: 25987 }, { livemode: false }]) {
     assert.throws(() => assertObservedCheckoutSource({ ...input, session: { ...input.session, ...session } }),
       /OBSERVED_SETTLEMENT_SESSION_BINDING_DENIED/)
+  }
+})
+
+test('an existing payment still requires fresh provider proof before replay succeeds', () => {
+  const source = readFileSync(new URL('../lib/server/stripe/publishing-observed-payment-service.ts', import.meta.url), 'utf8')
+  const replayStart = source.indexOf('if (prior) {', source.indexOf('export async function reconcileObservedSettlements'))
+  const replayBranch = source.slice(replayStart, source.indexOf('continue', replayStart))
+  assert.match(replayBranch, /await readObservedSettlement/)
+
+  const prior = { agreementId: request.agreementId, paymentType: 'ADDITIONAL_PAYMENT', grossAmountCents: 25988,
+    stripeEventId: 'evt_checkout1', stripeInvoiceId: null }
+  const settlement = { payment: { amountCents: 25988 }, eventId: 'evt_checkout1', invoiceId: null }
+  assert.doesNotThrow(() => assertObservedReplaySettlement(prior, request.agreementId, 'ADDITIONAL_PAYMENT', settlement))
+  for (const changed of [{ paymentType: 'SCHEDULED_INSTALLMENT' }, { stripeEventId: 'evt_other' },
+    { stripeInvoiceId: 'in_subscription' }, { grossAmountCents: 25987 }]) {
+    assert.throws(() => assertObservedReplaySettlement({ ...prior, ...changed }, request.agreementId,
+      'ADDITIONAL_PAYMENT', settlement), /OBSERVED_SETTLEMENT_CLASSIFICATION_CONFLICT/)
   }
 })
 

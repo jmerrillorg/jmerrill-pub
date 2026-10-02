@@ -247,11 +247,9 @@ export async function reconcileObservedSettlements(requestId: string) {
   for (const observation of request.settlementObservations) {
     const prior = await authority.ledger.findPaymentEvent('provider-event-unavailable', observation.paymentIntentId)
     if (prior) {
-      const live = await retrieveStripePaymentIntent(observation.paymentIntentId)
-      if (prior.agreementId !== request.agreementId || prior.paymentType !== observation.paymentType ||
-          prior.grossAmountCents !== live.amountCents || live.customerId !== authority.agreement.stripeCustomerId) {
-        throw new Error('OBSERVED_SETTLEMENT_CLASSIFICATION_CONFLICT')
-      }
+      const settlement = await readObservedSettlement(request, observation.paymentIntentId,
+        authority.agreement.stripeCustomerId, authority.agreement.snapshot.paymentScheduleId)
+      assertObservedReplaySettlement(prior, request.agreementId, observation.paymentType, settlement)
       continue
     }
     const settlement = await readObservedSettlement(request, observation.paymentIntentId,
@@ -288,6 +286,19 @@ export async function reconcileObservedSettlements(requestId: string) {
     }
   }
   return { request, authority, state }
+}
+
+export function assertObservedReplaySettlement(
+  prior: { agreementId: string; paymentType: string; grossAmountCents: number; stripeEventId: string; stripeInvoiceId: string | null },
+  agreementId: string,
+  paymentType: string,
+  settlement: { payment: { amountCents: number }; eventId: string; invoiceId: string | null },
+) {
+  if (prior.agreementId !== agreementId || prior.paymentType !== paymentType ||
+      prior.grossAmountCents !== settlement.payment.amountCents ||
+      prior.stripeEventId !== settlement.eventId || prior.stripeInvoiceId !== settlement.invoiceId) {
+    throw new Error('OBSERVED_SETTLEMENT_CLASSIFICATION_CONFLICT')
+  }
 }
 
 export async function reconcileAdditionalPaymentTail() {
