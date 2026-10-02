@@ -57,7 +57,7 @@ You wrote something that matters. It carries your story, your message, your name
 A guided publishing family that walks the whole road with the author — editorial, design, distribution, and long-term support — bringing the infrastructure of a major house while the author keeps the rights and the legacy. *Your name is on the front. Ours is on the back. We are here to support you.*
 
 **WHAT — the proof.**
-Five imprints. 125+ titles in the world. Professional editorial and design. Global distribution through Ingram. A path that continues after launch.
+Five imprints. 130+ published titles in the world. Professional editorial and design. Global distribution through Ingram. A path that continues after launch.
 
 The Why is not new. It already lives in "Helping authors help themselves" and "Your words. Your legacy. Your rights." The site simply buried it. This doctrine brings it back to the front door.
 
@@ -206,7 +206,7 @@ One doctrine, one spine, one three-altitude test, one copy discipline. Each JM1 
 
 1. **Hero** — "Your words. Your legacy. Your rights." A warm value line ("a publishing family that protects, honors, and shares your voice"). One dominant CTA, one quiet secondary. No "Operating System," no "enterprise," no "Division 01."
 2. **Choose Your Path** — intent-sort doorway, three options only: *I want to publish my book* (dominant) · *I want to explore the books* · *I'm already a JMP author*. Three, not seven — finer-grained intent belongs in the Pathfinder.
-3. **Why authors choose JMP** — the trust beat. The single reconciled **125+ titles** count lives here, with years in business and Ingram reach, in author-ownership language.
+3. **Why authors choose JMP** — the trust beat. The founder-confirmed **130+ published titles** portfolio statement lives here, with years in business and Ingram reach, in author-ownership language. A live catalog listing count is a separate metric.
 4. **How publishing works** — one merged journey (Discover · Edit · Design · Distribute · Grow), replacing all three current process diagrams.
 5. **Find Your Publishing Path** — the Pathfinder tool, carrying the warm "what are you writing?" tone; this is where finer-grained intent and genre live.
 6. **Publishing Packages** — three tiers, guided CTAs; Premier positioned as the larger-scope package for complex manuscripts. JM Signature remains an imprint, not a package.
@@ -252,7 +252,7 @@ Each page is mapped before code: purpose, visitor intent, current issue, new pro
 | Why-spine confirmed by Jackie | Approved |
 | Homepage 8-section structure | Approved |
 | Intent-sort doorway = three | Approved |
-| Title count standard = 125+ | Approved |
+| Published portfolio statement = 130+ published titles | Founder-confirmed; separate from live catalog listing count |
 | Build owner = Chad, Codex reviews | Approved |
 | Enterprise JM1 branch scope | Approved |
 | Agape International Cathedral excluded from doctrine scope | Approved |

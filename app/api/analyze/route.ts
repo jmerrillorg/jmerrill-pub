@@ -48,6 +48,9 @@ Provide a JSON response with EXACTLY this structure (no other text):
     // Strip any markdown fences
     const clean = text.replace(/```json|```/g, '').trim()
     const result = JSON.parse(clean)
+    if (!['Starter', 'Professional', 'Premier'].includes(result.packageSuggestion)) {
+      throw new Error('Analyzer returned an unsupported package')
+    }
 
     return NextResponse.json(result)
   } catch (err) {

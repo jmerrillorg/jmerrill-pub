@@ -88,42 +88,6 @@ const matrix = [
   },
 ]
 
-const paymentOptions = [
-  {
-    package: 'Starter',
-    base: '$1,999',
-    rows: [
-      { option: 'Pay in Full (7% off)', perPayment: '$1,859', total: '$1,859' },
-      { option: '2-Month', perPayment: '~$1,000', total: '$1,999' },
-      { option: '4-Month', perPayment: '$500/mo', total: '$1,999' },
-      { option: '8-Month', perPayment: '$250/mo', total: '$1,999' },
-      { option: '12-Month', perPayment: '$167/mo', total: '$1,999' },
-    ],
-  },
-  {
-    package: 'Professional',
-    base: '$4,500',
-    rows: [
-      { option: 'Pay in Full (7% off)', perPayment: '$4,185', total: '$4,185' },
-      { option: '2-Month', perPayment: '$2,250/mo', total: '$4,500' },
-      { option: '4-Month', perPayment: '$1,125/mo', total: '$4,500' },
-      { option: '8-Month', perPayment: '$563/mo', total: '$4,500' },
-      { option: '12-Month', perPayment: '$375/mo', total: '$4,500' },
-    ],
-  },
-  {
-    package: 'Premier',
-    base: '$7,500',
-    rows: [
-      { option: 'Pay in Full (7% off)', perPayment: '$6,975', total: '$6,975' },
-      { option: '2-Month', perPayment: '$3,750/mo', total: '$7,500' },
-      { option: '4-Month', perPayment: '$1,875/mo', total: '$7,500' },
-      { option: '8-Month', perPayment: '$938/mo', total: '$7,500' },
-      { option: '12-Month', perPayment: '$625/mo', total: '$7,500' },
-    ],
-  },
-]
-
 const fitIndicators = [
   'Manuscript length and readiness',
   'Level of editorial support needed',
@@ -388,42 +352,11 @@ export default function PackagesPage() {
             <em className="not-italic italic text-blue-500">for serious publishing projects.</em>
           </>
         }
-        description="Publishing is an investment in the work and the author behind it. Where available, payment options help authors plan responsibly while moving forward with clarity."
+        description="Flexible payment options may be available."
       >
-        <p className="mb-8 max-w-[760px] text-[15px] font-light leading-[1.8] text-gray-500">
-          Payment structure should make the publishing relationship clearer, not pressure an author into a rushed decision. We keep these options visible so authors can plan the care their book needs with realistic expectations.
+        <p className="max-w-[760px] text-[15px] font-light leading-[1.8] text-gray-500">
+          Publishing projects may qualify for structured payment arrangements based on package, project scope, and approved payment terms. Final payment terms are provided with your publishing agreement.
         </p>
-        <div className="grid gap-4 lg:grid-cols-3">
-          {paymentOptions.map((plan) => (
-            <div key={plan.package} className="overflow-hidden rounded-[26px] border border-gray-200 bg-[#F7F8FA]">
-              <div className="border-b border-gray-200 px-6 py-5">
-                <div className="mb-2 font-mono text-[10px] uppercase tracking-[0.12em] text-blue-500">{plan.package}</div>
-                <div
-                  className="text-[26px] text-charcoal"
-                  style={{ fontFamily: "'Libre Baskerville', serif", fontWeight: 700 }}
-                >
-                  {plan.base}
-                </div>
-              </div>
-              <div className="px-6 py-4">
-                <div className="mb-3 grid grid-cols-[1.4fr_1fr_1fr] gap-3 border-b border-gray-200 pb-3">
-                  <div className="text-[11px] font-mono uppercase tracking-[0.12em] text-gray-400">Option</div>
-                  <div className="text-right text-[11px] font-mono uppercase tracking-[0.12em] text-gray-400">Per Payment</div>
-                  <div className="text-right text-[11px] font-mono uppercase tracking-[0.12em] text-gray-400">Total</div>
-                </div>
-                <div className="flex flex-col gap-3">
-                  {plan.rows.map((row) => (
-                    <div key={row.option} className="grid grid-cols-[1.4fr_1fr_1fr] gap-3 items-start">
-                      <div className="text-[13px] font-medium leading-[1.5] text-charcoal">{row.option}</div>
-                      <div className="text-[13px] text-right text-gray-500">{row.perPayment}</div>
-                      <div className="text-[13px] text-right text-gray-500">{row.total}</div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
       </PageSection>
 
       <PageSection
@@ -484,7 +417,7 @@ export default function PackagesPage() {
       </PageSection>
 
       <PageSection
-        eyebrow="Ghostwriting + Publishing Bundle"
+        eyebrow="Ghostwriting Services"
         title={
           <>
             Need help writing
@@ -492,12 +425,12 @@ export default function PackagesPage() {
             <em className="not-italic italic text-blue-500">the book first?</em>
           </>
         }
-        description="Some authors have the message, story, or expertise, but need help turning it into a finished manuscript. The Ghostwriting + Publishing Bundle is for authors who need writing support before the publishing path begins."
+        description="Some authors have the message, story, or expertise, but need help turning it into a finished manuscript before publishing begins."
         surface="dark"
       >
         <div className="rounded-[28px] border border-blue-500/20 bg-blue-500/[0.06] px-8 py-7">
           <p className="max-w-[940px] text-[16px] font-light leading-[1.8] text-white/72">
-            Commission your manuscript with JMP and publish it here — your publishing package is 10% off when contracted together or within 90 days of ghostwriting completion.
+            Ghostwriting scope and fees are agreed separately from a publishing package. Once your manuscript is accepted, you can choose the publishing path that fits your book.
           </p>
           <Link href="/services#ghostwriting" className="mt-4 inline-flex text-[14px] font-semibold text-blue-400 transition-colors hover:text-blue-300">
             Learn more about ghostwriting →

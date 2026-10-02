@@ -21,7 +21,7 @@ Static JSON files may remain only as migration evidence, documentation, tests, o
 | `lib/content.ts` | Imports `data/books.json` directly and normalizes it into `bookCatalog` | All catalog consumers | Authoritative data dependency | Replace with Dataverse-backed read adapter |
 | `lib/content.ts` | Imports author, contributor, purchase link, retailer enrichment, series, and title-author override files | Books, authors, SEO, purchase links | Authoritative data dependency where values define title/author/catalog facts | Move governed fields to Dataverse/PAM; retain files only as migration evidence |
 | `app/books/BooksClient.tsx` | Filters `bookCatalog` and builds genre/imprint filters from static data | `/books` | Authoritative data dependency | Pass Dataverse records from server/API into client component |
-| `app/books/page.tsx` | Imports `bookCatalog` and `imprintCatalog` for page copy/filter metadata | `/books` | Authoritative data dependency for counts/imprints; marketing copy allowed | Keep "125+ titles" copy; exact listing/counts from Dataverse |
+| `app/books/page.tsx` | Imports `bookCatalog` and `imprintCatalog` for page copy/filter metadata | `/books` | Authoritative data dependency for counts/imprints; marketing copy allowed | Keep "130+ published titles" portfolio copy; label exact listing/counts from Dataverse separately |
 | `app/books/[id]/page.tsx` | Uses `bookCatalog`, `getBookById`, `getBooksByAuthorSlug`, `getBooksByImprint`, `getBooksBySeries`; static params generated from static catalog | Book detail pages | Authoritative data dependency | Fetch by Dataverse slug/id; generate static params from Dataverse or use dynamic rendering with cache |
 | `app/authors/page.tsx` | Uses `publicAuthorCatalog` and `bookCatalog.slice(0, 4)` | `/authors` | Authoritative data dependency | Fetch Dataverse-backed author summaries and featured titles |
 | `app/authors/[slug]/page.tsx` | Uses `authorCatalog` and `getAuthorBySlug`; static params from static authors | Author detail pages | Authoritative data dependency | Fetch author/contact profile and linked titles from Dataverse |
@@ -32,7 +32,7 @@ Static JSON files may remain only as migration evidence, documentation, tests, o
 | `components/content/AuthorCard.tsx` | Renders `AuthorRecord` shape from `lib/content.ts` | Shared author cards | Build/model dependency | Keep component, change DTO source to Dataverse author DTO |
 | `components/imprints/ImprintDetailTemplate.tsx` | Accepts featured books from static helper | Imprint pages | Build/model dependency | Keep component, feed Dataverse title DTOs |
 | `data/imprints.ts` | Imprint strategy/copy and routes | `/imprints`, `/readers`, book reader updates | Static marketing copy | Allowed, but certified assignment/counts must come from Dataverse |
-| `lib/tokens.ts` | Navigation/footer stats and imprint copy; comment says display imprint assigned via `books.json` | Navigation/footer/home sections | Static marketing copy plus stale architecture note | Keep "125+" copy; remove `books.json` authority comment |
+| `lib/tokens.ts` | Navigation/footer stats and imprint copy; comment says display imprint assigned via `books.json` | Navigation/footer/home sections | Static marketing copy plus stale architecture note | Keep "130+ published titles" portfolio copy; remove `books.json` authority comment |
 | `app/api/live-stats/route.ts` | Hardcoded `totalTitles: 125`, author/stage counts | Live stats API | Static catalog counts | Replace with Dataverse aggregate endpoint |
 | `data/BOOKS_DATA_GUIDE.md` | Instructs direct edits to `books.json` | Documentation | Obsolete operating instruction | Mark superseded or rewrite as Dataverse/PAM ingestion guide |
 
@@ -182,7 +182,7 @@ Cache with `next: { revalidate: 300 }` or equivalent ISR-style caching. Do not e
 3. **PR 3 - `/books` Listing Switch**
    - Convert `/books` server page to fetch Dataverse catalog summaries.
    - Pass records to `BooksClient`.
-   - Keep "125+ titles" marketing copy.
+   - Keep "130+ published titles" portfolio copy; label the live catalog count separately.
 
 4. **PR 4 - Book Detail and Sitemap Switch**
    - Convert `/books/[id]` and `app/sitemap.ts`.
@@ -208,4 +208,3 @@ Cache with `next: { revalidate: 300 }` or equivalent ISR-style caching. Do not e
 - Add documentation only.
 
 Broad public-surface refactor should wait until the dependency map and Dataverse read credentials are approved.
-

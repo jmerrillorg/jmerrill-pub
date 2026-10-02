@@ -3,8 +3,9 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
+import { publishedPortfolioCountPublic } from '@/lib/publishing/public-portfolio'
 
-export function HeroSection() {
+export function HeroSection({ catalogCount }: { catalogCount: number | null }) {
   const [mousePos, setMousePos] = useState({ x: 0.5, y: 0.5 })
 
   useEffect(() => {
@@ -32,7 +33,7 @@ export function HeroSection() {
           <div className="flex items-center gap-2 px-3 py-1.5 bg-blue-50 border border-blue-100 rounded-full">
             <span className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-pulse" />
             <span className="text-[10px] font-medium tracking-[0.14em] uppercase text-blue-600" style={{ fontFamily: "'DM Mono', monospace" }}>
-              Registered Publisher · 125+ Titles
+              Registered Publisher{catalogCount !== null ? ` · ${catalogCount} Catalog Titles` : ''}
             </span>
           </div>
         </div>
@@ -70,7 +71,7 @@ export function HeroSection() {
         </div>
 
         <div className="flex gap-10 mt-14 pt-8 border-t border-gray-100 animate-[fadeUp_0.7s_0.85s_both]">
-          {[['125', '+', 'Titles Published'], ['5', '', 'Official Imprints'], ['Ingram', '', 'Global Distribution']].map(([n, suf, l]) => (
+          {[[publishedPortfolioCountPublic, '', 'Published Titles'], ['5', '', 'Official Imprints'], ['Ingram', '', 'Global Distribution']].map(([n, suf, l]) => (
             <div key={l}>
               <div className="leading-none mb-1 text-charcoal" style={{ fontFamily: "'Libre Baskerville', serif", fontSize: '34px', fontWeight: 700, letterSpacing: '-0.02em' }}>
                 {n}<span className="text-blue-500">{suf}</span>

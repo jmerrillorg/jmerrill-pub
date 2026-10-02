@@ -107,7 +107,7 @@ export const serviceCategories = [
     description:
       'Picture books, illustrated stories, and middle-grade titles built to last and built to grow.',
     services: [
-      { name: "Children's Book Publishing Package", desc: 'Full-service publishing path with editorial, illustration coordination, layout, ISBN, and distribution.' },
+      { name: "Children's Book Publishing Package", desc: 'Specialty publishing package for author-supplied, production-usable illustrations or artwork. Original illustration creation is priced separately.' },
       { name: 'Illustrated Book Layout', desc: 'Typography, image placement, and print-ready formatting for illustrated titles.' },
       { name: 'Illustrated Book Production Setup', desc: 'Color profile verification, bleed setup, and printer-ready production prep.' },
       { name: "Children's Book Illustration", desc: 'Character development, scene illustration, and print-ready artwork.' },
@@ -174,7 +174,7 @@ export const serviceCategories = [
       { name: 'Ghostwriting – Standard', desc: 'Full-length nonfiction, faith-based books, memoir, self-help. 25,000–50,000 words.' },
       { name: 'Ghostwriting – Extended', desc: 'Extended nonfiction, trade books, comprehensive ministry and leadership titles. 50,000–75,000 words.' },
       { name: 'Ghostwriting – Premium', desc: 'Major trade books, legacy projects, flagship ministry titles. 75,000–100,000 words.' },
-      { name: 'Anthology Creation', desc: 'Multi-contributor compilations — churches, author collectives, memorial volumes. Scope varies; Publisher-reviewed.' },
+      { name: 'Anthology Development & Coordination', desc: 'Multi-contributor projects with scope and pricing set by an approved statement of work.' },
     ],
   },
 ] as const
