@@ -8,8 +8,10 @@ send, mark mail read, apply decisions, update payments or move lifecycle state.
 
 ## Protected Release
 
-1. Review PR #918 and its full Functions validation; merge only under normal
-   repository controls. Deploy the resulting canonical artifact through the
+1. Obtain Jackie's explicit authorization for the reviewed PR #918 release AND
+   reader enablement. This runbook and passing tests are not that authorization.
+   Record the reviewed head, current base and approval; re-review any intervening
+   changes. Merge only under normal repository controls. Deploy the resulting canonical artifact through the
    protected `jmerrill-pub-production` environment. Neither older run
    36929482252 nor 36933649885 contains this reader.
 2. Verify the live release and deployed function before enabling
@@ -53,8 +55,9 @@ Inbox/Sent. Hidden folders and recursive children are separately inventoried.
 Folder total counts are NOT window counts. Folder mismatches are exceptions.
 
 Every request uses `Prefer: IdType="ImmutableId"`. Records retain exact IDs,
-participants including each source's BCC, timestamps, subject, body preview,
-body hash and attachment indicator; full bodies are not exported. Graph IDs
+participants including each source's BCC, timestamps, subject,
+body hash and attachment indicator; neither full bodies nor body previews are
+exported (a preview can contain an entire short message). Graph IDs
 remain mailbox-scoped. Internet Message IDs are exact case-sensitive values.
 Conversation, subject and body similarity do not authorize title attribution.
 Conflicting delivery/inbound tuples are held without authoritative bindings.
@@ -86,6 +89,35 @@ conversation proximity, create a delivery record, infer an author decision or
 certify fresh provider delivery. Any incomplete or conflicting log poisons the
 join. Use this after extraction with separately preserved source authority;
 retain every nonmatching row as an exception.
+
+## Release Assessment Repairs (Reader 2.3.0)
+
+Invalid JSON or a missing runId is rejected before extraction. HTTP redirects
+are rejected; continuation links remain confined to the original mailbox.
+Every prior nonempty binding and body hash participates in conflict checks,
+including when intervening observations omit fields. Exact communication-copy
+joins cannot overwrite an existing communication/provider identity.
+
+Import validates each observation's date/window, query count, Graph identity,
+folder membership and metadata-only shape, in addition to the document digest.
+Held events cannot carry a title/author authority binding. A digest proves file
+integrity, not trusted provenance: use the authenticated download of the approved
+run, retain its source pages and evidence snapshot, and never import arbitrary files.
+
+## Safe Disable and Access Gate
+
+After an approved extraction, disable the dedicated reader setting. This blocks
+new HTTP starts; it does not cancel an in-flight invocation. Let an in-flight
+read settle or inspect its durable pages/failure receipt before any authorized
+host restart. Preserve all run directories. Never roll back unrelated production
+work merely to disable this reader. Reuse the same runId for same-version recovery;
+use a new run for a changed contract or expired continuation, linking the predecessor.
+
+The code's two-mailbox allowlist is not an Exchange permission boundary. Before
+enablement, verify the selected managed identity's effective Mail.Read coverage
+and applicable Exchange application access/RBAC policy for both mailboxes. Do not
+grant Mail.ReadWrite, Mail.Send or broader storage permissions for this packet.
+Existing unrelated identity grants do not authorize this reader to use them.
 
 ## Primary Technical Sources
 

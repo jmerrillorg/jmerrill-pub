@@ -17,7 +17,8 @@ test("exact provider copy binds recorded title and recipient without granting re
 });
 test("sender, recipient, timestamp and existing title disagreements cannot acquire a binding", () => {
   for (const alteration of [{ fromAddress: "attacker@example.org" }, { to: ["other@example.org"] },
-    { receivedAt: "2026-09-25T00:00:00Z" }, { titleId: "other" }, { authorId: "other" }, { correlationStatus: "CONFLICT_HELD" }]) {
+    { receivedAt: "2026-09-25T00:00:00Z" }, { titleId: "other" }, { authorId: "other" },
+    { communicationRecordId: "other" }, { providerMessageId: "other" }, { correlationStatus: "CONFLICT_HELD" }]) {
     assert.equal(attributeCommunicationCopies([{ ...message, ...alteration }], authority)[0].binding, undefined);
   }
 });

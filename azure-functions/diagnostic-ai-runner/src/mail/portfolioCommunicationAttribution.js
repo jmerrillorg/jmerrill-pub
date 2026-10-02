@@ -41,6 +41,8 @@ function attributeCommunicationCopies(messages, authority) {
           !Number.isFinite(Date.parse(sentAt)) || !Number.isFinite(Date.parse(observedAt)) ||
           Math.abs(Date.parse(observedAt) - Date.parse(sentAt)) > 86400000 ||
           (message.titleId && message.titleId !== title.jm1pub_titleid) ||
+          (message.communicationRecordId && message.communicationRecordId !== communicationRecordId) ||
+          (message.providerMessageId && message.providerMessageId.toLowerCase() !== field(description, "providerMessageId").toLowerCase()) ||
           (message.authorId && message.authorId !== contact.contactid)) return null;
       return { titleId: title.jm1pub_titleid, authorId: contact.contactid, communicationRecordId,
         providerMessageId: field(description, "providerMessageId"), logId: log.jm1_executionlogid };

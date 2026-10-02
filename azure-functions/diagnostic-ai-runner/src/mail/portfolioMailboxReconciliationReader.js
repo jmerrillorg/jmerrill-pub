@@ -9,10 +9,10 @@ const SCOPE = "https://graph.microsoft.com/.default";
 const MAILBOXES = Object.freeze(["publishing@jmerrill.one", "jackie@jmerrill.one"]);
 const WINDOW = Object.freeze({ start: "2026-07-03T04:00:00Z", endExclusive: "2026-10-02T04:00:00Z",
   businessTimeZone: "America/New_York", businessStartDate: "2026-07-03", businessEndDate: "2026-10-01" });
-const FIELDS = "id,internetMessageId,conversationId,parentFolderId,from,toRecipients,ccRecipients,bccRecipients,receivedDateTime,sentDateTime,createdDateTime,lastModifiedDateTime,subject,bodyPreview,body,hasAttachments";
+const FIELDS = "id,internetMessageId,conversationId,parentFolderId,from,toRecipients,ccRecipients,bccRecipients,receivedDateTime,sentDateTime,createdDateTime,lastModifiedDateTime,subject,body,hasAttachments";
 const CONTAINER = "jm1-publishing-portfolio-evidence";
 const DELIVERY_CONTAINER = "jm1-publishing-inbound-evidence";
-const READER_VERSION = "2.2.0";
+const READER_VERSION = "2.3.0";
 const INTERNAL_SENDERS = new Set([...MAILBOXES, "publishing@email.jmerrill.one"]);
 
 function fail(code, status) {
@@ -38,6 +38,11 @@ function internetIdentity(value) {
 const BINDING_FIELDS = ["titleId", "authorId", "engagementId", "stageId"];
 function bindingConflicts(a, b) {
   return BINDING_FIELDS.some((key) => a[key] && b[key] && a[key] !== b[key]);
+}
+
+function messageConflicts(a, b) {
+  return (a.internetMessageId && b.internetMessageId && internetIdentity(a.internetMessageId) !== internetIdentity(b.internetMessageId)) ||
+    a.from !== b.from || a.subject !== b.subject || (a.bodyHash && b.bodyHash && a.bodyHash !== b.bodyHash);
 }
 
 function hold(event) {
@@ -66,7 +71,7 @@ function messageRecord(message, mailbox, query, extractedAt) {
     bcc: recipients(message.bccRecipients),
     receivedAt: message.receivedDateTime || null, sentAt: message.sentDateTime || null,
     createdAt: message.createdDateTime || null, lastModifiedAt: message.lastModifiedDateTime || null,
-    subject: message.subject || null, bodyPreview: message.bodyPreview || null,
+    subject: message.subject || null,
     bodyHash: body === null ? null : hash(body), hasAttachments: message.hasAttachments === true,
     direction: INTERNAL_SENDERS.has(sender) ? "OUTBOUND" : sender ? "INBOUND" : "UNKNOWN",
     sourceQueryWindow: { ...WINDOW, timestampField: query }, extractedAt
@@ -105,10 +110,7 @@ function deduplicateRecords(records) {
     if (existing) {
       existing.observations.push(record);
       existing.sourceQueries.push(record.sourceQueryWindow.timestampField);
-      if ((existing.internetMessageId && record.internetMessageId &&
-          internetIdentity(existing.internetMessageId) !== internetIdentity(record.internetMessageId)) ||
-          existing.from !== record.from || existing.subject !== record.subject ||
-          (existing.bodyHash && record.bodyHash && existing.bodyHash !== record.bodyHash)) {
+      if (existing.observations.some((prior) => messageConflicts(prior, record))) {
         conflicts.push({ type: "GRAPH_IDENTITY_CONFLICT", key });
         existing.correlationStatus = "CONFLICT_HELD";
         for (const observation of existing.observations) {
@@ -131,8 +133,8 @@ function deduplicateRecords(records) {
     // Keep every mailbox's participants, BCC, timestamps and hash, not just its ID.
     const source = { ...record };
     if (existing) {
-      if (existing.from !== record.from || existing.subject !== record.subject ||
-          (existing.bodyHash && record.bodyHash && existing.bodyHash !== record.bodyHash)) {
+      if (existing.sources.some((priorSource) => priorSource.observations.some((prior) =>
+        record.observations.some((observation) => messageConflicts(prior, observation))))) {
         poisonedInternetIds.add(internetKey);
         conflicts.push({ type: "INTERNET_IDENTITY_CONFLICT", internetMessageId: internetKey,
           sourceMailbox: record.sourceMailbox, graphMessageId: record.graphMessageId });
@@ -154,20 +156,22 @@ function deduplicateRecords(records) {
 
 function enrichWithDeliveryLedger(events, deliveries) {
   const byInternet = new Map();
+  const observations = new Map();
   const poisoned = new Set();
   const conflicts = [];
   for (const delivery of deliveries) {
     const key = internetIdentity(delivery.internetMessageId);
     if (!key) continue;
     if (poisoned.has(key)) continue;
-    const previous = byInternet.get(key);
-    if (previous && (previous.communicationRecordId !== delivery.communicationRecordId ||
-        previous.outboundMessageId !== delivery.outboundMessageId || bindingConflicts(previous, delivery))) {
+    const previous = observations.get(key) || [];
+    if (previous.some((row) => row.communicationRecordId !== delivery.communicationRecordId ||
+        row.outboundMessageId !== delivery.outboundMessageId || bindingConflicts(row, delivery))) {
       conflicts.push({ type: "DELIVERY_IDENTITY_CONFLICT", internetMessageId: key });
       byInternet.delete(key);
       poisoned.add(key);
       continue;
     }
+    observations.set(key, [...previous, delivery]);
     byInternet.set(key, delivery);
   }
   let linked = 0;
@@ -176,6 +180,10 @@ function enrichWithDeliveryLedger(events, deliveries) {
     if (poisoned.has(key) || event.correlationStatus === "CONFLICT_HELD") return hold(event);
     const delivery = key ? byInternet.get(key) : null;
     if (!delivery) return event;
+    if ((observations.get(key) || []).some((row) => bindingConflicts(event, row))) {
+      conflicts.push({ type: "MAIL_DELIVERY_CORRELATION_CONFLICT", internetMessageId: key });
+      return hold(event);
+    }
     linked += 1;
     return { ...event, providerMessageId: delivery.outboundMessageId || null,
       communicationRecordId: delivery.communicationRecordId || null,
@@ -197,13 +205,13 @@ function enrichWithInboundEvents(events, inboundEvents) {
       inbound.graphMessageId && `graph:${String(inbound.mailbox || "").toLowerCase()}:${inbound.graphMessageId}`].filter(Boolean);
     for (const key of keys) {
       if (poisoned.has(key)) continue;
-      const prior = byIdentity.get(key);
-      if (prior && bindingConflicts(prior, inbound)) {
+      const prior = byIdentity.get(key) || [];
+      if (prior.some((row) => bindingConflicts(row, inbound))) {
         conflicts.push({ type: "INBOUND_CORRELATION_CONFLICT", key });
         byIdentity.delete(key);
         poisoned.add(key);
-      } else if (!prior) {
-        byIdentity.set(key, inbound);
+      } else {
+        byIdentity.set(key, [...prior, inbound]);
       }
     }
   }
@@ -212,10 +220,11 @@ function enrichWithInboundEvents(events, inboundEvents) {
     const keys = [event.internetMessageId && `internet:${internetIdentity(event.internetMessageId)}`,
       ...(event.sources || [event]).map((source) => `graph:${source.sourceMailbox}:${source.graphMessageId}`)].filter(Boolean);
     if (event.correlationStatus === "CONFLICT_HELD" || keys.some((key) => poisoned.has(key))) return hold(event);
-    const candidates = keys.map((key) => byIdentity.get(key)).filter(Boolean);
+    const candidates = keys.flatMap((key) => byIdentity.get(key) || []);
     const inbound = candidates[0];
     if (!inbound) return event;
-    if (candidates.some((candidate) => bindingConflicts(candidate, inbound)) || bindingConflicts(event, inbound)) {
+    if (candidates.some((candidate, index) => bindingConflicts(event, candidate) ||
+        candidates.slice(index + 1).some((other) => bindingConflicts(candidate, other)))) {
       conflicts.push({ type: "MAIL_SOURCE_CORRELATION_CONFLICT", graphMessageId: event.graphMessageId,
         sourceMailbox: event.sourceMailbox });
       return hold(event);
@@ -238,11 +247,18 @@ async function readInboundEvidencePrefix(prefix, connectionString, deps = {}) {
     const checkpointPath = `evidence-rows/${hash(blob.name)}.json`;
     const cached = await deps.readCheckpoint?.(checkpointPath);
     if (cached) { records.push(cached); continue; }
-    const bytes = await container.getBlockBlobClient(blob.name).downloadToBuffer();
+    const etag = blob.properties?.etag || null;
+    const bytes = await container.getBlockBlobClient(blob.name).downloadToBuffer(0, undefined,
+      etag ? { conditions: { ifMatch: etag } } : {});
     const record = JSON.parse(bytes.toString("utf8"));
     const fields = [...BINDING_FIELDS, "internetMessageId", "graphMessageId", "mailbox", "correlationStatus",
       "outboundMessageId", "communicationRecordId", "deliveryId", "inboundMessageEventId"];
     const projected = Object.fromEntries(fields.filter((field) => record[field] !== undefined).map((field) => [field, record[field]]));
+    if (Object.values(projected).some(value => value !== null && typeof value !== "string")) {
+      fail("PORTFOLIO_SOURCE_EVIDENCE_INVALID");
+    }
+    projected.sourceEvidence = { blobName: blob.name, etag, sha256: hash(bytes),
+      observedAt: (deps.now || (() => new Date()))().toISOString() };
     records.push(deps.writeCheckpoint ? await deps.writeCheckpoint(checkpointPath, projected) : projected);
   }
   return records;
@@ -252,7 +268,7 @@ async function graphGet(url, token, deps) {
   const request = deps.fetchImpl || fetch;
   for (let attempt = 0; attempt < 4; attempt += 1) {
     const accessToken = deps.getToken ? await deps.getToken() : token;
-    const response = await request(url, { method: "GET", signal: AbortSignal.timeout(30000), headers: {
+    const response = await request(url, { method: "GET", redirect: "error", signal: AbortSignal.timeout(30000), headers: {
       Authorization: `Bearer ${accessToken}`, Accept: "application/json",
       Prefer: 'IdType="ImmutableId", outlook.body-content-type="text"'
     } });

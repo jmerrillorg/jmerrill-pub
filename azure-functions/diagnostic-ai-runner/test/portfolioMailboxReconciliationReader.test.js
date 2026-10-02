@@ -26,6 +26,7 @@ test("fixed-window reader preserves Graph identities and hashes body without exp
   assert.equal(row.direction, "INBOUND");
   assert.match(row.bodyHash, /^[0-9a-f]{64}$/);
   assert.equal(JSON.stringify(row).includes("Private message body"), false);
+  assert.equal(Object.hasOwn(row, "bodyPreview"), false);
   assert.throws(() => firstUrl("attacker@example.org", "receivedDateTime"), /QUERY_NOT_ALLOWED/);
   assert.equal(row.sourceQueryWindow.start, "2026-07-03T04:00:00Z");
   assert.equal(row.sourceQueryWindow.endExclusive, "2026-10-02T04:00:00Z");
@@ -46,6 +47,7 @@ test("scanner follows only same-mailbox Graph next links with immutable IDs", as
     async (page) => pages.push(page), { fetchImpl, now: () => new Date("2026-10-02T12:00:00Z") });
   assert.deepEqual({ pages: result.pages, count: result.count }, { pages: 2, count: 2 });
   assert.equal(calls.every((call) => call.options.method === "GET"), true);
+  assert.equal(calls.every((call) => call.options.redirect === "error"), true);
   assert.equal(calls.every((call) => call.options.headers.Prefer.includes('IdType="ImmutableId"')), true);
   assert.equal(pages[0].records[0].sourceMailbox, "publishing@jmerrill.one");
   await assert.rejects(scanQuery("publishing@jmerrill.one", "receivedDateTime", "token",
@@ -128,6 +130,43 @@ function harness() {
   return { writes, deps };
 }
 
+test("partial delivery and inbound evidence cannot mask conflicting later bindings", () => {
+  const event = messageRecord(message("m1"), "publishing@jmerrill.one", "receivedDateTime", "now");
+  const base = { internetMessageId: event.internetMessageId, titleId: "title", authorId: "author",
+    correlationStatus: "DETERMINISTIC", communicationRecordId: "comm", outboundMessageId: "provider" };
+  const deliveries = [{ ...base, stageId: "one" }, base, { ...base, stageId: "two" }];
+  const inbounds = [base, { ...base, stageId: "one" }, { ...base, stageId: "two" }];
+  for (const rows of [deliveries, deliveries.toReversed(), inbounds]) {
+    assert.equal(enrichWithDeliveryLedger([event], rows).events[0].correlationStatus, "CONFLICT_HELD");
+    assert.equal(enrichWithInboundEvents([event], rows).events[0].correlationStatus, "CONFLICT_HELD");
+  }
+  const differentKeys = [base,
+    { ...base, internetMessageId: null, mailbox: "publishing@jmerrill.one", graphMessageId: "m1", stageId: "one" }];
+  assert.equal(enrichWithInboundEvents([{ ...event, stageId: "two" }], differentKeys)
+    .events[0].correlationStatus, "CONFLICT_HELD");
+});
+
+test("import rejects body leakage, out-of-window observations and forged query coverage", async () => {
+  const { writes, deps } = harness();
+  const manifest = await runPortfolioMailboxReconciliation(deps);
+  const original = [...writes.entries()].find(([key]) => key.endsWith("mail-events.json"))[1];
+  const coverage = [...writes.entries()].find(([key]) => key.endsWith("folder-coverage.json"))[1];
+  const { validateEvidenceImport } = require("../src/mail/portfolioMailboxEvidenceImport");
+  for (const [mutate, code] of [
+    [doc => { doc.events[0].sources[0].observations[0].body = "private"; }, /UNEXPECTED_MAIL_METADATA/],
+    [doc => { doc.events[0].bodyPreview = "entire short message"; }, /UNEXPECTED_MAIL_METADATA/],
+    [doc => { doc.events[0].sources[0].observations[0].receivedAt = "2026-01-01T00:00:00Z"; }, /OBSERVATION_WINDOW/],
+    [doc => { doc.events[0].sources[0].observations[0].sourceQueryWindow.timestampField = "sentDateTime"; }, /QUERY_OBSERVATION_COUNT/],
+    [doc => { doc.events[0].sources[0].observations[0].parentFolderId = "unknown"; }, /OBSERVATION_FOLDER/],
+    [doc => { doc.events[0].correlationStatus = "CONFLICT_HELD"; doc.events[0].titleId = "title"; }, /HELD_EVENT_AUTHORITY/]
+  ]) {
+    const document = structuredClone(original);
+    mutate(document);
+    const eventsSha256 = require("node:crypto").createHash("sha256").update(JSON.stringify(document)).digest("hex");
+    assert.throws(() => validateEvidenceImport({ ...manifest, eventsSha256 }, document, coverage), code);
+  }
+});
+
 test("a conflicting mailbox copy poisons every Internet identity regardless of input order", () => {
   const first = messageRecord(message("m1"), "publishing@jmerrill.one", "receivedDateTime", "2026-10-02T12:00:00Z");
   const second = { ...first, sourceMailbox: "jackie@jmerrill.one", graphMessageId: "m2" };
@@ -153,6 +192,14 @@ test("same-mailbox repeated observations retain participants and timestamps", ()
   assert.equal(events[0].sources[0].observations.length, 2);
   assert.deepEqual(events[0].sources[0].observations[1].bcc, later.bcc);
   assert.equal(events[0].sources[0].observations[1].lastModifiedAt, later.lastModifiedAt);
+});
+
+test("missing initial body hashes cannot hide conflicting later message observations", () => {
+  const first = messageRecord(message("m1"), "publishing@jmerrill.one", "receivedDateTime", "now");
+  const rows = [{ ...first, bodyHash: null }, { ...first, bodyHash: "a" }, { ...first, bodyHash: "b" }];
+  assert.equal(deduplicateRecords(rows).events.every(event => event.correlationStatus === "CONFLICT_HELD"), true);
+  const copies = rows.map((row, index) => ({ ...row, graphMessageId: `m${index}` }));
+  assert.equal(deduplicateRecords(copies).events.every(event => event.correlationStatus === "CONFLICT_HELD"), true);
 });
 
 test("complete manifest is written only after both mailboxes and both timestamp scans finish", async () => {
@@ -293,6 +340,8 @@ test("inbound evidence restart reuses per-record metadata without copying bodies
   const records = await readInboundEvidencePrefix("messages/", null, deps);
   assert.equal(reads, 3);
   assert.equal(records.length, 2);
+  assert.equal(records[0].sourceEvidence.blobName, "messages/a.json");
+  assert.match(records[0].sourceEvidence.sha256, /^[0-9a-f]{64}$/);
   assert.equal(JSON.stringify(records).includes("private full body"), false);
 });
 
