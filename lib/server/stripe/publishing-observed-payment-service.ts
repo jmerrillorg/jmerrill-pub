@@ -183,26 +183,59 @@ async function readObservedSettlement(request: ObservedAdditionalRequest, paymen
   if (charge.amount_refunded > 0 || charge.refunded === true || charge.disputed === true) throw new Error('OBSERVED_SETTLEMENT_REFUND_OR_DISPUTE_REVIEW_REQUIRED')
   const invoices = await stripeList(`/invoices?customer=${encodeURIComponent(customerId)}&limit=100`)
   const matches = invoices.filter((invoice: { payment_intent: unknown }) => invoice.payment_intent === paymentIntentId)
-  if (matches.length !== 1) throw new Error('OBSERVED_SETTLEMENT_INVOICE_AMBIGUOUS')
-  const invoice = matches[0]
-  if (invoice.status !== 'paid' || invoice.livemode !== true || invoice.customer !== customerId || invoice.amount_paid !== payment.amountCents) {
-    throw new Error('OBSERVED_SETTLEMENT_INVOICE_PARITY_FAILED')
-  }
-  // A subscription invoice settles a scheduled installment, regardless of how an observation labels it.
-  assertObservedAdditionalPaymentSource(invoice)
-  const subscription = await stripeSettlementRead(`/subscriptions/${encodeURIComponent(text(invoice.subscription))}`)
-  if (subscription.customer !== customerId || subscription.schedule !== scheduleId) throw new Error('OBSERVED_SETTLEMENT_SCHEDULE_BINDING_FAILED')
-  const paidAt = Number(invoice.status_transitions?.paid_at)
-  if (!Number.isSafeInteger(paidAt) || paidAt <= 0) throw new Error('OBSERVED_SETTLEMENT_TIMESTAMP_MISSING')
-  const query = new URLSearchParams({ type: 'invoice.paid', 'created[gte]': String(paidAt - 3600), 'created[lte]': String(paidAt + 3600), limit: '100' })
+  assertNoObservedSettlementInvoice(matches)
+  const rawPayment = await stripeSettlementRead(`/payment_intents/${encodeURIComponent(paymentIntentId)}`)
+  const sessions = await stripeList(`/checkout/sessions?payment_intent=${encodeURIComponent(paymentIntentId)}&limit=100`)
+  if (sessions.length !== 1) throw new Error('OBSERVED_SETTLEMENT_SESSION_AMBIGUOUS')
+  const session = sessions[0]
+  assertObservedCheckoutSource({ request, rawPayment, session, paymentIntentId, customerId,
+    scheduleId, amountCents: payment.amountCents })
+  const query = new URLSearchParams({ type: 'checkout.session.completed', 'created[gte]': String(session.created), limit: '100' })
   const events = await stripeList(`/events?${query}`)
-  const event = events.find((candidate: { data?: { object?: { id?: string } } }) => candidate.data?.object?.id === invoice.id)
-  if (!/^evt_[A-Za-z0-9]+$/.test(text(event?.id))) throw new Error('OBSERVED_SETTLEMENT_PROVIDER_EVENT_REQUIRED')
-  return { payment, invoiceId: invoice.id as string, eventId: event.id as string, paidAt: new Date(paidAt * 1000).toISOString(), requestId: request.requestId }
+  const matchingEvents = events.filter((candidate: { data?: { object?: { id?: string; payment_intent?: string } } }) =>
+    candidate.data?.object?.id === session.id && candidate.data?.object?.payment_intent === paymentIntentId)
+  if (matchingEvents.length !== 1 || !/^evt_[A-Za-z0-9]+$/.test(text(matchingEvents[0]?.id)) ||
+      !Number.isSafeInteger(matchingEvents[0]?.created)) throw new Error('OBSERVED_SETTLEMENT_PROVIDER_EVENT_REQUIRED')
+  return { payment, invoiceId: null, eventId: matchingEvents[0].id as string,
+    paidAt: new Date(matchingEvents[0].created * 1000).toISOString(), requestId: request.requestId }
 }
 
 export function assertObservedAdditionalPaymentSource(invoice: { subscription?: unknown }) {
   if (text(invoice.subscription)) throw new Error('OBSERVED_SCHEDULED_INVOICE_NOT_ADDITIONAL')
+}
+
+export function assertNoObservedSettlementInvoice(matches: { subscription?: unknown }[]) {
+  if (matches.length > 1) throw new Error('OBSERVED_SETTLEMENT_INVOICE_AMBIGUOUS')
+  if (matches.length === 1) {
+    assertObservedAdditionalPaymentSource(matches[0])
+    throw new Error('OBSERVED_SETTLEMENT_INVOICE_REVIEW_REQUIRED')
+  }
+}
+
+export function assertObservedCheckoutSource(input: {
+  request: Pick<ObservedAdditionalRequest, 'authorId' | 'titleId' | 'agreementId' | 'engagementId'>
+  rawPayment: { metadata?: Record<string, string> }
+  session: { livemode?: boolean; mode?: string; payment_status?: string; payment_intent?: string;
+    customer?: string; amount_total?: number; currency?: string; created?: number }
+  paymentIntentId: string
+  customerId: string
+  scheduleId: string
+  amountCents: number
+}) {
+  const metadata = parsePublishingPaymentMetadata(input.rawPayment.metadata)
+  if (!metadata.ok || metadata.authorId !== input.request.authorId || metadata.titleId !== input.request.titleId ||
+      metadata.agreementId !== input.request.agreementId || metadata.paymentScheduleId !== input.scheduleId ||
+      metadata.paymentType !== 'ADDITIONAL_PAYMENT' || metadata.scheduledObligationId ||
+      input.rawPayment.metadata?.jm1_engagement_id !== input.request.engagementId) {
+    throw new Error('OBSERVED_SETTLEMENT_METADATA_BINDING_DENIED')
+  }
+  const session = input.session
+  if (session.livemode !== true || session.mode !== 'payment' || session.payment_status !== 'paid' ||
+      session.payment_intent !== input.paymentIntentId || session.customer !== input.customerId ||
+      session.amount_total !== input.amountCents || session.currency !== 'usd' ||
+      !Number.isSafeInteger(session.created) || Number(session.created) <= 0) {
+    throw new Error('OBSERVED_SETTLEMENT_SESSION_BINDING_DENIED')
+  }
 }
 
 export async function reconcileObservedSettlements(requestId: string) {

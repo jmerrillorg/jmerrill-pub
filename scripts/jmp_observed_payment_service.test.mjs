@@ -4,7 +4,9 @@ import { readFileSync } from 'node:fs'
 import createJiti from 'jiti'
 
 const jiti = createJiti(import.meta.url)
-const { observedPaymentRequestIdentity, assertObservedRequestReplay, assertObservedAdditionalPaymentSource } = jiti('../lib/server/stripe/publishing-observed-payment-service.ts')
+const { observedPaymentRequestIdentity, assertObservedRequestReplay, assertObservedAdditionalPaymentSource,
+  assertNoObservedSettlementInvoice,
+  assertObservedCheckoutSource } = jiti('../lib/server/stripe/publishing-observed-payment-service.ts')
 const { paymentLedgerGuid } = jiti('../lib/server/stripe/publishing-payment-adapters.ts')
 
 const request = {
@@ -47,6 +49,41 @@ test('a paid subscription invoice cannot be imported as an additional payment', 
     /OBSERVED_SCHEDULED_INVOICE_NOT_ADDITIONAL/,
   )
   assert.doesNotThrow(() => assertObservedAdditionalPaymentSource({ subscription: null }))
+  assert.doesNotThrow(() => assertNoObservedSettlementInvoice([]))
+  assert.throws(() => assertNoObservedSettlementInvoice([{ subscription: 'sub_attas_schedule' }]),
+    /OBSERVED_SCHEDULED_INVOICE_NOT_ADDITIONAL/)
+  assert.throws(() => assertNoObservedSettlementInvoice([{ subscription: null }]),
+    /OBSERVED_SETTLEMENT_INVOICE_REVIEW_REQUIRED/)
+  assert.throws(() => assertNoObservedSettlementInvoice([{ subscription: null }, { subscription: null }]),
+    /OBSERVED_SETTLEMENT_INVOICE_AMBIGUOUS/)
+})
+
+test('invoice-free Checkout settlement requires exact additional-payment metadata and paid session', () => {
+  const input = {
+    request,
+    rawPayment: { metadata: {
+      jm1_payment_type: 'ADDITIONAL_PAYMENT', jm1_author_id: request.authorId,
+      jm1_title_id: request.titleId, jm1_agreement_id: request.agreementId,
+      jm1_engagement_id: request.engagementId, jm1_payment_schedule_id: 'schedule-1',
+      jm1_balance_version: 'balance-1',
+    } },
+    session: { livemode: true, mode: 'payment', payment_status: 'paid', payment_intent: 'pi_fixture1',
+      customer: 'cus_fixture1', amount_total: 25988, currency: 'usd', created: 1790431200 },
+    paymentIntentId: 'pi_fixture1', customerId: 'cus_fixture1', scheduleId: 'schedule-1', amountCents: 25988,
+  }
+  assert.doesNotThrow(() => assertObservedCheckoutSource(input))
+  for (const metadata of [{ jm1_payment_type: 'SCHEDULED_INSTALLMENT' },
+    { jm1_title_id: 'another-title' }, { jm1_engagement_id: 'another-engagement' },
+    { jm1_scheduled_obligation_id: 'obligation-1' }]) {
+    assert.throws(() => assertObservedCheckoutSource({ ...input,
+      rawPayment: { metadata: { ...input.rawPayment.metadata, ...metadata } } }),
+    /OBSERVED_SETTLEMENT_METADATA_BINDING_DENIED/)
+  }
+  for (const session of [{ payment_status: 'unpaid' }, { customer: 'cus_other' },
+    { payment_intent: 'pi_other' }, { amount_total: 25987 }, { livemode: false }]) {
+    assert.throws(() => assertObservedCheckoutSource({ ...input, session: { ...input.session, ...session } }),
+      /OBSERVED_SETTLEMENT_SESSION_BINDING_DENIED/)
+  }
 })
 
 test('uncommissioned prototype fails closed and contains no direct communication provider', () => {
