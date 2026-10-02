@@ -36,6 +36,7 @@ function buildHistoricalMigrationPlan(input) {
   const titleId = id(input.titleId);
   const authorId = id(input.authorId);
   const contactId = id(input.contactId);
+  if (authorId !== contactId) deny("HISTORICAL_MIGRATION_CANONICAL_AUTHOR_CONTACT_MISMATCH");
   const binding = input.identityBinding;
   if (!binding || id(binding.titleId) !== titleId || id(binding.authorId) !== authorId ||
       id(binding.contactId) !== contactId ||

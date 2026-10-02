@@ -5,8 +5,8 @@ const assert = require("node:assert/strict");
 const { buildHistoricalMigrationPlan } = require("../src/lifecycle/historicalMigrationContract");
 
 const titleId = "91c5e1ef-2980-f111-ab0f-7c1e525b15c2";
-const authorId = "11111111-1111-4111-8111-111111111111";
 const contactId = "dfb397e7-3b7c-f111-ab0f-6045bdd69435";
+const authorId = contactId;
 
 function input() {
   return {
@@ -85,6 +85,9 @@ test("rejects cross-title evidence and unbound identity", () => {
   const wrongContact = input();
   wrongContact.identityBinding.contactId = "22222222-2222-4222-8222-222222222222";
   assert.throws(() => buildHistoricalMigrationPlan(wrongContact), /IDENTITY_BINDING_MISMATCH/);
+  const wrongAuthor = input();
+  wrongAuthor.authorId = "11111111-1111-4111-8111-111111111111";
+  assert.throws(() => buildHistoricalMigrationPlan(wrongAuthor), /CANONICAL_AUTHOR_CONTACT_MISMATCH/);
 });
 
 test("holds missing source, completion and workspace authority", () => {
