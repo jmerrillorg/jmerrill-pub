@@ -1,0 +1,9 @@
+44676c7a7d96ebec75b200d757eec939ec868dadd056b593fbeaa59e7ef056cf  reports/jmp-post-phase6-ops-001-2026-09-20/00-executive-summary.md
+5e555a615893ff22868834d6e81db01f6a9eafd704c2c988ea6f3b08a7bdadc4  reports/jmp-post-phase6-ops-001-2026-09-20/a2-genuine-review-readback.md
+58fb55af888ae44defb61edd51547f70111780381cd9d7515196f3e20a49ad2f  reports/jmp-post-phase6-ops-001-2026-09-20/cody-as-system-audit.md
+007ab6cb09a60ab50c8df83d8415df81c5a334a8165f8a92a8b6a49843acf5c2  reports/jmp-post-phase6-ops-001-2026-09-20/deployed-authority-readback.json
+705b1eab0e4d49e8a2ba2d4401dd8bc1cb5c1eda30ffe1999d6ac88aeaf14ad3  reports/jmp-post-phase6-ops-001-2026-09-20/final-return.md
+bdaf115faafb32fd050212cc0f442403fd859d2e3af7ce6bdf85e1864dfa5768  reports/jmp-post-phase6-ops-001-2026-09-20/iyorwuese-placement-decision.md
+45b464a5323b56244345b10a01d70e5ae460c241da3baee3cdcfb166c69d2eac  reports/jmp-post-phase6-ops-001-2026-09-20/open-pr-triage.csv
+3f337905a1c9ddad06507793eea8c925d1a20a31493704bcf7b0c017a224a4bf  reports/jmp-post-phase6-ops-001-2026-09-20/stale-deployment-triage.csv
+7c832483d22f40bf7413fa8d10dd1eabfd19e3c17e6cb90bd419f521199bf8a2  reports/jmp-post-phase6-ops-001-2026-09-20/validation-manifest.json
