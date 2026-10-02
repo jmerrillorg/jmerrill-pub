@@ -1,9 +1,9 @@
 "use strict";
 const fs = require("node:fs");
 const path = require("node:path");
-const { createPublishingWaitStore } = require("../../src/lifecycle/publishingWaitStore");
-const { registerPublishingWait, dispatchPublishingWait, reconcilePublishingWaits } = require("../../src/lifecycle/publishingWaitCoordinator");
-const { OWNER_BY_TYPE } = require("../../src/lifecycle/publishingWaitResumeAdapter");
+const { createPublishingWaitStore } = require("../src/lifecycle/publishingWaitStore");
+const { registerPublishingWait, dispatchPublishingWait, reconcilePublishingWaits } = require("../src/lifecycle/publishingWaitCoordinator");
+const { OWNER_BY_TYPE } = require("../src/lifecycle/publishingWaitResumeAdapter");
 
 const [directory, phase, waitType] = process.argv.slice(2);
 const id = n => `${String(n).padStart(8, "0")}-1111-4111-8111-111111111111`;

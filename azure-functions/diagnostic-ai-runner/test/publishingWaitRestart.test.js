@@ -11,7 +11,7 @@ for (const type of ["AUTHOR_REVIEW_RESPONSE", "PROVIDER_READBACK"]) {
   test(`${type}: failure, crash after owner effect, recovery and replay across separate processes`, () => {
     const directory = fs.mkdtempSync(path.join(process.platform === "darwin" ? "/private/tmp" : os.tmpdir(), "publishing-wait-restart-"));
     const run = (phase, expectedExit = 0) => {
-      const result = spawnSync(process.execPath, [path.join(__dirname, "helpers/publishingWaitRestart.cjs"), directory, phase, type],
+      const result = spawnSync(process.execPath, [path.join(__dirname, "../test-support/publishingWaitRestart.cjs"), directory, phase, type],
         { encoding: "utf8", timeout: 60000 });
       assert.equal(result.status, expectedExit, result.stderr || String(result.error || ""));
       return expectedExit === 0 ? JSON.parse(result.stdout) : null;
