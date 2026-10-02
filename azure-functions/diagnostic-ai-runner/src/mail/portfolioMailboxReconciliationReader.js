@@ -12,7 +12,7 @@ const WINDOW = Object.freeze({ start: "2026-07-03T04:00:00Z", endExclusive: "202
 const FIELDS = "id,internetMessageId,conversationId,parentFolderId,from,toRecipients,ccRecipients,bccRecipients,receivedDateTime,sentDateTime,createdDateTime,lastModifiedDateTime,subject,bodyPreview,body,hasAttachments";
 const CONTAINER = "jm1-publishing-portfolio-evidence";
 const DELIVERY_CONTAINER = "jm1-publishing-inbound-evidence";
-const READER_VERSION = "2.1.0";
+const READER_VERSION = "2.2.0";
 const INTERNAL_SENDERS = new Set([...MAILBOXES, "publishing@email.jmerrill.one"]);
 
 function fail(code, status) {
@@ -98,23 +98,29 @@ function validateNextLink(next, mailbox) {
 function deduplicateRecords(records) {
   const byGraph = new Map();
   const conflicts = [];
+  const poisonedInternetIds = new Set();
   for (const record of records) {
     const key = `${record.sourceMailbox}:${record.graphMessageId}`;
     const existing = byGraph.get(key);
     if (existing) {
+      existing.observations.push(record);
+      existing.sourceQueries.push(record.sourceQueryWindow.timestampField);
       if ((existing.internetMessageId && record.internetMessageId &&
           internetIdentity(existing.internetMessageId) !== internetIdentity(record.internetMessageId)) ||
           existing.from !== record.from || existing.subject !== record.subject ||
           (existing.bodyHash && record.bodyHash && existing.bodyHash !== record.bodyHash)) {
         conflicts.push({ type: "GRAPH_IDENTITY_CONFLICT", key });
         existing.correlationStatus = "CONFLICT_HELD";
+        for (const observation of existing.observations) {
+          const identity = internetIdentity(observation.internetMessageId);
+          if (identity) poisonedInternetIds.add(identity);
+        }
         (existing.conflictingObservations ||= []).push(record);
         continue;
       }
-      existing.sourceQueries.push(record.sourceQueryWindow.timestampField);
       if (!existing.internetMessageId) existing.internetMessageId = record.internetMessageId;
     } else {
-      byGraph.set(key, { ...record, sourceQueries: [record.sourceQueryWindow.timestampField] });
+      byGraph.set(key, { ...record, observations: [record], sourceQueries: [record.sourceQueryWindow.timestampField] });
     }
   }
   const byInternet = new Map();
@@ -127,6 +133,7 @@ function deduplicateRecords(records) {
     if (existing) {
       if (existing.from !== record.from || existing.subject !== record.subject ||
           (existing.bodyHash && record.bodyHash && existing.bodyHash !== record.bodyHash)) {
+        poisonedInternetIds.add(internetKey);
         conflicts.push({ type: "INTERNET_IDENTITY_CONFLICT", internetMessageId: internetKey,
           sourceMailbox: record.sourceMailbox, graphMessageId: record.graphMessageId });
         existing.correlationStatus = "CONFLICT_HELD";
@@ -134,13 +141,15 @@ function deduplicateRecords(records) {
         continue;
       }
       existing.sources.push(source);
+      if (record.correlationStatus === "CONFLICT_HELD") existing.correlationStatus = "CONFLICT_HELD";
     } else {
       const event = { ...record, sources: [source] };
       events.push(event);
       if (internetKey) byInternet.set(internetKey, event);
     }
   }
-  return { events, conflicts, graphDistinctCount: byGraph.size };
+  return { events: events.map((event) => poisonedInternetIds.has(internetIdentity(event.internetMessageId)) ||
+    event.correlationStatus === "CONFLICT_HELD" ? hold(event) : event), conflicts, graphDistinctCount: byGraph.size };
 }
 
 function enrichWithDeliveryLedger(events, deliveries) {

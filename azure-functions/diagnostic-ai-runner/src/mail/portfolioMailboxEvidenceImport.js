@@ -20,10 +20,18 @@ function validateEvidenceImport(manifest, document, coverage) {
   requireProof(manifest.durableIdentityCompleteCount === document.events.length && document.events.every((event) =>
     event.graphMessageId && MAILBOXES.includes(event.sourceMailbox) && event.sources?.length > 0), "DURABLE_IDENTITY_INCOMPLETE");
   const sourceKeys = new Set();
+  let observationCount = 0;
   for (const event of document.events) for (const source of event.sources) {
     requireProof(source.graphMessageId && MAILBOXES.includes(source.sourceMailbox), "INVALID_MAILBOX_SOURCE");
-    sourceKeys.add(`${source.sourceMailbox}:${source.graphMessageId}`);
+    const key = `${source.sourceMailbox}:${source.graphMessageId}`;
+    requireProof(!sourceKeys.has(key), "DUPLICATE_GRAPH_SOURCE");
+    sourceKeys.add(key);
+    requireProof(Array.isArray(source.observations) && source.observations.length > 0, "MISSING_SOURCE_OBSERVATIONS");
+    requireProof(source.observations.every(row => row.graphMessageId === source.graphMessageId &&
+      row.sourceMailbox === source.sourceMailbox), "OBSERVATION_SOURCE_MISMATCH");
+    observationCount += source.observations.length;
   }
+  requireProof(observationCount === manifest.rawRowCountBeforeSameMailboxDeduplication, "OBSERVATION_COUNT_MISMATCH");
   requireProof(sourceKeys.size === manifest.graphDistinctCount && sourceKeys.size <= manifest.rawRowCountBeforeSameMailboxDeduplication, "GRAPH_COUNT_MISMATCH");
   requireProof(document.conflicts.length === manifest.unresolvedIdentityConflicts, "CONFLICT_COUNT_MISMATCH");
   return {

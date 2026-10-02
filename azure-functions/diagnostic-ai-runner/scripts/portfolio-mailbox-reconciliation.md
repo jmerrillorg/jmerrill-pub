@@ -70,12 +70,22 @@ and a non-success response. No failure is converted to an empty success page.
 
 ## Separate Reminder Proof
 
-Run 36929482252 (`ba00e47d...`) is an ancestor superseded by 36933649885
-(`fc756762...`). Do not approve the older candidate for the reminder repair.
-36933649885 requires protected approval and live SHA validation, followed by
-the existing read-only Atta September 21 delivery/response/suppression proof.
-Do not send a reminder to test suppression. A later approved cumulative release
-may supersede this dependency only after source equivalence is proved.
+Both 36929482252 (`ba00e47d...`) and 36933649885 (`fc756762...`) were superseded
+by cumulative production release 88222fa5972cd90f1155eb4b8842b51b24b75872.
+Do not approve either older artifact. October 2 live read-only delivery search
+and cadence preview, plus exact title-specific projection evidence, proved
+Atta's current suppression. Do not send a reminder to test it. Reader release
+approval remains separate; it is not present in either old run or that release.
+
+## Bounded Historical Attribution
+
+The pure `attributeCommunicationCopies` projection can bind historical ACS
+copies to existing communication logs by exact provider identity, title/contact
+lookup, recipient parity and bounded timestamp. It does not use title text or
+conversation proximity, create a delivery record, infer an author decision or
+certify fresh provider delivery. Any incomplete or conflicting log poisons the
+join. Use this after extraction with separately preserved source authority;
+retain every nonmatching row as an exception.
 
 ## Primary Technical Sources
 

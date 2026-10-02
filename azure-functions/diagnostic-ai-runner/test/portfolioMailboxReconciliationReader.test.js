@@ -128,6 +128,33 @@ function harness() {
   return { writes, deps };
 }
 
+test("a conflicting mailbox copy poisons every Internet identity regardless of input order", () => {
+  const first = messageRecord(message("m1"), "publishing@jmerrill.one", "receivedDateTime", "2026-10-02T12:00:00Z");
+  const second = { ...first, sourceMailbox: "jackie@jmerrill.one", graphMessageId: "m2" };
+  const conflicting = { ...second, internetMessageId: "<changed@example.org>" };
+  const otherIdentityCopy = { ...first, graphMessageId: "m3", internetMessageId: conflicting.internetMessageId };
+  for (const rows of [[first, second, conflicting, otherIdentityCopy], [conflicting, second, otherIdentityCopy, first]]) {
+    const dedup = deduplicateRecords(rows);
+    assert.equal(dedup.events.every(event => event.correlationStatus === "CONFLICT_HELD"), true);
+    const joined = enrichWithInboundEvents(dedup.events, [
+      { internetMessageId: first.internetMessageId, correlationStatus: "DETERMINISTIC", titleId: "title", authorId: "author" },
+      { internetMessageId: conflicting.internetMessageId, correlationStatus: "DETERMINISTIC", titleId: "title", authorId: "author" }
+    ]);
+    assert.equal(joined.linkedInboundCount, 0);
+    assert.equal(joined.events.every(event => !event.titleId), true);
+  }
+});
+
+test("same-mailbox repeated observations retain participants and timestamps", () => {
+  const first = messageRecord(message("m1"), "publishing@jmerrill.one", "receivedDateTime", "2026-10-02T12:00:00Z");
+  const later = { ...first, bcc: ["audit@example.org"], lastModifiedAt: "2026-10-02T13:00:00Z",
+    sourceQueryWindow: { ...first.sourceQueryWindow, timestampField: "sentDateTime" } };
+  const { events } = deduplicateRecords([first, later]);
+  assert.equal(events[0].sources[0].observations.length, 2);
+  assert.deepEqual(events[0].sources[0].observations[1].bcc, later.bcc);
+  assert.equal(events[0].sources[0].observations[1].lastModifiedAt, later.lastModifiedAt);
+});
+
 test("complete manifest is written only after both mailboxes and both timestamp scans finish", async () => {
   const { writes, deps } = harness();
   const result = await runPortfolioMailboxReconciliation(deps);
