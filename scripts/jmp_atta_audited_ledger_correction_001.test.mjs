@@ -120,7 +120,11 @@ test('journaled replay returns existing state and does not prepare another write
   Object.assign(input.requirements[1], plan.patches[1].body)
   Object.assign(input.agreement, plan.patches[2].body)
   input.audit = { jmpv2_paymentevidencekey: 'JMP-ATTA-AUDITED-LEDGER-CORRECTION-001',
-    jmpv2_eventkind: 'LEDGER_CORRECTION', jmpv2_eventstatus: 'CONFIRMED' }
+    jmpv2_agreementkey: agreementId, jmpv2_eventkind: 'LEDGER_CORRECTION',
+    jmpv2_eventstatus: 'CONFIRMED', jmpv2_allocationsjson: JSON.stringify({
+      correctedPaymentRowId: septemberPaymentId, requirementId: septemberId,
+      correctedBalanceVersion: plan.state.balanceVersion,
+      correctedNextDue: plan.state.nextScheduledDueDate }) }
   assert.deepEqual(planCorrection(input), { status: 'ALREADY_APPLIED' })
   input.requirements[1].jmpv2_obligationstatus = 'SCHEDULED'
   assert.throws(() => planCorrection(input), /AUDITED_REPLAY_STATE_MISMATCH/)

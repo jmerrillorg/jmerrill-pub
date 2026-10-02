@@ -79,8 +79,13 @@ export function planCorrection({ agreement, requirements, payments, audit, invoi
     september.jmpv2_obligationstatus === 'SATISFIED' &&
     agreement.jmpv2_nextduedate === october.jmpv2_duedate && agreement.jmpv2_nextpaymentat === october.jmpv2_duedate
   if (audit) {
+    const auditFacts = JSON.parse(audit.jmpv2_allocationsjson || '{}')
     assert(audit.jmpv2_paymentevidencekey === AUDIT_KEY && audit.jmpv2_eventkind === 'LEDGER_CORRECTION' &&
-      audit.jmpv2_eventstatus === 'CONFIRMED' && alreadyCorrected, 'AUDITED_REPLAY_STATE_MISMATCH')
+      audit.jmpv2_eventstatus === 'CONFIRMED' && audit.jmpv2_agreementkey === AGREEMENT &&
+      auditFacts.correctedPaymentRowId === SEPTEMBER_PAYMENT && auditFacts.requirementId === SEPTEMBER &&
+      auditFacts.correctedBalanceVersion === agreement.jmpv2_balanceversion &&
+      auditFacts.correctedNextDue === agreement.jmpv2_nextduedate && alreadyCorrected,
+    'AUDITED_REPLAY_STATE_MISMATCH')
     return { status: 'ALREADY_APPLIED' }
   }
   assert(!alreadyCorrected, 'UNJOURNALED_CORRECTION_PRESENT')
