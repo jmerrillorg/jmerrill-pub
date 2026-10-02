@@ -81,29 +81,37 @@ function buildHistoricalMigrationPlan(input) {
     }
     const status = currentStage === "12_COVER_DESIGN" ? evidence.status : evidence.status || "COMPLETED";
     if (currentStage === "12_COVER_DESIGN" &&
-        (status !== "COMPLETED" && !(stageCode === "05_AGREEMENT_PAYMENT" && status === "PARALLEL_PENDING"))) {
+        (status !== "COMPLETED" &&
+        !(stageCode === "05_AGREEMENT_PAYMENT" && status === "PARALLEL_PENDING") &&
+        !(stageCode === "07_DEVELOPMENTAL_EDITING" && status === "SUPERSEDED_STALE_RECORD"))) {
       deny("HISTORICAL_MIGRATION_PRIOR_STAGE_STATUS_INVALID");
     }
     if (stageCode === "05_AGREEMENT_PAYMENT" && currentStage === "12_COVER_DESIGN" &&
         ((status === "PARALLEL_PENDING") !== (input.agreementStatus === "PARALLEL_PENDING"))) {
       deny("HISTORICAL_MIGRATION_AGREEMENT_STAGE_MISMATCH");
     }
-    if (status === "PARALLEL_PENDING" && evidence.completedAt) {
+    if (status !== "COMPLETED" && evidence.completedAt) {
       deny("HISTORICAL_MIGRATION_PENDING_STAGE_COMPLETION_INVALID");
     }
     return {
-      recordType: status === "PARALLEL_PENDING" ? "MIGRATED_HISTORICAL_GATE" : "MIGRATED_HISTORICAL_STAGE_EVIDENCE",
+      recordType: status === "PARALLEL_PENDING" ? "MIGRATED_HISTORICAL_GATE" :
+        status === "SUPERSEDED_STALE_RECORD" ? "MIGRATED_HISTORICAL_DRIFT_EVIDENCE" :
+          "MIGRATED_HISTORICAL_STAGE_EVIDENCE",
       status,
       stageCode, sourceSystem, sourceRecordId, sourceArtifactId,
       sourceChecksum: evidence.sourceChecksum?.toLowerCase() || null,
       authorApprovalEvidence: evidence.authorApprovalEvidence || null,
-      completedAt: status === "PARALLEL_PENDING" ? null : timestamp(evidence.completedAt)
+      completedAt: status === "COMPLETED" ? timestamp(evidence.completedAt) : null
     };
   }).sort((a, b) => STAGES.indexOf(a.stageCode) - STAGES.indexOf(b.stageCode));
+  const stage12Required = STAGES.slice(6, currentIndex);
   if (currentStage === "12_COVER_DESIGN" &&
-      STAGES.slice(0, currentIndex).some((stageCode) => !seen.has(stageCode))) {
+      (["05_AGREEMENT_PAYMENT", ...stage12Required].some((stageCode) => !seen.has(stageCode)) ||
+      records.some((record) => stage12Required.slice(1).includes(record.stageCode) && record.status !== "COMPLETED"))) {
     deny("HISTORICAL_MIGRATION_PRIOR_STAGE_EVIDENCE_MISSING");
   }
+  const unreconstructedPriorStages = currentStage === "12_COVER_DESIGN" ?
+    STAGES.slice(0, currentIndex).filter((stageCode) => !seen.has(stageCode)) : [];
   const migrationKey = createHash("sha256").update(JSON.stringify({
     titleId, authorId, contactId, identitySourceRecordId: binding.sourceRecordId,
     packageCode, formats: [...formats].sort(), currentStage,
@@ -118,6 +126,7 @@ function buildHistoricalMigrationPlan(input) {
       itemId: workspace.itemId, path: workspace.path },
     agreementGate: input.agreementStatus, commercialStatus: input.commercialStatus,
     historicalEvidenceRecords: records,
+    unreconstructedPriorStages,
     stage13BlockedUntil: currentStage === "12_COVER_DESIGN" ?
       ["STAGE_12_COMPLETED", "AGREEMENT_SIGNED", "EXACT_PROOF_PREFLIGHT_PASS"] : [],
     syntheticStageEvents: []
