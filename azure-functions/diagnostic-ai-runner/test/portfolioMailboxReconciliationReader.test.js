@@ -2,7 +2,7 @@
 
 const { test } = require("node:test");
 const assert = require("node:assert/strict");
-const { firstUrl, messageRecord, scanQuery, deduplicateRecords, enrichWithDeliveryLedger,
+const { firstUrl, messageRecord, scanQuery, scanFolders, deduplicateRecords, enrichWithDeliveryLedger,
   enrichWithInboundEvents,
   runPortfolioMailboxReconciliation } =
   require("../src/mail/portfolioMailboxReconciliationReader");
@@ -84,6 +84,8 @@ test("delivery ledger enriches only exact Internet Message ID matches", () => {
   const conflicting = enrichWithDeliveryLedger([matched], [delivery,
     { ...delivery, communicationRecordId: "other" }]);
   assert.equal(conflicting.conflicts[0].type, "DELIVERY_IDENTITY_CONFLICT");
+  assert.equal(conflicting.linkedDeliveryCount, 0);
+  assert.equal(conflicting.events[0].titleId, undefined);
 });
 
 test("inbound event join uses deterministic exact IDs and preserves conflicts", () => {
@@ -103,12 +105,16 @@ test("inbound event join uses deterministic exact IDs and preserves conflicts", 
   assert.equal(conflict.conflicts[0].type, "MAIL_SOURCE_CORRELATION_CONFLICT");
 });
 
-test("complete manifest is written only after both mailboxes and both timestamp scans finish", async () => {
+function harness() {
   const writes = new Map();
   const containerClient = {
     createIfNotExists: async () => {},
-    getBlockBlobClient: (path) => ({ uploadData: async (bytes, options) => {
+    getBlockBlobClient: (path) => ({ downloadToBuffer: async () => {
+      if (!writes.has(path)) throw Object.assign(new Error("not found"), { statusCode: 404 });
+      return Buffer.from(JSON.stringify(writes.get(path)));
+    }, uploadData: async (bytes, options) => {
       assert.equal(options.conditions.ifNoneMatch, "*");
+      if (writes.has(path)) throw Object.assign(new Error("exists"), { statusCode: 412 });
       writes.set(path, JSON.parse(bytes.toString("utf8")));
     } })
   };
@@ -116,17 +122,127 @@ test("complete manifest is written only after both mailboxes and both timestamp 
     credential: { getToken: async () => ({ token: "secret" }) },
     runId: "11111111-1111-4111-8111-111111111111",
     now: () => new Date("2026-10-02T12:00:00Z"),
-    fetchImpl: async () => ({ ok: true, json: async () => ({ value: [message("m1")] }) }) };
+    fetchImpl: async (url) => ({ ok: true, json: async () => ({ value: url.includes("mailFolders")
+      ? [{ id: "folder-1", displayName: "Inbox", childFolderCount: 0 }]
+      : [message("m1")] }) }) };
+  return { writes, deps };
+}
+
+test("complete manifest is written only after both mailboxes and both timestamp scans finish", async () => {
+  const { writes, deps } = harness();
   const result = await runPortfolioMailboxReconciliation(deps);
   assert.equal(result.queries.length, 4);
   assert.equal(result.rawRowCountBeforeSameMailboxDeduplication, 4);
   assert.equal(result.mailEventCount, 1);
   assert.equal(result.durableIdentityCompleteCount, 1);
   assert.equal(result.deduplicationStatus, "EXACT_ID_PASS_FALLBACK_PENDING");
-  assert.equal(writes.size, 6);
+  assert.equal(result.folderCoverageStatus, "ENUMERATED");
+  assert.equal(result.folderCounts.length, 2);
+  const { validateEvidenceImport } = require("../src/mail/portfolioMailboxEvidenceImport");
+  const document = [...writes.entries()].find(([key]) => key.endsWith("mail-events.json"))[1];
+  const coverage = [...writes.entries()].find(([key]) => key.endsWith("folder-coverage.json"))[1];
+  assert.equal(validateEvidenceImport(result, document, coverage).messageCount, 1);
+  assert.throws(() => validateEvidenceImport({ ...result, queries: result.queries.slice(1) }, document, coverage), /INCOMPLETE_MAILBOX/);
+  assert.throws(() => validateEvidenceImport(result, { ...document, events: [] }, coverage), /DIGEST/);
+  assert.throws(() => validateEvidenceImport(result, document, { ...coverage, unmatchedFolderIds: ["missing"] }), /FOLDER_COVERAGE/);
   assert.equal([...writes.keys()].some((key) => key.endsWith("manifest.json")), true);
   writes.clear();
   await assert.rejects(runPortfolioMailboxReconciliation({ ...deps,
     fetchImpl: async () => ({ ok: false, status: 403 }) }), /GRAPH_READ_FAILED/);
-  assert.equal(writes.size, 0);
+  assert.equal([...writes.keys()].some((key) => key.endsWith("manifest.json")), false);
+  const failure = [...writes.entries()].find(([key]) => key.includes("failures/"))[1];
+  assert.equal(failure.httpStatus, 403);
+  assert.equal(JSON.stringify(failure).includes("secret"), false);
+});
+
+test("restart reuses durable pages and completed replay makes no Graph calls", async () => {
+  const { writes, deps } = harness();
+  let reads = 0;
+  await assert.rejects(runPortfolioMailboxReconciliation({ ...deps, fetchImpl: async (url) => {
+    reads += 1;
+    if (reads === 3) return { ok: false, status: 403 };
+    return deps.fetchImpl(url);
+  } }), /GRAPH_READ_FAILED/);
+  assert.equal([...writes.keys()].some((key) => key.includes("receivedDateTime/0000")), true);
+  const restartedUrls = [];
+  const result = await runPortfolioMailboxReconciliation({ ...deps, fetchImpl: async (url) => {
+    restartedUrls.push(url);
+    return deps.fetchImpl(url);
+  } });
+  assert.equal(result.queries.length, 4);
+  assert.equal(restartedUrls.some((url) => url.includes("publishing%40") && url.includes("receivedDateTime+ge")), false);
+  const replay = await runPortfolioMailboxReconciliation({ ...deps, fetchImpl: async () => { throw Error("must not fetch"); } });
+  assert.deepEqual(replay, result);
+});
+
+test("folders recurse through hidden children and every continuation page", async () => {
+  const calls = [];
+  const root = "https://graph.microsoft.com/v1.0/users/publishing%40jmerrill.one/mailFolders";
+  const result = await scanFolders("publishing@jmerrill.one", "token", { fetchImpl: async (url) => {
+    calls.push(url);
+    return { ok: true, json: async () => url.includes("childFolders")
+      ? { value: [{ id: "child", isHidden: true }] }
+      : url.includes("skiptoken") ? { value: [{ id: "second" }] }
+        : { value: [{ id: "first", childFolderCount: 1 }], "@odata.nextLink": `${root}?$skiptoken=next` } };
+  } });
+  assert.equal(result.folders.length, 3);
+  assert.equal(calls.length, 3);
+  assert.equal(calls.some((url) => url.includes("childFolders?includeHiddenFolders=true")), true);
+});
+
+test("Graph throttling retries and long Retry-After returns a resumable failure", async () => {
+  let calls = 0;
+  const sleeps = [];
+  const result = await scanQuery("publishing@jmerrill.one", "receivedDateTime", "token", async () => {}, {
+    sleep: async (ms) => sleeps.push(ms), fetchImpl: async () => ++calls === 1
+      ? { ok: false, status: 429, headers: { get: () => "2" } }
+      : { ok: true, json: async () => ({ value: [] }) }
+  });
+  assert.equal(result.pages, 1);
+  assert.deepEqual(sleeps, [2000]);
+  await assert.rejects(scanQuery("publishing@jmerrill.one", "receivedDateTime", "token", async () => {}, {
+    fetchImpl: async () => ({ ok: false, status: 429, headers: { get: () => "120" } })
+  }), /RETRY_LATER/);
+});
+
+test("exact Internet identity is case sensitive and source BCC/participants survive dedup", () => {
+  const first = messageRecord(message("m1"), "publishing@jmerrill.one", "receivedDateTime", "now");
+  const copy = { ...first, sourceMailbox: "jackie@jmerrill.one", graphMessageId: "m2", bcc: ["private@example.org"] };
+  const result = deduplicateRecords([first, copy]);
+  assert.deepEqual(result.events[0].sources[1].bcc, ["private@example.org"]);
+  assert.equal(deduplicateRecords([first, { ...copy, internetMessageId: "<M1@example.org>" }]).events.length, 2);
+  const conflict = deduplicateRecords([first, { ...copy, bodyHash: "other" }]);
+  assert.equal(conflict.events.every((event) => event.correlationStatus === "CONFLICT_HELD"), true);
+});
+
+test("delivery tuple conflicts stay poisoned even when a third record agrees", () => {
+  const event = messageRecord(message("m1"), "publishing@jmerrill.one", "receivedDateTime", "now");
+  const delivery = { internetMessageId: event.internetMessageId, titleId: "a", authorId: "author", communicationRecordId: "c" };
+  const result = enrichWithDeliveryLedger([event], [delivery, { ...delivery, titleId: "b" }, delivery]);
+  assert.equal(result.linkedDeliveryCount, 0);
+  assert.equal(result.events[0].correlationStatus, "CONFLICT_HELD");
+});
+
+test("all mailbox copies participate in inbound binding and disagreeing keys fail closed", () => {
+  const event = messageRecord(message("m1"), "publishing@jmerrill.one", "receivedDateTime", "now");
+  event.sources = [event, { sourceMailbox: "jackie@jmerrill.one", graphMessageId: "m2" }];
+  const inbound = { correlationStatus: "DETERMINISTIC", mailbox: "jackie@jmerrill.one", graphMessageId: "m2", titleId: "a", authorId: "author" };
+  assert.equal(enrichWithInboundEvents([event], [inbound]).linkedInboundCount, 1);
+  const result = enrichWithInboundEvents([event], [inbound, { ...inbound, graphMessageId: "other", internetMessageId: event.internetMessageId, titleId: "b" }]);
+  assert.equal(result.linkedInboundCount, 0);
+  assert.equal(result.events[0].titleId, undefined);
+});
+
+test("stored runs from a different contract cannot be resumed", async () => {
+  const { writes, deps } = harness();
+  writes.set(`runs/${deps.runId}/contract.json`, { readerVersion: "old" });
+  await assert.rejects(runPortfolioMailboxReconciliation(deps), /RUN_CONTRACT_MISMATCH/);
+});
+
+test("lost manifest write is recovered from durable evidence without rescanning", async () => {
+  const { writes, deps } = harness();
+  await runPortfolioMailboxReconciliation(deps);
+  writes.delete(`runs/${deps.runId}/manifest.json`);
+  const result = await runPortfolioMailboxReconciliation({ ...deps, fetchImpl: async () => { throw Error("unexpected fresh read"); } });
+  assert.equal(result.mailEventCount, 1);
 });
