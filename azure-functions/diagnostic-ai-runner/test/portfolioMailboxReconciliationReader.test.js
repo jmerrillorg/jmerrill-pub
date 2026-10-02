@@ -25,6 +25,8 @@ test("fixed-window reader preserves Graph identities and hashes body without exp
   assert.match(row.bodyHash, /^[0-9a-f]{64}$/);
   assert.equal(JSON.stringify(row).includes("Private message body"), false);
   assert.throws(() => firstUrl("attacker@example.org", "receivedDateTime"), /QUERY_NOT_ALLOWED/);
+  assert.equal(row.sourceQueryWindow.start, "2026-07-03T04:00:00Z");
+  assert.equal(row.sourceQueryWindow.endExclusive, "2026-10-02T04:00:00Z");
 });
 
 test("scanner follows only same-mailbox Graph next links with immutable IDs", async () => {

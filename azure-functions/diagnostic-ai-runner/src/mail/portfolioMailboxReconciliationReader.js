@@ -7,7 +7,8 @@ const { BlobServiceClient } = require("@azure/storage-blob");
 const GRAPH = "https://graph.microsoft.com/v1.0";
 const SCOPE = "https://graph.microsoft.com/.default";
 const MAILBOXES = Object.freeze(["publishing@jmerrill.one", "jackie@jmerrill.one"]);
-const WINDOW = Object.freeze({ start: "2026-07-03T00:00:00Z", endExclusive: "2026-10-02T00:00:00Z" });
+const WINDOW = Object.freeze({ start: "2026-07-03T04:00:00Z", endExclusive: "2026-10-02T04:00:00Z",
+  businessTimeZone: "America/New_York", businessStartDate: "2026-07-03", businessEndDate: "2026-10-01" });
 const FIELDS = "id,internetMessageId,conversationId,parentFolderId,from,toRecipients,ccRecipients,bccRecipients,receivedDateTime,sentDateTime,createdDateTime,lastModifiedDateTime,subject,bodyPreview,body,hasAttachments";
 const CONTAINER = "jm1-publishing-portfolio-evidence";
 const READER_VERSION = "2.0.0";
