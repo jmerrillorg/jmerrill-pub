@@ -55,6 +55,7 @@ require("./functions/runPublishingMailboxReplyCheck");
 require("./functions/runPublishingMailboxAttachmentReadback");
 require("./functions/runPublishingLifecycleReadback");
 require("./functions/runEnterpriseMailboxReadbackHealth");
+require("./functions/runPortfolioMailboxReconciliation");
 require("./functions/runCommercialEligibilityA2");
 require("./functions/runStripeConnectReminderMonitor");
 require("./functions/runPublishingPaymentTimer");
