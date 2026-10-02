@@ -21,7 +21,7 @@ type Props = {
   operatorEmail?: string | null
 }
 
-type WaitFilter = 'ALL' | 'JACKIE' | 'AUTHOR' | 'SYSTEM' | 'BLOCKED' | 'EXCEPTION'
+type WaitFilter = 'ALL' | 'JACKIE' | 'AUTHOR' | 'PUBLISHING' | 'PROVIDER' | 'BLOCKED' | 'EXCEPTION'
 
 export function PublisherPipelineClient({ initialPipeline, signedIn, operatorEmail }: Props) {
   const [pipeline, setPipeline] = useState(initialPipeline)
@@ -34,7 +34,8 @@ export function PublisherPipelineClient({ initialPipeline, signedIn, operatorEma
     const cards = pipeline?.cards || []
     if (waitFilter === 'JACKIE') return cards.filter((card) => card.waitingOn === 'Jackie')
     if (waitFilter === 'AUTHOR') return cards.filter((card) => card.waitingOn === 'Author')
-    if (waitFilter === 'SYSTEM') return cards.filter((card) => card.waitingOn === 'System')
+    if (waitFilter === 'PUBLISHING') return cards.filter((card) => card.waitingOn === 'JM Publishing' || card.waitingOn === 'System')
+    if (waitFilter === 'PROVIDER') return cards.filter((card) => card.waitingOn === 'External')
     if (waitFilter === 'BLOCKED') return cards.filter((card) => card.attention === 'Blocked')
     if (waitFilter === 'EXCEPTION') return cards.filter((card) => card.attention === 'Exception')
     return cards
@@ -126,10 +127,10 @@ export function PublisherPipelineClient({ initialPipeline, signedIn, operatorEma
               {refreshing ? 'Refreshing' : 'Refresh'}
             </button>
             <a
-              href="/publisher/operating-center"
+              href="/publisher/operating-center?view=diagnostics"
               className="inline-flex min-h-[40px] items-center rounded-full border border-white/10 px-4 text-[12px] font-semibold uppercase tracking-[0.08em] text-white/60"
             >
-              Operating Center
+              Diagnostics
             </a>
             <button
               type="button"
@@ -151,16 +152,12 @@ export function PublisherPipelineClient({ initialPipeline, signedIn, operatorEma
 
         {pipeline && (
           <>
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5 2xl:grid-cols-9">
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
               <Summary label="Active titles" value={pipeline.summary.totalTitles} />
-              <Summary label="Placed" value={pipeline.summary.placedTitles} />
-              <Summary label="Needs Jackie" value={pipeline.summary.needsJackie} tone="amber" />
-              <Summary label="Waiting author" value={pipeline.summary.waitingOnAuthor} tone="blue" />
-              <Summary label="Waiting system" value={pipeline.summary.waitingOnSystem} />
-              <Summary label="Blocked" value={pipeline.summary.blocked} tone="amber" />
-              <Summary label="Exceptions" value={pipeline.summary.exceptions} tone="rose" />
-              <Summary label="Reconcile" value={pipeline.summary.reconciliationRequired} tone="rose" />
-              <Summary label="Historical refs" value={pipeline.summary.suppressedHistoricalReferences} />
+              <Summary label="Waiting on author" value={pipeline.summary.waitingOnAuthor} tone="blue" />
+              <Summary label="Waiting on Publishing" value={pipeline.summary.waitingOnPublishing} />
+              <Summary label="Waiting on provider" value={pipeline.summary.waitingOnProvider} />
+              <Summary label="Needs reconciliation" value={pipeline.summary.reconciliationRequired} tone="rose" />
             </div>
 
             <div className="mt-5 flex flex-col gap-3 border border-white/10 bg-white/[0.035] p-4 lg:flex-row lg:items-center lg:justify-between">
@@ -203,7 +200,8 @@ export function PublisherPipelineClient({ initialPipeline, signedIn, operatorEma
                   ['ALL', 'All'],
                   ['JACKIE', 'Jackie'],
                   ['AUTHOR', 'Author'],
-                  ['SYSTEM', 'System'],
+                  ['PUBLISHING', 'Publishing'],
+                  ['PROVIDER', 'Provider'],
                   ['BLOCKED', 'Blocked'],
                   ['EXCEPTION', 'Exception'],
                 ].map(([id, label]) => (
@@ -351,10 +349,15 @@ function PipelineCard({ card, selected, onSelect }: { card: HumanPipelineCard; s
       <div className="mt-3 flex flex-wrap gap-2">
         <Badge label={card.waitingOn} tone={badgeTone(card.waitingOn, card.attention)} />
         <Badge label={card.attention} tone={card.attention === 'Blocked' || card.attention === 'Exception' ? 'rose' : 'neutral'} />
+        {!card.workspaceStateSupported && <Badge label="Workspace state gap" tone="amber" />}
       </div>
-      <p className="mt-3 text-[12px] leading-5 text-white/72">{card.conciseStatus}</p>
+      <p className="mt-3 text-[11px] leading-5 text-white/45">{card.stageLabel}</p>
+      <p className="mt-2 line-clamp-3 text-[12px] leading-5 text-white/80">{card.nextAction || card.conciseStatus}</p>
+      {card.waitAgeDays !== null && card.waitingOn !== 'Not Waiting' && (
+        <p className="mt-2 text-[11px] text-white/55">Waiting {card.waitAgeDays} day{card.waitAgeDays === 1 ? '' : 's'}</p>
+      )}
+      {card.blocker && <p className="mt-2 line-clamp-2 text-[11px] leading-5 text-rose-200">Blocked: {card.blocker}</p>}
       <div className="mt-3 grid gap-1.5 text-[11px] leading-5 text-white/45">
-        <p>{card.imprint}</p>
         <p>{card.package}</p>
       </div>
     </button>
@@ -418,6 +421,7 @@ function DetailPanel({ card }: { card: HumanPipelineCard | HumanPipelineReconcil
           <MiniFact label="Substage" value={card.substage} />
           <MiniFact label="Status" value={card.conciseStatus} />
           <MiniFact label="Waiting On" value={card.waitingOn} />
+          <MiniFact label="Waiting Since" value={card.waitingSince ? formatDateTime(card.waitingSince) : 'Not recorded'} />
           <MiniFact label="Attention" value={card.attention} />
           <MiniFact label="Confidence" value={card.confidence} />
         </DetailBlock>
@@ -444,6 +448,7 @@ function DetailPanel({ card }: { card: HumanPipelineCard | HumanPipelineReconcil
           <MiniFact label="Imprint" value={card.imprint} />
           <MiniFact label="Package" value={card.package} />
           <MiniFact label="Recent Movement" value={card.recentMovement || 'No recent movement surfaced'} />
+          <MiniFact label="Workspace state" value={card.workspaceStateSupported ? 'Active-state evidence present; path parity not verified here' : card.workspaceReason || 'Not verified'} />
         </DetailBlock>
 
         <a
@@ -506,7 +511,7 @@ function AttentionDot({ attention }: { attention: HumanPipelineCard['attention']
 function badgeTone(waitingOn: HumanPipelineCard['waitingOn'], attention: HumanPipelineCard['attention']) {
   if (attention === 'Exception' || attention === 'Blocked') return 'rose'
   if (waitingOn === 'Jackie') return 'amber'
-  if (waitingOn === 'Author' || waitingOn === 'System') return 'blue'
+  if (waitingOn === 'Author' || waitingOn === 'System' || waitingOn === 'JM Publishing') return 'blue'
   return 'neutral'
 }
 
