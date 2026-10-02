@@ -49,6 +49,11 @@ function hold(event) {
 
 function messageRecord(message, mailbox, query, extractedAt) {
   if (!message?.id) fail("PORTFOLIO_MAIL_GRAPH_ID_MISSING");
+  if (!MAILBOXES.includes(mailbox) || !["receivedDateTime", "sentDateTime"].includes(query)) fail("PORTFOLIO_MAIL_QUERY_NOT_ALLOWED");
+  const timestamp = Date.parse(message[query]);
+  if (!Number.isFinite(timestamp) || timestamp < Date.parse(WINDOW.start) || timestamp >= Date.parse(WINDOW.endExclusive)) {
+    fail("PORTFOLIO_MAIL_ROW_OUTSIDE_QUERY_WINDOW");
+  }
   const sender = address(message.from);
   const body = typeof message.body?.content === "string" ? message.body.content : null;
   return {

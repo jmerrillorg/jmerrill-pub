@@ -11,7 +11,7 @@ function message(id) {
   return { id, internetMessageId: `<${id}@example.org>`, conversationId: "thread-1",
     parentFolderId: "folder-1", from: { emailAddress: { address: "author@example.org" } },
     toRecipients: [{ emailAddress: { address: "publishing@jmerrill.one" } }],
-    ccRecipients: [], bccRecipients: [], receivedDateTime: "2026-09-21T12:00:00Z",
+    ccRecipients: [], bccRecipients: [], receivedDateTime: "2026-09-21T12:00:00Z", sentDateTime: "2026-09-21T12:00:00Z",
     subject: "Review", bodyPreview: "Short preview", body: { content: "Private message body" },
     hasAttachments: false };
 }
@@ -145,6 +145,8 @@ test("complete manifest is written only after both mailboxes and both timestamp 
   assert.throws(() => validateEvidenceImport({ ...result, queries: result.queries.slice(1) }, document, coverage), /INCOMPLETE_MAILBOX/);
   assert.throws(() => validateEvidenceImport(result, { ...document, events: [] }, coverage), /DIGEST/);
   assert.throws(() => validateEvidenceImport(result, document, { ...coverage, unmatchedFolderIds: ["missing"] }), /FOLDER_COVERAGE/);
+  assert.throws(() => validateEvidenceImport({ ...result, rawRowCountBeforeSameMailboxDeduplication: 99 }, document, coverage), /ROW_COUNT/);
+  assert.throws(() => validateEvidenceImport({ ...result, graphDistinctCount: 99 }, document, coverage), /GRAPH_COUNT/);
   assert.equal([...writes.keys()].some((key) => key.endsWith("manifest.json")), true);
   writes.clear();
   await assert.rejects(runPortfolioMailboxReconciliation({ ...deps,
@@ -265,4 +267,11 @@ test("inbound evidence restart reuses per-record metadata without copying bodies
   assert.equal(reads, 3);
   assert.equal(records.length, 2);
   assert.equal(JSON.stringify(records).includes("private full body"), false);
+});
+
+test("missing or out-of-window timestamps fail the extraction rather than contaminating coverage", () => {
+  for (const timestamp of [null, "invalid", "2026-07-03T03:59:59Z", "2026-10-02T04:00:00Z"]) {
+    assert.throws(() => messageRecord({ ...message("m"), receivedDateTime: timestamp }, "publishing@jmerrill.one", "receivedDateTime", "now"), /OUTSIDE_QUERY_WINDOW/);
+  }
+  assert.equal(messageRecord({ ...message("m"), receivedDateTime: "2026-07-03T04:00:00Z" }, "publishing@jmerrill.one", "receivedDateTime", "now").graphMessageId, "m");
 });
