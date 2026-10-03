@@ -8,6 +8,8 @@
 
 OP-006 provides a governed cover design readiness surface for title production. It tracks cover brief, market fit, BP-09 cover validation, author review posture, final cover packet readiness, and publisher approval.
 
+The `Complete / Operational` status above applies to the read-only command-center route, not to system-owned artwork generation or print-cover production. The separate cover producer remains uncommissioned until title-authority ingestion, durable execution/storage, concept and review-package QA, human approval, and deterministic final-format assembly are production-proven.
+
 ## Operational Behavior
 
 - Dataverse remains the operational source of truth.
