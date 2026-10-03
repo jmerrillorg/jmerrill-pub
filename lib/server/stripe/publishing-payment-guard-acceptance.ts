@@ -42,7 +42,7 @@ export async function executeGuardAcceptance(input: GuardAcceptanceRequest, depe
     const claim = current.claim
     // Only the deliberate metadata-only orphan or a completed fixture failure is recoverable here.
     const isAbandoned = claim.payloadHash === paymentMutationHash(fixturePayload('ABANDON'))
-    const isFailed = claim.status === 'RECOVERY_REQUIRED' && claim.payloadHash === paymentMutationHash(fixturePayload('FAIL'))
+    const isFailed = ['RECOVERY_REQUIRED', 'RELEASED'].includes(claim.status) && claim.payloadHash === paymentMutationHash(fixturePayload('FAIL'))
     if (claim.kind !== 'SCHEDULE_ADJUSTMENT' || (!isAbandoned && !isFailed)) {
       throw new Error('PAYMENT_GUARD_ACCEPTANCE_RECOVERY_DENIED')
     }

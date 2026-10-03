@@ -347,6 +347,9 @@ test('nonfinancial acceptance proves separate request contention, failure, orpha
   const failed = await store.read(PAYMENT_GUARD_ACCEPTANCE_ID)
   assert.equal(failed.claim.status, 'RECOVERY_REQUIRED')
   await executeGuardAcceptance({ action: 'RECOVER', runId: failureRunId, claimId: failed.claim.claimId }, dep)
+  const receiptCount = store.receipts.length
+  await executeGuardAcceptance({ action: 'RECOVER', runId: failureRunId, claimId: failed.claim.claimId }, dep)
+  assert.equal(store.receipts.length, receiptCount)
   const orphan = await executeGuardAcceptance({ action: 'ABANDON', runId: '33333333-3333-4333-8333-333333333333' }, dep)
   assert.equal(orphan.readback.claim.status, 'HELD')
   const independent = new AgreementPaymentGuard(store)
