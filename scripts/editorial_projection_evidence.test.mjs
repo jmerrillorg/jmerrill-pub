@@ -1,12 +1,33 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
-import { sameProjectionTitle, isBoundEditorialTransition, hasDeliveredPendingReview, selectCurrentEditorialStage } from '../lib/publishing/lifecycle/editorial-projection-evidence.ts'
+import { boundPublisherReview, sameProjectionTitle, isBoundEditorialTransition, hasDeliveredPendingReview, selectCurrentEditorialStage } from '../lib/publishing/lifecycle/editorial-projection-evidence.ts'
 
 const binding = {
   titleId: 'daf8180f-85a3-f111-b8de-000d3a14673b',
   stageId: 'ae3c9d5e-67b5-f111-aaab-000d3a10aa9c',
   gateId: '4d04daa2-67b5-f111-aaac-000d3a14673b',
 }
+
+test('publisher review survives stale awaiting-author summary using exact capture and owner evidence', () => {
+  const gate = {jm1pub_editorialapprovalgateid: binding.gateId, _jm1pub_titleid_value: binding.titleId,
+    jm1pub_gatestatus: 196650002, jm1pub_authordecision: null, createdon: '2026-09-21T00:00:00Z',
+    jm1pub_authorresponsesummary: 'Package sent. Awaiting author response.'}
+  const base = {jm1_sourceentity: 'jm1pub_editorialapprovalgate', jm1_sourcerecordid: binding.gateId, createdon: '2026-10-02T19:13:14Z'}
+  const captured = {...base, jm1_actiontype: 'AUTHOR_RESPONSE_CAPTURED',
+    jm1_actiondescription: `title=${binding.titleId}; Idempotency: author-review-response:abcd.`}
+  const review = {...base, jm1_executionlogid: 'evidence1', jm1_actiontype: 'AUTHOR_RESPONSE_REQUIRES_PUBLISHER_REVIEW',
+    jm1_actiondescription: 'Idempotency: author-review-response:abcd.'}
+  assert.equal(boundPublisherReview(gate, [captured,review]), review)
+  assert.equal(boundPublisherReview(gate, [review]), null)
+  assert.equal(boundPublisherReview(gate, [captured,{...review,jm1_sourcerecordid:binding.stageId}]), null)
+  assert.equal(boundPublisherReview(gate, [captured,{...review,jm1_sourceentity:'contact'}]), null)
+  assert.equal(boundPublisherReview(gate, [{...captured,jm1_actiondescription:`title=${binding.stageId}; Idempotency: author-review-response:abcd.`},review]), null)
+  assert.equal(boundPublisherReview(gate, [captured,{...review,jm1_actiondescription:'Idempotency: author-review-response:aaaa.'}]), null)
+  assert.equal(boundPublisherReview({...gate,jm1pub_awaitingsince:'2026-10-03T00:00:00Z'}, [captured,review]), null)
+  assert.equal(boundPublisherReview({...gate,jm1pub_authordecision:0}, [captured,review]), null)
+  assert.equal(boundPublisherReview({...gate,jm1pub_nextstageauthorized:true}, [captured,review]), null)
+  assert.equal(gate.jm1pub_authordecision, null)
+})
 test('title binding requires an exact canonical GUID, not a name or absent identity', () => {
   assert.equal(sameProjectionTitle(binding.titleId, binding.titleId.toUpperCase()), true)
   assert.equal(sameProjectionTitle('Whole', 'Whole'), false)

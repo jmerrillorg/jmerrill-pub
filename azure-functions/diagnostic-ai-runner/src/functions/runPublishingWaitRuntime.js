@@ -4,7 +4,11 @@ const { app } = require("@azure/functions");
 const { createPublishingWaitRuntime, SIGNAL_QUEUE } = require("../lifecycle/publishingWaitRuntime");
 const { dispatchPublishingWait, reconcilePublishingWaits } = require("../lifecycle/publishingWaitCoordinator");
 
-async function runWaitReconciliation(runtime) {
+async function runWaitReconciliation(runtime, { observationOnly = false } = {}) {
+  if (observationOnly) {
+    const health = await runtime.publishHealth([], [], { observationOnly: true });
+    return { registered: 0, observationOnly: true, health, results: [] };
+  }
   let produced;
   try { produced = await runtime.produceAuthorWaits(); }
   catch (error) { produced = { registered: 0, failures: [{ code: error.safeCode || "PUBLISHING_WAIT_PRODUCER_FAILED" }] }; }
@@ -21,9 +25,12 @@ if (process.env.JM1_PUBLISHING_WAIT_RUNTIME_ENABLED === "true") {
       context.info(`Publishing wait resume: ${result.status}`);
     }
   });
+}
+if (process.env.JM1_PUBLISHING_WAIT_RUNTIME_ENABLED === "true" || process.env.JM1_PUBLISHING_WAIT_OBSERVATION_ENABLED === "true") {
   app.timer("reconcile-publishing-waits", {
     schedule: "0 */5 * * * *", handler: async (_timer, context) => {
-      const result = await runWaitReconciliation(createPublishingWaitRuntime({ observe: (event) => context.info(JSON.stringify(event)) }));
+      const result = await runWaitReconciliation(createPublishingWaitRuntime({ observe: (event) => context.info(JSON.stringify(event)) }),
+        { observationOnly: process.env.JM1_PUBLISHING_WAIT_RUNTIME_ENABLED !== "true" });
       context.info(`Publishing wait health: ${JSON.stringify(result.health)}`);
       if (result.health.failures.length) throw Object.assign(new Error("Publishing waits require owner review"), { safeCode: "PUBLISHING_WAIT_FAILURES" });
     }

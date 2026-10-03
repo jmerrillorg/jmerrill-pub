@@ -9,7 +9,7 @@ const { BlobInboundEvidenceStore } = require("../mail/inbound/blobEvidenceStore"
 const { PublishingMailboxGraphClient } = require("../mail/inbound/graphClient");
 const { verifyCorrespondenceIdentity, bindCorrespondenceIdentity, declaredCorrespondenceEmail } = require("../mail/inbound/correspondenceIdentity");
 const { OWNER_BY_TYPE } = require("./publishingWaitResumeAdapter");
-const { waitRuntimeOwnsTitle } = require("./publishingWaitEnablement");
+const { waitRuntimeOwnsTitle, waitRuntimeMonitorsTitle } = require("./publishingWaitEnablement");
 const { recoverCadenceDelivery } = require("../mail/inbound/cadenceDeliveryRecovery");
 const PROJECTION_CONTAINER = "jm1-publishing-wait-projections";
 const SIGNAL_QUEUE = "jm1-publishing-wait-signals";
@@ -30,6 +30,7 @@ function createPublishingWaitRuntime(deps = {}) {
   const runtime = {
     store, handlers: owners, now: deps.now, observe: deps.observe,
     canDispatch: (wait) => waitRuntimeOwnsTitle(wait.titleId),
+    canMonitor: (wait) => waitRuntimeMonitorsTitle(wait.titleId),
     readAuthority: (wait) => owner(wait).readAuthority(wait),
     verifyCondition: (wait, authority) => owner(wait).verifyCondition(wait, authority),
     async publishReady(signal) {
@@ -85,22 +86,39 @@ function createPublishingWaitRuntime(deps = {}) {
       }
       return { registered, failures };
     },
-    async publishHealth(results, producerFailures = []) {
-      const health = { observedAt: (deps.now?.() || new Date()).toISOString(), counts: {}, failures: [...producerFailures] };
+    async publishHealth(results, producerFailures = [], { observationOnly = false } = {}) {
+      const now = deps.now?.() || new Date();
+      const health = { observedAt: now.toISOString(), counts: {}, failures: [...producerFailures], businessWaits: [] };
       for (const item of results) {
         health.counts[item.status] = (health.counts[item.status] || 0) + 1;
         if (["FAILURE_RECORDED", "FAILED"].includes(item.status)) health.failures.push({ waitId: item.waitId, code: item.code });
       }
       for await (const { value } of store.list()) {
+        if (observationOnly && !runtime.canMonitor(value)) continue;
         if (value.status === "FAILED") health.failures.push({ waitId: value.waitId, code: value.lastFailure?.code });
         if (value.status === "RESUMED") {
           const receipt = { schemaVersion: 1, owner: "jmerrillorg/jmerrill-pub", status: "RESUMED", waitId: value.waitId,
             sourceEventId: value.resumeResult.sourceEventId, owningRuntime: value.resumeResult.owningRuntime,
-            evidenceId: value.resumeResult.evidenceId, resumedAt: value.resumeResult.resumedAt };
+            evidenceId: value.resumeResult.evidenceId, resumedAt: value.resumeResult.resumedAt,
+            businessStateResult: value.resumeResult.businessStateResult };
+          if (runtime.canMonitor(value) && value.resumeResult.businessStateResult === "PUBLISHER_REVIEW_REQUIRED") {
+            try {
+              const adapter = owner(value);
+              if (!adapter.readBusinessWait) throw Object.assign(new Error("BUSINESS_WAIT_READER_UNAVAILABLE"), { safeCode: "BUSINESS_WAIT_READER_UNAVAILABLE" });
+              const businessWait = await adapter.readBusinessWait(value);
+              health.businessWaits.push({ waitId: value.waitId, titleId: value.titleId, stageId: value.stageId,
+                ...businessWait, checkedAt: now.toISOString(), nextCheckAt: new Date(now.getTime() + 300000).toISOString() });
+              if (businessWait.status !== "WAITING_FOR_PUBLISHER_REVIEW") {
+                health.failures.push({ waitId: value.waitId, code: "BUSINESS_WAIT_OWNER_REVALIDATION_REQUIRED" });
+              }
+            } catch (error) {
+              health.failures.push({ waitId: value.waitId, code: error.safeCode || "BUSINESS_WAIT_READ_FAILED" });
+            }
+          }
           await projection.getBlockBlobClient(`receipts/${value.waitId}.json`).uploadData(Buffer.from(JSON.stringify(receipt)),
             { blobHTTPHeaders: { blobContentType: "application/json" } });
         }
-        if (["RESUMED", "CANCELLED", "SUPERSEDED", "FAILED"].includes(value.status)) {
+        if (!observationOnly && ["RESUMED", "CANCELLED", "SUPERSEDED", "FAILED"].includes(value.status)) {
           await projection.getBlockBlobClient(`ready/${value.waitId}.json`).deleteIfExists();
         }
       }

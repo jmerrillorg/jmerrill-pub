@@ -41,13 +41,10 @@ const expectedStages = [
 ]
 
 test('Publisher Pipeline declares exactly the 16 human-facing stages in order', () => {
-  const stageCalls = [...model.matchAll(/stage\('([^']+)', '([^']+)', '([^']+)'/g)].map((match) => [
-    match[1],
-    match[2],
-    match[3],
-  ])
-
-  assert.deepEqual(stageCalls, expectedStages)
+  const definitions = JSON.parse(readFileSync('lib/publishing/lifecycle/stage-definitions.json', 'utf8'))
+  assert.match(model, /import stageDefinitions from '\.\/stage-definitions\.json'/)
+  assert.match(model, /stageDefinitions\.map/)
+  assert.deepEqual(definitions.map(item => [item.id, item.id.slice(0, 2), item.label]), expectedStages)
 })
 
 test('Every human-facing stage exposes executable artifact and transition authority', () => {
