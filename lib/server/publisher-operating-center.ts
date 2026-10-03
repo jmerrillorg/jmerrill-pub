@@ -1597,12 +1597,19 @@ async function getRecentEditorialStages(config: DataverseServerConfig) {
 }
 
 async function getRecentApprovalGates(config: DataverseServerConfig) {
-  return dataverseList(config, 'jm1pub_editorialapprovalgates', {
-    $select:
-      'jm1pub_editorialapprovalgateid,jm1pub_editorialapprovalgatename,jm1pub_gatecode,jm1pub_gatestatus,jm1pub_authordecision,jm1pub_authorresponsesummary,jm1pub_authordecisionon,jm1pub_authordecisionsource,jm1pub_nextstageauthorized,jm1pub_awaitingsince,_jm1pub_titleid_value,_jm1pub_editorialstageid_value,_jm1pub_deliverableartifactid_value,createdon,modifiedon',
+  const fields = 'jm1pub_editorialapprovalgateid,jm1pub_editorialapprovalgatename,jm1pub_gatecode,jm1pub_gatestatus,jm1pub_authordecision,jm1pub_authorresponsesummary,jm1pub_authordecisionon,jm1pub_authordecisionsource,jm1pub_nextstageauthorized,jm1pub_awaitingsince,_jm1pub_titleid_value,_jm1pub_editorialstageid_value,_jm1pub_deliverableartifactid_value,createdon,modifiedon'
+  const recent = await dataverseList(config, 'jm1pub_editorialapprovalgates', {
+    $select: fields,
     $orderby: 'modifiedon desc',
     $top: '100',
   })
+  const pending = await dataverseList(config, 'jm1pub_editorialapprovalgates', {
+    $select: fields,
+    $filter: 'statecode eq 0 and jm1pub_gatestatus eq 196650002 and jm1pub_authordecision eq null',
+    $orderby: 'modifiedon desc', $top: '5000',
+  })
+  if (pending.length >= 5000) throw new Error('PENDING_REVIEW_GATE_SCOPE_LIMIT')
+  return [...new Map([...recent, ...pending].map(gate => [stringValue(gate.jm1pub_editorialapprovalgateid), gate])).values()]
 }
 
 async function getRecentOpportunities(config: DataverseServerConfig) {
@@ -4647,7 +4654,7 @@ function royaltyDecisionTodayItem(royalties: PublisherRoyaltyReviewQueue): Publi
   }
 }
 
-function buildAuthorResponseQueue(
+export function buildAuthorResponseQueue(
   gates: DataverseRow[],
   titles: DataverseRow[],
   logs: DataverseRow[],
