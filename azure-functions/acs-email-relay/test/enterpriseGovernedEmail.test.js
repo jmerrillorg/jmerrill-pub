@@ -30,6 +30,9 @@ function loadEnterpriseRelayModule(options = {}) {
       }
       if (name.startsWith("../")) {
         const dependency = require(path.join(path.dirname(filePath), name));
+        if (name === "../security/callerAuthentication" && options.caller) {
+          return { ...dependency, authenticateCaller: () => ({ ok: true, caller: options.caller, authModel: "ENTRA_WORKLOAD_IDENTITY" }) };
+        }
         return name === "../state/messageLedger" && options.ledger
           ? { ...dependency, getMessageLedger: () => options.ledger } : dependency;
       }
@@ -470,4 +473,179 @@ test("Productions rights and contract language requires human review", () => {
   }));
   assert.equal(result.ok, false);
   assert.equal(result.reason, "HUMAN_REVIEW_REQUIRED_RIGHTS_CONTRACT");
+});
+
+const bp09Headers = () => workloadHeaders("38b09d6f-34d9-48b3-9627-f04c047fd534");
+const bp09Payload = () => ({
+  brand: "JMPRODUCTIONS", to: "productions@jmerrill.one",
+  templateId: "PRODUCTIONS.BP09_NOTICE", templateVersion: "1.0.0",
+  templateData: { referenceId: "90000000-0000-4000-a000-000000000009", leadId: "90000000-0000-4000-a000-000000000010" }
+});
+const quietContext = { warn() {}, info() {}, error() {} };
+
+test("BP09 no-send probe validates the complete bounded contract with no provider or ledger access", async () => {
+  const forbidden = () => { throw new Error("SIDE_EFFECT_FORBIDDEN"); };
+  const relay = loadEnterpriseRelayModule({ client: { beginSend: forbidden }, ledger: { reserve: forbidden } });
+  const result = await relay.routes["relay-authority-probe"].handler(routeRequest(bp09Payload(), bp09Headers()));
+  assert.equal(result.status, 200);
+  assert.equal(result.jsonBody.noSend, true);
+  assert.equal(result.jsonBody.callerId, "one-bp09-productions-prod");
+  assert.equal(result.jsonBody.recipient, "productions@jmerrill.one");
+  assert.equal(result.jsonBody.senderAddress, "productions@email.jmerrill.one");
+  assert.equal(result.jsonBody.replyTo, "productions@jmerrill.one");
+});
+
+test("BP09 denies all nonreference fields and cross-brand sender/destination overrides without reflecting content", async () => {
+  const relay = loadEnterpriseRelayModule({ ledger: { reserve() { throw new Error("MUST_NOT_RESERVE"); } } });
+  const mutations = [
+    (p) => ({ ...p, brand: "JMP" }),
+    (p) => ({ ...p, to: "jackie@jmerrill.one" }),
+    (p) => ({ ...p, to: ["productions@jmerrill.one", "client@example.com"] }),
+    (p) => ({ ...p, templateId: "PRODUCTIONS.OTHER" }),
+    (p) => ({ ...p, templateVersion: "2.0.0" }),
+    ...["subject", "html", "plainText", "body", "bodyText", "sourceRecord", "from", "senderAddress", "replyTo", "cc", "bcc", "recipients", "attachments", "idempotencyKey", "correlationId", "recordLink"].map(
+      (key) => (p) => ({ ...p, [key]: "PRIVATE_INQUIRY_DO_NOT_LOG" })),
+    (p) => ({ ...p, templateData: { ...p.templateData, message: "PRIVATE_INQUIRY_DO_NOT_LOG" } }),
+    (p) => ({ ...p, templateData: { ...p.templateData, leadId: "https://evil.invalid/PRIVATE_INQUIRY_DO_NOT_LOG" } }),
+    (p) => ({ ...p, templateData: { ...p.templateData, referenceId: "00000000-0000-0000-0000-000000000000" } }),
+    (p) => ({ ...p, templateData: null }),
+    () => null, () => [], () => "PRIVATE_INQUIRY_DO_NOT_LOG"
+  ];
+  for (const mutate of mutations) {
+    for (const name of ["send-enterprise-governed-email", "relay-authority-probe"]) {
+      const result = await relay.routes[name].handler(routeRequest(mutate(bp09Payload()), bp09Headers()), quietContext);
+      assert.equal(result.status, 400, name);
+      assert.equal(JSON.stringify(result).includes("PRIVATE_INQUIRY_DO_NOT_LOG"), false);
+    }
+  }
+});
+
+test("BP09 probe and send enforce inactive, revoked and wrong registry scopes before side effects", async () => {
+  const { findCallerByObjectId } = require("../src/policy/callerRegistry");
+  const caller = findCallerByObjectId("38b09d6f-34d9-48b3-9627-f04c047fd534");
+  const cases = [
+    [{ status: "INACTIVE" }, "CALLER_INACTIVE"],
+    [{ status: "REVOKED" }, "CALLER_INACTIVE"],
+    [{ authorizedBrands: [] }, "CALLER_BRAND_NOT_AUTHORIZED"],
+    [{ authorizedBrands: ["JMP"] }, "CALLER_BRAND_NOT_AUTHORIZED"],
+    [{ authorizedTemplates: [] }, "CALLER_TEMPLATE_NOT_AUTHORIZED"],
+    [{ authorizedTemplates: ["PRODUCTIONS.OTHER"] }, "CALLER_TEMPLATE_NOT_AUTHORIZED"],
+    [{ authorizedRecipients: [] }, "CALLER_RECIPIENT_NOT_AUTHORIZED"],
+    [{ authorizedRecipients: ["jackie@jmerrill.one"] }, "CALLER_RECIPIENT_NOT_AUTHORIZED"]
+  ];
+  for (const [changes, reason] of cases) {
+    let sideEffects = 0;
+    const forbidden = () => { sideEffects++; throw new Error("SIDE_EFFECT_FORBIDDEN"); };
+    const relay = loadEnterpriseRelayModule({ caller: { ...caller, ...changes },
+      client: { beginSend: forbidden }, ledger: { reserve: forbidden } });
+    for (const name of ["relay-authority-probe", "send-enterprise-governed-email"]) {
+      const result = await relay.routes[name].handler(routeRequest(bp09Payload(), bp09Headers()), quietContext);
+      assert.equal(result.status, 403, `${name}: ${JSON.stringify(changes)}`);
+      assert.equal(result.jsonBody.reason, reason);
+      assert.notEqual(result.jsonBody.authorized, true);
+    }
+    assert.equal(sideEffects, 0);
+  }
+});
+
+test("BP09 template cannot be borrowed by Publishing, JSJ, diagnostic, anonymous or unknown callers", async () => {
+  const relay = loadEnterpriseRelayModule({ ledger: { reserve() { throw new Error("MUST_NOT_RESERVE"); } } });
+  for (const oid of ["ce363f5a-94f3-4ea9-9ba3-061404fca098", "8a488b86-7a1a-4978-8705-6fbc3bd8ce15", "e8c51a80-bdb0-46fa-b398-9109719d6427", "00000000-0000-4000-a000-000000000001"]) {
+    const result = await relay.routes["send-enterprise-governed-email"].handler(routeRequest(bp09Payload(), workloadHeaders(oid)), quietContext);
+    assert.equal(result.status, 403);
+  }
+  assert.equal((await relay.routes["send-enterprise-governed-email"].handler(routeRequest(bp09Payload()), quietContext)).status, 401);
+});
+
+test("BP09 rendering is internal-only, reference-only and fixes links to the existing Lead authority", () => {
+  const relay = loadEnterpriseRelayModule();
+  const rendered = relay.validateEnterprisePayload(bp09Payload());
+  assert.equal(rendered.ok, true);
+  assert.equal(rendered.value.renderMetadata.audience, "INTERNAL_OPERATIONS");
+  assert.match(rendered.value.html, /https:\/\/jm1hq\.crm\.dynamics\.com\/main\.aspx\?pagetype=entityrecord&amp;etn=lead&amp;id=90000000-0000-4000-a000-000000000010/);
+  assert.equal(rendered.value.idempotencyKey, "bp09:productions:notice:90000000-0000-4000-a000-000000000009");
+  assert.equal(rendered.value.businessObjectId, bp09Payload().templateData.referenceId);
+  assert.equal(rendered.value.to.length, 1);
+  assert.equal(rendered.value.cc[0].address, "productions@jmerrill.one");
+  assert.equal(rendered.value.renderMetadata.htmlSha256.length, 64);
+});
+
+function bp09MemoryTable() {
+  const rows = new Map();
+  return { rows, async createTable() {},
+    async createEntity(row) {
+      const key = `${row.partitionKey}/${row.rowKey}`;
+      if (rows.has(key)) throw Object.assign(new Error("exists"), { statusCode: 409 });
+      rows.set(key, { ...row });
+    },
+    async getEntity(pk, rk) { return { ...rows.get(`${pk}/${rk}`) }; },
+    async updateEntity(row) {
+      const key = `${row.partitionKey}/${row.rowKey}`;
+      rows.set(key, { ...rows.get(key), ...row });
+    }
+  };
+}
+
+test("BP09 accepted replay survives runtime recreation and changed Lead conflicts without second provider call", async () => {
+  const { createLedger } = require("../src/state/messageLedger");
+  const table = bp09MemoryTable();
+  let sends = 0;
+  const options = () => ({ env: { ACS_CONNECTION_STRING: "fixture" }, ledger: createLedger(table),
+    client: { beginSend: async () => { sends++; return { pollUntilDone: async () => ({ status: "Succeeded", id: "provider-bp09" }) }; } } });
+  const send = (relay, payload = bp09Payload()) => relay.routes["send-enterprise-governed-email"].handler(routeRequest(payload, bp09Headers()), quietContext);
+  const first = await send(loadEnterpriseRelayModule(options()));
+  assert.equal(first.status, 202);
+  assert.equal(first.jsonBody.providerMessageId, "provider-bp09");
+  const restarted = loadEnterpriseRelayModule(options());
+  const replay = await send(restarted);
+  assert.equal(replay.status, 200);
+  assert.equal(replay.jsonBody.replay, true);
+  assert.equal(replay.jsonBody.jm1MessageId, first.jsonBody.jm1MessageId);
+  const changed = bp09Payload();
+  changed.templateData.leadId = "90000000-0000-4000-a000-000000000011";
+  const conflict = await send(restarted, changed);
+  assert.equal(conflict.status, 409);
+  assert.equal(conflict.jsonBody.accepted, false);
+  assert.equal(conflict.jsonBody.code, "IDEMPOTENCY_KEY_CONFLICT");
+  assert.equal(sends, 1);
+  assert.equal(table.rows.size, 1);
+  const stored = [...table.rows.values()][0];
+  assert.equal(stored.communicationState, "PROVIDER_ACCEPTED");
+  assert.equal(stored.providerMessageId, "provider-bp09");
+  for (const field of ["templateData", "html", "plainText", "subject", "message", "submission"]) assert.equal(Object.hasOwn(stored, field), false);
+});
+
+test("BP09 ambiguous send remains submitted after restart, exact retry does not resend", async () => {
+  const { createLedger } = require("../src/state/messageLedger");
+  const table = bp09MemoryTable();
+  let sends = 0;
+  const options = () => ({ env: { ACS_CONNECTION_STRING: "fixture" }, ledger: createLedger(table),
+    client: { beginSend: async () => { sends++; throw new Error("transport timeout"); } } });
+  const send = (relay) => relay.routes["send-enterprise-governed-email"].handler(routeRequest(bp09Payload(), bp09Headers()), quietContext);
+  const failed = await send(loadEnterpriseRelayModule(options()));
+  assert.equal(failed.status, 502);
+  assert.equal([...table.rows.values()][0].communicationState, "SUBMITTED");
+  const replay = await send(loadEnterpriseRelayModule(options()));
+  assert.equal(replay.status, 202);
+  assert.equal(replay.jsonBody.accepted, false);
+  assert.equal(replay.jsonBody.inProgress, true);
+  assert.equal(sends, 1);
+});
+
+test("BP09 failure before reservation safely retries with the same request", async () => {
+  const { createLedger } = require("../src/state/messageLedger");
+  const ledger = createLedger(bp09MemoryTable());
+  const original = ledger.reserve;
+  let attempts = 0, sends = 0;
+  ledger.reserve = async (input) => {
+    if (++attempts === 1) throw Object.assign(new Error("unavailable"), { safeCode: "MESSAGE_STORE_UNAVAILABLE" });
+    return original(input);
+  };
+  const relay = loadEnterpriseRelayModule({ env: { ACS_CONNECTION_STRING: "fixture" }, ledger,
+    client: { beginSend: async () => { sends++; return { pollUntilDone: async () => ({ status: "Succeeded", id: "provider-retry" }) }; } } });
+  const send = () => relay.routes["send-enterprise-governed-email"].handler(routeRequest(bp09Payload(), bp09Headers()), quietContext);
+  assert.equal((await send()).status, 502);
+  assert.equal(sends, 0);
+  assert.equal((await send()).jsonBody.accepted, true);
+  assert.equal(sends, 1);
 });
