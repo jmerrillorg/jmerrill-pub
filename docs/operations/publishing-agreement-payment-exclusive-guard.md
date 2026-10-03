@@ -70,6 +70,25 @@ in for the owner's actual approval/quiescence/provider evidence resolver.
 
 ## Reviewed rollout and acceptance
 
+The default-off, key-authenticated `/api/author/stripe/payment/guard-acceptance`
+facility operates only against guard namespace
+`00000000-0000-4000-8000-000000000922`. It refuses that namespace if an actual
+agreement record exists. It cannot accept another agreement, amount, provider
+payload or delay. It reuses the existing payment recovery key and needs
+`JMP_PAYMENT_GUARD_ACCEPTANCE_ENABLED=true` temporarily; no new identity/key.
+Disable this flag after readback. Every result explicitly identifies zero
+business effects; guard evidence itself is persisted and must be retained.
+
+The RUN fixture holds for four seconds; a second independent request must be
+denied. FAIL throws before any business action and retains recovery state.
+ABANDON creates a deliberate guard-only orphan without starting a work callback.
+The RECOVER action can release only that exact orphan or completed FAIL fixture,
+never a RUN claim or real agreement. This verifies the protocol, not an actual
+ambiguous Stripe write. Generic financial recovery still requires owner proof.
+GET independently rebuilds the persisted chain. A same-process test is not
+reported as an actual process restart; an authorized restart can additionally
+prove persistence of ABANDON across application processes.
+
 1. Review this PR, run payment CI, typecheck and production build. Resolve normal
    repository and release approval before merge/deployment. Lack of a configured
    GitHub reviewer rule is not evidence of founder approval.

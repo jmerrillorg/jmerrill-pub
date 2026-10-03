@@ -7,6 +7,7 @@ const jiti = createJiti(import.meta.url)
 const { AgreementPaymentGuard, assertAgreementPaymentGuard, paymentMutationHash, paymentGuardHttpStatus } = jiti('../lib/server/stripe/publishing-payment-guard.ts')
 const { DataversePaymentGuardStore, paymentGuardRowId } = jiti('../lib/server/stripe/publishing-payment-guard-store.ts')
 const { executeGovernedScheduleMutation } = jiti('../lib/server/stripe/publishing-schedule-mutation.ts')
+const { executeGuardAcceptance, guardAcceptanceAuthorized, parseGuardAcceptanceRequest, PAYMENT_GUARD_ACCEPTANCE_ID } = jiti('../lib/server/stripe/publishing-payment-guard-acceptance.ts')
 const runtime = jiti('../lib/server/stripe/publishing-payment-runtime.ts')
 const AGREEMENT = '11111111-1111-4111-8111-111111111111'
 const OTHER = '22222222-2222-4222-8222-222222222222'
@@ -316,4 +317,53 @@ test('busy and recovery holds are retryable, never acknowledged as successful we
   const checkout = readFileSync('lib/server/stripe/publishing-additional-payment.ts', 'utf8')
   assert.match(checkout, /ledger\.withAgreementMutation/)
   assert.match(checkout, /PAYMENT_GUARD_AGREEMENT_CHANGED/)
+})
+
+test('guard acceptance is default-off, requires existing privileged key, and rejects scope injection', () => {
+  const env = { JM1_PAYMENT_EVENT_RECOVERY_KEY: 'test-secret' }
+  assert.equal(guardAcceptanceAuthorized('test-secret', env), false)
+  env.JMP_PAYMENT_GUARD_ACCEPTANCE_ENABLED = 'true'
+  assert.equal(guardAcceptanceAuthorized(null, env), false)
+  assert.equal(guardAcceptanceAuthorized('wrong-secret', env), false)
+  assert.equal(guardAcceptanceAuthorized('test-secret', env), true)
+  const good = { action: 'RUN', runId: AGREEMENT }
+  assert.deepEqual(parseGuardAcceptanceRequest(good), good)
+  for (const input of [{ ...good, agreementId: AGREEMENT }, { ...good, holdMs: 999999 },
+    { ...good, action: 'CHARGE' }, { ...good, runId: 'bad' }, { ...good, claimId: 'bad' },
+    { ...good, action: 'RECOVER' }]) assert.throws(() => parseGuardAcceptanceRequest(input), /INPUT_INVALID/)
+})
+
+test('nonfinancial acceptance proves separate request contention, failure, orphan retention and restricted recovery', async () => {
+  const store = new Store(), entered = deferred(), release = deferred()
+  const dep = { store, assertNonBusinessNamespace: async () => {}, delay: async () => { entered.resolve(); await release.promise } }
+  const running = executeGuardAcceptance({ action: 'RUN', runId: AGREEMENT }, dep)
+  await entered.promise
+  await assert.rejects(executeGuardAcceptance({ action: 'RUN', runId: OTHER }, dep), /BUSY/)
+  const live = await store.read(PAYMENT_GUARD_ACCEPTANCE_ID)
+  await assert.rejects(executeGuardAcceptance({ action: 'RECOVER', runId: AGREEMENT, claimId: live.claim.claimId }, dep), /RECOVERY_DENIED/)
+  release.resolve(); await running
+  const failureRunId = '44444444-4444-4444-8444-444444444444'
+  await assert.rejects(executeGuardAcceptance({ action: 'FAIL', runId: failureRunId }, dep), /EXPECTED_FAILURE/)
+  const failed = await store.read(PAYMENT_GUARD_ACCEPTANCE_ID)
+  assert.equal(failed.claim.status, 'RECOVERY_REQUIRED')
+  await executeGuardAcceptance({ action: 'RECOVER', runId: failureRunId, claimId: failed.claim.claimId }, dep)
+  const orphan = await executeGuardAcceptance({ action: 'ABANDON', runId: '33333333-3333-4333-8333-333333333333' }, dep)
+  assert.equal(orphan.readback.claim.status, 'HELD')
+  const independent = new AgreementPaymentGuard(store)
+  assert.equal((await independent.readback(PAYMENT_GUARD_ACCEPTANCE_ID)).claim.claimId, orphan.readback.claim.claimId)
+  await executeGuardAcceptance({ action: 'RECOVER', runId: '33333333-3333-4333-8333-333333333333', claimId: orphan.readback.claim.claimId }, dep)
+  assert.equal((await independent.readback(PAYMENT_GUARD_ACCEPTANCE_ID)).claim.status, 'RELEASED')
+  assert.equal([...store.rows.keys()].every((id) => id === PAYMENT_GUARD_ACCEPTANCE_ID), true)
+})
+
+test('acceptance refuses a real agreement namespace and has no provider/business write adapters', async () => {
+  const store = new Store()
+  await assert.rejects(executeGuardAcceptance({ action: 'ABANDON', runId: AGREEMENT }, {
+    store, assertNonBusinessNamespace: async () => { throw new Error('NAMESPACE_COLLISION') },
+  }), /NAMESPACE_COLLISION/)
+  assert.equal(store.rows.size, 0)
+  assert.equal(store.intents.size, 0)
+  const route = readFileSync('app/api/author/stripe/payment/guard-acceptance/route.ts', 'utf8')
+  const source = readFileSync('lib/server/stripe/publishing-payment-guard-acceptance.ts', 'utf8')
+  assert.doesNotMatch(route + source, /api\.stripe\.com|createInvoice|appendConfirmedPayment|appendRefund|sendEmail|createAdditionalPaymentCheckoutSession/)
 })
