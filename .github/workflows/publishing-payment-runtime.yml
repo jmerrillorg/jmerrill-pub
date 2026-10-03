@@ -8,6 +8,7 @@ on:
       - 'app/api/author/stripe/**'
       - 'app/api/health/route.ts'
       - 'scripts/*payment*.test.mjs'
+      - 'scripts/atta_approved_tail_owner.test.mjs'
       - 'package*.json'
       - '.github/workflows/publishing-payment-runtime.yml'
       - '.github/workflows/azure-app-service-premium.yml'
@@ -30,3 +31,5 @@ jobs:
         run: node --test scripts/publishing_payment_exclusive_guard.test.mjs scripts/jmp_payments_extra_001.test.mjs scripts/jmp_payments_extra_002.test.mjs scripts/jmp_payments_extra_003.test.mjs scripts/jmp_payments_extra_003a.test.mjs scripts/jmp_payment_model_correction_001.test.mjs scripts/jmp_observed_payment_service.test.mjs scripts/jmp_atta_audited_ledger_correction_001.test.mjs scripts/jmp_pay_ingest_001_stripe_correlation.test.mjs scripts/atta_payment_event_recovery_guard.test.mjs scripts/atta_joined_family_reconciliation_guard.test.mjs
       - name: Production build (no deployment)
         run: npm run build
+      - name: Bounded approved-tail owner integration (no live credentials)
+        run: node --test scripts/atta_approved_tail_owner.test.mjs
