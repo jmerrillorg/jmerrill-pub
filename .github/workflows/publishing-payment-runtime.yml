@@ -1,0 +1,32 @@
+name: Publishing payment runtime validation
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'lib/server/stripe/**'
+      - 'app/api/author/stripe/**'
+      - 'app/api/health/route.ts'
+      - 'scripts/*payment*.test.mjs'
+      - 'package*.json'
+      - '.github/workflows/publishing-payment-runtime.yml'
+      - '.github/workflows/azure-app-service-premium.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - run: npm run type-check
+      - name: Payment and guard regression suites (no live credentials)
+        run: node --test scripts/publishing_payment_exclusive_guard.test.mjs scripts/jmp_payments_extra_001.test.mjs scripts/jmp_payments_extra_002.test.mjs scripts/jmp_payments_extra_003.test.mjs scripts/jmp_payments_extra_003a.test.mjs scripts/jmp_payment_model_correction_001.test.mjs scripts/jmp_observed_payment_service.test.mjs scripts/jmp_atta_audited_ledger_correction_001.test.mjs scripts/jmp_pay_ingest_001_stripe_correlation.test.mjs scripts/atta_payment_event_recovery_guard.test.mjs scripts/atta_joined_family_reconciliation_guard.test.mjs
+      - name: Production build (no deployment)
+        run: npm run build

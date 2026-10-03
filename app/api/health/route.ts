@@ -3,6 +3,7 @@ import { resolve } from 'node:path'
 import { NextResponse } from 'next/server'
 import { getPublisherRuntimeAuthMode, getPublisherRuntimeAuthReadback } from '@/lib/server/publisher-runtime-auth'
 import { productionAdditionalPaymentGateReadback, productionPaymentGateReadback } from '@/lib/server/stripe/publishing-payment-runtime'
+import { PAYMENT_GUARD_VERSION } from '@/lib/server/stripe/publishing-payment-guard'
 
 export const dynamic = 'force-dynamic'
 
@@ -78,6 +79,8 @@ export async function GET() {
     checkedAt: new Date().toISOString(),
     paymentGate,
     agreementPaymentRuntime: {
+      exclusiveGuardVersion: PAYMENT_GUARD_VERSION,
+      exclusiveGuardProof: 'REQUIRES_INDEPENDENT_DURABLE_READBACK',
       status: agreementPaymentGate.status,
       requested: agreementPaymentGate.requested,
       missing: agreementPaymentGate.missing,
