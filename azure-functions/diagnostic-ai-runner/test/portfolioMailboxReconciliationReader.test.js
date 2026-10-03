@@ -238,7 +238,11 @@ test("complete manifest is written only after both mailboxes and both timestamp 
   assert.equal([...writes.keys()].some((key) => key.endsWith("manifest.json")), true);
   writes.clear();
   await assert.rejects(runPortfolioMailboxReconciliation({ ...deps,
-    fetchImpl: async () => ({ ok: false, status: 403 }) }), /GRAPH_READ_FAILED/);
+    fetchImpl: async () => ({ ok: false, status: 403 }) }), error => {
+      assert.match(error.message, /GRAPH_READ_FAILED/);
+      assert.equal(error.failureReceiptUnavailable, false);
+      return true;
+    });
   assert.equal([...writes.keys()].some((key) => key.endsWith("manifest.json")), false);
   const failure = [...writes.entries()].find(([key]) => key.includes("failures/"))[1];
   assert.equal(failure.httpStatus, 403);

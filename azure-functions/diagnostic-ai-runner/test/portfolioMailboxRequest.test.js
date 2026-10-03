@@ -19,3 +19,23 @@ test("disabled reader and invalid requests never initiate extraction", async () 
     else process.env.JM1_PORTFOLIO_MAIL_RECONCILIATION_ENABLED = previous;
   }
 });
+
+test("storage setup failure does not claim a durable failure receipt", async () => {
+  const previousGate = process.env.JM1_PORTFOLIO_MAIL_RECONCILIATION_ENABLED;
+  const previousStorage = process.env.AzureWebJobsStorage;
+  try {
+    process.env.JM1_PORTFOLIO_MAIL_RECONCILIATION_ENABLED = "true";
+    delete process.env.AzureWebJobsStorage;
+    const runId = "11111111-1111-4111-8111-111111111111";
+    const response = await handler({ json: async () => ({ runId }) }, { error() {} });
+    assert.equal(response.status, 503);
+    assert.equal(response.jsonBody.runId, runId);
+    assert.equal(response.jsonBody.code, "PORTFOLIO_MAIL_EVIDENCE_STORAGE_MISSING");
+    assert.equal(response.jsonBody.failureReceiptUnavailable, true);
+  } finally {
+    if (previousGate === undefined) delete process.env.JM1_PORTFOLIO_MAIL_RECONCILIATION_ENABLED;
+    else process.env.JM1_PORTFOLIO_MAIL_RECONCILIATION_ENABLED = previousGate;
+    if (previousStorage === undefined) delete process.env.AzureWebJobsStorage;
+    else process.env.AzureWebJobsStorage = previousStorage;
+  }
+});

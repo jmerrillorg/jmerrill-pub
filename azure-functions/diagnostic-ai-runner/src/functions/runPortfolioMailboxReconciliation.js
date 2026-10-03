@@ -23,7 +23,7 @@ async function handler(request, context) {
     } catch (error) {
       context.error(`Portfolio mailbox reconciliation incomplete: ${error.safeCode || "UNEXPECTED_FAILURE"}.`);
       return { status: 503, jsonBody: { status: "INCOMPLETE", code: error.safeCode || "UNEXPECTED_FAILURE",
-        runId: error.runId || body.runId.toLowerCase(), failureReceiptUnavailable: error.failureReceiptUnavailable === true } };
+        runId: error.runId || body.runId.toLowerCase(), failureReceiptUnavailable: error.failureReceiptUnavailable !== false } };
     }
 }
 app.http("run-portfolio-mailbox-reconciliation", {

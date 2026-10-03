@@ -465,6 +465,7 @@ async function runPortfolioMailboxReconciliation(deps = {}) {
       await write(`failures/${attemptId}.json`, { runId, attemptId, status: "INCOMPLETE",
         code: error.safeCode || "UNEXPECTED_FAILURE", httpStatus: error.httpStatus || null,
         completedQueries: queries, recordedAt: (deps.now || (() => new Date()))().toISOString() });
+      error.failureReceiptUnavailable = false;
     } catch { error.failureReceiptUnavailable = true; }
     error.runId = runId;
     throw error;
