@@ -30,6 +30,9 @@ function loadEnterpriseRelayModule(options = {}) {
       }
       if (name.startsWith("../")) {
         const dependency = require(path.join(path.dirname(filePath), name));
+        if (name === "../security/callerAuthentication" && options.caller) {
+          return { ...dependency, authenticateCaller: () => ({ ok: true, caller: options.caller, authModel: "ENTRA_WORKLOAD_IDENTITY" }) };
+        }
         return name === "../state/messageLedger" && options.ledger
           ? { ...dependency, getMessageLedger: () => options.ledger } : dependency;
       }
@@ -517,6 +520,34 @@ test("BP09 denies all nonreference fields and cross-brand sender/destination ove
   }
 });
 
+test("BP09 probe and send enforce inactive, revoked and wrong registry scopes before side effects", async () => {
+  const { findCallerByObjectId } = require("../src/policy/callerRegistry");
+  const caller = findCallerByObjectId("38b09d6f-34d9-48b3-9627-f04c047fd534");
+  const cases = [
+    [{ status: "INACTIVE" }, "CALLER_INACTIVE"],
+    [{ status: "REVOKED" }, "CALLER_INACTIVE"],
+    [{ authorizedBrands: [] }, "CALLER_BRAND_NOT_AUTHORIZED"],
+    [{ authorizedBrands: ["JMP"] }, "CALLER_BRAND_NOT_AUTHORIZED"],
+    [{ authorizedTemplates: [] }, "CALLER_TEMPLATE_NOT_AUTHORIZED"],
+    [{ authorizedTemplates: ["PRODUCTIONS.OTHER"] }, "CALLER_TEMPLATE_NOT_AUTHORIZED"],
+    [{ authorizedRecipients: [] }, "CALLER_RECIPIENT_NOT_AUTHORIZED"],
+    [{ authorizedRecipients: ["jackie@jmerrill.one"] }, "CALLER_RECIPIENT_NOT_AUTHORIZED"]
+  ];
+  for (const [changes, reason] of cases) {
+    let sideEffects = 0;
+    const forbidden = () => { sideEffects++; throw new Error("SIDE_EFFECT_FORBIDDEN"); };
+    const relay = loadEnterpriseRelayModule({ caller: { ...caller, ...changes },
+      client: { beginSend: forbidden }, ledger: { reserve: forbidden } });
+    for (const name of ["relay-authority-probe", "send-enterprise-governed-email"]) {
+      const result = await relay.routes[name].handler(routeRequest(bp09Payload(), bp09Headers()), quietContext);
+      assert.equal(result.status, 403, `${name}: ${JSON.stringify(changes)}`);
+      assert.equal(result.jsonBody.reason, reason);
+      assert.notEqual(result.jsonBody.authorized, true);
+    }
+    assert.equal(sideEffects, 0);
+  }
+});
+
 test("BP09 template cannot be borrowed by Publishing, JSJ, diagnostic, anonymous or unknown callers", async () => {
   const relay = loadEnterpriseRelayModule({ ledger: { reserve() { throw new Error("MUST_NOT_RESERVE"); } } });
   for (const oid of ["ce363f5a-94f3-4ea9-9ba3-061404fca098", "8a488b86-7a1a-4978-8705-6fbc3bd8ce15", "e8c51a80-bdb0-46fa-b398-9109719d6427", "00000000-0000-4000-a000-000000000001"]) {
@@ -573,6 +604,8 @@ test("BP09 accepted replay survives runtime recreation and changed Lead conflict
   const changed = bp09Payload();
   changed.templateData.leadId = "90000000-0000-4000-a000-000000000011";
   const conflict = await send(restarted, changed);
+  assert.equal(conflict.status, 409);
+  assert.equal(conflict.jsonBody.accepted, false);
   assert.equal(conflict.jsonBody.code, "IDEMPOTENCY_KEY_CONFLICT");
   assert.equal(sends, 1);
   assert.equal(table.rows.size, 1);

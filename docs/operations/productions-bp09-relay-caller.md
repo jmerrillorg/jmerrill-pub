@@ -4,9 +4,10 @@ Packet: `JM1-PRD-BP09-RELAY-CALLER-COMMISSIONING-001`.
 
 This is the transport boundary for the existing ONE intake owner. It does not
 commission the public Productions form, assign a reviewer, establish retention,
-create a lead, or authorize client correspondence. Source contract: OPS PR #268,
-`ed92273af6a1207cf90e3f20d4e5e4e4061dd561`,
-`docs/governance/enterprise-orchestration/productions-bp09-reference-journey-contract.md`.
+create a lead, or authorize client correspondence. Source contract:
+[OPS PR #269](https://github.com/jmerrillorg/jm1-ops/pull/269), merge
+`bf1563c92e43a6d59df326bc0a8921ad365260ef`,
+`docs/governance/enterprise-orchestration/productions-bp09-reference-journey.md`.
 
 ## Identity And Authority
 
@@ -83,7 +84,8 @@ capacity and existing schema. Owner changes require their own normal review.
 The relay derives `bp09:productions:notice:<referenceId>` and uses the existing
 atomic ledger reservation. Receipt, caller, brand, template and rendered hashes
 bind the effect. Changing the linked Lead under that key fails with
-`IDEMPOTENCY_KEY_CONFLICT`; changing a caller-supplied key is impossible.
+HTTP 409 `IDEMPOTENCY_KEY_CONFLICT`; do not retry this deterministic conflict
+as a transient provider failure. Changing a caller-supplied key is impossible.
 
 - First completed ACS submission: HTTP 202, `accepted=true`, `jm1MessageId`,
   `providerMessageId`, `deliveryState=ACCEPTED`. This is provider acceptance, not

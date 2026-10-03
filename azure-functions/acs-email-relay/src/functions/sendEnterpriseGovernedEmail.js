@@ -428,6 +428,9 @@ app.http("send-enterprise-governed-email", {
         }
       }
       context.error(`Enterprise ACS relay send failed: ${code}; caller=${authentication.caller.callerId}; brand=${validation.value.brand}`);
+      if (code === "IDEMPOTENCY_KEY_CONFLICT") {
+        return response(409, { accepted: false, code, reason: code });
+      }
       return serverError(code, body);
     }
   }
@@ -449,6 +452,12 @@ app.http("relay-authority-probe", {
     if (authentication.caller.callerId === BP09_CALLER_ID) {
       const bounded = renderProductionsBp09Notice(body);
       if (!bounded.ok) return validationError(bounded.reason);
+      const authorization = authorizeCallerForBrand(authentication.caller, bounded.value.brand);
+      if (!authorization.ok) return unauthorized({}, authorization.reason, 403);
+      const templateAuthorization = authorizeCallerForTemplate(authentication.caller, bounded.value.templateId);
+      if (!templateAuthorization.ok) return unauthorized({}, templateAuthorization.reason, 403);
+      const recipientAuthorization = authorizeCallerForRecipients(authentication.caller, bounded.value.to.map((recipient) => recipient.address));
+      if (!recipientAuthorization.ok) return unauthorized({}, recipientAuthorization.reason, 403);
       return response(200, {
         authorized: true, noSend: true, callerId: authentication.caller.callerId,
         callerAuthModel: authentication.authModel, brand: bounded.value.brand,
