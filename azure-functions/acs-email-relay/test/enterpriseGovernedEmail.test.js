@@ -371,6 +371,34 @@ test("authority probe attributes a Publishing workload identity and derives bran
   assert.equal(result.jsonBody.replyTo, "publishing@jmerrill.one");
 });
 
+test("JSJ authority probe permits only the approved recipient without sending", async () => {
+  const { routes } = loadEnterpriseRelayModule();
+  const handler = routes["relay-authority-probe"].handler;
+  const headers = workloadHeaders("8a488b86-7a1a-4978-8705-6fbc3bd8ce15");
+  const allowed = await handler(routeRequest({ brand: "JSJ", recipient: "jackie@jmerrill.one" }, headers));
+  assert.equal(allowed.status, 200);
+  assert.equal(allowed.jsonBody.callerId, "jsj-web-prod");
+  assert.equal(allowed.jsonBody.senderAddress, "jackie@email.jackiesmithjr.com");
+  assert.equal(allowed.jsonBody.noSend, true);
+  assert.equal((await handler(routeRequest({ brand: "JSJ", recipient: "other@example.com" }, headers))).status, 403);
+  assert.equal((await handler(routeRequest({ brand: "JMP", recipient: "jackie@jmerrill.one" }, headers))).status, 403);
+});
+
+test("JSJ recipient and template denial occurs before any message reservation", async () => {
+  let reservations = 0;
+  const { routes } = loadEnterpriseRelayModule({ ledger: { reserve: async () => { reservations++; throw new Error("must not reserve"); } } });
+  const handler = routes["send-enterprise-governed-email"].handler;
+  const headers = workloadHeaders("8a488b86-7a1a-4978-8705-6fbc3bd8ce15");
+  const payload = validPayload({ brand: "JSJ", to: "other@example.com", templateId: "JSJ_INQUIRY_NOTIFICATION" });
+  const context = { warn() {}, info() {}, error() {} };
+  const denied = await handler(routeRequest(payload, headers), context);
+  assert.equal(denied.status, 403);
+  assert.equal(denied.jsonBody.reason, "CALLER_RECIPIENT_NOT_AUTHORIZED");
+  const wrongTemplate = await handler(routeRequest({ ...payload, to: "jackie@jmerrill.one", templateId: "JSJ_OTHER" }, headers), context);
+  assert.equal(wrongTemplate.status, 403);
+  assert.equal(reservations, 0);
+});
+
 test("durable trace contract fields are mandatory", () => {
   const { validateEnterprisePayload } = loadEnterpriseRelayModule();
   for (const [field, reason] of [
