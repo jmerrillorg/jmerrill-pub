@@ -45,6 +45,39 @@ For historical cadence deliveries missing from the inbound delivery ledger, reco
 
 Other registered owner adapters use the same contract. Unregistered editorial, cover, payment, provider and general-stage owners fail closed. A provider/system fixture proves the contract, not live commissioning of those capabilities.
 
+## Consumed Reply With Outstanding Publisher Review
+
+A `RESUMED` response receipt whose business result is `PUBLISHER_REVIEW_REQUIRED`
+is not author approval. The existing timer re-reads the exact gate, title, stage,
+legacy intake and owner audit ID, and projects the remaining human wait in
+`health.json.businessWaits`. The original wait, claim, receipt evidence ID and
+author decision are not reset. Missing or changed authority becomes an explicit
+safe failure for the existing OPS exception route; it is never a fabricated
+resolution. A legitimate human review is not itself a runtime failure or an
+invented SLA breach.
+
+`JM1_PUBLISHING_WAIT_OBSERVATION_ENABLED=true`, with the same explicit title
+allowlist and `JM1_PUBLISHING_WAIT_RUNTIME_ENABLED=false`, runs only that existing
+timer's observation branch. It does not register the queue handler, run the
+author producer, bind correspondence, dispatch an owner, reconcile claims or
+change wait state. It writes scoped health/receipt projections only and does
+not delete ready signals. The original author consumer retains ownership.
+Both flags default off; the broad stage worker stays off. Observation mode is
+not permission to enable OPS dispatch.
+
+The Publisher Operating Center retrieves review/capture audit pairs by exact
+pending-gate IDs rather than only the latest 100 global logs. Matching producer
+idempotency keys and title IDs are required. This makes a captured review visible
+even when the gate retains its older awaiting-author summary. No summary text is
+used to manufacture a decision. The view assigns the review to the Publisher
+role, not a guessed person and not the author. A resolved gate must have its
+own governed decision evidence; this change provides no decision endpoint.
+
+New release and bounded observation enablement require the normal protected
+path. Local tests and read-only evaluation against real evidence do not prove a
+live timer, OPS schedule or alert delivery. Keep those acceptance fields open
+until observed independently after approval.
+
 ## Deployment and Cutover Gates
 
 1. Review PR #909 and the linked jm1-ops change, reconcile current main and pass both validation suites. No merge or production deployment has been authorized merely by this document.

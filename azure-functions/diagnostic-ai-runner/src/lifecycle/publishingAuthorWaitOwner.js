@@ -53,7 +53,26 @@ function createAuthorWaitOwner({ client, inbound, graph }) {
         conversationId: raw.conversationId, senderAddress: identity.email, receivedDateTime: raw.receivedDateTime,
         bodyText: authorReplyText(raw), inReplyTo: matches[0].internetMessageId, gateId: wait.sourceRecordId, titleId: wait.titleId } };
   }
-  return { readAuthority: authority, verifyCondition: condition, idempotent: true,
+  async function readBusinessWait(wait) {
+    const current = await authority(wait);
+    const evidenceId = wait.resumeResult?.evidenceId;
+    if (!current || !GUID.test(evidenceId || "")) throw Object.assign(new Error("AUTHOR_REVIEW_WAIT_AUTHORITY_CHANGED"), { safeCode: "AUTHOR_REVIEW_WAIT_AUTHORITY_CHANGED" });
+    const evidence = await client.first("jm1_executionlogs", {
+      $select: "jm1_executionlogid,jm1_actiontype,jm1_sourceentity,jm1_sourcerecordid,createdon",
+      $filter: `jm1_executionlogid eq ${evidenceId}`
+    });
+    if (!equal(evidence?.jm1_executionlogid, evidenceId) || evidence.jm1_actiontype !== "AUTHOR_RESPONSE_REQUIRES_PUBLISHER_REVIEW" ||
+        evidence.jm1_sourceentity !== "jm1pub_editorialapprovalgate" || !equal(evidence.jm1_sourcerecordid, wait.sourceRecordId) ||
+        !Number.isFinite(Date.parse(evidence.createdon))) throw Object.assign(new Error("AUTHOR_REVIEW_WAIT_EVIDENCE_MISMATCH"), { safeCode: "AUTHOR_REVIEW_WAIT_EVIDENCE_MISMATCH" });
+    // A consumed reply is not a completed business gate. This is a read projection only.
+    if (current.gate.jm1pub_authordecision != null || current.gate.jm1pub_authordecisionon ||
+        current.gate.jm1pub_nextstageauthorized === true || current.gate.jm1pub_gatestatus !== 196650002) {
+      return { status: "OWNER_REVALIDATION_REQUIRED", owner: "JM_PUBLISHING", evidenceId, gateId: wait.sourceRecordId };
+    }
+    return { status: "WAITING_FOR_PUBLISHER_REVIEW", owner: "JM_PUBLISHING", evidenceId,
+      gateId: wait.sourceRecordId, waitingSince: evidence.createdon };
+  }
+  return { readAuthority: authority, verifyCondition: condition, readBusinessWait, idempotent: true,
     async dispatch({ wait, proof, idempotencyKey }) {
       // The existing consumer alone classifies/persists the original reply. No supplied decision or send.
       const result = await inbound.withBusinessRouteLease(`author-gate-${wait.sourceRecordId}`, async () => {

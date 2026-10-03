@@ -3,7 +3,7 @@ const { test } = require("node:test");
 const assert = require("node:assert/strict");
 const { createAuthorWaitOwner, authorWaitFor } = require("../src/lifecycle/publishingAuthorWaitOwner");
 const { buildMessageEvidence } = require("../src/mail/inbound/evidenceModel");
-const { waitRuntimeOwnsTitle } = require("../src/lifecycle/publishingWaitEnablement");
+const { waitRuntimeOwnsTitle, waitRuntimeMonitorsTitle } = require("../src/lifecycle/publishingWaitEnablement");
 const id = (n) => `${String(n).padStart(8,"0")}-1111-4111-8111-111111111111`;
 function setup() {
   const gate = { jm1pub_editorialapprovalgateid:id(1), _jm1pub_titleid_value:id(2), _jm1pub_editorialstageid_value:id(3),
@@ -24,7 +24,7 @@ function setup() {
       if(table==="jm1pub_titles")return {jm1pub_titleid:id(2),_jm1_primaryauthor_value:id(5),jm1_canonicalauthorcontactreference:`contact:${id(5)}`};
       if(table==="jm1pub_editorialartifacts")return {...artifact};
       if(table==="contacts")return {emailaddress1:"author@example.com"};
-      if(table==="jm1_executionlogs")return logs.find(x=>q.$filter.includes(x.jm1_actiontype) && q.$filter.includes("author-review-response:"))||null;
+      if(table==="jm1_executionlogs")return logs.find(x=>q.$filter === `jm1_executionlogid eq ${x.jm1_executionlogid}` || (q.$filter.includes(x.jm1_actiontype) && q.$filter.includes("author-review-response:")))||null;
       return null;
     },list:async()=>[],
     create:async(table,payload)=>{assert.equal(table,"jm1_executionlogs");const log={...payload,jm1_executionlogid:`log-${logs.length}`};logs.push(log);return log.jm1_executionlogid;},
@@ -67,4 +67,32 @@ test("cutover requires an explicit title scope and preserves other titles' curre
   assert.throws(()=>waitRuntimeOwnsTitle(id(2),{JM1_PUBLISHING_WAIT_RUNTIME_ENABLED:"true"}),/TITLE_SCOPE_REQUIRED/);
   const env={JM1_PUBLISHING_WAIT_RUNTIME_ENABLED:"true",JM1_PUBLISHING_WAIT_TITLE_IDS:id(2)};
   assert.equal(waitRuntimeOwnsTitle(id(2),env),true);assert.equal(waitRuntimeOwnsTitle(id(99),env),false);
+  const observe={JM1_PUBLISHING_WAIT_OBSERVATION_ENABLED:"true",JM1_PUBLISHING_WAIT_TITLE_IDS:id(2)};
+  assert.equal(waitRuntimeMonitorsTitle(id(2),observe),true);
+  assert.equal(waitRuntimeMonitorsTitle(id(99),observe),false);
+  assert.equal(waitRuntimeOwnsTitle(id(2),observe),false);
+  assert.throws(()=>waitRuntimeMonitorsTitle(id(2),{JM1_PUBLISHING_WAIT_OBSERVATION_ENABLED:"true"}),/TITLE_SCOPE_REQUIRED/);
+});
+
+test("consumed publisher-review result remains a monitored human wait, not author approval",async()=>{
+  const f=setup();
+  f.wait.resumeResult={evidenceId:id(8)};
+  f.logs.push({jm1_executionlogid:id(8),jm1_actiontype:"AUTHOR_RESPONSE_REQUIRES_PUBLISHER_REVIEW",
+    jm1_sourceentity:"jm1pub_editorialapprovalgate",jm1_sourcerecordid:id(1),createdon:"2026-10-02T00:00:00Z"});
+  const before=JSON.stringify({gate:f.gate,logs:f.logs,wait:f.wait});
+  const result=await f.owner.readBusinessWait(f.wait);
+  assert.equal(result.status,"WAITING_FOR_PUBLISHER_REVIEW");
+  assert.equal(result.owner,"JM_PUBLISHING");
+  assert.equal(JSON.stringify({gate:f.gate,logs:f.logs,wait:f.wait}),before);
+  f.gate.jm1pub_authordecision=196650001;
+  assert.equal((await f.owner.readBusinessWait(f.wait)).status,"OWNER_REVALIDATION_REQUIRED");
+  assert.equal(f.patches.length,0);
+});
+
+test("review monitor rejects an evidence row from another gate",async()=>{
+  const f=setup();f.wait.resumeResult={evidenceId:id(8)};
+  f.logs.push({jm1_executionlogid:id(8),jm1_actiontype:"AUTHOR_RESPONSE_REQUIRES_PUBLISHER_REVIEW",
+    jm1_sourceentity:"jm1pub_editorialapprovalgate",jm1_sourcerecordid:id(99),createdon:"2026-10-02T00:00:00Z"});
+  await assert.rejects(()=>f.owner.readBusinessWait(f.wait),/EVIDENCE_MISMATCH/);
+  assert.equal(f.patches.length,0);
 });
