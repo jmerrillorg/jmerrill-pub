@@ -1,6 +1,6 @@
 "use strict";
 
-const CALLER_REGISTRY_VERSION = "JM1-RELAY-CALLERS-v1.2.0";
+const CALLER_REGISTRY_VERSION = "JM1-RELAY-CALLERS-v1.3.0";
 
 const BRAND_ALIASES = Object.freeze({
   PUBLISHING: "JMP",
@@ -10,6 +10,20 @@ const BRAND_ALIASES = Object.freeze({
 });
 
 const CALLERS = Object.freeze([
+  caller({
+    callerId: "one-bp09-productions-prod",
+    identity: {
+      type: "ENTRA_WORKLOAD_IDENTITY",
+      objectId: "38b09d6f-34d9-48b3-9627-f04c047fd534"
+    },
+    application: "ONE BP-09 intake runtime: Productions reference notice only",
+    canonicalRepo: "jmerrillorg/jmerrill-one",
+    authorizedBrands: ["JMPRODUCTIONS"],
+    authorizedTemplates: ["PRODUCTIONS.BP09_NOTICE"],
+    authorizedRecipients: ["productions@jmerrill.one"],
+    status: "ACTIVE",
+    lastProven: null
+  }),
   caller({
     callerId: "publishing-web-prod",
     identity: {

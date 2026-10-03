@@ -9,6 +9,7 @@ const { sendWithCompletedReceipt } = require("../provider/acsCompletion");
 const { resolvePublishingAcceptance } = require("../state/publishingAcceptance");
 const { renderPublishingServiceCorrespondence } = require("../generated/communications/jm1-enterprise-communication-renderer");
 const { isGovernedNamespace } = require("../templates/templateRegistry");
+const { CALLER_ID: BP09_CALLER_ID, TEMPLATE_ID: BP09_TEMPLATE_ID, renderProductionsBp09Notice } = require("../templates/productionsBp09Notice");
 const {
   getSenderProfile,
   validateMessageIdentity,
@@ -131,6 +132,7 @@ function serverError(code, payload = {}) {
 }
 
 function validateEnterprisePayload(payload = {}) {
+  if (normalizeEnum(payload?.templateId) === BP09_TEMPLATE_ID) return renderProductionsBp09Notice(payload);
   const brand = normalizeBrand(payload.brand);
   const profileResult = getSenderProfile(brand);
   if (!profileResult.ok) return { ok: false, reason: profileResult.reason };
@@ -314,6 +316,10 @@ app.http("send-enterprise-governed-email", {
       return validationError("INVALID_JSON", body);
     }
 
+    if (authentication.caller.callerId === BP09_CALLER_ID) {
+      const bounded = renderProductionsBp09Notice(body);
+      if (!bounded.ok) return validationError(bounded.reason);
+    }
     const validation = validateEnterprisePayload(body || {});
     if (!validation.ok) {
       if (String(validation.reason || "").startsWith("HUMAN_REVIEW_REQUIRED")) return humanReview(validation.reason, body);
@@ -439,6 +445,19 @@ app.http("relay-authority-probe", {
       body = await request.json();
     } catch (_error) {
       return validationError("INVALID_JSON", body);
+    }
+    if (authentication.caller.callerId === BP09_CALLER_ID) {
+      const bounded = renderProductionsBp09Notice(body);
+      if (!bounded.ok) return validationError(bounded.reason);
+      return response(200, {
+        authorized: true, noSend: true, callerId: authentication.caller.callerId,
+        callerAuthModel: authentication.authModel, brand: bounded.value.brand,
+        templateId: bounded.value.templateId, templateVersion: bounded.value.templateVersion,
+        senderAddress: bounded.value.senderAddress, replyTo: bounded.value.replyTo,
+        recipient: bounded.value.to[0].address, brandCc: bounded.value.cc[0].address,
+        referenceId: bounded.value.businessObjectId, idempotencyKey: bounded.value.idempotencyKey,
+        renderMetadata: bounded.value.renderMetadata
+      });
     }
     const brand = normalizeBrand(body.brand);
     const profile = getSenderProfile(brand);
