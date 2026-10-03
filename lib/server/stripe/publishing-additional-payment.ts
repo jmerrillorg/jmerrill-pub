@@ -48,8 +48,21 @@ export async function startAdditionalPayment(input: {
   operationId: string
   sourceEvent?: AdditionalPaymentPreparation['sourceEvent']
 }) {
+  const candidate = await resolveAdditionalPaymentEligibility(input)
+  if (!candidate.eligible) return candidate
+  const agreementId = candidate.agreement.snapshot.agreementId
+  const ledger = new DataversePublishingPaymentLedger(getDataverseServerConfig()!)
+  return ledger.withAgreementMutation(agreementId, {
+    kind: 'CHECKOUT', operationId: additionalPaymentRequestId(agreementId, input.operationId),
+    payload: { contactId: input.contactId, engagementId: input.engagementId || null,
+      amountCents: input.amountCents, operationId: input.operationId, sourceEvent: input.sourceEvent || null },
+  }, () => startAdditionalPaymentUnderGuard(input, agreementId))
+}
+
+async function startAdditionalPaymentUnderGuard(input: Parameters<typeof startAdditionalPayment>[0], agreementId: string) {
   const eligibility = await resolveAdditionalPaymentEligibility(input)
   if (!eligibility.eligible) return eligibility
+  if (eligibility.agreement.snapshot.agreementId !== agreementId) throw new Error('PAYMENT_GUARD_AGREEMENT_CHANGED')
   if (!Number.isSafeInteger(input.amountCents) || input.amountCents < 100) {
     return { eligible: true as const, started: false as const, reason: 'PAYMENT_AMOUNT_INVALID', maximumAmountCents: eligibility.maximumAmountCents }
   }

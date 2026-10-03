@@ -1,4 +1,6 @@
 import { randomUUID } from 'node:crypto'
+import { AgreementPaymentGuard, assertAgreementPaymentGuard, type PaymentMutation } from './publishing-payment-guard'
+import { DataversePaymentGuardStore } from './publishing-payment-guard-store'
 
 import {
   dataverseFirst,
@@ -42,6 +44,12 @@ export function createDataversePublishingPaymentLedger(): PublishingPaymentLedge
 
 export class DataversePublishingPaymentLedger implements PublishingPaymentLedger {
   constructor(private readonly config: DataverseServerConfig) {}
+
+  paymentGuard() { return new AgreementPaymentGuard(new DataversePaymentGuardStore(this.config)) }
+
+  withAgreementMutation<T>(agreementId: string, operation: PaymentMutation, work: () => Promise<T>) {
+    return this.paymentGuard().run(agreementId, operation, work)
+  }
 
   async findActiveAgreementsForAuthor(authorId: string) {
     const rows = await dataverseList(this.config, AGREEMENTS, {
@@ -92,6 +100,7 @@ export class DataversePublishingPaymentLedger implements PublishingPaymentLedger
     payment: AgreementPayment
     expectedEtag: string
   }) {
+    assertAgreementPaymentGuard(input.agreement.snapshot.agreementId)
     const state = calculateAgreementPaymentState({
       ...input.agreement.snapshot,
       payments: [...input.agreement.snapshot.payments, input.payment],
@@ -117,6 +126,7 @@ export class DataversePublishingPaymentLedger implements PublishingPaymentLedger
     refund: AgreementRefund
     expectedEtag: string
   }) {
+    assertAgreementPaymentGuard(input.agreement.snapshot.agreementId)
     const state = calculateAgreementPaymentState({
       ...input.agreement.snapshot,
       refunds: [...(input.agreement.snapshot.refunds || []), input.refund],
@@ -151,6 +161,7 @@ export class DataversePublishingPaymentLedger implements PublishingPaymentLedger
   }
 
   async recordCollectionAttempt(attempt: CollectionAttempt) {
+    assertAgreementPaymentGuard(attempt.agreementId)
     await this.createEvidence({
       jmpv2_paymentevidencekey: attempt.executionKey,
       jmpv2_agreementkey: attempt.agreementId,
@@ -174,6 +185,7 @@ export class DataversePublishingPaymentLedger implements PublishingPaymentLedger
   }
 
   async reserveAdditionalPaymentPreparation(preparation: AdditionalPaymentPreparation) {
+    assertAgreementPaymentGuard(preparation.agreementId)
     try {
       await this.createEvidence({
         jmpv2_paymentevidencekey: preparation.requestId,
@@ -204,6 +216,7 @@ export class DataversePublishingPaymentLedger implements PublishingPaymentLedger
   }
 
   async recordAdditionalPaymentRequest(request: AdditionalPaymentRequest) {
+    assertAgreementPaymentGuard(request.agreementId)
     const existing = await dataverseFirst(this.config, EVENTS, {
       $select: 'jmpv2_paymentevidenceid',
       $filter: `jmpv2_eventkind eq 'ADDITIONAL_PAYMENT_REQUEST' and jmpv2_paymentevidencekey eq '${odata(request.requestId)}'`,
@@ -397,6 +410,7 @@ export function createStripeAgreementCollections(): StripeAgreementCollections {
   if (!/^(sk|rk)_live_/.test(secret)) throw new Error('STRIPE_LIVE_PAYMENT_CREDENTIAL_REQUIRED')
   return {
     async createInvoice(input) {
+      assertAgreementPaymentGuard(input.metadata.jm1_agreement_id)
       const item = new URLSearchParams({
         customer: input.customerId,
         amount: String(input.amountCents),
@@ -433,6 +447,7 @@ export async function createAdditionalPaymentCheckoutSession(input: {
   obligationId: string | null
   balanceVersion: string
 }) {
+  assertAgreementPaymentGuard(input.agreement.snapshot.agreementId)
   const gate = productionAdditionalPaymentGateReadback()
   if (!gate.enabled) throw new Error(`ADDITIONAL_PAYMENT_GATE_CLOSED:${gate.missing.join(',')}`)
   const secret = clean(process.env.STRIPE_CHECKOUT_SECRET_KEY || process.env.STRIPE_SECRET_KEY)
@@ -470,6 +485,7 @@ export function createStripeAgreementPayoff(): StripeAgreementPayoff {
   if (!/^(sk|rk)_live_/.test(secret)) throw new Error('STRIPE_LIVE_PAYMENT_CREDENTIAL_REQUIRED')
   return {
     async stopFutureCollections(input) {
+      assertAgreementPaymentGuard(input.agreementId)
       const schedule = await stripeGet(`/v1/subscription_schedules/${encodeURIComponent(input.paymentScheduleId)}`, secret)
       if (schedule.status === 'canceled' || schedule.status === 'released' || schedule.status === 'completed') {
         return { status: 'ALREADY_STOPPED' as const }

@@ -105,7 +105,8 @@ test('partial final collection and zero balance are exact integer-cent projectio
 test('settlement replay cannot borrow a payment from another agreement or change its amount', async () => {
   let reads = 0
   const event = { agreementId: 'agreement-1', stripePaymentId: 'payment-1', grossAmountCents: 25988 }
-  const ledger = { findPaymentEvent: async () => event, getAgreement: async () => { reads++; throw new Error('must not read') } }
+  const ledger = { withAgreementMutation: async (_id, _operation, work) => work(),
+    findPaymentEvent: async () => event, getAgreement: async () => { reads++; throw new Error('must not read') } }
   for (const change of [{ agreementId: 'agreement-2' }, { stripePaymentId: 'payment-2' }, { amountCents: 26000 }]) {
     const result = await processConfirmedAgreementPayment({ agreementId: 'agreement-1', stripeEventId: 'event-1',
       stripePaymentId: 'payment-1', amountCents: 25988, ledger, ...change })
