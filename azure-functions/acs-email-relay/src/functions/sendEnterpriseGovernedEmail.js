@@ -2,7 +2,7 @@ const { app } = require("@azure/functions");
 const { EmailClient } = require("@azure/communication-email");
 const { DefaultAzureCredential } = require("@azure/identity");
 const { authenticateCaller } = require("../security/callerAuthentication");
-const { authorizeCallerForBrand, authorizeCallerForTemplate, normalizeBrand } = require("../policy/callerRegistry");
+const { authorizeCallerForBrand, authorizeCallerForTemplate, authorizeCallerForRecipients, normalizeBrand } = require("../policy/callerRegistry");
 const { DELIVERY_STATE, getMessageLedger } = require("../state/messageLedger");
 const { renderTemplate } = require("../templates/renderer");
 const { sendWithCompletedReceipt } = require("../provider/acsCompletion");
@@ -331,6 +331,11 @@ app.http("send-enterprise-governed-email", {
       context.warn(`Enterprise ACS relay template authorization denied: ${templateAuthorization.reason}; caller=${authentication.caller.callerId}; template=${validation.value.templateId}`);
       return unauthorized(body, templateAuthorization.reason, 403);
     }
+    const recipientAuthorization = authorizeCallerForRecipients(authentication.caller, validation.value.to.map((recipient) => recipient.address));
+    if (!recipientAuthorization.ok) {
+      context.warn(`Enterprise ACS relay recipient authorization denied: ${recipientAuthorization.reason}; caller=${authentication.caller.callerId}`);
+      return unauthorized(body, recipientAuthorization.reason, 403);
+    }
 
     let reservation;
     let providerAccepted = false;
@@ -440,12 +445,17 @@ app.http("relay-authority-probe", {
     if (!profile.ok) return validationError(profile.reason, body);
     const authorization = authorizeCallerForBrand(authentication.caller, brand);
     if (!authorization.ok) return unauthorized(body, authorization.reason, 403);
+    if (body.recipient || body.to) {
+      const recipientAuthorization = authorizeCallerForRecipients(authentication.caller, normalizeRecipients(body.recipient || body.to).map((recipient) => recipient.address));
+      if (!recipientAuthorization.ok) return unauthorized(body, recipientAuthorization.reason, 403);
+    }
     return response(200, {
       authorized: true,
       noSend: true,
       callerId: authentication.caller.callerId,
       callerAuthModel: authentication.authModel,
       brand,
+      authorizedRecipients: authentication.caller.authorizedRecipients || undefined,
       senderAddress: profile.profile.acsFrom,
       brandCc: profile.profile.ccAddress,
       replyTo: profile.profile.replyTo
