@@ -151,6 +151,10 @@ function applyParagraphFormat(doc, edit, id, author, date) {
   let pPr = Array.from(paragraph.childNodes).find((n) => n.namespaceURI === W && n.localName === "pPr");
   if (pPr && descendants(pPr, W, "pPrChange").length) fail("EDITORIAL_PARAGRAPH_EXISTING_REVISION");
   const previous = pPr ? pPr.cloneNode(true) : doc.createElementNS(W, "w:pPr");
+  // CT_PPrBase history excludes paragraph-mark and section properties; retain them only in live pPr.
+  for (const child of Array.from(previous.childNodes)) {
+    if (child.namespaceURI === W && ["rPr", "sectPr"].includes(child.localName)) previous.removeChild(child);
+  }
   if (!pPr) {
     pPr = doc.createElementNS(W, "w:pPr");
     paragraph.insertBefore(pPr, paragraph.firstChild);

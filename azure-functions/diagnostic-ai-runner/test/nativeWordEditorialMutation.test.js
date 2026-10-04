@@ -149,6 +149,30 @@ test("tracked heading spacing and a checkbox prefix preserve all eight grids and
   }
 });
 
+test("paragraph format history excludes but preserves live paragraph-mark and section properties", async () => {
+  const zip = await JSZip.loadAsync(await fixture());
+  const doc = new DOMParser().parseFromString(await zip.file("word/document.xml").async("string"), "application/xml");
+  const heading = Array.from(doc.getElementsByTagNameNS(W, "p")).find((p) => p.textContent === "Structure and voice");
+  const props = heading.getElementsByTagNameNS(W, "pPr")[0];
+  const serializer = new XMLSerializer();
+  for (const name of ["rPr", "sectPr"]) {
+    const property = doc.createElementNS(W, `w:${name}`);
+    property.appendChild(doc.createElementNS(W, name === "rPr" ? "w:b" : "w:pgSz"));
+    props.appendChild(property);
+  }
+  const retained = Array.from(props.childNodes).filter((n) => ["rPr", "sectPr"].includes(n.localName)).map((n) => serializer.serializeToString(n));
+  zip.file("word/document.xml", serializer.serializeToString(doc));
+  const result = await applyNativeEditorialPlan(await zip.generateAsync({ type: "nodebuffer" }), [
+    { editId: "format", editClass: "FORMAT_PARAGRAPH", anchor: "Structure and voice", paragraphProperties: { keepNext: true }, authorityClass: "SYSTEM_AUTHORIZED_EDIT" }
+  ]);
+  const after = new DOMParser().parseFromString(await part(result.buffer, "word/document.xml"), "application/xml");
+  const formatted = Array.from(after.getElementsByTagNameNS(W, "p")).find((p) => p.textContent === "Structure and voice").getElementsByTagNameNS(W, "pPr")[0];
+  assert.deepEqual(Array.from(formatted.childNodes).filter((n) => ["rPr", "sectPr"].includes(n.localName)).map((n) => serializer.serializeToString(n)), retained);
+  const history = formatted.getElementsByTagNameNS(W, "pPrChange")[0];
+  assert.equal(history.getElementsByTagNameNS(W, "rPr").length, 0);
+  assert.equal(history.getElementsByTagNameNS(W, "sectPr").length, 0);
+});
+
 test("paragraph formatting rejects unsupported properties, partial anchors, grids and repeated formatting", async () => {
   const source = await fixture();
   const edit = { editId: "format", editClass: "FORMAT_PARAGRAPH", anchor: "Structure and voice", paragraphProperties: { keepNext: true }, authorityClass: "SYSTEM_AUTHORIZED_EDIT" };
