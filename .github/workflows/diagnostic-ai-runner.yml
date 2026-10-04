@@ -7,12 +7,14 @@ on:
       - main
     paths:
       - "azure-functions/diagnostic-ai-runner/**"
+      - "docs/implementation/canon-cache/jm1-publishing-editorial/**"
       - ".github/workflows/diagnostic-ai-runner.yml"
   push:
     branches:
       - main
     paths:
       - "azure-functions/diagnostic-ai-runner/**"
+      - "docs/implementation/canon-cache/jm1-publishing-editorial/**"
       - ".github/workflows/diagnostic-ai-runner.yml"
 
 permissions:
@@ -72,6 +74,8 @@ jobs:
             --mtime="@$source_date_epoch" \
             "$GITHUB_SHA:$FUNCTION_APP_PATH" | tar -xf - -C "$package_root"
           rm -rf "$package_root/test" "$package_root/local.settings.example.json"
+          # Package the existing approved canon verbatim; the runtime verifies its pinned hash.
+          node "$FUNCTION_APP_PATH/scripts/package-approved-revision-canon.js" "$GITHUB_WORKSPACE" "$package_root"
 
           (
             cd "$package_root"

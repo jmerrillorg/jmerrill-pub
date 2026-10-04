@@ -148,6 +148,7 @@ function rolePatterns(role) {
 }
 
 function isAuthorVisibleArtifact(artifact) {
+  if (require("./approvedRevisionAudience").isApprovedRevisionCandidate(artifact)) return false;
   if (artifact?.jm1pub_supersededon) return false;
   const status = `${artifact?.["jm1pub_artifactstatus@OData.Community.Display.V1.FormattedValue"] || ""} ${artifact?.jm1pub_artifactstatus || ""}`;
   const visibility = `${artifact?.["jm1pub_visibility@OData.Community.Display.V1.FormattedValue"] || ""} ${artifact?.jm1pub_visibility || ""}`;

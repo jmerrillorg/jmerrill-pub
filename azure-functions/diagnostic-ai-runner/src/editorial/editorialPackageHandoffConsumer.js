@@ -1,5 +1,7 @@
 "use strict";
 
+const { isApprovedRevisionCandidate } = require("./approvedRevisionAudience");
+
 const {
   allowedMimeForRole,
   createDataverseClient,
@@ -59,6 +61,7 @@ function toOutput(artifact) {
 function newestByRole(artifacts) {
   const selected = new Map();
   for (const artifact of artifacts) {
+    if (isApprovedRevisionCandidate(artifact)) continue;
     const output = toOutput(artifact);
     const role = packageRoleForOutput(output.outputName);
     if (!role) continue;
@@ -103,7 +106,7 @@ async function getStage(client, stageId) {
 async function listStageArtifacts(client, stage) {
   return client.list("jm1pub_editorialartifacts", {
     $select:
-      "jm1pub_editorialartifactid,jm1pub_editorialartifactname,jm1pub_filename,jm1pub_fileextension,jm1pub_filesizebytes,jm1pub_repositorydriveid,jm1pub_repositoryitemid,jm1pub_repositorypath,jm1pub_sha256,jm1pub_artifactstatus,jm1pub_visibility,createdon,modifiedon,_jm1pub_titleid_value,_jm1pub_editorialstageid_value",
+      "jm1pub_editorialartifactid,jm1pub_editorialartifactname,jm1pub_filename,jm1pub_fileextension,jm1pub_filesizebytes,jm1pub_repositorydriveid,jm1pub_repositoryitemid,jm1pub_repositorypath,jm1pub_sha256,jm1pub_artifactstatus,jm1pub_visibility,jm1pub_correlationid,createdon,modifiedon,_jm1pub_titleid_value,_jm1pub_editorialstageid_value",
     $filter:
       `_jm1pub_titleid_value eq ${stage._jm1pub_titleid_value} and ` +
       `_jm1pub_editorialstageid_value eq ${stage.jm1pub_editorialstageid}`,

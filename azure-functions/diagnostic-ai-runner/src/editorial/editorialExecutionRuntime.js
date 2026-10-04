@@ -4346,6 +4346,17 @@ async function processStage(client, stage, correlationId, options = {}) {
 
 async function runEditorialExecutionRuntime(options = {}, deps = {}) {
   const client = deps.client || createDataverseClient(requireDataverseConfig(), deps);
+  const approvedOwner = require("./approvedRevisionRuntime");
+  let approvedRevision = null;
+  if (approvedOwner.enabled()) {
+    try {
+      approvedRevision = await approvedOwner.runApprovedRevision({
+        revisionTaskId: require("../../config/whole-stage07-approved-revision.json").taskId, executionMode: "EXECUTE"
+      }, { client });
+    } catch (error) {
+      approvedRevision = { ok: false, status: "HELD", code: approvedOwner.safeCode(error) };
+    }
+  }
   const correlationId = options.correlationId || `EDITORIAL-RUNTIME-${new Date().toISOString()}`;
   const maxTasks = Math.min(Math.max(Number(options.maxTasks || process.env.JM1_EDITORIAL_RUNTIME_MAX_TASKS || 10), 1), 25);
   const commissioned = [];
@@ -4371,6 +4382,7 @@ async function runEditorialExecutionRuntime(options = {}, deps = {}) {
     correlationId,
     executorCount: Object.keys(EXECUTOR_POLICIES).length,
     commissioned,
+    approvedRevision,
     processed: results.length,
     results
   };
