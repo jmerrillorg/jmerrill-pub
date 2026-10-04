@@ -147,6 +147,11 @@ class InMemoryInboundEvidenceStore {
     return this.checkpoints.get(name) || null;
   }
 
+  async setCheckpointOnce(name, value) {
+    if (!this.checkpoints.has(name)) this.checkpoints.set(name, value);
+    return this.checkpoints.get(name);
+  }
+
   async setCheckpoint(name, value) {
     this.checkpoints.set(name, value);
     if (name === "publishing-mailbox-delta") {

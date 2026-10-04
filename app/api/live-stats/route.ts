@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { publishedPortfolioCountPublic } from '@/lib/publishing/public-portfolio'
 
 export const runtime = 'edge'
 // Cache for 5 minutes — swap for Dataverse fetch in Phase 2
@@ -18,7 +19,7 @@ export async function GET() {
     inDevelopment:   3,   // manuscripts currently in editorial
     inDesign:        2,   // covers / layouts in progress
     releasedThisWeek: 1,  // titles released in last 7 days
-    totalTitles:     125,
+    publishedPortfolioCountPublic,
     activeAuthors:   40,
     lastUpdated:     new Date().toISOString(),
   }

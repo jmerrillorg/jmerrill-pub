@@ -9,6 +9,22 @@ export function sameProjectionTitle(left: unknown, right: unknown): boolean {
   return /^[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}$/.test(canonical) && canonical === id(right)
 }
 
+export function boundPublisherReview(gate: EvidenceRow, logs: EvidenceRow[]): EvidenceRow | null {
+  if (Number(gate.jm1pub_gatestatus) !== 196650002 || gate.jm1pub_authordecision != null ||
+      gate.jm1pub_authordecisionon || gate.jm1pub_nextstageauthorized === true) return null
+  const gateId = gate.jm1pub_editorialapprovalgateid
+  const start = Date.parse(String(gate.jm1pub_awaitingsince || gate.createdon || ''))
+  if (!Number.isFinite(start)) return null
+  const key = (row: EvidenceRow) => String(row.jm1_actiondescription || '').match(/Idempotency: (author-review-response:[a-f0-9]+)\./)?.[1]
+  const bound = logs.filter(log => log.jm1_sourceentity === 'jm1pub_editorialapprovalgate' &&
+    sameProjectionTitle(log.jm1_sourcerecordid, gateId) && Number.isFinite(Date.parse(String(log.createdon))) &&
+    Date.parse(String(log.createdon)) >= start)
+  return bound.filter(log => log.jm1_actiontype === 'AUTHOR_RESPONSE_REQUIRES_PUBLISHER_REVIEW' && key(log) &&
+    bound.some(captured => captured.jm1_actiontype === 'AUTHOR_RESPONSE_CAPTURED' && key(captured) === key(log) &&
+      sameProjectionTitle(String(captured.jm1_actiondescription || '').match(/(?:^|[; ])title=([a-f0-9-]{36})(?:;| |$)/i)?.[1], gate._jm1pub_titleid_value)))
+    .sort((a, b) => Date.parse(String(b.createdon)) - Date.parse(String(a.createdon)))[0] || null
+}
+
 export function selectCurrentEditorialStage(stages: EvidenceRow[]): EvidenceRow | null {
   if (!stages.length) return null
   return [...stages].sort((a, b) => {

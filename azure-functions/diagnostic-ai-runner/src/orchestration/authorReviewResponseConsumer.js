@@ -189,7 +189,11 @@ function createDataverseClient(config, deps = {}) {
   async function patch(entitySet, id, payload) {
     await request(`${entitySet}(${id})`, { method: "PATCH", body: JSON.stringify(payload), prefer: "return=minimal" });
   }
-  return { list, first, create, patch };
+  async function patchIfMatch(entitySet, id, payload, etag) {
+    if (!etag) throw Object.assign(new Error("AUTHOR_GATE_ETAG_REQUIRED"), { safeCode: "AUTHOR_GATE_ETAG_REQUIRED" });
+    await request(`${entitySet}(${id})`, { method: "PATCH", body: JSON.stringify(payload), prefer: "return=minimal", headers: { "If-Match": etag } });
+  }
+  return { list, first, create, patch, patchIfMatch };
 }
 
 function classifyAuthorReviewResponse(text) {
@@ -1245,7 +1249,7 @@ async function processGateReply(client, gate, deps, triggerSource) {
   const idempotencyKey = stableIdempotencyKey(gateId, inboundMessageId);
   const existing = await findAnyExecutionLog(
     client,
-    [
+    deps.durableWaitResume ? ["AUTHOR_INBOUND_MESSAGE_COMPLETED"] : [
       "AUTHOR_INBOUND_MESSAGE_COMPLETED",
       "AUTHOR_RESPONSE_CAPTURED",
       "AUTHOR_APPROVAL_PERSISTED",
@@ -1433,7 +1437,11 @@ async function runAuthorReviewResponseConsumer(input = {}, deps = {}) {
   const packageDiagnostics = (await (deps.findPackageSelectionDiagnostics || findOpenPackageSelectionDiagnostics)(client, input.maxPackageSelections || 10))
     .filter((diagnostic) => !targetDiagnosticId || normalizeString(diagnostic.jm1pub_editorialdiagnosticid).toLowerCase() === targetDiagnosticId.toLowerCase());
   const results = [];
-  for (const gate of gates) results.push(await processGateReply(client, gate, deps, triggerSource));
+  for (const gate of gates) {
+    if (require("../lifecycle/publishingWaitEnablement").waitRuntimeOwnsTitle(gate._jm1pub_titleid_value)) {
+      results.push({ gateId: gate.jm1pub_editorialapprovalgateid, outcome: "DURABLE_WAIT_OWNER" });
+    } else results.push(await processGateReply(client, gate, deps, triggerSource));
+  }
   const packageSelectionResults = [];
   const packageDeps = { ...deps, targetDiagnosticId };
   for (const diagnostic of packageDiagnostics) packageSelectionResults.push(await processPackageSelectionReply(client, diagnostic, packageDeps, triggerSource));
@@ -1467,8 +1475,33 @@ async function runAuthorReviewResponseConsumer(input = {}, deps = {}) {
   };
 }
 
+async function resumeExactAuthorReviewReply(client, gate, reply, delivery) {
+  // Entry point for the wait owner, after verified identity and exact delivery checks.
+  const boundGate = { ...gate, jm1pub_authoremail: reply.senderAddress,
+    outboundInternetMessageId: delivery.internetMessageId };
+  const expectedSource = compactDecisionSource(durableInboundMessageId(reply));
+  const expectedDecision = decisionCode(resolveAuthorReviewDecision(gate, reply).classification);
+  if (gate.jm1pub_authordecision !== null && gate.jm1pub_authordecision !== undefined &&
+      (gate.jm1pub_authordecisionsource !== expectedSource || gate.jm1pub_authordecision !== expectedDecision)) {
+    return { gateId: gate.jm1pub_editorialapprovalgateid, outcome: "HELD_EXISTING_AUTHOR_DECISION" };
+  }
+  const guardedClient = { ...client, patch: async (entity, id, payload) => {
+    if (entity !== "jm1pub_editorialapprovalgates" || id !== gate.jm1pub_editorialapprovalgateid) {
+      throw Object.assign(new Error("AUTHOR_WAIT_PATCH_OUTSIDE_GATE"), { safeCode: "AUTHOR_WAIT_PATCH_OUTSIDE_GATE" });
+    }
+    if (gate.jm1pub_authordecision === expectedDecision && gate.jm1pub_authordecisionsource === expectedSource) return;
+    await client.patchIfMatch(entity, id, payload, gate["@odata.etag"]);
+  } };
+  return processGateReply(guardedClient, boundGate, {
+    durableWaitResume: true,
+    readReply: async () => reply,
+    verifyCadenceDeliveryBinding: async () => ({ status: "EXACT", deliveryEventId: delivery.deliveryId })
+  }, "DURABLE_WAIT_RESUME");
+}
+
 module.exports = {
   runAuthorReviewResponseConsumer,
+  resumeExactAuthorReviewReply,
   classifyAuthorReviewResponse,
   classifyAuthorReviewMessageIntents,
   resolveAuthorReviewDecision,

@@ -1,6 +1,6 @@
 "use strict";
 
-const CALLER_REGISTRY_VERSION = "JM1-RELAY-CALLERS-v1.1.0";
+const CALLER_REGISTRY_VERSION = "JM1-RELAY-CALLERS-v1.3.0";
 
 const BRAND_ALIASES = Object.freeze({
   PUBLISHING: "JMP",
@@ -10,6 +10,20 @@ const BRAND_ALIASES = Object.freeze({
 });
 
 const CALLERS = Object.freeze([
+  caller({
+    callerId: "one-bp09-productions-prod",
+    identity: {
+      type: "ENTRA_WORKLOAD_IDENTITY",
+      objectId: "38b09d6f-34d9-48b3-9627-f04c047fd534"
+    },
+    application: "ONE BP-09 intake runtime: Productions reference notice only",
+    canonicalRepo: "jmerrillorg/jmerrill-one",
+    authorizedBrands: ["JMPRODUCTIONS"],
+    authorizedTemplates: ["PRODUCTIONS.BP09_NOTICE"],
+    authorizedRecipients: ["productions@jmerrill.one"],
+    status: "ACTIVE",
+    lastProven: null
+  }),
   caller({
     callerId: "publishing-web-prod",
     identity: {
@@ -37,6 +51,20 @@ const CALLERS = Object.freeze([
     lastProven: null
   }),
   caller({
+    callerId: "jsj-web-prod",
+    identity: {
+      type: "ENTRA_WORKLOAD_IDENTITY",
+      objectId: "8a488b86-7a1a-4978-8705-6fbc3bd8ce15"
+    },
+    application: "Jackie Smith Jr. production contact runtime",
+    canonicalRepo: "jmerrillorg/jackiesmithjr",
+    authorizedBrands: ["JSJ"],
+    authorizedTemplates: ["JSJ_INQUIRY_NOTIFICATION"],
+    authorizedRecipients: ["jackie@jmerrill.one"],
+    status: "ACTIVE",
+    lastProven: null
+  }),
+  caller({
     callerId: "publishing-legacy-shared-relay-key",
     identity: {
       type: "LEGACY_SHARED_KEY",
@@ -56,7 +84,8 @@ function caller(value) {
     registryVersion: CALLER_REGISTRY_VERSION,
     ...value,
     authorizedBrands: Object.freeze(value.authorizedBrands.map(normalizeBrand)),
-    authorizedTemplates: Object.freeze((value.authorizedTemplates || []).map(normalizeTemplate))
+    authorizedTemplates: Object.freeze((value.authorizedTemplates || []).map(normalizeTemplate)),
+    authorizedRecipients: value.authorizedRecipients ? Object.freeze(value.authorizedRecipients.map((address) => String(address).trim().toLowerCase())) : null
   });
 }
 
@@ -102,6 +131,15 @@ function authorizeCallerForTemplate(callerRecord, templateId) {
   return { ok: true, caller: callerRecord, templateId: normalizedTemplate };
 }
 
+function authorizeCallerForRecipients(callerRecord, recipients) {
+  if (!callerRecord) return { ok: false, reason: "UNKNOWN_CALLER" };
+  if (!callerRecord.authorizedRecipients) return { ok: true, caller: callerRecord };
+  if (!Array.isArray(recipients) || recipients.length === 0 || recipients.some((address) => !callerRecord.authorizedRecipients.includes(String(address).trim().toLowerCase()))) {
+    return { ok: false, reason: "CALLER_RECIPIENT_NOT_AUTHORIZED" };
+  }
+  return { ok: true, caller: callerRecord };
+}
+
 function listCallers() {
   return [...CALLERS];
 }
@@ -110,6 +148,7 @@ module.exports = {
   CALLER_REGISTRY_VERSION,
   authorizeCallerForBrand,
   authorizeCallerForTemplate,
+  authorizeCallerForRecipients,
   findCallerByObjectId,
   getLegacyCaller,
   listCallers,

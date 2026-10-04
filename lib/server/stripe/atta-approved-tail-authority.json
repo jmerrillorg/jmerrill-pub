@@ -1,0 +1,25 @@
+{
+  "approvalReference": "JM1-VERTICAL-OPERATING-COMMISSIONING-001",
+  "approvalSourceHash": "2f225b1bfa3669d8c62913675bc614710c9518a284020fc16140c57b3f42eff5",
+  "source": "JMP-ATTA-PROVIDER-SAFE-TAIL-ADJUSTMENT-001/2026-10-03T02-45-30-444Z",
+  "approvedPayloadHash": "a27afce3a605324f753d3fd3fff7f1aa00932011737eb05624e559eabd2e5075",
+  "sourceHashes": {
+    "agreement": "ca5aaf14bee40fc5b0c34a1bdb8218108f239db593701ca7c883c7ffb60ad8c3",
+    "requirements": "fc7fcff1809b9e10a69b0b037f1cf097a1a71b7995d9be44b5315728bbb5bd98",
+    "payments": "27c8fc1b296d9a5d9bdfb90e6962997a0ece1d081e167854b108bfdf016d1c7a",
+    "customer": "5690d43927c82a9f24a9048ba9d8c167c6d8a80678c8b65573cb38951fc1544b",
+    "subscription": "31dfb13bd6922c51706496ea7f4805085e5310475b0eb8224787cc1b3225e620",
+    "schedule": "2f67b288593212964ad6ac123560b0f35ebe765b2a1d5a1e3160cbefc5a41f7f",
+    "invoices": "102790d0d3f283fa20481255fdc262518db87749f5d97be6bdfae6837d3a9fa0",
+    "payment-intents": "71a4ddd26faff7a372d38c015f181a7321e479ce2127e42168d9e36d4091c4ad",
+    "subscriptions": "308fc70c39d6317d0864644f3faeeb0b65e25c75aa4e52c6b5030d7df52536fd",
+    "schedules": "e8251b5295a8d81c03b8e30d2be27c145c5ff01e18ca5131fc949e95290a51aa",
+    "pending-invoice-items": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "all-invoice-items": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "charges": "8bb1e874426ac07c3a0d36fdcf9db38830a217c70cc53494f3546d55eecf87bb",
+    "balance-transactions": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "tax-ids": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "credit-notes-in_1UHjinJCiOVFpgYutHBdj0l4": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "credit-notes-in_1U6UvvJCiOVFpgYubDg2z1e9": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+  }
+}

@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { publishedPortfolioCountPublic } from '@/lib/publishing/public-portfolio'
 import './globals.css'
 import { NavBar } from '@/components/layout/NavBar'
 import { Footer } from '@/components/layout/Footer'
@@ -11,7 +12,7 @@ export const metadata: Metadata = {
     default:  'J Merrill Publishing, Inc. — Helping Authors Help Themselves',
   },
   description:
-    'J Merrill Publishing, Inc. is a full-service publisher helping authors own their intellectual property and reach readers worldwide. 125+ titles in print. 45,000+ global retail outlets via Ingram. Founded 2018, Columbus, Ohio. A J Merrill One company.',
+    `J Merrill Publishing, Inc. has ${publishedPortfolioCountPublic} published titles and helps authors own their intellectual property and reach readers worldwide. Explore its living book catalog and global distribution through Ingram. Founded 2018, Columbus, Ohio. A J Merrill One company.`,
   keywords: [
     'full-service publisher',
     'book publishing',

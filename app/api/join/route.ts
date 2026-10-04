@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { hasConfirmedNotificationDelivery, notificationNotConfiguredMessage, submitWebsiteForm, type Jm1PubInternalClassification } from '@/lib/server/form-integrations'
+import { hasConfirmedCanonicalFormCapture, hasConfirmedNotificationDelivery, notificationNotConfiguredMessage, submitWebsiteForm, type Jm1PubInternalClassification } from '@/lib/server/form-integrations'
 import { cleanString, missingFields, requiredFieldsResponse } from '@/lib/server/form-validation'
 
 type JoinImprint = 'J Merrill Publishing' | 'JM Little' | 'JM Verse' | 'JM Works' | 'JM Signature'
@@ -179,6 +179,14 @@ export async function POST(req: NextRequest) {
         },
         { status: 502 },
       )
+    }
+
+    if (!hasConfirmedCanonicalFormCapture(integration)) {
+      return NextResponse.json({
+        success: false,
+        message: 'Your message reached our team. We will follow up personally before your project moves ahead.',
+        integration,
+      }, { status: 202 })
     }
 
     return NextResponse.json({

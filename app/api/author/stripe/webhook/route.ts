@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 
 import { findSafeExecutionLogByName, updateCommissioningOpportunityPaymentStatus, writeSafeExecutionLog } from '@/lib/server/dataverse-execution-log'
+import { paymentGuardHttpStatus } from '@/lib/server/stripe/publishing-payment-guard'
 import {
   COMMISSIONING_REFERENCE,
 } from '@/lib/server/stripe/author-workspace-stripe'
@@ -115,7 +116,7 @@ export async function POST(req: NextRequest) {
     if (!result.ok) {
       await recordPublishingPaymentException(paymentSuccess, result.reason).catch(() => null)
     }
-    const status = result.ok ? 200 : 422
+    const status = result.ok ? 200 : paymentGuardHttpStatus(result.reason)
     return NextResponse.json({ received: true, processed: result.ok, result }, { status })
   }
 

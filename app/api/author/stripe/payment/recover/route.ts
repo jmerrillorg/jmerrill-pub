@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { paymentGuardHttpStatus } from '@/lib/server/stripe/publishing-payment-guard'
 
 import {
   processPublishingPaymentSuccess,
@@ -45,7 +46,7 @@ export async function POST(req: NextRequest) {
       correctionReason: manualCorrectionRequested ? correctionReason : null,
       source: manualCorrectionRequested ? 'GOVERNED_MANUAL_CORRECTION' : 'STRIPE_LIVE_RECOVERY',
     })
-    return NextResponse.json({ ok: result.ok, result }, { status: result.ok ? 200 : 422 })
+    return NextResponse.json({ ok: result.ok, result }, { status: result.ok ? 200 : paymentGuardHttpStatus(result.reason) })
   } catch (error: any) {
     return NextResponse.json({
       ok: false,
