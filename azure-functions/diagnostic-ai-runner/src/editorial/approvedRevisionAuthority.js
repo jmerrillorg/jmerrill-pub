@@ -1,9 +1,8 @@
 "use strict";
 
-const fs = require("node:fs");
-const path = require("node:path");
 const policy = require("../../config/whole-stage07-approved-revision.json");
 const { hash, fail } = require("./approvedRevisionDocument");
+const { readVerifiedSkill, bindSkill } = require("./approvedRevisionSkill");
 const { readExistingTitleAuthorities, readExistingGlobalStyleGuide } = require("./productionTitleAuthorityReader");
 
 const OWNER = "PUBLISHING_APPROVED_EDITORIAL_REVISION_V1";
@@ -27,6 +26,7 @@ function metadataPath(item) {
 async function readApprovedRevisionAuthority(input, deps) {
   validateInput(input);
   const policy = deps.policy || approvedPolicy;
+  const skill = await readVerifiedSkill(deps.readSkillFile);
   const client = deps.client;
   const task = await exact(client, "jm1_publishingtasks", "jm1_publishingtaskid", policy.taskId);
   const disposition = await exact(client, "jm1_executionlogs", "jm1_executionlogid", policy.dispositionId);
@@ -83,8 +83,7 @@ async function readApprovedRevisionAuthority(input, deps) {
   for (const [label, expected] of Object.entries(policy.titleAuthorities)) {
     if (titleAuthorities[label]?.id !== expected.id || titleAuthorities[label]?.sha256 !== expected.sha256) fail("REVISION_TITLE_AUTHORITY_CHANGED");
   }
-  const canon = deps.readStageCanon ? await deps.readStageCanon() : fs.readFileSync(path.join(__dirname, "../../config/developmental-editing.md"));
-  if (hash(canon) !== policy.stageCanonSha256) fail("REVISION_STAGE_CANON_CHANGED");
+  if (skill.files["references/developmental-editing.md"].sha256 !== policy.stageCanonSha256) fail("REVISION_STAGE_CANON_CHANGED");
   const sources = {
     stageCanon: { id: policy.stageCanonPath, version: policy.stageCanonSha256, sha256: policy.stageCanonSha256 },
     styleGuide,
@@ -102,6 +101,7 @@ async function readApprovedRevisionAuthority(input, deps) {
     sources: Object.fromEntries(Object.entries(sources).map(([k, v]) => [k, { id: v.id, version: v.version, sha256: v.sha256, scope: v.scope || null }])),
     protectedRecords: [task, disposition, stage, ...gates, source, delivered].map((r) => ({ etag: r["@odata.etag"] })),
     outputAudience: "INTERNAL_EDITORIAL", authorDeliveryEligible: false };
+  snapshot.editorialAuthority = bindSkill(skill, snapshot, stage.jm1pub_governingstyleguide);
   return { sourceBuffer, snapshot, fingerprint: hash(JSON.stringify(snapshot)), titleName: title.jm1pub_titlename };
 }
 

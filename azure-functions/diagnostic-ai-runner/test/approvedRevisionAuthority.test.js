@@ -7,8 +7,8 @@ const { policy, readApprovedRevisionAuthority } = require("../src/editorial/appr
 const { hash } = require("../src/editorial/approvedRevisionDocument");
 
 function fixture() {
-  const p = structuredClone(policy), source = Buffer.from("synthetic manuscript bytes"), canon = Buffer.from("synthetic stage canon");
-  p.sourceSha256 = hash(source); p.stageCanonSha256 = hash(canon);
+  const p = structuredClone(policy), source = Buffer.from("synthetic manuscript bytes");
+  p.sourceSha256 = hash(source);
   const decision = { decision: "APPROVED_STAGE07_REVISION_INSTRUCTIONS_ONLY", taskId: p.taskId, titleId: p.titleId,
     stageId: p.stageId, publisherUserId: p.publisherId, artifactId: p.deliveredArtifactId, artifactSha256: p.deliveredSha256,
     originUserMessage: p.approvalMessageId, criteria: ["bounded synthetic instruction"], sourceEventId: "existing-source-event" };
@@ -48,7 +48,7 @@ function fixture() {
   const deps = { policy: p, client: { list: async (set, query) => {
     const match = /^(\w+id) eq ([a-f0-9-]+)$/.exec(query.$filter);
     return match ? records[set].filter((r) => r[match[1]] === match[2]) : authorities;
-  } }, readStageCanon: async () => canon,
+  } }, readSkillFile: async (name) => fs.readFileSync(path.resolve(__dirname, "../../../docs/implementation/canon-cache/jm1-publishing-editorial", name)),
     verifyKnowledgeBlob: async () => ({ reachable: true, hashMatched: true, content: "global guide", calculatedSha256: hash("global guide") }),
     graph: async (uri) => {
       if (!uri.endsWith("/content")) return structuredClone(metadata);
@@ -68,6 +68,9 @@ test("authority binds seven existing sources, canonical byte provenance and pres
   assert.equal(a.snapshot.sources.priorAuthorDecisions.id, policy.dispositionId);
   assert.equal(a.snapshot.outputAudience, "INTERNAL_EDITORIAL");
   assert.equal(a.snapshot.authorDeliveryEligible, false);
+  assert.equal(a.snapshot.editorialAuthority.skill, "jm1-publishing-editorial");
+  assert.equal(a.snapshot.editorialAuthority.authority.titleStyleSheet.id, h.p.titleAuthorities.titleStyleSheet.id);
+  assert.equal(a.snapshot.editorialAuthority.authority.priorAuthorDecisions.sha256, h.p.dispositionSha256);
   const b = await readApprovedRevisionAuthority(input, h.deps);
   assert.equal(a.fingerprint, b.fingerprint);
 });
@@ -83,7 +86,9 @@ test("changed decision, owner, title, source path, canon or existing title autho
     (h) => { h.gates[0].jm1pub_authordecision = 196650000; },
     (h) => { h.metadata.parentReference.path = "/drives/drive/root:/07_Archive/title"; },
     (h) => { h.metadata.parentReference.driveId = "different"; },
-    (h) => { h.deps.readStageCanon = async () => Buffer.from("changed"); },
+    (h) => { h.deps.readSkillFile = async () => Buffer.from("changed"); },
+    (h) => { h.stage.jm1pub_governingstyleguide = "GENERIC"; },
+    (h) => { h.stage.jm1pub_stagetype = 100000002; },
     (h) => { h.authorities[0].jm1pub_sha256 = "a".repeat(64); },
     (h) => { h.authorities[2]._jm1pub_titleid_value = "different"; }
   ];
@@ -97,6 +102,6 @@ test("approved stage canon is packaged from the existing governed source without
   const root = path.resolve(__dirname, "../../..");
   assert.equal(hash(fs.readFileSync(path.join(root, policy.stageCanonPath))), policy.stageCanonSha256);
   const workflow = fs.readFileSync(path.join(root, ".github/workflows/diagnostic-ai-runner.yml"), "utf8");
-  assert.ok(workflow.includes(`cp ${policy.stageCanonPath}`));
-  assert.ok(workflow.includes(policy.stageCanonSha256));
+  assert.ok(workflow.includes("scripts/package-approved-revision-canon.js"));
+  assert.ok(workflow.includes("docs/implementation/canon-cache/jm1-publishing-editorial/**"));
 });

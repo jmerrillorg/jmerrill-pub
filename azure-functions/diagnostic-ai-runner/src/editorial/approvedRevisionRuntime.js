@@ -4,6 +4,14 @@ const { policy, OWNER, validateInput, readApprovedRevisionAuthority } = require(
 const { hash, fail, deriveApprovedFormattingPlan, produceApprovedFormattingRevision } = require("./approvedRevisionDocument");
 const { createApprovedRevisionStore } = require("./approvedRevisionStore");
 const { persistVariant, verifyReceipt } = require("./approvedRevisionPersistence");
+const { validateSkillPlan } = require("./approvedRevisionSkill");
+
+function verifyStoredPlan(manifest, binding) {
+  validateSkillPlan(manifest?.plan);
+  if (manifest.planSha256 !== hash(JSON.stringify(manifest.plan)) ||
+      JSON.stringify(manifest.editorialAuthority) !== JSON.stringify(binding) ||
+      JSON.stringify(manifest.plan.editorialAuthority) !== JSON.stringify(binding)) fail("REVISION_STORED_SKILL_BINDING_MISMATCH");
+}
 
 function enabled(env = process.env) {
   return env.JM1_APPROVED_EDITORIAL_REVISION_ENABLED === "true" && env.JM1_APPROVED_EDITORIAL_REVISION_TASK_ID === policy.taskId;
@@ -35,9 +43,10 @@ async function runApprovedRevision(input, supplied = {}) {
   if (input.executionMode === "READBACK") return { ok: true, status: "NOT_COMPLETED", state: await store.read("state.json"), ownerEnabled: enabled(supplied.env), externalSends: 0 };
   if (["DRY_RUN", "EXECUTE_ASYNC"].includes(input.executionMode)) {
     const authority = await readAuthority(input);
-    const plan = await deriveApprovedFormattingPlan(authority.sourceBuffer);
+    const plan = await deriveApprovedFormattingPlan(authority.sourceBuffer, authority.snapshot.editorialAuthority);
     if (input.executionMode === "DRY_RUN") return { ok: true, status: "DRY_RUN_READY", owner: OWNER, taskId: policy.taskId,
-      authorityFingerprint: authority.fingerprint, sources: authority.snapshot.sources, editCount: plan.edits.length,
+      authorityFingerprint: authority.fingerprint, sources: authority.snapshot.sources, editorialAuthority: plan.editorialAuthority,
+      planSha256: hash(JSON.stringify(plan)), editCount: plan.edits.length,
       gridCount: 8, checkboxCount: 8, headingCount: 32, authorDeliveryEligible: false, externalSends: 0, artifactWrites: 0 };
     const { enqueueApprovedRevision } = require("./targetedEditorialExecutionQueue");
     return enqueueApprovedRevision(input, deps);
@@ -68,18 +77,21 @@ async function runApprovedRevision(input, supplied = {}) {
         if (!saved) {
           if (review || clean) fail("REVISION_INCOMPLETE_GENERATION_RECOVERY_REQUIRED");
           const generated = await (deps.produce || produceApprovedFormattingRevision)(authority.sourceBuffer, {
-            sourceSha256: policy.sourceSha256, timestamp: intent.createdAt
+            sourceSha256: policy.sourceSha256, timestamp: intent.createdAt, editorialAuthority: authority.snapshot.editorialAuthority
           });
           saved = { evidence: generated.evidence, review: generated.review.toString("base64"), clean: generated.clean.toString("base64") };
+          verifyStoredPlan(saved.evidence, authority.snapshot.editorialAuthority);
           await claim.assertOwned();
           await store.put("generated.json", saved);
         }
         review = Buffer.from(saved.review, "base64"); clean = Buffer.from(saved.clean, "base64"); manifest = saved.evidence;
+        verifyStoredPlan(manifest, authority.snapshot.editorialAuthority);
         if (hash(review) !== manifest.reviewSha256 || hash(clean) !== manifest.cleanSha256 || manifest.sourceSha256 !== policy.sourceSha256) fail("REVISION_GENERATED_ENVELOPE_INVALID");
         await store.putBytes("review.docx", review);
         await store.putBytes("clean.docx", clean);
         await store.put("output-manifest.json", manifest);
       }
+      verifyStoredPlan(manifest, authority.snapshot.editorialAuthority);
       if (!review || !clean || hash(review) !== manifest.reviewSha256 || hash(clean) !== manifest.cleanSha256 ||
           manifest.sourceSha256 !== policy.sourceSha256 || manifest.recipe !== policy.recipeVersion ||
           manifest.gridCount !== 8 || manifest.headingFormats !== 32 || manifest.checkboxInsertions !== 8 ||
@@ -95,6 +107,7 @@ async function runApprovedRevision(input, supplied = {}) {
       const result = { owner: OWNER, taskId: policy.taskId, recipe: policy.recipeVersion, status: "AWAITING_VISUAL_QA",
         authorityFingerprint: intent.authorityFingerprint, sourceArtifactId: policy.sourceArtifactId, sourceSha256: policy.sourceSha256,
         canonicalSourceItemId: policy.canonicalSourceItemId, outputs, structuralQa: manifest,
+        editorialAuthority: manifest.editorialAuthority, planSha256: manifest.planSha256,
         visualQa: "NOT_PERFORMED", taskCompleted: false, authorApproved: false, authorDeliveryEligible: false,
         authorCommunications: 0, stageAdvancements: 0, completedAt: new Date().toISOString() };
       await checkReceipt(result);

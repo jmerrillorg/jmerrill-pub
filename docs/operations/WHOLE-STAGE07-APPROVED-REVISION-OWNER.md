@@ -16,6 +16,30 @@ read and bound. Existing author rulings supply preferences for this approved
 formatting-only scope; no general preference profile is invented. The Publisher
 disposition is not final author approval.
 
+The custom `jm1-publishing-editorial` skill governs this path. The version lock in
+`config/approved-revision-editorial-canon.json` pins the unchanged `SKILL.md`,
+`SOURCE-MANIFEST.md`, developmental reference, developmental pipeline bridge and
+editorial knowledge reference. The canonical packaging step verifies and bundles
+all five files verbatim. Missing files or hash/version drift fail closed; there
+is no generic guide fallback. Source changes also trigger the Function CI gate.
+
+`approvedRevisionSkill` translates the applicable skill boundaries into fixed
+validation: only the exact Whole task/title/Stage 07 disposition; existing
+`JMP-SG-CMOS` selection (never a fresh generic default); the existing global
+guide, project style sheet, voice, rulings/preferences and prior-decision hashes;
+and the exact 32 heading/8 checkbox plan. Rewrites, deletion, extra instructions,
+diagnostic-review closing text, style substitution and another title/stage fail.
+The bridge's advisory output cannot create new canon. The skill's hard-stop and
+human-approval rules remain intact: this owner cannot clear a flag, choose a new
+route, authorize delivery or advance a stage. It is not a new Editorial Review.
+
+The plan, immutable generation envelope, output manifest and receipt retain the
+skill version, source-package provenance, all five file hashes, selected doctrine,
+style sources, prior decision and applied rule map. These stay internal, outside
+the manuscripts. Recovery rejects pre-binding envelopes, stale plans or changed
+authority instead of promoting them. Structural output checks independently
+require all source text, original run formatting and table XML to be preserved.
+
 Only 32 existing category headings receive spacing/keep-with-next properties;
 eight final Core Components sentences receive a checkbox prefix. All eight
 tables and original text/run formatting are retained. Review has 40 native Word
@@ -55,7 +79,8 @@ telemetry. There is no chat-triggered reset or silent destructive rollback.
    task, disposition, source hashes and author gates. Verify private audit storage.
 3. With execution still disabled, call the existing key-authenticated targeted
    route with only `revisionTaskId` and `executionMode: DRY_RUN`. Require exact
-   seven-source binding, eight grids, 32 headings, eight checkbox targets and zero
+   seven-source binding plus all five custom-skill file hashes, the existing style
+   and decision binding, eight grids, 32 headings, eight checkbox targets and zero
    artifact writes. Missing access is a hold, not permission to broaden credentials.
 4. Under the approved bounded activation, set
    `JM1_APPROVED_EDITORIAL_REVISION_TASK_ID=f369abf6-a3ec-5346-a12b-c3bd44f29dfb`

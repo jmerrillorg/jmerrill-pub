@@ -4,8 +4,8 @@ const { createHash } = require("node:crypto");
 const JSZip = require("jszip");
 const { DOMParser, XMLSerializer } = require("@xmldom/xmldom");
 const { applyNativeEditorialPlan } = require("./nativeWordEditorialMutation");
+const { DIMENSIONS, headings, assertSkillBinding, validateSkillPlan } = require("./approvedRevisionSkill");
 const W = "http://schemas.openxmlformats.org/wordprocessingml/2006/main";
-const DIMENSIONS = Object.freeze(["Spiritual", "Mental", "Emotional", "Physical", "Personal", "Relational", "Financial", "Professional"]);
 const hash = (v) => createHash("sha256").update(v).digest("hex");
 function fail(code) { throw Object.assign(new Error(code), { safeCode: code }); }
 const elements = (node, name) => Array.from(node.getElementsByTagNameNS(W, name));
@@ -23,7 +23,9 @@ async function xml(buffer) {
 
 // This recipe can only change existing heading spacing and prepend eight checkbox glyphs.
 // It accepts no caller-supplied manuscript text, edit plan, styling rules or model output.
-async function deriveApprovedFormattingPlan(buffer) {
+async function deriveApprovedFormattingPlan(buffer, editorialAuthority) {
+  assertSkillBinding(editorialAuthority);
+  if (hash(buffer) !== editorialAuthority.sourceSha256) fail("REVISION_SOURCE_BINDING_INVALID");
   const { doc } = await xml(buffer);
   if (elements(doc, "tbl").length !== 8 || ["ins", "del", "pPrChange", "moveFrom", "moveTo"].some((n) => elements(doc, n).length)) {
     fail("REVISION_SOURCE_STRUCTURE_UNSUPPORTED");
@@ -38,14 +40,13 @@ async function deriveApprovedFormattingPlan(buffer) {
   const edits = [], targets = [];
   let prior = -1;
   for (const dimension of DIMENSIONS) {
-    const headings = [`Characteristics of ${dimension} Wholeness`, `Signs ${dimension} Wholeness May Need Attention`,
-      `Core Components of ${dimension} Wholeness`, `Practices That Build ${dimension} Wholeness`];
-    const indexes = headings.map(exact);
+    const sectionHeadings = headings(dimension);
+    const indexes = sectionHeadings.map(exact);
     if (!(prior < indexes[0] && indexes[0] < indexes[1] && indexes[1] < indexes[2] && indexes[2] < indexes[3])) {
       fail("REVISION_SECTION_ORDER_CONFLICT");
     }
     prior = indexes[3];
-    for (const anchor of headings) edits.push({ editId: `format-${edits.length}`, editClass: "FORMAT_PARAGRAPH", anchor,
+    for (const anchor of sectionHeadings) edits.push({ editId: `format-${edits.length}`, editClass: "FORMAT_PARAGRAPH", anchor,
       paragraphProperties: { spacingBefore: 240, spacingAfter: 120, keepNext: true }, authorityClass: "SYSTEM_AUTHORIZED_EDIT" });
     const boundary = texts.findIndex((t, i) => i > indexes[2] && i < indexes[3] && t.trim() === "Reflection Questions");
     if (boundary < 0) fail("REVISION_CORE_BOUNDARY_MISSING");
@@ -59,12 +60,13 @@ async function deriveApprovedFormattingPlan(buffer) {
       anchorScope: "PARAGRAPH", insertPosition: "BEFORE", proposedText: "\u2610 ", authorityClass: "SYSTEM_AUTHORIZED_EDIT" });
     targets.push({ dimension, paragraphIndex: last, anchorSha256: hash(anchor) });
   }
-  return { edits, targets };
+  return validateSkillPlan({ edits, targets, editorialAuthority });
 }
 
-async function produceApprovedFormattingRevision(source, { sourceSha256, timestamp } = {}) {
+async function produceApprovedFormattingRevision(source, { sourceSha256, timestamp, editorialAuthority } = {}) {
   if (!Buffer.isBuffer(source) || hash(source) !== sourceSha256 || !Number.isFinite(Date.parse(timestamp))) fail("REVISION_SOURCE_BINDING_INVALID");
-  const { edits, targets } = await deriveApprovedFormattingPlan(source);
+  const plan = await deriveApprovedFormattingPlan(source, editorialAuthority);
+  const { edits, targets } = plan;
   const review = await applyNativeEditorialPlan(source, edits, { timestamp, revisionAuthor: "J Merrill Publishing" });
   const before = await xml(source), after = await xml(review.buffer);
   const serialize = (node) => new XMLSerializer().serializeToString(node);
@@ -92,6 +94,7 @@ async function produceApprovedFormattingRevision(source, { sourceSha256, timesta
   return { review: review.buffer, clean, evidence: { recipe: "whole-stage07-formatting-v1", sourceSha256,
     reviewSha256: hash(review.buffer), cleanSha256: hash(clean), gridCount: 8, preservedGridHashes: tables(before.doc).map(hash),
     headingFormats: 32, checkboxInsertions: 8, targets, textRetention: "ALL_SOURCE_TEXT_PRESERVED",
+    editorialAuthority, plan, planSha256: hash(JSON.stringify(plan)),
     visualQa: "REQUIRED", authorApproval: "NOT_INFERRED" } };
 }
 

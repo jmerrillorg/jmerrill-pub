@@ -7,8 +7,8 @@ const { hash } = require("../src/editorial/approvedRevisionDocument");
 const { processQueuedTargetedEditorialExecution } = require("../src/editorial/targetedEditorialExecutionQueue");
 const env = { JM1_APPROVED_EDITORIAL_REVISION_ENABLED: "true", JM1_APPROVED_EDITORIAL_REVISION_TASK_ID: policy.taskId };
 const input = { revisionTaskId: policy.taskId, executionMode: "EXECUTE" };
-const evidence = { recipe: policy.recipeVersion, sourceSha256: policy.sourceSha256, reviewSha256: hash("review"),
-  cleanSha256: hash("clean"), gridCount: 8, headingFormats: 32, checkboxInsertions: 8, textRetention: "ALL_SOURCE_TEXT_PRESERVED" };
+const { binding, evidence: evidenceFixture } = require("./fixtures/approvedRevisionSkill");
+const evidence = evidenceFixture();
 
 function harness() {
   const data = new Map(), effects = [], counters = { produce: 0 };
@@ -26,7 +26,7 @@ function harness() {
     }
   };
   const deps = { env, store, client: {}, graph: async () => { throw new Error("unapproved Graph call"); },
-    readAuthority: async () => ({ sourceBuffer: Buffer.from("source"), fingerprint: "authority-1", snapshot: { sources: {} } }),
+    readAuthority: async () => ({ sourceBuffer: Buffer.from("source"), fingerprint: "authority-1", snapshot: { sources: {}, editorialAuthority: binding() } }),
     produce: async () => { counters.produce++; return { review: Buffer.from("review"), clean: Buffer.from("clean"), evidence }; },
     persistVariant: async (variant, bytes) => { if (!effects.includes(variant)) effects.push(variant); return { variant, sha256: hash(bytes) }; },
     verifyReceipt: async (receipt) => { assert.equal(receipt.outputs.length, 2); assert.equal(receipt.authorApproved, false); }
@@ -50,6 +50,8 @@ test("durable receipt survives restart and duplicate queue dispatch without rege
   const first = await runApprovedRevision(input, h.deps);
   assert.equal(first.status, "AWAITING_VISUAL_QA");
   assert.equal(first.receipt.taskCompleted, false);
+  assert.deepEqual(first.receipt.editorialAuthority, binding());
+  assert.equal(first.receipt.planSha256, hash(JSON.stringify(evidence.plan)));
   const message = { kind: "APPROVED_EDITORIAL_REVISION", version: 1, revisionTaskId: policy.taskId };
   const replay = await processQueuedTargetedEditorialExecution(message, { runApprovedRevision: (i) => runApprovedRevision(i, { ...h.deps }) });
   assert.equal(replay.status, "IDEMPOTENT");
@@ -90,7 +92,7 @@ test("transient registration failure persists backoff and retry uses readback in
 test("changed approval fails closed before any file write and remains held on replay", async () => {
   const h = harness();
   let reads = 0;
-  h.deps.readAuthority = async () => ({ sourceBuffer: Buffer.from("source"), fingerprint: ++reads === 1 ? "one" : "changed", snapshot: {} });
+  h.deps.readAuthority = async () => ({ sourceBuffer: Buffer.from("source"), fingerprint: ++reads === 1 ? "one" : "changed", snapshot: { editorialAuthority: binding() } });
   const first = await runApprovedRevision(input, h.deps);
   assert.equal(first.status, "HELD_AUTHORITY");
   assert.equal(first.code, "REVISION_AUTHORITY_CHANGED_BEFORE_PUBLICATION");
@@ -140,4 +142,19 @@ test("concurrent owner attempts serialize, and disablement still permits read-on
   assert.equal((await runApprovedRevision(input, h.deps)).status, "BUSY");
   release(); await first;
   assert.equal((await runApprovedRevision({ ...input, executionMode: "READBACK" }, { ...h.deps, env: {} })).status, "IDEMPOTENT");
+});
+
+test("recovery refuses old generic output evidence and altered custom skill plan before external writes", async () => {
+  for (const mutate of [
+    (e) => { delete e.plan; },
+    (e) => { e.editorialAuthority.version = "stale"; },
+    (e) => { e.plan.edits[4].proposedText = "replacement"; },
+    (e) => { e.planSha256 = "different"; }
+  ]) {
+    const h = harness(), e = structuredClone(evidence); mutate(e);
+    await h.store.put("generated.json", { review: Buffer.from("review").toString("base64"), clean: Buffer.from("clean").toString("base64"), evidence: e });
+    const result = await runApprovedRevision(input, h.deps);
+    assert.equal(result.status, "HELD_AUTHORITY");
+    assert.deepEqual(h.effects, []); assert.equal(h.counters.produce, 0);
+  }
 });

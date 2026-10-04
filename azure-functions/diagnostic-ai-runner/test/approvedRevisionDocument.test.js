@@ -4,6 +4,8 @@ const assert = require("node:assert/strict");
 const { Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell } = require("docx");
 const JSZip = require("jszip");
 const { DIMENSIONS, deriveApprovedFormattingPlan, produceApprovedFormattingRevision, hash } = require("../src/editorial/approvedRevisionDocument");
+const { binding } = require("./fixtures/approvedRevisionSkill");
+const derive = (bytes) => deriveApprovedFormattingPlan(bytes, binding(hash(bytes)));
 
 async function fixture(change = (x) => x) {
   const children = [];
@@ -20,7 +22,7 @@ async function fixture(change = (x) => x) {
 
 test("bounded recipe changes only 32 heading properties and eight split-run checkbox prefixes", async () => {
   const source = await fixture();
-  const out = await produceApprovedFormattingRevision(source, { sourceSha256: hash(source), timestamp: "2026-10-04T08:00:00.000Z" });
+  const out = await produceApprovedFormattingRevision(source, { sourceSha256: hash(source), timestamp: "2026-10-04T08:00:00.000Z", editorialAuthority: binding(hash(source)) });
   assert.equal(out.evidence.headingFormats, 32);
   assert.equal(out.evidence.checkboxInsertions, 8);
   assert.equal(out.evidence.preservedGridHashes.length, 8);
@@ -32,15 +34,26 @@ test("bounded recipe changes only 32 heading properties and eight split-run chec
   assert.equal((c.match(/<w:ins /g) || []).length, 0);
   assert.equal((c.match(/<w:pPrChange /g) || []).length, 0);
   assert.equal((c.match(/\u2610/g) || []).length, 8);
-  await assert.rejects(deriveApprovedFormattingPlan(out.review), /REVISION_SOURCE_STRUCTURE_UNSUPPORTED/);
-  await assert.rejects(deriveApprovedFormattingPlan(out.clean), /REVISION_FINAL_SENTENCE_AMBIGUOUS/);
+  assert.equal(out.evidence.editorialAuthority.skill, "jm1-publishing-editorial");
+  assert.equal(out.evidence.planSha256, hash(JSON.stringify(out.evidence.plan)));
+  await assert.rejects(derive(out.review), /REVISION_SOURCE_STRUCTURE_UNSUPPORTED/);
+  await assert.rejects(derive(out.clean), /REVISION_FINAL_SENTENCE_AMBIGUOUS/);
 });
 
 test("bounded recipe denies altered source, missing headings and out-of-order sections", async () => {
   const source = await fixture();
   await assert.rejects(produceApprovedFormattingRevision(source, { sourceSha256: "0".repeat(64), timestamp: new Date().toISOString() }), /REVISION_SOURCE_BINDING_INVALID/);
-  await assert.rejects(deriveApprovedFormattingPlan(await fixture((h) => h.replace("Characteristics of Mental", "Other Mental"))), /REVISION_SECTION_NOT_UNIQUE/);
-  await assert.rejects(deriveApprovedFormattingPlan(await fixture((h) => h.replace("Characteristics of Mental", "Characteristics of Spiritual"))), /REVISION_SECTION_NOT_UNIQUE/);
+  await assert.rejects(derive(await fixture((h) => h.replace("Characteristics of Mental", "Other Mental"))), /REVISION_SECTION_NOT_UNIQUE/);
+  await assert.rejects(derive(await fixture((h) => h.replace("Characteristics of Mental", "Characteristics of Spiritual"))), /REVISION_SECTION_NOT_UNIQUE/);
+});
+
+test("producer cannot execute with generic guides, absent skill, unrelated title or another stage", async () => {
+  const source = await fixture();
+  for (const b of [undefined, { chosenStyleGuide: "CMOS" }, { ...binding(hash(source)), titleId: "other" },
+    { ...binding(hash(source)), stageId: "other" }, { ...binding(hash(source)), doctrine: "LINE_EDITING" },
+    { ...binding(hash(source)), genericFallback: true }]) {
+    await assert.rejects(produceApprovedFormattingRevision(source, { sourceSha256: hash(source), timestamp: new Date().toISOString(), editorialAuthority: b }), /REVISION_CUSTOM_SKILL/);
+  }
 });
 
 module.exports = { fixture };

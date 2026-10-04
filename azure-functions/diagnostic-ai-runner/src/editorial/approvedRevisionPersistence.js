@@ -2,6 +2,7 @@
 
 const { policy, OWNER, metadataPath } = require("./approvedRevisionAuthority");
 const { hash, fail } = require("./approvedRevisionDocument");
+const { validateSkillPlan } = require("./approvedRevisionSkill");
 function guid(value) { const h = hash(value); return `${h.slice(0, 8)}-${h.slice(8, 12)}-5${h.slice(13, 16)}-a${h.slice(17, 20)}-${h.slice(20, 32)}`; }
 const artifactId = (variant) => guid(`${policy.taskId}:${policy.recipeVersion}:${variant}`);
 function itemPath(filename) { return `drives/${encodeURIComponent(policy.driveId)}/root:${policy.workspacePath}/02_Editorial/${filename}`; }
@@ -84,6 +85,17 @@ async function persistVariant(deps, variant, bytes, claim) {
     version: policy.outputVersion, filename, webUrl: item.webUrl, audience: "INTERNAL_EDITORIAL" };
 }
 async function verifyReceipt(deps, receipt) {
+  validateSkillPlan(receipt.structuralQa?.plan);
+  if (receipt.planSha256 !== hash(JSON.stringify(receipt.structuralQa.plan)) ||
+      receipt.structuralQa.planSha256 !== receipt.planSha256 ||
+      JSON.stringify(receipt.editorialAuthority) !== JSON.stringify(receipt.structuralQa.plan.editorialAuthority) ||
+      JSON.stringify(receipt.editorialAuthority) !== JSON.stringify(receipt.structuralQa.editorialAuthority) ||
+      receipt.editorialAuthority.sourceSha256 !== policy.sourceSha256 ||
+      receipt.editorialAuthority.criteriaSha256 !== policy.criteriaSha256 ||
+      receipt.editorialAuthority.authority.priorAuthorDecisions.sha256 !== policy.dispositionSha256 ||
+      Object.entries(policy.titleAuthorities).some(([key, ref]) => receipt.editorialAuthority.authority[key].sha256 !== ref.sha256)) {
+    fail("REVISION_RECEIPT_SKILL_BINDING_INVALID");
+  }
   if (receipt.owner !== OWNER || receipt.taskId !== policy.taskId || receipt.recipe !== policy.recipeVersion ||
       receipt.sourceArtifactId !== policy.sourceArtifactId || receipt.sourceSha256 !== policy.sourceSha256 ||
       receipt.canonicalSourceItemId !== policy.canonicalSourceItemId || receipt.authorApproved !== false ||
@@ -92,6 +104,7 @@ async function verifyReceipt(deps, receipt) {
       new Set(receipt.outputs.map((o) => o.variant)).size !== 2) fail("REVISION_RECEIPT_INVALID");
   for (const output of receipt.outputs) {
     if (!["review", "clean"].includes(output.variant) || output.artifactId !== artifactId(output.variant) ||
+        output.sha256 !== receipt.structuralQa[`${output.variant}Sha256`] ||
         output.version !== policy.outputVersion || output.audience !== "INTERNAL_EDITORIAL" ||
         !Number.isSafeInteger(output.size) || output.size <= 0) fail("REVISION_RECEIPT_OUTPUT_INVALID");
     const expectedName = output.variant === "review" ? policy.reviewFilename : policy.cleanFilename;

@@ -5,6 +5,7 @@ const { persistVariant, verifyReceipt, graphPath } = require("../src/editorial/a
 const { policy, OWNER } = require("../src/editorial/approvedRevisionAuthority");
 const { newestByRole } = require("../src/editorial/editorialPackageHandoffConsumer");
 const { materializeAttachments } = require("../src/editorial/editorialCadenceAuthorPackageSender");
+const { evidence } = require("./fixtures/approvedRevisionSkill");
 
 function fixture() {
   const files = new Map(), rows = new Map(), counts = { uploads: 0, creates: 0, claims: 0 };
@@ -53,6 +54,7 @@ function fixture() {
   return { deps, claim, files, rows, counts, loseUpload: () => { timeoutUpload = true; }, loseCreate: () => { timeoutCreate = true; } };
 }
 const receipt = (outputs) => ({ owner: OWNER, taskId: policy.taskId, recipe: policy.recipeVersion,
+  structuralQa: evidence(), editorialAuthority: evidence().editorialAuthority, planSha256: evidence().planSha256,
   sourceArtifactId: policy.sourceArtifactId, sourceSha256: policy.sourceSha256, canonicalSourceItemId: policy.canonicalSourceItemId,
   authorApproved: false, authorDeliveryEligible: false, taskCompleted: false, authorCommunications: 0, stageAdvancements: 0, outputs });
 
