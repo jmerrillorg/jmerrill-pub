@@ -50,7 +50,7 @@ function artifactPayload(variant, item, bytes) {
     jm1pub_filename: filename, jm1pub_fileextension: "docx", jm1pub_filesizebytes: bytes.length,
     jm1pub_repositorydriveid: policy.driveId, jm1pub_repositoryitemid: item.id, jm1pub_repositorypath: item.webUrl,
     jm1pub_sha256: hash(bytes), jm1pub_versionlabel: policy.outputVersion, jm1pub_artifactstatus: 196650000,
-    jm1pub_visibility: 196650001, jm1pub_iscurrentapproved: false,
+    jm1pub_visibility: 196650001, jm1pub_iscurrentapproved: false, statecode: 0,
     jm1pub_correlationid: `${OWNER}:${policy.taskId}`,
     jm1pub_notes: `Audience INTERNAL_EDITORIAL. Approved bounded revision candidate; visual QA and separate author review pending. Source ${policy.sourceArtifactId}; source SHA256 ${policy.sourceSha256}; disposition ${policy.dispositionId}. No author delivery or stage authorization.`,
     "Jm1pub_Titleid@odata.bind": `/jm1pub_titles(${policy.titleId})`,
@@ -64,7 +64,7 @@ async function readArtifact(client, id) {
 }
 function verifyArtifact(row, expected) {
   const fields = ["jm1pub_editorialartifactid", "jm1pub_filename", "jm1pub_filesizebytes", "jm1pub_sha256", "jm1pub_repositorydriveid", "jm1pub_repositoryitemid", "jm1pub_repositorypath", "jm1pub_versionlabel", "jm1pub_artifactstatus", "jm1pub_visibility", "jm1pub_iscurrentapproved", "jm1pub_correlationid"];
-  if (!row || fields.some((key) => row[key] !== expected[key]) || row._jm1pub_titleid_value !== policy.titleId ||
+  if (!row || row.statecode !== 0 || fields.some((key) => row[key] !== expected[key]) || row._jm1pub_titleid_value !== policy.titleId ||
       row._jm1pub_editorialstageid_value !== policy.stageId) fail("REVISION_ARTIFACT_REGISTRATION_CONFLICT");
 }
 async function persistVariant(deps, variant, bytes, claim) {

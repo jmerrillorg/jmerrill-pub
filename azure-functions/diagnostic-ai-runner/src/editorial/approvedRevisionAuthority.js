@@ -45,7 +45,7 @@ async function readApprovedRevisionAuthority(input, deps) {
   const title = await exact(client, "jm1pub_titles", "jm1pub_titleid", policy.titleId);
   const contact = await exact(client, "contacts", "contactid", policy.contactId);
   const stage = await exact(client, "jm1pub_editorialstages", "jm1pub_editorialstageid", policy.stageId);
-  if (publisher.isdisabled !== false || contact.statecode !== 0 || title.statecode !== 0 ||
+  if (publisher.isdisabled !== false || contact.statecode !== 0 || title.statecode !== 0 || stage.statecode !== 0 ||
       stage._jm1pub_titleid_value !== policy.titleId || stage._jm1pub_contactid_value !== policy.contactId ||
       stage.jm1pub_stagetype !== 100000001 || stage.jm1pub_stagestatus !== 100000002 || stage.jm1pub_governingstyleguide !== "JMP-SG-CMOS") {
     fail("REVISION_CURRENT_STAGE_OR_OWNER_CHANGED");
@@ -59,7 +59,8 @@ async function readApprovedRevisionAuthority(input, deps) {
   }
   const source = await exact(client, "jm1pub_editorialartifacts", "jm1pub_editorialartifactid", policy.sourceArtifactId);
   const delivered = await exact(client, "jm1pub_editorialartifacts", "jm1pub_editorialartifactid", policy.deliveredArtifactId);
-  if (source._jm1pub_titleid_value !== policy.titleId || source.jm1pub_iscurrentapproved !== true ||
+  if (source._jm1pub_titleid_value !== policy.titleId || source.statecode !== 0 ||
+      source.jm1pub_artifactstatus !== 196650003 || source.jm1pub_iscurrentapproved !== true ||
       source.jm1pub_sha256 !== policy.sourceSha256 || source.jm1pub_versionlabel !== policy.sourceVersion ||
       source.jm1pub_repositorydriveid !== policy.driveId || source.jm1pub_repositoryitemid !== policy.registeredSourceItemId ||
       delivered._jm1pub_titleid_value !== policy.titleId || delivered._jm1pub_editorialstageid_value !== policy.stageId ||

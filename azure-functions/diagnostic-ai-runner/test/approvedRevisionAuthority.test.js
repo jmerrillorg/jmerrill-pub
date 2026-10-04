@@ -16,9 +16,9 @@ function fixture() {
   const task = { jm1_publishingtaskid: p.taskId, jm1_iscompleted: false, statecode: 0, _ownerid_value: p.publisherId };
   const disposition = { jm1_executionlogid: p.dispositionId, jm1_actiondescription: JSON.stringify(decision),
     jm1_actiontype: "PUBLISHER_STAGE07_REVISION_DISPOSITION", _ownerid_value: p.publisherId, "@odata.etag": "d1" };
-  const stage = { jm1pub_editorialstageid: p.stageId, _jm1pub_titleid_value: p.titleId, _jm1pub_contactid_value: p.contactId,
+  const stage = { jm1pub_editorialstageid: p.stageId, statecode: 0, _jm1pub_titleid_value: p.titleId, _jm1pub_contactid_value: p.contactId,
     jm1pub_stagetype: 100000001, jm1pub_stagestatus: 100000002, jm1pub_governingstyleguide: "JMP-SG-CMOS" };
-  const original = { jm1pub_editorialartifactid: p.sourceArtifactId, _jm1pub_titleid_value: p.titleId, jm1pub_iscurrentapproved: true,
+  const original = { jm1pub_editorialartifactid: p.sourceArtifactId, statecode: 0, jm1pub_artifactstatus: 196650003, _jm1pub_titleid_value: p.titleId, jm1pub_iscurrentapproved: true,
     jm1pub_sha256: p.sourceSha256, jm1pub_versionlabel: p.sourceVersion, jm1pub_repositorydriveid: p.driveId, jm1pub_repositoryitemid: p.registeredSourceItemId };
   const delivered = { jm1pub_editorialartifactid: p.deliveredArtifactId, _jm1pub_titleid_value: p.titleId,
     _jm1pub_editorialstageid_value: p.stageId, jm1pub_sha256: p.deliveredSha256 };
@@ -77,6 +77,9 @@ test("changed decision, owner, title, source path, canon or existing title autho
     (h) => { h.task._ownerid_value = "different"; },
     (h) => { h.disposition.jm1_actiondescription += " "; },
     (h) => { h.stage._jm1pub_titleid_value = "different"; },
+    (h) => { h.stage.statecode = 1; },
+    (h) => { h.records.jm1pub_editorialartifacts[0].statecode = 1; },
+    (h) => { h.records.jm1pub_editorialartifacts[0].jm1pub_artifactstatus = 196650000; },
     (h) => { h.gates[0].jm1pub_authordecision = 196650000; },
     (h) => { h.metadata.parentReference.path = "/drives/drive/root:/07_Archive/title"; },
     (h) => { h.metadata.parentReference.driveId = "different"; },

@@ -98,6 +98,37 @@ test("changed approval fails closed before any file write and remains held on re
   assert.equal((await runApprovedRevision(input, h.deps)).status, "HELD_AUTHORITY");
 });
 
+test("five transient attempts exhaust durably and cannot silently reset on the next timer", async () => {
+  const h = harness();
+  h.deps.persistVariant = async () => { throw Object.assign(new Error("unavailable"), { status: 503 }); };
+  for (let attempt = 1; attempt <= 5; attempt++) {
+    const result = await runApprovedRevision(input, h.deps);
+    assert.equal(result.attempt, attempt);
+    assert.equal(result.status, attempt === 5 ? "RETRY_EXHAUSTED" : "RETRY_WAIT");
+    if (attempt < 5) {
+      assert.equal((await runApprovedRevision(input, h.deps)).status, "BACKOFF");
+      const state = await h.store.read("state.json");
+      h.data.set("state.json", Buffer.from(JSON.stringify({ ...state, nextAttemptAt: "2020-01-01T00:00:00Z" })));
+    }
+  }
+  assert.equal((await runApprovedRevision(input, h.deps)).status, "RETRY_EXHAUSTED");
+  assert.equal(h.counters.produce, 1); assert.deepEqual(h.effects, []);
+  assert.equal([...h.data.keys()].filter((k) => k.startsWith("failure-")).length, 5);
+});
+
+test("altered persisted source or recipe evidence is held before external persistence", async () => {
+  for (const change of [{ sourceSha256: "different" }, { recipe: "different" }, { checkboxInsertions: 9 }]) {
+    const h = harness();
+    await h.store.putBytes("review.docx", Buffer.from("review"));
+    await h.store.putBytes("clean.docx", Buffer.from("clean"));
+    await h.store.put("output-manifest.json", { ...evidence, ...change });
+    const result = await runApprovedRevision(input, h.deps);
+    assert.equal(result.status, "HELD_AUTHORITY");
+    assert.equal(result.code, "REVISION_STORED_OUTPUT_MISMATCH");
+    assert.equal(h.counters.produce, 0); assert.deepEqual(h.effects, []);
+  }
+});
+
 test("concurrent owner attempts serialize, and disablement still permits read-only receipt access", async () => {
   const h = harness();
   let release;
