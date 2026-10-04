@@ -89,6 +89,19 @@ function applyRevision(doc, edit, id, author, date) {
       (edit.editClass !== "INSERT_TEXT" || !["BEFORE", "AFTER"].includes(edit.insertPosition))) {
     fail("EDITORIAL_INSERT_POSITION_INVALID");
   }
+  if (edit.anchorScope !== undefined && edit.anchorScope !== "PARAGRAPH") fail("EDITORIAL_ANCHOR_SCOPE_INVALID");
+  if (edit.anchorScope === "PARAGRAPH") {
+    if (edit.editClass !== "INSERT_TEXT" || edit.insertPosition !== "BEFORE") fail("EDITORIAL_PARAGRAPH_INSERT_MODE_INVALID");
+    const paragraph = findExactParagraph(doc, edit.sourceText || edit.anchor);
+    const children = Array.from(paragraph.childNodes).filter((node) => node.nodeType === 1);
+    if (children.some((node) => node.namespaceURI !== W || !["pPr", "r"].includes(node.localName))) {
+      fail("EDITORIAL_PARAGRAPH_COMPLEX_STRUCTURE");
+    }
+    const firstRun = children.find((node) => node.localName === "r" && descendants(node, W, "t").length);
+    if (!firstRun || !edit.proposedText) fail("EDITORIAL_PARAGRAPH_INSERT_TEXT_REQUIRED");
+    paragraph.insertBefore(revisionNode(doc, "ins", id, author, date, firstRun, edit.proposedText), firstRun);
+    return 1;
+  }
   const source = edit.sourceText || edit.anchor;
   const match = findSingleRun(doc, source);
   const { run, text, offset } = match;
@@ -109,6 +122,19 @@ function applyRevision(doc, edit, id, author, date) {
   return edit.editClass === "INSERT_TEXT" ? 1 : edit.editClass === "DELETE_TEXT" ? 1 : 2;
 }
 
+function findExactParagraph(doc, anchor) {
+  if (typeof anchor !== "string" || !anchor.length) fail("EDITORIAL_ANCHOR_MISSING");
+  const matches = descendants(doc, W, "p").filter((p) =>
+    descendants(p, W, "t").map((t) => t.textContent).join("") === anchor);
+  if (matches.length !== 1) fail(matches.length ? "EDITORIAL_ANCHOR_AMBIGUOUS" : "EDITORIAL_PARAGRAPH_ANCHOR_NOT_FOUND");
+  const paragraph = matches[0];
+  if (paragraph.parentNode.namespaceURI !== W || paragraph.parentNode.localName !== "body" ||
+      ["ins", "del", "moveFrom", "moveTo"].some((name) => descendants(paragraph, W, name).length)) {
+    fail("EDITORIAL_PARAGRAPH_COMPLEX_STRUCTURE");
+  }
+  return paragraph;
+}
+
 function applyParagraphFormat(doc, edit, id, author, date) {
   const properties = edit.paragraphProperties;
   const allowed = new Set(["spacingBefore", "spacingAfter", "keepNext", "keepLines"]);
@@ -121,16 +147,7 @@ function applyParagraphFormat(doc, edit, id, author, date) {
       fail("EDITORIAL_PARAGRAPH_PROPERTIES_INVALID");
     }
   }
-  const anchor = edit.sourceText || edit.anchor;
-  if (typeof anchor !== "string" || !anchor.length) fail("EDITORIAL_ANCHOR_MISSING");
-  const matches = descendants(doc, W, "p").filter((p) =>
-    descendants(p, W, "t").map((t) => t.textContent).join("") === anchor);
-  if (matches.length !== 1) fail(matches.length ? "EDITORIAL_ANCHOR_AMBIGUOUS" : "EDITORIAL_PARAGRAPH_ANCHOR_NOT_FOUND");
-  const paragraph = matches[0];
-  if (paragraph.parentNode.namespaceURI !== W || paragraph.parentNode.localName !== "body" ||
-      ["ins", "del", "moveFrom", "moveTo"].some((name) => descendants(paragraph, W, name).length)) {
-    fail("EDITORIAL_PARAGRAPH_COMPLEX_STRUCTURE");
-  }
+  const paragraph = findExactParagraph(doc, edit.sourceText || edit.anchor);
   let pPr = Array.from(paragraph.childNodes).find((n) => n.namespaceURI === W && n.localName === "pPr");
   if (pPr && descendants(pPr, W, "pPrChange").length) fail("EDITORIAL_PARAGRAPH_EXISTING_REVISION");
   const previous = pPr ? pPr.cloneNode(true) : doc.createElementNS(W, "w:pPr");

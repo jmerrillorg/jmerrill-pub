@@ -25,6 +25,7 @@ async function fixture() {
         new Paragraph({ text: "Structure and voice", heading: HeadingLevel.HEADING_2 }),
         new Paragraph({ children: [new TextRun({ text: "This passage needs a clearer transition.", bold: true })] }),
         new Paragraph({ children: [new TextRun({ text: "Keep the author's intent here.", italics: true })] }),
+        new Paragraph({ children: [new TextRun({ text: "A final ", bold: true }), new TextRun({ text: "sentence split ", italics: true }), new TextRun("across runs.")] }),
         new Paragraph({ children: [new TextRun({ text: "Line with a preserved break", break: 1 })] }),
         new Paragraph("Please clarify the intended audience."),
         new Paragraph({ text: "First numbered item", numbering: { reference: "ordered", level: 0 } }),
@@ -76,6 +77,26 @@ test("native edits preserve the original Word structure and emit revisions and a
   assert.doesNotMatch(`${after}\n${comments}`, /Internal rights review only/);
   assert.equal(await part(result.buffer, "word/header1.xml"), await part(source, "word/header1.xml"));
   assert.equal(await part(result.buffer, "word/footer1.xml"), await part(source, "word/footer1.xml"));
+});
+
+test("an exact full-paragraph prefix retains split source runs and rejects ambiguous or replayed anchors", async () => {
+  const source = await fixture();
+  const edit = { editId: "prefix", editClass: "INSERT_TEXT", anchor: "A final sentence split across runs.", anchorScope: "PARAGRAPH", insertPosition: "BEFORE", proposedText: "\u2610 ", authorityClass: "SYSTEM_AUTHORIZED_EDIT" };
+  const result = await applyNativeEditorialPlan(source, [edit]);
+  const parse = async (buffer) => new DOMParser().parseFromString(await part(buffer, "word/document.xml"), "application/xml");
+  const before = await parse(source), after = await parse(result.buffer);
+  const original = Array.from(before.getElementsByTagNameNS(W, "p")).find((p) => p.textContent === edit.anchor);
+  const changed = Array.from(after.getElementsByTagNameNS(W, "p")).find((p) => p.textContent === "\u2610 " + edit.anchor);
+  const serializer = new XMLSerializer();
+  const insertion = changed.getElementsByTagNameNS(W, "ins")[0];
+  assert.equal(insertion.textContent, "\u2610 ");
+  changed.removeChild(insertion);
+  assert.equal(serializer.serializeToString(changed), serializer.serializeToString(original));
+  await assert.rejects(applyNativeEditorialPlan(result.buffer, [edit]), /EDITORIAL_PARAGRAPH_ANCHOR_NOT_FOUND/);
+  await assert.rejects(applyNativeEditorialPlan(source, [{ ...edit, anchor: "final sentence" }]), /EDITORIAL_PARAGRAPH_ANCHOR_NOT_FOUND/);
+  await assert.rejects(applyNativeEditorialPlan(source, [{ ...edit, insertPosition: "AFTER" }]), /EDITORIAL_PARAGRAPH_INSERT_MODE_INVALID/);
+  const duplicate = await Packer.toBuffer(new Document({ sections: [{ children: [new Paragraph(edit.anchor), new Paragraph(edit.anchor)] }] }));
+  await assert.rejects(applyNativeEditorialPlan(duplicate, [edit]), /EDITORIAL_ANCHOR_AMBIGUOUS/);
 });
 
 test("native editor rejects ambiguous and unauthorized edits without producing output", async () => {

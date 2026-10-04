@@ -100,6 +100,8 @@ function validateAgentEditPlan(result, authority) {
     }
     if (edit.insertPosition !== undefined && (edit.editClass !== "INSERT_TEXT" ||
         !["BEFORE", "AFTER"].includes(edit.insertPosition))) fail("EDITORIAL_INSERT_POSITION_INVALID");
+    if (edit.anchorScope !== undefined && (edit.anchorScope !== "PARAGRAPH" ||
+        edit.editClass !== "INSERT_TEXT" || edit.insertPosition !== "BEFORE")) fail("EDITORIAL_PARAGRAPH_INSERT_MODE_INVALID");
     if (edit.editClass === "FORMAT_PARAGRAPH" && (!edit.paragraphProperties ||
         typeof edit.paragraphProperties !== "object" || Array.isArray(edit.paragraphProperties) ||
         !Object.keys(edit.paragraphProperties).length ||
