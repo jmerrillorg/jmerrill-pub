@@ -10,6 +10,7 @@ const { resolvePublishingAcceptance } = require("../state/publishingAcceptance")
 const { renderPublishingServiceCorrespondence } = require("../generated/communications/jm1-enterprise-communication-renderer");
 const { isGovernedNamespace } = require("../templates/templateRegistry");
 const { CALLER_ID: BP09_CALLER_ID, TEMPLATE_ID: BP09_TEMPLATE_ID, renderProductionsBp09Notice } = require("../templates/productionsBp09Notice");
+const { CALLER_ID: FOUNDATION_CALLER_ID, TEMPLATE_ID: FOUNDATION_TEMPLATE_ID, renderFoundationVolunteerNotice } = require("../templates/foundationVolunteerNotice");
 const {
   getSenderProfile,
   validateMessageIdentity,
@@ -24,6 +25,12 @@ const HIGH_RISK_VALUES = new Set(["HIGH", "LEGAL", "FINANCIAL_ADVICE", "CONTRACT
 const FOUNDATION_PROMOTIONAL_TYPES = new Set(["FUNDRAISING", "PROMOTIONAL", "NEWSLETTER", "DONOR_MARKETING"]);
 
 let emailClient;
+
+function boundedNoticeRenderer(callerId) {
+  if (callerId === BP09_CALLER_ID) return renderProductionsBp09Notice;
+  if (callerId === FOUNDATION_CALLER_ID) return renderFoundationVolunteerNotice;
+  return null;
+}
 
 function getEmailClient() {
   if (emailClient) return emailClient;
@@ -133,6 +140,7 @@ function serverError(code, payload = {}) {
 
 function validateEnterprisePayload(payload = {}) {
   if (normalizeEnum(payload?.templateId) === BP09_TEMPLATE_ID) return renderProductionsBp09Notice(payload);
+  if (normalizeEnum(payload?.templateId) === FOUNDATION_TEMPLATE_ID) return renderFoundationVolunteerNotice(payload);
   const brand = normalizeBrand(payload.brand);
   const profileResult = getSenderProfile(brand);
   if (!profileResult.ok) return { ok: false, reason: profileResult.reason };
@@ -316,8 +324,9 @@ app.http("send-enterprise-governed-email", {
       return validationError("INVALID_JSON", body);
     }
 
-    if (authentication.caller.callerId === BP09_CALLER_ID) {
-      const bounded = renderProductionsBp09Notice(body);
+    const renderBounded = boundedNoticeRenderer(authentication.caller.callerId);
+    if (renderBounded) {
+      const bounded = renderBounded(body);
       if (!bounded.ok) return validationError(bounded.reason);
     }
     const validation = validateEnterprisePayload(body || {});
@@ -449,8 +458,9 @@ app.http("relay-authority-probe", {
     } catch (_error) {
       return validationError("INVALID_JSON", body);
     }
-    if (authentication.caller.callerId === BP09_CALLER_ID) {
-      const bounded = renderProductionsBp09Notice(body);
+    const renderBounded = boundedNoticeRenderer(authentication.caller.callerId);
+    if (renderBounded) {
+      const bounded = renderBounded(body);
       if (!bounded.ok) return validationError(bounded.reason);
       const authorization = authorizeCallerForBrand(authentication.caller, bounded.value.brand);
       if (!authorization.ok) return unauthorized({}, authorization.reason, 403);
