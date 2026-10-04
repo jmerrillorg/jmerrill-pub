@@ -11,6 +11,7 @@ app.storageQueue("run-targeted-editorial-execution-worker", {
   connection: "AzureWebJobsStorage",
   handler: async (message, context) => {
     const result = await processQueuedTargetedEditorialExecution(message);
+    if (!result.ok && result.code) context.error(`Editorial owner failure: ${result.code}`);
     const chunk =
       result.chunkIndex && result.chunkCount
         ? `; chunk=${result.chunkIndex}/${result.chunkCount}`

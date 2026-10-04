@@ -72,6 +72,9 @@ jobs:
             --mtime="@$source_date_epoch" \
             "$GITHUB_SHA:$FUNCTION_APP_PATH" | tar -xf - -C "$package_root"
           rm -rf "$package_root/test" "$package_root/local.settings.example.json"
+          # Package the existing approved canon verbatim; the runtime verifies its pinned hash.
+          cp docs/implementation/canon-cache/jm1-publishing-editorial/references/developmental-editing.md "$package_root/config/developmental-editing.md"
+          test "$(sha256sum "$package_root/config/developmental-editing.md" | awk '{print $1}')" = "db51d2b9b6032b14a8b85b7b943907d2a2ce290f67bf34df9e28d4526a326de5"
 
           (
             cd "$package_root"

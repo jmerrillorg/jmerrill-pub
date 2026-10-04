@@ -20,6 +20,17 @@ app.http("run-targeted-editorial-execution", {
     }
 
     const body = await request.json().catch(() => ({}));
+    if (Object.hasOwn(body, "revisionTaskId")) {
+      const { runApprovedRevision, safeCode } = require("../editorial/approvedRevisionRuntime");
+      try {
+        const result = await runApprovedRevision(body);
+        return { status: result.ok ? result.status === "QUEUED" ? 202 : 200 : 422, jsonBody: result };
+      } catch (error) {
+        const code = safeCode(error);
+        context.error(`Approved revision blocked: ${code}`);
+        return { status: 422, jsonBody: { ok: false, status: "HELD", code, externalSends: 0 } };
+      }
+    }
     if (String(body.executionMode || "").trim().toUpperCase() === "EXECUTE_ASYNC") {
       const evaluated = await evaluateTargetedEditorialExecution(body);
       if (!evaluated.ok) return { status: 422, jsonBody: evaluated };
