@@ -10,7 +10,7 @@ const R = "http://schemas.openxmlformats.org/package/2006/relationships";
 const CONTENT_TYPES = "http://schemas.openxmlformats.org/package/2006/content-types";
 const COMMENTS_REL = "http://schemas.openxmlformats.org/officeDocument/2006/relationships/comments";
 const COMMENTS_CONTENT_TYPE = "application/vnd.openxmlformats-officedocument.wordprocessingml.comments+xml";
-const EDIT_CLASSES = new Set(["REPLACE_TEXT", "INSERT_TEXT", "DELETE_TEXT", "EDITOR_COMMENT", "AUTHOR_QUESTION", "AUTHOR_DECISION_REQUIRED"]);
+const EDIT_CLASSES = new Set(["REPLACE_TEXT", "INSERT_TEXT", "DELETE_TEXT", "FORMAT_PARAGRAPH", "EDITOR_COMMENT", "AUTHOR_QUESTION", "AUTHOR_DECISION_REQUIRED"]);
 const INTERNAL_CLASSES = new Set([
   "PUBLISHER_INTERNAL", "RIGHTS_LEGAL_INTERNAL", "FACT_CHECK_INTERNAL", "PRODUCTION_INTERNAL",
   "PROVIDER_INTERNAL", "SYSTEM_INTERNAL", "AI_INTERNAL", "NO_CHANGE", "MOVE_SECTION_RECOMMENDATION"
@@ -85,6 +85,10 @@ function revisionNode(doc, kind, id, author, date, sourceRun, text) {
 }
 
 function applyRevision(doc, edit, id, author, date) {
+  if (edit.insertPosition !== undefined &&
+      (edit.editClass !== "INSERT_TEXT" || !["BEFORE", "AFTER"].includes(edit.insertPosition))) {
+    fail("EDITORIAL_INSERT_POSITION_INVALID");
+  }
   const source = edit.sourceText || edit.anchor;
   const match = findSingleRun(doc, source);
   const { run, text, offset } = match;
@@ -92,15 +96,78 @@ function applyRevision(doc, edit, id, author, date) {
   const before = text.slice(0, offset);
   const after = text.slice(offset + source.length);
   if (before) parent.insertBefore(textRun(doc, run, before), run);
-  if (edit.editClass === "INSERT_TEXT") parent.insertBefore(textRun(doc, run, source), run);
-  else parent.insertBefore(revisionNode(doc, "del", id, author, date, run, source), run);
+  if (edit.editClass === "INSERT_TEXT") {
+    if (edit.insertPosition !== "BEFORE") parent.insertBefore(textRun(doc, run, source), run);
+  } else parent.insertBefore(revisionNode(doc, "del", id, author, date, run, source), run);
   if (edit.editClass !== "DELETE_TEXT") {
     if (!edit.proposedText) fail("EDITORIAL_PROPOSED_TEXT_MISSING");
     parent.insertBefore(revisionNode(doc, "ins", id + 1, author, date, run, edit.proposedText), run);
   }
+  if (edit.editClass === "INSERT_TEXT" && edit.insertPosition === "BEFORE") parent.insertBefore(textRun(doc, run, source), run);
   if (after) parent.insertBefore(textRun(doc, run, after), run);
   parent.removeChild(run);
   return edit.editClass === "INSERT_TEXT" ? 1 : edit.editClass === "DELETE_TEXT" ? 1 : 2;
+}
+
+function applyParagraphFormat(doc, edit, id, author, date) {
+  const properties = edit.paragraphProperties;
+  const allowed = new Set(["spacingBefore", "spacingAfter", "keepNext", "keepLines"]);
+  if (!properties || typeof properties !== "object" || Array.isArray(properties) ||
+      !Object.keys(properties).length || Object.keys(properties).some((key) => !allowed.has(key))) {
+    fail("EDITORIAL_PARAGRAPH_PROPERTIES_INVALID");
+  }
+  for (const [key, value] of Object.entries(properties)) {
+    if (key.startsWith("spacing") ? !Number.isInteger(value) || value < 0 || value > 720 : typeof value !== "boolean") {
+      fail("EDITORIAL_PARAGRAPH_PROPERTIES_INVALID");
+    }
+  }
+  const anchor = edit.sourceText || edit.anchor;
+  if (typeof anchor !== "string" || !anchor.length) fail("EDITORIAL_ANCHOR_MISSING");
+  const matches = descendants(doc, W, "p").filter((p) =>
+    descendants(p, W, "t").map((t) => t.textContent).join("") === anchor);
+  if (matches.length !== 1) fail(matches.length ? "EDITORIAL_ANCHOR_AMBIGUOUS" : "EDITORIAL_PARAGRAPH_ANCHOR_NOT_FOUND");
+  const paragraph = matches[0];
+  if (paragraph.parentNode.namespaceURI !== W || paragraph.parentNode.localName !== "body" ||
+      ["ins", "del", "moveFrom", "moveTo"].some((name) => descendants(paragraph, W, name).length)) {
+    fail("EDITORIAL_PARAGRAPH_COMPLEX_STRUCTURE");
+  }
+  let pPr = Array.from(paragraph.childNodes).find((n) => n.namespaceURI === W && n.localName === "pPr");
+  if (pPr && descendants(pPr, W, "pPrChange").length) fail("EDITORIAL_PARAGRAPH_EXISTING_REVISION");
+  const previous = pPr ? pPr.cloneNode(true) : doc.createElementNS(W, "w:pPr");
+  if (!pPr) {
+    pPr = doc.createElementNS(W, "w:pPr");
+    paragraph.insertBefore(pPr, paragraph.firstChild);
+  }
+  // Keep existing styles, numbering and pagination; only the named properties change.
+  const order = ["pStyle", "keepNext", "keepLines", "pageBreakBefore", "framePr", "widowControl", "numPr",
+    "suppressLineNumbers", "pBdr", "shd", "tabs", "suppressAutoHyphens", "kinsoku", "wordWrap",
+    "overflowPunct", "topLinePunct", "autoSpaceDE", "autoSpaceDN", "bidi", "adjustRightInd", "snapToGrid",
+    "spacing", "ind", "contextualSpacing", "mirrorIndents", "suppressOverlap", "jc", "textDirection",
+    "textAlignment", "textboxTightWrap", "outlineLvl", "divId", "cnfStyle", "rPr", "sectPr", "pPrChange"];
+  function property(name) {
+    let child = Array.from(pPr.childNodes).find((n) => n.namespaceURI === W && n.localName === name);
+    if (!child) {
+      child = doc.createElementNS(W, `w:${name}`);
+      const next = Array.from(pPr.childNodes).find((n) => n.namespaceURI === W && order.indexOf(n.localName) > order.indexOf(name));
+      pPr.insertBefore(child, next || null);
+    }
+    return child;
+  }
+  for (const [key, value] of Object.entries(properties)) {
+    if (key.startsWith("spacing")) {
+      const spacing = property("spacing");
+      const side = key === "spacingBefore" ? "before" : "after";
+      spacing.removeAttributeNS(W, `${side}Lines`);
+      spacing.setAttributeNS(W, `w:${side}Autospacing`, "0");
+      spacing.setAttributeNS(W, `w:${side}`, String(value));
+    } else property(key).setAttributeNS(W, "w:val", value ? "1" : "0");
+  }
+  const change = property("pPrChange");
+  change.setAttributeNS(W, "w:id", String(id));
+  change.setAttributeNS(W, "w:author", author);
+  change.setAttributeNS(W, "w:date", date);
+  change.appendChild(previous);
+  return 1;
 }
 
 function applyComment(doc, edit, id, commentRoot, author, date) {
@@ -165,7 +232,7 @@ async function applyNativeEditorialPlan(sourceBuffer, plan, options = {}) {
   const comments = commentsPart
     ? parseXml(await commentsPart.async("string"), "EDITORIAL_COMMENTS_XML_INVALID")
     : parseXml(`<w:comments xmlns:w="${W}"/>`, "EDITORIAL_COMMENTS_XML_INVALID");
-  const existingIds = [...descendants(doc, W, "ins"), ...descendants(doc, W, "del"), ...descendants(comments, W, "comment")]
+  const existingIds = [...descendants(doc, W, "ins"), ...descendants(doc, W, "del"), ...descendants(doc, W, "pPrChange"), ...descendants(comments, W, "comment")]
     .map((node) => Number(node.getAttributeNS(W, "id"))).filter(Number.isFinite);
   let nextId = Math.max(0, ...existingIds) + 1;
   let revisions = 0;
@@ -184,9 +251,11 @@ async function applyNativeEditorialPlan(sourceBuffer, plan, options = {}) {
       fail("EDITORIAL_EDIT_CLASS_UNSUPPORTED");
     }
     validateAuthorEdit(edit);
-    if (["REPLACE_TEXT", "INSERT_TEXT", "DELETE_TEXT"].includes(kind)) {
+    if (["REPLACE_TEXT", "INSERT_TEXT", "DELETE_TEXT", "FORMAT_PARAGRAPH"].includes(kind)) {
       if (edit.authorityClass !== "SYSTEM_AUTHORIZED_EDIT") fail("EDITORIAL_EDIT_AUTHORITY_NOT_GRANTED");
-      revisions += applyRevision(doc, edit, nextId, author, date);
+      revisions += kind === "FORMAT_PARAGRAPH"
+        ? applyParagraphFormat(doc, edit, nextId, author, date)
+        : applyRevision(doc, edit, nextId, author, date);
       nextId += 2;
     } else {
       if (!edit.commentText) fail("EDITORIAL_COMMENT_TEXT_MISSING");

@@ -21,7 +21,13 @@ async function documentXml(buffer) {
 }
 
 function count(doc, localName) {
-  return doc.getElementsByTagNameNS(W, localName).length;
+  return Array.from(doc.getElementsByTagNameNS(W, localName)).filter((node) => {
+    // Tracked paragraph formatting retains an old-properties copy for Word's reject action.
+    for (let parent = node.parentNode; parent; parent = parent.parentNode) {
+      if (parent.namespaceURI === W && parent.localName === "pPrChange") return false;
+    }
+    return true;
+  }).length;
 }
 
 async function produceGovernedAuthorReviewDocx(sourceBuffer, agentResult, authority, options = {}) {

@@ -3,7 +3,7 @@
 const assert = require("node:assert/strict");
 const crypto = require("node:crypto");
 const test = require("node:test");
-const { Document, Packer, Paragraph, Table, TableRow, TableCell } = require("docx");
+const { Document, Packer, Paragraph, Table, TableRow, TableCell, HeadingLevel } = require("docx");
 const { AGENT_ID, validateAuthorityBundle } = require("../src/editorial/editorialAgentContract");
 const { produceGovernedAuthorReviewDocx } = require("../src/editorial/governedWordEditorialProducer");
 
@@ -17,7 +17,7 @@ async function fixture() {
     new TableRow({ children: [new TableCell({ children: [new Paragraph(`Assessment ${index + 1}`)] })] })
   ] }));
   const buffer = await Packer.toBuffer(new Document({ sections: [{ children: [
-    new Paragraph("This transition needs more clarity."),
+    new Paragraph({ text: "This transition needs more clarity.", heading: HeadingLevel.HEADING_2 }),
     new Paragraph("Please explain the intended audience."),
     ...tables
   ] }] }));
@@ -55,4 +55,17 @@ test("governed producer denies stale source or substituted authority before muta
   await assert.rejects(produceGovernedAuthorReviewDocx(Buffer.concat([buffer, Buffer.from("changed")]), result, authority), /EDITORIAL_SOURCE_BYTES_AUTHORITY_MISMATCH/);
   authority.voiceProfile.content = "Altered after preparation";
   await assert.rejects(produceGovernedAuthorReviewDocx(buffer, result, authority), /EDITORIAL_AUTHORITY_VOICEPROFILE_CHECKSUM_MISMATCH/);
+});
+
+test("governed producer accepts bounded tracked paragraph formatting without counting historical properties as live structure", async () => {
+  const { buffer, authority, result } = await fixture();
+  result.edits = [{ editId: "heading-format", editClass: "FORMAT_PARAGRAPH", anchor: "This transition needs more clarity.", paragraphProperties: { spacingBefore: 240, keepNext: true }, rationale: "Apply approved section delineation without altering words or grids.", authorityClass: "SYSTEM_AUTHORIZED_EDIT", authorVisibility: "AUTHOR", decisionRequired: false }];
+  const output = await produceGovernedAuthorReviewDocx(buffer, result, authority);
+  assert.equal(output.structurePreserved, true);
+  assert.equal(output.trackedRevisionCount, 1);
+  assert.equal(output.wordCommentCount, 0);
+  for (const properties of [{ pStyle: "Other" }, { spacingBefore: 999 }, {}]) {
+    result.edits[0].paragraphProperties = properties;
+    await assert.rejects(produceGovernedAuthorReviewDocx(buffer, result, authority), /EDITORIAL_PARAGRAPH_PROPERTIES_INVALID/);
+  }
 });

@@ -5,7 +5,7 @@ const crypto = require("node:crypto");
 const AGENT_ID = "jm1-agent-pub-editorial-01";
 const STAGES = new Set(["EDITORIAL_REVIEW", "DEVELOPMENTAL_EDITING", "LINE_EDITING", "COPYEDITING", "PROOFREADING"]);
 const EDIT_CLASSES = new Set([
-  "REPLACE_TEXT", "INSERT_TEXT", "DELETE_TEXT", "MOVE_SECTION_RECOMMENDATION",
+  "REPLACE_TEXT", "INSERT_TEXT", "DELETE_TEXT", "FORMAT_PARAGRAPH", "MOVE_SECTION_RECOMMENDATION",
   "EDITOR_COMMENT", "AUTHOR_QUESTION", "AUTHOR_DECISION_REQUIRED", "PUBLISHER_INTERNAL",
   "RIGHTS_LEGAL_INTERNAL", "FACT_CHECK_INTERNAL", "PRODUCTION_INTERNAL", "PROVIDER_INTERNAL",
   "SYSTEM_INTERNAL", "AI_INTERNAL", "NO_CHANGE"
@@ -91,13 +91,23 @@ function validateAgentEditPlan(result, authority) {
     if (edit.decisionRequired !== (edit.authorityClass !== "SYSTEM_AUTHORIZED_EDIT")) {
       fail("EDITORIAL_AGENT_DECISION_FLAG_MISMATCH");
     }
-    if (["REPLACE_TEXT", "INSERT_TEXT", "DELETE_TEXT"].includes(edit.editClass) &&
+    if (["REPLACE_TEXT", "INSERT_TEXT", "DELETE_TEXT", "FORMAT_PARAGRAPH"].includes(edit.editClass) &&
         edit.authorityClass !== "SYSTEM_AUTHORIZED_EDIT") fail("EDITORIAL_AGENT_EDIT_AUTHORITY_DENIED");
-    if (["REPLACE_TEXT", "INSERT_TEXT", "DELETE_TEXT", "EDITOR_COMMENT", "AUTHOR_QUESTION", "AUTHOR_DECISION_REQUIRED"].includes(edit.editClass) &&
+    if (["REPLACE_TEXT", "INSERT_TEXT", "DELETE_TEXT", "FORMAT_PARAGRAPH", "EDITOR_COMMENT", "AUTHOR_QUESTION", "AUTHOR_DECISION_REQUIRED"].includes(edit.editClass) &&
         !nonempty(edit.anchor || edit.sourceText)) fail("EDITORIAL_AGENT_EDIT_ANCHOR_MISSING");
     if (["REPLACE_TEXT", "INSERT_TEXT"].includes(edit.editClass) && !nonempty(edit.proposedText)) {
       fail("EDITORIAL_AGENT_PROPOSED_TEXT_MISSING");
     }
+    if (edit.insertPosition !== undefined && (edit.editClass !== "INSERT_TEXT" ||
+        !["BEFORE", "AFTER"].includes(edit.insertPosition))) fail("EDITORIAL_INSERT_POSITION_INVALID");
+    if (edit.editClass === "FORMAT_PARAGRAPH" && (!edit.paragraphProperties ||
+        typeof edit.paragraphProperties !== "object" || Array.isArray(edit.paragraphProperties) ||
+        !Object.keys(edit.paragraphProperties).length ||
+        Object.entries(edit.paragraphProperties).some(([key, value]) => {
+          if (["spacingBefore", "spacingAfter"].includes(key)) return !Number.isInteger(value) || value < 0 || value > 720;
+          if (["keepNext", "keepLines"].includes(key)) return typeof value !== "boolean";
+          return true;
+        }))) fail("EDITORIAL_PARAGRAPH_PROPERTIES_INVALID");
     if (["EDITOR_COMMENT", "AUTHOR_QUESTION", "AUTHOR_DECISION_REQUIRED"].includes(edit.editClass) &&
         !nonempty(edit.commentText)) fail("EDITORIAL_AGENT_COMMENT_TEXT_MISSING");
     if (edit.authorVisibility !== (INTERNAL_EDIT_CLASSES.has(edit.editClass) ? "INTERNAL" : "AUTHOR")) {

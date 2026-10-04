@@ -3,7 +3,7 @@
 const assert = require("node:assert/strict");
 const test = require("node:test");
 const JSZip = require("jszip");
-const { DOMParser } = require("@xmldom/xmldom");
+const { DOMParser, XMLSerializer } = require("@xmldom/xmldom");
 const {
   Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell,
   HeadingLevel, ExternalHyperlink, Header, Footer
@@ -95,4 +95,49 @@ test("native editor rejects ambiguous and unauthorized edits without producing o
   await assert.rejects(applyNativeEditorialPlan(source, [
     { editId: "e5", editClass: "REPLACE_TEXT", sourceText: "Line with a preserved break", proposedText: "Changed line", authorityClass: "SYSTEM_AUTHORIZED_EDIT" }
   ]), /EDITORIAL_ANCHOR_COMPLEX_RUN/);
+});
+
+test("tracked heading spacing and a checkbox prefix preserve all eight grids and unrelated package parts", async () => {
+  const source = await fixture();
+  const result = await applyNativeEditorialPlan(source, [
+    { editId: "format", editClass: "FORMAT_PARAGRAPH", anchor: "Structure and voice", paragraphProperties: { spacingBefore: 240, spacingAfter: 120, keepNext: true }, authorityClass: "SYSTEM_AUTHORIZED_EDIT" },
+    { editId: "checkbox", editClass: "INSERT_TEXT", anchor: "Keep the author's intent here.", insertPosition: "BEFORE", proposedText: "\u2610 ", authorityClass: "SYSTEM_AUTHORIZED_EDIT" }
+  ], { timestamp: "2026-10-04T00:00:00.000Z" });
+  const before = new DOMParser().parseFromString(await part(source, "word/document.xml"), "application/xml");
+  const after = new DOMParser().parseFromString(await part(result.buffer, "word/document.xml"), "application/xml");
+  const serializer = new XMLSerializer();
+  const tables = (doc) => Array.from(doc.getElementsByTagNameNS(W, "tbl")).map((t) => serializer.serializeToString(t));
+  assert.equal(tables(before).length, 8);
+  assert.deepEqual(tables(after), tables(before));
+  const heading = Array.from(after.getElementsByTagNameNS(W, "p")).find((p) => p.textContent === "Structure and voice");
+  const props = heading.getElementsByTagNameNS(W, "pPr")[0];
+  assert.equal(props.getElementsByTagNameNS(W, "spacing")[0].getAttributeNS(W, "before"), "240");
+  assert.equal(props.getElementsByTagNameNS(W, "keepNext")[0].getAttributeNS(W, "val"), "1");
+  const change = props.getElementsByTagNameNS(W, "pPrChange")[0];
+  assert.equal(change.getAttributeNS(W, "author"), "J Merrill Publishing");
+  const oldHeading = Array.from(before.getElementsByTagNameNS(W, "p")).find((p) => p.textContent === "Structure and voice");
+  assert.equal(serializer.serializeToString(change.firstChild), serializer.serializeToString(oldHeading.firstChild));
+  assert.ok(Array.from(after.getElementsByTagNameNS(W, "p")).some((p) => p.textContent === "\u2610 Keep the author's intent here."));
+  assert.equal(after.getElementsByTagNameNS(W, "del").length, 0);
+  assert.equal(result.trackedRevisionCount, 2);
+  const beforeZip = await JSZip.loadAsync(source), afterZip = await JSZip.loadAsync(result.buffer);
+  assert.deepEqual(Object.keys(afterZip.files), Object.keys(beforeZip.files));
+  for (const [name, entry] of Object.entries(beforeZip.files)) {
+    if (entry.dir || name === "word/document.xml") continue;
+    assert.deepEqual(await afterZip.file(name).async("nodebuffer"), await entry.async("nodebuffer"), name);
+  }
+});
+
+test("paragraph formatting rejects unsupported properties, partial anchors, grids and repeated formatting", async () => {
+  const source = await fixture();
+  const edit = { editId: "format", editClass: "FORMAT_PARAGRAPH", anchor: "Structure and voice", paragraphProperties: { keepNext: true }, authorityClass: "SYSTEM_AUTHORIZED_EDIT" };
+  for (const props of [{}, [], { pStyle: "Heading1" }, { spacingBefore: -1 }, { spacingAfter: 721 }, { keepNext: "true" }]) {
+    await assert.rejects(applyNativeEditorialPlan(source, [{ ...edit, paragraphProperties: props }]), /EDITORIAL_PARAGRAPH_PROPERTIES_INVALID/);
+  }
+  await assert.rejects(applyNativeEditorialPlan(source, [{ ...edit, anchor: "Structure" }]), /EDITORIAL_PARAGRAPH_ANCHOR_NOT_FOUND/);
+  await assert.rejects(applyNativeEditorialPlan(source, [{ ...edit, anchor: "Grid 1 value" }]), /EDITORIAL_PARAGRAPH_COMPLEX_STRUCTURE/);
+  await assert.rejects(applyNativeEditorialPlan(source, [{ ...edit, authorityClass: "PUBLISHER_DECISION_REQUIRED" }]), /EDITORIAL_EDIT_AUTHORITY_NOT_GRANTED/);
+  const once = await applyNativeEditorialPlan(source, [edit]);
+  await assert.rejects(applyNativeEditorialPlan(once.buffer, [edit]), /EDITORIAL_PARAGRAPH_EXISTING_REVISION/);
+  await assert.rejects(applyNativeEditorialPlan(source, [{ editId: "prefix", editClass: "INSERT_TEXT", anchor: "Structure and voice", proposedText: "prefix", insertPosition: "UNKNOWN", authorityClass: "SYSTEM_AUTHORIZED_EDIT" }]), /EDITORIAL_INSERT_POSITION_INVALID/);
 });
