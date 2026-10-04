@@ -54,9 +54,25 @@ Existing ten-minute editorial timer and targeted editorial queue invoke the
 same owner. The broad `WORD_NATIVE_AUTHOR_DOCUMENT_NOT_COMMISSIONED` hold is
 unchanged. No new stage event, pipeline, worker or communication owner exists.
 
-The existing private `agentic-audit` container holds
-`publishing/editorial-revisions/v1/<taskId>/`. A renewable 60-second blob lease
-serializes execution. Intent binds policy/authority hashes before generation.
+The existing private, immutable `agentic-audit` container holds the claim marker,
+intent, generation envelope, manifests, failure evidence and receipt under
+`publishing/editorial-revisions/v1/<taskId>/`. Mutable `state.json` lives at that
+same namespace in the existing private `jm1-publishing-stage-runtime` container.
+This is execution control, not a second business lifecycle store. A renewable
+60-second lease on the mutable state blob fences every state update and
+serializes execution. Both containers must be private, and the control container
+must explicitly report no immutability policy or legal hold before preflight or
+execution. No retention policy or permission is changed by this owner.
+
+The failed initial production attempt left only an immutable `READY`, attempt-0
+state preimage. It remains in the audit container unchanged. If a legacy audit
+state exists, only that exact pristine shape permits initialization of the new
+control state. Any attempted, held, malformed or otherwise different legacy
+state fails closed for explicit recovery; it is never silently reset. Readback
+prefers control state and falls back to the preserved legacy state when control
+state does not yet exist. Public state writes must go through the live claim.
+
+Intent binds policy/authority hashes before generation.
 One immutable generated envelope contains both variants and the internal
 manifest, allowing a restart after any partial storage write. Source authority
 is reread before external persistence. SharePoint uses conflict-fail upload
@@ -82,6 +98,11 @@ telemetry. There is no chat-triggered reset or silent destructive rollback.
    seven-source binding plus all five custom-skill file hashes, the existing style
    and decision binding, eight grids, 32 headings, eight checkbox targets and zero
    artifact writes. Missing access is a hold, not permission to broaden credentials.
+   Following the immutable-state repair, verify the old audit state remains
+   `READY`/0 and the new mutable control state is either absent or a valid
+   continuing attempt. Preserve the original poisoned queue message as failure
+   evidence; the existing timer can resume the exact task after reviewed release
+   and bounded enablement. Do not purge queues, release live leases or reset state.
 4. Under the approved bounded activation, set
    `JM1_APPROVED_EDITORIAL_REVISION_TASK_ID=f369abf6-a3ec-5346-a12b-c3bd44f29dfb`
    and `JM1_APPROVED_EDITORIAL_REVISION_ENABLED=true`. Only this task can execute.

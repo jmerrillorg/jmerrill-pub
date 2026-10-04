@@ -4,21 +4,29 @@ const { BlobServiceClient } = require("@azure/storage-blob");
 const { DefaultAzureCredential } = require("@azure/identity");
 const { hash, fail } = require("./approvedRevisionDocument");
 const { policy } = require("./approvedRevisionAuthority");
+const CONTROL_CONTAINER = "jm1-publishing-stage-runtime";
 
 function createApprovedRevisionStore(deps = {}) {
   const service = deps.service || new BlobServiceClient(process.env.JM1_AGENTIC_AUDIT_BLOB_SERVICE_URL ||
     "https://stjm1diagrunner.blob.core.windows.net", new DefaultAzureCredential());
   const container = service.getContainerClient(process.env.JM1_AGENTIC_AUDIT_CONTAINER || "agentic-audit");
+  const control = service.getContainerClient(CONTROL_CONTAINER);
   const prefix = `publishing/editorial-revisions/v1/${policy.taskId}`;
+  const stateBlob = control.getBlockBlobClient(`${prefix}/state.json`);
   const blob = (name) => {
     if (!/^[a-z0-9.-]+$/.test(name)) fail("REVISION_STORE_KEY_INVALID");
     return container.getBlockBlobClient(`${prefix}/${name}`);
   };
   async function readBytes(name) {
+    if (name === "state.json") {
+      try { return await stateBlob.downloadToBuffer(); }
+      catch (e) { if (e.statusCode !== 404) throw e; }
+    }
     try { return await blob(name).downloadToBuffer(); }
     catch (e) { if (e.statusCode === 404) return null; throw e; }
   }
   async function putBytes(name, bytes) {
+    if (name === "state.json") fail("REVISION_STATE_REQUIRES_CLAIM");
     try { await blob(name).uploadData(bytes, { conditions: { ifNoneMatch: "*" }, blobHTTPHeaders: { blobContentType: "application/octet-stream" } }); }
     catch (e) {
       if (![409, 412].includes(e.statusCode)) throw e;
@@ -33,11 +41,22 @@ function createApprovedRevisionStore(deps = {}) {
   async function assertPrivate() {
     const properties = await container.getProperties();
     if (properties.blobPublicAccess) fail("REVISION_AUDIT_CONTAINER_NOT_PRIVATE");
+    const controlProperties = await control.getProperties();
+    if (controlProperties.blobPublicAccess) fail("REVISION_CONTROL_CONTAINER_NOT_PRIVATE");
+    if (controlProperties.hasImmutabilityPolicy !== false || controlProperties.hasLegalHold !== false) {
+      fail("REVISION_CONTROL_MUTABILITY_UNPROVEN");
+    }
   }
   async function withClaim(work) {
     await assertPrivate();
     await put("claim.json", { owner: "PUBLISHING_APPROVED_EDITORIAL_REVISION_V1", taskId: policy.taskId });
-    const stateBlob = blob("state.json");
+    // Preserve the WORM pre-execution record. Never silently reset a prior attempt.
+    let legacy, hasLegacy = false;
+    try { legacy = JSON.parse((await blob("state.json").downloadToBuffer()).toString("utf8")); hasLegacy = true; }
+    catch (error) { if (error.statusCode !== 404) throw error; }
+    if (hasLegacy && (!legacy || legacy.status !== "READY" || legacy.attempt !== 0 || Object.keys(legacy).length !== 2)) {
+      fail("REVISION_LEGACY_STATE_RECOVERY_REQUIRED");
+    }
     try {
       await stateBlob.uploadData(Buffer.from(JSON.stringify({ status: "READY", attempt: 0 })), { conditions: { ifNoneMatch: "*" } });
     } catch (error) { if (![409, 412].includes(error.statusCode)) throw error; }
@@ -64,4 +83,4 @@ function createApprovedRevisionStore(deps = {}) {
   return { read, put, readBytes, putBytes, withClaim, assertPrivate, prefix };
 }
 
-module.exports = { createApprovedRevisionStore };
+module.exports = { createApprovedRevisionStore, CONTROL_CONTAINER };
