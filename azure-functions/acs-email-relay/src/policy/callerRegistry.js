@@ -1,6 +1,6 @@
 "use strict";
 
-const CALLER_REGISTRY_VERSION = "JM1-RELAY-CALLERS-v1.3.0";
+const CALLER_REGISTRY_VERSION = "JM1-RELAY-CALLERS-v1.4.0";
 
 const BRAND_ALIASES = Object.freeze({
   PUBLISHING: "JMP",
@@ -10,6 +10,17 @@ const BRAND_ALIASES = Object.freeze({
 });
 
 const CALLERS = Object.freeze([
+  caller({
+    callerId: "foundation-volunteer-web-prod",
+    identity: { type: "ENTRA_WORKLOAD_IDENTITY", objectId: "cb36ea0b-8ba6-4798-a836-47a52e340675" },
+    application: "Foundation volunteer intake: internal reference notice only",
+    canonicalRepo: "jmerrillorg/jmerrillfoundation",
+    authorizedBrands: ["JMFN"],
+    authorizedTemplates: ["FOUNDATION.VOLUNTEER_INQUIRY_NOTICE"],
+    authorizedRecipients: ["foundation@jmerrill.one"],
+    status: "ACTIVE",
+    lastProven: null
+  }),
   caller({
     callerId: "one-bp09-productions-prod",
     identity: {
