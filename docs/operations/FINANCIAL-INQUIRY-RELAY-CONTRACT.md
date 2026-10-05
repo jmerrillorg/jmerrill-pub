@@ -34,9 +34,13 @@ Both routes require exactly this five-key body:
 ```
 
 The example is synthetic, not authorization to send. Reference must be the
-owner's persisted inquiry reference in nonzero lowercase D-format GUID form.
-The owner must prove exact receipt/Lead lookup before dispatch; the relay does
-not read or write Dataverse or establish business identity.
+persisted Dataverse Lead primary key (`leadid`), in nonzero lowercase D-format
+GUID form. Financial derives it deterministically from the inquiry idempotency
+key, creates the Lead conditionally and verifies stored key/payload hashes on
+replay. The owner must prove exact receipt/Lead lookup before dispatch; the relay
+does not read or write Dataverse or establish business identity. Do not send an
+invented or unbacked reference. Synthetic acceptance uses an owner-proven labeled
+internal inquiry receipt, never a fabricated client/Contact or APS record.
 
 Only `templateData.referenceId` varies. Reject extra fields including client
 name/email, inquiry body, URLs, attachments, subject, body, recipients, sender,
