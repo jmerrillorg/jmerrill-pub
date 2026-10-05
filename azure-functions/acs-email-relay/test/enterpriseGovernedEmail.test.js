@@ -483,6 +483,154 @@ const bp09Payload = () => ({
 });
 const quietContext = { warn() {}, info() {}, error() {} };
 
+const financialHeaders = () => workloadHeaders("658e6d91-1d9d-493f-83bd-f327eaf74ac1");
+const financialPayload = () => ({
+  brand: "JMF", to: "financial@jmerrill.one",
+  templateId: "FINANCIAL.INQUIRY_NOTICE", templateVersion: "1.0.0",
+  templateData: { referenceId: "90000000-0000-4000-a000-000000000029" }
+});
+
+test("Financial no-send probe fixes caller, brand, internal reference and derived sender without effects", async () => {
+  const forbidden = () => { throw Error("SIDE_EFFECT_FORBIDDEN"); };
+  const relay = loadEnterpriseRelayModule({ client: { beginSend: forbidden }, ledger: { reserve: forbidden } });
+  for (let replay = 0; replay < 2; replay++) {
+    const result = await relay.routes["relay-authority-probe"].handler(routeRequest(financialPayload(), financialHeaders()));
+    assert.equal(result.status, 200);
+    assert.equal(result.jsonBody.authorized, true);
+    assert.equal(result.jsonBody.noSend, true);
+    assert.equal(result.jsonBody.callerId, "financial-inquiry-function-prod");
+    assert.equal(result.jsonBody.brand, "JMF");
+    assert.equal(result.jsonBody.senderAddress, "financial@email.jmerrill.one");
+    for (const field of ["recipient", "replyTo", "brandCc"]) assert.equal(result.jsonBody[field], "financial@jmerrill.one");
+    assert.equal(result.jsonBody.idempotencyKey, `financial:inquiry:notice:${financialPayload().templateData.referenceId}`);
+    assert.equal(result.jsonBody.renderMetadata.audience, "INTERNAL_OPERATIONS");
+  }
+});
+
+test("Financial denies private data, content, links, alternate identifiers and any envelope override", async () => {
+  const forbidden = () => { throw Error("SIDE_EFFECT_FORBIDDEN"); };
+  const relay = loadEnterpriseRelayModule({ client: { beginSend: forbidden }, ledger: { reserve: forbidden } });
+  const mutations = [
+    p => ({ ...p, brand: "JMP" }), p => ({ ...p, to: "client@example.com" }),
+    p => ({ ...p, to: ["financial@jmerrill.one"] }),
+    p => ({ ...p, templateId: "FINANCIAL.OTHER" }), p => ({ ...p, templateVersion: "2.0.0" }),
+    ...["subject", "html", "plainText", "body", "bodyText", "sourceRecord", "from", "senderAddress", "replyTo", "cc", "bcc", "recipients", "recipient", "attachments", "idempotencyKey", "correlationId", "recordLink", "businessObjectType", "businessObjectId", "messageType", "riskClassification"].map(
+      key => p => ({ ...p, [key]: "PRIVATE_CLIENT_DO_NOT_LOG" })),
+    ...["name", "email", "message", "url", "leadId", "clientId"].map(key => p => ({ ...p, templateData: { ...p.templateData, [key]: "PRIVATE_CLIENT_DO_NOT_LOG" } })),
+    ...[null, 123, "00000000-0000-0000-0000-000000000000", "90000000-0000-4000-A000-000000000029", "90000000-0000-4000-a000-000000000029\n", "<script>PRIVATE_CLIENT_DO_NOT_LOG</script>"].map(
+      referenceId => p => ({ ...p, templateData: { referenceId } })),
+    p => ({ ...p, templateData: null }), () => null, () => [], () => "PRIVATE_CLIENT_DO_NOT_LOG"
+  ];
+  for (const mutate of mutations) for (const route of ["send-enterprise-governed-email", "relay-authority-probe"]) {
+    const result = await relay.routes[route].handler(routeRequest(mutate(financialPayload()), financialHeaders()), quietContext);
+    assert.equal(result.status, 400);
+    assert.equal(JSON.stringify(result).includes("PRIVATE_CLIENT_DO_NOT_LOG"), false);
+  }
+});
+
+test("Financial template is unavailable to all other callers and legacy credentials", async (t) => {
+  const previousKey = process.env.JM1_RELAY_API_KEY;
+  process.env.JM1_RELAY_API_KEY = "financial-fixture-only";
+  t.after(() => {
+    if (previousKey === undefined) delete process.env.JM1_RELAY_API_KEY;
+    else process.env.JM1_RELAY_API_KEY = previousKey;
+  });
+  const forbidden = () => { throw Error("SIDE_EFFECT_FORBIDDEN"); };
+  const relay = loadEnterpriseRelayModule({ client: { beginSend: forbidden }, ledger: { reserve: forbidden } });
+  const { listCallers } = require("../src/policy/callerRegistry");
+  const others = listCallers().filter(c => c.identity.objectId && c.callerId !== "financial-inquiry-function-prod");
+  for (const route of ["send-enterprise-governed-email", "relay-authority-probe"]) {
+    for (const caller of others) {
+      const result = await relay.routes[route].handler(routeRequest(financialPayload(), workloadHeaders(caller.identity.objectId)), quietContext);
+      assert.ok([400, 403].includes(result.status), caller.callerId);
+      assert.notEqual(result.jsonBody.authorized, true);
+    }
+    assert.equal((await relay.routes[route].handler(routeRequest(financialPayload()), quietContext)).status, 401);
+    assert.equal((await relay.routes[route].handler(routeRequest(financialPayload(), workloadHeaders("00000000-0000-4000-a000-000000000001")), quietContext)).status, 403);
+    assert.equal((await relay.routes[route].handler(routeRequest(financialPayload(), { "x-jm1-relay-key": "financial-fixture-only" }), quietContext)).status, 403);
+  }
+});
+
+test("Financial revoked identity or changed template, brand and recipient scope denies before effects", async () => {
+  const { findCallerByObjectId } = require("../src/policy/callerRegistry");
+  const caller = findCallerByObjectId("658e6d91-1d9d-493f-83bd-f327eaf74ac1");
+  for (const changes of [{ status: "INACTIVE" }, { status: "REVOKED" }, { authorizedBrands: ["JMP"] }, { authorizedTemplates: [] }, { authorizedRecipients: [] }]) {
+    const forbidden = () => { throw Error("SIDE_EFFECT_FORBIDDEN"); };
+    const relay = loadEnterpriseRelayModule({ caller: { ...caller, ...changes }, client: { beginSend: forbidden }, ledger: { reserve: forbidden } });
+    for (const route of ["relay-authority-probe", "send-enterprise-governed-email"]) {
+      const result = await relay.routes[route].handler(routeRequest(financialPayload(), financialHeaders()), quietContext);
+      assert.equal(result.status, 403);
+    }
+  }
+});
+
+test("Financial static internal template does not weaken general GUID or financial compliance controls", () => {
+  const relay = loadEnterpriseRelayModule();
+  const generic = relay.validateEnterprisePayload(validPayload({ brand: "JMF", plainText: financialPayload().templateData.referenceId }));
+  assert.equal(generic.reason, "HUMAN_FIRST_INTERNAL_LANGUAGE_BLOCKED");
+  const risky = relay.validateEnterprisePayload(validPayload({ brand: "JMF", plainText: "This guarantees success." }));
+  assert.equal(risky.reason, "HUMAN_REVIEW_REQUIRED_FINANCIAL_COMPLIANCE");
+  const notice = relay.validateEnterprisePayload(financialPayload()).value;
+  assert.equal(notice.renderMetadata.audience, "INTERNAL_OPERATIONS");
+  assert.equal(notice.businessObjectType, "FINANCIAL_INQUIRY_RECEIPT");
+  assert.equal(notice.html.includes("href="), false);
+  assert.equal(notice.riskClassification, "ROUTINE");
+  assert.equal(notice.renderMetadata.htmlSha256.length, 64);
+});
+
+test("Financial accepted same-key replay survives restart; changed effect conflicts without another send", async () => {
+  const { createLedger } = require("../src/state/messageLedger");
+  const table = bp09MemoryTable(); let sends = 0;
+  const options = () => ({ env: { ACS_CONNECTION_STRING: "fixture" }, ledger: createLedger(table),
+    client: { beginSend: async message => {
+      sends++;
+      assert.equal(message.senderAddress, "financial@email.jmerrill.one");
+      assert.equal(message.recipients.to[0].address, "financial@jmerrill.one");
+      assert.equal(message.recipients.cc[0].address, "financial@jmerrill.one");
+      return { pollUntilDone: async () => ({ status: "Succeeded", id: "provider-financial" }) };
+    } } });
+  const send = relay => relay.routes["send-enterprise-governed-email"].handler(routeRequest(financialPayload(), financialHeaders()), quietContext);
+  const first = await send(loadEnterpriseRelayModule(options()));
+  assert.equal(first.status, 202);
+  const replay = await send(loadEnterpriseRelayModule(options()));
+  assert.equal(replay.status, 200); assert.equal(replay.jsonBody.replay, true);
+  assert.equal(replay.jsonBody.jm1MessageId, first.jsonBody.jm1MessageId);
+  assert.equal(replay.jsonBody.providerMessageId, "provider-financial");
+  assert.equal(sends, 1); assert.equal(table.rows.size, 1);
+  const stored = [...table.rows.values()][0];
+  assert.equal(stored.communicationState, "PROVIDER_ACCEPTED");
+  assert.equal(stored.mailboxVerifiedAt, undefined);
+  for (const field of ["templateData", "html", "plainText", "subject", "message", "submission", "name", "email"]) assert.equal(Object.hasOwn(stored, field), false);
+  table.rows.set(`${stored.partitionKey}/${stored.rowKey}`, { ...stored, fingerprint: "different-effect" });
+  const conflict = await send(loadEnterpriseRelayModule(options()));
+  assert.equal(conflict.status, 409); assert.equal(sends, 1);
+});
+
+test("Financial ambiguous transport stays submitted on restart and cannot trigger a duplicate send", async () => {
+  const { createLedger } = require("../src/state/messageLedger");
+  const table = bp09MemoryTable(); let sends = 0;
+  const options = () => ({ env: { ACS_CONNECTION_STRING: "fixture" }, ledger: createLedger(table),
+    client: { beginSend: async () => { sends++; throw Error("transport timeout"); } } });
+  const send = relay => relay.routes["send-enterprise-governed-email"].handler(routeRequest(financialPayload(), financialHeaders()), quietContext);
+  assert.equal((await send(loadEnterpriseRelayModule(options()))).status, 502);
+  assert.equal([...table.rows.values()][0].communicationState, "SUBMITTED");
+  const replay = await send(loadEnterpriseRelayModule(options()));
+  assert.equal(replay.status, 202); assert.equal(replay.jsonBody.accepted, false);
+  assert.equal(replay.jsonBody.inProgress, true); assert.equal(sends, 1);
+});
+
+test("Financial failure before reservation retries safely with the original reference", async () => {
+  const { createLedger } = require("../src/state/messageLedger");
+  const ledger = createLedger(bp09MemoryTable()); const original = ledger.reserve;
+  let attempts = 0, sends = 0;
+  ledger.reserve = async input => { if (++attempts === 1) throw Error("store unavailable"); return original(input); };
+  const relay = loadEnterpriseRelayModule({ env: { ACS_CONNECTION_STRING: "fixture" }, ledger,
+    client: { beginSend: async () => { sends++; return { pollUntilDone: async () => ({ status: "Succeeded", id: "provider-financial-retry" }) }; } } });
+  const send = () => relay.routes["send-enterprise-governed-email"].handler(routeRequest(financialPayload(), financialHeaders()), quietContext);
+  assert.equal((await send()).status, 502); assert.equal(sends, 0);
+  assert.equal((await send()).jsonBody.accepted, true); assert.equal(sends, 1);
+});
+
 const foundationHeaders = () => workloadHeaders("cb36ea0b-8ba6-4798-a836-47a52e340675");
 const foundationPayload = () => ({
   brand: "JMFN", to: "foundation@jmerrill.one",

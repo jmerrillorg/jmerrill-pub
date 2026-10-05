@@ -11,6 +11,7 @@ const { renderPublishingServiceCorrespondence } = require("../generated/communic
 const { isGovernedNamespace } = require("../templates/templateRegistry");
 const { CALLER_ID: BP09_CALLER_ID, TEMPLATE_ID: BP09_TEMPLATE_ID, renderProductionsBp09Notice } = require("../templates/productionsBp09Notice");
 const { CALLER_ID: FOUNDATION_CALLER_ID, TEMPLATE_ID: FOUNDATION_TEMPLATE_ID, renderFoundationVolunteerNotice } = require("../templates/foundationVolunteerNotice");
+const { CALLER_ID: FINANCIAL_CALLER_ID, TEMPLATE_ID: FINANCIAL_TEMPLATE_ID, renderFinancialInquiryNotice } = require("../templates/financialInquiryNotice");
 const {
   getSenderProfile,
   validateMessageIdentity,
@@ -29,6 +30,7 @@ let emailClient;
 function boundedNoticeRenderer(callerId) {
   if (callerId === BP09_CALLER_ID) return renderProductionsBp09Notice;
   if (callerId === FOUNDATION_CALLER_ID) return renderFoundationVolunteerNotice;
+  if (callerId === FINANCIAL_CALLER_ID) return renderFinancialInquiryNotice;
   return null;
 }
 
@@ -141,6 +143,7 @@ function serverError(code, payload = {}) {
 function validateEnterprisePayload(payload = {}) {
   if (normalizeEnum(payload?.templateId) === BP09_TEMPLATE_ID) return renderProductionsBp09Notice(payload);
   if (normalizeEnum(payload?.templateId) === FOUNDATION_TEMPLATE_ID) return renderFoundationVolunteerNotice(payload);
+  if (normalizeEnum(payload?.templateId) === FINANCIAL_TEMPLATE_ID) return renderFinancialInquiryNotice(payload);
   const brand = normalizeBrand(payload.brand);
   const profileResult = getSenderProfile(brand);
   if (!profileResult.ok) return { ok: false, reason: profileResult.reason };
