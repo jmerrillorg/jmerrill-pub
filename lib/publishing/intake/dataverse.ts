@@ -227,6 +227,33 @@ export async function finalizePublishingIntakeReceipt(recordId: string, intake: 
   }, 'receipt_finalize')
 }
 
+export async function listIncompletePublishingReceipts() {
+  const config = getDataverseConfig()
+  if (!config.ok) throw new Error('RECEIPT_CANONICAL_READER_CONFIGURATION_MISSING')
+  const token = await getDataverseAccessToken(config.value)
+  const query = new URLSearchParams({
+    $select: 'jm1_publishingintakeid,jm1_intakereferencecode,jm1_additionalnotes,createdon',
+    $filter: "startswith(jm1_additionalnotes,'Receipt fingerprint:') and contains(jm1_additionalnotes,'Receipt: RESERVED')",
+    $orderby: 'createdon asc', $top: '100',
+  })
+  let url: string | undefined = `${config.value.webApiBaseUrl}/${config.value.entitySet}?${query}`
+  const results: { recordId: string; reference: string; createdAt: string }[] = []
+  for (let page = 0; url && page < 10; page++) {
+    if (!url.startsWith(`${config.value.webApiBaseUrl}/`)) throw new Error('RECEIPT_PAGINATION_ORIGIN_INVALID')
+    const response: Response = await fetch(url, { headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' }, signal: AbortSignal.timeout(15_000) })
+    if (!response.ok) throw new Error('RECEIPT_CANONICAL_READER_FAILED')
+    const body: { value?: Record<string, unknown>[]; '@odata.nextLink'?: string } = await response.json()
+    if (!Array.isArray(body.value)) throw new Error('RECEIPT_CANONICAL_READER_INVALID')
+    for (const row of body.value) {
+      if (typeof row.jm1_publishingintakeid !== 'string' || typeof row.jm1_intakereferencecode !== 'string' || typeof row.createdon !== 'string') throw new Error('RECEIPT_CANONICAL_IDENTITY_INVALID')
+      if (!readReceiptNotes(row.jm1_additionalnotes).accepted) results.push({ recordId: row.jm1_publishingintakeid, reference: row.jm1_intakereferencecode, createdAt: row.createdon })
+    }
+    url = body['@odata.nextLink']
+  }
+  if (url) throw new Error('RECEIPT_CANONICAL_READER_CAPACITY_EXCEEDED')
+  return results
+}
+
 export async function markPublishingIntakeAcknowledgmentSent(
   recordId: string | undefined,
   sentAt = new Date().toISOString(),

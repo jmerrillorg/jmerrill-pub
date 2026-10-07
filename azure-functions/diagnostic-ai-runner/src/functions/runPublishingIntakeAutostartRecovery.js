@@ -142,6 +142,11 @@ async function callAutostart(intake) {
 }
 
 async function runPublishingIntakeAutostartRecovery(timer, context, deps = {}) {
+  if (safeTrim(process.env.JM1_INTAKE_RECEIPT_RECOVERY_ENABLED).toLowerCase() === "true") {
+    const response = await (deps.callReceiptRecovery || callReceiptRecovery)();
+    context.info(`Publishing receipt recovery observed; examined=${response.examined}; results=${response.results?.length || 0}; observedAt=${response.observedAt}; release=${response.releaseSha}`);
+    if (response.results?.some(result => result.error)) throw new Error("INTAKE_RECEIPT_MONITOR_FAILURE");
+  }
   if (!isEnabled()) {
     context.info("Publishing intake autostart recovery skipped: disabled.");
     return;
@@ -198,6 +203,18 @@ async function runPublishingIntakeAutostartRecovery(timer, context, deps = {}) {
   }
 }
 
+async function callReceiptRecovery() {
+  const owner = new URL(safeTrim(process.env.JM1_PUBLISHING_INTAKE_AUTOSTART_URL));
+  if (owner.origin !== "https://jmerrill.pub") throw new Error("RECEIPT_OWNER_ORIGIN_INVALID");
+  owner.pathname = "/api/publishing/intake/recovery";
+  owner.search = "";
+  const response = await fetch(owner, { method: "POST", signal: AbortSignal.timeout(120000),
+    headers: { "content-type": "application/json", "x-jm1-orchestration-worker-key": safeTrim(process.env.JM1_ORCHESTRATION_WORKER_KEY) },
+    body: JSON.stringify({ operation: "sweep" }) });
+  if (!response.ok) throw new Error(`INTAKE_RECEIPT_OWNER_HTTP_${response.status}`);
+  return response.json();
+}
+
 app.timer("run-publishing-intake-autostart-recovery", {
   schedule: process.env.JM1_PUBLISHING_INTAKE_AUTOSTART_CRON || "0 */2 * * * *",
   handler: runPublishingIntakeAutostartRecovery
@@ -207,5 +224,6 @@ module.exports = {
   runPublishingIntakeAutostartRecovery,
   listReadyIntakes,
   hasDispatchSuccessLog,
-  callAutostart
+  callAutostart,
+  callReceiptRecovery
 };
