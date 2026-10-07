@@ -23,6 +23,7 @@ import {
 } from '@/lib/publishing/intake/dataverse'
 import { rememberIdempotencyKey } from '@/lib/publishing/intake/idempotency'
 import { intakeFingerprint } from '@/lib/publishing/intake/receipt'
+import { reserveReceiptRecovery, recordReceiptCustody, recordReceiptFailure, recordReceiptComplete, withInitialReceiptClaim } from '@/lib/publishing/intake/receiptRecovery'
 import { sendJoinInternalNotification } from '@/lib/publishing/intake/internalNotification'
 import {
   ensureInquiryWorkspace,
@@ -268,7 +269,22 @@ async function handlePublishingIntakePost(req: NextRequest) {
     return json(pendingReceipt(prior.status === 'found' ? prior.reference : reference), 202, originResult.origin)
   }
 
+  if (dataverse.status === 'success' && dataverse.recordId) {
+    try {
+      await reserveReceiptRecovery(dataverse.recordId, intake, fingerprint, manuscriptFile)
+    } catch {
+      console.error('Publishing intake recovery journal unavailable.', { reference })
+      return json(pendingReceipt(reference), 202, originResult.origin)
+    }
+  }
+
+  return withInitialReceiptClaim(dataverse.status === 'success' ? dataverse.recordId : undefined, async () => {
   async function retainPending(operation: 'MANUSCRIPT_WRITEBACK' | 'WORKSPACE_WRITEBACK', reason: string) {
+    if (dataverse.status === 'success' && dataverse.recordId) {
+      await recordReceiptFailure(dataverse.recordId, 'INTAKE_DEPENDENCY_FAILURE').catch(() => {
+        console.error('Publishing intake recovery state write failed.', { reference })
+      })
+    }
     const recovery = await enqueuePublishingIntakeRecovery({
       intakeReference: reference,
       dataverseRecordId: dataverse.status === 'success' ? dataverse.recordId : undefined,
@@ -339,10 +355,16 @@ async function handlePublishingIntakePost(req: NextRequest) {
   }
 
   if (dataverse.status === 'success' && dataverse.recordId) {
+    try { await recordReceiptCustody(dataverse.recordId, acceptedIntake) }
+    catch { return retainPending('MANUSCRIPT_WRITEBACK', 'RECOVERY_CUSTODY_WRITE_FAILED') }
     const finalized = await finalizePublishingIntakeReceipt(dataverse.recordId, acceptedIntake, fingerprint)
     if (finalized.status !== 'success') {
       return retainPending('MANUSCRIPT_WRITEBACK', finalized.reason)
     }
+    // The canonical accepted receipt prevents recovery from resending mail after restart.
+    await recordReceiptComplete(dataverse.recordId).catch(() => {
+      console.error('Publishing intake completion journal write pending.', { reference })
+    })
   }
   if (dataverse.status === 'success' || dataverse.status === 'skipped') {
     rememberIdempotencyKey(acceptedIntake.idempotencyKey, reference)
@@ -474,6 +496,7 @@ async function handlePublishingIntakePost(req: NextRequest) {
   }
 
   return json(buildErrorResponse('unexpected_exception', 'receipt_not_committed', reference), 500, originResult.origin)
+  })
 }
 
 function pendingReceipt(reference: string): IntakeResponseBody {

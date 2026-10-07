@@ -65,6 +65,48 @@ reviewed repaired artifact is recovered forward. Restore alert preimage only
 through approved configuration rollback; do not change its recipients.
 
 Current production acceptance is NOT proven by this document or passing tests.
+
+## Incomplete receipt monitor and recovery
+
+`JM1_INTAKE_RECEIPT_RECOVERY_ENABLED=true` enables the existing two-minute
+intake recovery timer's authenticated call to the website receipt owner. The
+public producer stores new receipt recovery material in private
+`jm1pub/jm1-pub-intake-recovery`, never in the queue or alert body. The journal
+contains the original source bytes, checksum, normalized inquiry (challenge
+token omitted), and completed custody pointers. Dataverse remains receipt
+acceptance authority. The monitor also scans canonical reserved receipts and
+alerts on missing recovery custody; it never fabricates lost source content.
+
+Five-minute reserved work is overdue; explicit dependency failure is actionable
+immediately. Recent pending work and accepted receipts awaiting mailbox
+verification are not incomplete-receipt failures. Retry state is persistent,
+with 1/2/4/8/16-minute backoff, five attempts maximum and manual holds on identity,
+checksum or notification ambiguity. Renewable sixty-second blob leases serialize
+each receipt; abandoned leases expire without consuming any recovery queue item.
+Canonical acceptance is read back before completion. Recovery sends no author
+acknowledgment, creates no title/diagnostic and dispatches no editorial operation.
+
+Operational failure and resolution messages use the existing governed relay,
+canonical renderer and durable message ledger. Recipients are fixed to the
+existing internal operations address `jm1-admin@jmerrill.one`, with Publishing
+context copy `publishing@jmerrill.one`. Only references, failure classification
+and first-observed timestamp are included. Each receipt/status purpose is
+idempotent; an ambiguous provider send is held, not automatically resent.
+
+The internal acceptance route requires the existing worker secret, a pinned
+synthetic key/record ID and a maximum four-hour expiry. Its fixture content and
+internal recipient are server-defined; no caller-supplied manuscript or recipient
+is accepted. It persists exact custody before holding finalization, returns 202,
+and restores only that fixture's dependency hold. The timer, not a chat invocation,
+must produce the alert and resumed completion. Remove acceptance settings after
+proof, leaving normal receipt monitoring enabled. Queue inspection is peek-only.
+
+Disable `JM1_INTAKE_RECEIPT_RECOVERY_ENABLED` on the timer first to contain recovery;
+preserve all journals, receipts and files. Disabling it on the website restores
+the deployed synchronous receipt path but removes new recovery journaling, so it
+is containment, not complete monitoring. Preserve the canonical pre-release
+website, Function and relay artifact references before rollout. No historic
+author receipt, queue message, title state or manuscript is an acceptance fixture.
 # Live custody follow-up
 
 The first live synthetic DOCX proved SharePoint promotes library metadata into Office packages during upload. The document text was unchanged but its package bytes did not match the received source hash. New uploads therefore retain an inert `.source.bin` companion containing the exact received bytes before the readable DOCX. The manifest distinguishes the metadata-mutable document from the exact source companion and records its item ID, original filename, size and checksum. Existing real documents and historical manifests are not rewritten by this repair. Live acceptance must independently download and hash the synthetic companion; metadata or an input hash alone is insufficient.
