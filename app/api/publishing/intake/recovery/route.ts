@@ -7,7 +7,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { strToU8, zipSync } from 'fflate'
 import { intakeFingerprint, intakeRecordId } from '@/lib/publishing/intake/receipt'
 import { createNormalizedPublishingIntake, validatePublishingIntakeBody } from '@/lib/publishing/intake/schema'
-import { writePublishingIntakeWithRetry } from '@/lib/publishing/intake/dataverse'
+import { findPublishingIntakeByIdempotencyKey, writePublishingIntakeWithRetry } from '@/lib/publishing/intake/dataverse'
 import { uploadManuscriptToInquiryWorkspace } from '@/lib/publishing/intake/manuscriptUpload'
 import { enqueuePublishingIntakeRecovery } from '@/lib/publishing/intake/deadLetter'
 import { receiptRecoveryEnabled, reserveReceiptRecovery, recordReceiptCustody, recordReceiptFailure,
@@ -50,6 +50,14 @@ export async function POST(request: NextRequest) {
 }
 
 async function seedAcceptance(key: string, recordId: string) {
+  const existing = await findPublishingIntakeByIdempotencyKey(key)
+  if (existing.status === 'found') {
+    if (existing.recordId !== recordId) throw new Error('ACCEPTANCE_RECEIPT_IDENTITY_MISMATCH')
+    const receipt = await readReceiptRecovery(recordId)
+    if (receipt.reference !== existing.reference) throw new Error('ACCEPTANCE_RECEIPT_IDENTITY_MISMATCH')
+    return NextResponse.json(receipt, { status: 202 })
+  }
+  if (existing.status !== 'not_found') throw new Error('ACCEPTANCE_RECEIPT_READBACK_FAILED')
   // Fixed internal fixture only; caller cannot supply author content, recipient, or manuscript.
   const input = {
     firstName: 'Synthetic', lastName: 'RecoveryAcceptance', email: 'jm1-admin@jmerrill.one',

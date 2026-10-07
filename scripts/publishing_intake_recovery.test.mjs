@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
+import { readFileSync } from 'node:fs'
 import { createJiti } from 'jiti'
 import { NextRequest } from 'next/server.js'
 const jiti = createJiti(import.meta.url, { alias: { '@': new URL('..', import.meta.url).pathname } })
@@ -108,6 +109,15 @@ test('owner endpoint denies anonymous sweep, read and controlled fixture before 
       method: 'POST', body: JSON.stringify({ operation }) }))
     assert.equal(response.status, 401)
   }
+})
+
+test('acceptance replay returns canonical state before regenerating timestamped fixture bytes', () => {
+  const source = readFileSync(new URL('../app/api/publishing/intake/recovery/route.ts', import.meta.url), 'utf8')
+  const seed = source.slice(source.indexOf('async function seedAcceptance'))
+  assert.ok(seed.indexOf('findPublishingIntakeByIdempotencyKey(key)') < seed.indexOf('zipSync('))
+  assert.ok(seed.indexOf('readReceiptRecovery(recordId)') < seed.indexOf('writePublishingIntakeWithRetry('))
+  assert.match(seed, /existing\.recordId !== recordId/)
+  assert.match(seed, /existing\.status !== 'not_found'/)
 })
 
 test('private journal roundtrip retains source authority and rejects altered identity or bytes', () => {
