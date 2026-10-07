@@ -438,6 +438,7 @@ async function ensureFolderPath(token: string, driveId: string, folderPath: stri
 
 async function getDriveItemByPath(token: string, driveId: string, itemPath: string): Promise<GraphDriveItem | null> {
   const response = await fetch(`${GRAPH_BASE_URL}/drives/${encodeURIComponent(driveId)}/root:/${encodeGraphPath(itemPath)}`, {
+    signal: AbortSignal.timeout(15000),
     headers: graphHeaders(token),
   })
 
@@ -452,6 +453,7 @@ async function createFolder(token: string, driveId: string, parentPath: string, 
     : `/drives/${encodeURIComponent(driveId)}/root/children`
 
   const response = await fetch(`${GRAPH_BASE_URL}${parent}`, {
+    signal: AbortSignal.timeout(15000),
     method: 'POST',
     headers: {
       ...graphHeaders(token),
@@ -485,6 +487,7 @@ async function uploadSmallFile(
     `${GRAPH_BASE_URL}/drives/${encodeURIComponent(driveId)}/root:/${encodeGraphPath(itemPath)}:/content`,
     {
       method: 'PUT',
+      signal: AbortSignal.timeout(15000),
       headers: {
         ...graphHeaders(token),
         'Content-Type': contentType || 'application/octet-stream',
@@ -498,7 +501,7 @@ async function uploadSmallFile(
 }
 
 async function graphFetch(token: string, path: string): Promise<unknown> {
-  const response = await fetch(`${GRAPH_BASE_URL}${path}`, { headers: graphHeaders(token) })
+  const response = await fetch(`${GRAPH_BASE_URL}${path}`, { headers: graphHeaders(token), signal: AbortSignal.timeout(15000) })
   if (!response.ok) throw new Error(`graph_fetch_failed:${response.status}`)
   return response.json()
 }

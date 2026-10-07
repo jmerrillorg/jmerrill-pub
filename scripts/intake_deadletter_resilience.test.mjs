@@ -10,7 +10,8 @@ test('notification failure after durable intake is recoverable and does not bloc
   assert.match(route, /const notification = await sendJoinInternalNotification/)
   assert.match(route, /enqueuePublishingIntakeRecovery\(\{/)
   assert.match(route, /failedOperationType: 'PUBLISHING_NOTIFICATION'/)
-  assert.match(route, /return json\(\{ status: 'received', reference \}, 201/)
+  assert.match(route, /status: 'received'/)
+  assert.match(route, /finalizePublishingIntakeReceipt/)
 })
 
 test('invalid input failures are handled before any recovery queue enqueue', () => {

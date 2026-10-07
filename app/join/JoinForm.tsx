@@ -26,7 +26,7 @@ declare global {
   }
 }
 
-type Status = 'idle' | 'submitting' | 'success' | 'duplicate' | 'rate_limited' | 'error'
+type Status = 'idle' | 'submitting' | 'success' | 'pending' | 'duplicate' | 'rate_limited' | 'error'
 type VerificationConfigStatus = 'loading' | 'ready' | 'missing'
 
 type JoinFormState = {
@@ -388,8 +388,19 @@ export default function JoinForm() {
 
       const data = await res.json()
 
+      if (res.status === 202 && data.status === 'pending') {
+        setReference(data.reference)
+        setServerMessage(data.message)
+        setStatus('pending')
+        return
+      }
+
       if (res.status === 201 && data.status === 'received') {
-        localStorage.setItem(referenceStorageKey(form.idempotencyKey), data.reference)
+        try {
+          localStorage.setItem(referenceStorageKey(form.idempotencyKey), data.reference)
+        } catch {
+          // Browser storage is optional; it must not invalidate a durable receipt.
+        }
         setReference(data.reference)
         setContinuationUrl(typeof data.continuationUrl === 'string' ? data.continuationUrl : '')
         setStatus('success')
@@ -430,6 +441,17 @@ export default function JoinForm() {
     } catch {
       setStatus('error')
     }
+  }
+
+  if (status === 'pending') {
+    return (
+      <Panel>
+        <h2 className="mb-3 text-white" style={headingStyle}>Your inquiry needs a receipt check.</h2>
+        <p className="mb-4 text-[15px] leading-[1.75] text-slate-100">{serverMessage}</p>
+        <p className="text-slate-100">Your reference: {reference}</p>
+        <a href="mailto:publishing@jmerrill.one" className="mt-5 inline-flex text-blue-300 underline">Email Publishing</a>
+      </Panel>
+    )
   }
 
   if (status === 'success') {
@@ -847,7 +869,7 @@ export default function JoinForm() {
           )}
           {status === 'error' && (
             <p className="rounded-xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-[13px] leading-[1.7] text-red-200">
-              We&apos;re sorry — something went wrong on our end. Your submission did not go through. Please try again in a few minutes, or email us directly at publishing@jmerrill.one and we&apos;ll take care of you personally.
+              We could not confirm your submission. Please keep your manuscript and email publishing@jmerrill.one for assistance before submitting again.
             </p>
           )}
         </div>

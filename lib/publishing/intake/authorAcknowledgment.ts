@@ -21,6 +21,7 @@ export async function sendJoinAuthorAcknowledgment(
 
   try {
     const response = await fetch(`${config.value.relayUrl}/api/${RELAY_ROUTE}`, {
+      signal: AbortSignal.timeout(15000),
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -75,11 +76,11 @@ function buildAuthorAcknowledgmentPayload(intake: AcknowledgmentIntake) {
 
 function authorFacingNextStep(intake: AcknowledgmentIntake) {
   if (intake.manuscriptSubmissionChoice === 'later') {
-    return 'Your inquiry has been received. Please use the secure continuation link to add the manuscript when you are ready; Editorial Review cannot begin until a manuscript is connected.'
+    return 'Your inquiry has been received. Please use the secure continuation link to add the manuscript when you are ready. The Publishing team will review your inquiry.'
   }
 
   if (intake.manuscriptLifecycleState === 'NORMALIZATION_PENDING') {
-    return 'Your inquiry and manuscript have been received. JMP is preparing the manuscript file for Editorial Review.'
+    return 'Your inquiry and manuscript have been received. The Publishing team will review the file and follow up about any format requirements.'
   }
 
   return 'Your inquiry and manuscript have been received. JMP will review the project and keep you informed about the next step.'
