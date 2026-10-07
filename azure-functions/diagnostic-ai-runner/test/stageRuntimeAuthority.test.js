@@ -145,6 +145,7 @@ test("stage queue authority rejects non-Jackie, missing, and conflicting author 
     { _jm1_primaryauthor_value: "22222222-2222-4222-8222-222222222222", jm1_canonicalauthorcontactreference: "contact:22222222-2222-4222-8222-222222222222" },
     { _jm1_primaryauthor_value: null, jm1_canonicalauthorcontactreference: null },
     { jm1_canonicalauthorcontactreference: "malformed" },
+    { jm1_canonicalauthorcontactreference: " " },
     { _jm1_author_value: 42 },
   ]) {
     const result = await readStageAuthority(canonicalEvent,

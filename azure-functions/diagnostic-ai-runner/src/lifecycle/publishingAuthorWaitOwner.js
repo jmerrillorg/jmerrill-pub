@@ -6,6 +6,7 @@ const { verifyCorrespondenceIdentity } = require("../mail/inbound/correspondence
 const { authorReplyText } = require("../mail/inbound/replyText");
 const { buildMessageEvidence } = require("../mail/inbound/evidenceModel");
 const { resumeExactAuthorReviewReply } = require("../orchestration/authorReviewResponseConsumer");
+const { isJackieAuthoredTitle } = require("../author/jackieTitleSystemCommissioningPolicy");
 const GUID = /^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i;
 const equal = (a, b) => Boolean(a && b && String(a).toLowerCase() === String(b).toLowerCase());
 
@@ -18,7 +19,7 @@ function createAuthorWaitOwner({ client, inbound, graph }) {
     const stage = await client.first("jm1pub_editorialstages", { $filter: `jm1pub_editorialstageid eq ${wait.stageId}` });
     const contact = title?._jm1_primaryauthor_value || title?.jm1_canonicalauthorcontactreference?.replace(/^contact:/, "");
     const reference = title?.jm1_canonicalauthorcontactreference;
-    if (!equal(contact, wait.authorId) || (reference && reference.toLowerCase() !== `contact:${contact}`.toLowerCase()) ||
+    if (!isJackieAuthoredTitle(title) || !equal(contact, wait.authorId) || (reference && reference.toLowerCase() !== `contact:${contact}`.toLowerCase()) ||
         !equal(stage?._jm1pub_titleid_value, wait.titleId) || !equal(stage?._jm1pub_contactid_value, wait.authorId) || stage.jm1pub_stagecompletedate ||
         stage.jm1pub_publishingintakereference !== wait.legacyEngagementReference ||
         wait.executionId !== `author-response:${gate.jm1pub_editorialapprovalgateid}:${gate._jm1pub_deliverableartifactid_value}`) return null;

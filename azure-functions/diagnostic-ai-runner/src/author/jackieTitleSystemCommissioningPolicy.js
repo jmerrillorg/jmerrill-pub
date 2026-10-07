@@ -8,7 +8,7 @@ function normalizeContactReference(value) {
   if (value === null || value === undefined || value === "") return { present: false, id: "" };
   if (typeof value !== "string") return { present: true, id: "" };
   const text = value.trim().toLowerCase();
-  if (!text) return { present: false, id: "" };
+  if (!text) return { present: true, id: "" };
   const match = text.match(/^(?:contact:)?([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})$/);
   return { present: true, id: match?.[1] || "" };
 }
@@ -25,4 +25,8 @@ function isJackieAuthoredTitle(authorityRecord) {
   );
 }
 
-module.exports = { JACKIE_CANONICAL_AUTHOR_CONTACT_ID, isJackieAuthoredTitle };
+function jackieTitleCommissioningBlocker(authorityRecord) {
+  return isJackieAuthoredTitle(authorityRecord) ? null : "JACKIE_AUTHOR_ONLY_SYSTEM_COMMISSIONING_DENIED";
+}
+
+module.exports = { JACKIE_CANONICAL_AUTHOR_CONTACT_ID, isJackieAuthoredTitle, jackieTitleCommissioningBlocker };

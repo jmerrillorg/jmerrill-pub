@@ -5,9 +5,11 @@ const fs = require("node:fs");
 const path = require("node:path");
 const { policy, readApprovedRevisionAuthority } = require("../src/editorial/approvedRevisionAuthority");
 const { hash } = require("../src/editorial/approvedRevisionDocument");
+const { JACKIE_CANONICAL_AUTHOR_CONTACT_ID } = require("../src/author/jackieTitleSystemCommissioningPolicy");
 
 function fixture() {
   const p = structuredClone(policy), source = Buffer.from("synthetic manuscript bytes");
+  p.contactId = JACKIE_CANONICAL_AUTHOR_CONTACT_ID;
   p.sourceSha256 = hash(source);
   const decision = { decision: "APPROVED_STAGE07_REVISION_INSTRUCTIONS_ONLY", taskId: p.taskId, titleId: p.titleId,
     stageId: p.stageId, publisherUserId: p.publisherId, artifactId: p.deliveredArtifactId, artifactSha256: p.deliveredSha256,
@@ -38,7 +40,9 @@ function fixture() {
     _jm1pub_editorialstageid_value: p.stageId, jm1pub_authordecision: null, jm1pub_nextstageauthorized: false }));
   const records = {
     jm1_publishingtasks: [task], jm1_executionlogs: [disposition], jm1pub_editorialstages: [stage],
-    jm1pub_titles: [{ jm1pub_titleid: p.titleId, jm1pub_titlename: "Synthetic Title", statecode: 0 }],
+    jm1pub_titles: [{ jm1pub_titleid: p.titleId, jm1pub_titlename: "Synthetic Title", statecode: 0,
+      _jm1_primaryauthor_value: p.contactId, _jm1_author_value: p.contactId,
+      jm1_canonicalauthorcontactreference: `contact:${p.contactId}` }],
     contacts: [{ contactid: p.contactId, statecode: 0 }], systemusers: [{ systemuserid: p.publisherId, isdisabled: false }],
     jm1pub_editorialapprovalgates: gates, jm1pub_editorialartifacts: [original, delivered, ...authorities]
   };
@@ -73,6 +77,15 @@ test("authority binds seven existing sources, canonical byte provenance and pres
   assert.equal(a.snapshot.editorialAuthority.authority.priorAuthorDecisions.sha256, h.p.dispositionSha256);
   const b = await readApprovedRevisionAuthority(input, h.deps);
   assert.equal(a.fingerprint, b.fingerprint);
+});
+
+test("configured Jackuline production title is denied by Jackie-only commissioning policy", async () => {
+  const h = fixture();
+  const actualAuthorId = policy.contactId;
+  h.records.jm1pub_titles[0]._jm1_primaryauthor_value = actualAuthorId;
+  h.records.jm1pub_titles[0]._jm1_author_value = actualAuthorId;
+  h.records.jm1pub_titles[0].jm1_canonicalauthorcontactreference = `contact:${actualAuthorId}`;
+  await assert.rejects(readApprovedRevisionAuthority(input, h.deps), /JACKIE_AUTHOR_ONLY_SYSTEM_COMMISSIONING_DENIED/);
 });
 
 test("changed decision, owner, title, source path, canon or existing title authority fails closed", async () => {
