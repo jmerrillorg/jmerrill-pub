@@ -65,3 +65,6 @@ reviewed repaired artifact is recovered forward. Restore alert preimage only
 through approved configuration rollback; do not change its recipients.
 
 Current production acceptance is NOT proven by this document or passing tests.
+# Live custody follow-up
+
+The first live synthetic DOCX proved SharePoint promotes library metadata into Office packages during upload. The document text was unchanged but its package bytes did not match the received source hash. New uploads therefore retain an inert `.source.bin` companion containing the exact received bytes before the readable DOCX. The manifest distinguishes the metadata-mutable document from the exact source companion and records its item ID, original filename, size and checksum. Existing real documents and historical manifests are not rewritten by this repair. Live acceptance must independently download and hash the synthetic companion; metadata or an input hash alone is insufficient.
