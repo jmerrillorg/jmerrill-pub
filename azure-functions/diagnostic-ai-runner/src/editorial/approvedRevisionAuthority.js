@@ -4,6 +4,7 @@ const policy = require("../../config/whole-stage07-approved-revision.json");
 const { hash, fail } = require("./approvedRevisionDocument");
 const { readVerifiedSkill, bindSkill } = require("./approvedRevisionSkill");
 const { readExistingTitleAuthorities, readExistingGlobalStyleGuide } = require("./productionTitleAuthorityReader");
+const { jackieTitleCommissioningBlocker } = require("../author/jackieTitleSystemCommissioningPolicy");
 
 const OWNER = "PUBLISHING_APPROVED_EDITORIAL_REVISION_V1";
 const approvedPolicy = policy;
@@ -43,6 +44,7 @@ async function readApprovedRevisionAuthority(input, deps) {
   }
   const publisher = await exact(client, "systemusers", "systemuserid", policy.publisherId);
   const title = await exact(client, "jm1pub_titles", "jm1pub_titleid", policy.titleId);
+  if (jackieTitleCommissioningBlocker(title)) fail("JACKIE_AUTHOR_ONLY_SYSTEM_COMMISSIONING_DENIED");
   const contact = await exact(client, "contacts", "contactid", policy.contactId);
   const stage = await exact(client, "jm1pub_editorialstages", "jm1pub_editorialstageid", policy.stageId);
   if (publisher.isdisabled !== false || contact.statecode !== 0 || title.statecode !== 0 || stage.statecode !== 0 ||

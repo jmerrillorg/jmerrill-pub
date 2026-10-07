@@ -3,6 +3,7 @@
 const crypto = require("node:crypto");
 const { ClientSecretCredential, DefaultAzureCredential } = require("@azure/identity");
 const { nextStageCode } = require("./editorialAuthorGatePolicy");
+const { isJackieAuthoredTitle } = require("../author/jackieTitleSystemCommissioningPolicy");
 
 const EXECUTION_STATUS = { SUCCESS: 835500001, FAILED: 835500002 };
 const BAND_LEVEL_1 = 835500000;
@@ -261,7 +262,7 @@ async function evaluateEditorialNextStageMaterialization(input = {}, deps = {}) 
 
   const [titles, completedStages, artifacts, approvalGates, targetStages] = await Promise.all([
     findRows(client, "jm1pub_titles", {
-      $select: "jm1pub_titleid,jm1pub_name,jm1pub_titlename,jm1pub_authorname",
+      $select: "jm1pub_titleid,jm1pub_name,jm1pub_titlename,jm1pub_authorname,_jm1_primaryauthor_value,_jm1_author_value,jm1_canonicalauthorcontactreference",
       $filter: `jm1pub_titleid eq ${normalized.titleId}`,
       $top: "2"
     }),
@@ -307,6 +308,10 @@ async function evaluateEditorialNextStageMaterialization(input = {}, deps = {}) 
   const completedStage = completedStages[0];
   const artifact = artifacts[0];
   const gate = approvalGates[0];
+  if (!isJackieAuthoredTitle(title)) {
+    return blocked(normalized, "JACKIE_AUTHOR_ONLY_SYSTEM_COMMISSIONING_DENIED",
+      "Automated next-stage materialization is restricted to titles with authoritative, non-conflicting Jackie authorship.", { idempotencyKey });
+  }
   if (stageCodeForTypeOrName(completedStage) !== normalized.completedStageCode) {
     return blocked(normalized, "COMPLETED_STAGE_CODE_MISMATCH", "Resolved source stage does not match completedStageCode.", { idempotencyKey });
   }

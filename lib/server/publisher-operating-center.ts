@@ -13,6 +13,7 @@ import {
   stringValue,
   type DataverseServerConfig,
 } from './dataverse-server'
+import { isJackieAuthorContact } from './jackie-title-system-commissioning-policy'
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { randomUUID } from 'node:crypto'
@@ -1239,6 +1240,14 @@ export async function autoInitializeOutsideInquiryEditorialReview(input: {
     return {
       status: 'blocked' as const,
       blocker: 'intake_missing_contact',
+      intakeId: input.intakeId,
+    }
+  }
+
+  if (!isJackieAuthorContact(dataverseLookupId(intake, '_jm1_linkedcontact_value'))) {
+    return {
+      status: 'blocked' as const,
+      blocker: 'JACKIE_AUTHOR_ONLY_SYSTEM_COMMISSIONING_DENIED',
       intakeId: input.intakeId,
     }
   }

@@ -26,10 +26,14 @@ function accepted(input) {
     executionId: input.executionId
   };
 }
+function authorized(input) {
+  return { current: true, titleId: input.titleId, stageId: input.stageId, stageCode: input.stageCode };
+}
 
 test("eligible events fail before journal write when no stage dispatcher exists", async () => {
   let writes = 0;
   await assert.rejects(processStageEvent(event("STAGE_ELIGIBLE"), {
+    authorize: async (input) => authorized(input),
     persistEvent: async () => { writes += 1; return { status: "RECORDED" }; }
   }), /DISPATCHSTAGE_ADAPTER_MISSING/);
   assert.equal(writes, 0);
@@ -41,6 +45,7 @@ test("replay repeats the same adapter key after the journal already recorded eli
   const input = event("STAGE_ELIGIBLE");
   const deps = {
     persistEvent: async () => ({ status: ++attempts === 1 ? "RECORDED" : "DUPLICATE" }),
+    authorize: async (item) => authorized(item),
     dispatchStage: async (item) => { keys.push(item.idempotencyKey); return accepted(item); }
   };
   assert.equal((await processStageEvent(input, deps)).action, "ACCEPTED");
@@ -52,6 +57,7 @@ test("completion cannot be acknowledged without a correlated advancement adapter
   const input = event("STAGE_COMPLETED");
   await assert.rejects(processStageEvent(input, {
     persistEvent: async () => ({ status: "RECORDED" }),
+    authorize: async (item) => authorized(item),
     advanceStage: async () => ({ ...accepted(input), stageId: "00000000-0000-0000-0000-000000000000" })
   }), /ACTION_NOT_CORRELATED_OR_ACCEPTED/);
 });
@@ -59,6 +65,7 @@ test("completion cannot be acknowledged without a correlated advancement adapter
 test("gate resolution and scheduled retry require their own durable adapters", async () => {
   for (const type of ["HUMAN_ACTION_COMPLETED", "EXTERNAL_ACTION_COMPLETED", "STAGE_RETRY_SCHEDULED"]) {
     await assert.rejects(processStageEvent(event(type), {
+      authorize: async (input) => authorized(input),
       persistEvent: async () => ({ status: "RECORDED" })
     }), /ADAPTER_MISSING/);
   }
@@ -78,7 +85,19 @@ test("provider and human actors cannot emit system stage-control events", async 
     changed.idempotencyKey = keyFor(changed);
     await assert.rejects(processStageEvent(changed, {
       dispatchStage: async () => accepted(changed),
+      authorize: async (item) => authorized(item),
       persistEvent: async () => ({ status: "RECORDED" })
     }), /EVENT_ACTOR_MISMATCH/);
   }
+});
+
+test("unknown or non-Jackie stage authority is denied before journal or action", async () => {
+  let writes = 0, dispatches = 0;
+  await assert.rejects(processStageEvent(event("STAGE_ELIGIBLE"), {
+    authorize: async () => ({ current: false }),
+    persistEvent: async () => { writes += 1; return { status: "RECORDED" }; },
+    dispatchStage: async () => { dispatches += 1; }
+  }), /PUBLISHING_STAGE_AUTHORITY_DENIED/);
+  assert.equal(writes, 0);
+  assert.equal(dispatches, 0);
 });

@@ -11,13 +11,13 @@ function client(overrides = {}) {
   return {
     async first(entitySet) {
       if (entitySet === "contacts") return overrides.contact === null ? null :
-        { contactid: "106a78d0-fb9a-f111-b8dc-6045bdd69738", ...(overrides.contact || {}) };
+        { contactid: "d38aa56a-882a-f111-88b4-6045bdd69678", ...(overrides.contact || {}) };
       return entitySet === "jm1pub_editorialstages"
         ? { jm1pub_editorialstageid: stageId, jm1pub_stagetype: 100000001,
             jm1pub_stagestatus: 100000002, _jm1pub_titleid_value: titleId,
             ...(overrides.stage || {}) }
         : { jm1pub_titleid: titleId, jm1pub_stage: 100000006,
-            _jm1_primaryauthor_value: "106a78d0-fb9a-f111-b8dc-6045bdd69738",
+            _jm1_primaryauthor_value: "d38aa56a-882a-f111-88b4-6045bdd69678",
             ...(overrides.title || {}) };
     }
   };
@@ -30,12 +30,12 @@ test("reads exact live editorial stage/title authority", async () => {
 });
 
 test("editorial authority uses the exact contact reference when the primary lookup is absent", async () => {
-  const reference = "contact:106a78d0-fb9a-f111-b8dc-6045bdd69738";
+  const reference = "contact:d38aa56a-882a-f111-88b4-6045bdd69678";
   const event = { titleId, stageId, stageCode: "07_DEVELOPMENTAL_EDITING" };
   const resolved = await readEditorialStageAuthority(event,
     client({ title: { _jm1_primaryauthor_value: null, jm1_canonicalauthorcontactreference: reference } }));
   assert.equal(resolved.current, true);
-  assert.equal(resolved.authorId, "106a78d0-fb9a-f111-b8dc-6045bdd69738");
+  assert.equal(resolved.authorId, "d38aa56a-882a-f111-88b4-6045bdd69678");
   const missingContact = await readEditorialStageAuthority(event,
     client({ title: { _jm1_primaryauthor_value: null, jm1_canonicalauthorcontactreference: reference }, contact: null }));
   assert.equal(missingContact.current, false);
@@ -61,7 +61,7 @@ test("denies unsupported stages until their canonical adapter is commissioned", 
 });
 
 const lifecycleId = "11111111-1111-4111-8111-111111111111";
-const authorId = "106a78d0-fb9a-f111-b8dc-6045bdd69738";
+const authorId = "d38aa56a-882a-f111-88b4-6045bdd69678";
 const canonicalEvent = { titleId, stageId, stageCode: "13_PRODUCTION" };
 
 function canonicalClient(overrides = {}) {
@@ -137,4 +137,19 @@ test("canonical stage authority denies absent and conflicting records", async ()
       ...(await baseline.list("jmpv2_publishingengagements")),
       ...(await baseline.list("jmpv2_publishingengagements"))
     ] }))).current, false);
+});
+
+test("stage queue authority rejects non-Jackie, missing, and conflicting author records", async () => {
+  const title = (await canonicalClient().list("jm1pub_titles"))[0];
+  for (const mutation of [
+    { _jm1_primaryauthor_value: "22222222-2222-4222-8222-222222222222", jm1_canonicalauthorcontactreference: "contact:22222222-2222-4222-8222-222222222222" },
+    { _jm1_primaryauthor_value: null, jm1_canonicalauthorcontactreference: null },
+    { jm1_canonicalauthorcontactreference: "malformed" },
+    { jm1_canonicalauthorcontactreference: " " },
+    { _jm1_author_value: 42 },
+  ]) {
+    const result = await readStageAuthority(canonicalEvent,
+      canonicalClient({ jm1pub_titles: [{ ...title, ...mutation }] }));
+    assert.equal(result.current, false);
+  }
 });

@@ -11,6 +11,7 @@ const { verifyCorrespondenceIdentity, bindCorrespondenceIdentity, declaredCorres
 const { OWNER_BY_TYPE } = require("./publishingWaitResumeAdapter");
 const { waitRuntimeOwnsTitle, waitRuntimeMonitorsTitle } = require("./publishingWaitEnablement");
 const { recoverCadenceDelivery } = require("../mail/inbound/cadenceDeliveryRecovery");
+const { isJackieAuthoredTitle } = require("../author/jackieTitleSystemCommissioningPolicy");
 const PROJECTION_CONTAINER = "jm1-publishing-wait-projections";
 const SIGNAL_QUEUE = "jm1-publishing-wait-signals";
 
@@ -26,10 +27,17 @@ function createPublishingWaitRuntime(deps = {}) {
     if (!adapter) throw Object.assign(new Error("PUBLISHING_WAIT_OWNER_NOT_COMMISSIONED"), { safeCode: "PUBLISHING_WAIT_OWNER_NOT_COMMISSIONED" });
     return adapter;
   }
+  async function titleIsSystemCommissioningEligible(titleId) {
+    const title = await client.first("jm1pub_titles", {
+      $select: "jm1pub_titleid,_jm1_primaryauthor_value,_jm1_author_value,jm1_canonicalauthorcontactreference",
+      $filter: `jm1pub_titleid eq ${titleId}`
+    });
+    return String(title?.jm1pub_titleid || "").toLowerCase() === String(titleId || "").toLowerCase() && isJackieAuthoredTitle(title);
+  }
   const projection = deps.projection || BlobServiceClient.fromConnectionString(process.env.AzureWebJobsStorage).getContainerClient(PROJECTION_CONTAINER);
   const runtime = {
     store, handlers: owners, now: deps.now, observe: deps.observe,
-    canDispatch: (wait) => waitRuntimeOwnsTitle(wait.titleId),
+    canDispatch: async (wait) => waitRuntimeOwnsTitle(wait.titleId) && titleIsSystemCommissioningEligible(wait.titleId),
     canMonitor: (wait) => waitRuntimeMonitorsTitle(wait.titleId),
     readAuthority: (wait) => owner(wait).readAuthority(wait),
     verifyCondition: (wait, authority) => owner(wait).verifyCondition(wait, authority),
@@ -50,8 +58,9 @@ function createPublishingWaitRuntime(deps = {}) {
         runtime.observe?.({ ...failure, status: "PRODUCER_FAILED" });
       };
       for (const gate of gates) {
-        if (!waitRuntimeOwnsTitle(gate._jm1pub_titleid_value)) continue;
         try {
+        if (!waitRuntimeOwnsTitle(gate._jm1pub_titleid_value) ||
+            !await titleIsSystemCommissioningEligible(gate._jm1pub_titleid_value)) continue;
         const stage = await client.first("jm1pub_editorialstages", { $filter: `jm1pub_editorialstageid eq ${gate._jm1pub_editorialstageid_value}` });
         if (!stage?._jm1pub_contactid_value || !stage.jm1pub_publishingintakereference) continue;
         const contact = await client.first("contacts", { $filter: `contactid eq ${stage._jm1pub_contactid_value}`, $select: "contactid,emailaddress1" });

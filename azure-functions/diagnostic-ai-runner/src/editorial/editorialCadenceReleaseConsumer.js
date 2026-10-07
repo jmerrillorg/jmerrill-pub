@@ -17,6 +17,7 @@ const {
   sendCadenceAuthorReviewPackage,
   validateDueSendInput
 } = require("./editorialCadenceAuthorPackageSender");
+const { isJackieAuthoredTitle, JACKIE_CANONICAL_AUTHOR_CONTACT_ID } = require("../author/jackieTitleSystemCommissioningPolicy");
 const { reconcileDevelopmentalWorkspace } = require("./developmentalWorkspaceReconciliation");
 
 const POLICY_VERSION = "JMP Editorial Cadence Doctrine v1.0";
@@ -109,7 +110,7 @@ async function getStage(client, stageId) {
 
 async function getTitle(client, titleId) {
   const rows = await client.list("jm1pub_titles", {
-    $select: "jm1pub_titleid,jm1pub_name,jm1pub_titlename,jm1pub_authorname,_jm1_author_value,modifiedon,createdon",
+    $select: "jm1pub_titleid,jm1pub_name,jm1pub_titlename,jm1pub_authorname,_jm1_primaryauthor_value,_jm1_author_value,jm1_canonicalauthorcontactreference,modifiedon,createdon",
     $filter: `jm1pub_titleid eq ${titleId}`,
     $top: "1"
   });
@@ -585,6 +586,10 @@ async function processCadenceLog(client, cadenceLog, now, correlationId, deps = 
   const stage = await getStage(client, stageId);
   if (!stage) return { status: "SKIPPED", reason: "STAGE_NOT_FOUND", stageId };
   const title = normalizeString(stage._jm1pub_titleid_value) ? await getTitle(client, stage._jm1pub_titleid_value) : null;
+  if (!title || !isJackieAuthoredTitle(title) ||
+      normalizeString(stage._jm1pub_contactid_value).toLowerCase() !== JACKIE_CANONICAL_AUTHOR_CONTACT_ID) {
+    return { status: "HELD_NON_JACKIE_TITLE", reason: "JACKIE_AUTHOR_ONLY_SYSTEM_COMMISSIONING_DENIED", stageId };
+  }
   const contact = normalizeString(stage._jm1pub_contactid_value) ? await getContact(client, stage._jm1pub_contactid_value) : null;
   const gate = await getCurrentGate(client, stage);
   const completionLog = await latestPackageCompletionLog(client, stageId);
