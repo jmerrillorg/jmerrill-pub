@@ -2,6 +2,7 @@ import { createHash } from 'node:crypto'
 import { execFileSync } from 'node:child_process'
 import { mkdirSync, readFileSync, writeFileSync, readdirSync } from 'node:fs'
 import { join } from 'node:path'
+import { canonicalAuthorContactReference } from './canonical-author-contact-reference.mjs'
 
 const SOURCE_DIR = '/Volumes/UsersExternal/Developer/jmerrill-pub/docs/operations/generated/PUBLISHING-OPERATING-CENTER-FULL-TRUTH-AUDIT-2026-09-01'
 const OUT_DIR = 'docs/operations/generated/PUBLISHING-OPERATING-CENTER-WAVE1-CANONICAL-AUTHORITY-2026-09-01'
@@ -23,6 +24,13 @@ main().catch((error) => {
 })
 
 async function main() {
+  const approvedSingleTitleId = process.env.WAVE1_APPROVED_SINGLE_TITLE_ID?.toLowerCase() || ''
+  const expectedEtag = process.env.WAVE1_EXPECTED_ETAG || ''
+  const authorityEvidence = process.env.WAVE1_AUTHORITY_EVIDENCE || ''
+  if (approvedSingleTitleId && (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(approvedSingleTitleId) || !expectedEtag || !authorityEvidence)) {
+    throw new Error('STOP_SINGLE_RECORD_WRITE_REQUIRES_VALID_TITLE_ETAG_AND_AUTHORITY_EVIDENCE')
+  }
+
   mkdirSync(OUT_DIR, { recursive: true })
 
   const universe = parseCsv(readFileSync(join(SOURCE_DIR, '01_operating_center_title_universe.csv'), 'utf8'))
@@ -138,7 +146,8 @@ async function main() {
       writeLog.push({ TITLE_ID: row.TITLE_ID, ACTION: 'NO_WRITE', RESULT: 'LIVE_TITLE_NOT_FOUND', FIELDS: '' })
       continue
     }
-    const payload = buildAuthorityPayload(row)
+    const isExplicitTarget = row.TITLE_ID.toLowerCase() === approvedSingleTitleId
+    const payload = buildAuthorityPayload(row, isExplicitTarget ? authorityEvidence : '')
     const fields = Object.keys(payload)
     const forbidden = fields.filter((field) => !ALLOWED_PAYLOAD_FIELDS.includes(field))
     if (forbidden.length) throw new Error(`STOP_FORBIDDEN_PAYLOAD_FIELDS:${forbidden.join(',')}`)
@@ -147,6 +156,17 @@ async function main() {
       noOps += 1
       writeLog.push({ TITLE_ID: row.TITLE_ID, ACTION: 'PATCH_SKIPPED', RESULT: 'NO_OP_MATCH', FIELDS: fields.join(';') })
       continue
+    }
+
+    if (!approvedSingleTitleId || row.TITLE_ID.toLowerCase() !== approvedSingleTitleId) {
+      writeLog.push({ TITLE_ID: row.TITLE_ID, ACTION: 'NO_WRITE', RESULT: 'PREVIEW_ONLY_OR_OUTSIDE_EXPLICIT_SINGLE_RECORD_SCOPE', FIELDS: fields.join(';') })
+      continue
+    }
+    if (row.DETERMINISTIC !== 'YES' || !authorityEvidence) {
+      throw new Error(`STOP_SINGLE_RECORD_AUTHORITY_UNPROVEN:${row.TITLE_ID}`)
+    }
+    if (clean(live['@odata.etag']) !== expectedEtag) {
+      throw new Error(`STOP_SINGLE_RECORD_ETAG_CONFLICT:${row.TITLE_ID}`)
     }
 
     try {
@@ -211,15 +231,12 @@ async function main() {
   console.log(JSON.stringify(summary, null, 2))
 }
 
-function buildAuthorityPayload(row) {
+function buildAuthorityPayload(row, authorityEvidence = '') {
   return {
     jm1_canonicalstatus: row.RECORD_ROLE,
     jm1_canonicaltitlereference: row.CANONICAL_TITLE_ID || row.TITLE_ID,
-    jm1_canonicalauthorcontactreference:
-      [row.CANONICAL_CONTACT_ID && `contact:${row.CANONICAL_CONTACT_ID}`, row.CANONICAL_AUTHOR_PROFILE_ID && `authorProfile:${row.CANONICAL_AUTHOR_PROFILE_ID}`]
-        .filter(Boolean)
-        .join('; ') || 'UNRESOLVED',
-    jm1_sourceauthority: `PUBLISHING_OPERATING_CENTER_WAVE1_2026_09_01:${row.AUDIT_ROW_ID}`,
+    jm1_canonicalauthorcontactreference: canonicalAuthorContactReference(row.CANONICAL_CONTACT_ID),
+    jm1_sourceauthority: `PUBLISHING_OPERATING_CENTER_WAVE1_2026_09_01:${row.AUDIT_ROW_ID}${authorityEvidence ? `|OWNER_EVIDENCE:${authorityEvidence}` : ''}`,
   }
 }
 
@@ -400,9 +417,7 @@ Reason: existing Dataverse title authority fields can carry the Wave 1 canonical
     CANONICAL_STATUS: row.RECORD_ROLE,
     CANONICAL_TITLE_REFERENCE: row.CANONICAL_TITLE_ID || row.TITLE_ID,
     CANONICAL_AUTHOR_CONTACT_REFERENCE:
-      [row.CANONICAL_CONTACT_ID && `contact:${row.CANONICAL_CONTACT_ID}`, row.CANONICAL_AUTHOR_PROFILE_ID && `authorProfile:${row.CANONICAL_AUTHOR_PROFILE_ID}`]
-        .filter(Boolean)
-        .join('; ') || 'UNRESOLVED',
+      canonicalAuthorContactReference(row.CANONICAL_CONTACT_ID),
     FORBIDDEN_FIELDS: '0',
   })), [
     'TITLE_ID',
