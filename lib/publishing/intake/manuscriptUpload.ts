@@ -38,6 +38,8 @@ export type StoredManuscriptArtifact = {
   workspaceUrl: string
   workspaceFolderId: string
   sharePointItemId: string
+  originalBytesItemId?: string
+  originalBytesUrl?: string
 }
 
 export type ExistingIntakeWorkspaceInput = {
@@ -206,6 +208,15 @@ export async function storeOriginalManuscriptArtifact(input: {
   )
   const uploadFileName = buildUploadFileName(input.intake.reference, validation.value.fileName)
   const sourceSha256 = computeSha256(validation.value.bytes)
+  // SharePoint promotes library metadata into Office packages. Retain exact
+  // source bytes in an inert companion before creating the readable document.
+  const originalBytes = await uploadSmallFile(
+    context.token,
+    context.driveId,
+    `${context.workspacePath}/${ORIGINAL_MANUSCRIPT_FOLDER}/${uploadFileName}.source.bin`,
+    validation.value.bytes,
+    'application/octet-stream',
+  )
   const uploaded = await uploadSmallFile(
     context.token,
     context.driveId,
@@ -225,6 +236,8 @@ export async function storeOriginalManuscriptArtifact(input: {
     workspaceUrl: context.workspace.webUrl || manuscriptFolder.webUrl,
     workspaceFolderId: context.workspace.id,
     sharePointItemId: uploaded.id,
+    originalBytesItemId: originalBytes.id,
+    originalBytesUrl: originalBytes.webUrl,
   }
   const sourceManifestBytes = encodeUtf8Json(buildSourceArtifactManifest({
     intake: input.intake,
@@ -334,7 +347,8 @@ export function buildSourceArtifactManifest(input: {
     intakeReference: input.intake.reference,
     correlationId: input.intake.idempotencyKey || input.intake.reference,
     sourceArtifact: {
-      immutable: true,
+      immutable: false,
+      documentMutationPolicy: 'sharepoint_library_metadata_promotion_possible',
       fileName: input.artifact.fileName,
       originalFileName: input.artifact.originalFileName,
       sourceFormat: input.artifact.fileType,
@@ -344,6 +358,15 @@ export function buildSourceArtifactManifest(input: {
       reviewFlag: input.artifact.reviewFlag,
       sharePointItemId: input.artifact.sharePointItemId,
       sharePointWebUrl: input.artifact.manuscriptUrl,
+      originalBytes: input.artifact.originalBytesItemId ? {
+        immutable: true,
+        sharePointItemId: input.artifact.originalBytesItemId,
+        sharePointWebUrl: input.artifact.originalBytesUrl,
+        sizeBytes: input.artifact.size,
+        sha256: input.artifact.sha256,
+        restoreFileName: input.artifact.originalFileName,
+        storageFormat: 'inert_binary_companion',
+      } : null,
     },
     provenance: {
       ...input.provenance,

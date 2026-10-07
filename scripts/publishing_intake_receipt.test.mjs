@@ -85,6 +85,15 @@ async function exercise(mode, action) {
       if (method === 'PUT') {
         state.uploads++
         if (mode === 'upload-failure') return new Response(null, { status: 503 })
+        if (url.includes('.source.bin')) {
+          assert.deepEqual(new Uint8Array(options.body), harmlessDocx)
+        }
+        if (url.includes('source-artifact-manifest.json')) {
+          const manifest = JSON.parse(new TextDecoder().decode(options.body))
+          assert.equal(manifest.sourceArtifact.immutable, false)
+          assert.equal(manifest.sourceArtifact.originalBytes.immutable, true)
+          assert.equal(manifest.sourceArtifact.originalBytes.sizeBytes, harmlessDocx.length)
+        }
       }
       return Response.json({ id: 'fixture-item', name: 'Fixture', webUrl: 'https://jmerrillfoundation.sharepoint.com/sites/publishing/fixture' })
     }
@@ -147,7 +156,7 @@ test('complete receipt and duplicate retry create one inquiry, upload and notifi
   assert.equal(second.status, 201)
   assert.equal(second.body.reference, first.body.reference)
   assert.equal(state.creates, 1)
-  assert.equal(state.uploads, 2, 'One DOCX and one source manifest')
+  assert.equal(state.uploads, 3, 'Exact inert source bytes, one DOCX and one source manifest')
   assert.equal(state.notifications, 1)
   assert.equal(state.acknowledgments, 1)
   assert.equal([...state.rows.values()][0].jm1_stage0handoffstatus, 835500003)
@@ -181,7 +190,7 @@ test('concurrent identical submissions cannot duplicate custody or author commun
   assert.ok(results.every(result => result.status === 201 || result.status === 202))
   assert.equal(results[0].body.reference, results[1].body.reference)
   assert.equal(state.rows.size, 1)
-  assert.equal(state.uploads, 2)
+  assert.equal(state.uploads, 3)
   assert.equal(state.acknowledgments, 1)
 }))
 
