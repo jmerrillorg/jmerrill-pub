@@ -10,18 +10,19 @@ import {
 } from '@/lib/publishing/intake/continuation'
 import {
   classifyRecoverableFailure,
-  enqueuePublishingIntakeDeadLetter,
   enqueuePublishingIntakeRecovery,
 } from '@/lib/publishing/intake/deadLetter'
 import { sendJoinAuthorAcknowledgment } from '@/lib/publishing/intake/authorAcknowledgment'
 import {
   findPublishingIntakeByIdempotencyKey,
+  finalizePublishingIntakeReceipt,
   markPublishingIntakeAcknowledgmentFailed,
   markPublishingIntakeAcknowledgmentPending,
   markPublishingIntakeAcknowledgmentSent,
   writePublishingIntakeWithRetry,
 } from '@/lib/publishing/intake/dataverse'
-import { getIdempotencyReplay, rememberIdempotencyKey } from '@/lib/publishing/intake/idempotency'
+import { rememberIdempotencyKey } from '@/lib/publishing/intake/idempotency'
+import { intakeFingerprint } from '@/lib/publishing/intake/receipt'
 import { sendJoinInternalNotification } from '@/lib/publishing/intake/internalNotification'
 import {
   ensureInquiryWorkspace,
@@ -37,14 +38,14 @@ import {
   validatePublishingIntakeBody,
   type IntakeValidationError,
 } from '@/lib/publishing/intake/schema'
-import { maskEmail, maskName } from '@/lib/publishing/intake/sanitize'
 import { verifyTurnstileToken } from '@/lib/publishing/intake/turnstile'
-import { autoInitializeOutsideInquiryEditorialReview } from '@/lib/server/publisher-operating-center'
 
 export const dynamic = 'force-dynamic'
 
 type IntakeResponseBody =
   | { status: 'received'; reference: string; continuationUrl?: string }
+  | { status: 'pending'; reference: string; message: string }
+  | { status: 'conflict'; message: string }
   | { status: 'invalid'; code: 'validation_failed'; errors: IntakeValidationError[] }
   | { status: 'duplicate' }
   | { status: 'rate_limited' }
@@ -221,15 +222,15 @@ async function handlePublishingIntakePost(req: NextRequest) {
     }
   }
 
-  const replay = getIdempotencyReplay(validation.data.idempotencyKey)
-  if (replay) {
-    return json({ status: 'received', reference: replay.reference }, 201, originResult.origin)
-  }
-
+  const fingerprint = intakeFingerprint(validation.data, manuscriptFile?.bytes)
   const durableReplay = await findPublishingIntakeByIdempotencyKey(validation.data.idempotencyKey)
   if (durableReplay.status === 'found') {
-    rememberIdempotencyKey(validation.data.idempotencyKey, durableReplay.reference)
-    return json({ status: 'received', reference: durableReplay.reference }, 201, originResult.origin)
+    if (durableReplay.fingerprint && durableReplay.fingerprint !== fingerprint) {
+      return json({ status: 'conflict', message: 'This request reference belongs to a different submission. Please contact Publishing for assistance.' }, 409, originResult.origin)
+    }
+    return durableReplay.accepted
+      ? json({ status: 'received', reference: durableReplay.reference }, 201, originResult.origin)
+      : json(pendingReceipt(durableReplay.reference), 202, originResult.origin)
   }
 
   if (durableReplay.status === 'failed' && process.env.NODE_ENV === 'production') {
@@ -248,6 +249,39 @@ async function handlePublishingIntakePost(req: NextRequest) {
   const intake = createNormalizedPublishingIntake(validation.data, reference)
   let acceptedIntake = intake
 
+  // Reserve durable inquiry custody before any file or downstream side effect.
+  const dataverse = await writePublishingIntakeWithRetry({ ...intake, manuscriptUrl: undefined, manuscriptReceived: false }, fingerprint)
+  if (dataverse.status === 'failed') {
+    const diagnostics = buildFailureDiagnostics(dataverse.reason)
+    const recovery = await enqueuePublishingIntakeRecovery({
+      intakeReference: reference,
+      correlationId: intake.idempotencyKey,
+      failedOperationType: 'DATAVERSE_INTAKE_CREATE',
+      failureClassification: classifyRecoverableFailure(dataverse.reason),
+      safeErrorCode: dataverse.reason,
+    })
+    console.error('Publishing intake reservation failed.', { reference, code: diagnostics.code, recoveryStatus: recovery.status })
+    return json(buildErrorResponse(diagnostics.code, diagnostics.detail, reference), diagnostics.httpStatus, originResult.origin)
+  }
+  if (dataverse.status === 'success' && dataverse.existing) {
+    const prior = await findPublishingIntakeByIdempotencyKey(intake.idempotencyKey)
+    return json(pendingReceipt(prior.status === 'found' ? prior.reference : reference), 202, originResult.origin)
+  }
+
+  async function retainPending(operation: 'MANUSCRIPT_WRITEBACK' | 'WORKSPACE_WRITEBACK', reason: string) {
+    const recovery = await enqueuePublishingIntakeRecovery({
+      intakeReference: reference,
+      dataverseRecordId: dataverse.status === 'success' ? dataverse.recordId : undefined,
+      workspaceFolderId: acceptedIntake.workspaceFolderId,
+      correlationId: intake.idempotencyKey,
+      failedOperationType: operation,
+      failureClassification: classifyRecoverableFailure(reason),
+      safeErrorCode: reason,
+    })
+    console.error('Publishing intake incomplete receipt requires owner review.', { reference, operation, recoveryStatus: recovery.status })
+    return json(pendingReceipt(reference), 202, req.headers.get('origin'))
+  }
+
   try {
     if (manuscriptFile) {
       const workspace = await uploadManuscriptToInquiryWorkspace(intake, manuscriptFile)
@@ -257,11 +291,7 @@ async function handlePublishingIntakePost(req: NextRequest) {
           reference,
         })
 
-        return json(
-          buildErrorResponse('manuscript_upload_failed', sanitizeDiagnosticDetail(workspace.reason), reference),
-          500,
-          originResult.origin,
-        )
+        return retainPending('MANUSCRIPT_WRITEBACK', workspace.reason)
       }
 
       acceptedIntake = {
@@ -280,6 +310,7 @@ async function handlePublishingIntakePost(req: NextRequest) {
       }
     } else if (submittedManuscriptUrl) {
       const workspace = await ensureInquiryWorkspace(intake)
+      if (workspace.status !== 'created') return retainPending('WORKSPACE_WRITEBACK', workspace.reason)
       acceptedIntake = {
         ...intake,
         manuscriptReceived: true,
@@ -291,6 +322,7 @@ async function handlePublishingIntakePost(req: NextRequest) {
       }
     } else {
       const workspace = await ensureInquiryWorkspace(intake)
+      if (workspace.status !== 'created') return retainPending('WORKSPACE_WRITEBACK', workspace.reason)
       acceptedIntake = {
         ...intake,
         workspaceUrl: workspace.status === 'created' ? workspace.workspaceUrl : undefined,
@@ -303,18 +335,15 @@ async function handlePublishingIntakePost(req: NextRequest) {
       reference,
     })
 
-    return json(
-      buildErrorResponse(
-        'manuscript_upload_failed',
-        sanitizeDiagnosticDetail(error instanceof Error ? error.message : 'unknown'),
-        reference,
-      ),
-      500,
-      originResult.origin,
-    )
+    return retainPending('MANUSCRIPT_WRITEBACK', error instanceof Error ? error.name : 'unknown')
   }
 
-  const dataverse = await writePublishingIntakeWithRetry(acceptedIntake)
+  if (dataverse.status === 'success' && dataverse.recordId) {
+    const finalized = await finalizePublishingIntakeReceipt(dataverse.recordId, acceptedIntake, fingerprint)
+    if (finalized.status !== 'success') {
+      return retainPending('MANUSCRIPT_WRITEBACK', finalized.reason)
+    }
+  }
   if (dataverse.status === 'success' || dataverse.status === 'skipped') {
     rememberIdempotencyKey(acceptedIntake.idempotencyKey, reference)
     const continuation = dataverse.status === 'success' && dataverse.recordId && acceptedIntake.manuscriptSubmissionChoice === 'later'
@@ -431,54 +460,7 @@ async function handlePublishingIntakePost(req: NextRequest) {
       }
     }
 
-    if (
-      dataverse.status === 'success' &&
-      dataverse.recordId &&
-      (acceptedIntake.manuscriptReceived === true || Boolean(acceptedIntake.manuscriptUrl))
-    ) {
-      try {
-        const orchestration = await autoInitializeOutsideInquiryEditorialReview({
-          intakeId: dataverse.recordId,
-          correlationId: acceptedIntake.idempotencyKey,
-        })
-
-        if (orchestration.status !== 'dispatched') {
-          const recovery = await enqueuePublishingIntakeRecovery({
-            intakeReference: acceptedIntake.reference,
-            dataverseRecordId: dataverse.recordId,
-            workspaceFolderId: acceptedIntake.workspaceFolderId,
-            correlationId: acceptedIntake.idempotencyKey,
-            failedOperationType: 'PIPELINE_ORCHESTRATION',
-            failureClassification: classifyRecoverableFailure(`orchestration_${orchestration.blocker}`),
-            safeErrorCode: `orchestration_${orchestration.blocker}`,
-          })
-
-          console.warn('Publishing intake orchestration did not complete after intake acceptance.', {
-            status: orchestration.status,
-            blocker: orchestration.blocker,
-            recoveryStatus: recovery.status,
-            reference,
-          })
-        }
-      } catch (error) {
-        const reason = error instanceof Error ? error.message : 'unknown'
-        const recovery = await enqueuePublishingIntakeRecovery({
-          intakeReference: acceptedIntake.reference,
-          dataverseRecordId: dataverse.recordId,
-          workspaceFolderId: acceptedIntake.workspaceFolderId,
-          correlationId: acceptedIntake.idempotencyKey,
-          failedOperationType: 'PIPELINE_ORCHESTRATION',
-          failureClassification: classifyRecoverableFailure(`orchestration_exception:${reason}`),
-          safeErrorCode: `orchestration_exception:${reason}`,
-        })
-
-        console.warn('Publishing intake orchestration threw after intake acceptance.', {
-          reason: error instanceof Error ? error.name : 'unknown',
-          recoveryStatus: recovery.status,
-          reference,
-        })
-      }
-    }
+    // Public receipt is manual Publishing work, never editorial execution authority.
 
     return json(
       {
@@ -491,30 +473,11 @@ async function handlePublishingIntakePost(req: NextRequest) {
     )
   }
 
-  const deadLetter = await enqueuePublishingIntakeDeadLetter(acceptedIntake, dataverse.reason)
-  if (deadLetter.status === 'enqueued') {
-    console.error('Publishing intake Dataverse write failed; recovery message enqueued.', {
-      reason: dataverse.reason,
-      reference,
-      firstName: maskName(intake.firstName),
-      email: maskEmail(intake.email),
-    })
-  }
+  return json(buildErrorResponse('unexpected_exception', 'receipt_not_committed', reference), 500, originResult.origin)
+}
 
-  console.error('Publishing intake failed without Dataverse write or dead-letter.', {
-    dataverseReason: dataverse.reason,
-    deadLetterStatus: deadLetter.status,
-    reference,
-    firstName: maskName(intake.firstName),
-    email: maskEmail(intake.email),
-  })
-
-  const diagnostics = buildFailureDiagnostics(dataverse.reason)
-  return json(
-    buildErrorResponse(diagnostics.code, diagnostics.detail, reference),
-    diagnostics.httpStatus,
-    originResult.origin,
-  )
+function pendingReceipt(reference: string): IntakeResponseBody {
+  return { status: 'pending', reference, message: 'Your inquiry is recorded, but we have not confirmed the complete submission. Publishing needs to review it. Please keep this reference; do not submit again. You may email publishing@jmerrill.one for assistance.' }
 }
 
 function buildContinuation(intakeId: string, reference: string): { claims: IntakeContinuationClaims; url: string } | null {

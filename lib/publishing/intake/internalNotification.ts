@@ -20,6 +20,7 @@ export async function sendJoinInternalNotification(
 
   try {
     const response = await fetch(`${config.value.relayUrl}/api/${RELAY_ROUTE}`, {
+      signal: AbortSignal.timeout(15000),
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -59,10 +60,10 @@ function buildJoinInternalNotificationPayload(intake: InternalNotificationIntake
     continuationUrl: intake.continuationUrl || undefined,
     intakeChannel: intake.intakeChannel,
     dataverseIntakeUrl: recordId ? buildDataverseRecordUrl('jm1_publishingintake', recordId) : undefined,
-    stageStatus: 'Intake received; routing/workspace automation pending or in progress.',
+    stageStatus: 'Inquiry received; manual Publishing review required. No title processing authorized.',
     nextAction: intake.manuscriptSubmissionChoice === 'later'
-      ? 'Monitor manuscript continuation. Editorial Review must not begin until manuscript evidence is bound.'
-      : 'Review the new /join intake and confirm Contact, Lead, workspace, and Editorial Review routing completed.',
+      ? 'Jackie Smith, Jr.: review the existing Publishing inquiry manually; manuscript continuation does not authorize title processing.'
+      : 'Jackie Smith, Jr.: review the existing Publishing inquiry and preserved manuscript manually. Receipt does not authorize editorial processing or title advancement.',
     recipient: 'publishing@jmerrill.one',
   }
 }

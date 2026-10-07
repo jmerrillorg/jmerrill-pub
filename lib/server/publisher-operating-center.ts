@@ -14,6 +14,7 @@ import {
   type DataverseServerConfig,
 } from './dataverse-server'
 import { isJackieAuthorContact } from './jackie-title-system-commissioning-policy'
+import { readReceiptNotes } from '../publishing/intake/receipt'
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { randomUUID } from 'node:crypto'
@@ -1805,6 +1806,8 @@ function buildQueueItem(
   const sourceLocation = stringValue(intake.jm1_manuscripturl || intake.jm1_submissionurl)
   const hasManuscript = intake.jm1_manuscriptreceived === true || Boolean(sourceLocation)
   const intakeNotes = stringValue(intake.jm1_additionalnotes)
+  const manualReceipt = intakeNotes.startsWith('Receipt fingerprint:')
+  const receiptAccepted = readReceiptNotes(intakeNotes).accepted
   const acknowledgmentState = acknowledgmentStateForIntake(intake)
   const notificationState = notificationStateForIntake(intake, logs)
   const systemAttentionFlag = acknowledgmentState === 'AUTHOR_ACK_FAILED' ||
@@ -1827,7 +1830,9 @@ function buildQueueItem(
         latestAction: latestActionType,
       })
     : undefined
-  const currentBlocker = deriveIntakeSpecificBlocker(
+  const currentBlocker = manualReceipt
+    ? receiptAccepted ? 'Manual Publishing review required' : 'Intake receipt recovery required'
+    : deriveIntakeSpecificBlocker(
     intakeNotes,
     hasManuscript,
     deriveQueueBlocker(
@@ -1845,10 +1850,12 @@ function buildQueueItem(
   )
   const authorizedActions = buildAuthorizedActions(currentBlocker, hasContact)
   const recommendedNextAction =
-    editorialWorkloadState && currentBlocker !== 'Ready for next editorial scheduling decision'
+    manualReceipt
+      ? 'Jackie Smith, Jr.: review the existing Publishing inquiry and custody evidence manually; do not initiate title processing.'
+      : editorialWorkloadState && currentBlocker !== 'Ready for next editorial scheduling decision'
       ? deriveNextAction(editorialWorkloadState, titleName)
       : authorizedActions.find((action) => action.id !== 'view_only')?.label || currentBlocker
-  const actionOwner = currentBlocker.includes('release decision ready')
+  const actionOwner = manualReceipt ? 'publisher' : currentBlocker.includes('release decision ready')
     ? 'publisher'
     : currentBlocker.includes('response pending')
       ? 'author'
@@ -1866,6 +1873,7 @@ function buildQueueItem(
             ? 'publisher'
             : 'system'
   const execution = deriveQueueExecutionModel({
+    manualReview: manualReceipt,
     actionOwner,
     currentBlocker,
     hasAuthorizedAction: authorizedActions.some((action) => action.id !== 'view_only'),
@@ -1909,11 +1917,11 @@ function buildQueueItem(
     sourceLocation,
     submissionDate: stringValue(intake.createdon),
     manuscriptState: hasManuscript ? 'MANUSCRIPT_RECEIVED' : 'MANUSCRIPT_PENDING',
-    waitingOn: hasManuscript ? 'JMP' : 'Prospect',
+    waitingOn: manualReceipt ? 'JMP' : hasManuscript ? 'JMP' : 'Prospect',
     acknowledgmentState,
     acknowledgmentError: stringValue(intake.jm1_acknowledgmenterror),
     notificationState,
-    systemAttentionFlag,
+    systemAttentionFlag: systemAttentionFlag || (manualReceipt && !receiptAccepted),
     currentBlocker,
     recommendedNextAction,
     actionOwner,
@@ -2532,6 +2540,7 @@ function deriveOwner(
 }
 
 function deriveQueueExecutionModel(input: {
+  manualReview?: boolean
   actionOwner: PublisherQueueItem['actionOwner']
   currentBlocker: string
   hasAuthorizedAction: boolean
@@ -2550,6 +2559,16 @@ function deriveQueueExecutionModel(input: {
   | 'expectedDuration'
   | 'exactBlocker'
 > {
+  if (input.manualReview) {
+    return {
+      executionMode: 'PUBLISHER_MANUAL', executionState: 'WAITING_FOR_HUMAN',
+      businessOwner: 'Publisher', executionOwner: 'Publisher',
+      runtime: 'Governed Publishing manual inquiry review', runtimeCostCategory: 'No variable model cost',
+      awaiting: 'Publisher', lastTrigger: 'Durable inquiry receipt',
+      lastExecution: input.latestExecutionEvidence || 'No title processing authorized',
+      expectedDuration: 'Publisher dependent', exactBlocker: input.currentBlocker,
+    }
+  }
   if (input.actionOwner === 'author') {
     return {
       executionMode: 'EXTERNAL_PARTY',
