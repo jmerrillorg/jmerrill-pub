@@ -40,20 +40,14 @@ function unionById(rows) {
 
 async function findCurrentExamples(client) {
   const jackie = JACKIE_CANONICAL_AUTHOR_CONTACT_ID;
-  const jackieFilters = [
-    "_jm1_primaryauthor_value eq " + jackie,
-    "_jm1_author_value eq " + jackie,
-    "jm1_canonicalauthorcontactreference eq 'contact:" + jackie + "'",
-  ];
-  const jackieRows = unionById((await Promise.all(jackieFilters.map((filter) =>
-    client.list("jm1pub_titles", {
-      $select: TITLE_SELECT,
-      $filter: "statecode eq 0 and " + filter,
-      $top: "50",
-    })))).flat());
+  const currentTitles = unionById(await client.list("jm1pub_titles", {
+    $select: TITLE_SELECT,
+    $filter: "statecode eq 0",
+    $top: "500",
+  }));
 
   let jackieRecord = null;
-  for (const row of jackieRows) {
+  for (const row of currentTitles) {
     if (!isJackieAuthoredTitle(row)) continue;
     const id = consistentAuthorId(row);
     if (id === jackie && await client.first("contacts", {
@@ -65,14 +59,8 @@ async function findCurrentExamples(client) {
     }
   }
 
-  const otherRows = await client.list("jm1pub_titles", {
-    $select: TITLE_SELECT,
-    $filter: "statecode eq 0 and _jm1_primaryauthor_value ne " + jackie +
-      " and _jm1_primaryauthor_value ne null",
-    $top: "100",
-  });
   let otherRecord = null;
-  for (const row of otherRows) {
+  for (const row of currentTitles) {
     if (isJackieAuthoredTitle(row)) continue;
     const id = consistentAuthorId(row);
     if (id && id !== jackie && await client.first("contacts", {

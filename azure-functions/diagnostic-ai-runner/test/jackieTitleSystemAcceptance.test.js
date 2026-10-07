@@ -33,10 +33,10 @@ function makeClient(options = {}) {
     async list(entity, query) {
       queries.push({ entity, query });
       if (entity !== "jm1pub_titles") throw new Error("unexpected list target");
-      if (query.$filter.includes("_jm1_primaryauthor_value eq " + JACKIE) ||
-          query.$filter.includes("_jm1_author_value eq " + JACKIE) ||
-          query.$filter.includes("contact:" + JACKIE)) return [jackieTitle];
-      return [otherTitle];
+      assert.equal(query.$select, "jm1pub_titleid,_jm1_primaryauthor_value,_jm1_author_value,jm1_canonicalauthorcontactreference");
+      assert.equal(query.$filter, "statecode eq 0");
+      assert.equal(query.$top, "500");
+      return [jackieTitle, otherTitle];
     },
     async first(entity, query) {
       queries.push({ entity, query });
