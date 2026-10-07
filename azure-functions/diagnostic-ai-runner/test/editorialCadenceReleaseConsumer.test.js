@@ -17,7 +17,7 @@ const {
 const stageId = "fd577d2b-01a0-f111-b8dc-000d3a14673b";
 const titleId = "title-before-you-were-born";
 const gateId = "gate-before-you-were-born";
-const contactId = "dfb397e7-3b7c-f111-ab0f-6045bdd69435";
+const contactId = "d38aa56a-882a-f111-88b4-6045bdd69678";
 const packageId = "pkg-before-you-were-born-developmental-v1";
 
 test("historical delivered review repairs stage status only against its exact pending gate", async () => {
@@ -69,7 +69,7 @@ function makeClient(overrides = {}) {
   const calls = { listed: [], created: [], patched: [] };
   const stage = {
     jm1pub_editorialstageid: stageId,
-    jm1pub_name: "Developmental Editing - Before You Were Born",
+    jm1pub_name: "Developmental Editing - Synthetic Jackie Commissioning Fixture",
     _jm1pub_titleid_value: titleId,
     _jm1pub_contactid_value: contactId,
     jm1pub_intakereference: "JMP-INT-202607-LQPHEK",
@@ -79,20 +79,23 @@ function makeClient(overrides = {}) {
   };
   const title = {
     jm1pub_titleid: titleId,
-    jm1pub_titlename: "Before You Were Born",
-    jm1pub_authorname: "Sean Crowley"
+    jm1pub_titlename: "Synthetic Jackie Commissioning Fixture",
+    jm1pub_authorname: "Jackie Smith, Jr.",
+    _jm1_primaryauthor_value: contactId,
+    _jm1_author_value: contactId,
+    jm1_canonicalauthorcontactreference: `contact:${contactId}`
   };
   const gate = {
     jm1pub_editorialapprovalgateid: gateId,
-    jm1pub_editorialapprovalgatename: "Developmental Review - Before You Were Born",
+    jm1pub_editorialapprovalgatename: "Developmental Review - Synthetic Jackie Commissioning Fixture",
     jm1pub_gatestatus: 196650001,
     _jm1pub_titleid_value: titleId,
     _jm1pub_editorialstageid_value: stageId
   };
   const contact = {
     contactid: contactId,
-    fullname: "Sean Crowley",
-    emailaddress1: "sean@example.com"
+    fullname: "Jackie Smith, Jr.",
+    emailaddress1: "jackie-fixture@example.invalid"
   };
   const artifacts = [
     {
@@ -379,7 +382,7 @@ test("due package with no delivery evidence holds until Word-native producer is 
   assert.ok(!client.calls.patched.some((call) => call.entitySet === "jm1pub_editorialapprovalgates" && call.payload.jm1pub_gatestatus === 196650002));
 });
 
-test("due package with missing contact fails closed as ambiguous and does not send", async () => {
+test("due non-Jackie package with missing contact is denied before send", async () => {
   const client = makeClient({
     stage: {
       jm1pub_editorialstageid: stageId,
@@ -396,12 +399,11 @@ test("due package with missing contact fails closed as ambiguous and does not se
     { now: "2026-08-28T15:00:00Z", correlationId: "test-missing-contact" },
     { client, ...deps }
   );
-  assert.equal(result.nonSendable, 1);
+  assert.equal(result.nonSendable, 0);
   assert.equal(result.dueSystemAttention, 0);
-  assert.equal(result.results[0].status, "AMBIGUOUS");
-  assert.deepEqual(result.results[0].blockers, ["CONTACT_MISSING", "AUTHOR_EMAIL_MISSING", "AUTHOR_BINDING_MISMATCH"]);
+  assert.equal(result.results[0].status, "HELD_NON_JACKIE_TITLE");
   assert.equal(deps.sends.length, 0);
-  assert.ok(client.calls.created.some((call) => call.payload.jm1_actiontype === "PACKAGE_CADENCE_RELEASE_SEND_BLOCKED"));
+  assert.ok(client.calls.created.every((call) => call.payload.jm1_actiontype !== "PACKAGE_CADENCE_RELEASE_AUTHOR_PACKAGE_SENT"));
 });
 
 test("due package with missing required attachment fails closed without failing the timer", async () => {

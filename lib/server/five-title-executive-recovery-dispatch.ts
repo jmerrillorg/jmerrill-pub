@@ -16,6 +16,7 @@ import {
 } from './dataverse-server'
 import type { PackageStageCode } from './author-review-package-engine'
 import { dispatchAuthorPackage } from './publishing-dispatch-service'
+import { jackieTitleCommissioningBlocker } from './jackie-title-system-commissioning-policy'
 
 type DataverseRow = Record<string, unknown>
 
@@ -165,11 +166,11 @@ function selectTitles(input?: string[]) {
 async function readTitleAuthority(config: DataverseServerConfig, authority: RecoveryTitleAuthority): Promise<TitleDispatchResult> {
   const title = authority.expectedTitleId
     ? await dataverseFirst(config, 'jm1pub_titles', {
-        $select: 'jm1pub_titleid,jm1pub_name,jm1pub_titlename,jm1pub_authorname,_jm1_author_value',
+        $select: 'jm1pub_titleid,jm1pub_name,jm1pub_titlename,jm1pub_authorname,_jm1_author_value,_jm1_primaryauthor_value,jm1_canonicalauthorcontactreference',
         $filter: `jm1pub_titleid eq ${authority.expectedTitleId}`,
       })
     : await dataverseFirst(config, 'jm1pub_titles', {
-        $select: 'jm1pub_titleid,jm1pub_name,jm1pub_titlename,jm1pub_authorname,_jm1_author_value',
+        $select: 'jm1pub_titleid,jm1pub_name,jm1pub_titlename,jm1pub_authorname,_jm1_author_value,_jm1_primaryauthor_value,jm1_canonicalauthorcontactreference',
         $filter: `jm1pub_titlename eq '${escapeOData(authority.title)}' or jm1pub_name eq '${escapeOData(authority.title)}'`,
       })
   const titleId = stringValue(title?.jm1pub_titleid)
@@ -214,6 +215,7 @@ async function readTitleAuthority(config: DataverseServerConfig, authority: Reco
   const packageReadinessBlockers = packageArtifactReadinessBlockers(authority, authorVisibleArtifacts)
   const blockers = [
     !titleId ? 'CANONICAL_TITLE_NOT_FOUND' : '',
+    jackieTitleCommissioningBlocker(title),
     !contact ? 'CANONICAL_CONTACT_NOT_FOUND' : '',
     !recipientEmail ? 'CANONICAL_RECIPIENT_EMAIL_MISSING' : '',
     !stageId ? 'CURRENT_STAGE_NOT_FOUND' : '',
@@ -223,7 +225,7 @@ async function readTitleAuthority(config: DataverseServerConfig, authority: Reco
     authorVisibleArtifacts.length === 0 ? 'AUTHOR_SAFE_PACKAGE_ARTIFACTS_NOT_FOUND' : '',
     ...packageReadinessBlockers,
     activeGates.length > 1 ? 'DUPLICATE_ACTIVE_GATES' : '',
-  ].filter(Boolean)
+  ].filter((blocker): blocker is string => Boolean(blocker))
 
   return {
     intakeCode: authority.intakeCode,

@@ -6,6 +6,7 @@ const { authorReplyText } = require("./replyText");
 const { serviceIntent } = require("./serviceIntent");
 const { createDataverseClient } = require("../../orchestration/authorReviewResponseConsumer");
 const { createDefaultInboundContextProvider } = require("./contextProvider");
+const { isJackieAuthoredTitle } = require("../../author/jackieTitleSystemCommissioningPolicy");
 
 const ROUTABLE_CLASSES = new Set([
   MESSAGE_CLASS.AUTHOR_RESPONSE,
@@ -347,6 +348,17 @@ async function routeQueueItem(queueItem, deps) {
   if (!movement) {
     await invalidateExistingRoute(store, queueItem, existing, "HELD_STALE_OR_AMBIGUOUS_MOVEMENT");
     return { outcome: "HELD_STALE_OR_AMBIGUOUS_MOVEMENT", eventId };
+  }
+  const titleId = normalizeString(queueItem.titleId);
+  if (!/^[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}$/i.test(titleId)) {
+    return { outcome: "HELD_JACKIE_AUTHOR_ONLY_SYSTEM_COMMISSIONING_DENIED", eventId };
+  }
+  const title = await client.first("jm1pub_titles", {
+    $select: "jm1pub_titleid,_jm1_primaryauthor_value,_jm1_author_value,jm1_canonicalauthorcontactreference",
+    $filter: `jm1pub_titleid eq ${titleId}`
+  });
+  if (normalizeString(title?.jm1pub_titleid).toLowerCase() !== titleId.toLowerCase() || !isJackieAuthoredTitle(title)) {
+    return { outcome: "HELD_JACKIE_AUTHOR_ONLY_SYSTEM_COMMISSIONING_DENIED", eventId };
   }
   const graphMessage = await graphClient.getMessage(queueItem.graphMessageId);
   if (normalizeString(graphMessage.internetMessageId) !== normalizeString(message.internetMessageId) ||

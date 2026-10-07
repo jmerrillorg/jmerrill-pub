@@ -6,6 +6,7 @@ const { BlobServiceClient } = require("@azure/storage-blob");
 const { QueueServiceClient } = require("@azure/storage-queue");
 const { Document, Packer, Paragraph, TextRun, HeadingLevel } = require("docx");
 const mammoth = require("mammoth");
+const { isJackieAuthoredTitle } = require("../author/jackieTitleSystemCommissioningPolicy");
 const { routeToProvider } = require("../model/providerRouter");
 const { summarizeCorrectionCount } = require("./correctionCounting");
 const { validateEditorialCompliance } = require("./editorialComplianceValidator");
@@ -252,7 +253,7 @@ function validateTargetedExecutionInput(input = {}) {
 
 async function findExactTitle(client, titleId) {
   return client.list("jm1pub_titles", {
-    $select: "jm1pub_titleid,jm1pub_name,jm1pub_titlename,jm1pub_authorname,modifiedon",
+    $select: "jm1pub_titleid,jm1pub_name,jm1pub_titlename,jm1pub_authorname,_jm1_primaryauthor_value,_jm1_author_value,jm1_canonicalauthorcontactreference,modifiedon",
     $filter: `jm1pub_titleid eq ${normalizeString(titleId)}`,
     $top: "2"
   });
@@ -4200,6 +4201,13 @@ async function processStage(client, stage, correlationId, options = {}) {
   const policy = EXECUTOR_POLICIES[stageCode];
   if (!policy || !stageStatusIsExecutable(stage)) {
     return { stageId: stage.jm1pub_editorialstageid, stageCode, status: "SKIPPED_NOT_EXECUTABLE" };
+  }
+  const titleId = normalizeString(stage._jm1pub_titleid_value);
+  const titleRows = titleId ? await findExactTitle(client, titleId) : [];
+  if (titleRows.length !== 1 || normalizeString(titleRows[0]?.jm1pub_titleid).toLowerCase() !== titleId.toLowerCase() ||
+      !isJackieAuthoredTitle(titleRows[0])) {
+    return { stageId: stage.jm1pub_editorialstageid, titleId: titleId || null, stageCode,
+      status: "BLOCKED_JACKIE_AUTHOR_ONLY_SYSTEM_COMMISSIONING_DENIED" };
   }
   const preservedExactBlocker = extractExistingExactBlocker(stage);
   if (shouldPreserveExistingExactBlocker(preservedExactBlocker)) {

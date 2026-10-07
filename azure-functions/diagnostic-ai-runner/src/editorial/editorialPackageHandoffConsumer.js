@@ -1,6 +1,7 @@
 "use strict";
 
 const { isApprovedRevisionCandidate } = require("./approvedRevisionAudience");
+const { isJackieAuthoredTitle } = require("../author/jackieTitleSystemCommissioningPolicy");
 
 const {
   allowedMimeForRole,
@@ -160,6 +161,16 @@ async function processQaLog(client, qaLog, correlationId) {
   if (!stageId) return { status: "SKIPPED", reason: "QA_LOG_WITHOUT_STAGE" };
   const stage = await getStage(client, stageId);
   if (!stage) return { status: "SKIPPED", reason: "STAGE_NOT_FOUND", stageId };
+  const titleId = normalizeString(stage._jm1pub_titleid_value);
+  if (!titleId) return { status: "BLOCKED", reason: "TITLE_AUTHORITY_MISSING", stageId };
+  const title = await client.first("jm1pub_titles", {
+    $select: "jm1pub_titleid,_jm1_primaryauthor_value,_jm1_author_value,jm1_canonicalauthorcontactreference",
+    $filter: `jm1pub_titleid eq ${titleId}`
+  });
+  if (normalizeString(title?.jm1pub_titleid).toLowerCase() !== titleId.toLowerCase()) {
+    return { status: "BLOCKED", reason: "TITLE_AUTHORITY_UNRESOLVED", stageId };
+  }
+  if (!isJackieAuthoredTitle(title)) return { status: "BLOCKED", reason: "JACKIE_AUTHOR_ONLY_SYSTEM_COMMISSIONING_DENIED", stageId };
   const stageCode = normalizeStageCode(stage);
   const requiredRoles = requiredPackageRoles(stageCode);
   if (!requiredRoles.length) return { status: "SKIPPED", reason: "PACKAGE_POLICY_NOT_CONFIGURED", stageId, stageCode };

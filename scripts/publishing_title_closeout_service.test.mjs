@@ -34,7 +34,13 @@ const baseInput = {
 
 function rows(overrides = {}) {
   return {
-    title: { jm1pub_titleid: baseInput.titleId, jm1pub_titlename: 'The Intentional Leader' },
+    title: {
+      jm1pub_titleid: baseInput.titleId,
+      jm1pub_titlename: 'The Intentional Leader',
+      _jm1_primaryauthor_value: 'd38aa56a-882a-f111-88b4-6045bdd69678',
+      _jm1_author_value: 'd38aa56a-882a-f111-88b4-6045bdd69678',
+      jm1_canonicalauthorcontactreference: 'contact:d38aa56a-882a-f111-88b4-6045bdd69678',
+    },
     stage: {
       jm1pub_editorialstageid: baseInput.stageId,
       jm1pub_name: 'Interior Layout - The Intentional Leader',
@@ -196,7 +202,7 @@ test('stable idempotency key includes operation facts', () => {
   assert.match(first, /^[a-f0-9]{64}$/)
 })
 
-test('eligible non-pilot governed title can use closeout service once all gates pass', async () => {
+test('non-Jackie title remains manual and cannot enter automated closeout', async () => {
   const nonPilotInput = {
     ...baseInput,
     titleId: 'governed-title-001',
@@ -214,7 +220,7 @@ test('eligible non-pilot governed title can use closeout service once all gates 
     requiredInternalVerification: 'COMPLETE',
   }
   const result = await closeApprovedStage(nonPilotInput, adapter(rows({
-    title: { jm1pub_titleid: 'governed-title-001', jm1pub_titlename: 'The General’s Will and Last Testament' },
+    title: { jm1pub_titleid: 'governed-title-001', jm1pub_titlename: 'The General’s Will and Last Testament', _jm1_primaryauthor_value: '11111111-1111-1111-1111-111111111111' },
     stage: {
       jm1pub_editorialstageid: 'governed-stage-001',
       jm1pub_name: 'Developmental Editing - The General’s Will and Last Testament',
@@ -246,6 +252,7 @@ test('eligible non-pilot governed title can use closeout service once all gates 
       },
     ],
   })))
-  assert.equal(result.status, 'eligible')
-  assert.equal(result.nextStage, 'Line Editing')
+  assert.equal(result.status, 'blocked')
+  assert.equal(result.resultCode, 'JACKIE_AUTHOR_ONLY_SYSTEM_COMMISSIONING_DENIED')
+  assert.deepEqual(result.blockers, ['JACKIE_AUTHOR_ONLY_SYSTEM_COMMISSIONING_DENIED'])
 })

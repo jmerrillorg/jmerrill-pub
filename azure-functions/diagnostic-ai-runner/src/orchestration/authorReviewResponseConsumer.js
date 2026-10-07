@@ -7,6 +7,7 @@
  */
 
 const { readPublishingMailboxReply, PUBLISHING_MAILBOX } = require("../mail/publishingMailboxReader");
+const { isJackieAuthoredTitle } = require("../author/jackieTitleSystemCommissioningPolicy");
 const { classifyPackageReply } = require("../mail/publishingPackageReplyClassifier");
 const {
   buildPackageAcceptedEvent,
@@ -349,7 +350,6 @@ function validateAuthorIdentity(gate, reply) {
 }
 
 async function resolveGateAuthorIdentity(client, gate) {
-  if (extractEmailCandidates(gate).length) return { ok: true, gate };
   const titleId = normalizeString(gate._jm1pub_titleid_value);
   const stageId = normalizeString(gate._jm1pub_editorialstageid_value);
   const guid = /^[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}$/i;
@@ -358,7 +358,7 @@ async function resolveGateAuthorIdentity(client, gate) {
   }
   const [title, stage] = await Promise.all([
     client.first("jm1pub_titles", {
-      $select: "jm1pub_titleid,_jm1_author_value,jm1_canonicalauthorcontactreference",
+      $select: "jm1pub_titleid,_jm1_primaryauthor_value,_jm1_author_value,jm1_canonicalauthorcontactreference",
       $filter: `jm1pub_titleid eq ${titleId}`
     }),
     client.first("jm1pub_editorialstages", {
@@ -373,9 +373,10 @@ async function resolveGateAuthorIdentity(client, gate) {
   const stageContactId = normalizeString(stage?._jm1pub_contactid_value).toLowerCase();
   if (normalizeString(title?.jm1pub_titleid).toLowerCase() !== titleId.toLowerCase() ||
       normalizeString(stage?._jm1pub_titleid_value).toLowerCase() !== titleId.toLowerCase() ||
+      !isJackieAuthoredTitle(title) ||
       (titleLookupId && titleReferenceId && titleLookupId !== titleReferenceId) ||
       !titleContactId || titleContactId !== stageContactId) {
-    return { ok: false, reason: "GATE_AUTHOR_TITLE_STAGE_BINDING_MISMATCH" };
+    return { ok: false, reason: "JACKIE_AUTHOR_ONLY_SYSTEM_COMMISSIONING_DENIED" };
   }
   const contact = await client.first("contacts", {
     $select: "contactid,emailaddress1",

@@ -18,6 +18,7 @@ import {
   type AuthorReviewPackageType,
 } from './author-package-notification-engine'
 import { dispatchAuthorPackage } from './publishing-dispatch-service'
+import { jackieTitleCommissioningBlocker } from './jackie-title-system-commissioning-policy'
 
 const EXECUTION_STATUS_SUCCESS = 835500001
 const EXECUTION_STATUS_FAILED = 835500002
@@ -187,6 +188,10 @@ export async function sendProofreadingNotification(input: NotificationInput): Pr
     getTitle(config, titleId),
     getArtifact(config, artifactId),
   ])
+  const authorshipBlocker = jackieTitleCommissioningBlocker(title)
+  if (authorshipBlocker) {
+    return notificationBlocked(config, input.gateId, input.correlationId, authorshipBlocker)
+  }
   const titleName = stringValue(title.jm1pub_titlename || title.jm1pub_name) || 'The Intentional Leader'
   const authorEmail = await resolveAuthorEmail(config, title, stage)
   if (!authorEmail) {
@@ -466,6 +471,8 @@ export async function processProofreadingApprovalEvent(payload: ApprovalTransiti
     getStage(config, payload.stageId),
     getArtifact(config, payload.approvedArtifactId),
   ])
+  const authorshipBlocker = jackieTitleCommissioningBlocker(title)
+  if (authorshipBlocker) return transitionBlocked(config, payload, authorshipBlocker)
   const titleName = stringValue(title.jm1pub_titlename || title.jm1pub_name) || payload.titleId
   const checksum = stringValue(artifact.jm1pub_sha256) || extractChecksum(`${artifact.jm1pub_notes || ''}`)
   if (!checksum || checksum !== payload.approvedArtifactChecksum) {
@@ -776,7 +783,7 @@ async function getStage(config: DataverseServerConfig, stageId: string) {
 
 async function getTitle(config: DataverseServerConfig, titleId: string) {
   const title = await dataverseFirst(config, 'jm1pub_titles', {
-    $select: 'jm1pub_titleid,jm1pub_name,jm1pub_titlename,jm1pub_authorname,_jm1_author_value',
+    $select: 'jm1pub_titleid,jm1pub_name,jm1pub_titlename,jm1pub_authorname,_jm1_author_value,_jm1_primaryauthor_value,jm1_canonicalauthorcontactreference',
     $filter: `jm1pub_titleid eq ${titleId}`,
   })
   if (!title) throw new Error('title_not_found')
