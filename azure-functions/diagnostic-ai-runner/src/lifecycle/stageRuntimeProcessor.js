@@ -28,6 +28,14 @@ async function processStageEvent(event, deps = {}) {
   if (action && typeof deps[action] !== "function") {
     throw safeCode(`PUBLISHING_STAGE_${action.toUpperCase()}_ADAPTER_MISSING`);
   }
+  if (action) {
+    if (typeof deps.authorize !== "function") throw safeCode("PUBLISHING_STAGE_AUTHORITY_ADAPTER_MISSING");
+    const authority = await deps.authorize(event);
+    if (!authority?.current || authority.titleId?.toLowerCase() !== event.titleId.toLowerCase() ||
+        authority.stageId?.toLowerCase() !== event.stageId.toLowerCase() || authority.stageCode !== event.stageCode) {
+      throw safeCode("PUBLISHING_STAGE_AUTHORITY_DENIED");
+    }
+  }
 
   const recorded = await (deps.persistEvent || persistStageEvent)(event, deps);
   if (!action) return { ...recorded, action: "JOURNAL_ONLY" };

@@ -100,6 +100,13 @@ function parseQueuedMessage(message) {
 
 async function processQueuedTargetedEditorialExecution(message, deps = {}) {
   const parsed = parseQueuedMessage(message);
+  if (parsed.kind === "APPROVED_EDITORIAL_REVISION") {
+    if (parsed.version !== 1 || Object.keys(parsed).some((k) => !["kind", "version", "revisionTaskId"].includes(k))) {
+      throw Object.assign(new Error("Invalid approved revision message"), { safeCode: "REVISION_QUEUE_INVALID" });
+    }
+    const runner = deps.runApprovedRevision || require("./approvedRevisionRuntime").runApprovedRevision;
+    return runner({ revisionTaskId: parsed.revisionTaskId, executionMode: "EXECUTE" });
+  }
   if (parsed.kind !== "TARGETED_EDITORIAL_EXECUTION" || Number(parsed.version) !== 1) {
     throw Object.assign(new Error("Unsupported targeted editorial execution queue message."), {
       safeCode: "TARGETED_EDITORIAL_QUEUE_MESSAGE_UNSUPPORTED"
@@ -129,10 +136,19 @@ async function processQueuedTargetedEditorialExecution(message, deps = {}) {
   });
 }
 
+async function enqueueApprovedRevision(input, deps = {}) {
+  require("./approvedRevisionAuthority").validateInput(input);
+  const client = createQueueClient(deps);
+  // Reuse the existing queue; do not provision another queue or invent a stage event.
+  const sent = await client.sendMessage(JSON.stringify({ kind: "APPROVED_EDITORIAL_REVISION", version: 1, revisionTaskId: input.revisionTaskId }));
+  return { ok: true, status: "QUEUED", messageId: sent.messageId, taskId: input.revisionTaskId, externalSends: 0 };
+}
+
 module.exports = {
   DEFAULT_QUEUE_NAME,
   buildQueuedTargetedEditorialExecutionMessage,
   enqueueTargetedEditorialExecution,
+  enqueueApprovedRevision,
   processQueuedTargetedEditorialExecution,
   queueName
 };

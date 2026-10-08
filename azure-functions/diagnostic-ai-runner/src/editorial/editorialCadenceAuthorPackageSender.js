@@ -1,6 +1,7 @@
 "use strict";
 
 const { createHash } = require("node:crypto");
+const { isJackieAuthoredTitle, JACKIE_CANONICAL_AUTHOR_CONTACT_ID } = require("../author/jackieTitleSystemCommissioningPolicy");
 const { DefaultAzureCredential } = require("@azure/identity");
 const {
   markCommunicationFailed,
@@ -148,6 +149,7 @@ function rolePatterns(role) {
 }
 
 function isAuthorVisibleArtifact(artifact) {
+  if (require("./approvedRevisionAudience").isApprovedRevisionCandidate(artifact)) return false;
   if (artifact?.jm1pub_supersededon) return false;
   const status = `${artifact?.["jm1pub_artifactstatus@OData.Community.Display.V1.FormattedValue"] || ""} ${artifact?.jm1pub_artifactstatus || ""}`;
   const visibility = `${artifact?.["jm1pub_visibility@OData.Community.Display.V1.FormattedValue"] || ""} ${artifact?.jm1pub_visibility || ""}`;
@@ -507,6 +509,9 @@ function validateDueSendInput(input) {
 }
 
 async function sendCadenceAuthorReviewPackage(input, deps = {}) {
+  if (!isJackieAuthoredTitle(input?.title) || normalizeId(input?.contact?.contactid) !== JACKIE_CANONICAL_AUTHOR_CONTACT_ID) {
+    return { status: "BLOCKED", blockers: ["JACKIE_AUTHOR_ONLY_SYSTEM_COMMISSIONING_DENIED"] };
+  }
   const validationBlockers = validateDueSendInput(input);
   if (validationBlockers.length > 0) return { status: "BLOCKED", blockers: validationBlockers };
 

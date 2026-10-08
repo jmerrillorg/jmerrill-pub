@@ -1662,6 +1662,30 @@ app.http("send-internal-author-draft-review-notification", {
   }
 });
 
+app.http("send-intake-operational-alert", {
+  methods: ["POST"], authLevel: "anonymous", route: "send-intake-operational-alert",
+  handler: async (request, context) => {
+    if (!verifyRelayKey(request)) return { status: 401, jsonBody: { code: "UNAUTHORIZED" } };
+    let body;
+    try { body = await request.json(); } catch { return { status: 400, jsonBody: { code: "INVALID_JSON" } }; }
+    const { validateIntakeOperationalAlert, sendIntakeOperationalAlert } = require("../state/intakeOperationalAlert");
+    const validation = validateIntakeOperationalAlert(body);
+    if (!validation.ok) return { status: 400, jsonBody: { code: validation.reason } };
+    try {
+      const receipt = await sendIntakeOperationalAlert(validation.value, {
+        senderAddress: getAcsSenderAddress(), sendMessage: sendAcsMessageWithReceipt,
+      });
+      return { status: 202, jsonBody: { providerMessageId: receipt.providerMessageId,
+        communicationRecordId: receipt.communicationRecordId, replay: receipt.replay,
+        recipient: "jm1-admin@jmerrill.one", reference: body.reference, state: body.status } };
+    } catch (error) {
+      const code = safeErrorCode(error);
+      context.error(`Publishing intake operational alert failed: ${code}; reference=${body.reference}`);
+      return { status: 503, jsonBody: { code } };
+    }
+  }
+});
+
 app.http("send-join-internal-notification", {
   methods: ["POST"],
   authLevel: "anonymous",

@@ -10,6 +10,9 @@ app.timer("run-editorial-execution-runtime", {
       correlationId: `EDITORIAL-RUNTIME-TIMER-${new Date().toISOString()}`,
       maxTasks: Number(process.env.JM1_EDITORIAL_RUNTIME_MAX_TASKS || 10)
     });
+    if (result.approvedRevision && !result.approvedRevision.ok) {
+      context.error(`Approved editorial revision held: ${result.approvedRevision.code || result.approvedRevision.status}`);
+    }
     context.info(
       `Editorial execution runtime completed; processed=${result.processed}; executors=${result.executorCount}; correlation=${result.correlationId}`
     );

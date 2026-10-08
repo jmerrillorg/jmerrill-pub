@@ -4,6 +4,7 @@ import { NextResponse } from 'next/server'
 import { getPublisherRuntimeAuthMode, getPublisherRuntimeAuthReadback } from '@/lib/server/publisher-runtime-auth'
 import { productionAdditionalPaymentGateReadback, productionPaymentGateReadback } from '@/lib/server/stripe/publishing-payment-runtime'
 import { PAYMENT_GUARD_VERSION } from '@/lib/server/stripe/publishing-payment-guard'
+import { intakeAuthorityHealth } from '@/lib/publishing/intake/authorityHealth'
 
 export const dynamic = 'force-dynamic'
 
@@ -44,7 +45,9 @@ export async function GET() {
   ) as Record<string, DependencyHealth>
   dependencies.dataverse = runtimeAuthDependencyHealth('dataverse')
   dependencies.graph = runtimeAuthDependencyHealth('graph')
-  dependencies.relayHost = await relayHostHealth()
+  const [relayHost, intakeAuthority] = await Promise.all([relayHostHealth(), intakeAuthorityHealth()])
+  dependencies.relayHost = relayHost
+  dependencies.intakeAuthority = { ...intakeAuthority, required: [], present: [], missing: [] }
 
   const agreementPaymentGate = productionPaymentGateReadback()
   const additionalPaymentGate = productionAdditionalPaymentGateReadback()

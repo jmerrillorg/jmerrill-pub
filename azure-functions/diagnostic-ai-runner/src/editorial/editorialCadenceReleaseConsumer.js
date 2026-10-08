@@ -17,6 +17,7 @@ const {
   sendCadenceAuthorReviewPackage,
   validateDueSendInput
 } = require("./editorialCadenceAuthorPackageSender");
+const { isJackieAuthoredTitle, JACKIE_CANONICAL_AUTHOR_CONTACT_ID } = require("../author/jackieTitleSystemCommissioningPolicy");
 const { reconcileDevelopmentalWorkspace } = require("./developmentalWorkspaceReconciliation");
 
 const POLICY_VERSION = "JMP Editorial Cadence Doctrine v1.0";
@@ -109,7 +110,7 @@ async function getStage(client, stageId) {
 
 async function getTitle(client, titleId) {
   const rows = await client.list("jm1pub_titles", {
-    $select: "jm1pub_titleid,jm1pub_name,jm1pub_titlename,jm1pub_authorname,_jm1_author_value,modifiedon,createdon",
+    $select: "jm1pub_titleid,jm1pub_name,jm1pub_titlename,jm1pub_authorname,_jm1_primaryauthor_value,_jm1_author_value,jm1_canonicalauthorcontactreference,modifiedon,createdon",
     $filter: `jm1pub_titleid eq ${titleId}`,
     $top: "1"
   });
@@ -130,7 +131,7 @@ async function listStageArtifacts(client, titleId, stageId) {
   if (!titleId) return [];
   return client.list("jm1pub_editorialartifacts", {
     $select:
-      "jm1pub_editorialartifactid,jm1pub_editorialartifactname,jm1pub_filename,jm1pub_artifacttype,jm1pub_artifactstatus,jm1pub_visibility,jm1pub_versionlabel,jm1pub_sha256,jm1pub_repositorypath,jm1pub_repositorydriveid,jm1pub_repositoryitemid,jm1pub_filesizebytes,jm1pub_iscurrentapproved,jm1pub_supersededon,_jm1pub_titleid_value,_jm1pub_editorialstageid_value,createdon,modifiedon",
+      "jm1pub_editorialartifactid,jm1pub_editorialartifactname,jm1pub_filename,jm1pub_artifacttype,jm1pub_artifactstatus,jm1pub_visibility,jm1pub_versionlabel,jm1pub_sha256,jm1pub_repositorypath,jm1pub_repositorydriveid,jm1pub_repositoryitemid,jm1pub_filesizebytes,jm1pub_iscurrentapproved,jm1pub_supersededon,jm1pub_correlationid,_jm1pub_titleid_value,_jm1pub_editorialstageid_value,createdon,modifiedon",
     $filter: `_jm1pub_titleid_value eq ${titleId} and _jm1pub_editorialstageid_value eq ${stageId}`,
     $orderby: "modifiedon desc",
     $top: "50"
@@ -585,6 +586,10 @@ async function processCadenceLog(client, cadenceLog, now, correlationId, deps = 
   const stage = await getStage(client, stageId);
   if (!stage) return { status: "SKIPPED", reason: "STAGE_NOT_FOUND", stageId };
   const title = normalizeString(stage._jm1pub_titleid_value) ? await getTitle(client, stage._jm1pub_titleid_value) : null;
+  if (!title || !isJackieAuthoredTitle(title) ||
+      normalizeString(stage._jm1pub_contactid_value).toLowerCase() !== JACKIE_CANONICAL_AUTHOR_CONTACT_ID) {
+    return { status: "HELD_NON_JACKIE_TITLE", reason: "JACKIE_AUTHOR_ONLY_SYSTEM_COMMISSIONING_DENIED", stageId };
+  }
   const contact = normalizeString(stage._jm1pub_contactid_value) ? await getContact(client, stage._jm1pub_contactid_value) : null;
   const gate = await getCurrentGate(client, stage);
   const completionLog = await latestPackageCompletionLog(client, stageId);

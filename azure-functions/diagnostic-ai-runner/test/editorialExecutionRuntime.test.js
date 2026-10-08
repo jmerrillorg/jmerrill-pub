@@ -44,6 +44,18 @@ const {
   targetedExecutionIdempotencyKey,
   runEditorialExecutionRuntime
 } = require("../src/editorial/editorialExecutionRuntime");
+const { JACKIE_CANONICAL_AUTHOR_CONTACT_ID } = require("../src/author/jackieTitleSystemCommissioningPolicy");
+
+function syntheticJackieTitle(titleId = "title-1", titleName = "Synthetic test title") {
+  return {
+    jm1pub_titleid: titleId,
+    jm1pub_titlename: titleName,
+    jm1pub_authorname: "Jackie Smith, Jr. (synthetic fixture)",
+    _jm1_primaryauthor_value: JACKIE_CANONICAL_AUTHOR_CONTACT_ID,
+    _jm1_author_value: JACKIE_CANONICAL_AUTHOR_CONTACT_ID,
+    jm1_canonicalauthorcontactreference: `contact:${JACKIE_CANONICAL_AUTHOR_CONTACT_ID}`
+  };
+}
 
 test("parseNonNegativeInteger preserves numeric queue cursor values", () => {
   assert.equal(parseNonNegativeInteger(1, 0), 1);
@@ -449,7 +461,7 @@ function targetedDevelopmentalExecutionClient(overrides = {}) {
     patches: [],
     async list(entitySet, query = {}) {
       if (entitySet === "jm1pub_titles") {
-        return [{ jm1pub_titleid: "title-1", jm1pub_titlename: "Whole", jm1pub_authorname: "Jackuline Fly" }];
+        return [syntheticJackieTitle()];
       }
       if (entitySet === "jm1pub_editorialstages") return [stage];
       if (entitySet === "jm1pub_editorialartifacts" && /artifact-source/.test(query.$filter || "")) return [sourceArtifact];
@@ -1778,6 +1790,7 @@ test("runtime claims active tasks and records exact blockers instead of generic 
   const client = {
     async list(entitySet, query) {
       if (entitySet === "jm1_executionlogs") return [];
+      if (entitySet === "jm1pub_titles") return [syntheticJackieTitle()];
       if (entitySet === "jm1pub_editorialartifacts") return [];
       throw new Error(`Unexpected list ${entitySet} ${JSON.stringify(query)}`);
     },
@@ -1869,6 +1882,7 @@ test("runtime materializes outputs by updating existing artifact records", async
   const client = {
     async list(entitySet, query) {
       if (entitySet === "jm1_executionlogs") return [];
+      if (entitySet === "jm1pub_titles") return [syntheticJackieTitle()];
       if (entitySet === "jm1pub_editorialartifacts" && query.$filter.includes("jm1pub_editorialartifactname eq")) {
         return [{ jm1pub_editorialartifactid: "existing-artifact" }];
       }
@@ -1990,6 +2004,7 @@ test("developmental editing holds rebuilt author DOCX before upload or package h
   const client = {
     async list(entitySet, query = {}) {
       if (entitySet === "jm1_executionlogs") return [];
+      if (entitySet === "jm1pub_titles") return [syntheticJackieTitle()];
       if (entitySet === "jm1pub_editorialstages") {
         return [{ jm1pub_editorialstageid: "stage-editorial", jm1pub_stagetype: 100000000 }];
       }
@@ -2119,6 +2134,7 @@ test("line editing holds rebuilt author DOCX while retaining model and upstream 
   const client = {
     async list(entitySet, query = {}) {
       if (entitySet === "jm1_executionlogs") return [];
+      if (entitySet === "jm1pub_titles") return [syntheticJackieTitle()];
       if (entitySet === "jm1pub_editorialstages") {
         return [{ jm1pub_editorialstageid: "stage-dev", jm1pub_stagetype: 100000001 }];
       }
@@ -2228,6 +2244,7 @@ test("line editing fails closed when governed model output lacks edited manuscri
   const client = {
     async list(entitySet, query = {}) {
       if (entitySet === "jm1_executionlogs") return [];
+      if (entitySet === "jm1pub_titles") return [syntheticJackieTitle()];
       if (entitySet === "jm1pub_editorialstages") {
         return [{ jm1pub_editorialstageid: "stage-dev", jm1pub_stagetype: 100000001 }];
       }
@@ -2340,6 +2357,7 @@ test("line editing rejected drift logs diagnostics without artifacts or author g
   const client = {
     async list(entitySet, query = {}) {
       if (entitySet === "jm1_executionlogs") return [];
+      if (entitySet === "jm1pub_titles") return [syntheticJackieTitle()];
       if (entitySet === "jm1pub_editorialstages") {
         return [{ jm1pub_editorialstageid: "stage-dev", jm1pub_stagetype: 100000001 }];
       }
@@ -2425,6 +2443,7 @@ test("idempotent replay opens missing author gate for already recorded output wi
   const logs = [];
   const client = {
     async list(entitySet, query = {}) {
+      if (entitySet === "jm1pub_titles") return [syntheticJackieTitle()];
       if (entitySet === "jm1_executionlogs" && query.$filter?.includes("ACTIVE_EDITORIAL_OUTPUT_CREATED")) {
         return [{ jm1_executionlogid: "existing-output-log" }];
       }
@@ -2511,6 +2530,7 @@ test("runtime preserves existing exact content blocker instead of replacing it w
   const client = {
     async list(entitySet) {
       if (entitySet === "jm1_executionlogs") return [];
+      if (entitySet === "jm1pub_titles") return [syntheticJackieTitle()];
       if (entitySet === "jm1pub_editorialartifacts") return [];
       throw new Error(`Unexpected list ${entitySet}`);
     },

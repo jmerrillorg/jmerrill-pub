@@ -19,6 +19,7 @@ import {
   evaluateAuthorFinalApprovalGate,
   type AuthorFinalApprovalSemantic,
 } from './author-final-approval-gate'
+import { jackieTitleCommissioningBlocker } from './jackie-title-system-commissioning-policy'
 
 type DataverseRow = Record<string, unknown>
 
@@ -109,6 +110,7 @@ export type PublishingTitleCloseoutFailureCode =
   | 'TITLE_CLOSEOUT_CHECKSUM_MISMATCH'
   | 'TITLE_CLOSEOUT_NEXT_STAGE_UNDEFINED'
   | 'TITLE_CLOSEOUT_RESPONSE_CLOCK_CONFLICT'
+  | 'JACKIE_AUTHOR_ONLY_SYSTEM_COMMISSIONING_DENIED'
 
 export type PublishingTitleCloseoutReadback = {
   title: DataverseRow | null
@@ -190,6 +192,11 @@ export async function closeApprovedStage(
   }
 
   const readback = await adapter.read(input, idempotencyKey)
+  const blockers = validateCloseoutReadback(input, readback)
+  if (blockers.length > 0) {
+    const baseResult = base(input, idempotencyKey, proposedMutations, emptyCounts, readback)
+    return { ...baseResult, status: 'blocked', resultCode: blockers[0], blockers }
+  }
   if (readback.existingCloseoutLog) {
     return {
       ...base(input, idempotencyKey, proposedMutations, emptyCounts, readback),
@@ -199,11 +206,7 @@ export async function closeApprovedStage(
     }
   }
 
-  const blockers = validateCloseoutReadback(input, readback)
   const baseResult = base(input, idempotencyKey, proposedMutations, emptyCounts, readback)
-  if (blockers.length > 0) {
-    return { ...baseResult, status: 'blocked', resultCode: blockers[0], blockers }
-  }
   if (input.dryRun) return { ...baseResult, status: 'eligible', resultCode: 'TITLE_CLOSEOUT_ELIGIBLE' }
   if (input.confirm !== true) {
     return { ...baseResult, status: 'blocked', resultCode: 'TITLE_CLOSEOUT_AUTHORITY_MISSING', blockers: ['TITLE_CLOSEOUT_AUTHORITY_MISSING'] }
@@ -257,6 +260,7 @@ export function validateCloseoutReadback(
   const artifact = approvedArtifact(readback.artifacts, input.approvedArtifactId)
 
   if (!readback.title) failures.push('TITLE_CLOSEOUT_TITLE_NOT_FOUND')
+  if (jackieTitleCommissioningBlocker(readback.title)) failures.push('JACKIE_AUTHOR_ONLY_SYSTEM_COMMISSIONING_DENIED')
   if (!readback.stage || stringValue(readback.stage.jm1pub_editorialstageid) !== input.stageId) failures.push('TITLE_CLOSEOUT_STAGE_MISMATCH')
   if (readback.stage && dataverseLookupId(readback.stage, '_jm1pub_titleid_value') && dataverseLookupId(readback.stage, '_jm1pub_titleid_value') !== input.titleId) {
     failures.push('TITLE_CLOSEOUT_STAGE_MISMATCH')
@@ -308,7 +312,7 @@ async function readTitleCloseoutAuthority(
 ): Promise<PublishingTitleCloseoutReadback> {
   const [title, stage, gate, gates, artifacts, existingCloseoutLog] = await Promise.all([
     dataverseFirst(config, 'jm1pub_titles', {
-      $select: 'jm1pub_titleid,jm1pub_name,jm1pub_titlename,jm1pub_authorname,modifiedon',
+      $select: 'jm1pub_titleid,jm1pub_name,jm1pub_titlename,jm1pub_authorname,_jm1_author_value,_jm1_primaryauthor_value,jm1_canonicalauthorcontactreference,modifiedon',
       $filter: `jm1pub_titleid eq ${input.titleId}`,
     }),
     dataverseFirst(config, 'jm1pub_editorialstages', {

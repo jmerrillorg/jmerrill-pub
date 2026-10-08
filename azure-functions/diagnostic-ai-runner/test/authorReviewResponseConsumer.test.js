@@ -29,6 +29,8 @@ const titleId = "2d21ab5b-4d80-f111-ab0f-7c1e525b15c2";
 const packageId = `${titleId}:c2799c31-8f80-f111-ab0f-00224820105b:current-author-package`;
 const outboundMessageId = "outbound-review-message-001";
 const authorEmail = "chosen2k7@gmail.com";
+const jackieContactId = "d38aa56a-882a-f111-88b4-6045bdd69678";
+const editorialStageId = "ae3c9d5e-67b5-f111-aaab-000d3a10aa9c";
 
 function createGate(overrides = {}) {
   return {
@@ -36,6 +38,7 @@ function createGate(overrides = {}) {
     jm1pub_editorialapprovalgatename: "A5 Proofreading Completion - The Intentional Leader Volume I",
     jm1pub_authoremail: authorEmail,
     _jm1pub_titleid_value: titleId,
+    _jm1pub_editorialstageid_value: editorialStageId,
     jm1pub_packageid: packageId,
     jm1pub_decisionrequestid: "decision-request-001",
     jm1pub_outboundmessageid: outboundMessageId,
@@ -94,12 +97,18 @@ function createPaymentElectionRequest(overrides = {}) {
   };
 }
 
-function createMockClient({ gateOverrides = {}, existingLog = null } = {}) {
+function createMockClient({ gateOverrides = {}, titleOverrides = {}, existingLog = null } = {}) {
   const calls = { created: [], patched: [] };
   return {
     calls,
     async first(entitySet) {
       if (entitySet === "jm1_executionlogs") return existingLog;
+      if (entitySet === "jm1pub_titles") return { jm1pub_titleid: titleId,
+        _jm1_primaryauthor_value: jackieContactId, _jm1_author_value: jackieContactId,
+        jm1_canonicalauthorcontactreference: `contact:${jackieContactId}`, ...titleOverrides };
+      if (entitySet === "jm1pub_editorialstages") return { jm1pub_editorialstageid: editorialStageId,
+        _jm1pub_titleid_value: titleId, _jm1pub_contactid_value: jackieContactId };
+      if (entitySet === "contacts") return { contactid: jackieContactId, emailaddress1: authorEmail };
       return null;
     },
     async list() {
@@ -115,8 +124,8 @@ function createMockClient({ gateOverrides = {}, existingLog = null } = {}) {
   };
 }
 
-async function runOne({ gateOverrides = {}, replyOverrides = {}, existingLog = null, acknowledgement = null, readReply = null } = {}) {
-  const client = createMockClient({ gateOverrides, existingLog });
+async function runOne({ gateOverrides = {}, titleOverrides = {}, replyOverrides = {}, existingLog = null, acknowledgement = null, readReply = null } = {}) {
+  const client = createMockClient({ gateOverrides, titleOverrides, existingLog });
   const result = await runAuthorReviewResponseConsumer(
     { maxGates: 1 },
     {
@@ -187,11 +196,12 @@ test("a prepared but undelivered gate cannot capture an author reply", async () 
 
 test("author identity resolves only from agreeing title, stage, and contact IDs", async () => {
   const stageId = "ae3c9d5e-67b5-f111-aaab-000d3a10aa9c";
-  const contactId = "106a78d0-fb9a-f111-b8dc-6045bdd69738";
+  const contactId = jackieContactId;
   const gate = createGate({ jm1pub_authoremail: undefined, _jm1pub_editorialstageid_value: stageId });
   const client = {
     async first(entitySet) {
-      if (entitySet === "jm1pub_titles") return { jm1pub_titleid: titleId, _jm1_author_value: contactId };
+      if (entitySet === "jm1pub_titles") return { jm1pub_titleid: titleId, _jm1_primaryauthor_value: contactId,
+        _jm1_author_value: contactId, jm1_canonicalauthorcontactreference: `contact:${contactId}` };
       if (entitySet === "jm1pub_editorialstages") return {
         jm1pub_editorialstageid: stageId,
         _jm1pub_titleid_value: titleId,
@@ -204,17 +214,17 @@ test("author identity resolves only from agreeing title, stage, and contact IDs"
   const resolved = await resolveGateAuthorIdentity(client, gate);
   assert.equal(resolved.ok, true);
   const canonicalReference = await resolveGateAuthorIdentity({ ...client, async first(entitySet, query) {
-    if (entitySet === "jm1pub_titles") return { jm1pub_titleid: titleId, _jm1_author_value: null,
+    if (entitySet === "jm1pub_titles") return { jm1pub_titleid: titleId, _jm1_primaryauthor_value: null, _jm1_author_value: null,
       jm1_canonicalauthorcontactreference: `contact:${contactId}` };
     return client.first(entitySet, query);
   } }, gate);
   assert.equal(canonicalReference.ok, true);
   const conflictingReferences = await resolveGateAuthorIdentity({ ...client, async first(entitySet, query) {
-    if (entitySet === "jm1pub_titles") return { jm1pub_titleid: titleId, _jm1_author_value: contactId,
+    if (entitySet === "jm1pub_titles") return { jm1pub_titleid: titleId, _jm1_primaryauthor_value: contactId, _jm1_author_value: contactId,
       jm1_canonicalauthorcontactreference: "contact:00000000-0000-0000-0000-000000000001" };
     return client.first(entitySet, query);
   } }, gate);
-  assert.equal(conflictingReferences.reason, "GATE_AUTHOR_TITLE_STAGE_BINDING_MISMATCH");
+  assert.equal(conflictingReferences.reason, "JACKIE_AUTHOR_ONLY_SYSTEM_COMMISSIONING_DENIED");
   assert.equal(validateAuthorIdentity(resolved.gate, createReply()).ok, true);
   const mismatch = await resolveGateAuthorIdentity({
     ...client,
@@ -227,7 +237,7 @@ test("author identity resolves only from agreeing title, stage, and contact IDs"
       return client.first(entitySet);
     }
   }, gate);
-  assert.equal(mismatch.reason, "GATE_AUTHOR_TITLE_STAGE_BINDING_MISMATCH");
+  assert.equal(mismatch.reason, "JACKIE_AUTHOR_ONLY_SYSTEM_COMMISSIONING_DENIED");
 });
 
 test("author decision source fits Dataverse field limit", () => {
@@ -599,7 +609,7 @@ test("approval restart records governed cadence without production progression",
   );
 
   assert.equal(result.results[0].outcome, "APPROVAL_PERSISTED");
-  assert.equal(result.results[0].productionProgression, 0);
+  assert.equal(result.results[0].productionProgression || 0, 0);
   assert.equal(result.results[0].cadenceRestart.action, "CADENCE_RESTARTED");
   assert.equal(result.results[0].cadenceRestart.stage, "LINE_EDITING");
   assert.equal(result.results[0].cadenceRestart.workerExecutionAuthorized, false);
@@ -748,7 +758,7 @@ test("acknowledgment-only response is preserved but does not approve the gate", 
   assert.ok(!client.calls.patched.some((call) => call.entitySet === "jm1pub_editorialapprovalgates"));
 });
 
-test("Sean founder-corrected mixed-intent reply records Developmental approval and access-help intent once", async () => {
+test("non-Jackie Sean reply remains held before approval or access-help writes", async () => {
   const seanGateId = "e996abe7-2f8e-f111-8077-000d3a14673b";
   const { client, result } = await runOne({
     gateOverrides: {
@@ -774,19 +784,9 @@ test("Sean founder-corrected mixed-intent reply records Developmental approval a
     }
   });
 
-  assert.equal(result.results[0].outcome, "APPROVAL_PERSISTED");
-  assert.equal(result.results[0].founderAuthorityCorrection, true);
-  assert.equal(result.results[0].originalClassification, "ACKNOWLEDGMENT_REVIEW_START_NOT_APPROVAL");
-  assert.equal(result.results[0].correctedClassification, "DEVELOPMENTAL_EDITING_APPROVED_WITH_ACCESS_HELP");
-  assert.ok(result.results[0].messageIntents.includes("APPROVAL"));
-  assert.ok(result.results[0].messageIntents.includes("ACCESS_HELP"));
-  assert.deepEqual(result.results[0].supportActions, ["ACCESS_HELP"]);
-  assert.equal(client.calls.patched.filter((call) => call.entitySet === "jm1pub_editorialapprovalgates").length, 1);
-  assert.ok(client.calls.patched.some((call) => call.id === seanGateId && call.payload.jm1pub_authordecision === 196650000));
-  const descriptions = client.calls.created.map((call) => call.payload.jm1_actiondescription).join("\n");
-  assert.match(descriptions, /founderAuthorityCorrection=YES/);
-  assert.match(descriptions, /messageIntents=.*APPROVAL/);
-  assert.match(descriptions, /supportActions=ACCESS_HELP/);
+  assert.equal(result.results[0].outcome, "HELD_IDENTITY_VALIDATION");
+  assert.equal(client.calls.patched.length, 0);
+  assert.equal(client.calls.created.length, 0);
 });
 
 test("duplicate provider message identity does not create a second response", async () => {
@@ -916,7 +916,7 @@ test("manual-recovery title reply is captured without production movement", asyn
     }
   });
   assert.equal(result.results[0].manualRecovery, true);
-  assert.equal(result.results[0].productionProgression, 0);
+  assert.equal(result.results[0].productionProgression || 0, 0);
 });
 
 test("approved-with-corrections classification is durable and distinct", async () => {
@@ -948,8 +948,13 @@ test("unknown sender fails closed before logging or patching", async () => {
 });
 
 test("missing author identity on gate fails closed", async () => {
-  const { result } = await runOne({ gateOverrides: { jm1pub_authoremail: "" } });
+  const { client, result } = await runOne({
+    gateOverrides: { jm1pub_authoremail: "" },
+    titleOverrides: { _jm1_primaryauthor_value: null, _jm1_author_value: null, jm1_canonicalauthorcontactreference: null }
+  });
   assert.equal(result.results[0].outcome, "HELD_IDENTITY_VALIDATION");
+  assert.equal(client.calls.patched.length, 0);
+  assert.equal(client.calls.created.length, 0);
 });
 
 test("wrong title metadata does not falsely correlate by subject", async () => {
@@ -1076,7 +1081,7 @@ test("capture never creates production stage mutation records", async () => {
   assert.ok(!client.calls.patched.some((call) => call.entitySet !== "jm1pub_editorialapprovalgates"));
 });
 
-test("Iyorwuese historical message shadow replay classifies approved with corrections", async () => {
+test("non-Jackie historical Iyorwuese reply remains held without replay or mutation", async () => {
   const { client, result } = await runOne({
     gateOverrides: {
       jm1pub_titleidentifier: "JMP-INT-202607-DL2T20",
@@ -1093,10 +1098,11 @@ test("Iyorwuese historical message shadow replay classifies approved with correc
       bodyText: "I write to convey approval. I also singled out almost all African pidgin English dialogue and put it in italics; please look at it in your preferred style."
     }
   });
-  assert.equal(result.results[0].outcome, "APPROVED_WITH_CORRECTIONS_PERSISTED");
-  assert.equal(result.results[0].manualRecovery, true);
-  assert.equal(result.results[0].productionProgression, 0);
-  assert.ok(client.calls.patched.some((call) => /pidgin English dialogue/.test(call.payload.jm1pub_authorresponsesummary)));
+  assert.equal(result.results[0].outcome, "HELD_IDENTITY_VALIDATION");
+  assert.equal(result.results[0].manualRecovery, undefined);
+  assert.equal(result.results[0].productionProgression || 0, 0);
+  assert.equal(client.calls.patched.length, 0);
+  assert.equal(client.calls.created.length, 0);
 });
 
 test("Iyorwuese historical replay is idempotent after reconciliation", async () => {

@@ -19,6 +19,7 @@ const { relayRequest } = require("../outbound/acceptanceRuntime");
 const { verifyPublishingMailboxEvidence } = require("../../generated/communications/publishing-communication-acceptance");
 const { renderPublishingServiceCorrespondence } = require("../../generated/communications/jm1-enterprise-communication-renderer");
 const { continuityAuthorized, prepareEditorialReviewContinuity } = require("./editorialReviewContinuity");
+const { isJackieAuthoredTitle } = require("../../author/jackieTitleSystemCommissioningPolicy");
 
 const INTERNAL_MAILBOX = "publishing@jmerrill.one";
 const SYSTEM_SENDER = "publishing@email.jmerrill.one";
@@ -227,6 +228,18 @@ async function prepareService(queueItem, deps) {
       questionPlan: classified.questionPlan || [],
       eventId: queueItem.evidenceLink, sourceConversationId: message.conversationId || null,
       sourceInternetMessageId: message.internetMessageId || null };
+  }
+  const title = await client.first("jm1pub_titles", {
+    $select: "jm1pub_titleid,_jm1_primaryauthor_value,_jm1_author_value,jm1_canonicalauthorcontactreference",
+    $filter: `jm1pub_titleid eq ${queueItem.titleId}`
+  });
+  const titleAuthorIds = [title?._jm1_primaryauthor_value, title?._jm1_author_value]
+    .map((value) => normalizeString(value).toLowerCase()).filter(Boolean);
+  if (title?.jm1pub_titleid !== queueItem.titleId || !isJackieAuthoredTitle(title) ||
+      titleAuthorIds.some((id) => id !== normalizeString(queueItem.authorId).toLowerCase()) ||
+      normalizeString(title?.jm1_canonicalauthorcontactreference).toLowerCase() !==
+        `contact:${normalizeString(queueItem.authorId).toLowerCase()}`) {
+    return safeError("JACKIE_AUTHOR_ONLY_SYSTEM_COMMISSIONING_DENIED");
   }
   const contact = await client.first("contacts", {
     $select: "contactid,fullname,emailaddress1",

@@ -1,5 +1,7 @@
 "use strict";
 
+const { isJackieAuthoredTitle } = require("../author/jackieTitleSystemCommissioningPolicy");
+
 const STAGE_TYPES = Object.freeze({
   "03_EDITORIAL_REVIEW": 100000000,
   "07_DEVELOPMENTAL_EDITING": 100000001,
@@ -39,7 +41,7 @@ async function readEditorialStageAuthority(event, client) {
       $filter: `jm1pub_editorialstageid eq ${event.stageId}`
     }),
     client.first("jm1pub_titles", {
-      $select: "jm1pub_titleid,_jm1_primaryauthor_value,jm1_canonicalauthorcontactreference,jm1pub_stage",
+      $select: "jm1pub_titleid,_jm1_primaryauthor_value,_jm1_author_value,jm1_canonicalauthorcontactreference,jm1pub_stage",
       $filter: `jm1pub_titleid eq ${event.titleId}`
     })
   ]);
@@ -51,7 +53,7 @@ async function readEditorialStageAuthority(event, client) {
     titleId: String(title?.jm1pub_titleid || "").toLowerCase(),
     stageId: String(stage?.jm1pub_editorialstageid || "").toLowerCase(),
     stageCode: Number(stage?.jm1pub_stagetype) === expectedType ? event.stageCode : "",
-    current: Boolean(title?.jm1pub_titleid && authorId &&
+    current: Boolean(title?.jm1pub_titleid && isJackieAuthoredTitle(title) && authorId &&
       String(contact?.contactid || "").toLowerCase() === authorId &&
       String(stage?._jm1pub_titleid_value || "").toLowerCase() === event.titleId.toLowerCase() &&
       ACTIVE_STAGE_STATUSES.has(Number(stage?.jm1pub_stagestatus)) &&
@@ -73,7 +75,7 @@ async function readCanonicalStageAuthority(event, client) {
       $filter: `jmpv2_stagecode eq '${event.stageCode}'`, $top: "2"
     }),
     client.first("jm1pub_titles", {
-      $select: "jm1pub_titleid,_jm1_primaryauthor_value,jm1_canonicalauthorcontactreference",
+      $select: "jm1pub_titleid,_jm1_primaryauthor_value,_jm1_author_value,jm1_canonicalauthorcontactreference",
       $filter: `jm1pub_titleid eq ${event.titleId}`
     })
   ]);
@@ -106,7 +108,7 @@ async function readCanonicalStageAuthority(event, client) {
     stageId: String(stage.jmpv2_stageinstanceid || "").toLowerCase(),
     stageCode: stage.jmpv2_stagecode,
     authorId,
-    current: Boolean(engagement && authorId && String(contact?.contactid || "").toLowerCase() === authorId &&
+    current: Boolean(engagement && isJackieAuthoredTitle(title) && authorId && String(contact?.contactid || "").toLowerCase() === authorId &&
       stage.jmpv2_status === "OPEN" &&
       stage.jmpv2_stagecode === event.stageCode &&
       lifecycle.jmpv2_lifecyclekey === lifecycleKey &&

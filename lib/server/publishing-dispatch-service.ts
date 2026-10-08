@@ -39,6 +39,7 @@ import {
   type PublishingLifecycleContext,
 } from './publishing-lifecycle-context'
 import { getGraphSharePointRuntimeAccessToken } from './publisher-runtime-auth'
+import { jackieTitleCommissioningBlocker } from './jackie-title-system-commissioning-policy'
 
 const GATE_STATUS_READY_FOR_AUTHOR_RELEASE = 196650001
 const GATE_STATUS_AWAITING_AUTHOR_RESPONSE = 196650002
@@ -72,6 +73,7 @@ export type PublishingDispatchRequest = {
 }
 
 export type PublishingDispatchValidation = {
+  jackieAuthorship: 'PASS' | 'FAIL'
   currentPackage: 'PASS' | 'FAIL'
   titleReadiness: 'PASS' | 'WORKING_TITLE'
   authorFacingIdentity: 'PASS' | 'FAIL'
@@ -360,7 +362,12 @@ export async function certifyOperationalDelivery(
   const technicalReleaseBlocker = readback.existingTechnicalRelease
     ? ''
     : 'OPERATIONAL_CERTIFICATION_BLOCKED:TECHNICAL_RELEASE_EVIDENCE_MISSING'
-  const blockers = [...evidenceBlockers, ...gateBlockers, technicalReleaseBlocker].filter(Boolean)
+  const blockers = [
+    ...evidenceBlockers,
+    ...gateBlockers,
+    technicalReleaseBlocker,
+    jackieTitleCommissioningBlocker(readback.title),
+  ].filter((blocker): blocker is string => Boolean(blocker))
   const authorResponseAlreadyReceived = input.authorResponseAlreadyReceived === true
   const authorResponseClassification = input.authorResponseClassification || 'AMBIGUOUS_RESPONSE'
   const base = {
@@ -824,6 +831,7 @@ function validateReadback(input: PublishingDispatchRequest, readback: DispatchRe
   })
 
   return {
+    jackieAuthorship: jackieTitleCommissioningBlocker(readback.title) ? 'FAIL' : 'PASS',
     currentPackage: input.packageId && readback.attachmentIds.length > 0 ? 'PASS' : 'FAIL',
     titleReadiness: readback.titleStatus === 'WORKING_TITLE' ? 'WORKING_TITLE' : 'PASS',
     authorFacingIdentity: isUsableAuthorFacingName(readback.authorName) ? 'PASS' : 'FAIL',
@@ -848,6 +856,7 @@ function validationBlockers(validation: PublishingDispatchValidation) {
       if (key === 'portalAccessPreflight' || key === 'workspaceTarget') return ''
       if (key === 'currentGate') return 'DUPLICATE_ACTIVE_GATE_RECONCILIATION_REQUIRED'
       if (key === 'intakeReference') return 'PUBLISHING_DISPATCH_BLOCKED - INTAKE_REFERENCE_CODE_INVALID'
+      if (key === 'jackieAuthorship') return 'JACKIE_AUTHOR_ONLY_SYSTEM_COMMISSIONING_DENIED'
       if (key === 'authorFacingIdentity') return 'PUBLISHING_DISPATCH_BLOCKED - AUTHOR_FACING_IDENTITY_NOT_RESOLVED'
       return `PUBLISHING_DISPATCH_BLOCKED - ${key.toUpperCase()}`
     })
@@ -1023,7 +1032,7 @@ async function getGraphToken() {
 
 async function getTitle(config: DataverseServerConfig, titleId: string) {
   const title = await dataverseFirst(config, 'jm1pub_titles', {
-    $select: 'jm1pub_titleid,jm1pub_name,jm1pub_titlename,jm1pub_authorname,_jm1_author_value',
+    $select: 'jm1pub_titleid,jm1pub_name,jm1pub_titlename,jm1pub_authorname,_jm1_author_value,_jm1_primaryauthor_value,jm1_canonicalauthorcontactreference',
     $filter: `jm1pub_titleid eq ${titleId}`,
   })
   if (!title) throw new Error('PUBLISHING_DISPATCH_TITLE_NOT_FOUND')

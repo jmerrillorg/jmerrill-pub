@@ -6,7 +6,7 @@ const { authorCopy, runAuthorFollowupCadence } = require("../src/author/authorFo
 const { elapsedGovernedBusinessDays } = require("../src/author/authorBusinessCalendar");
 
 const titleId = "daf8180f-85a3-f111-b8de-000d3a14673b";
-const authorId = "106a78d0-fb9a-f111-b8dc-6045bdd69738";
+const authorId = "d38aa56a-882a-f111-88b4-6045bdd69678";
 const stageId = "ae3c9d5e-67b5-f111-aaab-000d3a10aa9c";
 const gateId = "4d04daa2-67b5-f111-aaac-000d3a14673b";
 const projection = {
@@ -22,7 +22,8 @@ function mockDeps(overrides = {}) {
   const calls = { sent: 0, reserved: 0, marked: 0, mutations: 0 };
   const client = { async first(entitySet) {
     if (entitySet === "jm1pub_titles") return { jm1pub_titleid: titleId,
-      _jm1_primaryauthor_value: authorId, jm1_canonicalauthorcontactreference: `contact:${authorId}`,
+      _jm1_primaryauthor_value: authorId, _jm1_author_value: authorId,
+      jm1_canonicalauthorcontactreference: `contact:${authorId}`,
       jm1pub_titlename: "Whole" };
     if (entitySet === "contacts") return { contactid: authorId, fullname: "Jackuline Fly",
       emailaddress1: "author@example.com" };
@@ -63,6 +64,21 @@ test("enabled runtime rechecks current action and uses governed relay once", asy
   assert.equal(calls.reserved, 1);
   assert.equal(calls.marked, 1);
   assert.equal(calls.mutations, 0);
+});
+
+test("non-Jackie title is held before reserving or sending an automatic follow-up", async () => {
+  const otherAuthorId = "106a78d0-fb9a-f111-b8dc-6045bdd69738";
+  const { calls, deps } = mockDeps({ enabled: true, client: { async first(entitySet) {
+    if (entitySet === "jm1pub_titles") return { jm1pub_titleid: titleId,
+      _jm1_primaryauthor_value: otherAuthorId, _jm1_author_value: otherAuthorId,
+      jm1_canonicalauthorcontactreference: `contact:${otherAuthorId}`, jm1pub_titlename: "Whole" };
+    if (entitySet === "contacts") return { contactid: authorId, fullname: "Author", emailaddress1: "author@example.com" };
+    throw new Error(`Unexpected ${entitySet}`);
+  } } });
+  const result = await runAuthorFollowupCadence({ now: "2026-09-29T17:00:00Z" }, deps);
+  assert.equal(result.results[0].status, "HELD");
+  assert.equal(result.results[0].reason, "JACKIE_AUTHOR_ONLY_SYSTEM_COMMISSIONING_DENIED");
+  assert.deepEqual(calls, { sent: 0, reserved: 0, marked: 0, mutations: 0 });
 });
 
 test("changed action and delivered replay do not send", async () => {

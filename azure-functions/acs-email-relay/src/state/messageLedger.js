@@ -140,7 +140,9 @@ function createLedger(tableClient) {
       updatedAt: acceptedAt,
       failureClass: ""
     };
-    if (entity.brand === "JMPRODUCTIONS" && entity.templateId === "PRODUCTIONS.BP09_NOTICE") {
+    if ((entity.brand === "JMPRODUCTIONS" && entity.templateId === "PRODUCTIONS.BP09_NOTICE")
+        || (entity.brand === "JMFN" && entity.templateId === "FOUNDATION.VOLUNTEER_INQUIRY_NOTICE")
+        || (entity.brand === "JMF" && entity.templateId === "FINANCIAL.INQUIRY_NOTICE")) {
       updated.communicationState = COMMUNICATION_STATE.PROVIDER_ACCEPTED;
     }
     if (entity.brand === "JMP") Object.assign(updated, {

@@ -1,4 +1,5 @@
 import type { NormalizedPublishingIntake } from './schema'
+import { intakeRecordId, readReceiptNotes, receiptNotes } from './receipt'
 import { getDataverseRuntimeAccessToken, getPublisherRuntimeAuthMode } from '@/lib/server/publisher-runtime-auth'
 import {
   manuscriptTypeOptions,
@@ -11,7 +12,7 @@ import {
 export const CONFIRMED_DATAVERSE_MAPPING_REQUIRED = publishingIntakeDataverseMapping
 
 export type DataverseWriteResult =
-  | { status: 'success'; recordId?: string; entityUrl?: string }
+  | { status: 'success'; recordId?: string; entityUrl?: string; existing?: boolean }
   | { status: 'skipped'; reason: 'non_production_mapping_pending' }
   | { status: 'failed'; reason: string; retryable: boolean }
 
@@ -21,7 +22,7 @@ export type DataverseUpdateResult =
   | { status: 'failed'; reason: string; retryable: boolean }
 
 export type DataverseReplayResult =
-  | { status: 'found'; reference: string; recordId?: string }
+  | { status: 'found'; reference: string; recordId?: string; accepted: boolean; fingerprint?: string }
   | { status: 'not_found' }
   | { status: 'skipped'; reason: 'non_production_mapping_pending' }
   | { status: 'failed'; reason: string; retryable: boolean }
@@ -33,6 +34,7 @@ const WORKSPACE_STATUS_CREATED = 835513001
 
 export async function writePublishingIntakeToDataverse(
   payload: NormalizedPublishingIntake,
+  fingerprint?: string,
 ): Promise<DataverseWriteResult> {
   const config = getDataverseConfig()
 
@@ -61,13 +63,35 @@ export async function writePublishingIntakeToDataverse(
           'OData-MaxVersion': '4.0',
           'OData-Version': '4.0',
         },
-        body: JSON.stringify(buildPublishingIntakeDataversePayload(payload)),
+        body: JSON.stringify({
+          ...buildPublishingIntakeDataversePayload(payload),
+          jm1_publishingintakeid: intakeRecordId(payload.idempotencyKey),
+          ...(fingerprint ? {
+            jm1_additionalnotes: receiptNotes(fingerprint, false, buildCanonicalAdditionalNotes(payload)),
+            // Live legacy triggers require Pending acknowledgment / Ready handoff.
+            // Hold both while custody is reserved; public receipt is not title authority.
+            jm1_acknowledgmentsent: false,
+            jm1_acknowledgmentstatus: ACKNOWLEDGMENT_STATUS_EXCEPTION,
+            jm1_acknowledgmenterror: 'Receipt not finalized; acknowledgment held by intake owner.',
+            jm1_stage0handoffstatus: 835500003,
+            jm1_stage0handofferror: 'Manual Publishing review required; receipt does not authorize title processing.',
+          } : {}),
+        }),
+        signal: AbortSignal.timeout(15000),
       },
     )
 
     if (response.status === 201 || response.status === 204) {
       const entityUrl = response.headers.get('OData-EntityId') || undefined
-      return { status: 'success', entityUrl, recordId: extractDataverseRecordId(entityUrl) }
+      return { status: 'success', entityUrl, recordId: extractDataverseRecordId(entityUrl) || intakeRecordId(payload.idempotencyKey) }
+    }
+
+    // A timed-out create or competing request may already own this primary key.
+    if (response.status === 409 || response.status === 412 || response.status === 400) {
+      const replay = await findPublishingIntakeByIdempotencyKey(payload.idempotencyKey)
+      if (replay.status === 'found' && (!fingerprint || replay.fingerprint === fingerprint)) {
+        return { status: 'success', recordId: replay.recordId, existing: true }
+      }
     }
 
     const errorBody = await safeResponseText(response)
@@ -101,11 +125,11 @@ export async function writePublishingIntakeToDataverse(
   }
 }
 
-export async function writePublishingIntakeWithRetry(payload: NormalizedPublishingIntake) {
+export async function writePublishingIntakeWithRetry(payload: NormalizedPublishingIntake, fingerprint?: string) {
   let lastResult: DataverseWriteResult = { status: 'failed', reason: 'not_attempted', retryable: true }
 
   for (let attempt = 0; attempt < 3; attempt += 1) {
-    lastResult = await writePublishingIntakeToDataverse(payload)
+    lastResult = await writePublishingIntakeToDataverse(payload, fingerprint)
     if (lastResult.status === 'success' || lastResult.status === 'skipped' || !lastResult.retryable) {
       return lastResult
     }
@@ -136,9 +160,9 @@ export async function findPublishingIntakeByIdempotencyKey(idempotencyKey: strin
     const columns = CONFIRMED_DATAVERSE_MAPPING_REQUIRED.columns
     const filter = `${columns.idempotencyKey} eq '${escapeODataString(idempotencyKey)}'`
     const query = new URLSearchParams({
-      $select: `jm1_publishingintakeid,${columns.reference}`,
+      $select: `jm1_publishingintakeid,${columns.reference},${columns.additionalNotes}`,
       $filter: filter,
-      $top: '1',
+      $top: '2',
     })
     const response = await fetch(
       `${config.value.webApiBaseUrl}/${config.value.entitySet}?${query.toString()}`,
@@ -150,6 +174,7 @@ export async function findPublishingIntakeByIdempotencyKey(idempotencyKey: strin
           'OData-MaxVersion': '4.0',
           'OData-Version': '4.0',
         },
+        signal: AbortSignal.timeout(15000),
       },
     )
 
@@ -164,8 +189,17 @@ export async function findPublishingIntakeByIdempotencyKey(idempotencyKey: strin
     }
 
     const json = await response.json().catch(() => null)
+    if (!isRecord(json) || !Array.isArray(json.value)) {
+      return { status: 'failed', reason: 'dataverse_replay_readback_invalid', retryable: false }
+    }
+    if (json.value.length > 1) {
+      return { status: 'failed', reason: 'dataverse_replay_identity_conflict', retryable: false }
+    }
     const first = isRecord(json) && Array.isArray(json.value) ? json.value[0] : undefined
-    if (!isRecord(first)) return { status: 'not_found' }
+    if (json.value.length === 0) return { status: 'not_found' }
+    if (!isRecord(first) || typeof first.jm1_publishingintakeid !== 'string') {
+      return { status: 'failed', reason: 'dataverse_replay_readback_invalid', retryable: false }
+    }
 
     const referenceValue = first[columns.reference]
     const reference = typeof referenceValue === 'string' ? referenceValue : ''
@@ -173,9 +207,10 @@ export async function findPublishingIntakeByIdempotencyKey(idempotencyKey: strin
       ? {
           status: 'found',
           reference,
+          ...readReceiptNotes(first[columns.additionalNotes]),
           recordId: typeof first.jm1_publishingintakeid === 'string' ? first.jm1_publishingintakeid : undefined,
         }
-      : { status: 'not_found' }
+      : { status: 'failed', reason: 'dataverse_replay_readback_invalid', retryable: false }
   } catch (error) {
     return {
       status: 'failed',
@@ -183,6 +218,40 @@ export async function findPublishingIntakeByIdempotencyKey(idempotencyKey: strin
       retryable: true,
     }
   }
+}
+
+export async function finalizePublishingIntakeReceipt(recordId: string, intake: NormalizedPublishingIntake, fingerprint: string) {
+  return updatePublishingIntakeRecord(recordId, {
+    ...buildPublishingIntakeDataversePayload(intake),
+    jm1_additionalnotes: receiptNotes(fingerprint, true, buildCanonicalAdditionalNotes(intake)),
+  }, 'receipt_finalize')
+}
+
+export async function listIncompletePublishingReceipts() {
+  const config = getDataverseConfig()
+  if (!config.ok) throw new Error('RECEIPT_CANONICAL_READER_CONFIGURATION_MISSING')
+  const token = await getDataverseAccessToken(config.value)
+  const query = new URLSearchParams({
+    $select: 'jm1_publishingintakeid,jm1_intakereferencecode,jm1_additionalnotes,createdon',
+    $filter: "startswith(jm1_additionalnotes,'Receipt fingerprint:') and contains(jm1_additionalnotes,'Receipt: RESERVED')",
+    $orderby: 'createdon asc', $top: '100',
+  })
+  let url: string | undefined = `${config.value.webApiBaseUrl}/${config.value.entitySet}?${query}`
+  const results: { recordId: string; reference: string; createdAt: string }[] = []
+  for (let page = 0; url && page < 10; page++) {
+    if (!url.startsWith(`${config.value.webApiBaseUrl}/`)) throw new Error('RECEIPT_PAGINATION_ORIGIN_INVALID')
+    const response: Response = await fetch(url, { headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' }, signal: AbortSignal.timeout(15_000) })
+    if (!response.ok) throw new Error('RECEIPT_CANONICAL_READER_FAILED')
+    const body: { value?: Record<string, unknown>[]; '@odata.nextLink'?: string } = await response.json()
+    if (!Array.isArray(body.value)) throw new Error('RECEIPT_CANONICAL_READER_INVALID')
+    for (const row of body.value) {
+      if (typeof row.jm1_publishingintakeid !== 'string' || typeof row.jm1_intakereferencecode !== 'string' || typeof row.createdon !== 'string') throw new Error('RECEIPT_CANONICAL_IDENTITY_INVALID')
+      if (!readReceiptNotes(row.jm1_additionalnotes).accepted) results.push({ recordId: row.jm1_publishingintakeid, reference: row.jm1_intakereferencecode, createdAt: row.createdon })
+    }
+    url = body['@odata.nextLink']
+  }
+  if (url) throw new Error('RECEIPT_CANONICAL_READER_CAPACITY_EXCEEDED')
+  return results
 }
 
 export async function markPublishingIntakeAcknowledgmentSent(
@@ -227,6 +296,7 @@ export async function markPublishingIntakeAcknowledgmentSent(
           jm1_acknowledgmentattemptcount: 1,
           jm1_acknowledgmenterror: null,
         }),
+        signal: AbortSignal.timeout(15000),
       },
     )
 
@@ -353,6 +423,7 @@ async function updatePublishingIntakeRecord(
           'If-Match': '*',
         },
         body: JSON.stringify(values),
+        signal: AbortSignal.timeout(15000),
       },
     )
 

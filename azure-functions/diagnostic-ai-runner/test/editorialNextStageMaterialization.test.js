@@ -13,6 +13,7 @@ const {
   runEditorialNextStageMaterialization
 } = require("../src/editorial/editorialNextStageMaterialization");
 const { consumeApprovalEvent } = require("../src/orchestration/approvalEventConsumer");
+const { JACKIE_CANONICAL_AUTHOR_CONTACT_ID } = require("../src/author/jackieTitleSystemCommissioningPolicy");
 
 const titleId = "title-1";
 const completedStageId = "stage-dev";
@@ -24,7 +25,13 @@ function title(overrides = {}) {
   return {
     jm1pub_titleid: titleId,
     jm1pub_titlename: "The General's Will and Last Testament",
-    jm1pub_authorname: "Iyorwuese Hagher",
+    jm1pub_authorname: "Jackie Smith, Jr. (synthetic fixture)",
+    _jm1_primaryauthor_value: JACKIE_CANONICAL_AUTHOR_CONTACT_ID,
+    _jm1_author_value: JACKIE_CANONICAL_AUTHOR_CONTACT_ID,
+    jm1_canonicalauthorcontactreference: `contact:${JACKIE_CANONICAL_AUTHOR_CONTACT_ID}`,
+    _jm1_primaryauthor_value: JACKIE_CANONICAL_AUTHOR_CONTACT_ID,
+    _jm1_author_value: JACKIE_CANONICAL_AUTHOR_CONTACT_ID,
+    jm1_canonicalauthorcontactreference: `contact:${JACKIE_CANONICAL_AUTHOR_CONTACT_ID}`,
     ...overrides
   };
 }
@@ -113,6 +120,10 @@ function createMockClient(overrides = {}) {
       }
       return [];
     },
+    async first(entitySet, query = {}) {
+      const rowsForEntity = await this.list(entitySet, query);
+      return rowsForEntity[0] || null;
+    },
     async create(entitySet, payload) {
       calls.created.push({ entitySet, payload });
       if (entitySet === "jm1pub_editorialstages") return "stage-line";
@@ -129,6 +140,17 @@ test("materializer dry-run creates a Line Editing plan from completed Developmen
   assert.equal(result.status, "DRY_RUN_READY");
   assert.equal(result.targetStageCode, "LINE_EDITING");
   assert.equal(result.approvalGate.nextStageAuthorized, true);
+});
+
+test("direct materialization denies missing and conflicting author identity before creating a stage", async () => {
+  const client = createMockClient({ rows: { titles: [title({
+    _jm1_primaryauthor_value: "22222222-2222-4222-8222-222222222222",
+    _jm1_author_value: JACKIE_CANONICAL_AUTHOR_CONTACT_ID,
+    jm1_canonicalauthorcontactreference: `contact:${JACKIE_CANONICAL_AUTHOR_CONTACT_ID}`
+  })] } });
+  const result = await runEditorialNextStageMaterialization(materializationInput({ executionMode: "EXECUTE" }), { client });
+  assert.equal(result.code, "JACKIE_AUTHOR_ONLY_SYSTEM_COMMISSIONING_DENIED");
+  assert.equal(client.calls.created.length, 0);
 });
 
 test("execute creates exactly one Line Editing stage and one materialization log", async () => {

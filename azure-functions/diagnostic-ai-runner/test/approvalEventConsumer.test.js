@@ -43,7 +43,10 @@ function createMockClient(overrides = {}) {
       if (entitySet === "jm1pub_titles") {
         return {
           jm1pub_titleid: titleId,
-          jm1pub_titlename: "The Intentional Leader"
+          jm1pub_titlename: "The Intentional Leader",
+          _jm1_primaryauthor_value: "d38aa56a-882a-f111-88b4-6045bdd69678",
+          _jm1_author_value: "d38aa56a-882a-f111-88b4-6045bdd69678",
+          jm1_canonicalauthorcontactreference: "contact:d38aa56a-882a-f111-88b4-6045bdd69678"
         };
       }
       if (entitySet === "jm1_executionlogs" && filter.includes("AUTHOR_PACKAGE_ATTACHMENT_EVIDENCE_RECORDED")) {

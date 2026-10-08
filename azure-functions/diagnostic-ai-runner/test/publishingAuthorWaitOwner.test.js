@@ -4,26 +4,27 @@ const assert = require("node:assert/strict");
 const { createAuthorWaitOwner, authorWaitFor } = require("../src/lifecycle/publishingAuthorWaitOwner");
 const { buildMessageEvidence } = require("../src/mail/inbound/evidenceModel");
 const { waitRuntimeOwnsTitle, waitRuntimeMonitorsTitle } = require("../src/lifecycle/publishingWaitEnablement");
+const { JACKIE_CANONICAL_AUTHOR_CONTACT_ID } = require("../src/author/jackieTitleSystemCommissioningPolicy");
 const id = (n) => `${String(n).padStart(8,"0")}-1111-4111-8111-111111111111`;
-function setup() {
+function setup(authorId = JACKIE_CANONICAL_AUTHOR_CONTACT_ID) {
   const gate = { jm1pub_editorialapprovalgateid:id(1), _jm1pub_titleid_value:id(2), _jm1pub_editorialstageid_value:id(3),
     _jm1pub_deliverableartifactid_value:id(4), jm1pub_gatestatus:196650002, jm1pub_editorialapprovalgatename:"Developmental review",
     jm1pub_authordecision:null, "@odata.etag":"v1" };
-  const stage = { jm1pub_editorialstageid:id(3), _jm1pub_titleid_value:id(2), _jm1pub_contactid_value:id(5),jm1pub_publishingintakereference:"JMP-INT-1" };
+  const stage = { jm1pub_editorialstageid:id(3), _jm1pub_titleid_value:id(2), _jm1pub_contactid_value:authorId,jm1pub_publishingintakereference:"JMP-INT-1" };
   const raw = { id:"graph1",internetMessageId:"<original1>",internetMessageHeaders:[{name:"In-Reply-To",value:"<outbound1>"}],
     receivedDateTime:"2026-10-01T12:00:00Z",from:{emailAddress:{address:"author@example.com"}},body:{contentType:"text",content:"Please make these corrections. Keep the original grid."} };
   const message = buildMessageEvidence(raw);
   const artifact = { jm1pub_editorialartifactid:id(4),_jm1pub_titleid_value:id(2),_jm1pub_editorialstageid_value:id(3),jm1pub_sha256:"a".repeat(64) };
-  const delivery = { deliveryId:"delivery1",internetMessageId:"<outbound1>",titleId:id(2),authorId:id(5),stageId:id(3),gateId:id(1),
+  const delivery = { deliveryId:"delivery1",internetMessageId:"<outbound1>",titleId:id(2),authorId,stageId:id(3),gateId:id(1),
     artifactId:id(4),artifactHash:"a".repeat(64),engagementId:"JMP-INT-1",deliveryStatus:"SENT_COPY_VERIFIED",deliveredAt:"2026-09-30T12:00:00Z" };
   const logs=[], patches=[];
   const client = {
     first:async(table,q)=>{
       if(table==="jm1pub_editorialapprovalgates")return {...gate};
       if(table==="jm1pub_editorialstages")return {...stage};
-      if(table==="jm1pub_titles")return {jm1pub_titleid:id(2),_jm1_primaryauthor_value:id(5),jm1_canonicalauthorcontactreference:`contact:${id(5)}`};
+      if(table==="jm1pub_titles")return {jm1pub_titleid:id(2),_jm1_primaryauthor_value:authorId,_jm1_author_value:authorId,jm1_canonicalauthorcontactreference:`contact:${authorId}`};
       if(table==="jm1pub_editorialartifacts")return {...artifact};
-      if(table==="contacts")return {emailaddress1:"author@example.com"};
+      if(table==="contacts")return {contactid:authorId,emailaddress1:"author@example.com"};
       if(table==="jm1_executionlogs")return logs.find(x=>q.$filter === `jm1_executionlogid eq ${x.jm1_executionlogid}` || (q.$filter.includes(x.jm1_actiontype) && q.$filter.includes("author-review-response:")))||null;
       return null;
     },list:async()=>[],
@@ -50,6 +51,18 @@ test("partial capture evidence is not a completion receipt",async()=>{
   const a=await f.owner.readAuthority(f.wait),p=await f.owner.verifyCondition(f.wait,a);
   await f.owner.dispatch({wait:f.wait,proof:p,idempotencyKey:f.wait.idempotencyKey});
   assert.equal(f.patches.length,1);
+});
+test("external-author wait remains readable but cannot enter the Jackie-only dispatch",async()=>{
+  const f=setup(id(5));
+  const authority=await f.owner.readAuthority(f.wait);
+  assert.ok(authority);
+  f.wait.resumeResult={evidenceId:id(8)};
+  f.logs.push({jm1_executionlogid:id(8),jm1_actiontype:"AUTHOR_RESPONSE_REQUIRES_PUBLISHER_REVIEW",
+    jm1_sourceentity:"jm1pub_editorialapprovalgate",jm1_sourcerecordid:id(1),createdon:"2026-10-02T00:00:00Z"});
+  assert.equal((await f.owner.readBusinessWait(f.wait)).status,"WAITING_FOR_PUBLISHER_REVIEW");
+  await assert.rejects(() => f.owner.dispatch({wait:f.wait,proof:{satisfied:true,evidenceReference:"unused"},idempotencyKey:f.wait.idempotencyKey}),
+    /NON_JACKIE_AUTOMATION_DENIED/);
+  assert.equal(f.patches.length,0);
 });
 for(const [name,mutate] of [
   ["wrong title",f=>f.delivery.titleId=id(99)], ["wrong author",f=>f.delivery.authorId=id(99)],

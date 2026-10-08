@@ -7,7 +7,7 @@ const { serviceIntent, serviceCopy } = require("../../src/mail/inbound/serviceIn
 const { executeService, runInboundService, verifyMailboxCopy } = require("../../src/mail/inbound/serviceRunner");
 const { validatePaymentLink } = require("../../src/mail/inbound/paymentLinkAuthority");
 
-const authorId = "11111111-1111-4111-8111-111111111111";
+const authorId = "d38aa56a-882a-f111-88b4-6045bdd69678";
 const titleId = "22222222-2222-4222-8222-222222222222";
 const stageId = "33333333-3333-4333-8333-333333333333";
 const engagementId = "ENG-1";
@@ -23,7 +23,8 @@ function message(body, id = "mail-1") {
 }
 
 async function setup(body, classification = "EDITORIAL_RESPONSE", identity = {}) {
-  const authorId = identity.authorId || "11111111-1111-4111-8111-111111111111";
+  const authorId = identity.authorId || "d38aa56a-882a-f111-88b4-6045bdd69678";
+  const titleAuthorId = identity.titleAuthorId || authorId;
   const titleId = identity.titleId || "22222222-2222-4222-8222-222222222222";
   const graphMessage = message(body);
   const context = {
@@ -42,12 +43,18 @@ async function setup(body, classification = "EDITORIAL_RESPONSE", identity = {})
     authorId, titleId, engagementId, status: "HELD_EDITORIAL_AUTHORITY",
     editorialGate: { status: "EXACT" }
   };
+  Object.assign(queue, { businessEventId: "route-1", routingStatus: "HUMAN_REVIEW_READY" });
+  await store.updateQueueItem(queue);
   await store.upsertBusinessRoute(route);
   const effects = { sends: [], reserves: 0, sentRecords: 0 };
   const deps = {
     store, graphClient: { getMessage: async () => graphMessage },
     contextProvider: async () => context,
-    client: { first: async (set) => set === "contacts" ? { contactid: authorId, fullname: "Author Example", emailaddress1: "author@example.com" } : null },
+    client: { first: async (set) => set === "contacts"
+      ? { contactid: authorId, fullname: "Author Example", emailaddress1: "author@example.com" }
+      : set === "jm1pub_titles" ? { jm1pub_titleid: titleId,
+        _jm1_primaryauthor_value: titleAuthorId, _jm1_author_value: titleAuthorId,
+        jm1_canonicalauthorcontactreference: `contact:${titleAuthorId}` } : null },
     reserveCommunicationIntent: async () => { effects.reserves++; return { status: "RESERVED", communicationRecordId: "comm-1", semanticIdempotencyKey: "semantic-1" }; },
     markCommunicationSent: async () => { effects.sentRecords++; return { sentRecordId: "sent-1" }; },
     verifyMailboxCopy: async () => ({ status: "PASS", graphMessageId: "graph-1",
@@ -61,6 +68,19 @@ async function setup(body, classification = "EDITORIAL_RESPONSE", identity = {})
   return { queue, route, store, deps, effects };
 }
 
+test("automatic inbound service holds a non-Jackie title before reserving or sending", async () => {
+  const { deps, effects } = await setup("I need help signing in", "AUTHOR_ACCESS_REQUEST", {
+    titleAuthorId: "106a78d0-fb9a-f111-b8dc-6045bdd69738"
+  });
+  deps.enabled = true;
+  const result = await runInboundService({}, deps);
+  assert.equal(result.results[0].outcome, "HELD_SERVICE_AUTHORITY");
+  assert.equal(result.results[0].reason, "JACKIE_AUTHOR_ONLY_SYSTEM_COMMISSIONING_DENIED");
+  assert.equal(effects.sends.length, 0);
+  assert.equal(effects.reserves, 0);
+  assert.equal(effects.sentRecords, 0);
+});
+
 test("normal timer serves the delivered-review continuation once and preserves the original event", async () => {
   const { CONTINUITY_AUTHORITY } = require("../../src/mail/inbound/editorialReviewContinuity");
   const { queue, route, store, deps, effects } = await setup(
@@ -71,17 +91,15 @@ test("normal timer serves the delivered-review continuation once and preserves t
   deps.enabled = true;
   deps.prepareEditorialReviewContinuity = async () => ({ status: "READY", deliveredAt: "2026-09-21T09:02:36Z", providerMessageId: "original-delivery" });
   const first = await runInboundService({}, deps);
-  assert.equal(first.results[0].outcome, "SENT");
-  assert.equal(first.results[0].intent, "DELIVERED_EDITORIAL_REVIEW_CONTINUITY");
-  assert.equal(effects.sends.length, 1);
-  assert.match(effects.sends[0].input.sendApproval.draftBody, /September 21/);
+  assert.equal(first.results[0].outcome, "HELD_SERVICE_AUTHORITY");
+  assert.equal(first.results[0].reason, "JACKIE_AUTHOR_ONLY_SYSTEM_COMMISSIONING_DENIED");
+  assert.equal(effects.sends.length, 0);
   const current = await store.getBusinessRoute(queue.evidenceLink);
-  assert.equal(current.inboundMessageEventId, queue.evidenceLink);
-  assert.deepEqual(current.serviceHistory, [previous]);
-  assert.equal(current.service.waitingOn, "AUTHOR");
+  assert.deepEqual(current.serviceHistory, undefined);
+  assert.deepEqual(current.service, previous);
   await runInboundService({}, deps);
-  assert.equal(effects.sends.length, 1);
-  assert.equal((await executeService(queue, deps)).outcome, "IDEMPOTENT");
+  assert.equal(effects.sends.length, 0);
+  assert.equal((await executeService(queue, deps)).outcome, "HELD_SERVICE_AUTHORITY");
 });
 
 test("an incomplete response search leaves prior correspondence intact and sends nothing", async () => {

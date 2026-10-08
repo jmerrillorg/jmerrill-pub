@@ -34,6 +34,12 @@ function fakeDataverse() {
     rows,
     async list() { return [{ jm1pub_editorialapprovalgateid: "gate-1", _jm1pub_deliverableartifactid_value: "artifact-1" }]; },
     async first(_set, query) {
+      if (_set === "jm1pub_titles") return {
+        jm1pub_titleid: "11111111-1111-4111-8111-111111111111",
+        _jm1_primaryauthor_value: "d38aa56a-882a-f111-88b4-6045bdd69678",
+        _jm1_author_value: "d38aa56a-882a-f111-88b4-6045bdd69678",
+        jm1_canonicalauthorcontactreference: "contact:d38aa56a-882a-f111-88b4-6045bdd69678"
+      };
       const eventId = query.$filter.match(/jm1_sourcerecordid eq '([^']+)'/)?.[1];
       return rows.find((row) => row.jm1_sourcerecordid === eventId) || null;
     },
