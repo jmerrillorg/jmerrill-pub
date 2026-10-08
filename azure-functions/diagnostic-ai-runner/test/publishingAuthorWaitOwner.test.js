@@ -52,12 +52,16 @@ test("partial capture evidence is not a completion receipt",async()=>{
   await f.owner.dispatch({wait:f.wait,proof:p,idempotencyKey:f.wait.idempotencyKey});
   assert.equal(f.patches.length,1);
 });
-test("author wait refuses a non-Jackie title before reply verification or dispatch",async()=>{
+test("external-author wait remains readable but cannot enter the Jackie-only dispatch",async()=>{
   const f=setup(id(5));
   const authority=await f.owner.readAuthority(f.wait);
-  assert.equal(authority,null);
-  const proof=await f.owner.verifyCondition(f.wait,authority);
-  assert.equal(proof.satisfied,false);
+  assert.ok(authority);
+  f.wait.resumeResult={evidenceId:id(8)};
+  f.logs.push({jm1_executionlogid:id(8),jm1_actiontype:"AUTHOR_RESPONSE_REQUIRES_PUBLISHER_REVIEW",
+    jm1_sourceentity:"jm1pub_editorialapprovalgate",jm1_sourcerecordid:id(1),createdon:"2026-10-02T00:00:00Z"});
+  assert.equal((await f.owner.readBusinessWait(f.wait)).status,"WAITING_FOR_PUBLISHER_REVIEW");
+  await assert.rejects(() => f.owner.dispatch({wait:f.wait,proof:{satisfied:true,evidenceReference:"unused"},idempotencyKey:f.wait.idempotencyKey}),
+    /NON_JACKIE_AUTOMATION_DENIED/);
   assert.equal(f.patches.length,0);
 });
 for(const [name,mutate] of [

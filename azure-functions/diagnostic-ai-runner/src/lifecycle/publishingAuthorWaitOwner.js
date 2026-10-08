@@ -15,15 +15,18 @@ function createAuthorWaitOwner({ client, inbound, graph }) {
     if (!GUID.test(wait.sourceRecordId)) return null;
     const gate = await client.first("jm1pub_editorialapprovalgates", { $filter: `jm1pub_editorialapprovalgateid eq ${wait.sourceRecordId}` });
     if (!gate || !equal(gate._jm1pub_titleid_value, wait.titleId) || !equal(gate._jm1pub_editorialstageid_value, wait.stageId)) return null;
-    const title = await client.first("jm1pub_titles", { $filter: `jm1pub_titleid eq ${wait.titleId}` });
+    const title = await client.first("jm1pub_titles", {
+      $select: "jm1pub_titleid,_jm1_primaryauthor_value,_jm1_author_value,jm1_canonicalauthorcontactreference",
+      $filter: `jm1pub_titleid eq ${wait.titleId}`
+    });
     const stage = await client.first("jm1pub_editorialstages", { $filter: `jm1pub_editorialstageid eq ${wait.stageId}` });
     const contact = title?._jm1_primaryauthor_value || title?.jm1_canonicalauthorcontactreference?.replace(/^contact:/, "");
     const reference = title?.jm1_canonicalauthorcontactreference;
-    if (!isJackieAuthoredTitle(title) || !equal(contact, wait.authorId) || (reference && reference.toLowerCase() !== `contact:${contact}`.toLowerCase()) ||
+    if (!equal(contact, wait.authorId) || (reference && reference.toLowerCase() !== `contact:${contact}`.toLowerCase()) ||
         !equal(stage?._jm1pub_titleid_value, wait.titleId) || !equal(stage?._jm1pub_contactid_value, wait.authorId) || stage.jm1pub_stagecompletedate ||
         stage.jm1pub_publishingintakereference !== wait.legacyEngagementReference ||
         wait.executionId !== `author-response:${gate.jm1pub_editorialapprovalgateid}:${gate._jm1pub_deliverableartifactid_value}`) return null;
-    return { titleId: title.jm1pub_titleid, authorId: contact, stageId: stage.jm1pub_editorialstageid,
+    return { titleId: title.jm1pub_titleid, authorId: contact, stageId: stage.jm1pub_editorialstageid, title,
       executionId: wait.executionId, legacyEngagementReference: stage.jm1pub_publishingintakereference, gate };
   }
   async function condition(wait, current) {
@@ -78,6 +81,9 @@ function createAuthorWaitOwner({ client, inbound, graph }) {
       // The existing consumer alone classifies/persists the original reply. No supplied decision or send.
       const result = await inbound.withBusinessRouteLease(`author-gate-${wait.sourceRecordId}`, async () => {
         const current = await authority(wait);
+        if (!current || !isJackieAuthoredTitle(current.title)) {
+          throw Object.assign(new Error("NON_JACKIE_AUTOMATION_DENIED"), { safeCode: "NON_JACKIE_AUTOMATION_DENIED" });
+        }
         const fresh = await condition(wait, current);
         if (!fresh.satisfied || fresh.evidenceReference !== proof.evidenceReference) throw Object.assign(new Error("AUTHOR_WAIT_CHANGED"), { safeCode: "AUTHOR_WAIT_CHANGED" });
         return resumeExactAuthorReviewReply(client, fresh.gate, fresh.reply, fresh.delivery);
