@@ -63,6 +63,26 @@ test("missing intake and changed source deny before inference", async () => {
   const y = fixture(); y.deps.downloadSource = async () => Buffer.from("different");
   await assert.rejects(execute(y.input, y.deps), /SOURCE_BYTES_CHANGED/); assert.equal(y.calls(), 0);
 });
+test("self-consistent saved report with wrong source echo is rejected without inference or writes", async () => {
+  for (const key of ["sourceVersion", "wordCount", "title"]) {
+    const x = fixture(); x.authority.titleName = "Fixture";
+    const first = await execute(x.input, x.deps);
+    const blob = x.saved.get(first.reference), receipt = JSON.parse(blob.bytes);
+    receipt.report.intakeSummary[key] = key === "wordCount" ? 99 : "wrong";
+    receipt.reportSha256 = hash(JSON.stringify(receipt.report));
+    blob.bytes = Buffer.from(JSON.stringify(receipt));
+    const before = [...x.saved].map(([p, v]) => [p, v.etag, v.bytes.toString("hex")]);
+    await assert.rejects(execute(x.input, x.deps), /REVIEW_OUTPUT_SOURCE_(VERSION|CONTEXT)_MISMATCH/);
+    assert.equal(x.calls(), 1);
+    assert.deepEqual([...x.saved].map(([p, v]) => [p, v.etag, v.bytes.toString("hex")]), before);
+  }
+});
+test("source bytes changed during inference cannot publish a review", async () => {
+  const x = fixture(), original = x.deps.callModel;
+  x.deps.callModel = async () => { const result = await original(); x.deps.downloadSource = async () => Buffer.from("changed"); return result; };
+  await assert.rejects(execute(x.input, x.deps), /SOURCE_BYTES_CHANGED_DURING_EXECUTION/);
+  assert.equal([...x.saved.keys()].some(p => p.startsWith("commissioning-editorial-review/")), false);
+});
 test("source-context rejection retains original candidate and cost proof without an accepted receipt", async () => {
   for (const key of ["sourceVersion", "wordCount"]) {
     const x = fixture();

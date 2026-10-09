@@ -31,6 +31,7 @@ test("prospective proposal binds held6 and fresh exact request/cost without reus
   const x = fixture(), before = structuredClone(x.state);
   const result = await proposal.prepareGloryNextAssessmentProposal(x.deps);
   assert.equal(result.status, "DECISION_REQUIRED_NOT_EXECUTABLE"); assert.equal(result.proposedAttempt, 7);
+  assert.equal(result.executionPathStatus, "ADAPTER_PREPARED_DISABLED_PENDING_NEW_AUTHORITY");
   assert.equal(result.modelInvocationAttempts, 0); assert.equal(result.authorityWrites, 0);
   assert.equal(result.planningCeilingUsd, 0.33192); assert.equal(x.counts(), 1); assert.deepEqual(x.state, before);
   assert.deepEqual(await proposal.prepareGloryNextAssessmentProposal(x.deps), result);
