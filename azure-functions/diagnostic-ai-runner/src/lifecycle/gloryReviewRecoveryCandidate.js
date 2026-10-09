@@ -21,7 +21,8 @@ async function claimGloryRecovery(input, deps = {}) {
   if (state?.status !== "HELD" || state.attempts !== 5 || state.causeCode !== "REVIEW_CATEGORY_NOTES_INVALID" ||
       state.executionId !== EXECUTION_ID || state.titleId !== TITLE_ID || state.bindingHash !== BINDING_HASH ||
       etag !== HELD_ETAG || state.quarantineReference !== `commissioning-review-quarantine/${TITLE_ID}/${BINDING_HASH}/${CANDIDATE_HASH}.json` ||
-      current?.release !== RELEASE || current.sourceSha256 !== SOURCE_HASH || current.canonSha256 !== CANON_HASH ||
+      current?.strictProducerRelease !== RELEASE || !/^[a-f0-9]{40}$/.test(current.release || "") ||
+      current.release !== approval?.recoveryRelease || current.sourceSha256 !== SOURCE_HASH || current.canonSha256 !== CANON_HASH ||
       current.strictTool !== true || current.jackieAuthorshipVerified !== true || current.scopeEnabled !== true ||
       approval?.executionId !== EXECUTION_ID || approval.preimageSha256 !== digest(state) ||
       approval.expectedEtag !== etag || approval.release !== RELEASE ||
@@ -32,7 +33,9 @@ async function claimGloryRecovery(input, deps = {}) {
   if (await deps.verifyApproval(approval, current) !== true) deny();
   const now = (deps.now || (() => new Date()))();
   if (!Number.isFinite(Date.parse(approval.expiresAt)) || Date.parse(approval.expiresAt) <= now.getTime()) deny();
-  const claimed = { ...state, status: "CLAIMED", attempts: 6, claimId: randomUUID(),
+  const claimed = { schemaVersion: state.schemaVersion, executionId: state.executionId,
+    titleId: state.titleId, bindingHash: state.bindingHash, startedAt: state.startedAt,
+    status: "CLAIMED", attempts: 6, claimId: randomUUID(),
     claimedAt: now.toISOString(), leaseUntil: new Date(now.getTime() + 20 * 60 * 1000).toISOString(),
     additionalRecovery: { version: "GLORY_STRICT_TOOL_SINGLE_RECOVERY_V1", approvalRecordId: approval.recordId,
       approvalSha256: digest(approval), strictRepairRelease: RELEASE, limits: LIMITS,

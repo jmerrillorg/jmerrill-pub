@@ -6,10 +6,10 @@ function fixture() {
   const state = { status: "HELD", attempts: 5, causeCode: "REVIEW_CATEGORY_NOTES_INVALID",
     executionId: c.EXECUTION_ID, titleId: c.TITLE_ID, bindingHash: c.BINDING_HASH,
     quarantineReference: `commissioning-review-quarantine/${c.TITLE_ID}/${c.BINDING_HASH}/${c.CANDIDATE_HASH}.json` };
-  const current = { release: c.RELEASE, sourceSha256: c.SOURCE_HASH, canonSha256: c.CANON_HASH,
+  const current = { release: c.RELEASE, strictProducerRelease: c.RELEASE, sourceSha256: c.SOURCE_HASH, canonSha256: c.CANON_HASH,
     strictTool: true, jackieAuthorshipVerified: true, scopeEnabled: true };
   const approval = { recordId: "synthetic-only", executionId: c.EXECUTION_ID, preimageSha256: c.digest(state),
-    expectedEtag: c.HELD_ETAG, release: c.RELEASE, limits: c.LIMITS, maxCostUsd: 1,
+    expectedEtag: c.HELD_ETAG, release: c.RELEASE, recoveryRelease: c.RELEASE, limits: c.LIMITS, maxCostUsd: 1,
     expiresAt: "2026-10-10T00:00:00Z" };
   return { state, current, approval, etag: c.HELD_ETAG };
 }
