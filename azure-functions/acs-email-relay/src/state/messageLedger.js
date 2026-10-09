@@ -253,7 +253,42 @@ function createLedger(tableClient) {
     await tableClient.upsertEntity(entity, "Replace");
     return entity;
   }
-  return { reserve, recordSubmitted, recordAccepted, recordFailure, findByCommunicationId, findByProviderId, listVerificationPending, recordVerification, acceptanceSummary, recordRuntimeHealth };
+  async function lookupExact(input) {
+    const partitionKey = hash(`${input.callerId}|${input.brand}`).slice(0, 32);
+    const rowKey = hash(input.idempotencyKey);
+    if (/-secondary\./i.test(tableClient.url || "")) return { status: "indeterminate" };
+    let entity;
+    try {
+      entity = await tableClient.getEntity(partitionKey, rowKey);
+    } catch (error) {
+      if (Number(error?.statusCode) !== 404) return { status: "indeterminate" };
+      // A point-read 404 can also mean a missing table. Confirm successful
+      // empty execution of this exact indexed query before reporting absence.
+      try {
+        const rows = [];
+        for await (const row of tableClient.listEntities({ queryOptions: {
+          filter: `PartitionKey eq '${partitionKey}' and RowKey eq '${rowKey}'`
+        } })) {
+          rows.push(row);
+          if (rows.length > 1) return { status: "indeterminate" };
+        }
+        if (!rows.length) return { status: "not_found" };
+        entity = rows[0];
+      } catch { return { status: "indeterminate" }; }
+    }
+    if (!entity || entity.partitionKey !== partitionKey || entity.rowKey !== rowKey ||
+        entity.callerId !== input.callerId || entity.brand !== input.brand ||
+        entity.idempotencyKey !== input.idempotencyKey ||
+        entity.templateId !== input.templateId || entity.templateVersion !== input.templateVersion ||
+        entity.businessObjectType !== input.businessObjectType || entity.businessObjectId !== input.businessObjectId ||
+        entity.correlationId !== input.correlationId || entity.recipient !== input.recipients.join(",") ||
+        entity.fingerprint !== createFingerprint(input)) return { status: "indeterminate" };
+    if (entity.deliveryState !== DELIVERY_STATE.ACCEPTED || !entity.jm1MessageId ||
+        !entity.providerMessageId || !Number.isFinite(Date.parse(entity.acceptedAt))) return { status: "indeterminate" };
+    return { status: "found", jm1MessageId: entity.jm1MessageId,
+      providerMessageId: entity.providerMessageId, acceptedAt: entity.acceptedAt, deliveryState: entity.deliveryState };
+  }
+  return { reserve, recordSubmitted, recordAccepted, recordFailure, findByCommunicationId, findByProviderId, listVerificationPending, recordVerification, acceptanceSummary, recordRuntimeHealth, lookupExact };
 }
 
 function getMessageLedger() {

@@ -63,6 +63,9 @@ jobs:
     if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     environment: production
+    concurrency:
+      group: func-jm1-acs-email-relay-production
+      cancel-in-progress: false
 
     steps:
       - name: Checkout
