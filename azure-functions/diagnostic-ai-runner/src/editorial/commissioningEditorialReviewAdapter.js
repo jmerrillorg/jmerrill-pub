@@ -33,8 +33,7 @@ async function prepareCommissioningEditorialReview(input, deps = {}) {
   const authority = await deps.readReviewAuthority(run.titleId, run.source.sha256);
   const bytes = await deps.downloadSource(run.source);
   if (!Buffer.isBuffer(bytes) || sha(bytes) !== run.source.sha256) fail("REVIEW_SOURCE_BYTES_CHANGED");
-  const extracted = await (deps.extractText || (async buffer =>
-    (await require("mammoth").extractRawText({ buffer })).value))(bytes);
+  const extracted = await (deps.extractText || require("./commissioningSourceText").extractCommissioningSourceText)(bytes, titleAuthority.sourceMedia);
   const assembled = assembleReviewPrompt({ titleId: run.titleId, sourceSha256: run.source.sha256,
     sourceVersion: run.source.version, manuscript: extracted, authority });
   const binding = { parentExecutionId: run.executionId, titleId: run.titleId, stage: "EDITORIAL_REVIEW",

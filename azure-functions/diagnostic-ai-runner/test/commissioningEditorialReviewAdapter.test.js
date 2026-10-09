@@ -44,8 +44,15 @@ function fixture() {
       }
     }; } } };
   saved.set(`commissioning-intake/${id}/${plan.bindingHash}.json`, { etag: "initial", bytes: Buffer.from(JSON.stringify({ executionId: plan.executionId, bindingHash: plan.bindingHash, titleId: id, status: "INTAKE_MATERIALS_VERIFIED", productionStageChanged: false })) });
-  return { input, deps, saved, report, authority, title, calls: () => calls, advance: ms => { clock += ms; } };
+  return { input, deps, saved, report, authority, title, artifact, calls: () => calls, advance: ms => { clock += ms; } };
 }
+test("approved exact-byte Markdown uses the governed artifact format reader", async () => {
+  const x = fixture(); x.artifact.jm1pub_repositorypath = "canonical/manuscript.md";
+  delete x.deps.extractText;
+  const result = await execute(x.input, x.deps);
+  assert.equal(result.receipt.status, "EDITORIAL_REVIEW_READY_FOR_PUBLISHER");
+  assert.equal(x.calls(), 1);
+});
 test("received source cannot enter an assessment even if the general review worker is enabled", async () => {
   const x = fixture(); x.input.source.role = "RECEIVED_ORIGINAL";
   await assert.rejects(execute(x.input, x.deps), /RECEIVED_SOURCE_NOT_APPROVED_CONTROLLING/);
