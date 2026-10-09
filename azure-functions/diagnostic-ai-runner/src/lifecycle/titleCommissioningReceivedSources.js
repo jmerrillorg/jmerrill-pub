@@ -76,6 +76,8 @@ async function readReceivedSourceProof(policy, deps) {
   const source = await sourceBytes(policy.itemId, deps);
   if (!Buffer.isBuffer(source) || source.length !== policy.bytes || hash(source) !== policy.sha256) fail("COMMISSIONING_RECEIVED_SOURCE_BYTES_CHANGED");
   if (policy.format === "docx") {
+    const after = verifySourceMetadata(policy, await (deps.sourceMetadata || sourceMetadata)(policy, deps));
+    if (after.sourceETag !== custody.sourceETag || after.repositoryPath !== custody.repositoryPath) fail("COMMISSIONING_RECEIVED_SOURCE_VERSION_CHANGED");
     const zip = await require("jszip").loadAsync(source, { checkCRC32: true });
     if (!zip.file("word/document.xml") || !zip.file("[Content_Types].xml") || zip.file("word/vbaProject.bin")) {
       fail("COMMISSIONING_RECEIVED_DOCX_INVALID");
