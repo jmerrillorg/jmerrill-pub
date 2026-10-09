@@ -25,6 +25,10 @@ resource intakeFailureAlert 'Microsoft.Insights/scheduledQueryRules@2023-12-01' 
 traces
 | where message startswith "Publishing commissioning intake: "
 | extend result = parse_json(substring(message, indexof(message, "{")))
+| mv-apply execution = result.results on (
+    summarize unfinished = countif(tostring(execution.status) != "COMPLETED")
+)
+| where array_length(result.failures) > 0 or unfinished == 0
 | summarize arg_max(timestamp, *)
 | where array_length(result.failures) > 0
 | project timestamp
