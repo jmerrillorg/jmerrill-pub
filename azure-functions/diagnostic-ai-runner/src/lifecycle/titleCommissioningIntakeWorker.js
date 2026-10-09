@@ -48,7 +48,9 @@ async function processTitleCommissioningStep(input, deps, contract) {
     if (conflict(error)) return { status: "CLAIM_CONFLICT", executionId: plan.executionId };
     if (error?.statusCode !== 404) throw error;
   }
-  if (state?.status === "COMPLETED" || state?.status === "HELD") return state;
+  const repairRecovery = state?.status === "HELD" && state.attempts < MAX_ATTEMPTS &&
+    typeof contract.recoverHeld === "function" && contract.recoverHeld(state) === true;
+  if (state?.status === "COMPLETED" || (state?.status === "HELD" && !repairRecovery)) return state;
   if (state?.status === "CLAIMED") {
     if (!Number.isFinite(Date.parse(state.leaseUntil))) fail("COMMISSIONING_EXECUTION_LEASE_INVALID");
     if (Date.parse(state.leaseUntil) > now.getTime()) return { status: "IN_FLIGHT", executionId: plan.executionId };
@@ -63,6 +65,8 @@ async function processTitleCommissioningStep(input, deps, contract) {
   const claimed = {
     schemaVersion: 1, executionId: plan.executionId, bindingHash: plan.bindingHash, titleId: plan.titleId,
     status: "CLAIMED", attempts: (state?.attempts || 0) + 1,
+    ...(repairRecovery ? { repairRecovery: { version: contract.repairVersion, previousState: state } }
+      : state?.repairRecovery ? { repairRecovery: state.repairRecovery } : {}),
     claimId: randomUUID(), startedAt: state?.startedAt || at, claimedAt: at,
     leaseUntil: new Date(now.getTime() + (contract.leaseMs || LEASE_MS)).toISOString()
   };

@@ -6,8 +6,8 @@ const path = require("node:path");
 const { lifecycleReadback, lifecycleReadbackHandler } = require("../src/functions/runPublishingLifecycleReadback");
 const authorId = "106a78d0-fb9a-f111-b8dc-6045bdd69738";
 const titleId = "daf8180f-85a3-f111-b8de-000d3a14673b";
-test("HTTP boundary routes both exact commissioning readback modes after authentication", async () => {
-  for (const mode of ["COMMISSIONING_INTAKE_READ_ONLY", "COMMISSIONING_REVIEW_READ_ONLY"]) {
+test("HTTP boundary routes exact commissioning readback modes after authentication", async () => {
+  for (const mode of ["COMMISSIONING_INTAKE_READ_ONLY", "COMMISSIONING_REVIEW_READ_ONLY", "COMMISSIONING_IDENTITY_READ_ONLY"]) {
     let calls = 0;
     const request = { headers: { get: () => "internal-key" }, json: async () => ({ mode, titleId }) };
     const deps = { env: { JM1_DIAGNOSTIC_RUNNER_KEY: "internal-key" }, commissioningReadback: async body => {

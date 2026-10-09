@@ -33,6 +33,18 @@ last 20 minutes; configured provider retry bounds exceeding 10 minutes deny the
 call. The registered Foundry route and existing AI gate remain mandatory;
 direct-provider or automatic fallback execution is prohibited.
 
+Within an already-authorized commissioning scope, a composite Contact/profile
+reference must resolve by exact IDs to the active canonical Jackie Contact and
+active profile, including record versions. Conflicting lookup fields, unknown
+text, inactive records, or failed reads deny execution. This does not change
+the general authorship guard, alter identity records, or select a manuscript.
+Composite proofs are retained in intake/review evidence and rechecked after
+inference. Existing strict-contact receipts remain byte-compatible.
+The authenticated `COMMISSIONING_IDENTITY_READ_ONLY` mode checks only the four
+already identified commissioning title IDs. It returns metadata, creates no
+scope/receipt, touches no storage, and dispatches nothing. PASS is identity
+preflight, not enrollment, manuscript selection, or stage authorization.
+
 The bound assessment prompt uses one 240-second provider request per worker
 attempt, with no provider-level retries. Other prompt routes retain their
 configured limits. Safe timeout/transport causes remain in the durable failure
@@ -66,3 +78,14 @@ Never delete records or release claims from chat to manufacture recovery.
 Source tests and a merged release are not live commissioning. Acceptance needs
 the natural scheduled review, durable assessment/document custody, repeat
 readback with stable IDs/hashes, and no prohibited effects.
+# Exact assessment output and repair recovery
+
+The assessment route uses the nine-section JSON tool schema exported by its
+owner contract, not the provider's generic object schema. Existing semantic,
+source, identity and approval-boundary validation remains mandatory.
+
+The reviewed `EDITORIAL_REVIEW_EXACT_TOOL_SCHEMA_V1` repair may recover a
+`REVIEW_SECTIONS_INVALID` hold once through the normal scoped CAS worker. It
+preserves the held preimage and execution identity, respects the existing
+attempt limit, and does not recover permission, authority, identity or
+substantive editorial holds. A second structural failure remains held.

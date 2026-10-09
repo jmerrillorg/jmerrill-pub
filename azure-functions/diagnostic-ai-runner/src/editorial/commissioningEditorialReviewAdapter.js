@@ -14,7 +14,7 @@ async function executeCommissioningEditorialReview(input, deps = {}) {
   if (typeof deps.readReviewAuthority !== "function" || typeof deps.downloadSource !== "function") {
     fail("REVIEW_OWNER_READERS_NOT_BOUND");
   }
-  await readTitleCommissioningAuthority(input, deps);
+  const titleAuthority = await readTitleCommissioningAuthority(input, deps);
   const intakeBlob = deps.containerClient.getBlockBlobClient(`commissioning-intake/${run.titleId}/${run.bindingHash}.json`);
   const intakeProperties = await intakeBlob.getProperties();
   if (!intakeProperties.etag) fail("REVIEW_INTAKE_VERSION_MISSING");
@@ -30,6 +30,7 @@ async function executeCommissioningEditorialReview(input, deps = {}) {
   const assembled = assembleReviewPrompt({ titleId: run.titleId, sourceSha256: run.source.sha256,
     sourceVersion: run.source.version, manuscript: extracted, authority });
   const binding = { parentExecutionId: run.executionId, titleId: run.titleId, stage: "EDITORIAL_REVIEW",
+    ...(titleAuthority.identityProof.method === "EXACT_PROFILE_CONTACT_BINDING" ? { identityProof: titleAuthority.identityProof } : {}),
     source: run.source, promptSha256: assembled.promptSha256,
     authority: assembled.provenance.map(({ verifiedAt, ...source }) => source), contractVersion: "JMP-EDITORIAL-REVIEW-ASSESSMENT-V1" };
   const bindingHash = sha(JSON.stringify(binding));
@@ -92,7 +93,10 @@ async function executeCommissioningEditorialReview(input, deps = {}) {
       (authority.titleName && report.intakeSummary.title !== authority.titleName)) fail("REVIEW_OUTPUT_SOURCE_CONTEXT_MISMATCH");
   if (report.imprintAlignment.authority !== "SUGGESTED_ONLY") fail("REVIEW_OFFICIAL_IMPRINT_ASSIGNMENT_NOT_BOUND");
   // Recheck authority after inference; no result is published from stale scope.
-  await readTitleCommissioningAuthority(input, deps);
+  const currentTitleAuthority = await readTitleCommissioningAuthority(input, deps);
+  if (JSON.stringify(currentTitleAuthority.identityProof) !== JSON.stringify(titleAuthority.identityProof)) {
+    fail("REVIEW_AUTHOR_IDENTITY_CHANGED_DURING_EXECUTION");
+  }
   const refreshed = await deps.readReviewAuthority(run.titleId, run.source.sha256);
   const rebound = assembleReviewPrompt({ titleId: run.titleId, sourceSha256: run.source.sha256,
     sourceVersion: run.source.version, manuscript: extracted, authority: refreshed });

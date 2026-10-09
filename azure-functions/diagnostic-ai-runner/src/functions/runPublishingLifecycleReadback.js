@@ -154,7 +154,7 @@ async function lifecycleReadbackHandler(request, deps = {}) {
     if (!key || request.headers.get("x-jm1-diagnostic-runner-key") !== key) return { status: 401, jsonBody: { error: "UNAUTHORIZED" } };
     let body;
     try { body = await request.json(); } catch { return { status: 400, jsonBody: { error: "INVALID_JSON" } }; }
-    if (["COMMISSIONING_INTAKE_READ_ONLY", "COMMISSIONING_REVIEW_READ_ONLY"].includes(body?.mode)) {
+    if (["COMMISSIONING_INTAKE_READ_ONLY", "COMMISSIONING_REVIEW_READ_ONLY", "COMMISSIONING_IDENTITY_READ_ONLY"].includes(body?.mode)) {
       try { return await (deps.commissioningReadback || require("../lifecycle/titleCommissioningReadback").titleCommissioningReadback)(body); }
       catch (error) { return { status: 502, jsonBody: {
         error: /^(?:REVIEW|COMMISSIONING)_[A-Z_]{1,100}$/.test(error?.safeCode || "")

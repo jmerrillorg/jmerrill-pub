@@ -35,3 +35,15 @@ test("a current approved artifact cannot silently replace the controlling source
   const x = fixture(); x.scope.controllingSourceArtifactId = titleId;
   await assert.rejects(read(x.input, x.deps), /ARTIFACT_ROLE_SCOPE_MISMATCH/);
 });
+test("composite source identity is accepted only through live exact Contact/profile proof", async () => {
+  const x = fixture(), profileId = "00000000-0000-4000-8000-000000000003";
+  x.title.jm1_canonicalauthorcontactreference = `contact:${contact}; authorProfile:${profileId}`;
+  const original = x.deps.client.first;
+  const profile = { jm1_authorprofileid: profileId, _jm1_contact_value: contact, statecode: 0, versionnumber: 9 };
+  x.deps.client.first = async entity => entity === "jm1_authorprofiles" ? profile : entity === "contacts"
+    ? { contactid: contact, statecode: 0, versionnumber: 8 } : original(entity);
+  const result = await read(x.input, x.deps);
+  assert.equal(result.identityProof.profileId, profileId);
+  profile._jm1_contact_value = artifactId;
+  await assert.rejects(read(x.input, x.deps), /AUTHOR_AUTHORITY_CHANGED/);
+});

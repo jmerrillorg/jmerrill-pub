@@ -39,3 +39,18 @@ test("cross-title stored receipt is denied, never projected as complete", async 
   const x = fixture(); x.records.set(`commissioning-intake/${titleId}/${x.plan.bindingHash}.json`, { titleId: "other", executionId: x.plan.executionId, bindingHash: x.plan.bindingHash });
   await assert.rejects(read({ mode: "COMMISSIONING_INTAKE_READ_ONLY", titleId }, x.deps), /IDENTITY_CONFLICT/);
 });
+test("fixed-title identity preflight reads exact links without touching storage or dispatch", async () => {
+  const id = "f79006b7-f595-f111-8076-00224820105b";
+  const contact = require("../src/author/jackieTitleSystemCommissioningPolicy").JACKIE_CANONICAL_AUTHOR_CONTACT_ID;
+  const profile = "1f0188ca-71a5-f111-b8de-7c1e525b15c2";
+  const deps = { client: { first: async entity => entity === "jm1pub_titles"
+    ? { jm1pub_titleid: id, versionnumber: 1, jm1_canonicalauthorcontactreference: `contact:${contact}; authorProfile:${profile}` }
+    : entity === "jm1_authorprofiles" ? { jm1_authorprofileid: profile, _jm1_contact_value: contact, statecode: 0, versionnumber: 2 }
+      : { contactid: contact, statecode: 0, versionnumber: 3 } } };
+  Object.defineProperty(deps, "containerClient", { get() { assert.fail("identity read cannot touch storage"); } });
+  const result = await read({ mode: "COMMISSIONING_IDENTITY_READ_ONLY", titleId: id }, deps);
+  assert.equal(result.status, 200); assert.equal(result.jsonBody.identityBinding, "PASS");
+  assert.equal(result.jsonBody.scopeStatus, "READ_ONLY_IDENTITY_PREFLIGHT_NOT_EXECUTION_AUTHORITY");
+  assert.equal(result.jsonBody.effects, 0); assert.equal(result.jsonBody.commissioningIdentity.profileId, profile);
+  assert.equal((await read({ mode: "COMMISSIONING_IDENTITY_READ_ONLY", titleId: "other" })).status, 400);
+});

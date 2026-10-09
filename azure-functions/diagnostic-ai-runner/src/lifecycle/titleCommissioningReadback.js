@@ -6,9 +6,26 @@ const { readTitleCommissioningAuthority } = require("./titleCommissioningAuthori
 
 async function titleCommissioningReadback(body, deps = {}) {
   if (!body || Object.keys(body).some(k => !["mode", "titleId"].includes(k)) ||
-      !["COMMISSIONING_INTAKE_READ_ONLY", "COMMISSIONING_REVIEW_READ_ONLY"].includes(body.mode) || !ownerBinding(body.titleId)) {
+      !["COMMISSIONING_INTAKE_READ_ONLY", "COMMISSIONING_REVIEW_READ_ONLY", "COMMISSIONING_IDENTITY_READ_ONLY"].includes(body.mode)) {
     return { status: 400, jsonBody: { code: "COMMISSIONING_READBACK_SCOPE_DENIED", effects: 0 } };
   }
+  if (body.mode === "COMMISSIONING_IDENTITY_READ_ONLY") {
+    const authorizedSourceIds = ["f1908dc9-5775-f111-ab0f-6045bdd69435", "e797232b-da7a-f111-ab0f-00224820105b",
+      "f79006b7-f595-f111-8076-00224820105b", "a69b9dfa-bb7b-f111-ab0f-7c1e525b15c2"];
+    if (!authorizedSourceIds.includes(body.titleId)) return { status: 400, jsonBody: { code: "COMMISSIONING_READBACK_SCOPE_DENIED", effects: 0 } };
+    const client = deps.client || require("../orchestration/authorReviewResponseConsumer").createDataverseClient({
+      apiBase: process.env.DATAVERSE_WEB_API_BASE_URL, resourceUrl: process.env.DATAVERSE_RESOURCE_URL
+    });
+    const title = await client.first("jm1pub_titles", { $filter: `jm1pub_titleid eq ${body.titleId}` });
+    if (title?.jm1pub_titleid !== body.titleId) return { status: 409, jsonBody: { code: "COMMISSIONING_AUTHOR_AUTHORITY_CHANGED", effects: 0 } };
+    // This scope authorizes a fixed-source identity read, never execution.
+    const proof = await require("../author/jackieCommissioningIdentityReader").readJackieCommissioningIdentity(title,
+      { enabled: true, titleId: body.titleId, mode: "JACKIE_TITLE_INTERNAL_COMMISSIONING" }, client);
+    return { status: 200, jsonBody: { mode: body.mode, titleId: body.titleId, titleVersion: String(title.versionnumber),
+      identityBinding: proof ? "PASS" : "HELD", commissioningIdentity: proof, effects: 0,
+      scopeStatus: "READ_ONLY_IDENTITY_PREFLIGHT_NOT_EXECUTION_AUTHORITY" } };
+  }
+  if (!ownerBinding(body.titleId)) return { status: 400, jsonBody: { code: "COMMISSIONING_READBACK_SCOPE_DENIED", effects: 0 } };
   const binding = ownerBinding(body.titleId); const plan = planTitleCommissioningRun(binding.request);
   const containerClient = deps.containerClient || require("@azure/storage-blob").BlobServiceClient
     .fromConnectionString(process.env.AzureWebJobsStorage).getContainerClient("jm1-publishing-stage-runtime");
@@ -76,6 +93,7 @@ async function titleCommissioningReadback(body, deps = {}) {
   return { status: 200, jsonBody: { mode: body.mode, effects: 0, observedAt: new Date().toISOString(),
     titleId: plan.titleId, executionId: plan.executionId, bindingHash: plan.bindingHash,
     nativeAuthorityAndBytes: "PASS", artifactBindings: authority.artifacts, scopePersisted, reviewAuthority,
+    commissioningIdentity: authority.identityProof,
     reviewExecution: reviewExecution ? { etag: reviewExecution.etag, status: reviewExecution.value.status,
       attempts: reviewExecution.value.attempts, failureCode: reviewExecution.value.failureCode, causeCode: reviewExecution.value.causeCode,
       claimedAt: reviewExecution.value.claimedAt, leaseUntil: reviewExecution.value.leaseUntil,
