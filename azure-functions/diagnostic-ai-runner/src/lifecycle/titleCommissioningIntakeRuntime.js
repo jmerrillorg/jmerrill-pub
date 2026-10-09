@@ -37,6 +37,16 @@ async function runTitleCommissioningIntakeRuntime(deps = {}) {
       const result = await processTitleCommissioningIntake(request, workerDeps);
       results.push({ titleId, executionId: result.executionId, status: result.status, receiptReference: result.receiptReference || null });
       if (result.status === "HELD" || result.status === "RETRY_PENDING") failures.push({ titleId, code: result.failureCode, status: result.status });
+      if (result.status === "COMPLETED" && env.JM1_TITLE_COMMISSIONING_REVIEW_ENABLED === "true") {
+        const reviewReaders = require("../editorial/commissioningEditorialReviewReaders")
+          .createCommissioningEditorialReviewReaders({ ...deps, client });
+        const review = await require("./titleCommissioningEditorialReviewWorker")
+          .processTitleCommissioningEditorialReview(request, { ...deps, client, containerClient, ...readers, ...reviewReaders });
+        results.push({ titleId, stage: "EDITORIAL_REVIEW", executionId: review.executionId,
+          status: review.status, receiptReference: review.receiptReference || null });
+        if (["HELD", "RETRY_PENDING"].includes(review.status)) failures.push({ titleId, stage: "EDITORIAL_REVIEW",
+          code: review.failureCode, status: review.status });
+      }
     } catch (error) {
       failures.push({ titleId, code: error?.statusCode === 404 ? "COMMISSIONING_OWNER_BINDING_MISSING" : "COMMISSIONING_READ_OR_DISPATCH_FAILED" });
     }
