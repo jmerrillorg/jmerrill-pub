@@ -156,6 +156,10 @@ app.http("publishing-lifecycle-readback", {
     if (!key || request.headers.get("x-jm1-diagnostic-runner-key") !== key) return { status: 401, jsonBody: { error: "UNAUTHORIZED" } };
     let body;
     try { body = await request.json(); } catch { return { status: 400, jsonBody: { error: "INVALID_JSON" } }; }
+    if (body?.mode === "COMMISSIONING_INTAKE_READ_ONLY") {
+      try { return await require("../lifecycle/titleCommissioningReadback").titleCommissioningReadback(body); }
+      catch { return { status: 502, jsonBody: { error: "COMMISSIONING_NATIVE_READBACK_FAILED", effects: 0 } }; }
+    }
     try { return await lifecycleReadback(body, {
       client: createDataverseClient({ apiBase: process.env.DATAVERSE_WEB_API_BASE_URL, resourceUrl: process.env.DATAVERSE_RESOURCE_URL }),
       graphClient: new PublishingMailboxGraphClient(),

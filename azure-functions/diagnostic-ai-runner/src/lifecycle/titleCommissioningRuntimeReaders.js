@@ -28,7 +28,25 @@ function createTitleCommissioningRuntimeReaders(deps = {}) {
       if (!/^[a-f0-9]{64}$/i.test(expectedSha256 || "")) return false;
       const bytes = typeof deps.downloadArtifact === "function"
         ? await deps.downloadArtifact(artifact)
-        : await require("../editorial/productionTitleAuthorityReader").graphBytes(artifact, deps);
+        : await require("../editorial/productionTitleAuthorityReader").graphBytes(artifact, {
+          ...deps,
+          credential: deps.credential || new (require("@azure/identity").ManagedIdentityCredential)(),
+          fetchImpl: async (url, options) => {
+            let response;
+            try {
+              response = await (deps.fetchImpl || fetch)(url, { ...options, signal: AbortSignal.timeout(30000) });
+            } catch (error) {
+              if (["TimeoutError", "AbortError"].includes(error?.name)) deny("COMMISSIONING_DEPENDENCY_UNAVAILABLE");
+              throw error;
+            }
+            if ([408, 429, 500, 502, 503, 504].includes(response.status)) {
+              throw Object.assign(new Error("COMMISSIONING_DEPENDENCY_UNAVAILABLE"), {
+                safeCode: "COMMISSIONING_DEPENDENCY_UNAVAILABLE", statusCode: response.status
+              });
+            }
+            return response;
+          }
+        });
       return Buffer.isBuffer(bytes) && createHash("sha256").update(bytes).digest("hex") === expectedSha256.toLowerCase();
     }
   };

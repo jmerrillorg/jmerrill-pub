@@ -104,3 +104,31 @@ advance any canonical stage. Replay returns the existing execution result.
 If ownership changes while work is running, the stale claimant cannot overwrite
 the new result. Disablement stops new timer dispatch; it does not delete claims,
 receipts, source history, or current title state.
+
+## Exact owner provisioning and readback
+
+The reviewed `titleCommissioningOwnerBindings` module pins Establishing Glory's
+original artifact, four retained artifact IDs, versions and registered hashes.
+An enabled allowlisted timer can provision only these scope/request records,
+after fresh native title, artifact and byte checks. It uses create-only writes;
+any existing conflicting or revoked scope wins. A partial write recovers forward
+without replacing the preserved scope. No operator storage key is substituted.
+Other titles have no compiled bootstrap authority and remain unbound.
+
+The original local draft plan is preserved. The governed runtime plan replaces
+its local inventory-file history reference with an exact Dataverse title history
+reference, so its binding hash differs from that never-executed local proposal.
+This is not a replay or a reset of production title history.
+
+The existing authenticated lifecycle readback route accepts only
+`{"mode":"COMMISSIONING_INTAKE_READ_ONLY","titleId":"f1908dc9-5775-f111-ab0f-6045bdd69435"}`
+for this acceptance. It freshly checks native bytes and returns ETag-bound
+execution/receipt metadata without writes. Additional fields or other titles
+are denied. It can prove native read access before timer enablement; a proposed
+unpersisted scope is explicitly distinguished from a persisted one.
+
+`infra/jm1-infra-006/app-service/title-commissioning-intake-alert.bicep` defines a
+stateful failure/resolution rule against this timer's latest metadata-only
+observation and the existing Publishing operations action group. It neither
+changes recipients nor introduces a scheduler or agent. Actual failure and
+resolution email delivery remain live acceptance items after protected release.

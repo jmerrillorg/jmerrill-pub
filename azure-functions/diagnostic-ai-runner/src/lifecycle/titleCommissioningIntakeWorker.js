@@ -9,7 +9,7 @@ const MAX_ATTEMPTS = 5;
 const RETRYABLE = new Set(["ETIMEDOUT", "ECONNRESET", "EAI_AGAIN", "COMMISSIONING_DEPENDENCY_UNAVAILABLE"]);
 function fail(code) { throw Object.assign(new Error(code), { safeCode: code }); }
 function conflict(error) { return [409, 412].includes(error?.statusCode); }
-function retryable(error) { return RETRYABLE.has(error?.safeCode || error?.code) || [408, 429, 500, 502, 503, 504].includes(error?.statusCode); }
+function retryable(error) { return RETRYABLE.has(error?.safeCode || error?.code) || [408, 429, 500, 502, 503, 504].includes(error?.statusCode ?? error?.status); }
 
 // This is an execution receipt, not canonical title stage state. A recovered
 // claim invokes the same create-only intake adapter and cannot advance a title.

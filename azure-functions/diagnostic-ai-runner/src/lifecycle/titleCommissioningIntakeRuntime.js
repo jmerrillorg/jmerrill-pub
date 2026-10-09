@@ -20,6 +20,8 @@ async function runTitleCommissioningIntakeRuntime(deps = {}) {
   const results = []; const failures = [];
   for (const titleId of ids) {
     try {
+      await require("./titleCommissioningOwnerBindings").ensureTitleCommissioningOwnerBindings(titleId,
+        { ...deps, client, containerClient, ...readers });
       // Read a fixed owner-maintained request; never accept an invocation body
       // or list/discover other titles from this timer.
       const blob = containerClient.getBlockBlobClient(`commissioning-requests/${titleId}.json`);

@@ -64,6 +64,11 @@ test("retry exhaustion leaves a durable held result", async () => {
   for (let i = 0; i < 5; i++) { await process(x.input, x.deps); x.advance(3600000); }
   assert.equal(x.row().status, "HELD"); assert.equal(x.row().attempts, 5);
 });
+test("native Dataverse transient status retries without retaining response bodies", async () => {
+  const x = fixture(); x.deps.executeIntake = async () => { throw Object.assign(new Error("private response"), { status: 429, body: { secret: "omitted" } }); };
+  const result = await process(x.input, x.deps);
+  assert.equal(result.status, "RETRY_PENDING"); assert.equal(JSON.stringify(result).includes("omitted"), false);
+});
 test("mismatched owner result never counts as completed", async () => {
   const x = fixture(); x.deps.executeIntake = async () => ({ receipt: { executionId: "other" } });
   assert.equal((await process(x.input, x.deps)).status, "HELD");

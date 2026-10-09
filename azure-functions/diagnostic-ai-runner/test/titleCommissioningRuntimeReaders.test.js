@@ -36,3 +36,21 @@ test("native byte verification rejects changed bytes and invalid checksums", asy
   assert.equal(await readers.verifyArtifactBytes({}, "0".repeat(64)), false);
   assert.equal(await readers.verifyArtifactBytes({}, "invalid"), false);
 });
+test("native Graph transient failures retain retry classification but permission denial does not", async () => {
+  for (const status of [429, 503, 403]) {
+    const readers = createTitleCommissioningRuntimeReaders({
+      containerClient: { getBlockBlobClient() {} }, credential: { getToken: async () => ({ token: "synthetic" }) },
+      fetchImpl: async (_url, options) => { assert.ok(options.signal); return { ok: false, status }; }
+    });
+    await assert.rejects(readers.verifyArtifactBytes({ jm1pub_repositorydriveid: "fixture-drive", jm1pub_repositoryitemid: "fixture-item" }, "a".repeat(64)),
+      status === 403 ? { safeCode: "EDITORIAL_TITLE_AUTHORITY_SHAREPOINT_READ_FAILED" } : { safeCode: "COMMISSIONING_DEPENDENCY_UNAVAILABLE", statusCode: status });
+  }
+});
+test("native Graph timeout is a sanitized transient failure", async () => {
+  const readers = createTitleCommissioningRuntimeReaders({
+    containerClient: { getBlockBlobClient() {} }, credential: { getToken: async () => ({ token: "synthetic" }) },
+    fetchImpl: async () => { throw Object.assign(new Error("private request"), { name: "TimeoutError" }); }
+  });
+  await assert.rejects(readers.verifyArtifactBytes({ jm1pub_repositorydriveid: "fixture", jm1pub_repositoryitemid: "fixture" }, "a".repeat(64)),
+    { safeCode: "COMMISSIONING_DEPENDENCY_UNAVAILABLE" });
+});
