@@ -32,6 +32,7 @@ async function verifyCommissioningReviewGuards() {
     if (error.safeCode !== "REVIEW_SOURCE_FORMAT_HANDOFF_REQUIRED") throw error;
     checks.vellumHandoffRequired = true;
   }
+  Object.assign(checks, await require("./commissioningProductionGuardProbe").verifyCommissioningProductionGuards());
   return { status: "SYNTHETIC_RUNTIME_GUARDS_VERIFIED", checks, proofLevel: "EFFECT_FREE_SYNTHETIC_NOT_TITLE_ACCEPTANCE",
     businessEffects: 0, executionEffects: 0, authorityWrites: 0, modelInvocationAttempts: 0 };
 }

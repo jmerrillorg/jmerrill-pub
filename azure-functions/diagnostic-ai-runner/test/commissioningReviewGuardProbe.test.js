@@ -10,6 +10,10 @@ test("fixed authenticated live guard probe is synthetic and needs no provider, s
   assert.equal(result.jsonBody.checks.markdownLiteralPreserved, true);
   assert.equal(result.jsonBody.checks.vellumHandoffRequired, true);
   assert.equal(result.jsonBody.checks.sharepointDocumentUrlResolved, true);
+  for (const name of ["stage13SyntheticEvidenceAccepted", "stage13MissingProofIdentityDenied", "stage13PendingAgreementDenied",
+    "stage13ProofChecksumMismatchDenied", "stage15SyntheticReadbackAndRetryVerified", "stage15WrongEditionDenied", "stage15PendingIsNotPublication"]) {
+    assert.equal(result.jsonBody.checks[name], true, name);
+  }
   assert.equal((await handler(request({ mode: "VERIFY_REVIEW_GUARDS", titleId: "caller" }), deps)).status, 400);
   assert.equal((await handler(request({ mode: "VERIFY_REVIEW_GUARDS" }, "wrong"), deps)).status, 401);
   const denied = await handler(request({ mode: "EXECUTE_NEXT_ASSESSMENT" }), deps);
