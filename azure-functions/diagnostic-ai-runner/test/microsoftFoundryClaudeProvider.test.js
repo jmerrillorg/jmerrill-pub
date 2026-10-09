@@ -104,7 +104,9 @@ describe("microsoftFoundryClaudeProvider", () => {
       assert.deepEqual(schema.required, SECTIONS);
       assert.equal(schema.additionalProperties, false);
       assert.deepEqual(schema.properties.categoryScores.required, CATEGORIES);
-      assert.equal(schema.properties.categoryScores.properties.STRUCTURE_FLOW.maximum, 5);
+      assert.deepEqual(schema.properties.categoryScores.properties.STRUCTURE_FLOW.enum, [1, 2, 3, 4, 5]);
+      assert.equal(loaded.selectStructuredOutputTool("", { promptVersion: "JMP-EDITORIAL-REVIEW-ASSESSMENT-V1" }).strict, true);
+      assert.equal(loaded.selectStructuredOutputTool("plain", {}).strict, undefined);
       assert.equal(schema.properties.intakeSummary.properties.wordCount.type, "integer");
       assert.equal(schema.properties.integrityFlags.items.properties.hardStop.type, "boolean");
       assert.equal(schema.properties.recommendation.additionalProperties, false);

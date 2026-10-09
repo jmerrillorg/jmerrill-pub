@@ -23,6 +23,26 @@ function authority() {
 test("assessment contract accepts nine sections and eight 1-5 scores", () => {
   const r = report(); assert.equal(validateEditorialReview(r), r);
 });
+test("strict provider schema preserves exact shape without weakening local bounds", () => {
+  const { strictProviderReviewSchema, EDITORIAL_REVIEW_OUTPUT_SCHEMA, SECTIONS } = require("../src/editorial/commissioningEditorialReviewContract");
+  const schema = strictProviderReviewSchema();
+  assert.deepEqual(schema.required, SECTIONS);
+  assert.deepEqual(schema.properties.categoryNotes.required, CATEGORIES);
+  function check(node) {
+    for (const key of ["minimum", "maximum", "minLength", "maxLength", "maxItems"]) assert.equal(Object.hasOwn(node, key), false);
+    if (node.type === "object") assert.equal(node.additionalProperties, false);
+    if (Object.hasOwn(node, "minItems")) assert.ok([0, 1].includes(node.minItems));
+    for (const child of Object.values(node.properties || {})) check(child);
+    if (node.items) check(node.items);
+  }
+  check(schema);
+  assert.equal(EDITORIAL_REVIEW_OUTPUT_SCHEMA.properties.intakeSummary.properties.wordCount.minimum, 1);
+  assert.equal(EDITORIAL_REVIEW_OUTPUT_SCHEMA.properties.strengths.minItems, 3);
+  const invalid = report(); invalid.categoryNotes = "Narrative cannot replace keyed observations";
+  assert.throws(() => validateEditorialReview(invalid), /CATEGORY_NOTES_INVALID/);
+  invalid.categoryNotes = Object.fromEntries(CATEGORIES.map(k => [k, ""]));
+  assert.throws(() => validateEditorialReview(invalid), /CATEGORY_NOTES_INVALID/);
+});
 test("legacy 0-10 scores and editing output are rejected", () => {
   const r = report(); r.categoryScores.VOICE_TONE = 10;
   assert.throws(() => validateEditorialReview(r), /SCORES_INVALID/);

@@ -332,7 +332,8 @@ function selectStructuredOutputTool(promptBody, route = {}) {
   if (route.promptVersion === "JMP-EDITORIAL-REVIEW-ASSESSMENT-V1") return {
     name: STRUCTURED_OUTPUT_TOOL.name,
     description: "Submit the complete nine-section assessment only; no edited manuscript or approval.",
-    input_schema: require("../../editorial/commissioningEditorialReviewContract").EDITORIAL_REVIEW_OUTPUT_SCHEMA
+    strict: true,
+    input_schema: require("../../editorial/commissioningEditorialReviewContract").strictProviderReviewSchema()
   };
   if (isLineEditingChunkPrompt(promptBody)) return LINE_EDITING_CHUNK_OUTPUT_TOOL;
   if (isDevelopmentalEditingChunkPrompt(promptBody)) return DEVELOPMENTAL_EDITING_CHUNK_OUTPUT_TOOL;
