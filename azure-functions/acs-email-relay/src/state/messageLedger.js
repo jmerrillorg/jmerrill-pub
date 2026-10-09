@@ -140,7 +140,7 @@ function createLedger(tableClient) {
       updatedAt: acceptedAt,
       failureClass: ""
     };
-    if ((entity.brand === "JMPRODUCTIONS" && entity.templateId === "PRODUCTIONS.BP09_NOTICE")
+    if ((entity.brand === "JMPRODUCTIONS" && ["PRODUCTIONS.BP09_NOTICE", "PRODUCTIONS.BP09_REVIEW_OVERDUE", "PRODUCTIONS.BP09_REVIEW_RESOLVED"].includes(entity.templateId))
         || (entity.brand === "JMFN" && entity.templateId === "FOUNDATION.VOLUNTEER_INQUIRY_NOTICE")
         || (entity.brand === "JMF" && entity.templateId === "FINANCIAL.INQUIRY_NOTICE")) {
       updated.communicationState = COMMUNICATION_STATE.PROVIDER_ACCEPTED;
@@ -253,7 +253,7 @@ function createLedger(tableClient) {
     await tableClient.upsertEntity(entity, "Replace");
     return entity;
   }
-  async function lookupExact(input) {
+  async function lookupExact(input, receiptId) {
     const partitionKey = hash(`${input.callerId}|${input.brand}`).slice(0, 32);
     const rowKey = hash(input.idempotencyKey);
     if (/-secondary\./i.test(tableClient.url || "")) return { status: "indeterminate" };
@@ -283,12 +283,19 @@ function createLedger(tableClient) {
         entity.businessObjectType !== input.businessObjectType || entity.businessObjectId !== input.businessObjectId ||
         entity.correlationId !== input.correlationId || entity.recipient !== input.recipients.join(",") ||
         entity.fingerprint !== createFingerprint(input)) return { status: "indeterminate" };
+    if (receiptId !== undefined) {
+      if (entity.jm1MessageId !== receiptId) return { status: "indeterminate" };
+      if (entity.deliveryState === DELIVERY_STATE.FAILED && Number.isFinite(Date.parse(entity.updatedAt))) {
+        return { status: "failed", jm1MessageId: entity.jm1MessageId, failedAt: entity.updatedAt };
+      }
+    }
     if (entity.deliveryState !== DELIVERY_STATE.ACCEPTED || !entity.jm1MessageId ||
         !entity.providerMessageId || !Number.isFinite(Date.parse(entity.acceptedAt))) return { status: "indeterminate" };
     return { status: "found", jm1MessageId: entity.jm1MessageId,
       providerMessageId: entity.providerMessageId, acceptedAt: entity.acceptedAt, deliveryState: entity.deliveryState };
   }
-  return { reserve, recordSubmitted, recordAccepted, recordFailure, findByCommunicationId, findByProviderId, listVerificationPending, recordVerification, acceptanceSummary, recordRuntimeHealth, lookupExact };
+  return { reserve, recordSubmitted, recordAccepted, recordFailure, findByCommunicationId, findByProviderId, listVerificationPending, recordVerification, acceptanceSummary, recordRuntimeHealth, lookupExact,
+    lookupExactDelivery: (input, receiptId) => lookupExact(input, receiptId) };
 }
 
 function getMessageLedger() {
