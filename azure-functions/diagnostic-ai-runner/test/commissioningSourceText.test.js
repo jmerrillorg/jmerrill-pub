@@ -1,12 +1,20 @@
 "use strict";
 const test = require("node:test"), assert = require("node:assert/strict");
-const { extractCommissioningSourceText: extract } = require("../src/editorial/commissioningSourceText");
+const { extractCommissioningSourceText: extract, sourceExtension } = require("../src/editorial/commissioningSourceText");
 test("DOCX and legacy extraction retain the existing Mammoth text exactly", async () => {
   const { Document, Paragraph, Packer } = require("docx");
   const bytes = await Packer.toBuffer(new Document({ sections: [{ children: [new Paragraph("Exact fixture text")] }] }));
   const expected = (await require("mammoth").extractRawText({ buffer: bytes })).value;
   assert.equal(await extract(bytes, { repositoryPath: "canonical/manuscript.docx" }), expected);
   assert.equal(await extract(bytes), expected);
+  assert.equal(await extract(bytes, { repositoryPath: "https://jmerrillfoundation.sharepoint.com/sites/publishing/_layouts/15/Doc.aspx?sourcedoc=%7Bfixture%7D&file=Governed%20Title.docx&action=default&mobileredirect=true" }), expected);
+});
+test("governed SharePoint document URLs resolve the file parameter, not the viewer extension", () => {
+  assert.equal(sourceExtension("https://jmerrillfoundation.sharepoint.com/sites/publishing/_layouts/15/Doc.aspx?file=Governed%20Title.docx&action=default"), ".docx");
+  assert.equal(sourceExtension("https://jmerrillfoundation.sharepoint.com/sites/publishing/manuscript.md?download=1"), ".md");
+  for (const path of ["https://other.invalid/Doc.aspx?file=title.docx", "https://jmerrillfoundation.sharepoint.com/sites/publishing/_layouts/15/Doc.aspx", "https://jmerrillfoundation.sharepoint.com/sites/publishing/_layouts/15/Doc.aspx?file=path%2Ftitle.docx"]) {
+    assert.throws(() => sourceExtension(path), /FORMAT_HANDOFF_REQUIRED/);
+  }
 });
 test("governed Markdown is preserved literally without executing or resolving content", async () => {
   const text = "# Title\n\n[reference](https://example.invalid)\n<script>fixture</script>\n```sh\nfixture\n```\n";
