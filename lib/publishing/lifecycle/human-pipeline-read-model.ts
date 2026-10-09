@@ -8,6 +8,7 @@ import {
   EDITORIAL_SYSTEM_STAGE_CONTRACTS,
   type EditorialStageContract,
 } from './editorial-system-contract'
+import stageDefinitions from './stage-definitions.json'
 
 export type HumanPipelineStageId =
   | '01_INQUIRY'
@@ -94,24 +95,9 @@ export type HumanPipelineView = {
   }
 }
 
-export const HUMAN_PUBLISHING_PIPELINE_STAGES: HumanPipelineStage[] = [
-  stage('01_INQUIRY', '01', 'Inquiry', 'Inquiry', 'Prospect signal has been received.'),
-  stage('02_INTAKE', '02', 'Intake', 'Intake', 'Submission facts and source evidence are being normalized.'),
-  stage('03_EDITORIAL_REVIEW', '03', 'Editorial Review', 'Review', 'Publisher review and pre-contract editorial recommendation work.'),
-  stage('04_AUTHOR_DECISION', '04', 'Author Decision', 'Decision', 'Author decides whether to continue from the recommendation/package offer.'),
-  stage('05_AGREEMENT_PAYMENT', '05', 'Agreement & Payment', 'Agreement', 'Agreement execution and required commercial activation.'),
-  stage('06_ONBOARDING', '06', 'Onboarding', 'Onboarding', 'Author access, workspace, and joined-family setup.'),
-  stage('07_DEVELOPMENTAL_EDITING', '07', 'Developmental Editing', 'Developmental', 'Developmental editing work and author review.'),
-  stage('08_LINE_EDITING', '08', 'Line Editing', 'Line', 'Line editing work and author review.'),
-  stage('09_COPYEDITING', '09', 'Copyediting', 'Copyediting', 'Copyediting work and author review.'),
-  stage('10_PROOFREADING', '10', 'Proofreading', 'Proofreading', 'Proof review and final text approval.'),
-  stage('11_INTERIOR_LAYOUT', '11', 'Interior Layout', 'Layout', 'Interior formatting, layout, and page-count work.'),
-  stage('12_COVER_DESIGN', '12', 'Cover Design', 'Cover', 'Cover concept, cover production, and wrap-readiness work.'),
-  stage('13_PRODUCTION', '13', 'Production', 'Production', 'Final book-production assembly and certification.'),
-  stage('14_DISTRIBUTION', '14', 'Distribution', 'Distribution', 'Distributor submission and channel-readiness work.'),
-  stage('15_PUBLICATION', '15', 'Publication', 'Publication', 'Launch release and publication activation.'),
-  stage('16_POST_PUBLICATION', '16', 'Post-Publication', 'Post-Pub', 'Published-title stewardship, catalog, royalties, and ongoing operations.'),
-]
+export const HUMAN_PUBLISHING_PIPELINE_STAGES: HumanPipelineStage[] = stageDefinitions.map((item) =>
+  stage(item.id as HumanPipelineStageId, item.id.slice(0, 2), item.label, item.shortLabel, item.description),
+)
 
 export function buildHumanPublishingPipelineView(
   cards: PublisherTitleOperatingCard[],

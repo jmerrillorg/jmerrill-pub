@@ -41,6 +41,8 @@ function agreement(snapshotOverride = {}) {
 }
 
 class MemoryLedger {
+  // This fixture isolates existing financial behavior; the guard suite exercises the real shared guard.
+  async withAgreementMutation(_agreementId, _operation, work) { return work() }
   constructor(record = agreement()) {
     this.record = structuredClone(record)
     this.events = new Map()

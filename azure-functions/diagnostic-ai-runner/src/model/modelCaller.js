@@ -91,6 +91,7 @@ async function callModel({
     output: result.output,
     tokenCounts: result.tokenCounts || { input: 0, output: 0, total: 0 },
     httpStatus: result.httpStatus,
+    failureCode: result.failureCode || null,
     request: result.request || null,
     rateLimit: result.rateLimit || null,
     error: result.error

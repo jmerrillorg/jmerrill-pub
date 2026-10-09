@@ -9,11 +9,12 @@ const {
   sendCadenceAuthorReviewPackage,
   validateDevelopmentalContentTruth
 } = require("../src/editorial/editorialCadenceAuthorPackageSender");
+const { JACKIE_CANONICAL_AUTHOR_CONTACT_ID } = require("../src/author/jackieTitleSystemCommissioningPolicy");
 
 const titleId = "fd577d2b-01a0-f111-b8dc-000d3a14673b";
 const stageId = "0f587d2b-01a0-f111-b8dc-000d3a14673b";
 const gateId = "0cf8a1d7-04a0-f111-b8dc-00224820105b";
-const contactId = "5bb796dc-cd95-f111-8076-7c1e525b15c2";
+const contactId = JACKIE_CANONICAL_AUTHOR_CONTACT_ID;
 const packageId = `pkg-${stageId}-developmental-editing-v2`;
 
 function artifact(role, overrides = {}) {
@@ -40,9 +41,10 @@ function artifact(role, overrides = {}) {
 function input(artifacts) {
   return {
     titleId,
-    titleName: "Indomitable",
-    authorName: "Quanisha Dockery",
-    title: { jm1pub_titleid: titleId },
+    titleName: "Synthetic title",
+    authorName: "Synthetic author",
+    title: { jm1pub_titleid: titleId, _jm1_primaryauthor_value: contactId, _jm1_author_value: contactId,
+      jm1_canonicalauthorcontactreference: `contact:${contactId}` },
     stage: {
       jm1pub_editorialstageid: stageId,
       _jm1pub_titleid_value: titleId,
@@ -100,8 +102,8 @@ test("exact September 12 Atta review-only state blocks the false completed-packa
   let relayCalls = 0;
   const attaInput = {
     ...input([artifact("reviewInstructions")]),
-    titleName: "Untitled",
-    authorName: "Atta Boateng",
+    titleName: "Synthetic title",
+    authorName: "Synthetic author",
     contact: { contactid: contactId, emailaddress1: "atta@example.com" }
   };
   await assert.rejects(
@@ -132,6 +134,22 @@ test("system renderer retains conversational copy while manuscript send is held"
   assert.doesNotMatch(`${payload.body}\n${payload.htmlBody}`, /Why you are receiving this|What has been completed|What's attached|What we need from you|How to respond|What happens next/i);
   assert.match(payload.body, /We've attached .*Edited Manuscript.* together with .*Editorial Review/i);
   assert.match(payload.body, /^Good day Quanisha,/);
+});
+
+test("non-Jackie and missing authorship fail closed before artifact work or relay", async () => {
+  let downloads = 0;
+  let sends = 0;
+  const result = await sendCadenceAuthorReviewPackage({
+    ...input([artifact("editedManuscript"), artifact("reviewInstructions")]),
+    title: { jm1pub_titleid: titleId },
+    contact: { contactid: "5bb796dc-cd95-f111-8076-7c1e525b15c2", emailaddress1: "author@example.com" }
+  }, {
+    downloadArtifact: async () => { downloads += 1; return Buffer.from("synthetic"); },
+    sendRelay: async () => { sends += 1; }
+  });
+  assert.deepEqual(result, { status: "BLOCKED", blockers: ["JACKIE_AUTHOR_ONLY_SYSTEM_COMMISSIONING_DENIED"] });
+  assert.equal(downloads, 0);
+  assert.equal(sends, 0);
 });
 
 test("uncommissioned producer blocks relay before reserving a communication", async () => {

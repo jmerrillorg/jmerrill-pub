@@ -1,0 +1,18 @@
+[
+  { "id": "01_INQUIRY", "shortLabel": "Inquiry", "label": "Inquiry", "description": "Prospect signal has been received." },
+  { "id": "02_INTAKE", "shortLabel": "Intake", "label": "Intake", "description": "Submission facts and source evidence are being normalized." },
+  { "id": "03_EDITORIAL_REVIEW", "shortLabel": "Review", "label": "Editorial Review", "description": "Publisher review and pre-contract editorial recommendation work." },
+  { "id": "04_AUTHOR_DECISION", "shortLabel": "Decision", "label": "Author Decision", "description": "Author decides whether to continue from the recommendation/package offer." },
+  { "id": "05_AGREEMENT_PAYMENT", "shortLabel": "Agreement", "label": "Agreement & Payment", "description": "Agreement execution and required commercial activation." },
+  { "id": "06_ONBOARDING", "shortLabel": "Onboarding", "label": "Onboarding", "description": "Author access, workspace, and joined-family setup." },
+  { "id": "07_DEVELOPMENTAL_EDITING", "shortLabel": "Developmental", "label": "Developmental Editing", "description": "Developmental editing work and author review." },
+  { "id": "08_LINE_EDITING", "shortLabel": "Line", "label": "Line Editing", "description": "Line editing work and author review." },
+  { "id": "09_COPYEDITING", "shortLabel": "Copyediting", "label": "Copyediting", "description": "Copyediting work and author review." },
+  { "id": "10_PROOFREADING", "shortLabel": "Proofreading", "label": "Proofreading", "description": "Proof review and final text approval." },
+  { "id": "11_INTERIOR_LAYOUT", "shortLabel": "Layout", "label": "Interior Layout", "description": "Interior formatting, layout, and page-count work." },
+  { "id": "12_COVER_DESIGN", "shortLabel": "Cover", "label": "Cover Design", "description": "Cover concept, cover production, and wrap-readiness work." },
+  { "id": "13_PRODUCTION", "shortLabel": "Production", "label": "Production", "description": "Final book-production assembly and certification." },
+  { "id": "14_DISTRIBUTION", "shortLabel": "Distribution", "label": "Distribution", "description": "Distributor submission and channel-readiness work." },
+  { "id": "15_PUBLICATION", "shortLabel": "Publication", "label": "Publication", "description": "Launch release and publication activation." },
+  { "id": "16_POST_PUBLICATION", "shortLabel": "Post-Pub", "label": "Post-Publication", "description": "Published-title stewardship, catalog, royalties, and ongoing operations." }
+]

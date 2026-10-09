@@ -2,6 +2,9 @@
 
 const { test, describe } = require("node:test");
 const assert = require("node:assert/strict");
+// Keep external telemetry initialization out of prompt-reader unit tests.
+const telemetryPath = require.resolve("../src/observability/dependencyTelemetry");
+require.cache[telemetryPath] = { exports: { trackDependency: async (_context, _descriptor, operation) => operation() } };
 
 const {
   CONTROLLED_EXECUTION_TYPE,

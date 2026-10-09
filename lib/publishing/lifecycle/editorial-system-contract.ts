@@ -79,6 +79,16 @@ export type ExactVersionApprovalEvidence = {
   directionApproved?: boolean
 }
 
+export type GovernedGateEvidence = {
+  status: 'PASS' | 'FAIL' | 'UNPROVEN'
+  sourceRecordId: string
+  titleId: string
+  authorId: string
+  verifiedAt: string
+  format?: 'PAPERBACK' | 'HARDCOVER' | 'EBOOK' | 'AUDIOBOOK'
+  identifier?: string
+}
+
 export type StageCompletionEvidence = {
   titleId: string
   authorId: string
@@ -93,6 +103,10 @@ export type StageCompletionEvidence = {
   }
   completionSignals?: string[]
   entitledFormats?: Array<'PAPERBACK' | 'HARDCOVER' | 'EBOOK' | 'AUDIOBOOK'>
+  rightsAuthority?: GovernedGateEvidence
+  retailMetadataAuthority?: GovernedGateEvidence
+  providerPublicationReadbacks?: GovernedGateEvidence[]
+  publicAvailabilityReadbacks?: GovernedGateEvidence[]
 }
 
 export type StageCompletionEvaluation = {
@@ -214,13 +228,44 @@ export function evaluateStageCompletion(
     if (!result.ok) blockers.push(result.blocker)
   }
 
-  if (contract.stageId === '13_PRODUCTION' || contract.stageId === '14_DISTRIBUTION') {
-    for (const format of evidence.entitledFormats || []) {
-      const artifacts = evidence.outputArtifacts.filter((artifact) => artifact.format === format)
-      if (!artifacts.length) blockers.push(`ENTITLED_FORMAT_ARTIFACT_MISSING:${format}`)
-      if (artifacts.some((artifact) => !artifact.identifier)) blockers.push(`FORMAT_IDENTIFIER_MISSING:${format}`)
-      if (artifacts.some((artifact) => artifact.distributionAuthority !== 'PASS')) blockers.push(`DISTRIBUTION_AUTHORITY_MISSING:${format}`)
+  if (['13_PRODUCTION', '14_DISTRIBUTION', '15_PUBLICATION'].includes(contract.stageId)) {
+    const formats = evidence.entitledFormats || []
+    if (!formats.length || new Set(formats).size !== formats.length) blockers.push('GOVERNED_FORMAT_ENTITLEMENT_MISSING_OR_DUPLICATE')
+    const requiredRoles = contract.stageId === '13_PRODUCTION'
+      ? ['FINAL_INTERIOR', 'FINAL_COVER', 'DISTRIBUTION_ARTIFACT'] as const
+      : contract.stageId === '14_DISTRIBUTION'
+        ? ['DISTRIBUTION_ARTIFACT', 'DISTRIBUTION_SUBMISSION_EVIDENCE'] as const
+        : ['PUBLIC_CATALOG_PROJECTION'] as const
+    for (const format of formats) {
+      const artifacts = evidence.outputArtifacts.filter((artifact) =>
+        artifact.format === format && artifact.titleId === evidence.titleId && artifact.authorId === evidence.authorId && artifact.current !== false,
+      )
+      for (const role of requiredRoles) {
+        if (!artifacts.some((artifact) => artifact.role === role)) blockers.push(`ENTITLED_FORMAT_ROLE_MISSING:${format}:${role}`)
+      }
+      const identifiers = new Set(artifacts.map((artifact) => artifact.identifier).filter(Boolean))
+      if (artifacts.some((artifact) => !artifact.identifier) || identifiers.size !== 1) blockers.push(`FORMAT_IDENTIFIER_MISSING_OR_CONFLICTING:${format}`)
+      if (contract.stageId !== '15_PUBLICATION' && artifacts.some((artifact) => artifact.distributionAuthority !== 'PASS')) {
+        blockers.push(`DISTRIBUTION_AUTHORITY_MISSING:${format}`)
+      }
+      if (contract.stageId === '15_PUBLICATION') {
+        const identifier = identifiers.size === 1 ? [...identifiers][0] : undefined
+        const submitted = evidence.sourceArtifacts.some((artifact) => artifact.role === 'DISTRIBUTION_SUBMISSION_EVIDENCE' &&
+          artifact.format === format && artifact.identifier === identifier && artifact.titleId === evidence.titleId &&
+          artifact.authorId === evidence.authorId && artifact.current !== false)
+        if (!identifier || !submitted) blockers.push(`PUBLICATION_SUBMISSION_BINDING_MISSING:${format}`)
+        if (!hasBoundReadback(evidence.providerPublicationReadbacks, evidence, format, identifier)) blockers.push(`PROVIDER_PUBLICATION_NOT_CONFIRMED:${format}`)
+        if (!hasBoundReadback(evidence.publicAvailabilityReadbacks, evidence, format, identifier)) blockers.push(`PUBLIC_AVAILABILITY_NOT_CONFIRMED:${format}`)
+      }
     }
+    if (evidence.outputArtifacts.some((artifact) => artifact.format && !formats.includes(artifact.format))) {
+      blockers.push('UNAUTHORIZED_OUTPUT_FORMAT')
+    }
+  }
+
+  if (contract.stageId === '13_PRODUCTION') {
+    if (!isBoundPassingGate(evidence.rightsAuthority, evidence)) blockers.push('RIGHTS_AUTHORITY_NOT_PROVEN')
+    if (!isBoundPassingGate(evidence.retailMetadataAuthority, evidence)) blockers.push('RETAIL_METADATA_AUTHORITY_NOT_PROVEN')
   }
 
   const uniqueBlockers = [...new Set(blockers)]
@@ -240,6 +285,27 @@ function matchingArtifacts(
   return artifacts.filter((artifact) =>
     artifact.role === role && artifact.titleId === evidence.titleId && artifact.authorId === evidence.authorId && artifact.current !== false,
   )
+}
+
+function isBoundPassingGate(
+  gate: GovernedGateEvidence | undefined,
+  evidence: Pick<StageCompletionEvidence, 'titleId' | 'authorId'>,
+) {
+  return Boolean(
+    gate?.status === 'PASS' && gate.sourceRecordId && gate.titleId === evidence.titleId &&
+    gate.authorId === evidence.authorId && gate.verifiedAt && Number.isFinite(Date.parse(gate.verifiedAt)),
+  )
+}
+
+function hasBoundReadback(
+  readbacks: GovernedGateEvidence[] | undefined,
+  evidence: Pick<StageCompletionEvidence, 'titleId' | 'authorId'>,
+  format: NonNullable<GovernedGateEvidence['format']>,
+  identifier: string | undefined,
+) {
+  return Boolean(identifier && readbacks?.some((readback) =>
+    isBoundPassingGate(readback, evidence) && readback.format === format && readback.identifier === identifier,
+  ))
 }
 
 function isGovernedSharePointArtifact(artifact: GovernedArtifactEvidence) {

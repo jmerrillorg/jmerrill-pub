@@ -123,10 +123,19 @@ test("mailbox cancellation check requires exact system copy and holds on any lat
   const unrelated = { ...reply, id: "onboarding-1", conversationId: "onboarding-thread",
     subject: "Whole onboarding" };
   assert.deepEqual(evaluateMailboxResponseSearch({ ...readback, jsonBody: { ...readback.jsonBody,
-    queries: [{ rows: [copy, unrelated] }] } }, { send: base.sendEvents[0], titleName: "Whole" }).candidateMessageIds, []);
+    queries: [{ rows: [copy, unrelated] }] } }, { send: base.sendEvents[0], titleName: "Whole" }).candidateMessageIds, ["onboarding-1"]);
   assert.deepEqual(evaluateMailboxResponseSearch({ ...readback, jsonBody: { ...readback.jsonBody,
     queries: [{ rows: [copy, { ...unrelated, id: "new-subject", subject: "Whole manuscript reply" }] }] } },
   { send: base.sendEvents[0], titleName: "Whole" }).candidateMessageIds, ["new-subject"]);
+  assert.deepEqual(evaluateMailboxResponseSearch({ ...readback, jsonBody: { ...readback.jsonBody,
+    queries: [{ rows: [copy, { ...reply, id: "renamed-title-reply", conversationId: "new-thread",
+      subject: "Re: Untitled", authorReply: "Please see my response." }] }] } },
+  { send: base.sendEvents[0], titleName: "They Think Themselves to Be Something (4TBS)" }).candidateMessageIds,
+  ["renamed-title-reply"]);
+  assert.deepEqual(evaluateMailboxResponseSearch(readback, { send: { ...base.sendEvents[0],
+    jm1_actiondescription: `${base.sendEvents[0].jm1_actiondescription}; title=Untitled;` },
+    currentTitleName: "They Think Themselves to Be Something (4TBS)" }).titleNameHistory,
+  ["Untitled", "They Think Themselves to Be Something (4TBS)"]);
   assert.equal(evaluateMailboxResponseSearch({ ...readback, jsonBody: { ...readback.jsonBody,
     responseSearch: { complete: false } } }, { send: base.sendEvents[0] }).complete, false);
   assert.equal(evaluateMailboxResponseSearch({ ...readback, jsonBody: { ...readback.jsonBody,

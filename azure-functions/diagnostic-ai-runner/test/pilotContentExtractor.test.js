@@ -1,8 +1,14 @@
 "use strict";
 
-const { describe, it } = require("node:test");
+const { describe, it, beforeEach } = require("node:test");
 const assert = require("node:assert/strict");
+// Telemetry lifecycle has its own tests; extraction units must not start an SDK.
+const telemetryPath = require.resolve("../src/observability/dependencyTelemetry");
+require.cache[telemetryPath] = { exports: { trackDependency: async (_context, _descriptor, operation) => operation() } };
 const { detectExtension, fetchAndExtractManuscript, isSharePointUrl, encodeShareUrl } = require("../src/extraction/pilotContentExtractor");
+beforeEach(context => {
+  context.mock.method(global, "fetch", async () => { throw new Error("SYNTHETIC_NETWORK_FAILURE"); });
+});
 
 // ---------------------------------------------------------------------------
 // detectExtension

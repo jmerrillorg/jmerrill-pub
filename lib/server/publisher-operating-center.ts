@@ -13,11 +13,13 @@ import {
   stringValue,
   type DataverseServerConfig,
 } from './dataverse-server'
+import { isJackieAuthorContact } from './jackie-title-system-commissioning-policy'
+import { readReceiptNotes } from '../publishing/intake/receipt'
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { randomUUID } from 'node:crypto'
 import { selectTitleBoundEditorialStage } from './author-editorial-stage-readback'
-import { hasDeliveredPendingReview, isBoundEditorialTransition, sameProjectionTitle, selectCurrentEditorialStage } from '../publishing/lifecycle/editorial-projection-evidence'
+import { boundPublisherReview, hasDeliveredPendingReview, isBoundEditorialTransition, sameProjectionTitle, selectCurrentEditorialStage } from '../publishing/lifecycle/editorial-projection-evidence'
 import {
   classifyTitlePortfolio,
   isActivePipeline,
@@ -947,6 +949,10 @@ export async function buildPublisherOperatingCenterSnapshot(): Promise<Publisher
     getRecentProductionTasks(config),
   ])
 
+  // Review holds must not age out of the unrelated global recent-log window.
+  const reviewLogs = [...new Map([...logs, ...await getPendingPublisherReviewLogs(config, approvalGates)]
+    .map(log => [stringValue(log.jm1_executionlogid), log])).values()]
+
   const queue = intakes
     .map((intake) => buildQueueItem(intake, titles, assets, editorialStages, opportunities, diagnostics, logs))
     .filter((item) => item.intakeReference)
@@ -961,9 +967,9 @@ export async function buildPublisherOperatingCenterSnapshot(): Promise<Publisher
   const portfolio = buildPortfolioItems(titles, assets, editorialStages, approvalGates, productionProjects)
   const deliveryLogs = await getDeliveredReviewLogs(config, approvalGates)
   const deliveredReviewArtifacts = await getDeliveredReviewArtifacts(config, approvalGates, deliveryLogs)
-  const workload = buildWorkloadItems(titles, assets, editorialStages, intakes, [...logs, ...deliveryLogs], portfolio, approvalGates, deliveredReviewArtifacts)
+  const workload = buildWorkloadItems(titles, assets, editorialStages, intakes, [...reviewLogs, ...deliveryLogs], portfolio, approvalGates, deliveredReviewArtifacts)
   const productionCommand = buildProductionCommand(workload, portfolio, productionProjects, productionTasks)
-  const authorResponses = buildAuthorResponseQueue(approvalGates, titles, logs)
+  const authorResponses = buildAuthorResponseQueue(approvalGates, titles, reviewLogs)
   const metrics = buildMetrics(queue, logs, workload, portfolio)
   const today = buildPublisherToday({
     generatedAt: new Date().toISOString(),
@@ -1235,6 +1241,14 @@ export async function autoInitializeOutsideInquiryEditorialReview(input: {
     return {
       status: 'blocked' as const,
       blocker: 'intake_missing_contact',
+      intakeId: input.intakeId,
+    }
+  }
+
+  if (!isJackieAuthorContact(dataverseLookupId(intake, '_jm1_linkedcontact_value'))) {
+    return {
+      status: 'blocked' as const,
+      blocker: 'JACKIE_AUTHOR_ONLY_SYSTEM_COMMISSIONING_DENIED',
       intakeId: input.intakeId,
     }
   }
@@ -1593,12 +1607,19 @@ async function getRecentEditorialStages(config: DataverseServerConfig) {
 }
 
 async function getRecentApprovalGates(config: DataverseServerConfig) {
-  return dataverseList(config, 'jm1pub_editorialapprovalgates', {
-    $select:
-      'jm1pub_editorialapprovalgateid,jm1pub_editorialapprovalgatename,jm1pub_gatecode,jm1pub_gatestatus,jm1pub_authordecision,jm1pub_authorresponsesummary,jm1pub_authordecisionon,jm1pub_authordecisionsource,jm1pub_nextstageauthorized,_jm1pub_titleid_value,_jm1pub_editorialstageid_value,_jm1pub_deliverableartifactid_value,createdon,modifiedon',
+  const fields = 'jm1pub_editorialapprovalgateid,jm1pub_editorialapprovalgatename,jm1pub_gatecode,jm1pub_gatestatus,jm1pub_authordecision,jm1pub_authorresponsesummary,jm1pub_authordecisionon,jm1pub_authordecisionsource,jm1pub_nextstageauthorized,jm1pub_awaitingsince,_jm1pub_titleid_value,_jm1pub_editorialstageid_value,_jm1pub_deliverableartifactid_value,createdon,modifiedon'
+  const recent = await dataverseList(config, 'jm1pub_editorialapprovalgates', {
+    $select: fields,
     $orderby: 'modifiedon desc',
     $top: '100',
   })
+  const pending = await dataverseList(config, 'jm1pub_editorialapprovalgates', {
+    $select: fields,
+    $filter: 'statecode eq 0 and jm1pub_gatestatus eq 196650002 and jm1pub_authordecision eq null',
+    $orderby: 'modifiedon desc', $top: '5000',
+  })
+  if (pending.length >= 5000) throw new Error('PENDING_REVIEW_GATE_SCOPE_LIMIT')
+  return [...new Map([...recent, ...pending].map(gate => [stringValue(gate.jm1pub_editorialapprovalgateid), gate])).values()]
 }
 
 async function getRecentOpportunities(config: DataverseServerConfig) {
@@ -1625,6 +1646,22 @@ async function getRecentExecutionLogs(config: DataverseServerConfig) {
     $orderby: 'createdon desc',
     $top: '100',
   })
+}
+
+async function getPendingPublisherReviewLogs(config: DataverseServerConfig, gates: DataverseRow[]) {
+  const result: DataverseRow[] = []
+  const ids = gates.filter(gate => Number(gate.jm1pub_gatestatus) === 196650002 && gate.jm1pub_authordecision == null)
+    .map(gate => stringValue(gate.jm1pub_editorialapprovalgateid)).filter(id => sameProjectionTitle(id, id))
+  for (let start = 0; start < ids.length; start += 20) {
+    const rows = await dataverseList(config, 'jm1_executionlogs', {
+      $select: 'jm1_executionlogid,jm1_actiontype,jm1_actiondescription,jm1_sourceentity,jm1_sourcerecordid,createdon',
+      $filter: `jm1_sourceentity eq 'jm1pub_editorialapprovalgate' and (jm1_actiontype eq 'AUTHOR_RESPONSE_CAPTURED' or jm1_actiontype eq 'AUTHOR_RESPONSE_REQUIRES_PUBLISHER_REVIEW') and (${ids.slice(start, start + 20).map(id => `jm1_sourcerecordid eq '${id}'`).join(' or ')})`,
+      $orderby: 'createdon desc', $top: '5000',
+    })
+    if (rows.length >= 5000) throw new Error('PUBLISHER_REVIEW_EVIDENCE_SCOPE_LIMIT')
+    result.push(...rows)
+  }
+  return result
 }
 
 async function getDeliveredReviewLogs(config: DataverseServerConfig, gates: DataverseRow[]) {
@@ -1769,6 +1806,8 @@ function buildQueueItem(
   const sourceLocation = stringValue(intake.jm1_manuscripturl || intake.jm1_submissionurl)
   const hasManuscript = intake.jm1_manuscriptreceived === true || Boolean(sourceLocation)
   const intakeNotes = stringValue(intake.jm1_additionalnotes)
+  const manualReceipt = intakeNotes.startsWith('Receipt fingerprint:')
+  const receiptAccepted = readReceiptNotes(intakeNotes).accepted
   const acknowledgmentState = acknowledgmentStateForIntake(intake)
   const notificationState = notificationStateForIntake(intake, logs)
   const systemAttentionFlag = acknowledgmentState === 'AUTHOR_ACK_FAILED' ||
@@ -1791,7 +1830,9 @@ function buildQueueItem(
         latestAction: latestActionType,
       })
     : undefined
-  const currentBlocker = deriveIntakeSpecificBlocker(
+  const currentBlocker = manualReceipt
+    ? receiptAccepted ? 'Manual Publishing review required' : 'Intake receipt recovery required'
+    : deriveIntakeSpecificBlocker(
     intakeNotes,
     hasManuscript,
     deriveQueueBlocker(
@@ -1809,10 +1850,12 @@ function buildQueueItem(
   )
   const authorizedActions = buildAuthorizedActions(currentBlocker, hasContact)
   const recommendedNextAction =
-    editorialWorkloadState && currentBlocker !== 'Ready for next editorial scheduling decision'
+    manualReceipt
+      ? 'Jackie Smith, Jr.: review the existing Publishing inquiry and custody evidence manually; do not initiate title processing.'
+      : editorialWorkloadState && currentBlocker !== 'Ready for next editorial scheduling decision'
       ? deriveNextAction(editorialWorkloadState, titleName)
       : authorizedActions.find((action) => action.id !== 'view_only')?.label || currentBlocker
-  const actionOwner = currentBlocker.includes('release decision ready')
+  const actionOwner = manualReceipt ? 'publisher' : currentBlocker.includes('release decision ready')
     ? 'publisher'
     : currentBlocker.includes('response pending')
       ? 'author'
@@ -1830,6 +1873,7 @@ function buildQueueItem(
             ? 'publisher'
             : 'system'
   const execution = deriveQueueExecutionModel({
+    manualReview: manualReceipt,
     actionOwner,
     currentBlocker,
     hasAuthorizedAction: authorizedActions.some((action) => action.id !== 'view_only'),
@@ -1873,11 +1917,11 @@ function buildQueueItem(
     sourceLocation,
     submissionDate: stringValue(intake.createdon),
     manuscriptState: hasManuscript ? 'MANUSCRIPT_RECEIVED' : 'MANUSCRIPT_PENDING',
-    waitingOn: hasManuscript ? 'JMP' : 'Prospect',
+    waitingOn: manualReceipt ? 'JMP' : hasManuscript ? 'JMP' : 'Prospect',
     acknowledgmentState,
     acknowledgmentError: stringValue(intake.jm1_acknowledgmenterror),
     notificationState,
-    systemAttentionFlag,
+    systemAttentionFlag: systemAttentionFlag || (manualReceipt && !receiptAccepted),
     currentBlocker,
     recommendedNextAction,
     actionOwner,
@@ -1998,6 +2042,10 @@ function buildWorkloadItems(
       const intake = intakes.find((row) => normalizeTitle(stringValue(row.jm1_projecttitle || row.jm1_name)) === normalizeTitle(titleName))
       const latestLog = findLatestLogForWorkload(logs, titleId, assetId, stages)
       const pendingDeliveredReview = Boolean(latestStage && hasDeliveredPendingReview(latestStage, approvalGates, logs))
+      const publisherReview = latestStage && approvalGates
+        .filter(gate => sameProjectionTitle(gate._jm1pub_titleid_value, titleId) &&
+          sameProjectionTitle(gate._jm1pub_editorialstageid_value, latestStage.jm1pub_editorialstageid))
+        .map(gate => boundPublisherReview(gate, logs)).find(Boolean)
       const workloadState = deriveWorkloadState({
         pipelineStage,
         stageType,
@@ -2037,23 +2085,23 @@ function buildWorkloadItems(
         editorialSubstage: workloadState.includes('Author Review') ? 'Author Review' : stageStatus || 'Not Started',
         workloadState,
         activeCapability: capability,
-        currentOwner: owner,
-        executionMode: execution.executionMode,
-        executionState: execution.executionState,
+        currentOwner: publisherReview ? 'Publisher' : owner,
+        executionMode: publisherReview ? 'PUBLISHER_MANUAL' : execution.executionMode,
+        executionState: publisherReview ? 'WAITING_FOR_HUMAN' : execution.executionState,
         businessOwner: execution.businessOwner,
-        executionOwner: execution.executionOwner,
+        executionOwner: publisherReview ? 'Publisher' : execution.executionOwner,
         runtime: execution.runtime,
         runtimeCostCategory: execution.runtimeCostCategory,
-        awaiting: execution.awaiting,
+        awaiting: publisherReview ? 'Publisher' : execution.awaiting,
         lastTrigger: execution.lastTrigger,
         lastExecution: execution.lastExecution,
         expectedDuration: execution.expectedDuration,
-        exactBlocker: execution.exactBlocker,
-        nextAction: deriveNextAction(workloadState, titleName),
+        exactBlocker: publisherReview ? 'Captured author response requires publisher review; approval remains pending.' : execution.exactBlocker,
+        nextAction: publisherReview ? 'Review the captured response in the Author Response queue.' : deriveNextAction(workloadState, titleName),
         targetDate: deriveTargetDate(workloadState),
         ageDays: age,
-        authorAction: deriveAuthorAction(workloadState, guard.status),
-        publisherAction: derivePublisherAction(workloadState),
+        authorAction: publisherReview ? 'No repeat response requested.' : deriveAuthorAction(workloadState, guard.status),
+        publisherAction: publisherReview ? 'Review the captured editorial requests.' : derivePublisherAction(workloadState),
         internalQaState: deriveInternalQaState(workloadState),
         packageReadiness: derivePackageReadiness(workloadState, guard.status),
         holdReason: guard.status === 'blocked' ? guard.message : '',
@@ -2492,6 +2540,7 @@ function deriveOwner(
 }
 
 function deriveQueueExecutionModel(input: {
+  manualReview?: boolean
   actionOwner: PublisherQueueItem['actionOwner']
   currentBlocker: string
   hasAuthorizedAction: boolean
@@ -2510,6 +2559,16 @@ function deriveQueueExecutionModel(input: {
   | 'expectedDuration'
   | 'exactBlocker'
 > {
+  if (input.manualReview) {
+    return {
+      executionMode: 'PUBLISHER_MANUAL', executionState: 'WAITING_FOR_HUMAN',
+      businessOwner: 'Publisher', executionOwner: 'Publisher',
+      runtime: 'Governed Publishing manual inquiry review', runtimeCostCategory: 'No variable model cost',
+      awaiting: 'Publisher', lastTrigger: 'Durable inquiry receipt',
+      lastExecution: input.latestExecutionEvidence || 'No title processing authorized',
+      expectedDuration: 'Publisher dependent', exactBlocker: input.currentBlocker,
+    }
+  }
   if (input.actionOwner === 'author') {
     return {
       executionMode: 'EXTERNAL_PARTY',
@@ -4623,7 +4682,7 @@ function royaltyDecisionTodayItem(royalties: PublisherRoyaltyReviewQueue): Publi
   }
 }
 
-function buildAuthorResponseQueue(
+export function buildAuthorResponseQueue(
   gates: DataverseRow[],
   titles: DataverseRow[],
   logs: DataverseRow[],
@@ -4641,7 +4700,7 @@ function buildAuthorResponseQueue(
   return gates
     .filter((gate) => {
       const summary = stringValue(gate.jm1pub_authorresponsesummary)
-      return Boolean(gate.jm1pub_authordecisionon || summary.match(/\b(author replied|outlook message|message id|approved|response received)\b/i))
+      return Boolean(boundPublisherReview(gate, logs) || gate.jm1pub_authordecisionon || summary.match(/\b(author replied|outlook message|message id|approved|response received)\b/i))
     })
     .map((gate) => {
       const gateId = stringValue(gate.jm1pub_editorialapprovalgateid)
@@ -4650,12 +4709,13 @@ function buildAuthorResponseQueue(
       const packageId = dataverseLookupId(gate, '_jm1pub_deliverableartifactid_value')
       const title = titles.find((candidate) => stringValue(candidate.jm1pub_titleid) === titleId)
       const summary = stringValue(gate.jm1pub_authorresponsesummary)
+      const publisherReview = boundPublisherReview(gate, logs)
       const gateStatus = dataverseFormatted(gate, 'jm1pub_gatestatus') || stringValue(gate.jm1pub_gatestatus)
       const authorDecision = dataverseFormatted(gate, 'jm1pub_authordecision') || stringValue(gate.jm1pub_authordecision)
-      const decisionOn = stringValue(gate.jm1pub_authordecisionon || gate.modifiedon || gate.createdon)
+      const decisionOn = stringValue(publisherReview?.createdon || gate.jm1pub_authordecisionon || gate.modifiedon || gate.createdon)
       const modifiedOn = stringValue(gate.modifiedon || decisionOn)
       const ageMinutes = ageMinutesSince(decisionOn || modifiedOn)
-      const classifiedDecision = classifyAuthorDecision(authorDecision, summary)
+      const classifiedDecision = publisherReview ? 'AMBIGUOUS — HUMAN REVIEW' : classifyAuthorDecision(authorDecision, summary)
       const transitionEvidence = logs.find((log) => isBoundEditorialTransition(log, { titleId, stageId, gateId, decisionOn }))
       const processingStatus = deriveAuthorResponseProcessingStatus(gateStatus, classifiedDecision, transitionEvidence)
       const failedStep = deriveAuthorResponseFailedStep(gateStatus, transitionEvidence, processingStatus)
@@ -4686,7 +4746,7 @@ function buildAuthorResponseQueue(
             : processingStatus === 'AMBIGUOUS — REVIEW'
               ? 'Confirm the response classification before movement.'
               : 'Automatic consumer will retry; use Admin Retry Event only with the original event and reason.',
-        threadEvidence: stringValue(gate.jm1pub_authordecisionsource) || extractThreadEvidence(summary),
+        threadEvidence: publisherReview ? `Governed response review: ${stringValue(publisherReview.jm1_executionlogid)}` : stringValue(gate.jm1pub_authordecisionsource) || extractThreadEvidence(summary),
         gateId,
         stageId,
         packageId,

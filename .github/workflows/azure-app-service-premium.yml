@@ -59,12 +59,13 @@ jobs:
           npm run jmp-lifecycle-wave-c-evidence-completion-guard
           npm run jmp-lifecycle-wave-c1-artifact-commercial-evidence-guard
           npm run jm1-initiative-handoff-guard
-          node --test scripts/jmp_intake_redesign_guard.test.mjs
+          node --test scripts/jmp_intake_redesign_guard.test.mjs scripts/publishing_intake_receipt.test.mjs scripts/publishing_intake_recovery.test.mjs scripts/publishing_intake_authority_health.test.mjs scripts/intake_deadletter_resilience.test.mjs
           node --test scripts/form_notification_recipient_boundary.test.mjs scripts/author_editorial_stage_readback.test.mjs scripts/publishing_transport_boundary.test.mjs
           node --test scripts/author_onboarding_authority.test.mjs scripts/author_onboarding_answer_preservation.test.mjs scripts/whole_onboarding_continuity.test.mjs scripts/author_email_otp_login.test.mjs
           node scripts/check-catalog-runtime-source.mjs
           node scripts/infra006_health_contract.test.mjs
-          node --test scripts/jmp_payments_extra_001.test.mjs scripts/jmp_payments_extra_002.test.mjs scripts/jmp_payments_extra_003.test.mjs scripts/jmp_payments_extra_003a.test.mjs scripts/jmp_payment_model_correction_001.test.mjs scripts/jmp_observed_payment_service.test.mjs
+          node --test scripts/atta_approved_tail_owner.test.mjs
+          node --test scripts/publishing_payment_exclusive_guard.test.mjs scripts/jmp_payments_extra_001.test.mjs scripts/jmp_payments_extra_002.test.mjs scripts/jmp_payments_extra_003.test.mjs scripts/jmp_payments_extra_003a.test.mjs scripts/jmp_payment_model_correction_001.test.mjs scripts/jmp_observed_payment_service.test.mjs
 
       - name: Build
         env:

@@ -1,6 +1,7 @@
 "use strict";
 
 const { materializeNextStageFromApprovalEvent } = require("../editorial/editorialNextStageMaterialization");
+const { isJackieAuthoredTitle } = require("../author/jackieTitleSystemCommissioningPolicy");
 
 const EXECUTION_STATUS = {
   SUCCESS: 835500001,
@@ -191,7 +192,7 @@ async function getStage(client, stageId) {
 
 async function getTitle(client, titleId) {
   const title = await client.first("jm1pub_titles", {
-    $select: "jm1pub_titleid,jm1pub_name,jm1pub_titlename,jm1pub_authorname",
+    $select: "jm1pub_titleid,jm1pub_name,jm1pub_titlename,jm1pub_authorname,_jm1_primaryauthor_value,_jm1_author_value,jm1_canonicalauthorcontactreference",
     $filter: `jm1pub_titleid eq ${titleId}`
   });
   if (!title) throw Object.assign(new Error("approval_event_title_not_found"), { safeCode: "APPROVAL_TITLE_NOT_FOUND" });
@@ -405,6 +406,8 @@ async function consumeProofreadingApprovalEvent(client, event) {
 }
 
 async function consumeApprovalEvent(client, event) {
+  const title = await getTitle(client, event.titleId);
+  if (!isJackieAuthoredTitle(title)) return transitionBlocked(client, event, "JACKIE_AUTHOR_ONLY_SYSTEM_COMMISSIONING_DENIED");
   if (event.currentStageCode === "PROOFREADING" || event.eventType === "PROOFREADING_APPROVED") {
     return consumeProofreadingApprovalEvent(client, event);
   }

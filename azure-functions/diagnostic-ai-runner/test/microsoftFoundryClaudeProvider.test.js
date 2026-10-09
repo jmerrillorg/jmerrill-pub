@@ -80,6 +80,85 @@ afterEach(() => {
 });
 
 describe("microsoftFoundryClaudeProvider", () => {
+  test("assessment cannot substitute text JSON for the forced strict tool", async () => {
+    const { loaded, restore } = loadProviderWithStubs({ fetchImpl: async (_url, options) => {
+      assert.equal(JSON.parse(options.body).tools[0].strict, true);
+      return { ok: true, status: 200, headers: new Headers(), json: async () => ({
+        content: [{ type: "text", text: '{"assessment":"not a tool"}' }], usage: { input_tokens: 1, output_tokens: 2 }
+      }) };
+    } });
+    try {
+      await withEnv({ AZURE_FOUNDRY_ENDPOINT: "https://ais-jm1-foundry.services.ai.azure.com/" }, async () => {
+        const result = await loaded.call({ promptBody: "bounded assessment", diagnosticId: "fixture",
+          route: { deploymentName: "jm1-editorial-devline-primary", promptVersion: "JMP-EDITORIAL-REVIEW-ASSESSMENT-V1" } });
+        assert.equal(result.ok, false); assert.equal(result.output, null);
+        assert.equal(result.failureCode, "MODEL_STRICT_TOOL_OUTPUT_MISSING");
+      });
+    } finally { restore(); }
+  });
+  test("assessment truncation fails closed rather than accepting partial tool input", async () => {
+    const { loaded, restore } = loadProviderWithStubs({ fetchImpl: async () => ({ ok: true, status: 200,
+      headers: new Headers(), json: async () => ({ stop_reason: "max_tokens", usage: { input_tokens: 10, output_tokens: 8192 },
+        content: [{ type: "tool_use", name: "submit_jm1_structured_output", input: { partial: true } }] }) }) });
+    try {
+      await withEnv({ AZURE_FOUNDRY_ENDPOINT: "https://ais-jm1-foundry.services.ai.azure.com/" }, async () => {
+        const result = await loaded.call({ promptBody: "bounded assessment", diagnosticId: "fixture",
+          route: { deploymentName: "jm1-editorial-devline-primary", promptVersion: "JMP-EDITORIAL-REVIEW-ASSESSMENT-V1" } });
+        assert.equal(result.ok, false); assert.equal(result.output, null);
+        assert.equal(result.failureCode, "MODEL_OUTPUT_TRUNCATED");
+        assert.equal(result.request.maxOutputTokens, 8192);
+      });
+    } finally { restore(); }
+  });
+  test("assessment binds all nine exact sections despite editing markers in manuscript data", () => {
+    const { loaded, restore } = loadProviderWithStubs();
+    try {
+      const { SECTIONS, CATEGORIES } = require("../src/editorial/commissioningEditorialReviewContract");
+      const schema = loaded.selectStructuredOutputTool("cc010_line_editing_full_manuscript_chunk_execution", {
+        promptVersion: "JMP-EDITORIAL-REVIEW-ASSESSMENT-V1"
+      }).input_schema;
+      assert.deepEqual(schema.required, SECTIONS);
+      assert.equal(schema.additionalProperties, false);
+      assert.deepEqual(schema.properties.categoryScores.required, CATEGORIES);
+      assert.deepEqual(schema.properties.categoryScores.properties.STRUCTURE_FLOW.enum, [1, 2, 3, 4, 5]);
+      assert.equal(loaded.selectStructuredOutputTool("", { promptVersion: "JMP-EDITORIAL-REVIEW-ASSESSMENT-V1" }).strict, true);
+      assert.equal(loaded.selectStructuredOutputTool("plain", {}).strict, undefined);
+      assert.equal(schema.properties.intakeSummary.properties.wordCount.type, "integer");
+      assert.equal(schema.properties.integrityFlags.items.properties.hardStop.type, "boolean");
+      assert.equal(schema.properties.recommendation.additionalProperties, false);
+      assert.equal(Object.hasOwn(schema.properties, "editedManuscript"), false);
+      assert.equal(loaded.selectStructuredOutputTool("plain", {}).input_schema.additionalProperties, true);
+    } finally { restore(); }
+  });
+  test("assessment alone uses one bounded longer request without provider replay", () => {
+    const { loaded, restore } = loadProviderWithStubs();
+    try {
+      withEnv({ AZURE_FOUNDRY_TIMEOUT_MS: "5000", AZURE_FOUNDRY_MAX_RETRIES: "1" }, () => {
+        const review = loaded.selectRuntimeOptions({ promptVersion: "JMP-EDITORIAL-REVIEW-ASSESSMENT-V1" });
+        assert.equal(review.timeoutMs, 240000); assert.equal(review.maxRetries, 0);
+        const other = loaded.selectRuntimeOptions({ promptVersion: "OTHER" });
+        assert.equal(other.timeoutMs, 5000); assert.equal(other.maxRetries, 1);
+      });
+    } finally { restore(); }
+  });
+  test("assessment timeout makes one request and exposes only a safe failure code", async () => {
+    let calls = 0;
+    const { loaded, restore } = loadProviderWithStubs({ fetchImpl: async () => {
+      calls++; throw "REQUEST_TIMEOUT";
+    } });
+    const previous = process.env.AZURE_FOUNDRY_ENDPOINT;
+    process.env.AZURE_FOUNDRY_ENDPOINT = "https://ais-jm1-foundry.services.ai.azure.com";
+    try {
+      const result = await loaded.call({ promptBody: "assessment fixture", diagnosticId: "fixture",
+        route: { deploymentName: "jm1-editorial-devline-primary", promptVersion: "JMP-EDITORIAL-REVIEW-ASSESSMENT-V1" } });
+      assert.equal(calls, 1); assert.equal(result.ok, false);
+      assert.equal(result.failureCode, "MODEL_REQUEST_TIMEOUT");
+    } finally {
+      if (previous === undefined) delete process.env.AZURE_FOUNDRY_ENDPOINT;
+      else process.env.AZURE_FOUNDRY_ENDPOINT = previous;
+      restore();
+    }
+  });
   test("fails closed when endpoint or route deployment is missing", async () => {
     const { loaded, restore } = loadProviderWithStubs();
     try {

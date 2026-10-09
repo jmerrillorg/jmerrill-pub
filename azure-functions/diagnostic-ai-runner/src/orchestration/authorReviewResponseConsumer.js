@@ -7,6 +7,7 @@
  */
 
 const { readPublishingMailboxReply, PUBLISHING_MAILBOX } = require("../mail/publishingMailboxReader");
+const { isJackieAuthoredTitle } = require("../author/jackieTitleSystemCommissioningPolicy");
 const { classifyPackageReply } = require("../mail/publishingPackageReplyClassifier");
 const {
   buildPackageAcceptedEvent,
@@ -189,7 +190,11 @@ function createDataverseClient(config, deps = {}) {
   async function patch(entitySet, id, payload) {
     await request(`${entitySet}(${id})`, { method: "PATCH", body: JSON.stringify(payload), prefer: "return=minimal" });
   }
-  return { list, first, create, patch };
+  async function patchIfMatch(entitySet, id, payload, etag) {
+    if (!etag) throw Object.assign(new Error("AUTHOR_GATE_ETAG_REQUIRED"), { safeCode: "AUTHOR_GATE_ETAG_REQUIRED" });
+    await request(`${entitySet}(${id})`, { method: "PATCH", body: JSON.stringify(payload), prefer: "return=minimal", headers: { "If-Match": etag } });
+  }
+  return { list, first, create, patch, patchIfMatch };
 }
 
 function classifyAuthorReviewResponse(text) {
@@ -345,7 +350,6 @@ function validateAuthorIdentity(gate, reply) {
 }
 
 async function resolveGateAuthorIdentity(client, gate) {
-  if (extractEmailCandidates(gate).length) return { ok: true, gate };
   const titleId = normalizeString(gate._jm1pub_titleid_value);
   const stageId = normalizeString(gate._jm1pub_editorialstageid_value);
   const guid = /^[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}$/i;
@@ -354,7 +358,7 @@ async function resolveGateAuthorIdentity(client, gate) {
   }
   const [title, stage] = await Promise.all([
     client.first("jm1pub_titles", {
-      $select: "jm1pub_titleid,_jm1_author_value,jm1_canonicalauthorcontactreference",
+      $select: "jm1pub_titleid,_jm1_primaryauthor_value,_jm1_author_value,jm1_canonicalauthorcontactreference",
       $filter: `jm1pub_titleid eq ${titleId}`
     }),
     client.first("jm1pub_editorialstages", {
@@ -369,9 +373,10 @@ async function resolveGateAuthorIdentity(client, gate) {
   const stageContactId = normalizeString(stage?._jm1pub_contactid_value).toLowerCase();
   if (normalizeString(title?.jm1pub_titleid).toLowerCase() !== titleId.toLowerCase() ||
       normalizeString(stage?._jm1pub_titleid_value).toLowerCase() !== titleId.toLowerCase() ||
+      !isJackieAuthoredTitle(title) ||
       (titleLookupId && titleReferenceId && titleLookupId !== titleReferenceId) ||
       !titleContactId || titleContactId !== stageContactId) {
-    return { ok: false, reason: "GATE_AUTHOR_TITLE_STAGE_BINDING_MISMATCH" };
+    return { ok: false, reason: "JACKIE_AUTHOR_ONLY_SYSTEM_COMMISSIONING_DENIED" };
   }
   const contact = await client.first("contacts", {
     $select: "contactid,emailaddress1",
@@ -1245,7 +1250,7 @@ async function processGateReply(client, gate, deps, triggerSource) {
   const idempotencyKey = stableIdempotencyKey(gateId, inboundMessageId);
   const existing = await findAnyExecutionLog(
     client,
-    [
+    deps.durableWaitResume ? ["AUTHOR_INBOUND_MESSAGE_COMPLETED"] : [
       "AUTHOR_INBOUND_MESSAGE_COMPLETED",
       "AUTHOR_RESPONSE_CAPTURED",
       "AUTHOR_APPROVAL_PERSISTED",
@@ -1433,7 +1438,11 @@ async function runAuthorReviewResponseConsumer(input = {}, deps = {}) {
   const packageDiagnostics = (await (deps.findPackageSelectionDiagnostics || findOpenPackageSelectionDiagnostics)(client, input.maxPackageSelections || 10))
     .filter((diagnostic) => !targetDiagnosticId || normalizeString(diagnostic.jm1pub_editorialdiagnosticid).toLowerCase() === targetDiagnosticId.toLowerCase());
   const results = [];
-  for (const gate of gates) results.push(await processGateReply(client, gate, deps, triggerSource));
+  for (const gate of gates) {
+    if (require("../lifecycle/publishingWaitEnablement").waitRuntimeOwnsTitle(gate._jm1pub_titleid_value)) {
+      results.push({ gateId: gate.jm1pub_editorialapprovalgateid, outcome: "DURABLE_WAIT_OWNER" });
+    } else results.push(await processGateReply(client, gate, deps, triggerSource));
+  }
   const packageSelectionResults = [];
   const packageDeps = { ...deps, targetDiagnosticId };
   for (const diagnostic of packageDiagnostics) packageSelectionResults.push(await processPackageSelectionReply(client, diagnostic, packageDeps, triggerSource));
@@ -1467,8 +1476,33 @@ async function runAuthorReviewResponseConsumer(input = {}, deps = {}) {
   };
 }
 
+async function resumeExactAuthorReviewReply(client, gate, reply, delivery) {
+  // Entry point for the wait owner, after verified identity and exact delivery checks.
+  const boundGate = { ...gate, jm1pub_authoremail: reply.senderAddress,
+    outboundInternetMessageId: delivery.internetMessageId };
+  const expectedSource = compactDecisionSource(durableInboundMessageId(reply));
+  const expectedDecision = decisionCode(resolveAuthorReviewDecision(gate, reply).classification);
+  if (gate.jm1pub_authordecision !== null && gate.jm1pub_authordecision !== undefined &&
+      (gate.jm1pub_authordecisionsource !== expectedSource || gate.jm1pub_authordecision !== expectedDecision)) {
+    return { gateId: gate.jm1pub_editorialapprovalgateid, outcome: "HELD_EXISTING_AUTHOR_DECISION" };
+  }
+  const guardedClient = { ...client, patch: async (entity, id, payload) => {
+    if (entity !== "jm1pub_editorialapprovalgates" || id !== gate.jm1pub_editorialapprovalgateid) {
+      throw Object.assign(new Error("AUTHOR_WAIT_PATCH_OUTSIDE_GATE"), { safeCode: "AUTHOR_WAIT_PATCH_OUTSIDE_GATE" });
+    }
+    if (gate.jm1pub_authordecision === expectedDecision && gate.jm1pub_authordecisionsource === expectedSource) return;
+    await client.patchIfMatch(entity, id, payload, gate["@odata.etag"]);
+  } };
+  return processGateReply(guardedClient, boundGate, {
+    durableWaitResume: true,
+    readReply: async () => reply,
+    verifyCadenceDeliveryBinding: async () => ({ status: "EXACT", deliveryEventId: delivery.deliveryId })
+  }, "DURABLE_WAIT_RESUME");
+}
+
 module.exports = {
   runAuthorReviewResponseConsumer,
+  resumeExactAuthorReviewReply,
   classifyAuthorReviewResponse,
   classifyAuthorReviewMessageIntents,
   resolveAuthorReviewDecision,

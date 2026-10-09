@@ -81,6 +81,15 @@ function createClient({ existingCompleted = false, omitLedger = false, omitMemo 
   }
   return {
     calls,
+    async first(entitySet) {
+      if (entitySet === "jm1pub_titles") return {
+        jm1pub_titleid: "title-1",
+        _jm1_primaryauthor_value: "d38aa56a-882a-f111-88b4-6045bdd69678",
+        _jm1_author_value: "d38aa56a-882a-f111-88b4-6045bdd69678",
+        jm1_canonicalauthorcontactreference: "contact:d38aa56a-882a-f111-88b4-6045bdd69678"
+      };
+      return null;
+    },
     async list(entitySet, query = {}) {
       const filter = query.$filter || "";
       if (entitySet === "jm1_executionlogs") {
@@ -115,6 +124,16 @@ test("developmental handoff selects the edited manuscript as the durable deliver
   ]);
   const deliverable = deliverableForStage("DEVELOPMENTAL_EDITING", outputs);
   assert.equal(deliverable.artifactId, "edited");
+});
+
+test("non-Jackie title is held before package handoff writes", async () => {
+  const client = createClient();
+  client.first = async () => ({ jm1pub_titleid: "title-1", _jm1_primaryauthor_value: "22222222-2222-4222-8222-222222222222" });
+  const result = await runEditorialPackageHandoffConsumer({}, { client, qaLogs: [{ jm1_sourcerecordid: "stage-1" }] });
+  assert.deepEqual(result.results[0], { status: "BLOCKED", reason: "JACKIE_AUTHOR_ONLY_SYSTEM_COMMISSIONING_DENIED", stageId: "stage-1" });
+  assert.equal(client.calls.patched.length, 0);
+  assert.equal(client.calls.created.length, 1); // cycle health log only
+  assert.equal(client.calls.created[0].payload.jm1_actiontype, "EDITORIAL_PACKAGE_HANDOFF_HEALTH_REFRESHED");
 });
 
 test("later QA preserves delivered review authority without manifest or stage writes", async () => {

@@ -102,6 +102,7 @@ export async function enqueuePublishingIntakeRecovery(
     const body = buildQueueMessageBody(message)
     const headers = buildQueueHeaders(config, body)
     const response = await fetch(url, {
+      signal: AbortSignal.timeout(10000),
       method: 'POST',
       headers,
       body,

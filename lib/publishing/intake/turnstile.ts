@@ -28,6 +28,7 @@ export async function verifyTurnstileToken(token: string, remoteIp?: string): Pr
   if (remoteIp && remoteIp !== 'unknown') body.set('remoteip', remoteIp)
 
   const response = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
+    signal: AbortSignal.timeout(10000),
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     body,

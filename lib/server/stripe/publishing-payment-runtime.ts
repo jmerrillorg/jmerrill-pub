@@ -1,4 +1,5 @@
 import { createHash } from 'node:crypto'
+import type { PaymentMutation } from './publishing-payment-guard'
 
 import {
   allocateIncomingPayment,
@@ -75,6 +76,7 @@ export type AdditionalPaymentPreparation = Omit<AdditionalPaymentRequest, 'strip
 }
 
 export interface PublishingPaymentLedger {
+  withAgreementMutation<T>(agreementId: string, operation: PaymentMutation, work: () => Promise<T>): Promise<T>
   getAgreement(agreementId: string): Promise<AgreementLedgerRecord | null>
   listDueAgreements(asOf: string): Promise<AgreementLedgerRecord[]>
   findPaymentEvent(stripeEventId: string, stripePaymentId: string): Promise<PaymentEventRecord | null>
@@ -109,6 +111,7 @@ export interface StripeAgreementCollections {
 
 export interface StripeAgreementPayoff {
   stopFutureCollections(input: {
+    agreementId: string
     paymentScheduleId: string
     idempotencyKey: string
   }): Promise<{ status: 'CANCELLED' | 'ALREADY_STOPPED' }>
@@ -208,45 +211,40 @@ export async function runRecurringInstallmentExecutor(input: {
   assertRuntimeDate(input.asOf)
   const agreements = await input.ledger.listDueAgreements(input.asOf)
   const results: Array<Record<string, unknown>> = []
-  for (const agreement of agreements) {
-    const state = calculateAgreementPaymentState(agreement.snapshot)
-    if (agreement.status !== 'ACTIVE' || state.paidInFull) {
-      results.push({ agreementId: agreement.snapshot.agreementId, status: 'SKIPPED_NOT_ACTIVE' })
-      continue
-    }
-    const obligation = nextDueObligation(agreement.snapshot, input.asOf)
-    if (!obligation) {
-      results.push({ agreementId: agreement.snapshot.agreementId, status: 'SKIPPED_NOT_DUE' })
-      continue
-    }
-    const amountCents = Math.min(obligation.amountCents, state.remainingBalanceCents)
-    const executionKey = hashKey('scheduled', agreement.snapshot.agreementId, obligation.obligationId)
-    const existing = await input.ledger.findCollectionAttempt(executionKey)
-    if (existing) {
-      results.push({ agreementId: agreement.snapshot.agreementId, status: 'IDEMPOTENT_REPLAY', invoiceId: existing.stripeInvoiceId })
-      continue
-    }
+  for (const candidate of agreements) {
+    const agreementId = candidate.snapshot.agreementId
     try {
-      const invoice = await input.stripe.createInvoice({
-        customerId: required(agreement.stripeCustomerId, 'STRIPE_CUSTOMER_REQUIRED'),
-        amountCents,
-        idempotencyKey: executionKey,
-        metadata: paymentMetadata(agreement, 'SCHEDULED_INSTALLMENT', obligation.obligationId, state.balanceVersion),
+      const result = await input.ledger.withAgreementMutation(agreementId, {
+        kind: 'COLLECTION', operationId: hashKey('executor', agreementId, input.asOf), payload: { asOf: input.asOf },
+      }, async () => {
+        // Re-read eligibility after the claim; the timer candidate snapshot can be stale.
+        const agreement = await input.ledger.getAgreement(agreementId)
+        if (!agreement) return { agreementId, status: 'SKIPPED_NOT_ACTIVE' }
+        const state = calculateAgreementPaymentState(agreement.snapshot)
+        if (agreement.status !== 'ACTIVE' || state.paidInFull) return { agreementId, status: 'SKIPPED_NOT_ACTIVE' }
+        const obligation = nextDueObligation(agreement.snapshot, input.asOf)
+        if (!obligation) return { agreementId, status: 'SKIPPED_NOT_DUE' }
+        const amountCents = Math.min(obligation.amountCents, state.remainingBalanceCents)
+        const executionKey = hashKey('scheduled', agreementId, obligation.obligationId)
+        const existing = await input.ledger.findCollectionAttempt(executionKey)
+        if (existing) return { agreementId, status: 'IDEMPOTENT_REPLAY', invoiceId: existing.stripeInvoiceId }
+        const invoice = await input.stripe.createInvoice({
+          customerId: required(agreement.stripeCustomerId, 'STRIPE_CUSTOMER_REQUIRED'),
+          amountCents,
+          idempotencyKey: executionKey,
+          metadata: paymentMetadata(agreement, 'SCHEDULED_INSTALLMENT', obligation.obligationId, state.balanceVersion),
+        })
+        await input.ledger.recordCollectionAttempt({
+          executionKey, agreementId, obligationId: obligation.obligationId, amountCents,
+          stripeInvoiceId: invoice.invoiceId, status: 'CREATED', createdAt: input.asOf,
+        })
+        input.telemetry?.({ name: 'publishing.payment.executor', success: true, code: 'INVOICE_CREATED', agreementId })
+        return { agreementId, status: 'INVOICE_CREATED', amountCents, invoiceId: invoice.invoiceId }
       })
-      await input.ledger.recordCollectionAttempt({
-        executionKey,
-        agreementId: agreement.snapshot.agreementId,
-        obligationId: obligation.obligationId,
-        amountCents,
-        stripeInvoiceId: invoice.invoiceId,
-        status: 'CREATED',
-        createdAt: input.asOf,
-      })
-      input.telemetry?.({ name: 'publishing.payment.executor', success: true, code: 'INVOICE_CREATED', agreementId: agreement.snapshot.agreementId })
-      results.push({ agreementId: agreement.snapshot.agreementId, status: 'INVOICE_CREATED', amountCents, invoiceId: invoice.invoiceId })
+      results.push(result)
     } catch (error) {
-      input.telemetry?.({ name: 'publishing.payment.executor', success: false, code: safeCode(error), agreementId: agreement.snapshot.agreementId })
-      results.push({ agreementId: agreement.snapshot.agreementId, status: 'ATTENTION_REQUIRED', code: safeCode(error) })
+      input.telemetry?.({ name: 'publishing.payment.executor', success: false, code: safeCode(error), agreementId })
+      results.push({ agreementId, status: 'ATTENTION_REQUIRED', code: safeCode(error) })
     }
   }
   return { ok: results.every((row) => row.status !== 'ATTENTION_REQUIRED'), processed: results.length, results }
@@ -260,6 +258,13 @@ export async function createAdditionalPaymentInvoice(input: {
   ledger: PublishingPaymentLedger
   stripe: StripeAgreementCollections
 }) {
+  return input.ledger.withAgreementMutation(input.agreementId, {
+    kind: 'COLLECTION', operationId: hashKey('additional', input.agreementId, input.expectedBalanceVersion, String(input.amountCents)),
+    payload: { amountCents: input.amountCents, expectedBalanceVersion: input.expectedBalanceVersion },
+  }, () => createAdditionalPaymentInvoiceUnderGuard(input))
+}
+
+async function createAdditionalPaymentInvoiceUnderGuard(input: Parameters<typeof createAdditionalPaymentInvoice>[0]) {
   const agreement = await input.ledger.getAgreement(input.agreementId)
   if (!agreement) return blocked('AGREEMENT_NOT_FOUND')
   const allocation = allocateIncomingPayment({
@@ -305,6 +310,15 @@ export async function processConfirmedAgreementPayment(input: {
   payoff?: StripeAgreementPayoff | null
   telemetry?: PaymentRuntimeTelemetry
 }) {
+  return input.ledger.withAgreementMutation(input.agreementId, {
+    kind: 'PAYMENT', operationId: input.stripeEventId,
+    payload: { stripeEventId: input.stripeEventId, stripePaymentId: input.stripePaymentId,
+      stripeInvoiceId: input.stripeInvoiceId || null, amountCents: input.amountCents,
+      intent: input.intent, occurredAt: input.occurredAt },
+  }, () => processConfirmedAgreementPaymentUnderGuard(input))
+}
+
+async function processConfirmedAgreementPaymentUnderGuard(input: Parameters<typeof processConfirmedAgreementPayment>[0]) {
   const duplicate = await input.ledger.findPaymentEvent(input.stripeEventId, input.stripePaymentId)
   if (duplicate) {
     if (duplicate.agreementId !== input.agreementId || duplicate.stripePaymentId !== input.stripePaymentId ||
@@ -385,6 +399,7 @@ async function stopScheduleAfterPayoff(input: {
   }
   try {
     const result = await input.payoff.stopFutureCollections({
+      agreementId: input.agreement.snapshot.agreementId,
       paymentScheduleId: required(input.agreement.snapshot.paymentScheduleId, 'PAYMENT_SCHEDULE_ID_REQUIRED'),
       idempotencyKey: hashKey('payoff', input.event.paymentEventId),
     })
@@ -392,7 +407,7 @@ async function stopScheduleAfterPayoff(input: {
     return { ok: true as const, required: true, status: result.status }
   } catch (error) {
     input.telemetry?.({ name: 'publishing.payment.payoff', success: false, code: safeCode(error), agreementId: input.event.agreementId })
-    return blocked('PAYOFF_SCHEDULE_STOP_FAILED', { paymentRecorded: true, paymentEventId: input.event.paymentEventId })
+    return blocked('PAYOFF_SCHEDULE_STOP_FAILED', { paymentRecorded: true, paymentEventId: input.event.paymentEventId, requiresExclusiveRecovery: true })
   }
 }
 
@@ -429,6 +444,12 @@ export async function processConfirmedAgreementRefund(input: {
   ledger: PublishingPaymentLedger
   qbo: QboPublishingPaymentAdapter
 }) {
+  return input.ledger.withAgreementMutation(input.agreementId, {
+    kind: 'REFUND', operationId: input.refund.eventId, payload: input.refund,
+  }, () => processConfirmedAgreementRefundUnderGuard(input))
+}
+
+async function processConfirmedAgreementRefundUnderGuard(input: Parameters<typeof processConfirmedAgreementRefund>[0]) {
   const agreement = await input.ledger.getAgreement(input.agreementId)
   if (!agreement) return blocked('AGREEMENT_NOT_FOUND')
   const original = agreement.snapshot.payments.find((row) => row.paymentId === input.refund.originalPaymentId)

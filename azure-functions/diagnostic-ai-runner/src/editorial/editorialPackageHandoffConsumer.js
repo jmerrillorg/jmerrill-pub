@@ -1,5 +1,8 @@
 "use strict";
 
+const { isApprovedRevisionCandidate } = require("./approvedRevisionAudience");
+const { isJackieAuthoredTitle } = require("../author/jackieTitleSystemCommissioningPolicy");
+
 const {
   allowedMimeForRole,
   createDataverseClient,
@@ -59,6 +62,7 @@ function toOutput(artifact) {
 function newestByRole(artifacts) {
   const selected = new Map();
   for (const artifact of artifacts) {
+    if (isApprovedRevisionCandidate(artifact)) continue;
     const output = toOutput(artifact);
     const role = packageRoleForOutput(output.outputName);
     if (!role) continue;
@@ -103,7 +107,7 @@ async function getStage(client, stageId) {
 async function listStageArtifacts(client, stage) {
   return client.list("jm1pub_editorialartifacts", {
     $select:
-      "jm1pub_editorialartifactid,jm1pub_editorialartifactname,jm1pub_filename,jm1pub_fileextension,jm1pub_filesizebytes,jm1pub_repositorydriveid,jm1pub_repositoryitemid,jm1pub_repositorypath,jm1pub_sha256,jm1pub_artifactstatus,jm1pub_visibility,createdon,modifiedon,_jm1pub_titleid_value,_jm1pub_editorialstageid_value",
+      "jm1pub_editorialartifactid,jm1pub_editorialartifactname,jm1pub_filename,jm1pub_fileextension,jm1pub_filesizebytes,jm1pub_repositorydriveid,jm1pub_repositoryitemid,jm1pub_repositorypath,jm1pub_sha256,jm1pub_artifactstatus,jm1pub_visibility,jm1pub_correlationid,createdon,modifiedon,_jm1pub_titleid_value,_jm1pub_editorialstageid_value",
     $filter:
       `_jm1pub_titleid_value eq ${stage._jm1pub_titleid_value} and ` +
       `_jm1pub_editorialstageid_value eq ${stage.jm1pub_editorialstageid}`,
@@ -157,6 +161,16 @@ async function processQaLog(client, qaLog, correlationId) {
   if (!stageId) return { status: "SKIPPED", reason: "QA_LOG_WITHOUT_STAGE" };
   const stage = await getStage(client, stageId);
   if (!stage) return { status: "SKIPPED", reason: "STAGE_NOT_FOUND", stageId };
+  const titleId = normalizeString(stage._jm1pub_titleid_value);
+  if (!titleId) return { status: "BLOCKED", reason: "TITLE_AUTHORITY_MISSING", stageId };
+  const title = await client.first("jm1pub_titles", {
+    $select: "jm1pub_titleid,_jm1_primaryauthor_value,_jm1_author_value,jm1_canonicalauthorcontactreference",
+    $filter: `jm1pub_titleid eq ${titleId}`
+  });
+  if (normalizeString(title?.jm1pub_titleid).toLowerCase() !== titleId.toLowerCase()) {
+    return { status: "BLOCKED", reason: "TITLE_AUTHORITY_UNRESOLVED", stageId };
+  }
+  if (!isJackieAuthoredTitle(title)) return { status: "BLOCKED", reason: "JACKIE_AUTHOR_ONLY_SYSTEM_COMMISSIONING_DENIED", stageId };
   const stageCode = normalizeStageCode(stage);
   const requiredRoles = requiredPackageRoles(stageCode);
   if (!requiredRoles.length) return { status: "SKIPPED", reason: "PACKAGE_POLICY_NOT_CONFIGURED", stageId, stageCode };

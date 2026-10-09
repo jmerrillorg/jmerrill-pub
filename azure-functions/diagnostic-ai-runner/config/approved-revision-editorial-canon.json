@@ -1,0 +1,14 @@
+{
+  "skill": "jm1-publishing-editorial",
+  "version": "2026-08-20-founder-corrections",
+  "sourcePackage": "JMP-GPTs_2.zip",
+  "sourcePackageSha256": "53a85a57aaf1b7bf7a1d09182dbf033713bc239866b150591447374997708886",
+  "sourceRoot": "docs/implementation/canon-cache/jm1-publishing-editorial",
+  "files": {
+    "SKILL.md": "4f5d35d89f9656ac7a2867e6cb9db9d66d21f0cfb038bec1b85cde8f52571126",
+    "SOURCE-MANIFEST.md": "0a5c4e45b9dd28d596f499c46f009274c2ac30084942caa496850db76591874b",
+    "references/developmental-editing.md": "db51d2b9b6032b14a8b85b7b943907d2a2ce290f67bf34df9e28d4526a326de5",
+    "references/developmental-pipeline-bridge.md": "ba6d8e188017c58ca72190ed6823336f77e4b0632c3d1d7b91a8d941bc86de03",
+    "references/knowledge.md": "996b71c36dc3ba97ade297da62fb46b51202eb02f9a1d93cee0a196de6b5e378"
+  }
+}

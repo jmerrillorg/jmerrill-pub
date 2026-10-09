@@ -128,6 +128,7 @@ async function acquireClientCredentialToken(
   }
 
   const response = await fetchImpl(`https://login.microsoftonline.com/${config.tenantId}/oauth2/v2.0/token`, {
+    signal: AbortSignal.timeout(10000),
     method: 'POST',
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded',
@@ -173,6 +174,7 @@ async function acquireManagedIdentityToken(
   }
 
   const response = await fetchImpl(url.toString(), {
+    signal: AbortSignal.timeout(10000),
     method: 'GET',
     headers,
   })

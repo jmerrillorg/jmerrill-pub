@@ -30,6 +30,9 @@ function loadEnterpriseRelayModule(options = {}) {
       }
       if (name.startsWith("../")) {
         const dependency = require(path.join(path.dirname(filePath), name));
+        if (name === "../security/callerAuthentication" && options.caller) {
+          return { ...dependency, authenticateCaller: () => ({ ok: true, caller: options.caller, authModel: "ENTRA_WORKLOAD_IDENTITY" }) };
+        }
         return name === "../state/messageLedger" && options.ledger
           ? { ...dependency, getMessageLedger: () => options.ledger } : dependency;
       }
@@ -371,6 +374,34 @@ test("authority probe attributes a Publishing workload identity and derives bran
   assert.equal(result.jsonBody.replyTo, "publishing@jmerrill.one");
 });
 
+test("JSJ authority probe permits only the approved recipient without sending", async () => {
+  const { routes } = loadEnterpriseRelayModule();
+  const handler = routes["relay-authority-probe"].handler;
+  const headers = workloadHeaders("8a488b86-7a1a-4978-8705-6fbc3bd8ce15");
+  const allowed = await handler(routeRequest({ brand: "JSJ", recipient: "jackie@jmerrill.one" }, headers));
+  assert.equal(allowed.status, 200);
+  assert.equal(allowed.jsonBody.callerId, "jsj-web-prod");
+  assert.equal(allowed.jsonBody.senderAddress, "jackie@email.jackiesmithjr.com");
+  assert.equal(allowed.jsonBody.noSend, true);
+  assert.equal((await handler(routeRequest({ brand: "JSJ", recipient: "other@example.com" }, headers))).status, 403);
+  assert.equal((await handler(routeRequest({ brand: "JMP", recipient: "jackie@jmerrill.one" }, headers))).status, 403);
+});
+
+test("JSJ recipient and template denial occurs before any message reservation", async () => {
+  let reservations = 0;
+  const { routes } = loadEnterpriseRelayModule({ ledger: { reserve: async () => { reservations++; throw new Error("must not reserve"); } } });
+  const handler = routes["send-enterprise-governed-email"].handler;
+  const headers = workloadHeaders("8a488b86-7a1a-4978-8705-6fbc3bd8ce15");
+  const payload = validPayload({ brand: "JSJ", to: "other@example.com", templateId: "JSJ_INQUIRY_NOTIFICATION" });
+  const context = { warn() {}, info() {}, error() {} };
+  const denied = await handler(routeRequest(payload, headers), context);
+  assert.equal(denied.status, 403);
+  assert.equal(denied.jsonBody.reason, "CALLER_RECIPIENT_NOT_AUTHORIZED");
+  const wrongTemplate = await handler(routeRequest({ ...payload, to: "jackie@jmerrill.one", templateId: "JSJ_OTHER" }, headers), context);
+  assert.equal(wrongTemplate.status, 403);
+  assert.equal(reservations, 0);
+});
+
 test("durable trace contract fields are mandatory", () => {
   const { validateEnterprisePayload } = loadEnterpriseRelayModule();
   for (const [field, reason] of [
@@ -442,4 +473,463 @@ test("Productions rights and contract language requires human review", () => {
   }));
   assert.equal(result.ok, false);
   assert.equal(result.reason, "HUMAN_REVIEW_REQUIRED_RIGHTS_CONTRACT");
+});
+
+const bp09Headers = () => workloadHeaders("38b09d6f-34d9-48b3-9627-f04c047fd534");
+const bp09Payload = () => ({
+  brand: "JMPRODUCTIONS", to: "productions@jmerrill.one",
+  templateId: "PRODUCTIONS.BP09_NOTICE", templateVersion: "1.0.0",
+  templateData: { referenceId: "90000000-0000-4000-a000-000000000009", leadId: "90000000-0000-4000-a000-000000000010" }
+});
+const quietContext = { warn() {}, info() {}, error() {} };
+
+const financialHeaders = () => workloadHeaders("658e6d91-1d9d-493f-83bd-f327eaf74ac1");
+const financialPayload = () => ({
+  brand: "JMF", to: "financial@jmerrill.one",
+  templateId: "FINANCIAL.INQUIRY_NOTICE", templateVersion: "1.0.0",
+  templateData: { referenceId: "90000000-0000-4000-a000-000000000029" }
+});
+
+test("Financial no-send probe fixes caller, brand, internal reference and derived sender without effects", async () => {
+  const forbidden = () => { throw Error("SIDE_EFFECT_FORBIDDEN"); };
+  const relay = loadEnterpriseRelayModule({ client: { beginSend: forbidden }, ledger: { reserve: forbidden } });
+  for (let replay = 0; replay < 2; replay++) {
+    const result = await relay.routes["relay-authority-probe"].handler(routeRequest(financialPayload(), financialHeaders()));
+    assert.equal(result.status, 200);
+    assert.equal(result.jsonBody.authorized, true);
+    assert.equal(result.jsonBody.noSend, true);
+    assert.equal(result.jsonBody.callerId, "financial-inquiry-function-prod");
+    assert.equal(result.jsonBody.brand, "JMF");
+    assert.equal(result.jsonBody.senderAddress, "financial@email.jmerrill.one");
+    for (const field of ["recipient", "replyTo", "brandCc"]) assert.equal(result.jsonBody[field], "financial@jmerrill.one");
+    assert.equal(result.jsonBody.idempotencyKey, `financial:inquiry:notice:${financialPayload().templateData.referenceId}`);
+    assert.equal(result.jsonBody.renderMetadata.audience, "INTERNAL_OPERATIONS");
+  }
+});
+
+test("Financial denies private data, content, links, alternate identifiers and any envelope override", async () => {
+  const forbidden = () => { throw Error("SIDE_EFFECT_FORBIDDEN"); };
+  const relay = loadEnterpriseRelayModule({ client: { beginSend: forbidden }, ledger: { reserve: forbidden } });
+  const mutations = [
+    p => ({ ...p, brand: "JMP" }), p => ({ ...p, to: "client@example.com" }),
+    p => ({ ...p, to: ["financial@jmerrill.one"] }),
+    p => ({ ...p, templateId: "FINANCIAL.OTHER" }), p => ({ ...p, templateVersion: "2.0.0" }),
+    ...["subject", "html", "plainText", "body", "bodyText", "sourceRecord", "from", "senderAddress", "replyTo", "cc", "bcc", "recipients", "recipient", "attachments", "idempotencyKey", "correlationId", "recordLink", "businessObjectType", "businessObjectId", "messageType", "riskClassification"].map(
+      key => p => ({ ...p, [key]: "PRIVATE_CLIENT_DO_NOT_LOG" })),
+    ...["name", "email", "message", "url", "leadId", "clientId"].map(key => p => ({ ...p, templateData: { ...p.templateData, [key]: "PRIVATE_CLIENT_DO_NOT_LOG" } })),
+    ...[null, 123, "00000000-0000-0000-0000-000000000000", "90000000-0000-4000-A000-000000000029", "90000000-0000-4000-a000-000000000029\n", "<script>PRIVATE_CLIENT_DO_NOT_LOG</script>"].map(
+      referenceId => p => ({ ...p, templateData: { referenceId } })),
+    p => ({ ...p, templateData: null }), () => null, () => [], () => "PRIVATE_CLIENT_DO_NOT_LOG"
+  ];
+  for (const mutate of mutations) for (const route of ["send-enterprise-governed-email", "relay-authority-probe"]) {
+    const result = await relay.routes[route].handler(routeRequest(mutate(financialPayload()), financialHeaders()), quietContext);
+    assert.equal(result.status, 400);
+    assert.equal(JSON.stringify(result).includes("PRIVATE_CLIENT_DO_NOT_LOG"), false);
+  }
+});
+
+test("Financial template is unavailable to all other callers and legacy credentials", async (t) => {
+  const previousKey = process.env.JM1_RELAY_API_KEY;
+  process.env.JM1_RELAY_API_KEY = "financial-fixture-only";
+  t.after(() => {
+    if (previousKey === undefined) delete process.env.JM1_RELAY_API_KEY;
+    else process.env.JM1_RELAY_API_KEY = previousKey;
+  });
+  const forbidden = () => { throw Error("SIDE_EFFECT_FORBIDDEN"); };
+  const relay = loadEnterpriseRelayModule({ client: { beginSend: forbidden }, ledger: { reserve: forbidden } });
+  const { listCallers } = require("../src/policy/callerRegistry");
+  const others = listCallers().filter(c => c.identity.objectId && c.callerId !== "financial-inquiry-function-prod");
+  for (const route of ["send-enterprise-governed-email", "relay-authority-probe"]) {
+    for (const caller of others) {
+      const result = await relay.routes[route].handler(routeRequest(financialPayload(), workloadHeaders(caller.identity.objectId)), quietContext);
+      assert.ok([400, 403].includes(result.status), caller.callerId);
+      assert.notEqual(result.jsonBody.authorized, true);
+    }
+    assert.equal((await relay.routes[route].handler(routeRequest(financialPayload()), quietContext)).status, 401);
+    assert.equal((await relay.routes[route].handler(routeRequest(financialPayload(), workloadHeaders("00000000-0000-4000-a000-000000000001")), quietContext)).status, 403);
+    assert.equal((await relay.routes[route].handler(routeRequest(financialPayload(), { "x-jm1-relay-key": "financial-fixture-only" }), quietContext)).status, 403);
+  }
+});
+
+test("Financial revoked identity or changed template, brand and recipient scope denies before effects", async () => {
+  const { findCallerByObjectId } = require("../src/policy/callerRegistry");
+  const caller = findCallerByObjectId("658e6d91-1d9d-493f-83bd-f327eaf74ac1");
+  for (const changes of [{ status: "INACTIVE" }, { status: "REVOKED" }, { authorizedBrands: ["JMP"] }, { authorizedTemplates: [] }, { authorizedRecipients: [] }]) {
+    const forbidden = () => { throw Error("SIDE_EFFECT_FORBIDDEN"); };
+    const relay = loadEnterpriseRelayModule({ caller: { ...caller, ...changes }, client: { beginSend: forbidden }, ledger: { reserve: forbidden } });
+    for (const route of ["relay-authority-probe", "send-enterprise-governed-email"]) {
+      const result = await relay.routes[route].handler(routeRequest(financialPayload(), financialHeaders()), quietContext);
+      assert.equal(result.status, 403);
+    }
+  }
+});
+
+test("Financial static internal template does not weaken general GUID or financial compliance controls", () => {
+  const relay = loadEnterpriseRelayModule();
+  const generic = relay.validateEnterprisePayload(validPayload({ brand: "JMF", plainText: financialPayload().templateData.referenceId }));
+  assert.equal(generic.reason, "HUMAN_FIRST_INTERNAL_LANGUAGE_BLOCKED");
+  const risky = relay.validateEnterprisePayload(validPayload({ brand: "JMF", plainText: "This guarantees success." }));
+  assert.equal(risky.reason, "HUMAN_REVIEW_REQUIRED_FINANCIAL_COMPLIANCE");
+  const notice = relay.validateEnterprisePayload(financialPayload()).value;
+  assert.equal(notice.renderMetadata.audience, "INTERNAL_OPERATIONS");
+  assert.equal(notice.businessObjectType, "FINANCIAL_INQUIRY_RECEIPT");
+  assert.equal(notice.html.includes("href="), false);
+  assert.equal(notice.riskClassification, "ROUTINE");
+  assert.equal(notice.renderMetadata.htmlSha256.length, 64);
+});
+
+test("Financial accepted same-key replay survives restart; changed effect conflicts without another send", async () => {
+  const { createLedger } = require("../src/state/messageLedger");
+  const table = bp09MemoryTable(); let sends = 0;
+  const options = () => ({ env: { ACS_CONNECTION_STRING: "fixture" }, ledger: createLedger(table),
+    client: { beginSend: async message => {
+      sends++;
+      assert.equal(message.senderAddress, "financial@email.jmerrill.one");
+      assert.equal(message.recipients.to[0].address, "financial@jmerrill.one");
+      assert.equal(message.recipients.cc[0].address, "financial@jmerrill.one");
+      return { pollUntilDone: async () => ({ status: "Succeeded", id: "provider-financial" }) };
+    } } });
+  const send = relay => relay.routes["send-enterprise-governed-email"].handler(routeRequest(financialPayload(), financialHeaders()), quietContext);
+  const first = await send(loadEnterpriseRelayModule(options()));
+  assert.equal(first.status, 202);
+  const replay = await send(loadEnterpriseRelayModule(options()));
+  assert.equal(replay.status, 200); assert.equal(replay.jsonBody.replay, true);
+  assert.equal(replay.jsonBody.jm1MessageId, first.jsonBody.jm1MessageId);
+  assert.equal(replay.jsonBody.providerMessageId, "provider-financial");
+  assert.equal(sends, 1); assert.equal(table.rows.size, 1);
+  const stored = [...table.rows.values()][0];
+  assert.equal(stored.communicationState, "PROVIDER_ACCEPTED");
+  assert.equal(stored.mailboxVerifiedAt, undefined);
+  for (const field of ["templateData", "html", "plainText", "subject", "message", "submission", "name", "email"]) assert.equal(Object.hasOwn(stored, field), false);
+  table.rows.set(`${stored.partitionKey}/${stored.rowKey}`, { ...stored, fingerprint: "different-effect" });
+  const conflict = await send(loadEnterpriseRelayModule(options()));
+  assert.equal(conflict.status, 409); assert.equal(sends, 1);
+});
+
+test("Financial ambiguous transport stays submitted on restart and cannot trigger a duplicate send", async () => {
+  const { createLedger } = require("../src/state/messageLedger");
+  const table = bp09MemoryTable(); let sends = 0;
+  const options = () => ({ env: { ACS_CONNECTION_STRING: "fixture" }, ledger: createLedger(table),
+    client: { beginSend: async () => { sends++; throw Error("transport timeout"); } } });
+  const send = relay => relay.routes["send-enterprise-governed-email"].handler(routeRequest(financialPayload(), financialHeaders()), quietContext);
+  assert.equal((await send(loadEnterpriseRelayModule(options()))).status, 502);
+  assert.equal([...table.rows.values()][0].communicationState, "SUBMITTED");
+  const replay = await send(loadEnterpriseRelayModule(options()));
+  assert.equal(replay.status, 202); assert.equal(replay.jsonBody.accepted, false);
+  assert.equal(replay.jsonBody.inProgress, true); assert.equal(sends, 1);
+});
+
+test("Financial failure before reservation retries safely with the original reference", async () => {
+  const { createLedger } = require("../src/state/messageLedger");
+  const ledger = createLedger(bp09MemoryTable()); const original = ledger.reserve;
+  let attempts = 0, sends = 0;
+  ledger.reserve = async input => { if (++attempts === 1) throw Error("store unavailable"); return original(input); };
+  const relay = loadEnterpriseRelayModule({ env: { ACS_CONNECTION_STRING: "fixture" }, ledger,
+    client: { beginSend: async () => { sends++; return { pollUntilDone: async () => ({ status: "Succeeded", id: "provider-financial-retry" }) }; } } });
+  const send = () => relay.routes["send-enterprise-governed-email"].handler(routeRequest(financialPayload(), financialHeaders()), quietContext);
+  assert.equal((await send()).status, 502); assert.equal(sends, 0);
+  assert.equal((await send()).jsonBody.accepted, true); assert.equal(sends, 1);
+});
+
+const foundationHeaders = () => workloadHeaders("cb36ea0b-8ba6-4798-a836-47a52e340675");
+const foundationPayload = () => ({
+  brand: "JMFN", to: "foundation@jmerrill.one",
+  templateId: "FOUNDATION.VOLUNTEER_INQUIRY_NOTICE", templateVersion: "1.0.0",
+  templateData: { referenceId: "90000000-0000-4000-a000-000000000019" }
+});
+
+test("Foundation no-send probe validates exact notice without provider or ledger access", async () => {
+  const forbidden = () => { throw Error("SIDE_EFFECT_FORBIDDEN"); };
+  const relay = loadEnterpriseRelayModule({ client: { beginSend: forbidden }, ledger: { reserve: forbidden } });
+  const result = await relay.routes["relay-authority-probe"].handler(routeRequest(foundationPayload(), foundationHeaders()));
+  assert.equal(result.status, 200);
+  assert.equal(result.jsonBody.noSend, true);
+  assert.equal(result.jsonBody.callerId, "foundation-volunteer-web-prod");
+  assert.equal(result.jsonBody.recipient, "foundation@jmerrill.one");
+  assert.equal(result.jsonBody.brandCc, "foundation@jmerrill.one");
+  assert.equal(result.jsonBody.senderAddress, "foundation@email.jmerrill.one");
+  assert.equal(result.jsonBody.replyTo, "foundation@jmerrill.one");
+  assert.equal(result.jsonBody.idempotencyKey, `foundation:volunteer-inquiry:notice:${foundationPayload().templateData.referenceId}`);
+});
+
+test("Foundation rejects private content, identifiers, links and envelope overrides without reflection", async () => {
+  const relay = loadEnterpriseRelayModule({ ledger: { reserve() { throw Error("MUST_NOT_RESERVE"); } } });
+  const mutations = [
+    p => ({ ...p, brand: "JMP" }), p => ({ ...p, to: "client@example.com" }),
+    p => ({ ...p, to: ["foundation@jmerrill.one", "client@example.com"] }),
+    p => ({ ...p, templateId: "FOUNDATION.OTHER" }), p => ({ ...p, templateVersion: "2.0.0" }),
+    ...["subject", "html", "plainText", "body", "bodyText", "sourceRecord", "from", "senderAddress", "replyTo", "cc", "bcc", "recipients", "recipient", "attachments", "idempotencyKey", "correlationId", "recordLink", "businessObjectType", "businessObjectId", "messageType", "riskClassification"].map(
+      key => p => ({ ...p, [key]: "PRIVATE_INQUIRY_DO_NOT_LOG" })),
+    ...["name", "email", "message", "url", "leadId"].map(key => p => ({ ...p, templateData: { ...p.templateData, [key]: "PRIVATE_INQUIRY_DO_NOT_LOG" } })),
+    ...[null, 123, "00000000-0000-0000-0000-000000000000", "90000000-0000-4000-A000-000000000019", "90000000-0000-4000-a000-000000000019\n", "<script>PRIVATE_INQUIRY_DO_NOT_LOG</script>"].map(
+      referenceId => p => ({ ...p, templateData: { referenceId } })),
+    p => ({ ...p, templateData: null }), () => null, () => [], () => "PRIVATE_INQUIRY_DO_NOT_LOG"
+  ];
+  for (const mutate of mutations) for (const route of ["send-enterprise-governed-email", "relay-authority-probe"]) {
+    const result = await relay.routes[route].handler(routeRequest(mutate(foundationPayload()), foundationHeaders()), quietContext);
+    assert.equal(result.status, 400);
+    assert.equal(JSON.stringify(result).includes("PRIVATE_INQUIRY_DO_NOT_LOG"), false);
+  }
+});
+
+test("Foundation template cannot be borrowed; generic GUID filter is unchanged", async (t) => {
+  const previousKey = process.env.JM1_RELAY_API_KEY;
+  process.env.JM1_RELAY_API_KEY = "synthetic-only";
+  t.after(() => {
+    if (previousKey === undefined) delete process.env.JM1_RELAY_API_KEY;
+    else process.env.JM1_RELAY_API_KEY = previousKey;
+  });
+  const relay = loadEnterpriseRelayModule({ ledger: { reserve() { throw Error("MUST_NOT_RESERVE"); } } });
+  for (const oid of ["ce363f5a-94f3-4ea9-9ba3-061404fca098", "8a488b86-7a1a-4978-8705-6fbc3bd8ce15", "e8c51a80-bdb0-46fa-b398-9109719d6427", "38b09d6f-34d9-48b3-9627-f04c047fd534", "00000000-0000-4000-a000-000000000001"]) {
+    const result = await relay.routes["send-enterprise-governed-email"].handler(routeRequest(foundationPayload(), workloadHeaders(oid)), quietContext);
+    assert.ok([400, 403].includes(result.status));
+  }
+  assert.equal((await relay.routes["send-enterprise-governed-email"].handler(routeRequest(foundationPayload()), quietContext)).status, 401);
+  assert.equal((await relay.routes["send-enterprise-governed-email"].handler(routeRequest(foundationPayload(), { "x-jm1-relay-key": "synthetic-only" }), quietContext)).status, 403);
+  const generic = relay.validateEnterprisePayload(validPayload({ brand: "JMFN", plainText: foundationPayload().templateData.referenceId }));
+  assert.equal(generic.reason, "HUMAN_FIRST_INTERNAL_LANGUAGE_BLOCKED");
+  const notice = relay.validateEnterprisePayload(foundationPayload()).value;
+  assert.equal(notice.renderMetadata.audience, "INTERNAL_OPERATIONS");
+  assert.equal(notice.businessObjectId, foundationPayload().templateData.referenceId);
+  assert.equal(notice.correlationId, notice.businessObjectId);
+  assert.equal(notice.businessObjectType, "FOUNDATION_VOLUNTEER_INQUIRY_RECEIPT");
+  assert.equal(notice.messageType, "INTERNAL_VOLUNTEER_INQUIRY_NOTICE");
+  assert.equal(notice.riskClassification, "ROUTINE");
+  assert.equal(notice.html.includes("href="), false);
+});
+
+test("Foundation revoked or changed caller scope denies both routes before effects", async () => {
+  const { findCallerByObjectId } = require("../src/policy/callerRegistry");
+  const caller = findCallerByObjectId("cb36ea0b-8ba6-4798-a836-47a52e340675");
+  for (const changes of [{ status: "INACTIVE" }, { status: "REVOKED" }, { authorizedBrands: ["JMP"] }, { authorizedTemplates: [] }, { authorizedRecipients: ["jackie@jmerrill.one"] }]) {
+    const forbidden = () => { throw Error("SIDE_EFFECT_FORBIDDEN"); };
+    const relay = loadEnterpriseRelayModule({ caller: { ...caller, ...changes }, client: { beginSend: forbidden }, ledger: { reserve: forbidden } });
+    for (const route of ["relay-authority-probe", "send-enterprise-governed-email"]) {
+      const result = await relay.routes[route].handler(routeRequest(foundationPayload(), foundationHeaders()), quietContext);
+      assert.equal(result.status, 403);
+      assert.notEqual(result.jsonBody.authorized, true);
+    }
+  }
+});
+
+test("Foundation accepted replay survives restart with one provider call and metadata-only receipt", async () => {
+  const { createLedger } = require("../src/state/messageLedger");
+  const table = bp09MemoryTable();
+  let sends = 0;
+  const options = () => ({ env: { ACS_CONNECTION_STRING: "fixture" }, ledger: createLedger(table),
+    client: { beginSend: async message => {
+      sends++;
+      assert.equal(message.senderAddress, "foundation@email.jmerrill.one");
+      assert.equal(message.recipients.to[0].address, "foundation@jmerrill.one");
+      assert.equal(message.recipients.cc[0].address, "foundation@jmerrill.one");
+      return { pollUntilDone: async () => ({ status: "Succeeded", id: "provider-foundation" }) };
+    } } });
+  const send = relay => relay.routes["send-enterprise-governed-email"].handler(routeRequest(foundationPayload(), foundationHeaders()), quietContext);
+  const first = await send(loadEnterpriseRelayModule(options()));
+  assert.equal(first.status, 202); assert.equal(first.jsonBody.accepted, true);
+  const replay = await send(loadEnterpriseRelayModule(options()));
+  assert.equal(replay.status, 200); assert.equal(replay.jsonBody.replay, true);
+  assert.equal(replay.jsonBody.jm1MessageId, first.jsonBody.jm1MessageId);
+  assert.equal(replay.jsonBody.providerMessageId, "provider-foundation");
+  assert.equal(sends, 1); assert.equal(table.rows.size, 1);
+  const stored = [...table.rows.values()][0];
+  assert.equal(stored.communicationState, "PROVIDER_ACCEPTED");
+  assert.equal(stored.mailboxVerifiedAt, undefined);
+  for (const field of ["templateData", "html", "plainText", "subject", "message", "submission", "name", "email"]) assert.equal(Object.hasOwn(stored, field), false);
+  table.rows.set(`${stored.partitionKey}/${stored.rowKey}`, { ...stored, fingerprint: "different-effect" });
+  const conflict = await send(loadEnterpriseRelayModule(options()));
+  assert.equal(conflict.status, 409); assert.equal(conflict.jsonBody.code, "IDEMPOTENCY_KEY_CONFLICT");
+  assert.equal(sends, 1);
+});
+
+test("Foundation uncertain provider result remains submitted and never blindly resends", async () => {
+  const { createLedger } = require("../src/state/messageLedger");
+  const table = bp09MemoryTable(); let sends = 0;
+  const options = () => ({ env: { ACS_CONNECTION_STRING: "fixture" }, ledger: createLedger(table),
+    client: { beginSend: async () => { sends++; throw Error("transport timeout"); } } });
+  const send = relay => relay.routes["send-enterprise-governed-email"].handler(routeRequest(foundationPayload(), foundationHeaders()), quietContext);
+  assert.equal((await send(loadEnterpriseRelayModule(options()))).status, 502);
+  assert.equal([...table.rows.values()][0].communicationState, "SUBMITTED");
+  const replay = await send(loadEnterpriseRelayModule(options()));
+  assert.equal(replay.status, 202); assert.equal(replay.jsonBody.accepted, false);
+  assert.equal(replay.jsonBody.inProgress, true); assert.equal(sends, 1);
+});
+
+test("Foundation pre-reservation failure is retryable without duplicate provider effects", async () => {
+  const { createLedger } = require("../src/state/messageLedger");
+  const ledger = createLedger(bp09MemoryTable()); const original = ledger.reserve;
+  let attempts = 0, sends = 0;
+  ledger.reserve = async input => { if (++attempts === 1) throw Error("store unavailable"); return original(input); };
+  const relay = loadEnterpriseRelayModule({ env: { ACS_CONNECTION_STRING: "fixture" }, ledger,
+    client: { beginSend: async () => { sends++; return { pollUntilDone: async () => ({ status: "Succeeded", id: "provider-foundation-retry" }) }; } } });
+  const send = () => relay.routes["send-enterprise-governed-email"].handler(routeRequest(foundationPayload(), foundationHeaders()), quietContext);
+  assert.equal((await send()).status, 502); assert.equal(sends, 0);
+  assert.equal((await send()).jsonBody.accepted, true); assert.equal(sends, 1);
+});
+
+test("BP09 no-send probe validates the complete bounded contract with no provider or ledger access", async () => {
+  const forbidden = () => { throw new Error("SIDE_EFFECT_FORBIDDEN"); };
+  const relay = loadEnterpriseRelayModule({ client: { beginSend: forbidden }, ledger: { reserve: forbidden } });
+  const result = await relay.routes["relay-authority-probe"].handler(routeRequest(bp09Payload(), bp09Headers()));
+  assert.equal(result.status, 200);
+  assert.equal(result.jsonBody.noSend, true);
+  assert.equal(result.jsonBody.callerId, "one-bp09-productions-prod");
+  assert.equal(result.jsonBody.recipient, "productions@jmerrill.one");
+  assert.equal(result.jsonBody.senderAddress, "productions@email.jmerrill.one");
+  assert.equal(result.jsonBody.replyTo, "productions@jmerrill.one");
+});
+
+test("BP09 denies all nonreference fields and cross-brand sender/destination overrides without reflecting content", async () => {
+  const relay = loadEnterpriseRelayModule({ ledger: { reserve() { throw new Error("MUST_NOT_RESERVE"); } } });
+  const mutations = [
+    (p) => ({ ...p, brand: "JMP" }),
+    (p) => ({ ...p, to: "jackie@jmerrill.one" }),
+    (p) => ({ ...p, to: ["productions@jmerrill.one", "client@example.com"] }),
+    (p) => ({ ...p, templateId: "PRODUCTIONS.OTHER" }),
+    (p) => ({ ...p, templateVersion: "2.0.0" }),
+    ...["subject", "html", "plainText", "body", "bodyText", "sourceRecord", "from", "senderAddress", "replyTo", "cc", "bcc", "recipients", "attachments", "idempotencyKey", "correlationId", "recordLink"].map(
+      (key) => (p) => ({ ...p, [key]: "PRIVATE_INQUIRY_DO_NOT_LOG" })),
+    (p) => ({ ...p, templateData: { ...p.templateData, message: "PRIVATE_INQUIRY_DO_NOT_LOG" } }),
+    (p) => ({ ...p, templateData: { ...p.templateData, leadId: "https://evil.invalid/PRIVATE_INQUIRY_DO_NOT_LOG" } }),
+    (p) => ({ ...p, templateData: { ...p.templateData, referenceId: "00000000-0000-0000-0000-000000000000" } }),
+    (p) => ({ ...p, templateData: null }),
+    () => null, () => [], () => "PRIVATE_INQUIRY_DO_NOT_LOG"
+  ];
+  for (const mutate of mutations) {
+    for (const name of ["send-enterprise-governed-email", "relay-authority-probe"]) {
+      const result = await relay.routes[name].handler(routeRequest(mutate(bp09Payload()), bp09Headers()), quietContext);
+      assert.equal(result.status, 400, name);
+      assert.equal(JSON.stringify(result).includes("PRIVATE_INQUIRY_DO_NOT_LOG"), false);
+    }
+  }
+});
+
+test("BP09 probe and send enforce inactive, revoked and wrong registry scopes before side effects", async () => {
+  const { findCallerByObjectId } = require("../src/policy/callerRegistry");
+  const caller = findCallerByObjectId("38b09d6f-34d9-48b3-9627-f04c047fd534");
+  const cases = [
+    [{ status: "INACTIVE" }, "CALLER_INACTIVE"],
+    [{ status: "REVOKED" }, "CALLER_INACTIVE"],
+    [{ authorizedBrands: [] }, "CALLER_BRAND_NOT_AUTHORIZED"],
+    [{ authorizedBrands: ["JMP"] }, "CALLER_BRAND_NOT_AUTHORIZED"],
+    [{ authorizedTemplates: [] }, "CALLER_TEMPLATE_NOT_AUTHORIZED"],
+    [{ authorizedTemplates: ["PRODUCTIONS.OTHER"] }, "CALLER_TEMPLATE_NOT_AUTHORIZED"],
+    [{ authorizedRecipients: [] }, "CALLER_RECIPIENT_NOT_AUTHORIZED"],
+    [{ authorizedRecipients: ["jackie@jmerrill.one"] }, "CALLER_RECIPIENT_NOT_AUTHORIZED"]
+  ];
+  for (const [changes, reason] of cases) {
+    let sideEffects = 0;
+    const forbidden = () => { sideEffects++; throw new Error("SIDE_EFFECT_FORBIDDEN"); };
+    const relay = loadEnterpriseRelayModule({ caller: { ...caller, ...changes },
+      client: { beginSend: forbidden }, ledger: { reserve: forbidden } });
+    for (const name of ["relay-authority-probe", "send-enterprise-governed-email"]) {
+      const result = await relay.routes[name].handler(routeRequest(bp09Payload(), bp09Headers()), quietContext);
+      assert.equal(result.status, 403, `${name}: ${JSON.stringify(changes)}`);
+      assert.equal(result.jsonBody.reason, reason);
+      assert.notEqual(result.jsonBody.authorized, true);
+    }
+    assert.equal(sideEffects, 0);
+  }
+});
+
+test("BP09 template cannot be borrowed by Publishing, JSJ, diagnostic, anonymous or unknown callers", async () => {
+  const relay = loadEnterpriseRelayModule({ ledger: { reserve() { throw new Error("MUST_NOT_RESERVE"); } } });
+  for (const oid of ["ce363f5a-94f3-4ea9-9ba3-061404fca098", "8a488b86-7a1a-4978-8705-6fbc3bd8ce15", "e8c51a80-bdb0-46fa-b398-9109719d6427", "00000000-0000-4000-a000-000000000001"]) {
+    const result = await relay.routes["send-enterprise-governed-email"].handler(routeRequest(bp09Payload(), workloadHeaders(oid)), quietContext);
+    assert.equal(result.status, 403);
+  }
+  assert.equal((await relay.routes["send-enterprise-governed-email"].handler(routeRequest(bp09Payload()), quietContext)).status, 401);
+});
+
+test("BP09 rendering is internal-only, reference-only and fixes links to the existing Lead authority", () => {
+  const relay = loadEnterpriseRelayModule();
+  const rendered = relay.validateEnterprisePayload(bp09Payload());
+  assert.equal(rendered.ok, true);
+  assert.equal(rendered.value.renderMetadata.audience, "INTERNAL_OPERATIONS");
+  assert.match(rendered.value.html, /https:\/\/jm1hq\.crm\.dynamics\.com\/main\.aspx\?pagetype=entityrecord&amp;etn=lead&amp;id=90000000-0000-4000-a000-000000000010/);
+  assert.equal(rendered.value.idempotencyKey, "bp09:productions:notice:90000000-0000-4000-a000-000000000009");
+  assert.equal(rendered.value.businessObjectId, bp09Payload().templateData.referenceId);
+  assert.equal(rendered.value.to.length, 1);
+  assert.equal(rendered.value.cc[0].address, "productions@jmerrill.one");
+  assert.equal(rendered.value.renderMetadata.htmlSha256.length, 64);
+});
+
+function bp09MemoryTable() {
+  const rows = new Map();
+  return { rows, async createTable() {},
+    async createEntity(row) {
+      const key = `${row.partitionKey}/${row.rowKey}`;
+      if (rows.has(key)) throw Object.assign(new Error("exists"), { statusCode: 409 });
+      rows.set(key, { ...row });
+    },
+    async getEntity(pk, rk) { return { ...rows.get(`${pk}/${rk}`) }; },
+    async updateEntity(row) {
+      const key = `${row.partitionKey}/${row.rowKey}`;
+      rows.set(key, { ...rows.get(key), ...row });
+    }
+  };
+}
+
+test("BP09 accepted replay survives runtime recreation and changed Lead conflicts without second provider call", async () => {
+  const { createLedger } = require("../src/state/messageLedger");
+  const table = bp09MemoryTable();
+  let sends = 0;
+  const options = () => ({ env: { ACS_CONNECTION_STRING: "fixture" }, ledger: createLedger(table),
+    client: { beginSend: async () => { sends++; return { pollUntilDone: async () => ({ status: "Succeeded", id: "provider-bp09" }) }; } } });
+  const send = (relay, payload = bp09Payload()) => relay.routes["send-enterprise-governed-email"].handler(routeRequest(payload, bp09Headers()), quietContext);
+  const first = await send(loadEnterpriseRelayModule(options()));
+  assert.equal(first.status, 202);
+  assert.equal(first.jsonBody.providerMessageId, "provider-bp09");
+  const restarted = loadEnterpriseRelayModule(options());
+  const replay = await send(restarted);
+  assert.equal(replay.status, 200);
+  assert.equal(replay.jsonBody.replay, true);
+  assert.equal(replay.jsonBody.jm1MessageId, first.jsonBody.jm1MessageId);
+  const changed = bp09Payload();
+  changed.templateData.leadId = "90000000-0000-4000-a000-000000000011";
+  const conflict = await send(restarted, changed);
+  assert.equal(conflict.status, 409);
+  assert.equal(conflict.jsonBody.accepted, false);
+  assert.equal(conflict.jsonBody.code, "IDEMPOTENCY_KEY_CONFLICT");
+  assert.equal(sends, 1);
+  assert.equal(table.rows.size, 1);
+  const stored = [...table.rows.values()][0];
+  assert.equal(stored.communicationState, "PROVIDER_ACCEPTED");
+  assert.equal(stored.providerMessageId, "provider-bp09");
+  for (const field of ["templateData", "html", "plainText", "subject", "message", "submission"]) assert.equal(Object.hasOwn(stored, field), false);
+});
+
+test("BP09 ambiguous send remains submitted after restart, exact retry does not resend", async () => {
+  const { createLedger } = require("../src/state/messageLedger");
+  const table = bp09MemoryTable();
+  let sends = 0;
+  const options = () => ({ env: { ACS_CONNECTION_STRING: "fixture" }, ledger: createLedger(table),
+    client: { beginSend: async () => { sends++; throw new Error("transport timeout"); } } });
+  const send = (relay) => relay.routes["send-enterprise-governed-email"].handler(routeRequest(bp09Payload(), bp09Headers()), quietContext);
+  const failed = await send(loadEnterpriseRelayModule(options()));
+  assert.equal(failed.status, 502);
+  assert.equal([...table.rows.values()][0].communicationState, "SUBMITTED");
+  const replay = await send(loadEnterpriseRelayModule(options()));
+  assert.equal(replay.status, 202);
+  assert.equal(replay.jsonBody.accepted, false);
+  assert.equal(replay.jsonBody.inProgress, true);
+  assert.equal(sends, 1);
+});
+
+test("BP09 failure before reservation safely retries with the same request", async () => {
+  const { createLedger } = require("../src/state/messageLedger");
+  const ledger = createLedger(bp09MemoryTable());
+  const original = ledger.reserve;
+  let attempts = 0, sends = 0;
+  ledger.reserve = async (input) => {
+    if (++attempts === 1) throw Object.assign(new Error("unavailable"), { safeCode: "MESSAGE_STORE_UNAVAILABLE" });
+    return original(input);
+  };
+  const relay = loadEnterpriseRelayModule({ env: { ACS_CONNECTION_STRING: "fixture" }, ledger,
+    client: { beginSend: async () => { sends++; return { pollUntilDone: async () => ({ status: "Succeeded", id: "provider-retry" }) }; } } });
+  const send = () => relay.routes["send-enterprise-governed-email"].handler(routeRequest(bp09Payload(), bp09Headers()), quietContext);
+  assert.equal((await send()).status, 502);
+  assert.equal(sends, 0);
+  assert.equal((await send()).jsonBody.accepted, true);
+  assert.equal(sends, 1);
 });

@@ -3,9 +3,30 @@ const test = require("node:test");
 const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const path = require("node:path");
-const { lifecycleReadback } = require("../src/functions/runPublishingLifecycleReadback");
+const { lifecycleReadback, lifecycleReadbackHandler } = require("../src/functions/runPublishingLifecycleReadback");
 const authorId = "106a78d0-fb9a-f111-b8dc-6045bdd69738";
 const titleId = "daf8180f-85a3-f111-b8de-000d3a14673b";
+test("HTTP boundary routes exact commissioning readback modes after authentication", async () => {
+  for (const mode of ["COMMISSIONING_INTAKE_READ_ONLY", "COMMISSIONING_REVIEW_READ_ONLY", "COMMISSIONING_IDENTITY_READ_ONLY"]) {
+    let calls = 0;
+    const request = { headers: { get: () => "internal-key" }, json: async () => ({ mode, titleId }) };
+    const deps = { env: { JM1_DIAGNOSTIC_RUNNER_KEY: "internal-key" }, commissioningReadback: async body => {
+      calls++; assert.equal(body.mode, mode); return { status: 200, jsonBody: { mode, effects: 0 } };
+    } };
+    assert.equal((await lifecycleReadbackHandler(request, deps)).status, 200); assert.equal(calls, 1);
+    request.headers.get = () => "wrong";
+    assert.equal((await lifecycleReadbackHandler(request, deps)).status, 401); assert.equal(calls, 1);
+  }
+});
+test("HTTP failure preserves safe owner code, never raw dependency content", async () => {
+  const request = { headers: { get: () => "key" }, json: async () => ({ mode: "COMMISSIONING_REVIEW_READ_ONLY", titleId }) };
+  const deps = { env: { JM1_DIAGNOSTIC_RUNNER_KEY: "key" }, commissioningReadback: async () => {
+    throw Object.assign(new Error("private content"), { safeCode: "REVIEW_TITLE_CONTEXT_UNBOUND" });
+  } };
+  assert.equal((await lifecycleReadbackHandler(request, deps)).jsonBody.error, "REVIEW_TITLE_CONTEXT_UNBOUND");
+  deps.commissioningReadback = async () => { throw new Error("private content"); };
+  assert.equal((await lifecycleReadbackHandler(request, deps)).jsonBody.error, "COMMISSIONING_NATIVE_READBACK_FAILED");
+});
 test("production startup explicitly registers the read-only route", () => {
   assert.match(fs.readFileSync(path.join(__dirname, "../src/index.js"), "utf8"),
     /require\("\.\/functions\/runPublishingLifecycleReadback"\)/);
@@ -13,7 +34,8 @@ test("production startup explicitly registers the read-only route", () => {
 function dependencies(wrongAuthor = false) {
   return { client: { first: async entity => entity === "contacts"
     ? { contactid: authorId, fullname: "Test Author", emailaddress1: "test@example.com" }
-    : { jm1pub_titleid: titleId, _jm1_primaryauthor_value: wrongAuthor ? titleId : authorId, jm1pub_titlename: "Test Project" } },
+    : { jm1pub_titleid: titleId, _jm1_primaryauthor_value: wrongAuthor ? titleId : authorId, jm1pub_titlename: "Test Project" },
+    list: async () => [] },
     graphClient: { request: async method => { assert.equal(method, "GET"); return { value: [] }; } } };
 }
 test("bounded production identity readback is effect-free and renders the canonical fixture", async () => {
@@ -32,6 +54,8 @@ test("wrong immutable author-title pair is denied before mailbox access", async 
 test("unbounded reads and text-only identity are denied", async () => {
   assert.equal((await lifecycleReadback({ authorId: "Test Author", titleId }, dependencies())).status, 400);
   assert.equal((await lifecycleReadback({ authorId, titleId, afterIso: "2020-01-01" }, dependencies())).status, 400);
+  assert.equal((await lifecycleReadback({ authorId, titleId, includeResponseSearch: true,
+    afterIso: new Date(Date.now() - 86400000).toISOString() }, dependencies())).status, 400);
 });
 test("encoded mailbox pagination remains bounded to the canonical Graph mailbox", async () => {
   const deps = dependencies();
@@ -90,7 +114,7 @@ test("recent system census is explicitly requested and bounded independently of 
   assert.equal(result.jsonBody.effects, 0);
 });
 
-test("response search follows exact threads and alternate addresses from new author text only", async () => {
+test("response search preserves alternate-address leads without verifying them", async () => {
   const deps = dependencies();
   const filters = [];
   deps.graphClient.request = async (method, path) => {
@@ -106,14 +130,41 @@ test("response search follows exact threads and alternate addresses from new aut
     return { value: [] };
   };
   const result = await lifecycleReadback({ authorId, titleId, includeResponseSearch: true,
-    afterIso: new Date(Date.now() - 86400000).toISOString() }, deps);
-  assert.deepEqual(result.jsonBody.responseSearch.aliases, ["new-author@example.net"]);
-  assert.equal(result.jsonBody.responseSearch.complete, true);
+    afterIso: new Date(Date.now() - 86400000).toISOString(), deliverySentAtIso: new Date().toISOString() }, deps);
+  assert.deepEqual(result.jsonBody.responseSearch.aliases, []);
+  assert.deepEqual(result.jsonBody.responseSearch.unverifiedAliasLeads, ["new-author@example.net"]);
+  assert.equal(result.jsonBody.responseSearch.complete, false);
+  assert.equal(result.jsonBody.responseSearch.reason, "ALTERNATE_SENDER_IDENTITY_UNVERIFIED");
   assert.equal(result.jsonBody.responseSearch.identityChanges, 0);
   assert.match(filters[2], /new-author@example.net/);
   assert.match(filters[3], /conversationId eq 'exact-thread'/);
+  assert.match(filters[1], /from\/emailAddress\/address eq 'publishing@email\.jmerrill\.one'/);
+  assert.doesNotMatch(filters[1], /Test Project/);
   assert.equal(filters.some(filter => filter.includes("quoted@example.net")), false);
   assert.equal(result.jsonBody.effects, 0);
+});
+
+test("registered alternate requires primary-address verification evidence before response search trusts it", async () => {
+  for (const verified of [false, true]) {
+    const deps = dependencies();
+    const first = deps.client.first;
+    deps.client.first = async entity => entity === "contacts"
+      ? { contactid: authorId, fullname: "Test Author", emailaddress1: "test@example.com",
+        emailaddress2: "author@example.net" } : first(entity);
+    deps.client.list = async () => verified ? [{ jm1_sourceentity: "contact", jm1_sourcerecordid: authorId,
+      jm1_actiondescription: `address=author@example.net; status=VERIFIED; verificationMethod=PRIMARY_EMAIL_EXPLICIT_STATEMENT; sourceMessageId=source-1; verifiedAt=${new Date().toISOString()};` }] : [];
+    const filters = [];
+    deps.graphClient.request = async (method, path) => {
+      const filter = new URL(path, "https://graph.microsoft.com").searchParams.get("$filter");
+      filters.push(filter);
+      return { value: [] };
+    };
+    const result = await lifecycleReadback({ authorId, titleId, includeResponseSearch: true,
+      afterIso: new Date(Date.now() - 86400000).toISOString(), deliverySentAtIso: new Date().toISOString() }, deps);
+    assert.deepEqual(result.jsonBody.responseSearch.aliases, verified ? ["author@example.net"] : []);
+    assert.equal(result.jsonBody.responseSearch.complete, verified);
+    assert.ok(filters.some(filter => filter.includes("author@example.net")));
+  }
 });
 
 test("truncated thread read cannot establish absence of author response", async () => {
@@ -128,6 +179,6 @@ test("truncated thread read cannot establish absence of author response", async 
     return { value: [] };
   };
   const result = await lifecycleReadback({ authorId, titleId, includeResponseSearch: true,
-    afterIso: new Date(Date.now() - 86400000).toISOString() }, deps);
+    afterIso: new Date(Date.now() - 86400000).toISOString(), deliverySentAtIso: new Date().toISOString() }, deps);
   assert.equal(result.jsonBody.responseSearch.complete, false);
 });

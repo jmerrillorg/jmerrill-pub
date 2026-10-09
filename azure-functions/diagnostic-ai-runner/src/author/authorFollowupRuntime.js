@@ -11,6 +11,7 @@ const { CADENCE_DAYS, evaluateAuthorFollowup } = require("./authorFollowupPolicy
 const { elapsedGovernedBusinessDays } = require("./authorBusinessCalendar");
 const { scanCurrentAuthorActions } = require("./currentAuthorActionCensus");
 const { createCurrentAuthorResponseSearch } = require("./currentAuthorResponseSearch");
+const { isJackieAuthoredTitle } = require("./jackieTitleSystemCommissioningPolicy");
 
 const INTERNAL_MAILBOX = "publishing@jmerrill.one";
 
@@ -49,13 +50,16 @@ function authorCopy(title, author, dueAt, position) {
 async function prepareFollowup(client, projection, position) {
   const [title, contact] = await Promise.all([
     client.first("jm1pub_titles", {
-      $select: "jm1pub_titleid,jm1pub_titlename,_jm1_primaryauthor_value,jm1_canonicalauthorcontactreference",
+      $select: "jm1pub_titleid,jm1pub_titlename,_jm1_primaryauthor_value,_jm1_author_value,jm1_canonicalauthorcontactreference",
       $filter: `jm1pub_titleid eq ${projection.titleId}`
     }),
     client.first("contacts", {
       $select: "contactid,fullname,emailaddress1", $filter: `contactid eq ${projection.authorId}`
     })
   ]);
+  if (!isJackieAuthoredTitle(title)) {
+    return { status: "HELD", reason: "JACKIE_AUTHOR_ONLY_SYSTEM_COMMISSIONING_DENIED" };
+  }
   if (title?.jm1pub_titleid !== projection.titleId ||
       title?._jm1_primaryauthor_value !== projection.authorId ||
       title?.jm1_canonicalauthorcontactreference?.toLowerCase() !== `contact:${projection.authorId}` ||

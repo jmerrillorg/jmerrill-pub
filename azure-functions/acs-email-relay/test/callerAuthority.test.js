@@ -6,6 +6,7 @@ const {
   CALLER_REGISTRY_VERSION,
   authorizeCallerForBrand,
   authorizeCallerForTemplate,
+  authorizeCallerForRecipients,
   findCallerByObjectId,
   getLegacyCaller,
   listCallers
@@ -25,7 +26,7 @@ function principalHeader(objectId) {
 }
 
 test("caller registry is versioned and contains no implicit all-brand grant", () => {
-  assert.equal(CALLER_REGISTRY_VERSION, "JM1-RELAY-CALLERS-v1.1.0");
+  assert.equal(CALLER_REGISTRY_VERSION, "JM1-RELAY-CALLERS-v1.6.0");
   assert.ok(listCallers().length >= 3);
   assert.equal(listCallers().some((caller) => caller.authorizedBrands.includes("ALL_BRANDS")), false);
 });
@@ -80,4 +81,15 @@ test("diagnostic runner is limited to the payment-election template namespace", 
   const runner = findCallerByObjectId("e8c51a80-bdb0-46fa-b398-9109719d6427");
   assert.equal(authorizeCallerForTemplate(runner, "PUBLISHING.PAYMENT_ELECTION_REQUIRED").ok, true);
   assert.equal(authorizeCallerForTemplate(runner, "PUBLISHING.UNRELATED_MESSAGE").reason, "CALLER_TEMPLATE_NOT_AUTHORIZED");
+});
+
+test("JSJ workload is limited to its brand, notification template, and Jackie mailbox", () => {
+  const jsj = findCallerByObjectId("8a488b86-7a1a-4978-8705-6fbc3bd8ce15");
+  assert.equal(jsj.callerId, "jsj-web-prod");
+  assert.equal(authorizeCallerForBrand(jsj, "JSJ").ok, true);
+  assert.equal(authorizeCallerForBrand(jsj, "JMP").reason, "CALLER_BRAND_NOT_AUTHORIZED");
+  assert.equal(authorizeCallerForTemplate(jsj, "JSJ_INQUIRY_NOTIFICATION").ok, true);
+  assert.equal(authorizeCallerForTemplate(jsj, "JSJ_OTHER").reason, "CALLER_TEMPLATE_NOT_AUTHORIZED");
+  assert.equal(authorizeCallerForRecipients(jsj, ["jackie@jmerrill.one"]).ok, true);
+  assert.equal(authorizeCallerForRecipients(jsj, ["other@example.com"]).reason, "CALLER_RECIPIENT_NOT_AUTHORIZED");
 });

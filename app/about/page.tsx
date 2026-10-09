@@ -3,6 +3,7 @@ import { CTASection } from '@/components/content/CTASection'
 import { PageHero } from '@/components/site/PageHero'
 import { PageSection } from '@/components/site/PageSection'
 import { division } from '@/lib/tokens'
+import { publishedPortfolioCountPublic } from '@/lib/publishing/public-portfolio'
 
 export const metadata: Metadata = {
   title: 'About — J Merrill Publishing, Inc.',
@@ -65,7 +66,8 @@ const carePrinciples = [
 ]
 
 const proofPoints = [
-  '125+ titles',
+  `${publishedPortfolioCountPublic} published titles`,
+  'A living book catalog',
   'Five official imprints',
   "Global distribution through Ingram's retail and library network",
   'Registered publisher',

@@ -14,6 +14,28 @@ function context() {
   };
 }
 
+test("existing timer observes receipt recovery independently of title autostart", async () => {
+  const prior = { receipt: process.env.JM1_INTAKE_RECEIPT_RECOVERY_ENABLED, title: process.env.JM1_PUBLISHING_INTAKE_AUTOSTART_RECOVERY_ENABLED };
+  process.env.JM1_INTAKE_RECEIPT_RECOVERY_ENABLED = "true";
+  process.env.JM1_PUBLISHING_INTAKE_AUTOSTART_RECOVERY_ENABLED = "false";
+  try {
+    const log = context(); let calls = 0;
+    await runPublishingIntakeAutostartRecovery(null, log, {
+      callReceiptRecovery: async () => { calls++; return { examined: 1, results: [{ phase: "COMPLETED" }], observedAt: "fixture", releaseSha: "fixture" }; },
+      listReadyIntakes: async () => assert.fail("must not scan title processing"),
+    });
+    assert.equal(calls, 1);
+    assert.match(log.messages.info[0], /receipt recovery observed/);
+    await assert.rejects(runPublishingIntakeAutostartRecovery(null, log, {
+      callReceiptRecovery: async () => ({ examined: 1, results: [{ error: "DEPENDENCY_UNAVAILABLE" }] }),
+    }), /INTAKE_RECEIPT_MONITOR_FAILURE/);
+  } finally {
+    for (const [name, value] of [["JM1_INTAKE_RECEIPT_RECOVERY_ENABLED", prior.receipt], ["JM1_PUBLISHING_INTAKE_AUTOSTART_RECOVERY_ENABLED", prior.title]]) {
+      if (value === undefined) delete process.env[name]; else process.env[name] = value;
+    }
+  }
+});
+
 test("autostart recovery surfaces scan failures to the durable timer runtime", async () => {
   const prior = process.env.JM1_PUBLISHING_INTAKE_AUTOSTART_RECOVERY_ENABLED;
   process.env.JM1_PUBLISHING_INTAKE_AUTOSTART_RECOVERY_ENABLED = "true";

@@ -2,13 +2,16 @@ const { app } = require("@azure/functions");
 const { EmailClient } = require("@azure/communication-email");
 const { DefaultAzureCredential } = require("@azure/identity");
 const { authenticateCaller } = require("../security/callerAuthentication");
-const { authorizeCallerForBrand, authorizeCallerForTemplate, normalizeBrand } = require("../policy/callerRegistry");
+const { authorizeCallerForBrand, authorizeCallerForTemplate, authorizeCallerForRecipients, normalizeBrand } = require("../policy/callerRegistry");
 const { DELIVERY_STATE, getMessageLedger } = require("../state/messageLedger");
 const { renderTemplate } = require("../templates/renderer");
 const { sendWithCompletedReceipt } = require("../provider/acsCompletion");
 const { resolvePublishingAcceptance } = require("../state/publishingAcceptance");
 const { renderPublishingServiceCorrespondence } = require("../generated/communications/jm1-enterprise-communication-renderer");
 const { isGovernedNamespace } = require("../templates/templateRegistry");
+const { CALLER_ID: BP09_CALLER_ID, TEMPLATE_ID: BP09_TEMPLATE_ID, REVIEW_TEMPLATES, renderProductionsBp09Notice } = require("../templates/productionsBp09Notice");
+const { CALLER_ID: FOUNDATION_CALLER_ID, TEMPLATE_ID: FOUNDATION_TEMPLATE_ID, renderFoundationVolunteerNotice } = require("../templates/foundationVolunteerNotice");
+const { CALLER_ID: FINANCIAL_CALLER_ID, TEMPLATE_ID: FINANCIAL_TEMPLATE_ID, renderFinancialInquiryNotice } = require("../templates/financialInquiryNotice");
 const {
   getSenderProfile,
   validateMessageIdentity,
@@ -23,6 +26,13 @@ const HIGH_RISK_VALUES = new Set(["HIGH", "LEGAL", "FINANCIAL_ADVICE", "CONTRACT
 const FOUNDATION_PROMOTIONAL_TYPES = new Set(["FUNDRAISING", "PROMOTIONAL", "NEWSLETTER", "DONOR_MARKETING"]);
 
 let emailClient;
+
+function boundedNoticeRenderer(callerId) {
+  if (callerId === BP09_CALLER_ID) return renderProductionsBp09Notice;
+  if (callerId === FOUNDATION_CALLER_ID) return renderFoundationVolunteerNotice;
+  if (callerId === FINANCIAL_CALLER_ID) return renderFinancialInquiryNotice;
+  return null;
+}
 
 function getEmailClient() {
   if (emailClient) return emailClient;
@@ -131,6 +141,9 @@ function serverError(code, payload = {}) {
 }
 
 function validateEnterprisePayload(payload = {}) {
+  if (normalizeEnum(payload?.templateId) === BP09_TEMPLATE_ID || Object.hasOwn(REVIEW_TEMPLATES, payload?.templateId || "")) return renderProductionsBp09Notice(payload);
+  if (normalizeEnum(payload?.templateId) === FOUNDATION_TEMPLATE_ID) return renderFoundationVolunteerNotice(payload);
+  if (normalizeEnum(payload?.templateId) === FINANCIAL_TEMPLATE_ID) return renderFinancialInquiryNotice(payload);
   const brand = normalizeBrand(payload.brand);
   const profileResult = getSenderProfile(brand);
   if (!profileResult.ok) return { ok: false, reason: profileResult.reason };
@@ -314,6 +327,11 @@ app.http("send-enterprise-governed-email", {
       return validationError("INVALID_JSON", body);
     }
 
+    const renderBounded = boundedNoticeRenderer(authentication.caller.callerId);
+    if (renderBounded) {
+      const bounded = renderBounded(body);
+      if (!bounded.ok) return validationError(bounded.reason);
+    }
     const validation = validateEnterprisePayload(body || {});
     if (!validation.ok) {
       if (String(validation.reason || "").startsWith("HUMAN_REVIEW_REQUIRED")) return humanReview(validation.reason, body);
@@ -330,6 +348,11 @@ app.http("send-enterprise-governed-email", {
     if (!templateAuthorization.ok) {
       context.warn(`Enterprise ACS relay template authorization denied: ${templateAuthorization.reason}; caller=${authentication.caller.callerId}; template=${validation.value.templateId}`);
       return unauthorized(body, templateAuthorization.reason, 403);
+    }
+    const recipientAuthorization = authorizeCallerForRecipients(authentication.caller, validation.value.to.map((recipient) => recipient.address));
+    if (!recipientAuthorization.ok) {
+      context.warn(`Enterprise ACS relay recipient authorization denied: ${recipientAuthorization.reason}; caller=${authentication.caller.callerId}`);
+      return unauthorized(body, recipientAuthorization.reason, 403);
     }
 
     let reservation;
@@ -417,6 +440,9 @@ app.http("send-enterprise-governed-email", {
         }
       }
       context.error(`Enterprise ACS relay send failed: ${code}; caller=${authentication.caller.callerId}; brand=${validation.value.brand}`);
+      if (code === "IDEMPOTENCY_KEY_CONFLICT") {
+        return response(409, { accepted: false, code, reason: code });
+      }
       return serverError(code, body);
     }
   }
@@ -435,17 +461,42 @@ app.http("relay-authority-probe", {
     } catch (_error) {
       return validationError("INVALID_JSON", body);
     }
+    const renderBounded = boundedNoticeRenderer(authentication.caller.callerId);
+    if (renderBounded) {
+      const bounded = renderBounded(body);
+      if (!bounded.ok) return validationError(bounded.reason);
+      const authorization = authorizeCallerForBrand(authentication.caller, bounded.value.brand);
+      if (!authorization.ok) return unauthorized({}, authorization.reason, 403);
+      const templateAuthorization = authorizeCallerForTemplate(authentication.caller, bounded.value.templateId);
+      if (!templateAuthorization.ok) return unauthorized({}, templateAuthorization.reason, 403);
+      const recipientAuthorization = authorizeCallerForRecipients(authentication.caller, bounded.value.to.map((recipient) => recipient.address));
+      if (!recipientAuthorization.ok) return unauthorized({}, recipientAuthorization.reason, 403);
+      return response(200, {
+        authorized: true, noSend: true, callerId: authentication.caller.callerId,
+        callerAuthModel: authentication.authModel, brand: bounded.value.brand,
+        templateId: bounded.value.templateId, templateVersion: bounded.value.templateVersion,
+        senderAddress: bounded.value.senderAddress, replyTo: bounded.value.replyTo,
+        recipient: bounded.value.to[0].address, brandCc: bounded.value.cc[0].address,
+        referenceId: bounded.value.businessObjectId, idempotencyKey: bounded.value.idempotencyKey,
+        renderMetadata: bounded.value.renderMetadata
+      });
+    }
     const brand = normalizeBrand(body.brand);
     const profile = getSenderProfile(brand);
     if (!profile.ok) return validationError(profile.reason, body);
     const authorization = authorizeCallerForBrand(authentication.caller, brand);
     if (!authorization.ok) return unauthorized(body, authorization.reason, 403);
+    if (body.recipient || body.to) {
+      const recipientAuthorization = authorizeCallerForRecipients(authentication.caller, normalizeRecipients(body.recipient || body.to).map((recipient) => recipient.address));
+      if (!recipientAuthorization.ok) return unauthorized(body, recipientAuthorization.reason, 403);
+    }
     return response(200, {
       authorized: true,
       noSend: true,
       callerId: authentication.caller.callerId,
       callerAuthModel: authentication.authModel,
       brand,
+      authorizedRecipients: authentication.caller.authorizedRecipients || undefined,
       senderAddress: profile.profile.acsFrom,
       brandCc: profile.profile.ccAddress,
       replyTo: profile.profile.replyTo
