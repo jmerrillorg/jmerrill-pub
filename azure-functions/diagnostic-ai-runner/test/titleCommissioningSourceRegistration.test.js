@@ -1,4 +1,8 @@
 "use strict";
+require("node:test")("source registration is imported by the actual Function entry point", () => {
+  const source = require("node:fs").readFileSync(require("node:path").join(__dirname, "../src/index.js"), "utf8");
+  require("node:assert/strict").match(source, /require\("\.\/functions\/runTitleCommissioningSourceRegistration"\)/);
+});
 const test = require("node:test"), assert = require("node:assert/strict");
 const { sourceRegistrationHandler: handler } = require("../src/lifecycle/titleCommissioningSourceRegistration");
 const { policies } = require("../src/lifecycle/titleCommissioningReceivedSources");
