@@ -54,7 +54,7 @@ async function prepareGloryNextAssessmentProposal(deps) {
     tariff: { reference: `commissioning-recovery-tariffs/${c.TITLE_ID}.json`, sha256: tariff.sha256,
       etag: tariff.etag, verifiedAt: tariff.value.verifiedAt, expiresAt: tariff.value.expiresAt }, deployment,
     approvalRequired: "NEW_EXACT_ONE_ATTEMPT_INTERNAL_ASSESSMENT_DECISION",
-    executionPathStatus: "SEPARATELY_REVIEWED_HELD6_TO7_ADAPTER_REQUIRED",
+    executionPathStatus: "ADAPTER_PREPARED_DISABLED_PENDING_NEW_AUTHORITY",
     automaticRetryAuthorized: false, businessEffects: 0, executionEffects: 0, authorityWrites: 0,
     modelInvocationAttempts: 0, providerCountRequests: 1 };
 }
