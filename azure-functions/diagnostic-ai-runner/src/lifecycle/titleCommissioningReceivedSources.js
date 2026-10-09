@@ -130,6 +130,13 @@ async function registerReceivedSource(policy, deps) {
   if (!title && !policy.newTitleWorkReference) fail("COMMISSIONING_RECEIVED_TITLE_MISSING");
   const assertOwned = deps.claim?.assertOwned;
   if (typeof assertOwned !== "function") fail("COMMISSIONING_REGISTRATION_CLAIM_REQUIRED");
+  const id = sourceArtifactId(policy);
+  let row = await deps.client.first("jm1pub_editorialartifacts", { $filter: `jm1pub_editorialartifactid eq ${id}` });
+  if (row) await verifySourceRegistration(policy, row, deps);
+  else {
+    const candidates = await deps.client.list("jm1pub_editorialartifacts", { $filter: `jm1pub_repositoryitemid eq '${policy.itemId}'`, $top: "5000" });
+    if (candidates.length) fail("COMMISSIONING_RECEIVED_EXISTING_ARTIFACT_CONFLICT");
+  }
   if (!title) {
     const candidates = await deps.client.list("jm1pub_titles", { $filter: `jm1_sourceauthority eq '${policy.newTitleWorkReference}' or jm1pub_titlename eq '${policy.titleName}'`, $top: "5000" });
     if (candidates.length) fail("COMMISSIONING_NEW_WORK_CROSSWALK_REQUIRES_REVIEW");
@@ -145,8 +152,6 @@ async function registerReceivedSource(policy, deps) {
     title = await readSourceTitle(policy, deps);
     if (!title) fail("COMMISSIONING_RECEIVED_TITLE_CREATE_UNCONFIRMED");
   }
-  const id = sourceArtifactId(policy);
-  let row = await deps.client.first("jm1pub_editorialartifacts", { $filter: `jm1pub_editorialartifactid eq ${id}` });
   if (!row) {
     const candidates = await deps.client.list("jm1pub_editorialartifacts", { $filter: `jm1pub_repositoryitemid eq '${policy.itemId}'`, $top: "5000" });
     if (candidates.length) fail("COMMISSIONING_RECEIVED_EXISTING_ARTIFACT_CONFLICT");

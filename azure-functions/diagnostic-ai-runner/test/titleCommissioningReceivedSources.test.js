@@ -70,8 +70,14 @@ test("new My AI record is explicit creation tied to source UUID, never a guessed
   assert.equal(x.creates(), 2);
   assert.equal(x.rows.get(`jm1pub_titles:${result.titleId}`).jm1_sourceauthority, x.policy.newTitleWorkReference);
   await received.registerReceivedSource(x.policy, x.deps); assert.equal(x.creates(), 2);
-  const y = fixture(received.policies.MY_AI); y.rows.clear(); y.deps.client.list = async () => [{ jm1pub_titleid: "unresolved-existing" }];
+  const y = fixture(received.policies.MY_AI); y.rows.clear(); y.deps.client.list = async entity => entity === "jm1pub_titles" ? [{ jm1pub_titleid: "unresolved-existing" }] : [];
   await assert.rejects(received.registerReceivedSource(y.policy, y.deps), /CROSSWALK_REQUIRES_REVIEW/); assert.equal(y.creates(), 0);
+});
+test("source-item conflict blocks new My AI title creation before any write", async () => {
+  const x = fixture(received.policies.MY_AI); x.rows.clear();
+  x.deps.client.list = async entity => entity === "jm1pub_editorialartifacts" ? [{ jm1pub_editorialartifactid: "other" }] : [];
+  await assert.rejects(received.registerReceivedSource(x.policy, x.deps), /EXISTING_ARTIFACT_CONFLICT/);
+  assert.equal(x.creates(), 0);
 });
 test("ambiguous creation is retried by exact ID and never a second create identity", async () => {
   const x = fixture(), create = x.deps.client.create;
