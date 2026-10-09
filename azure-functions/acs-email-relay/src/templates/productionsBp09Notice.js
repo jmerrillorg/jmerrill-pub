@@ -6,6 +6,10 @@ const { resolveSenderProfile } = require("../policy/acsSenderRegistry");
 const CALLER_ID = "one-bp09-productions-prod";
 const TEMPLATE_ID = "PRODUCTIONS.BP09_NOTICE";
 const TEMPLATE_VERSION = "1.0.0";
+const REVIEW_TEMPLATES = Object.freeze({
+  "PRODUCTIONS.BP09_REVIEW_OVERDUE": "overdue",
+  "PRODUCTIONS.BP09_REVIEW_RESOLVED": "resolved"
+});
 const TOP_FIELDS = ["brand", "to", "templateId", "templateVersion", "templateData"];
 const DATA_FIELDS = ["referenceId", "leadId"];
 const GUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
@@ -23,21 +27,27 @@ function renderProductionsBp09Notice(payload) {
   if (!exactKeys(payload, TOP_FIELDS)) return deny("BP09_REFERENCE_ENVELOPE_REQUIRED");
   if (payload.brand !== "JMPRODUCTIONS") return deny("BP09_BRAND_MISMATCH");
   if (payload.to !== "productions@jmerrill.one") return deny("BP09_DESTINATION_MISMATCH");
-  if (payload.templateId !== TEMPLATE_ID || payload.templateVersion !== TEMPLATE_VERSION) {
+  const phase = REVIEW_TEMPLATES[payload.templateId];
+  if ((!phase && payload.templateId !== TEMPLATE_ID) || payload.templateVersion !== TEMPLATE_VERSION) {
     return deny("BP09_TEMPLATE_MISMATCH");
   }
-  if (!exactKeys(payload.templateData, DATA_FIELDS)
-      || !DATA_FIELDS.every((field) => typeof payload.templateData[field] === "string"
+  const fields = phase ? [...DATA_FIELDS, "transitionId"] : DATA_FIELDS;
+  if (!exactKeys(payload.templateData, fields)
+      || !fields.every((field) => typeof payload.templateData[field] === "string"
         && GUID.test(payload.templateData[field])
         && payload.templateData[field] !== "00000000-0000-0000-0000-000000000000")) {
     return deny("BP09_REFERENCE_IDS_REQUIRED");
   }
-  const { referenceId, leadId } = payload.templateData;
+  const { referenceId, leadId, transitionId } = payload.templateData;
   const profile = resolveSenderProfile("JMPRODUCTIONS");
   const recordLink = `https://jm1hq.crm.dynamics.com/main.aspx?pagetype=entityrecord&etn=lead&id=${leadId}`;
-  const subject = "Productions inquiry ready for review";
-  const plainText = `A Productions inquiry is ready for internal review.\n\nReference: ${referenceId}\nOpen the secure record: ${recordLink}\n\nJ Merrill Productions`;
-  const html = `<!doctype html><html><body><p>A Productions inquiry is ready for internal review.</p><p>Reference: ${referenceId}</p><p><a href="${recordLink.replaceAll("&", "&amp;")}">Open the secure record</a></p><p>J Merrill Productions</p></body></html>`;
+  const subject = phase === "overdue" ? "Productions inquiry review overdue"
+    : phase === "resolved" ? "Productions inquiry review resolved" : "Productions inquiry ready for review";
+  const intro = phase === "overdue" ? "A Productions inquiry has passed its internal review deadline."
+    : phase === "resolved" ? "A Productions inquiry review checkpoint has been resolved."
+      : "A Productions inquiry is ready for internal review.";
+  const plainText = `${intro}\n\nReference: ${referenceId}\nOpen the secure record: ${recordLink}\n\nJ Merrill Productions`;
+  const html = `<!doctype html><html><body><p>${intro}</p><p>Reference: ${referenceId}</p><p><a href="${recordLink.replaceAll("&", "&amp;")}">Open the secure record</a></p><p>J Merrill Productions</p></body></html>`;
   const sha256 = (text) => createHash("sha256").update(text).digest("hex");
   return { ok: true, value: {
     brand: "JMPRODUCTIONS", profile,
@@ -45,11 +55,11 @@ function renderProductionsBp09Notice(payload) {
     to: [{ address: "productions@jmerrill.one", displayName: profile.organizationDisplayName }],
     cc: [{ address: profile.ccAddress, displayName: profile.organizationDisplayName }],
     subject, plainText, html,
-    messageType: "INTERNAL_INQUIRY_NOTICE", riskClassification: "ROUTINE",
+    messageType: phase ? `INTERNAL_REVIEW_${phase.toUpperCase()}` : "INTERNAL_INQUIRY_NOTICE", riskClassification: "ROUTINE",
     sourceRecord: referenceId, businessObjectType: "BP09_INTAKE_RECEIPT",
-    businessObjectId: referenceId, correlationId: referenceId,
-    templateId: TEMPLATE_ID, templateVersion: TEMPLATE_VERSION,
-    idempotencyKey: `bp09:productions:notice:${referenceId}`,
+    businessObjectId: referenceId, correlationId: transitionId || referenceId,
+    templateId: payload.templateId, templateVersion: TEMPLATE_VERSION,
+    idempotencyKey: phase ? `bp09:productions:review:${phase}:${referenceId}:${transitionId}` : `bp09:productions:notice:${referenceId}`,
     renderMetadata: {
       audience: "INTERNAL_OPERATIONS", rendererVersion: "PRODUCTIONS-BP09-v1.0.0",
       brandTokenVersion: profile.policyId,
@@ -58,4 +68,4 @@ function renderProductionsBp09Notice(payload) {
   } };
 }
 
-module.exports = { CALLER_ID, TEMPLATE_ID, TEMPLATE_VERSION, renderProductionsBp09Notice };
+module.exports = { CALLER_ID, TEMPLATE_ID, TEMPLATE_VERSION, REVIEW_TEMPLATES, renderProductionsBp09Notice };

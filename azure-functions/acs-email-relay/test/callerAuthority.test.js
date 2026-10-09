@@ -26,7 +26,7 @@ function principalHeader(objectId) {
 }
 
 test("caller registry is versioned and contains no implicit all-brand grant", () => {
-  assert.equal(CALLER_REGISTRY_VERSION, "JM1-RELAY-CALLERS-v1.5.0");
+  assert.equal(CALLER_REGISTRY_VERSION, "JM1-RELAY-CALLERS-v1.6.0");
   assert.ok(listCallers().length >= 3);
   assert.equal(listCallers().some((caller) => caller.authorizedBrands.includes("ALL_BRANDS")), false);
 });
