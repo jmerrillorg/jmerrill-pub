@@ -94,6 +94,33 @@ test("permission denial is held rather than retried through another provider", a
   const x = fixture(); x.deps.callModel = async () => ({ ok: false, httpStatus: 403 });
   const result = await worker(x.input, x.deps); assert.equal(result.status, "HELD");
   assert.equal([...x.saved.keys()].some(name => name.endsWith(".md")), false);
+  assert.deepEqual(await worker(x.input, x.deps), result);
+});
+test("exact-schema repair recovers one structural hold and preserves its preimage", async () => {
+  const x = fixture(), original = x.deps.callModel;
+  x.deps.callModel = async () => ({ ok: true, provider: "microsoft-foundry-claude",
+    route: { deploymentAlias: "jm1-editorial-devline-primary" }, output: { invalid: true } });
+  const held = await worker(x.input, x.deps);
+  assert.equal(held.causeCode, "REVIEW_SECTIONS_INVALID");
+  x.deps.callModel = original;
+  const recovered = await worker(x.input, x.deps);
+  assert.equal(recovered.status, "COMPLETED");
+  assert.equal(recovered.executionId, held.executionId);
+  assert.deepEqual(recovered.repairRecovery.previousState, held);
+  assert.equal(recovered.attempts, 2);
+  assert.deepEqual(await worker(x.input, x.deps), recovered);
+  assert.equal(x.calls(), 1);
+});
+test("schema repair does not loop when the repaired producer still returns invalid sections", async () => {
+  const x = fixture(); let calls = 0;
+  x.deps.callModel = async () => { calls++; return { ok: true, provider: "microsoft-foundry-claude",
+    route: { deploymentAlias: "jm1-editorial-devline-primary" }, output: {} }; };
+  await worker(x.input, x.deps);
+  const heldAgain = await worker(x.input, x.deps);
+  assert.equal(heldAgain.status, "HELD");
+  assert.equal(heldAgain.attempts, 2);
+  assert.deepEqual(await worker(x.input, x.deps), heldAgain);
+  assert.equal(calls, 2);
 });
 test("provider timeout preserves a safe cause and resumes the same review", async () => {
   const x = fixture(), original = x.deps.callModel;
@@ -108,4 +135,20 @@ test("provider timeout preserves a safe cause and resumes the same review", asyn
   assert.equal(recovered.status, "COMPLETED");
   assert.equal(recovered.executionId, failed.executionId);
   assert.equal(recovered.attempts, 2);
+});
+test("verified profile identity is pinned and a mid-assessment version change holds output", async () => {
+  const x = fixture(), profileId = "00000000-0000-4000-8000-000000000003";
+  x.input.title = { jm1pub_titleid: x.title.jm1pub_titleid, _jm1_primaryauthor_value: author };
+  x.title.jm1_canonicalauthorcontactreference = `contact:${author}; authorProfile:${profileId}`;
+  const originalRead = x.deps.client.first;
+  const profile = { jm1_authorprofileid: profileId, _jm1_contact_value: author, statecode: 0, versionnumber: 1 };
+  x.deps.client.first = async entity => entity === "jm1_authorprofiles" ? profile : entity === "contacts"
+    ? { contactid: author, statecode: 0, versionnumber: 1 } : originalRead(entity);
+  const originalModel = x.deps.callModel;
+  x.deps.callModel = async () => { const result = await originalModel(); profile.versionnumber++; return result; };
+  const result = await worker(x.input, x.deps);
+  assert.equal(result.status, "HELD");
+  assert.equal(result.causeCode, "REVIEW_AUTHOR_IDENTITY_CHANGED_DURING_EXECUTION");
+  assert.equal(x.saved.size, 2);
+  assert.equal([...x.saved.keys()].some(name => name.endsWith(".md")), false);
 });

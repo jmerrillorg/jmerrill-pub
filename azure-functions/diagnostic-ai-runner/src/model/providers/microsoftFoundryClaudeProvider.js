@@ -322,7 +322,11 @@ function selectRuntimeOptions(route = {}) {
 
 function selectStructuredOutputTool(promptBody, route = {}) {
   // Bound assessment authority outranks markers inside untrusted manuscript data.
-  if (route.promptVersion === "JMP-EDITORIAL-REVIEW-ASSESSMENT-V1") return STRUCTURED_OUTPUT_TOOL;
+  if (route.promptVersion === "JMP-EDITORIAL-REVIEW-ASSESSMENT-V1") return {
+    name: STRUCTURED_OUTPUT_TOOL.name,
+    description: "Submit the complete nine-section assessment only; no edited manuscript or approval.",
+    input_schema: require("../../editorial/commissioningEditorialReviewContract").EDITORIAL_REVIEW_OUTPUT_SCHEMA
+  };
   if (isLineEditingChunkPrompt(promptBody)) return LINE_EDITING_CHUNK_OUTPUT_TOOL;
   if (isDevelopmentalEditingChunkPrompt(promptBody)) return DEVELOPMENTAL_EDITING_CHUNK_OUTPUT_TOOL;
   return STRUCTURED_OUTPUT_TOOL;

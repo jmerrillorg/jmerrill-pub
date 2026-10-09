@@ -15,6 +15,7 @@ async function executeTitleCommissioningIntake(input, deps = {}) {
   const receipt = {
     schemaVersion: 1, executionId: run.executionId, titleId: run.titleId,
     bindingHash: run.bindingHash, scopeVersion: authority.scopeVersion,
+    ...(authority.identityProof.method === "EXACT_PROFILE_CONTACT_BINDING" ? { identityProof: authority.identityProof } : {}),
     status: "INTAKE_MATERIALS_VERIFIED", source: run.source,
     retainedWork: authority.artifacts.filter(a => a.role === "RETAINED_WORK"),
     historyTreatment: run.historyTreatment, productionStageChanged: false,

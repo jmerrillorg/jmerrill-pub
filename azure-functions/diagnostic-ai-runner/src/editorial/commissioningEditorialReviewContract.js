@@ -10,6 +10,23 @@ const SECTIONS = Object.freeze([
   "categoryNotes", "integrityFlags", "styleGuideDetermination", "recommendation"
 ]);
 const PATHWAYS = new Set(["DEVELOPMENTAL", "LINE_AND_COPY", "REWRITE", "DECLINE", "FAST_TRACK_CONSIDERATION"]);
+const stringSchema = { type: "string", minLength: 1, maxLength: 12000 };
+const fieldsSchema = properties => ({ type: "object", properties, required: Object.keys(properties), additionalProperties: false });
+const textFields = keys => Object.fromEntries(keys.map(key => [key, stringSchema]));
+const EDITORIAL_REVIEW_OUTPUT_SCHEMA = fieldsSchema({
+  intakeSummary: fieldsSchema({
+    ...textFields(["title", "sourceVersion", "genre", "audience", "draftStage", "seriesPotential", "comparables", "authorIntent", "submissionCompleteness"]),
+    wordCount: { type: "integer", minimum: 1 }
+  }),
+  imprintAlignment: fieldsSchema({ imprint: stringSchema, authority: { type: "string", enum: ["CONFIRMED", "SUGGESTED_ONLY"] }, rationale: stringSchema, publisherApprovalRequired: { type: "boolean" } }),
+  categoryScores: fieldsSchema(Object.fromEntries(CATEGORIES.map(key => [key, { type: "integer", minimum: 1, maximum: 5 }]))),
+  strengths: { type: "array", minItems: 3, maxItems: 5, items: stringSchema },
+  risks: { type: "array", minItems: 3, maxItems: 5, items: stringSchema },
+  categoryNotes: fieldsSchema(textFields(CATEGORIES)),
+  integrityFlags: { type: "array", maxItems: 20, items: fieldsSchema({ category: stringSchema, observation: stringSchema, hardStop: { type: "boolean" } }) },
+  styleGuideDetermination: fieldsSchema(textFields(["primaryGuide", "secondaryReference", "conflicts"])),
+  recommendation: fieldsSchema({ pathway: { type: "string", enum: [...PATHWAYS] }, rationale: stringSchema, forwardChecklist: { type: "array", minItems: 1, items: stringSchema }, resubmissionEligibility: stringSchema })
+});
 const hash = value => createHash("sha256").update(value).digest("hex");
 function deny(code) { throw Object.assign(new Error(code), { safeCode: code }); }
 function object(value) { return value && typeof value === "object" && !Array.isArray(value); }
@@ -98,4 +115,4 @@ function assembleReviewPrompt({ titleId, sourceSha256, sourceVersion, manuscript
   return { prompt, promptSha256: hash(prompt), provenance };
 }
 
-module.exports = { CATEGORIES, SECTIONS, verifyReviewAuthority, validateEditorialReview, assembleReviewPrompt };
+module.exports = { CATEGORIES, SECTIONS, EDITORIAL_REVIEW_OUTPUT_SCHEMA, verifyReviewAuthority, validateEditorialReview, assembleReviewPrompt };

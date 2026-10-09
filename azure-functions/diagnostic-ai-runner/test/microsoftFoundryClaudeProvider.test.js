@@ -80,6 +80,24 @@ afterEach(() => {
 });
 
 describe("microsoftFoundryClaudeProvider", () => {
+  test("assessment binds all nine exact sections despite editing markers in manuscript data", () => {
+    const { loaded, restore } = loadProviderWithStubs();
+    try {
+      const { SECTIONS, CATEGORIES } = require("../src/editorial/commissioningEditorialReviewContract");
+      const schema = loaded.selectStructuredOutputTool("cc010_line_editing_full_manuscript_chunk_execution", {
+        promptVersion: "JMP-EDITORIAL-REVIEW-ASSESSMENT-V1"
+      }).input_schema;
+      assert.deepEqual(schema.required, SECTIONS);
+      assert.equal(schema.additionalProperties, false);
+      assert.deepEqual(schema.properties.categoryScores.required, CATEGORIES);
+      assert.equal(schema.properties.categoryScores.properties.STRUCTURE_FLOW.maximum, 5);
+      assert.equal(schema.properties.intakeSummary.properties.wordCount.type, "integer");
+      assert.equal(schema.properties.integrityFlags.items.properties.hardStop.type, "boolean");
+      assert.equal(schema.properties.recommendation.additionalProperties, false);
+      assert.equal(Object.hasOwn(schema.properties, "editedManuscript"), false);
+      assert.equal(loaded.selectStructuredOutputTool("plain", {}).input_schema.additionalProperties, true);
+    } finally { restore(); }
+  });
   test("assessment alone uses one bounded longer request without provider replay", () => {
     const { loaded, restore } = loadProviderWithStubs();
     try {

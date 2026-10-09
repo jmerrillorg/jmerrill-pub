@@ -1,6 +1,6 @@
 "use strict";
 
-const { isJackieAuthoredTitle } = require("../author/jackieTitleSystemCommissioningPolicy");
+const { readJackieCommissioningIdentity } = require("../author/jackieCommissioningIdentityReader");
 const GUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 function deny(code) { throw Object.assign(new Error(code), { safeCode: code }); }
 
@@ -17,7 +17,9 @@ async function readTitleCommissioningAuthority(input, deps = {}) {
       typeof scope.version !== "string" || !scope.version.trim() ||
       scope.mode !== "JACKIE_TITLE_INTERNAL_COMMISSIONING") deny("COMMISSIONING_SCOPE_NOT_CURRENT");
   const title = await deps.client.first("jm1pub_titles", { $filter: `jm1pub_titleid eq ${titleId}` });
-  if (title?.jm1pub_titleid !== titleId || !isJackieAuthoredTitle(title)) deny("COMMISSIONING_AUTHOR_AUTHORITY_CHANGED");
+  if (title?.jm1pub_titleid !== titleId) deny("COMMISSIONING_AUTHOR_AUTHORITY_CHANGED");
+  const identityProof = await readJackieCommissioningIdentity(title, scope, deps.client);
+  if (!identityProof) deny("COMMISSIONING_AUTHOR_AUTHORITY_CHANGED");
   const sourceId = /^dataverse:jm1pub_editorialartifact:([a-f0-9-]{36})$/i.exec(input.source?.reference || "")?.[1];
   if (!GUID.test(sourceId || "")) deny("COMMISSIONING_SOURCE_REFERENCE_INVALID");
   if (scope.controllingSourceArtifactId !== sourceId || !Array.isArray(scope.retainedArtifactIds) ||
@@ -43,7 +45,7 @@ async function readTitleCommissioningAuthority(input, deps = {}) {
     if (await deps.verifyArtifactBytes(artifact, binding.sha256) !== true) deny("COMMISSIONING_ARTIFACT_BYTES_UNVERIFIED");
     artifacts.push({ artifactId: binding.artifactId, version: binding.version, sha256: binding.sha256, role: binding.role });
   }
-  return { title, artifacts, scopeVersion: scope.version, current: true };
+  return { title, identityProof, artifacts, scopeVersion: scope.version, current: true };
 }
 
 module.exports = { readTitleCommissioningAuthority };
