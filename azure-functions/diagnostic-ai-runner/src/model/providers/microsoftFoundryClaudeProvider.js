@@ -145,7 +145,7 @@ async function call({ promptBody, diagnosticId, telemetry = null, route }) {
   try {
     const credential = new DefaultAzureCredential();
     const tokenResult = await credential.getToken(TOKEN_SCOPE);
-    const runtimeOptions = getProviderRuntimeOptions("AZURE_FOUNDRY");
+    const runtimeOptions = selectRuntimeOptions(route);
 
     const response = await trackDependency(
       telemetry,
@@ -289,6 +289,8 @@ async function call({ promptBody, diagnosticId, telemetry = null, route }) {
       output: null,
       tokenCounts: { input: 0, output: 0, total: 0 },
       httpStatus,
+      failureCode: error === "REQUEST_TIMEOUT" || ["AbortError", "TimeoutError"].includes(error?.name)
+        ? "MODEL_REQUEST_TIMEOUT" : "MODEL_TRANSPORT_UNAVAILABLE",
       error: `MODEL_CALL_EXCEPTION: ${String(error.message || error).slice(0, 200)}`
     };
   }
@@ -309,6 +311,13 @@ function extractTextContent(responseBody) {
     .map((part) => part.text)
     .join("\n")
     .trim();
+}
+
+function selectRuntimeOptions(route = {}) {
+  const options = getProviderRuntimeOptions("AZURE_FOUNDRY");
+  // Full-manuscript assessment needs one longer request, not repeated short calls.
+  return route.promptVersion === "JMP-EDITORIAL-REVIEW-ASSESSMENT-V1"
+    ? { ...options, timeoutMs: 240000, maxRetries: 0 } : options;
 }
 
 function selectStructuredOutputTool(promptBody, route = {}) {
@@ -373,5 +382,6 @@ module.exports = {
   isLineEditingChunkPrompt,
   isDevelopmentalEditingChunkPrompt,
   selectMaxOutputTokens,
+  selectRuntimeOptions,
   selectStructuredOutputTool
 };

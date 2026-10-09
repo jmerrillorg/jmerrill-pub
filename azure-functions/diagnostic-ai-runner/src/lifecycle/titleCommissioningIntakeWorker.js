@@ -6,7 +6,8 @@ const { executeTitleCommissioningIntake } = require("./titleCommissioningIntake"
 
 const LEASE_MS = 5 * 60 * 1000;
 const MAX_ATTEMPTS = 5;
-const RETRYABLE = new Set(["ETIMEDOUT", "ECONNRESET", "EAI_AGAIN", "COMMISSIONING_DEPENDENCY_UNAVAILABLE"]);
+const RETRYABLE = new Set(["ETIMEDOUT", "ECONNRESET", "EAI_AGAIN", "COMMISSIONING_DEPENDENCY_UNAVAILABLE",
+  "REVIEW_MODEL_REQUEST_TIMEOUT", "REVIEW_MODEL_TRANSPORT_UNAVAILABLE"]);
 function fail(code) { throw Object.assign(new Error(code), { safeCode: code }); }
 function conflict(error) { return [409, 412].includes(error?.statusCode); }
 function retryable(error) { return RETRYABLE.has(error?.safeCode || error?.code) || [408, 429, 500, 502, 503, 504].includes(error?.statusCode ?? error?.status); }

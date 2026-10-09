@@ -80,6 +80,35 @@ afterEach(() => {
 });
 
 describe("microsoftFoundryClaudeProvider", () => {
+  test("assessment alone uses one bounded longer request without provider replay", () => {
+    const { loaded, restore } = loadProviderWithStubs();
+    try {
+      withEnv({ AZURE_FOUNDRY_TIMEOUT_MS: "5000", AZURE_FOUNDRY_MAX_RETRIES: "1" }, () => {
+        const review = loaded.selectRuntimeOptions({ promptVersion: "JMP-EDITORIAL-REVIEW-ASSESSMENT-V1" });
+        assert.equal(review.timeoutMs, 240000); assert.equal(review.maxRetries, 0);
+        const other = loaded.selectRuntimeOptions({ promptVersion: "OTHER" });
+        assert.equal(other.timeoutMs, 5000); assert.equal(other.maxRetries, 1);
+      });
+    } finally { restore(); }
+  });
+  test("assessment timeout makes one request and exposes only a safe failure code", async () => {
+    let calls = 0;
+    const { loaded, restore } = loadProviderWithStubs({ fetchImpl: async () => {
+      calls++; throw "REQUEST_TIMEOUT";
+    } });
+    const previous = process.env.AZURE_FOUNDRY_ENDPOINT;
+    process.env.AZURE_FOUNDRY_ENDPOINT = "https://ais-jm1-foundry.services.ai.azure.com";
+    try {
+      const result = await loaded.call({ promptBody: "assessment fixture", diagnosticId: "fixture",
+        route: { deploymentName: "jm1-editorial-devline-primary", promptVersion: "JMP-EDITORIAL-REVIEW-ASSESSMENT-V1" } });
+      assert.equal(calls, 1); assert.equal(result.ok, false);
+      assert.equal(result.failureCode, "MODEL_REQUEST_TIMEOUT");
+    } finally {
+      if (previous === undefined) delete process.env.AZURE_FOUNDRY_ENDPOINT;
+      else process.env.AZURE_FOUNDRY_ENDPOINT = previous;
+      restore();
+    }
+  });
   test("fails closed when endpoint or route deployment is missing", async () => {
     const { loaded, restore } = loadProviderWithStubs();
     try {

@@ -33,6 +33,12 @@ last 20 minutes; configured provider retry bounds exceeding 10 minutes deny the
 call. The registered Foundry route and existing AI gate remain mandatory;
 direct-provider or automatic fallback execution is prohibited.
 
+The bound assessment prompt uses one 240-second provider request per worker
+attempt, with no provider-level retries. Other prompt routes retain their
+configured limits. Safe timeout/transport causes remain in the durable failure
+record; raw provider errors and manuscript content do not. The existing five
+worker attempts and same-execution backoff remain controlling.
+
 The saved assessment precedes document publication. A document-write failure
 recovers that saved assessment, preserving exact rendered bytes without another
 model call. Create-only receipt/document persistence rejects conflicting replay.
