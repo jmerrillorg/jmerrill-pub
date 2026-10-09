@@ -23,6 +23,8 @@ async function verifyCommissioningReviewGuards() {
   const fixture = "# Internal format fixture\n\nLiteral manuscript data.\n";
   if (await extract(Buffer.from(fixture), { repositoryPath: "synthetic/fixture.md" }) !== fixture) throw Error("PROBE_FORMAT_MISSING");
   checks.markdownLiteralPreserved = true;
+  if (await extract(Buffer.from(fixture), { repositoryPath: "https://jmerrillfoundation.sharepoint.com/sites/publishing/_layouts/15/Doc.aspx?file=fixture.md" }) !== fixture) throw Error("PROBE_FORMAT_MISSING");
+  checks.sharepointDocumentUrlResolved = true;
   try {
     await extract(Buffer.from("fixed fixture"), { repositoryPath: "synthetic/fixture.vellum" });
     throw Error("PROBE_FORMAT_MISSING");

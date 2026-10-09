@@ -2,12 +2,24 @@
 const { extname } = require("node:path");
 const { TextDecoder } = require("node:util");
 function deny(code) { throw Object.assign(new Error(code), { safeCode: code }); }
+function sourceExtension(repositoryPath = "") {
+  if (!/^https?:\/\//iu.test(repositoryPath)) return extname(repositoryPath).toLowerCase();
+  let url;
+  try { url = new URL(repositoryPath); } catch { deny("REVIEW_SOURCE_FORMAT_HANDOFF_REQUIRED"); }
+  if (url.protocol !== "https:" || url.hostname !== "jmerrillfoundation.sharepoint.com") deny("REVIEW_SOURCE_FORMAT_HANDOFF_REQUIRED");
+  if (/\/_layouts\/15\/Doc\.aspx$/iu.test(url.pathname)) {
+    const file = url.searchParams.get("file");
+    if (!file || /[\/\\\x00-\x1f]/u.test(file)) deny("REVIEW_SOURCE_FORMAT_HANDOFF_REQUIRED");
+    return extname(file).toLowerCase();
+  }
+  return extname(url.pathname).toLowerCase();
+}
 
 // Format comes from the revalidated artifact, never from the HTTP caller.
 // Markdown is literal manuscript data; links, HTML and code are not executed.
 async function extractCommissioningSourceText(bytes, media = {}) {
   if (!Buffer.isBuffer(bytes) || !bytes.length) deny("REVIEW_SOURCE_TEXT_EMPTY");
-  const extension = extname(media.repositoryPath || "").toLowerCase();
+  const extension = sourceExtension(media.repositoryPath);
   if (extension === ".md") {
     let text;
     try { text = new TextDecoder("utf-8", { fatal: true }).decode(bytes); }
@@ -21,4 +33,4 @@ async function extractCommissioningSourceText(bytes, media = {}) {
   if (!text?.trim()) deny("REVIEW_SOURCE_TEXT_EMPTY");
   return text;
 }
-module.exports = { extractCommissioningSourceText };
+module.exports = { extractCommissioningSourceText, sourceExtension };
