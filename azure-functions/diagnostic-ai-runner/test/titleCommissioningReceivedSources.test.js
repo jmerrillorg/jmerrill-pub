@@ -52,6 +52,30 @@ test("changed registration checksum or approval status rejects replay without ne
     assert.equal(x.creates(), 1);
   }
 });
+
+test("exact founder-completed Intake rename preserves registry and run identity; other locations deny", async () => {
+  for (const [policy, oldName, newName] of [
+    [received.policies.TIL_DEATH, "JMP-INT-202608-3W6Q6L - Jackie Smith Jr - TIL DEATH DO US PART", "Smith, Jackie - Til Death Do Us Part"],
+    [received.policies.MY_AI, "2025-Smith-MyAIJourney", "Smith, Jackie - My AI Journey"]
+  ]) {
+    const x = fixture(policy);
+    const prefix = "https://jmerrillfoundation.sharepoint.com/sites/publishing/Shared%20Documents/01_Pipeline_A-Z/02%20-%20Intake/";
+    const historical = `${prefix}${encodeURIComponent(oldName)}/Original.md`;
+    let current = historical;
+    x.deps.readReceivedSourceProof = async () => ({ repositoryPath: current, originalFileName: "Original.md" });
+    await received.registerReceivedSource(policy, x.deps);
+    const row = x.rows.get(`jm1pub_editorialartifacts:${received.sourceArtifactId(policy)}`), before = structuredClone(row);
+    current = `${prefix}${encodeURIComponent(newName)}/Original.md`;
+    assert.equal(await received.verifySourceRegistration(policy, row, x.deps), true);
+    assert.deepEqual(row, before); assert.equal(x.creates(), 1);
+    for (const wrong of [current.replace("Original.md", "Different.md"), current.replace("01_Pipeline_A-Z", "07_Archive"),
+      current.replace("jmerrillfoundation.sharepoint.com", "other.sharepoint.com"), current + "?token=secret",
+      `${prefix}Unrelated/Original.md`]) {
+      current = wrong;
+      await assert.rejects(received.verifySourceRegistration(policy, row, x.deps), /LOCATION_CONFLICT/);
+    }
+  }
+});
 test("source proof, strict author and exclusive claim are required before creation", async () => {
   const x = fixture(); x.deps.readReceivedSourceProof = async () => { throw Error("MANIFEST_CHANGED"); };
   await assert.rejects(received.registerReceivedSource(x.policy, x.deps), /MANIFEST_CHANGED/); assert.equal(x.creates(), 0);

@@ -153,6 +153,26 @@ settings afterward. Broad stage/wait workers remain disabled. Any ambiguous
 write requires same-ID readback and forward recovery, not a new ID or reset.
 No linked source registration commissions the complete Publishing pipeline.
 
+The October 9 founder-completed Intake folder renames for Til Death and My AI
+Journey are accepted only as the exact reviewed old-to-new URL pairs, with
+unchanged relative file path, drive/item ID, title binding and checksum.
+Current native custody is reverified; historical registry URLs and completed
+intake receipts are not rewritten. Other relocations still fail closed.
+
+## Prospective Glory assessment decision
+
+The authenticated Glory recovery route accepts only
+`{"mode":"PREPARE_NEXT_ASSESSMENT"}` to prepare a read-only proposal from the
+exact held attempt-six preimage. Review, stage and wait dispatch must be off.
+The proposal binds current source/canon bytes, deployment, request hash,
+existing private tariff and a fresh provider token count. Counting is not
+inference; this mode writes no authority, claim or receipt and calls no model.
+
+The consumed attempt-six approval is not a new grant. The result remains
+`DECISION_REQUIRED_NOT_EXECUTABLE`; its planning ceiling is not spend approval.
+A new attributable decision and separately reviewed held-six-to-seven adapter
+are required before any additional inference. No scheduled retry is authorized.
+
 The original local draft plan is preserved. The governed runtime plan replaces
 its local inventory-file history reference with an exact Dataverse title history
 reference, so its binding hash differs from that never-executed local proposal.
