@@ -15,6 +15,14 @@ async function packageCanon(repoRoot, packageRoot) {
     fs.mkdirSync(path.dirname(dest), { recursive: true });
     fs.writeFileSync(dest, value);
   }
+  const review = require("../config/commissioning-editorial-review-canon.json");
+  const reviewBytes = fs.readFileSync(path.join(repoRoot, review.sourceRoot, review.file));
+  if (require("node:crypto").createHash("sha256").update(reviewBytes).digest("hex") !== review.sha256) {
+    throw new Error("REVIEW_PACKAGED_CANON_CHECKSUM_MISMATCH");
+  }
+  const reviewDest = path.join(packageRoot, "config/jm1-publishing-editorial", review.file);
+  fs.mkdirSync(path.dirname(reviewDest), { recursive: true });
+  fs.writeFileSync(reviewDest, reviewBytes);
 }
 if (require.main === module) {
   if (process.argv.length !== 4) throw new Error("Repository and package paths required");

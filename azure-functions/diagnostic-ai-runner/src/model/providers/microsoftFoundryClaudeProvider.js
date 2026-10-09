@@ -129,8 +129,8 @@ async function call({ promptBody, diagnosticId, telemetry = null, route }) {
   const anthropicVersion = process.env.AZURE_FOUNDRY_ANTHROPIC_VERSION || DEFAULT_ANTHROPIC_VERSION;
   const deployment = route.deploymentName;
   const url = `${endpoint}/anthropic/v1/messages`;
-  const structuredOutputTool = selectStructuredOutputTool(promptBody);
-  const maxOutputTokens = selectMaxOutputTokens(promptBody);
+  const structuredOutputTool = selectStructuredOutputTool(promptBody, route);
+  const maxOutputTokens = selectMaxOutputTokens(promptBody, route);
   const requestBody = {
     model: deployment,
     messages: [{ role: "user", content: promptBody }],
@@ -145,7 +145,7 @@ async function call({ promptBody, diagnosticId, telemetry = null, route }) {
   try {
     const credential = new DefaultAzureCredential();
     const tokenResult = await credential.getToken(TOKEN_SCOPE);
-    const runtimeOptions = getProviderRuntimeOptions("AZURE_FOUNDRY");
+    const runtimeOptions = selectRuntimeOptions(route);
 
     const response = await trackDependency(
       telemetry,
@@ -213,6 +213,13 @@ async function call({ promptBody, diagnosticId, telemetry = null, route }) {
     }
 
     const usage = responseBody?.usage || {};
+    if (route.promptVersion === "JMP-EDITORIAL-REVIEW-ASSESSMENT-V1" && responseBody.stop_reason === "max_tokens") {
+      return { ok: false, provider: "microsoft-foundry-claude", output: null,
+        tokenCounts: { input: usage.input_tokens || 0, output: usage.output_tokens || 0,
+          total: (usage.input_tokens || 0) + (usage.output_tokens || 0) },
+        httpStatus, failureCode: "MODEL_OUTPUT_TRUNCATED", error: "MODEL_OUTPUT_TRUNCATED",
+        request: { deployment, maxOutputTokens: requestBody.max_tokens, responseContract: "anthropic-messages-tool", stopReason: "max_tokens" } };
+    }
     const toolInput = extractStructuredToolInput(responseBody);
     if (toolInput) {
       return {
@@ -289,6 +296,8 @@ async function call({ promptBody, diagnosticId, telemetry = null, route }) {
       output: null,
       tokenCounts: { input: 0, output: 0, total: 0 },
       httpStatus,
+      failureCode: error === "REQUEST_TIMEOUT" || ["AbortError", "TimeoutError"].includes(error?.name)
+        ? "MODEL_REQUEST_TIMEOUT" : "MODEL_TRANSPORT_UNAVAILABLE",
       error: `MODEL_CALL_EXCEPTION: ${String(error.message || error).slice(0, 200)}`
     };
   }
@@ -311,7 +320,20 @@ function extractTextContent(responseBody) {
     .trim();
 }
 
-function selectStructuredOutputTool(promptBody) {
+function selectRuntimeOptions(route = {}) {
+  const options = getProviderRuntimeOptions("AZURE_FOUNDRY");
+  // Full-manuscript assessment needs one longer request, not repeated short calls.
+  return route.promptVersion === "JMP-EDITORIAL-REVIEW-ASSESSMENT-V1"
+    ? { ...options, timeoutMs: 240000, maxRetries: 0 } : options;
+}
+
+function selectStructuredOutputTool(promptBody, route = {}) {
+  // Bound assessment authority outranks markers inside untrusted manuscript data.
+  if (route.promptVersion === "JMP-EDITORIAL-REVIEW-ASSESSMENT-V1") return {
+    name: STRUCTURED_OUTPUT_TOOL.name,
+    description: "Submit the complete nine-section assessment only; no edited manuscript or approval.",
+    input_schema: require("../../editorial/commissioningEditorialReviewContract").EDITORIAL_REVIEW_OUTPUT_SCHEMA
+  };
   if (isLineEditingChunkPrompt(promptBody)) return LINE_EDITING_CHUNK_OUTPUT_TOOL;
   if (isDevelopmentalEditingChunkPrompt(promptBody)) return DEVELOPMENTAL_EDITING_CHUNK_OUTPUT_TOOL;
   return STRUCTURED_OUTPUT_TOOL;
@@ -330,7 +352,8 @@ function parsePositiveInteger(value, fallback) {
   return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
 }
 
-function selectMaxOutputTokens(promptBody) {
+function selectMaxOutputTokens(promptBody, route = {}) {
+  if (route.promptVersion === "JMP-EDITORIAL-REVIEW-ASSESSMENT-V1") return 8192;
   if (isLineEditingChunkPrompt(promptBody)) {
     return parsePositiveInteger(process.env.AZURE_FOUNDRY_LINE_CHUNK_MAX_OUTPUT_TOKENS, DEFAULT_LINE_CHUNK_MAX_OUTPUT_TOKENS);
   }
@@ -370,5 +393,6 @@ module.exports = {
   isLineEditingChunkPrompt,
   isDevelopmentalEditingChunkPrompt,
   selectMaxOutputTokens,
+  selectRuntimeOptions,
   selectStructuredOutputTool
 };

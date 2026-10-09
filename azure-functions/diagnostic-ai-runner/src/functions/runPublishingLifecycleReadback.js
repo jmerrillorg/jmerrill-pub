@@ -149,17 +149,24 @@ async function lifecycleReadback(body, deps) {
     rendering, effects: 0, communicationsSent: 0, noSend: true } };
 }
 
-app.http("publishing-lifecycle-readback", {
-  methods: ["POST"], authLevel: "anonymous", route: "publishing/lifecycle/readback",
-  handler: async request => {
-    const key = process.env.JM1_DIAGNOSTIC_RUNNER_KEY;
+async function lifecycleReadbackHandler(request, deps = {}) {
+    const key = (deps.env || process.env).JM1_DIAGNOSTIC_RUNNER_KEY;
     if (!key || request.headers.get("x-jm1-diagnostic-runner-key") !== key) return { status: 401, jsonBody: { error: "UNAUTHORIZED" } };
     let body;
     try { body = await request.json(); } catch { return { status: 400, jsonBody: { error: "INVALID_JSON" } }; }
+    if (["COMMISSIONING_INTAKE_READ_ONLY", "COMMISSIONING_REVIEW_READ_ONLY", "COMMISSIONING_IDENTITY_READ_ONLY"].includes(body?.mode)) {
+      try { return await (deps.commissioningReadback || require("../lifecycle/titleCommissioningReadback").titleCommissioningReadback)(body); }
+      catch (error) { return { status: 502, jsonBody: {
+        error: /^(?:REVIEW|COMMISSIONING)_[A-Z_]{1,100}$/.test(error?.safeCode || "")
+          ? error.safeCode : "COMMISSIONING_NATIVE_READBACK_FAILED", effects: 0 } }; }
+    }
     try { return await lifecycleReadback(body, {
       client: createDataverseClient({ apiBase: process.env.DATAVERSE_WEB_API_BASE_URL, resourceUrl: process.env.DATAVERSE_RESOURCE_URL }),
       graphClient: new PublishingMailboxGraphClient(),
     }); } catch (error) { return { status: 502, jsonBody: { error: error.safeCode || "AUTHORITATIVE_READ_FAILED", effects: 0 } }; }
-  },
+}
+app.http("publishing-lifecycle-readback", {
+  methods: ["POST"], authLevel: "anonymous", route: "publishing/lifecycle/readback",
+  handler: request => lifecycleReadbackHandler(request),
 });
-module.exports = { lifecycleReadback };
+module.exports = { lifecycleReadback, lifecycleReadbackHandler };

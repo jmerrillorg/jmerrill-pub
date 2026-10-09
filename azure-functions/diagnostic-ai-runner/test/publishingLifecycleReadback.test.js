@@ -3,9 +3,30 @@ const test = require("node:test");
 const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const path = require("node:path");
-const { lifecycleReadback } = require("../src/functions/runPublishingLifecycleReadback");
+const { lifecycleReadback, lifecycleReadbackHandler } = require("../src/functions/runPublishingLifecycleReadback");
 const authorId = "106a78d0-fb9a-f111-b8dc-6045bdd69738";
 const titleId = "daf8180f-85a3-f111-b8de-000d3a14673b";
+test("HTTP boundary routes exact commissioning readback modes after authentication", async () => {
+  for (const mode of ["COMMISSIONING_INTAKE_READ_ONLY", "COMMISSIONING_REVIEW_READ_ONLY", "COMMISSIONING_IDENTITY_READ_ONLY"]) {
+    let calls = 0;
+    const request = { headers: { get: () => "internal-key" }, json: async () => ({ mode, titleId }) };
+    const deps = { env: { JM1_DIAGNOSTIC_RUNNER_KEY: "internal-key" }, commissioningReadback: async body => {
+      calls++; assert.equal(body.mode, mode); return { status: 200, jsonBody: { mode, effects: 0 } };
+    } };
+    assert.equal((await lifecycleReadbackHandler(request, deps)).status, 200); assert.equal(calls, 1);
+    request.headers.get = () => "wrong";
+    assert.equal((await lifecycleReadbackHandler(request, deps)).status, 401); assert.equal(calls, 1);
+  }
+});
+test("HTTP failure preserves safe owner code, never raw dependency content", async () => {
+  const request = { headers: { get: () => "key" }, json: async () => ({ mode: "COMMISSIONING_REVIEW_READ_ONLY", titleId }) };
+  const deps = { env: { JM1_DIAGNOSTIC_RUNNER_KEY: "key" }, commissioningReadback: async () => {
+    throw Object.assign(new Error("private content"), { safeCode: "REVIEW_TITLE_CONTEXT_UNBOUND" });
+  } };
+  assert.equal((await lifecycleReadbackHandler(request, deps)).jsonBody.error, "REVIEW_TITLE_CONTEXT_UNBOUND");
+  deps.commissioningReadback = async () => { throw new Error("private content"); };
+  assert.equal((await lifecycleReadbackHandler(request, deps)).jsonBody.error, "COMMISSIONING_NATIVE_READBACK_FAILED");
+});
 test("production startup explicitly registers the read-only route", () => {
   assert.match(fs.readFileSync(path.join(__dirname, "../src/index.js"), "utf8"),
     /require\("\.\/functions\/runPublishingLifecycleReadback"\)/);
