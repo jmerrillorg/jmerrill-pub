@@ -9,7 +9,7 @@ const sha = bytes => createHash("sha256").update(bytes).digest("hex");
 
 // This adapter produces an internal assessment only. Its receipt is linked-run
 // evidence, never a Dataverse stage transition or approval authority.
-async function executeCommissioningEditorialReview(input, deps = {}) {
+async function prepareCommissioningEditorialReview(input, deps = {}) {
   const run = planTitleCommissioningRun(input);
   if (typeof deps.readReviewAuthority !== "function" || typeof deps.downloadSource !== "function") {
     fail("REVIEW_OWNER_READERS_NOT_BOUND");
@@ -35,6 +35,11 @@ async function executeCommissioningEditorialReview(input, deps = {}) {
     authority: assembled.provenance.map(({ verifiedAt, ...source }) => source), contractVersion: "JMP-EDITORIAL-REVIEW-ASSESSMENT-V1" };
   const bindingHash = sha(JSON.stringify(binding));
   const reference = `commissioning-editorial-review/${run.titleId}/${run.bindingHash}/${bindingHash}.json`;
+  return { run, binding, bindingHash, reference, assembled, extracted, authority, titleAuthority };
+}
+
+async function executeCommissioningEditorialReview(input, deps = {}) {
+  const { run, binding, bindingHash, reference, assembled, extracted, authority, titleAuthority } = await prepareCommissioningEditorialReview(input, deps);
   const resultBlob = deps.containerClient.getBlockBlobClient(reference);
   const ensureDocument = async receipt => {
     const document = Buffer.from(require("./commissioningEditorialReviewRenderer")
@@ -90,7 +95,10 @@ async function executeCommissioningEditorialReview(input, deps = {}) {
     fail("COMMISSIONING_DEPENDENCY_UNAVAILABLE");
   }
   let report;
-  try { report = validateEditorialReview(model.output); }
+  try {
+    if (model.recoveryBudgetVerified === false) fail("REVIEW_RECOVERY_ACTUAL_USAGE_REQUIRES_REVIEW");
+    report = validateEditorialReview(model.output);
+  }
   catch (error) {
     // Private rejected candidate custody is separate from publishable receipts.
     // Nothing from this object is emitted to telemetry or the review renderer.
@@ -130,6 +138,7 @@ async function executeCommissioningEditorialReview(input, deps = {}) {
     provider: model.provider, deploymentAlias: model.route.deploymentAlias,
     providerRequestPolicy: { timeoutMs: limits.timeoutMs, maxProviderRetries: limits.maxRetries },
     tokenCounts: model.tokenCounts, productionStageChanged: false, authorDecisionInferred: false,
+    ...(model.recoveryCostProof ? { recoveryCostProof: model.recoveryCostProof } : {}),
     forbiddenEffects: run.forbiddenEffects,
     documentReference: reference.replace(/\.json$/, ".md"),
     documentSha256: sha(require("./commissioningEditorialReviewRenderer").renderCommissioningEditorialReview(report, binding)) };
@@ -144,4 +153,4 @@ async function executeCommissioningEditorialReview(input, deps = {}) {
   }
 }
 
-module.exports = { executeCommissioningEditorialReview };
+module.exports = { executeCommissioningEditorialReview, prepareCommissioningEditorialReview };

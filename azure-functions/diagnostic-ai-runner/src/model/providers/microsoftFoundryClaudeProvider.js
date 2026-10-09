@@ -129,16 +129,7 @@ async function call({ promptBody, diagnosticId, telemetry = null, route }) {
   const anthropicVersion = process.env.AZURE_FOUNDRY_ANTHROPIC_VERSION || DEFAULT_ANTHROPIC_VERSION;
   const deployment = route.deploymentName;
   const url = `${endpoint}/anthropic/v1/messages`;
-  const structuredOutputTool = selectStructuredOutputTool(promptBody, route);
-  const maxOutputTokens = selectMaxOutputTokens(promptBody, route);
-  const requestBody = {
-    model: deployment,
-    messages: [{ role: "user", content: promptBody }],
-    max_tokens: maxOutputTokens,
-    tools: [structuredOutputTool],
-    tool_choice: { type: "tool", name: structuredOutputTool.name },
-    stream: false
-  };
+  const requestBody = buildRequestBody(promptBody, route);
 
   let httpStatus = null;
 
@@ -386,7 +377,15 @@ function extractStructuredToolInput(responseBody) {
   return toolBlock?.input || null;
 }
 
+function buildRequestBody(promptBody, route) {
+  const tool = selectStructuredOutputTool(promptBody, route);
+  return { model: route.deploymentName, messages: [{ role: "user", content: promptBody }],
+    max_tokens: selectMaxOutputTokens(promptBody, route), tools: [tool],
+    tool_choice: { type: "tool", name: tool.name }, stream: false };
+}
+
 module.exports = {
+  buildRequestBody,
   DEFAULT_ANTHROPIC_VERSION,
   DEFAULT_LINE_CHUNK_MAX_OUTPUT_TOKENS,
   DEFAULT_MAX_OUTPUT_TOKENS,

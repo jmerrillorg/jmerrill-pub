@@ -73,3 +73,13 @@ test("mismatched owner result never counts as completed", async () => {
   const x = fixture(); x.deps.executeIntake = async () => ({ receipt: { executionId: "other" } });
   assert.equal((await process(x.input, x.deps)).status, "HELD");
 });
+test("ordinary worker cannot reclaim an expired additional-budget recovery", async () => {
+  const x = fixture();
+  const state = { schemaVersion: 1, executionId: x.plan.executionId, titleId: x.plan.titleId,
+    bindingHash: x.plan.bindingHash, status: "CLAIMED", attempts: 6,
+    leaseUntil: "2026-01-01T00:00:00Z", additionalRecovery: { version: "bounded-owner" } };
+  x.deps.containerClient = { getBlockBlobClient: () => ({ getProperties: async () => ({ etag: "one" }),
+    downloadToBuffer: async () => Buffer.from(JSON.stringify(state)),
+    uploadData: async () => assert.fail("ordinary worker must not mutate recovery") }) };
+  assert.deepEqual(await process(x.input, x.deps), state); assert.equal(x.calls(), 0);
+});
