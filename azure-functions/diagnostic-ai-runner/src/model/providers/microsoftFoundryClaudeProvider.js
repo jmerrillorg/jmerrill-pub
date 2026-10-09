@@ -213,6 +213,13 @@ async function call({ promptBody, diagnosticId, telemetry = null, route }) {
     }
 
     const usage = responseBody?.usage || {};
+    if (route.promptVersion === "JMP-EDITORIAL-REVIEW-ASSESSMENT-V1" && responseBody.stop_reason === "max_tokens") {
+      return { ok: false, provider: "microsoft-foundry-claude", output: null,
+        tokenCounts: { input: usage.input_tokens || 0, output: usage.output_tokens || 0,
+          total: (usage.input_tokens || 0) + (usage.output_tokens || 0) },
+        httpStatus, failureCode: "MODEL_OUTPUT_TRUNCATED", error: "MODEL_OUTPUT_TRUNCATED",
+        request: { deployment, maxOutputTokens: requestBody.max_tokens, responseContract: "anthropic-messages-tool", stopReason: "max_tokens" } };
+    }
     const toolInput = extractStructuredToolInput(responseBody);
     if (toolInput) {
       return {
@@ -346,7 +353,7 @@ function parsePositiveInteger(value, fallback) {
 }
 
 function selectMaxOutputTokens(promptBody, route = {}) {
-  if (route.promptVersion === "JMP-EDITORIAL-REVIEW-ASSESSMENT-V1") return DEFAULT_MAX_OUTPUT_TOKENS;
+  if (route.promptVersion === "JMP-EDITORIAL-REVIEW-ASSESSMENT-V1") return 8192;
   if (isLineEditingChunkPrompt(promptBody)) {
     return parsePositiveInteger(process.env.AZURE_FOUNDRY_LINE_CHUNK_MAX_OUTPUT_TOKENS, DEFAULT_LINE_CHUNK_MAX_OUTPUT_TOKENS);
   }

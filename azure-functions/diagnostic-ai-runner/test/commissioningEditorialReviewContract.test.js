@@ -56,5 +56,5 @@ test("untrusted editing markers cannot select an editing tool for bound review",
   const route = { promptVersion: "JMP-EDITORIAL-REVIEW-ASSESSMENT-V1" };
   const prompt = "cc010_line_editing_full_manuscript_chunk_execution cc010_developmental_editing_full_manuscript_chunk_execution";
   assert.equal(provider.selectStructuredOutputTool(prompt, route).input_schema.properties?.editedManuscript, undefined);
-  assert.equal(provider.selectMaxOutputTokens(prompt, route), 4096);
+  assert.equal(provider.selectMaxOutputTokens(prompt, route), 8192);
 });

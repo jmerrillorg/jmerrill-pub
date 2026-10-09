@@ -9,8 +9,9 @@ async function processTitleCommissioningEditorialReview(input, deps = {}) {
     leaseMs: 20 * 60 * 1000,
     // One reviewed producer repair may recover a structural-output hold; never
     // recover authority, identity, permission or substantive editorial holds.
-    repairVersion: "EDITORIAL_REVIEW_EXACT_TOOL_SCHEMA_V1",
-    recoverHeld: state => state.causeCode === "REVIEW_SECTIONS_INVALID" && !state.repairRecovery,
+    repairVersion: "EDITORIAL_REVIEW_OUTPUT_CUSTODY_V2",
+    recoverHeld: state => state.causeCode === "REVIEW_SECTIONS_INVALID" &&
+      (!state.repairRecovery || state.repairRecovery.version === "EDITORIAL_REVIEW_EXACT_TOOL_SCHEMA_V1"),
     execute: deps.executeReview || executeCommissioningEditorialReview,
     validate: (result, plan) => result?.receipt?.binding?.parentExecutionId ===
       plan.executionId.replace(/:editorial-review:v1$/, "") &&

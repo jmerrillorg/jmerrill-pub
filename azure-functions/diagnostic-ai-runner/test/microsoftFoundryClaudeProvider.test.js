@@ -80,6 +80,20 @@ afterEach(() => {
 });
 
 describe("microsoftFoundryClaudeProvider", () => {
+  test("assessment truncation fails closed rather than accepting partial tool input", async () => {
+    const { loaded, restore } = loadProviderWithStubs({ fetchImpl: async () => ({ ok: true, status: 200,
+      headers: new Headers(), json: async () => ({ stop_reason: "max_tokens", usage: { input_tokens: 10, output_tokens: 8192 },
+        content: [{ type: "tool_use", name: "submit_jm1_structured_output", input: { partial: true } }] }) }) });
+    try {
+      await withEnv({ AZURE_FOUNDRY_ENDPOINT: "https://ais-jm1-foundry.services.ai.azure.com/" }, async () => {
+        const result = await loaded.call({ promptBody: "bounded assessment", diagnosticId: "fixture",
+          route: { deploymentName: "jm1-editorial-devline-primary", promptVersion: "JMP-EDITORIAL-REVIEW-ASSESSMENT-V1" } });
+        assert.equal(result.ok, false); assert.equal(result.output, null);
+        assert.equal(result.failureCode, "MODEL_OUTPUT_TRUNCATED");
+        assert.equal(result.request.maxOutputTokens, 8192);
+      });
+    } finally { restore(); }
+  });
   test("assessment binds all nine exact sections despite editing markers in manuscript data", () => {
     const { loaded, restore } = loadProviderWithStubs();
     try {

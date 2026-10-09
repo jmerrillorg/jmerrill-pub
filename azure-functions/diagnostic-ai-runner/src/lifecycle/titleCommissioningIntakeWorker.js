@@ -96,6 +96,10 @@ async function processTitleCommissioningStep(input, deps, contract) {
     result = { ...claimed, status: canRetry ? "RETRY_PENDING" : "HELD",
       failureCode: retryable(error) ? "COMMISSIONING_DEPENDENCY_UNAVAILABLE" : "COMMISSIONING_AUTHORITY_OR_RESULT_REQUIRES_REVIEW",
       ...(/^(?:REVIEW|COMMISSIONING)_[A-Z_]{1,100}$/.test(error?.safeCode || "") ? { causeCode: error.safeCode } : {}),
+      ...(typeof error.quarantineReference === "string" &&
+        error.quarantineReference.startsWith(`commissioning-review-quarantine/${plan.titleId}/${plan.bindingHash}/`) &&
+        /^[a-f0-9]{64}\.json$/.test(error.quarantineReference.split("/").pop())
+        ? { quarantineReference: error.quarantineReference } : {}),
       failedAt: (deps.now || (() => new Date()))().toISOString(),
       ...(canRetry ? { nextAttemptAt: new Date(now.getTime() + Math.min(60 * 60 * 1000, 60000 * 2 ** (claimed.attempts - 1))).toISOString() } : {}) };
   }

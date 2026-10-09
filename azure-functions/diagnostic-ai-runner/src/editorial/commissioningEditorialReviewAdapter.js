@@ -83,11 +83,34 @@ async function executeCommissioningEditorialReview(input, deps = {}) {
     if (model?.gateBlocked) fail("REVIEW_MODEL_GATE_CLOSED");
     if (model?.failureCode === "MODEL_REQUEST_TIMEOUT") fail("REVIEW_MODEL_REQUEST_TIMEOUT");
     if (model?.failureCode === "MODEL_TRANSPORT_UNAVAILABLE") fail("REVIEW_MODEL_TRANSPORT_UNAVAILABLE");
+    if (model?.failureCode === "MODEL_OUTPUT_TRUNCATED") fail("REVIEW_MODEL_OUTPUT_TRUNCATED");
     if ([400, 401, 403, 404].includes(model?.httpStatus) || model?.configMissing?.length ||
         (model?.ok && model.provider !== "microsoft-foundry-claude")) fail("REVIEW_MODEL_AUTHORITY_OR_CONFIGURATION_REQUIRED");
     fail("COMMISSIONING_DEPENDENCY_UNAVAILABLE");
   }
-  const report = validateEditorialReview(model.output);
+  let report;
+  try { report = validateEditorialReview(model.output); }
+  catch (error) {
+    // Private rejected candidate custody is separate from publishable receipts.
+    // Nothing from this object is emitted to telemetry or the review renderer.
+    const candidate = { status: "QUARANTINED_INVALID_ASSESSMENT", binding,
+      safeCode: error.safeCode, observedAt: (deps.now || (() => new Date()))().toISOString(),
+      output: model.output, tokenCounts: model.tokenCounts, request: model.request };
+    const bytes = Buffer.from(JSON.stringify(candidate));
+    const quarantineReference = `commissioning-review-quarantine/${run.titleId}/${run.bindingHash}/${sha(bytes)}.json`;
+    const quarantine = deps.containerClient.getBlockBlobClient(quarantineReference);
+    try {
+      await quarantine.uploadData(bytes, { conditions: { ifNoneMatch: "*" },
+        blobHTTPHeaders: { blobContentType: "application/json" } });
+    } catch (writeError) {
+      if (![409, 412].includes(writeError?.statusCode)) throw writeError;
+      const properties = await quarantine.getProperties();
+      if (!properties.etag || !(await quarantine.downloadToBuffer(0, undefined,
+        { conditions: { ifMatch: properties.etag } })).equals(bytes)) fail("REVIEW_QUARANTINE_CUSTODY_CONFLICT");
+    }
+    error.quarantineReference = quarantineReference;
+    throw error;
+  }
   if (report.intakeSummary.sourceVersion !== run.source.version) fail("REVIEW_OUTPUT_SOURCE_VERSION_MISMATCH");
   if (report.intakeSummary.wordCount !== extracted.trim().split(/\s+/u).length ||
       (authority.titleName && report.intakeSummary.title !== authority.titleName)) fail("REVIEW_OUTPUT_SOURCE_CONTEXT_MISMATCH");
