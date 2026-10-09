@@ -117,3 +117,38 @@ jm1-editorial-devline-primary deployment under ais-jm1-foundry, rg-jm1-ai;
 return its actual denial for separate scoped review, not Contributor/key fallback.
 Likewise count-only access uses the existing Foundry workload identity;
 permission failures stop before a claim. No platform grant is changed here.
+
+## Attributed decision and owner custody repair, October 9
+
+Jackie's actual primary-chat message
+01a12155-116f-7c30-b120-478bf3ab357e answered "approved" to the preceding
+one-assessment, USD1-before-tax question. Both actual turns were independently
+read; the coordinator instruction alone was not used as approval. Approved
+codebase445d2c68921b9317aa3f09fc4d0770097c31ba2e and all prior state remain
+preserved. This decision is not approval for a quarterly split or other titles.
+
+The operator's existing storage login cannot read the private execution blob.
+Do not obtain an account key or broaden the operator's storage grant. The
+existing Function owner therefore has a bounded create-only custody repair:
+REGISTER_APPROVED_AUTHORITY. It defaultsOFF through
+JM1_GLORY_RECOVERY_CUSTODY_ENABLED, requires ordinary review/broad workersOFF,
+accepts no caller terms, and can persist only the compiled exact attributed
+decision, its one-use approval and the independently verified current standard
+Sonnet5 tariff. It does not claim or invoke a model. Existing mismatched records
+are not overwritten. Interrupted custody writes can resume only from identical
+bytes; authority is pinned separately before count/model preflight.
+
+The compiled approval expires October9 at16:43:05UTC; an expired decision fails
+closed. Current pricing evidence is the October9 official Claude pricing page:
+Sonnet5 USD2/MTok input, USD10/MTok output; Foundry Marketplace uses standard
+token rates converted to CCUs. GlobalStandard has no US-only multiplier. No
+caching or additional feature is in the bound request. This is a conservative
+standard-rate cost proof, not an actual settled Azure invoice.
+
+This source-only custody repair requires normal exact-head CI/review/protected
+release. After release, verify SHA/default denial/unchanged state, enable only
+custody, record its exact hashes and disable custody, then pin those hashes and
+enable preflight only. Native deployment/token-count permission failures still
+stop before any claim. EXECUTE remains off until preflight passes. Temporary
+custody/preflight/dispatch flags and pins must be removed after acceptance or
+blocker; preserve records/history and keep ordinary review off for attempt6.

@@ -17,18 +17,22 @@ function nativeDependencies(env) {
 
 async function gloryRecovery(body, supplied = {}) {
   const env = supplied.env || process.env;
-  if (!body || Object.keys(body).length !== 1 || !["PREFLIGHT", "EXECUTE"].includes(body.mode)) {
+  if (!body || Object.keys(body).length !== 1 || !["PREFLIGHT", "EXECUTE", "REGISTER_APPROVED_AUTHORITY"].includes(body.mode)) {
     return { status: 400, jsonBody: { code: "REVIEW_RECOVERY_REQUEST_DENIED", businessEffects: 0 } };
   }
-  if ((body.mode === "EXECUTE" ? env.JM1_GLORY_RECOVERY_DISPATCH_ENABLED : env.JM1_GLORY_RECOVERY_PREFLIGHT_ENABLED) !== "true") {
+  const enabled = body.mode === "REGISTER_APPROVED_AUTHORITY" ? env.JM1_GLORY_RECOVERY_CUSTODY_ENABLED :
+    body.mode === "EXECUTE" ? env.JM1_GLORY_RECOVERY_DISPATCH_ENABLED : env.JM1_GLORY_RECOVERY_PREFLIGHT_ENABLED;
+  if (enabled !== "true") {
     return { status: 403, jsonBody: { code: "REVIEW_RECOVERY_DISABLED", businessEffects: 0, executionEffects: 0, modelInvocationAttempts: 0 } };
   }
-  if (body.mode === "EXECUTE" && (env.JM1_TITLE_COMMISSIONING_REVIEW_ENABLED !== "false" ||
+  if (["EXECUTE", "REGISTER_APPROVED_AUTHORITY"].includes(body.mode) && (env.JM1_TITLE_COMMISSIONING_REVIEW_ENABLED !== "false" ||
       env.JM1_PUBLISHING_STAGE_RUNTIME_ENABLED !== "false" || env.JM1_PUBLISHING_WAIT_RUNTIME_ENABLED !== "false")) {
     return { status: 409, jsonBody: { code: "REVIEW_RECOVERY_WORKER_ISOLATION_REQUIRED",
       businessEffects: 0, executionEffects: 0, modelInvocationAttempts: 0 } };
   }
   const deps = supplied.containerClient ? supplied : { ...nativeDependencies(env), ...supplied };
+  if (body.mode === "REGISTER_APPROVED_AUTHORITY") return { status: 200,
+    jsonBody: await require("./gloryReviewRecoveryAuthorityCustody").registerApprovedRecoveryAuthority(deps) };
   const prepared = await readers.prepareRecovery(deps);
   if (body.mode === "PREFLIGHT") return { status: 200, jsonBody: { status: "PREFLIGHT_READY_NOT_DISPATCHED",
     executionId: c.EXECUTION_ID, heldEtag: prepared.input.etag,

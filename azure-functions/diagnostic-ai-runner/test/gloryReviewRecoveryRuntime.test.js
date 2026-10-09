@@ -49,7 +49,7 @@ function fixture() {
       return row.bytes;
     },
     uploadData: async (bytes, options) => {
-      if (rows.get(path).etag !== options.conditions.ifMatch) throw Object.assign(new Error("CAS"), { statusCode: 412 });
+      if (options.conditions.ifNoneMatch === "*" ? rows.has(path) : rows.get(path).etag !== options.conditions.ifMatch) throw Object.assign(new Error("CAS"), { statusCode: 412 });
       writes++; const etag = `written${writes}`; rows.set(path, { bytes, etag }); return { etag };
     }
   }) };
@@ -70,6 +70,41 @@ test("default disabled route performs no reads, writes or model requests", async
   const x = fixture(); delete x.env.JM1_GLORY_RECOVERY_DISPATCH_ENABLED;
   const result = await gloryRecovery({ mode: "EXECUTE" }, x.deps);
   assert.equal(result.status, 403); assert.equal(x.writes(), 0); assert.equal(x.countCalls(), 0); assert.equal(x.calls(), 0);
+});
+test("exact approved authority custody is default off and cannot accept caller terms", async () => {
+  const x = fixture();
+  assert.equal((await gloryRecovery({ mode: "REGISTER_APPROVED_AUTHORITY" }, x.deps)).status, 403);
+  assert.equal((await gloryRecovery({ mode: "REGISTER_APPROVED_AUTHORITY", approval: {} }, x.deps)).status, 400);
+  assert.equal(x.writes(), 0); assert.equal(x.countCalls(), 0); assert.equal(x.calls(), 0);
+});
+test("owner creates only fixed approved evidence and exact replay never overwrites or invokes", async () => {
+  const x = fixture(); x.env.JM1_GLORY_RECOVERY_CUSTODY_ENABLED = "true";
+  x.deps.now = () => new Date("2026-10-09T15:50:00Z"); x.rows.delete(x.tariffPath);
+  const first = await gloryRecovery({ mode: "REGISTER_APPROVED_AUTHORITY" }, x.deps);
+  assert.equal(first.jsonBody.authorityCustodyWrites, 3); assert.equal(x.writes(), 3);
+  const second = await gloryRecovery({ mode: "REGISTER_APPROVED_AUTHORITY" }, x.deps);
+  assert.equal(second.jsonBody.authorityCustodyWrites, 0); assert.equal(x.writes(), 3);
+  const approval = JSON.parse(x.rows.get(first.jsonBody.approval.reference).bytes);
+  assert.equal(approval.preimageSha256, c.digest(x.state)); assert.equal(approval.maxCostUsd, 1);
+  x.env.JM1_GLORY_RECOVERY_APPROVAL_ID = approval.recordId;
+  x.env.JM1_GLORY_RECOVERY_APPROVAL_SHA256 = first.jsonBody.approval.sha256;
+  x.env.JM1_GLORY_RECOVERY_TARIFF_SHA256 = first.jsonBody.tariff.sha256;
+  r.validateApproval({ value: approval, sha256: first.jsonBody.approval.sha256 }, x.env, x.deps.now());
+  await r.readDecisionEvidence(x.deps.containerClient, approval);
+  assert.equal(x.calls(), 0); assert.equal(x.countCalls(), 0);
+  assert.deepEqual(JSON.parse(x.rows.get(x.executionPath).bytes), x.state);
+});
+test("custody rejects expired decision, changed preimage, conflicts and changed source", async () => {
+  for (const mode of ["expired", "state", "conflict", "source"]) {
+    const x = fixture(); x.env.JM1_GLORY_RECOVERY_CUSTODY_ENABLED = "true";
+    x.deps.now = () => new Date(mode === "expired" ? "2026-10-09T16:44:00Z" : "2026-10-09T15:50:00Z");
+    if (mode !== "conflict") x.rows.delete(x.tariffPath);
+    if (mode === "state") x.replace(x.executionPath, { ...x.state, attempts: 6 });
+    if (mode === "source") x.prepared.run.source.sha256 = "a".repeat(64);
+    await assert.rejects(gloryRecovery({ mode: "REGISTER_APPROVED_AUTHORITY" }, x.deps));
+    assert.equal(x.calls(), 0); assert.equal(x.countCalls(), 0);
+    assert.deepEqual(JSON.parse(x.rows.get(x.executionPath).bytes).attempts, mode === "state" ? 6 : 5);
+  }
 });
 test("ordinary review or broad workers on cannot dispatch even with approval pins", async () => {
   for (const name of ["JM1_TITLE_COMMISSIONING_REVIEW_ENABLED", "JM1_PUBLISHING_STAGE_RUNTIME_ENABLED", "JM1_PUBLISHING_WAIT_RUNTIME_ENABLED"]) {
