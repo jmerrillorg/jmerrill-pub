@@ -48,6 +48,10 @@ function createCoverTitleAuthorityReader(options = {}) {
     }
     if (typeof options.loadCommissioningScope !== "function") throw new Error("COVER_COMMISSIONING_SCOPE_MISSING");
     const scope = await options.loadCommissioningScope(titleId);
+    if (typeof scope?.version !== "string" || !scope.version.trim() ||
+        typeof scope.authorityReference !== "string" || !scope.authorityReference.trim()) {
+      throw new Error("COVER_COMMISSIONING_SCOPE_UNVERSIONED");
+    }
     const identity = await readJackieCommissioningIdentity(title, scope, options.identityClient);
     if (!identity) throw new Error("COVER_JACKIE_IDENTITY_DENIED");
     if (typeof options.identityClient?.first !== "function") throw new Error("COVER_IDENTITY_CLIENT_NOT_BOUND");
@@ -68,7 +72,10 @@ function createCoverTitleAuthorityReader(options = {}) {
       ...titleRecord("title", title.jm1pub_titlename),
       ...titleRecord("subtitle", title.jm1pub_subtitle),
       ...titleRecord("authorDisplay", title.jm1pub_authordisplayname),
-      ...titleRecord("authorId", authorId, "TITLE_AUTHOR_BINDING"),
+      ...titleRecord("authorId", authorId, "TITLE_AUTHOR_BINDING").map(record => ({ ...record,
+        sourceId: [titleId, identity.contactId, identity.profileId].filter(Boolean).join(","),
+        sourceVersion: JSON.stringify({ title: title["@odata.etag"], scope: scope.version,
+          contact: String(contact.versionnumber), profile: identity.profileVersion || null }) })),
       ...titleRecord("imprint", title["jm1pub_imprint@OData.Community.Display.V1.FormattedValue"])
     ];
     const isbn = {};

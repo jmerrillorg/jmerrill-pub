@@ -28,6 +28,7 @@ function fixture(overrides = {}) {
     resourceUrl: "https://jm1hq.crm.dynamics.com",
     credential: { getToken: async () => ({ token: "test-token" }) },
     loadCommissioningScope: async () => ({ enabled: true, revoked: false, titleId,
+      version: "fixture-v1", authorityReference: "FIXTURE_ONLY",
       mode: "JACKIE_TITLE_INTERNAL_COMMISSIONING", ...overrides.scope }),
     identityClient: overrides.identityClient || { first: async () => ({
       contactid: "d38aa56a-882a-f111-88b4-6045bdd69678", statecode: 0, versionnumber: 3 }) },
@@ -68,6 +69,8 @@ test("compound reference requires exact active Contact/profile evidence, never a
     : { jm1_authorprofileid: profileId, _jm1_contact_value: contactId, statecode: 0, versionnumber: 2 } };
   const candidates = await fixture({ title, identityClient }).reader(titleId);
   assert.equal(candidates.find((row) => row.field === "authorId").value, contactId);
+  assert.deepEqual(JSON.parse(candidates.find(row => row.field === "authorId").sourceVersion), {
+    title: 'W/"57459277"', scope: "fixture-v1", contact: "3", profile: "2" });
   const denied = fixture({ title, identityClient: { first: async () => null } });
   await assert.rejects(denied.reader(titleId), /COVER_JACKIE_IDENTITY_DENIED/);
   assert.equal(denied.calls.length, 1);
@@ -94,6 +97,12 @@ test("inactive or missing current Contact denies edition reads", async () => {
     await assert.rejects(reader(titleId), /COVER_CURRENT_CONTACT_UNVERIFIED/);
     assert.equal(calls.length, 1);
   }
+});
+
+test("unversioned scope cannot become cover authority", async () => {
+  const { reader, calls } = fixture({ scope: { version: "" } });
+  await assert.rejects(reader(titleId), /COVER_COMMISSIONING_SCOPE_UNVERSIONED/);
+  assert.equal(calls.length, 1);
 });
 
 test("reader derives internal creative category from title-bound governed evidence", async () => {

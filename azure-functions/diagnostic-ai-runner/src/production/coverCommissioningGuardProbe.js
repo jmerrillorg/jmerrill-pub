@@ -15,7 +15,7 @@ async function verifyCoverCommissioningGuards() {
     apiBase: "https://fixture.crm.dynamics.com/api/data/v9.2",
     resourceUrl: "https://fixture.crm.dynamics.com",
     credential: { getToken: async () => ({ token: "fixed-noncredential-fixture" }) },
-    loadCommissioningScope: async () => ({ titleId, enabled: true,
+    loadCommissioningScope: async () => ({ titleId, enabled: true, version: "fixture-v1", authorityReference: "FIXTURE_ONLY",
       mode: "JACKIE_TITLE_INTERNAL_COMMISSIONING" }),
     identityClient: { first: forbidden },
     fetch: async () => {
