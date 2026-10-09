@@ -58,3 +58,23 @@ Require reviewed release and live SHA, exact source bytes, populated retained
 work, durable plan and receipt readback, restart/replay with no duplicate effect,
 source/revocation denial, and observed system-owned dispatch and recovery.
 Fixture tests and local source readbacks alone cannot commission this path.
+# Owner clarification and native runtime reader
+
+The coordinator relayed Jackie's intended commissioning set: My AI Journey,
+Til Death Do Us Part, The Intentional Leader, Establishing Glory: The Library,
+and The Long Watch. Intentional Leader and Long Watch are the two year-long
+works. Exact record/source versions remain independently verified bindings;
+this clarification does not normalize Contacts or weaken the authorship guard.
+Intentional Leader is actively being updated: preserved partial snapshots are
+not final editions or evidence of lost content.
+
+`createTitleCommissioningRuntimeReaders` reads owner-maintained scope from
+`commissioning-scopes/<exact-title-id>.json` in the existing private container.
+Each read uses the current ETag as an `ifMatch` condition, validates provenance,
+and returns a version containing that ETag. No scope is written by intake and
+no scope is accepted from an invocation approval flag. Missing scope or failed
+read remains fail-closed. Scope provisioning, worker registration and deployed
+acceptance are not established by this reader's source tests.
+
+Artifact verification reuses the existing production SharePoint byte reader
+and checks the registered SHA-256 without retaining manuscript text in receipts.
