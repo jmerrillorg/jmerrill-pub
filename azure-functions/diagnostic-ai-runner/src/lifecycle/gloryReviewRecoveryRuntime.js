@@ -17,9 +17,11 @@ function nativeDependencies(env) {
 
 async function gloryRecovery(body, supplied = {}) {
   const env = supplied.env || process.env;
-  if (!body || Object.keys(body).length !== 1 || !["PREFLIGHT", "EXECUTE", "REGISTER_APPROVED_AUTHORITY", "PREPARE_NEXT_ASSESSMENT"].includes(body.mode)) {
+  if (!body || Object.keys(body).length !== 1 || !["PREFLIGHT", "EXECUTE", "REGISTER_APPROVED_AUTHORITY", "PREPARE_NEXT_ASSESSMENT", "VERIFY_REVIEW_GUARDS"].includes(body.mode)) {
     return { status: 400, jsonBody: { code: "REVIEW_RECOVERY_REQUEST_DENIED", businessEffects: 0 } };
   }
+  if (body.mode === "VERIFY_REVIEW_GUARDS") return { status: 200,
+    jsonBody: await require("./commissioningReviewGuardProbe").verifyCommissioningReviewGuards() };
   if (body.mode === "PREPARE_NEXT_ASSESSMENT") {
     const deps = supplied.containerClient ? supplied : { ...nativeDependencies(env), ...supplied };
     return { status: 200, jsonBody: await require("./gloryNextAssessmentProposal").prepareGloryNextAssessmentProposal(deps) };

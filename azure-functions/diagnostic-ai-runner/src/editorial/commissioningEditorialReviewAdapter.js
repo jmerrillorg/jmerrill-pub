@@ -6,6 +6,13 @@ const { readTitleCommissioningAuthority } = require("../lifecycle/titleCommissio
 const { assembleReviewPrompt, validateEditorialReview } = require("./commissioningEditorialReviewContract");
 function fail(code) { throw Object.assign(new Error(code), { safeCode: code }); }
 const sha = bytes => createHash("sha256").update(bytes).digest("hex");
+function validateSourceContext(report, run, extracted, authority) {
+  validateEditorialReview(report);
+  if (report.intakeSummary.sourceVersion !== run.source.version) fail("REVIEW_OUTPUT_SOURCE_VERSION_MISMATCH");
+  if (report.intakeSummary.wordCount !== extracted.trim().split(/\s+/u).length ||
+      (authority.titleName && report.intakeSummary.title !== authority.titleName)) fail("REVIEW_OUTPUT_SOURCE_CONTEXT_MISMATCH");
+  if (report.imprintAlignment.authority !== "SUGGESTED_ONLY") fail("REVIEW_OFFICIAL_IMPRINT_ASSIGNMENT_NOT_BOUND");
+}
 
 // This adapter produces an internal assessment only. Its receipt is linked-run
 // evidence, never a Dataverse stage transition or approval authority.
@@ -66,7 +73,7 @@ async function executeCommissioningEditorialReview(input, deps = {}) {
     if (saved.bindingHash !== bindingHash || JSON.stringify(saved.binding) !== JSON.stringify(binding) ||
         saved.status !== "EDITORIAL_REVIEW_READY_FOR_PUBLISHER" || saved.productionStageChanged !== false ||
         saved.reportSha256 !== sha(JSON.stringify(saved.report))) fail("REVIEW_RESULT_REPLAY_CONFLICT");
-    validateEditorialReview(saved.report);
+    validateSourceContext(saved.report, run, extracted, authority);
     await ensureDocument(saved);
     return { receipt: saved, reference, duplicate: true };
   };
@@ -98,11 +105,8 @@ async function executeCommissioningEditorialReview(input, deps = {}) {
   let report;
   try {
     if (model.recoveryBudgetVerified === false) fail("REVIEW_RECOVERY_ACTUAL_USAGE_REQUIRES_REVIEW");
-    report = validateEditorialReview(model.output);
-    if (report.intakeSummary.sourceVersion !== run.source.version) fail("REVIEW_OUTPUT_SOURCE_VERSION_MISMATCH");
-    if (report.intakeSummary.wordCount !== extracted.trim().split(/\s+/u).length ||
-        (authority.titleName && report.intakeSummary.title !== authority.titleName)) fail("REVIEW_OUTPUT_SOURCE_CONTEXT_MISMATCH");
-    if (report.imprintAlignment.authority !== "SUGGESTED_ONLY") fail("REVIEW_OFFICIAL_IMPRINT_ASSIGNMENT_NOT_BOUND");
+    report = model.output;
+    validateSourceContext(report, run, extracted, authority);
   }
   catch (error) {
     // Private rejected candidate custody is separate from publishable receipts.
@@ -127,6 +131,8 @@ async function executeCommissioningEditorialReview(input, deps = {}) {
     throw error;
   }
   // Recheck authority after inference; no result is published from stale scope.
+  const currentBytes = await deps.downloadSource(run.source);
+  if (!Buffer.isBuffer(currentBytes) || sha(currentBytes) !== run.source.sha256) fail("REVIEW_SOURCE_BYTES_CHANGED_DURING_EXECUTION");
   const currentTitleAuthority = await readTitleCommissioningAuthority(input, deps);
   if (JSON.stringify(currentTitleAuthority.identityProof) !== JSON.stringify(titleAuthority.identityProof)) {
     fail("REVIEW_AUTHOR_IDENTITY_CHANGED_DURING_EXECUTION");
@@ -155,4 +161,4 @@ async function executeCommissioningEditorialReview(input, deps = {}) {
   }
 }
 
-module.exports = { executeCommissioningEditorialReview, prepareCommissioningEditorialReview };
+module.exports = { executeCommissioningEditorialReview, prepareCommissioningEditorialReview, validateSourceContext };
