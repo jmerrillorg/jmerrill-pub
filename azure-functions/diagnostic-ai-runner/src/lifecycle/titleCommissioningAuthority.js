@@ -34,6 +34,7 @@ async function readTitleCommissioningAuthority(input, deps = {}) {
   const bindings = [{ artifactId: sourceId, version: input.source.version, sha256: input.source.sha256, role: "CONTROLLING_SOURCE" },
     ...(input.retainedArtifacts || []).map(item => ({ ...item, role: "RETAINED_WORK" }))];
   const artifacts = [];
+  let sourceMedia;
   for (const binding of bindings) {
     if (!GUID.test(binding.artifactId || "")) deny("COMMISSIONING_ARTIFACT_REFERENCE_INVALID");
     if (binding.role === "RETAINED_WORK" && binding.reference !== `dataverse:jm1pub_editorialartifact:${binding.artifactId}`) {
@@ -55,9 +56,10 @@ async function readTitleCommissioningAuthority(input, deps = {}) {
         (typeof deps.verifyReceivedSource !== "function" || await deps.verifyReceivedSource(title, artifact, scope) !== true)) {
       deny("COMMISSIONING_RECEIVED_SOURCE_PROVENANCE_UNVERIFIED");
     }
+    if (binding.role === "CONTROLLING_SOURCE") sourceMedia = { repositoryPath: artifact.jm1pub_repositorypath || "" };
     artifacts.push({ artifactId: binding.artifactId, version: binding.version, sha256: binding.sha256, role: binding.role });
   }
-  return { title, identityProof, artifacts, scopeVersion: scope.version, current: true };
+  return { title, identityProof, artifacts, sourceMedia, scopeVersion: scope.version, current: true };
 }
 
 module.exports = { readTitleCommissioningAuthority };
