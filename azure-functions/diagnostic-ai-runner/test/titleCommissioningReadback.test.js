@@ -75,3 +75,36 @@ test("fixed-title identity preflight reads exact links without touching storage 
   assert.equal(result.jsonBody.effects, 0); assert.equal(result.jsonBody.commissioningIdentity.profileId, profile);
   assert.equal((await read({ mode: "COMMISSIONING_IDENTITY_READ_ONLY", titleId: "other" })).status, 400);
 });
+test("encoded category-note diagnosis is metadata-only and never accepts a rejected report", async () => {
+  const { CATEGORIES } = require("../src/editorial/commissioningEditorialReviewContract");
+  for (const notes of ["private narrative", JSON.stringify(Object.fromEntries(CATEGORIES.map(k => [k, "private observation"]))),
+    JSON.stringify({ STRUCTURE_FLOW: "private observation" }), "null", "[]"]) {
+    const x = fixture();
+    const candidate = { status: "QUARANTINED_INVALID_ASSESSMENT", safeCode: "REVIEW_CATEGORY_NOTES_INVALID",
+      binding: { titleId, parentExecutionId: x.plan.executionId, source: x.plan.source }, output: {
+        intakeSummary: { title: "UNKNOWN", sourceVersion: "1", genre: "UNKNOWN", audience: "UNKNOWN", wordCount: 1,
+          draftStage: "UNKNOWN", seriesPotential: "UNKNOWN", comparables: "UNKNOWN", authorIntent: "UNKNOWN", submissionCompleteness: "UNKNOWN" },
+        imprintAlignment: { imprint: "UNKNOWN", authority: "SUGGESTED_ONLY", rationale: "UNKNOWN", publisherApprovalRequired: true },
+        categoryScores: Object.fromEntries(CATEGORIES.map(k => [k, 3])), categoryNotes: notes,
+        strengths: ["one", "two", "three"], risks: ["one", "two", "three"], integrityFlags: [],
+        styleGuideDetermination: { primaryGuide: "UNKNOWN", secondaryReference: "UNKNOWN", conflicts: "UNKNOWN" },
+        recommendation: { pathway: "DEVELOPMENTAL", rationale: "UNKNOWN", forwardChecklist: ["Human review"], resubmissionEligibility: "UNKNOWN" }
+      } };
+    const hash = require("node:crypto").createHash("sha256").update(JSON.stringify(candidate)).digest("hex");
+    const reference = `commissioning-review-quarantine/${titleId}/${x.plan.bindingHash}/${hash}.json`;
+    x.records.set(reference, candidate);
+    x.records.set(`commissioning-review-executions/${titleId}/${x.plan.bindingHash}.json`, {
+      titleId, executionId: `${x.plan.executionId}:editorial-review:v1`, bindingHash: x.plan.bindingHash,
+      status: "HELD", quarantineReference: reference
+    });
+    const result = await read({ mode: "COMMISSIONING_INTAKE_READ_ONLY", titleId }, x.deps);
+    assert.equal(result.jsonBody.reviewRejection.categoryNotesJson.decodable, notes !== "private narrative");
+    assert.equal(result.jsonBody.reviewRejection.categoryNotesJson.fullContractValid,
+      notes.startsWith("{\"STRUCTURE_FLOW\"") && Object.keys(JSON.parse(notes)).length === CATEGORIES.length);
+    assert.equal(result.jsonBody.reviewExecution.status, "HELD");
+    assert.equal(result.jsonBody.effects, 0);
+    assert.equal(JSON.stringify(result).includes("private observation"), false);
+    assert.equal(JSON.stringify(result).includes("private narrative"), false);
+    assert.equal(candidate.output.categoryNotes, notes);
+  }
+});

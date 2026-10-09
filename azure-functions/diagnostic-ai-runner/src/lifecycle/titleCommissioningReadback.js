@@ -96,18 +96,30 @@ async function titleCommissioningReadback(body, deps = {}) {
           candidate.value.status !== "QUARANTINED_INVALID_ASSESSMENT" ||
           candidate.value.binding?.titleId !== plan.titleId || candidate.value.binding.parentExecutionId !== plan.executionId ||
           JSON.stringify(candidate.value.binding.source) !== JSON.stringify(plan.source)) throw new Error("REVIEW_QUARANTINE_CUSTODY_INVALID");
-      const { SECTIONS, CATEGORIES } = require("../editorial/commissioningEditorialReviewContract");
+      const { SECTIONS, CATEGORIES, validateEditorialReview } = require("../editorial/commissioningEditorialReviewContract");
       const output = candidate.value.output;
       const notes = output?.categoryNotes;
       const shape = value => ({ type: Array.isArray(value) ? "array" : value === null ? "null" : typeof value,
         ...(typeof value === "string" ? { length: value.length, nonempty: value.trim().length > 0 } : {}),
         ...(value && typeof value === "object" ? { count: Object.keys(value).length } : {}) });
+      let categoryNotesJson = null;
+      if (typeof notes === "string" && notes.length <= 120000) {
+        // Inspect a representation defect without exposing or accepting the candidate.
+        try {
+          const decoded = JSON.parse(notes);
+          let fullContractValid = false;
+          try { validateEditorialReview({ ...output, categoryNotes: decoded }); fullContractValid = true; } catch {}
+          categoryNotesJson = { decodable: true, decodedShape: shape(decoded),
+            presentCategories: CATEGORIES.filter(key => Object.hasOwn(decoded || {}, key)), fullContractValid };
+        } catch { categoryNotesJson = { decodable: false, fullContractValid: false }; }
+      }
       reviewRejection = { reference, etag: candidate.etag, sha256: candidate.sha256,
         safeCode: /^(?:REVIEW|COMMISSIONING)_[A-Z_]{1,100}$/.test(candidate.value.safeCode || "") ? candidate.value.safeCode : "REVIEW_REJECTED",
         tokenCounts: Object.fromEntries(["input", "output", "total"].map(key => [key,
           Number.isSafeInteger(candidate.value.tokenCounts?.[key]) && candidate.value.tokenCounts[key] >= 0 ? candidate.value.tokenCounts[key] : null])),
         outputShape: shape(output), presentSections: SECTIONS.filter(key => Object.hasOwn(output || {}, key)),
         categoryNotesShape: shape(notes), presentCategories: CATEGORIES.filter(key => Object.hasOwn(notes || {}, key)),
+        categoryNotesJson,
         categoryNoteShapes: Object.fromEntries(CATEGORIES.filter(key => Object.hasOwn(notes || {}, key)).map(key => [key, shape(notes[key])])),
         contentReturned: false };
     }
