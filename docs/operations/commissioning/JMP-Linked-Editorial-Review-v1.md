@@ -1,0 +1,62 @@
+# Linked Editorial Review v1
+
+Owner: Publishing. Scope: existing Jackie-title internal commissioning runs.
+
+## Entry and Exit
+
+Entry requires the exact immutable completed intake receipt, current strict
+Jackie author authority, current owner scope, and matching registered source
+and retained-artifact versions and bytes. No live title stage is reset.
+
+Editorial Review assesses only. It consumes the verbatim, hash-pinned review
+canon and verified existing global knowledge. Existing approved title style,
+voice, and ruling artifacts are reused when present; conflicting authorities
+deny execution. Missing title context is explicit, not fabricated. This initial
+assessment is not the seven-source authority bundle required for editing.
+
+Exit is a validated nine-section assessment with eight 1-5 category scores,
+exact source version/word count, suggested-only imprint context, an immutable
+JSON receipt, and a readable Markdown artifact with independently verified hash.
+The result is advisory and waits for publisher review. It grants no author
+approval, imprint assignment, rights clearance, or downstream stage permission.
+
+## Execution and Recovery
+
+The existing commissioning intake timer dispatches review only after intake
+completion and `JM1_TITLE_COMMISSIONING_REVIEW_ENABLED=true`. Its existing exact
+title allowlist and owner bindings remain controlling. Broad stage and wait
+workers stay disabled.
+
+Review reuses the intake worker's CAS claims, bounded attempts, exponential
+backoff, and expired-claim recovery in a separate stage namespace. Review leases
+last 20 minutes; configured provider retry bounds exceeding 10 minutes deny the
+call. The registered Foundry route and existing AI gate remain mandatory;
+direct-provider or automatic fallback execution is prohibited.
+
+The saved assessment precedes document publication. A document-write failure
+recovers that saved assessment, preserving exact rendered bytes without another
+model call. Create-only receipt/document persistence rejects conflicting replay.
+Inference interrupted before persistence may be retried within the bounded
+attempt budget; provider inference is not claimed to be exactly-once.
+
+The existing intake failure alert also observes review failures. No scheduler,
+agent, communications owner, or business pipeline is duplicated. Readback adds
+an authenticated exact-title review mode; intake mode remains metadata-only.
+Review mode exposes the internal assessment, never full source or canon text.
+
+## Effects and Release
+
+Allowed: private linked-run execution state and internal assessment artifacts.
+Forbidden: source edits, author mail, payments, fulfillment, public release,
+distribution, identifier registration, and live title stage changes.
+
+Deploy through Diagnostic AI Runner CI/CD only after review and required checks.
+Before enabling, verify the deployed SHA, native source/authority readback, and
+that the existing allowlist contains only the accepted commissioning title.
+Disable the review setting to stop new dispatch; preserve in-flight leases and
+durable receipts. Disable intake too if containment requires stopping both.
+Never delete records or release claims from chat to manufacture recovery.
+
+Source tests and a merged release are not live commissioning. Acceptance needs
+the natural scheduled review, durable assessment/document custody, repeat
+readback with stable IDs/hashes, and no prohibited effects.

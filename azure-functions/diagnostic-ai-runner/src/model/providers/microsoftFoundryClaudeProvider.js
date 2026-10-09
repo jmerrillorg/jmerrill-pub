@@ -129,8 +129,8 @@ async function call({ promptBody, diagnosticId, telemetry = null, route }) {
   const anthropicVersion = process.env.AZURE_FOUNDRY_ANTHROPIC_VERSION || DEFAULT_ANTHROPIC_VERSION;
   const deployment = route.deploymentName;
   const url = `${endpoint}/anthropic/v1/messages`;
-  const structuredOutputTool = selectStructuredOutputTool(promptBody);
-  const maxOutputTokens = selectMaxOutputTokens(promptBody);
+  const structuredOutputTool = selectStructuredOutputTool(promptBody, route);
+  const maxOutputTokens = selectMaxOutputTokens(promptBody, route);
   const requestBody = {
     model: deployment,
     messages: [{ role: "user", content: promptBody }],
@@ -311,7 +311,9 @@ function extractTextContent(responseBody) {
     .trim();
 }
 
-function selectStructuredOutputTool(promptBody) {
+function selectStructuredOutputTool(promptBody, route = {}) {
+  // Bound assessment authority outranks markers inside untrusted manuscript data.
+  if (route.promptVersion === "JMP-EDITORIAL-REVIEW-ASSESSMENT-V1") return STRUCTURED_OUTPUT_TOOL;
   if (isLineEditingChunkPrompt(promptBody)) return LINE_EDITING_CHUNK_OUTPUT_TOOL;
   if (isDevelopmentalEditingChunkPrompt(promptBody)) return DEVELOPMENTAL_EDITING_CHUNK_OUTPUT_TOOL;
   return STRUCTURED_OUTPUT_TOOL;
@@ -330,7 +332,8 @@ function parsePositiveInteger(value, fallback) {
   return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
 }
 
-function selectMaxOutputTokens(promptBody) {
+function selectMaxOutputTokens(promptBody, route = {}) {
+  if (route.promptVersion === "JMP-EDITORIAL-REVIEW-ASSESSMENT-V1") return DEFAULT_MAX_OUTPUT_TOKENS;
   if (isLineEditingChunkPrompt(promptBody)) {
     return parsePositiveInteger(process.env.AZURE_FOUNDRY_LINE_CHUNK_MAX_OUTPUT_TOKENS, DEFAULT_LINE_CHUNK_MAX_OUTPUT_TOKENS);
   }
