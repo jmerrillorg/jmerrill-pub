@@ -8,7 +8,7 @@ function deny(code = "REVIEW_RECOVERY_NEXT_AUTHORITY_REQUIRED") {
   throw Object.assign(new Error(code), { safeCode: code });
 }
 
-// No endpoint or timer binding. A reviewed owner must supply durable authority,
+// No timer binding. The authenticated owner supplies durable authority,
 // fresh native budget/identity checks and explicit enablement before any claim.
 async function runGloryNextAssessmentRecovery(input, deps = {}) {
   const { state, etag, approval, current } = input || {};
