@@ -13,7 +13,7 @@ function fixture() {
   const tariff = { status: "APPROVED_CURRENT", currency: "USD", model: "claude-sonnet-5", modelVersion: "2", sku: "GlobalStandard",
     caching: "NONE", additionalCharges: "NONE", inputMicroUsdPerToken: 2, outputMicroUsdPerToken: 10,
     sourceReference: "SYNTHETIC", verifiedAt: "2026-10-09T20:00:00Z", expiresAt: "2026-10-10T20:00:00Z" };
-  const requestSha256 = r.sha(JSON.stringify(require("../model/providers/microsoftFoundryClaudeProvider").buildRequestBody("fixture", r.route)));
+  const requestSha256 = r.sha(JSON.stringify(require("../src/model/providers/microsoftFoundryClaudeProvider").buildRequestBody("fixture", r.route)));
   const id = "00000000-0000-4000-8000-000000000001", decisionId = "00000000-0000-4000-8000-000000000002";
   const approval = { recordId: id, status: "APPROVED", purpose: "ONE_ADDITIONAL_GLORY_INTERNAL_ASSESSMENT",
     approvedByContactId: require("../author/jackieTitleSystemCommissioningPolicy").JACKIE_CANONICAL_AUTHOR_CONTACT_ID,
