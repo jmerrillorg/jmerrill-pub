@@ -14,7 +14,7 @@ const LIMITS = Object.freeze({ additionalAttempts: 1, maxProviderRetries: 0, tim
 const digest = value => createHash("sha256").update(JSON.stringify(value)).digest("hex");
 function deny() { throw Object.assign(new Error("REVIEW_RECOVERY_AUTHORITY_NOT_CURRENT"), { safeCode: "REVIEW_RECOVERY_AUTHORITY_NOT_CURRENT" }); }
 
-// Inactive review candidate: no route, timer, model call or authority-record writer.
+// Governed one-off owner only; no timer or authority-record writer.
 // A future owner adapter must independently verify approval and meter provider cost.
 async function claimGloryRecovery(input, deps = {}) {
   const { state, etag, current, approval } = input || {};
@@ -28,7 +28,7 @@ async function claimGloryRecovery(input, deps = {}) {
       approval.expectedEtag !== etag || approval.release !== RELEASE ||
       JSON.stringify(approval.limits) !== JSON.stringify(LIMITS) ||
       typeof approval.recordId !== "string" || !approval.recordId.trim() ||
-      !Number.isFinite(approval.maxCostUsd) || approval.maxCostUsd <= 0 ||
+      !Number.isFinite(approval.maxCostUsd) || approval.maxCostUsd <= 0 || approval.maxCostUsd > 1 ||
       typeof deps.verifyApproval !== "function" || typeof deps.blob?.uploadData !== "function") deny();
   if (await deps.verifyApproval(approval, current) !== true) deny();
   const now = (deps.now || (() => new Date()))();
@@ -80,14 +80,21 @@ async function runGloryRecovery(input, deps = {}) {
     const receipt = review?.receipt;
     require("../editorial/commissioningEditorialReviewContract").validateEditorialReview(receipt?.report);
     if (receipt.status !== "EDITORIAL_REVIEW_READY_FOR_PUBLISHER" || receipt.productionStageChanged !== false ||
-        receipt.binding?.titleId !== TITLE_ID || receipt.binding.parentExecutionId !== EXECUTION_ID.replace(/:editorial-review:v1$/, "") ||
+        receipt.binding?.titleId !== TITLE_ID || receipt.binding.stage !== "EDITORIAL_REVIEW" ||
+        receipt.binding.parentExecutionId !== EXECUTION_ID.replace(/:editorial-review:v1$/, "") ||
         receipt.reportSha256 !== digest(receipt.report) ||
         typeof review.reference !== "string" || !review.reference.startsWith(`commissioning-editorial-review/${TITLE_ID}/${BINDING_HASH}/`)) deny();
     result = { ...claim.state, status: "COMPLETED", receiptReference: review.reference,
       completedAt: (deps.now || (() => new Date()))().toISOString(), productionStageChanged: false };
-  } catch (_error) {
+  } catch (error) {
     // Timeout/ambiguous owner writes are reconciled from exact receipts, never retried here.
     result = holdAmbiguousRecovery(claim.state);
+    if (/^REVIEW_[A-Z_]{1,100}$/.test(error?.safeCode || "")) result.causeCode = error.safeCode;
+    const prefix = `commissioning-review-quarantine/${TITLE_ID}/${BINDING_HASH}/`;
+    if (typeof error?.quarantineReference === "string" && error.quarantineReference.startsWith(prefix) &&
+        /^[a-f0-9]{64}\.json$/.test(error.quarantineReference.slice(prefix.length))) {
+      result.quarantineReference = error.quarantineReference;
+    }
   }
   try {
     await deps.blob.uploadData(Buffer.from(JSON.stringify(result)), {

@@ -58,6 +58,17 @@ test("missing intake and changed source deny before inference", async () => {
   const y = fixture(); y.deps.downloadSource = async () => Buffer.from("different");
   await assert.rejects(execute(y.input, y.deps), /SOURCE_BYTES_CHANGED/); assert.equal(y.calls(), 0);
 });
+test("additional recovery actual-usage overrun retains private output and cannot publish a report", async () => {
+  const x = fixture();
+  x.deps.callModel = async () => ({ ok: true, provider: "microsoft-foundry-claude",
+    route: { deploymentAlias: "jm1-editorial-devline-primary" }, output: x.report,
+    tokenCounts: { input: 125001, output: 100 }, recoveryBudgetVerified: false });
+  await assert.rejects(execute(x.input, x.deps), /REVIEW_RECOVERY_ACTUAL_USAGE_REQUIRES_REVIEW/);
+  const quarantine = [...x.saved.entries()].filter(([path]) => path.startsWith("commissioning-review-quarantine/"));
+  assert.equal(quarantine.length, 1);
+  assert.deepEqual(JSON.parse(quarantine[0][1].bytes).output, x.report);
+  assert.equal([...x.saved.keys()].some(path => path.startsWith("commissioning-editorial-review/")), false);
+});
 test("model fallback and edited output never persist assessment", async () => {
   const x = fixture(); x.deps.callModel = async () => ({ ok: true, provider: "anthropic-direct" });
   await assert.rejects(execute(x.input, x.deps), /AUTHORITY_OR_CONFIGURATION_REQUIRED/); assert.equal(x.saved.size, 1);

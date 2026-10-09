@@ -84,7 +84,7 @@ test("validated owner receipt completes internally without approving or advancin
     blob: { uploadData: async () => { writes++; return { etag: "next" }; } },
     executeReview: async () => ({ reference: `commissioning-editorial-review/${c.TITLE_ID}/${c.BINDING_HASH}/fixture.json`,
       receipt: { status: "EDITORIAL_REVIEW_READY_FOR_PUBLISHER", productionStageChanged: false,
-        binding: { titleId: c.TITLE_ID, parentExecutionId: c.EXECUTION_ID.replace(/:editorial-review:v1$/, "") },
+        binding: { titleId: c.TITLE_ID, stage: "EDITORIAL_REVIEW", parentExecutionId: c.EXECUTION_ID.replace(/:editorial-review:v1$/, "") },
         report, reportSha256: c.digest(report) } }) });
   assert.equal(result.status, "COMPLETED"); assert.equal(result.productionStageChanged, false);
   assert.equal(result.attempts, 6); assert.equal(writes, 2);
