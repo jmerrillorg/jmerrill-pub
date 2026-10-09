@@ -103,12 +103,22 @@ async function resolveOwnerBinding(titleId, deps = {}) {
   const row = await deps.client.first("jm1pub_editorialartifacts", { $filter: `jm1pub_editorialartifactid eq ${id}` });
   if (!row) return null;
   await received.verifySourceRegistration(policy, row, deps);
+  const retainedArtifacts = [];
+  if (policy.retainedSourceKey) {
+    const retainedPolicy = received.policies[policy.retainedSourceKey], retainedId = received.sourceArtifactId(retainedPolicy);
+    const retainedRow = await deps.client.first("jm1pub_editorialartifacts", { $filter: `jm1pub_editorialartifactid eq ${retainedId}` });
+    if (!retainedRow) return null;
+    await received.verifySourceRegistration(retainedPolicy, retainedRow, deps);
+    retainedArtifacts.push({ artifactId: retainedId, reference: `dataverse:jm1pub_editorialartifact:${retainedId}`,
+      version: String(retainedRow.versionnumber), sha256: retainedPolicy.sha256 });
+  }
   const reference = `JMP-JACKIE-TITLE-COMMISSIONING-20261008:${titleId}:RECEIVED_SOURCE_V1`;
   return { request: { schemaVersion: 1, authorityReference: reference,
     title: { jm1pub_titleid: titleId, jm1_canonicalauthorcontactreference: `contact:${JACKIE_CANONICAL_AUTHOR_CONTACT_ID}` },
     source: { reference: `dataverse:jm1pub_editorialartifact:${id}`, version: String(row.versionnumber), sha256: policy.sha256, role: "RECEIVED_ORIGINAL" },
-    retainedArtifacts: [], historyReference: `dataverse:jm1pub_title:${titleId}:PRESERVE_EXISTING_PRODUCTION_HISTORY`, revision: 1 },
+    retainedArtifacts, historyReference: `dataverse:jm1pub_title:${titleId}:PRESERVE_EXISTING_PRODUCTION_HISTORY`, revision: 1 },
     scope: { schemaVersion: 1, titleId, authorityReference: reference, version: "received-owner-v1", enabled: true, revoked: false,
-      mode: "JACKIE_TITLE_INTERNAL_COMMISSIONING", sourceRole: "RECEIVED_ORIGINAL", controllingSourceArtifactId: id, retainedArtifactIds: [] } };
+      mode: "JACKIE_TITLE_INTERNAL_COMMISSIONING", sourceRole: "RECEIVED_ORIGINAL", controllingSourceArtifactId: id,
+      retainedArtifactIds: retainedArtifacts.map(artifact => artifact.artifactId) } };
 }
 module.exports = { ownerBinding, resolveOwnerBinding, registrationEnabled, ensureTitleCommissioningOwnerBindings };
