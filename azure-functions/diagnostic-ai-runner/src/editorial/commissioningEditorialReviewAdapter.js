@@ -98,13 +98,18 @@ async function executeCommissioningEditorialReview(input, deps = {}) {
   try {
     if (model.recoveryBudgetVerified === false) fail("REVIEW_RECOVERY_ACTUAL_USAGE_REQUIRES_REVIEW");
     report = validateEditorialReview(model.output);
+    if (report.intakeSummary.sourceVersion !== run.source.version) fail("REVIEW_OUTPUT_SOURCE_VERSION_MISMATCH");
+    if (report.intakeSummary.wordCount !== extracted.trim().split(/\s+/u).length ||
+        (authority.titleName && report.intakeSummary.title !== authority.titleName)) fail("REVIEW_OUTPUT_SOURCE_CONTEXT_MISMATCH");
+    if (report.imprintAlignment.authority !== "SUGGESTED_ONLY") fail("REVIEW_OFFICIAL_IMPRINT_ASSIGNMENT_NOT_BOUND");
   }
   catch (error) {
     // Private rejected candidate custody is separate from publishable receipts.
     // Nothing from this object is emitted to telemetry or the review renderer.
     const candidate = { status: "QUARANTINED_INVALID_ASSESSMENT", binding,
       safeCode: error.safeCode, observedAt: (deps.now || (() => new Date()))().toISOString(),
-      output: model.output, tokenCounts: model.tokenCounts, request: model.request };
+      output: model.output, tokenCounts: model.tokenCounts, request: model.request,
+      ...(model.recoveryCostProof ? { recoveryCostProof: model.recoveryCostProof } : {}) };
     const bytes = Buffer.from(JSON.stringify(candidate));
     const quarantineReference = `commissioning-review-quarantine/${run.titleId}/${run.bindingHash}/${sha(bytes)}.json`;
     const quarantine = deps.containerClient.getBlockBlobClient(quarantineReference);
@@ -120,10 +125,6 @@ async function executeCommissioningEditorialReview(input, deps = {}) {
     error.quarantineReference = quarantineReference;
     throw error;
   }
-  if (report.intakeSummary.sourceVersion !== run.source.version) fail("REVIEW_OUTPUT_SOURCE_VERSION_MISMATCH");
-  if (report.intakeSummary.wordCount !== extracted.trim().split(/\s+/u).length ||
-      (authority.titleName && report.intakeSummary.title !== authority.titleName)) fail("REVIEW_OUTPUT_SOURCE_CONTEXT_MISMATCH");
-  if (report.imprintAlignment.authority !== "SUGGESTED_ONLY") fail("REVIEW_OFFICIAL_IMPRINT_ASSIGNMENT_NOT_BOUND");
   // Recheck authority after inference; no result is published from stale scope.
   const currentTitleAuthority = await readTitleCommissioningAuthority(input, deps);
   if (JSON.stringify(currentTitleAuthority.identityProof) !== JSON.stringify(titleAuthority.identityProof)) {
