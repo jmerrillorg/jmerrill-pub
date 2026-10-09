@@ -56,6 +56,16 @@ test("requires exact approved proof artifact, version, and checksum", () => {
   assert.ok(evaluateStage13Preflight(input).blockers.includes("EXACT_PROOF_APPROVAL_MISSING"));
 });
 
+test("missing proof and approval artifact IDs cannot compare equal", () => {
+  for (const missing of [undefined, "", "   "]) {
+    const input = snapshot();
+    input.proofArtifact.artifactId = missing;
+    input.proofApproval.artifactId = missing;
+    assert.equal(evaluateStage13Preflight(input).ready, false);
+    assert.ok(evaluateStage13Preflight(input).blockers.includes("EXACT_PROOF_APPROVAL_MISSING"));
+  }
+});
+
 test("holds Stage 13 for a pending or cross-title agreement", () => {
   const input = snapshot();
   input.agreementGate.status = "PARALLEL_PENDING";

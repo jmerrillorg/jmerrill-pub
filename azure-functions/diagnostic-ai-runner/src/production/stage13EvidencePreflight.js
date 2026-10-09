@@ -59,7 +59,7 @@ function evaluateStage13Preflight(snapshot) {
     blockers.add("AGREEMENT_AUTHORITY_MISSING");
   }
   if (!isCurrent(proof) || proof.titleId !== titleId || proof.authorId !== authorId ||
-      !SHA256.test(value(proof.checksum)) || proof.qaStatus !== "PASS" ||
+      !value(proof.artifactId) || !SHA256.test(value(proof.checksum)) || proof.qaStatus !== "PASS" ||
       !isCurrent(approval) || approval.titleId !== titleId || approval.authorId !== authorId ||
       approval.status !== "APPROVED" || approval.artifactId !== proof.artifactId ||
       approval.version !== proof.version || approval.checksum !== proof.checksum) {
