@@ -153,6 +153,12 @@ settings afterward. Broad stage/wait workers remain disabled. Any ambiguous
 write requires same-ID readback and forward recovery, not a new ID or reset.
 No linked source registration commissions the complete Publishing pipeline.
 
+The October 9 founder-completed Intake folder renames for Til Death and My AI
+Journey are accepted only as the exact reviewed old-to-new URL pairs, with
+unchanged relative file path, drive/item ID, title binding and checksum.
+Current native custody is reverified; historical registry URLs and completed
+intake receipts are not rewritten. Other relocations still fail closed.
+
 ## Prospective Glory assessment decision
 
 The authenticated Glory recovery route accepts only

@@ -121,8 +121,29 @@ async function verifySourceRegistration(policy, row, deps) {
       row.jm1pub_supersededon || row.statecode !== 0 || row.jm1pub_correlationid !== `JMP-JACKIE-TITLE-COMMISSIONING-20261008:RECEIVED:${policy.itemId}` ||
       !Number.isSafeInteger(row.versionnumber)) fail("COMMISSIONING_RECEIVED_REGISTRATION_CONFLICT");
   const proof = await (deps.readReceivedSourceProof || readReceivedSourceProof)(policy, deps);
-  if (row.jm1pub_repositorypath !== proof.repositoryPath) fail("COMMISSIONING_RECEIVED_REGISTRATION_LOCATION_CONFLICT");
+  if (row.jm1pub_repositorypath !== proof.repositoryPath && !verifiedIntakeRelocation(policy, row.jm1pub_repositorypath, proof.repositoryPath)) {
+    fail("COMMISSIONING_RECEIVED_REGISTRATION_LOCATION_CONFLICT");
+  }
   return true;
+}
+
+// Founder-completed folder renames do not change the exact drive/item/bytes
+// checked above. Preserve the registered historical URL and completed run.
+function verifiedIntakeRelocation(policy, historical, current) {
+  const names = policy === policies.TIL_DEATH
+    ? ["JMP-INT-202608-3W6Q6L - Jackie Smith Jr - TIL DEATH DO US PART", "Smith, Jackie - Til Death Do Us Part"]
+    : policy === policies.MY_AI ? ["2025-Smith-MyAIJourney", "Smith, Jackie - My AI Journey"] : null;
+  if (!names) return false;
+  try {
+    const before = new URL(historical), after = new URL(current);
+    const prefix = "/sites/publishing/Shared Documents/01_Pipeline_A-Z/02 - Intake/";
+    if ([before, after].some(url => url.protocol !== "https:" || url.hostname !== "jmerrillfoundation.sharepoint.com" || url.port || url.search || url.hash)) return false;
+    const oldPath = decodeURIComponent(before.pathname), newPath = decodeURIComponent(after.pathname);
+    const oldPrefix = `${prefix}${names[0]}/`, newPrefix = `${prefix}${names[1]}/`;
+    return oldPath.startsWith(oldPrefix) && newPath.startsWith(newPrefix) &&
+      oldPath.slice(oldPrefix.length) === newPath.slice(newPrefix.length) &&
+      !oldPath.includes("/../") && !newPath.includes("/../");
+  } catch { return false; }
 }
 async function registerReceivedSource(policy, deps) {
   const proof = await (deps.readReceivedSourceProof || readReceivedSourceProof)(policy, deps);
