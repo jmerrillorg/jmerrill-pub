@@ -39,6 +39,27 @@ test("cross-title stored receipt is denied, never projected as complete", async 
   const x = fixture(); x.records.set(`commissioning-intake/${titleId}/${x.plan.bindingHash}.json`, { titleId: "other", executionId: x.plan.executionId, bindingHash: x.plan.bindingHash });
   await assert.rejects(read({ mode: "COMMISSIONING_INTAKE_READ_ONLY", titleId }, x.deps), /IDENTITY_CONFLICT/);
 });
+test("rejected candidate readback verifies exact custody and returns shapes, never private content", async () => {
+  const x = fixture();
+  const candidate = { status: "QUARANTINED_INVALID_ASSESSMENT", safeCode: "REVIEW_CATEGORY_NOTES_INVALID",
+    binding: { titleId, parentExecutionId: x.plan.executionId, source: x.plan.source },
+    output: { categoryNotes: { STRUCTURE_FLOW: ["private manuscript-derived text"] } },
+    tokenCounts: { input: 10, output: 20, total: 30 } };
+  const sha256 = require("node:crypto").createHash("sha256").update(JSON.stringify(candidate)).digest("hex");
+  const reference = `commissioning-review-quarantine/${titleId}/${x.plan.bindingHash}/${sha256}.json`;
+  x.records.set(reference, candidate);
+  x.records.set(`commissioning-review-executions/${titleId}/${x.plan.bindingHash}.json`, {
+    titleId, executionId: `${x.plan.executionId}:editorial-review:v1`, bindingHash: x.plan.bindingHash,
+    status: "HELD", quarantineReference: reference
+  });
+  const result = await read({ mode: "COMMISSIONING_INTAKE_READ_ONLY", titleId }, x.deps);
+  assert.equal(result.jsonBody.reviewRejection.sha256, sha256);
+  assert.equal(result.jsonBody.reviewRejection.categoryNoteShapes.STRUCTURE_FLOW.type, "array");
+  assert.equal(result.jsonBody.reviewRejection.contentReturned, false);
+  assert.equal(JSON.stringify(result).includes("private manuscript-derived"), false);
+  candidate.binding.titleId = "other";
+  await assert.rejects(read({ mode: "COMMISSIONING_INTAKE_READ_ONLY", titleId }, x.deps), /CUSTODY_INVALID/);
+});
 test("fixed-title identity preflight reads exact links without touching storage or dispatch", async () => {
   const id = "f79006b7-f595-f111-8076-00224820105b";
   const contact = require("../src/author/jackieTitleSystemCommissioningPolicy").JACKIE_CANONICAL_AUTHOR_CONTACT_ID;

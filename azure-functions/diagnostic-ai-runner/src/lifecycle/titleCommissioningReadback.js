@@ -52,13 +52,15 @@ async function titleCommissioningReadback(body, deps = {}) {
     try {
       const { etag } = await blob.getProperties();
       if (!etag) throw new Error("COMMISSIONING_READBACK_VERSION_MISSING");
-      return { etag, value: JSON.parse((await blob.downloadToBuffer(0, undefined, { conditions: { ifMatch: etag } })).toString("utf8")) };
+      const bytes = await blob.downloadToBuffer(0, undefined, { conditions: { ifMatch: etag } });
+      return { etag, sha256: require("node:crypto").createHash("sha256").update(bytes).digest("hex"), value: JSON.parse(bytes.toString("utf8")) };
     } catch (error) { if (error?.statusCode === 404) return null; throw error; }
   }
   const execution = await read(`commissioning-executions/${plan.titleId}/${plan.bindingHash}.json`);
   const receipt = await read(`commissioning-intake/${plan.titleId}/${plan.bindingHash}.json`);
   const reviewExecution = await read(`commissioning-review-executions/${plan.titleId}/${plan.bindingHash}.json`);
   let reviewReceipt = null;
+  let reviewRejection = null;
   if (reviewExecution) {
     if (reviewExecution.value.executionId !== `${plan.executionId}:editorial-review:v1` ||
         reviewExecution.value.titleId !== plan.titleId || reviewExecution.value.bindingHash !== plan.bindingHash) {
@@ -84,6 +86,31 @@ async function titleCommissioningReadback(body, deps = {}) {
         await documentBlob.downloadToBuffer(0, undefined, { conditions: { ifMatch: documentProperties.etag } })
       ).digest("hex") !== reviewReceipt.value.documentSha256) throw new Error("COMMISSIONING_REVIEW_DOCUMENT_CUSTODY_INVALID");
     }
+    if (reviewExecution.value.status === "HELD" && reviewExecution.value.quarantineReference) {
+      const reference = reviewExecution.value.quarantineReference;
+      const prefix = `commissioning-review-quarantine/${plan.titleId}/${plan.bindingHash}/`;
+      if (typeof reference !== "string" || !reference.startsWith(prefix) ||
+          !/^[a-f0-9]{64}\.json$/.test(reference.slice(prefix.length))) throw new Error("REVIEW_QUARANTINE_PATH_INVALID");
+      const candidate = await read(reference);
+      if (!candidate || `${candidate.sha256}.json` !== reference.slice(prefix.length) ||
+          candidate.value.status !== "QUARANTINED_INVALID_ASSESSMENT" ||
+          candidate.value.binding?.titleId !== plan.titleId || candidate.value.binding.parentExecutionId !== plan.executionId ||
+          JSON.stringify(candidate.value.binding.source) !== JSON.stringify(plan.source)) throw new Error("REVIEW_QUARANTINE_CUSTODY_INVALID");
+      const { SECTIONS, CATEGORIES } = require("../editorial/commissioningEditorialReviewContract");
+      const output = candidate.value.output;
+      const notes = output?.categoryNotes;
+      const shape = value => ({ type: Array.isArray(value) ? "array" : value === null ? "null" : typeof value,
+        ...(typeof value === "string" ? { length: value.length, nonempty: value.trim().length > 0 } : {}),
+        ...(value && typeof value === "object" ? { count: Object.keys(value).length } : {}) });
+      reviewRejection = { reference, etag: candidate.etag, sha256: candidate.sha256,
+        safeCode: /^(?:REVIEW|COMMISSIONING)_[A-Z_]{1,100}$/.test(candidate.value.safeCode || "") ? candidate.value.safeCode : "REVIEW_REJECTED",
+        tokenCounts: Object.fromEntries(["input", "output", "total"].map(key => [key,
+          Number.isSafeInteger(candidate.value.tokenCounts?.[key]) && candidate.value.tokenCounts[key] >= 0 ? candidate.value.tokenCounts[key] : null])),
+        outputShape: shape(output), presentSections: SECTIONS.filter(key => Object.hasOwn(output || {}, key)),
+        categoryNotesShape: shape(notes), presentCategories: CATEGORIES.filter(key => Object.hasOwn(notes || {}, key)),
+        categoryNoteShapes: Object.fromEntries(CATEGORIES.filter(key => Object.hasOwn(notes || {}, key)).map(key => [key, shape(notes[key])])),
+        contentReturned: false };
+    }
   }
   for (const record of [execution, receipt].filter(Boolean)) {
     if (record.value.executionId !== plan.executionId || record.value.titleId !== plan.titleId || record.value.bindingHash !== plan.bindingHash) {
@@ -94,6 +121,7 @@ async function titleCommissioningReadback(body, deps = {}) {
     titleId: plan.titleId, executionId: plan.executionId, bindingHash: plan.bindingHash,
     nativeAuthorityAndBytes: "PASS", artifactBindings: authority.artifacts, scopePersisted, reviewAuthority,
     commissioningIdentity: authority.identityProof,
+    reviewRejection,
     reviewExecution: reviewExecution ? { etag: reviewExecution.etag, status: reviewExecution.value.status,
       attempts: reviewExecution.value.attempts, failureCode: reviewExecution.value.failureCode, causeCode: reviewExecution.value.causeCode,
       quarantineReference: reviewExecution.value.quarantineReference,
