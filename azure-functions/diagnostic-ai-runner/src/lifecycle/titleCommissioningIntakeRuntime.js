@@ -16,7 +16,7 @@ async function runTitleCommissioningIntakeRuntime(deps = {}) {
   const client = deps.client || require("../orchestration/authorReviewResponseConsumer").createDataverseClient({
     apiBase: env.DATAVERSE_WEB_API_BASE_URL, resourceUrl: env.DATAVERSE_RESOURCE_URL
   });
-  const readers = createTitleCommissioningRuntimeReaders({ ...deps, containerClient });
+  const readers = createTitleCommissioningRuntimeReaders({ ...deps, client, containerClient });
   const results = []; const failures = [];
   for (const titleId of ids) {
     try {
@@ -37,7 +37,7 @@ async function runTitleCommissioningIntakeRuntime(deps = {}) {
       const result = await processTitleCommissioningIntake(request, workerDeps);
       results.push({ titleId, executionId: result.executionId, status: result.status, receiptReference: result.receiptReference || null });
       if (result.status === "HELD" || result.status === "RETRY_PENDING") failures.push({ titleId, code: result.failureCode, status: result.status });
-      if (result.status === "COMPLETED" && env.JM1_TITLE_COMMISSIONING_REVIEW_ENABLED === "true") {
+      if (result.status === "COMPLETED" && request.source?.role !== "RECEIVED_ORIGINAL" && env.JM1_TITLE_COMMISSIONING_REVIEW_ENABLED === "true") {
         const reviewReaders = require("../editorial/commissioningEditorialReviewReaders")
           .createCommissioningEditorialReviewReaders({ ...deps, client });
         const review = await require("./titleCommissioningEditorialReviewWorker")

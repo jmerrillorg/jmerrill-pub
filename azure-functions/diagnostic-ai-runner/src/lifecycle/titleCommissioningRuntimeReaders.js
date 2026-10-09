@@ -10,6 +10,12 @@ function createTitleCommissioningRuntimeReaders(deps = {}) {
     deny("COMMISSIONING_SCOPE_STORE_NOT_BOUND");
   }
   return {
+    async verifyReceivedSource(title, artifact, scope) {
+      const received = require("./titleCommissioningReceivedSources");
+      const policy = received.policyForTitle(title?.jm1pub_titleid);
+      if (!policy || scope.sourceRole !== "RECEIVED_ORIGINAL" || scope.controllingSourceArtifactId !== received.sourceArtifactId(policy)) return false;
+      return received.verifySourceRegistration(policy, artifact, deps);
+    },
     async readScope(titleId) {
       if (!GUID.test(titleId || "")) deny("COMMISSIONING_SCOPE_TITLE_INVALID");
       const blob = deps.containerClient.getBlockBlobClient(`commissioning-scopes/${titleId.toLowerCase()}.json`);

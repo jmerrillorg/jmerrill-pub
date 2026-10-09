@@ -47,3 +47,27 @@ test("composite source identity is accepted only through live exact Contact/prof
   profile._jm1_contact_value = artifactId;
   await assert.rejects(read(x.input, x.deps), /AUTHOR_AUTHORITY_CHANGED/);
 });
+test("received original requires exact provenance and cannot substitute for approved controlling work", async () => {
+  const x = fixture(); x.input.source.role = "RECEIVED_ORIGINAL"; x.scope.sourceRole = "RECEIVED_ORIGINAL";
+  x.artifact.jm1pub_iscurrentapproved = false;
+  await assert.rejects(read(x.input, x.deps), /PROVENANCE_UNVERIFIED/);
+  x.deps.verifyReceivedSource = async () => true;
+  assert.equal((await read(x.input, x.deps)).current, true);
+  x.input.source.role = "APPROVED_CONTROLLING";
+  await assert.rejects(read(x.input, x.deps), /SOURCE_ROLE_MISMATCH/);
+  x.scope.sourceRole = "APPROVED_CONTROLLING";
+  await assert.rejects(read(x.input, x.deps), /ARTIFACT_AUTHORITY_CHANGED/);
+});
+test("unapproved or historical retained work is preserved but never becomes controlling authority", async () => {
+  const x = fixture(), retainedId = "00000000-0000-4000-8000-000000000003";
+  const retained = { ...x.artifact, jm1pub_editorialartifactid: retainedId, jm1pub_iscurrentapproved: false,
+    jm1pub_supersededon: "2026-09-01T00:00:00Z" };
+  x.scope.retainedArtifactIds = [retainedId];
+  x.input.retainedArtifacts = [{ artifactId: retainedId, reference: `dataverse:jm1pub_editorialartifact:${retainedId}`, version: "10", sha256: retained.jm1pub_sha256 }];
+  x.deps.client.first = async (entity, query) => entity === "jm1pub_titles" ? x.title : query.$filter.includes(retainedId) ? retained : x.artifact;
+  const result = await read(x.input, x.deps);
+  assert.equal(result.artifacts[1].role, "RETAINED_WORK");
+  x.input.source.reference = `dataverse:jm1pub_editorialartifact:${retainedId}`;
+  x.scope.controllingSourceArtifactId = retainedId;
+  await assert.rejects(read(x.input, x.deps), /ARTIFACT_AUTHORITY_CHANGED/);
+});

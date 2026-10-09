@@ -34,6 +34,10 @@ function planTitleCommissioningRun(input) {
       version: artifact.version, reference: artifact.reference, disposition: "PRESERVE_REVALIDATE" };
   }).sort((a, b) => a.artifactId.localeCompare(b.artifactId));
   const sourceBinding = { reference: source.reference, version: source.version, sha256: source.sha256 };
+  if (source.role !== undefined) {
+    if (!["RECEIVED_ORIGINAL", "APPROVED_CONTROLLING"].includes(source.role)) fail("COMMISSIONING_SOURCE_ROLE_INVALID");
+    sourceBinding.role = source.role;
+  }
   const identity = { titleId: title.jm1pub_titleid.toLowerCase(), revision, source: sourceBinding,
     retainedArtifacts: artifacts, historyReference };
   const bindingHash = hash(identity);

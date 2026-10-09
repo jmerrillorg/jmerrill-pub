@@ -1,5 +1,5 @@
 "use strict";
-const { ownerBinding } = require("./titleCommissioningOwnerBindings");
+const { ownerBinding, resolveOwnerBinding } = require("./titleCommissioningOwnerBindings");
 const { planTitleCommissioningRun } = require("./titleCommissioningRun");
 const { createTitleCommissioningRuntimeReaders } = require("./titleCommissioningRuntimeReaders");
 const { readTitleCommissioningAuthority } = require("./titleCommissioningAuthority");
@@ -25,14 +25,21 @@ async function titleCommissioningReadback(body, deps = {}) {
       identityBinding: proof ? "PASS" : "HELD", commissioningIdentity: proof, effects: 0,
       scopeStatus: "READ_ONLY_IDENTITY_PREFLIGHT_NOT_EXECUTION_AUTHORITY" } };
   }
-  if (!ownerBinding(body.titleId)) return { status: 400, jsonBody: { code: "COMMISSIONING_READBACK_SCOPE_DENIED", effects: 0 } };
-  const binding = ownerBinding(body.titleId); const plan = planTitleCommissioningRun(binding.request);
+  if (!ownerBinding(body.titleId) && !require("./titleCommissioningReceivedSources").policyForTitle(body.titleId)) {
+    return { status: 400, jsonBody: { code: "COMMISSIONING_READBACK_SCOPE_DENIED", effects: 0 } };
+  }
   const containerClient = deps.containerClient || require("@azure/storage-blob").BlobServiceClient
     .fromConnectionString(process.env.AzureWebJobsStorage).getContainerClient("jm1-publishing-stage-runtime");
   const client = deps.client || require("../orchestration/authorReviewResponseConsumer").createDataverseClient({
     apiBase: process.env.DATAVERSE_WEB_API_BASE_URL, resourceUrl: process.env.DATAVERSE_RESOURCE_URL
   });
-  const readers = deps.readers || createTitleCommissioningRuntimeReaders({ ...deps, containerClient });
+  const binding = await resolveOwnerBinding(body.titleId, { ...deps, client });
+  if (!binding) return { status: 400, jsonBody: { code: "COMMISSIONING_READBACK_SCOPE_DENIED", effects: 0 } };
+  const plan = planTitleCommissioningRun(binding.request);
+  if (body.mode === "COMMISSIONING_REVIEW_READ_ONLY" && plan.source.role === "RECEIVED_ORIGINAL") {
+    return { status: 409, jsonBody: { code: "REVIEW_RECEIVED_SOURCE_NOT_APPROVED_CONTROLLING", effects: 0 } };
+  }
+  const readers = deps.readers || createTitleCommissioningRuntimeReaders({ ...deps, client, containerClient });
   let scope = binding.scope; let scopePersisted = false;
   try { scope = await readers.readScope(body.titleId); scopePersisted = true; }
   catch (error) { if (error?.statusCode !== 404) throw error; }

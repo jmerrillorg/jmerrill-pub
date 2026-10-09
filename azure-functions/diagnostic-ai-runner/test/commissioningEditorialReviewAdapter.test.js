@@ -46,6 +46,11 @@ function fixture() {
   saved.set(`commissioning-intake/${id}/${plan.bindingHash}.json`, { etag: "initial", bytes: Buffer.from(JSON.stringify({ executionId: plan.executionId, bindingHash: plan.bindingHash, titleId: id, status: "INTAKE_MATERIALS_VERIFIED", productionStageChanged: false })) });
   return { input, deps, saved, report, authority, title, calls: () => calls, advance: ms => { clock += ms; } };
 }
+test("received source cannot enter an assessment even if the general review worker is enabled", async () => {
+  const x = fixture(); x.input.source.role = "RECEIVED_ORIGINAL";
+  await assert.rejects(execute(x.input, x.deps), /RECEIVED_SOURCE_NOT_APPROVED_CONTROLLING/);
+  assert.equal(x.calls(), 0);
+});
 test("review produces durable assessment and replay never calls model twice", async () => {
   const x = fixture(), before = structuredClone(x.title);
   const first = await execute(x.input, x.deps), again = await execute(x.input, { ...x.deps });
