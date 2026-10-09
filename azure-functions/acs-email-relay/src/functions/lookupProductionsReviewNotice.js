@@ -8,16 +8,16 @@ async function lookupProductionsReviewNotice(request, deps = {}) {
   const auth = (deps.authenticateCaller || authenticateCaller)(request);
   if (!auth.ok || auth.authModel !== "ENTRA_WORKLOAD_IDENTITY" ||
       auth.caller?.callerId !== CALLER_ID || auth.caller.status !== "ACTIVE") {
-    return { status: 403, jsonBody: { status: "unknown", code: "LOOKUP_CALLER_DENIED" } };
+    return { status: 403, jsonBody: { status: "unknown", code: "LOOKUP_CALLER_DENIED", retryAuthorized: false } };
   }
   let payload;
-  try { payload = await request.json(); } catch { return { status: 400, jsonBody: { status: "unknown" } }; }
+  try { payload = await request.json(); } catch { return { status: 400, jsonBody: { status: "unknown", code: "LOOKUP_REQUEST_INVALID", retryAuthorized: false } }; }
   const { receiptId, ...envelope } = payload || {};
   if (typeof receiptId !== "string" || !/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/i.test(receiptId)) {
-    return { status: 400, jsonBody: { status: "unknown", code: "LOOKUP_RECEIPT_REQUIRED" } };
+    return { status: 400, jsonBody: { status: "unknown", code: "LOOKUP_RECEIPT_REQUIRED", retryAuthorized: false } };
   }
   const rendered = renderProductionsBp09Notice(envelope);
-  if (!rendered.ok) return { status: 400, jsonBody: { status: "unknown", code: "LOOKUP_REQUEST_INVALID" } };
+  if (!rendered.ok) return { status: 400, jsonBody: { status: "unknown", code: "LOOKUP_REQUEST_INVALID", retryAuthorized: false } };
   const value = rendered.value;
   try {
     const result = await (deps.ledger || getMessageLedger()).lookupExactDelivery({

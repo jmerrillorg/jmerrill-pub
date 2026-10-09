@@ -47,6 +47,42 @@ provider acceptance, not destination delivery. Delivered status requires an
 independently bound authoritative delivery event/readback and timestamp. That
 source must be established before destination delivery can be commissioned.
 
+### Exact JSON response shapes
+
+Request is the exact sending envelope above plus `receiptId` (JM1 message UUID,
+not the ACS provider ID). The lookup never accepts an arbitrary message body.
+
+HTTP 200 accepted:
+```json
+{"status":"accepted","receiptId":"<JM1 UUID>","providerMessageId":"<ACS ID>","acceptedAt":"<ISO timestamp>","deliveryEvidenceAvailable":false,"retryAuthorized":false}
+```
+
+HTTP 200 failed:
+```json
+{"status":"failed","receiptId":"<JM1 UUID>","failedAt":"<durable ISO timestamp>","retryAuthorized":false}
+```
+
+HTTP 503 unknown (missing receipt, unfinished reservation, stored mismatch,
+unavailable primary storage or exception):
+```json
+{"status":"unknown","retryAuthorized":false}
+```
+
+HTTP 403 denied identity:
+```json
+{"status":"unknown","code":"LOOKUP_CALLER_DENIED","retryAuthorized":false}
+```
+
+HTTP 400 invalid probe:
+```json
+{"status":"unknown","code":"LOOKUP_REQUEST_INVALID","retryAuthorized":false}
+```
+Malformed/missing receipt UUID instead returns `code=LOOKUP_RECEIPT_REQUIRED`.
+Codes and status values are strings, IDs/timestamps are strings, all false
+values are JSON booleans. Failed/unknown responses have no provider message ID.
+Unknown/denied/invalid responses expose no receipt or timestamp. There is no
+`messageId` alias and no `deliveredAt` field in this candidate contract.
+
 ## Release and acceptance
 
 Use the existing serialized protected relay deployment and preserve its LKG.

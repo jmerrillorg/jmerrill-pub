@@ -48,6 +48,7 @@ test("exact repeated lookup proves acceptance only, never delivery or resend aut
   const f = fixture(); const first = await lookup(f); const second = await lookup(f);
   assert.deepEqual(first, second); assert.equal(first.jsonBody.status, "accepted");
   assert.equal(first.jsonBody.deliveryEvidenceAvailable, false); assert.equal(first.jsonBody.retryAuthorized, false);
+  assert.deepEqual(Object.keys(first.jsonBody).sort(), ["status", "receiptId", "providerMessageId", "acceptedAt", "deliveryEvidenceAvailable", "retryAuthorized"].sort());
   assert.equal(first.jsonBody.acceptedAt, "2026-10-09T14:00:00Z"); assert.equal(f.calls.length, 2);
 });
 test("exact failed receipt returns failure timestamp, while reservation and conflicts stay unknown", async () => {
@@ -60,11 +61,13 @@ test("exact failed receipt returns failure timestamp, while reservation and conf
 });
 test("denied caller, recipient, receipt, version and unbounded content never read storage", async () => {
   for (const change of [{ receiptId: "invalid" }, { to: "other@example.com" }, { body: "private" }, { templateVersion: "2" }]) {
-    const f = fixture(); assert.equal((await lookup(f, { ...payload, receiptId, ...change })).status, 400);
+    const f = fixture(); const result = await lookup(f, { ...payload, receiptId, ...change });
+    assert.equal(result.status, 400); assert.equal(result.jsonBody.retryAuthorized, false);
     assert.equal(f.calls.length, 0);
   }
   for (const a of [{ ...auth(), authModel: "LEGACY_SHARED_KEY" }, { ...auth(), caller: { callerId: "other", status: "ACTIVE" } }]) {
-    const f = fixture(); assert.equal((await lookup(f, undefined, () => a)).status, 403); assert.equal(f.calls.length, 0);
+    const f = fixture(); const result = await lookup(f, undefined, () => a);
+    assert.equal(result.status, 403); assert.equal(result.jsonBody.retryAuthorized, false); assert.equal(f.calls.length, 0);
   }
 });
 test("absence, permission failures and timeouts remain unknown with no resend permission", async () => {
