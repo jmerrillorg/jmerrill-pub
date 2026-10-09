@@ -58,6 +58,22 @@ test("missing intake and changed source deny before inference", async () => {
   const y = fixture(); y.deps.downloadSource = async () => Buffer.from("different");
   await assert.rejects(execute(y.input, y.deps), /SOURCE_BYTES_CHANGED/); assert.equal(y.calls(), 0);
 });
+test("source-context rejection retains original candidate and cost proof without an accepted receipt", async () => {
+  for (const key of ["sourceVersion", "wordCount"]) {
+    const x = fixture();
+    x.report.intakeSummary[key] = key === "wordCount" ? 99 : "unbound-version";
+    const original = x.deps.callModel;
+    x.deps.callModel = async () => ({ ...await original(), recoveryCostProof: { actualMicroUsd: 123 } });
+    await assert.rejects(execute(x.input, x.deps), /REVIEW_OUTPUT_SOURCE_(VERSION|CONTEXT)_MISMATCH/);
+    const candidates = [...x.saved.entries()].filter(([path]) => path.startsWith("commissioning-review-quarantine/"));
+    assert.equal(candidates.length, 1);
+    const candidate = JSON.parse(candidates[0][1].bytes);
+    assert.deepEqual(candidate.output, x.report);
+    assert.deepEqual(candidate.recoveryCostProof, { actualMicroUsd: 123 });
+    assert.equal([...x.saved.keys()].some(path => path.startsWith("commissioning-editorial-review/")), false);
+    assert.equal(x.calls(), 1);
+  }
+});
 test("additional recovery actual-usage overrun retains private output and cannot publish a report", async () => {
   const x = fixture();
   x.deps.callModel = async () => ({ ok: true, provider: "microsoft-foundry-claude",
