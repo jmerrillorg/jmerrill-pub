@@ -16,7 +16,7 @@ function fixture() {
   const requestSha256 = r.sha(JSON.stringify(require("../src/model/providers/microsoftFoundryClaudeProvider").buildRequestBody("fixture", r.route)));
   const id = "00000000-0000-4000-8000-000000000001", decisionId = "00000000-0000-4000-8000-000000000002";
   const approval = { recordId: id, status: "APPROVED", purpose: "ONE_ADDITIONAL_GLORY_INTERNAL_ASSESSMENT",
-    approvedByContactId: require("../author/jackieTitleSystemCommissioningPolicy").JACKIE_CANONICAL_AUTHOR_CONTACT_ID,
+    approvedByContactId: require("../src/author/jackieTitleSystemCommissioningPolicy").JACKIE_CANONICAL_AUTHOR_CONTACT_ID,
     approvedAt: "2026-10-09T20:00:00Z", expiresAt: "2026-10-09T21:00:00Z", recoveryRelease: "a".repeat(40),
     executionId: c.EXECUTION_ID, proposedAttempt: 7, expectedEtag: HELD_ETAG, preimageSha256: c.digest(state),
     sourceSha256: c.SOURCE_HASH, canonSha256: c.CANON_HASH, requestSha256, tariffSha256: r.sha(JSON.stringify(tariff)),
