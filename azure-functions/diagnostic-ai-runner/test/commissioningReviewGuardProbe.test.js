@@ -9,4 +9,6 @@ test("fixed authenticated live guard probe is synthetic and needs no provider, s
   assert.equal(result.jsonBody.modelInvocationAttempts, 0); assert.equal(result.jsonBody.executionEffects, 0);
   assert.equal((await handler(request({ mode: "VERIFY_REVIEW_GUARDS", titleId: "caller" }), deps)).status, 400);
   assert.equal((await handler(request({ mode: "VERIFY_REVIEW_GUARDS" }, "wrong"), deps)).status, 401);
+  const denied = await handler(request({ mode: "EXECUTE_NEXT_ASSESSMENT" }), deps);
+  assert.equal(denied.status, 403); assert.equal(denied.jsonBody.modelInvocationAttempts, 0);
 });

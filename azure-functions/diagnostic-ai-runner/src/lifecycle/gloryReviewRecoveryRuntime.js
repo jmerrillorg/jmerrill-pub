@@ -17,11 +17,20 @@ function nativeDependencies(env) {
 
 async function gloryRecovery(body, supplied = {}) {
   const env = supplied.env || process.env;
-  if (!body || Object.keys(body).length !== 1 || !["PREFLIGHT", "EXECUTE", "REGISTER_APPROVED_AUTHORITY", "PREPARE_NEXT_ASSESSMENT", "VERIFY_REVIEW_GUARDS"].includes(body.mode)) {
+  if (!body || Object.keys(body).length !== 1 || !["PREFLIGHT", "EXECUTE", "REGISTER_APPROVED_AUTHORITY", "PREPARE_NEXT_ASSESSMENT", "VERIFY_REVIEW_GUARDS", "EXECUTE_NEXT_ASSESSMENT"].includes(body.mode)) {
     return { status: 400, jsonBody: { code: "REVIEW_RECOVERY_REQUEST_DENIED", businessEffects: 0 } };
   }
   if (body.mode === "VERIFY_REVIEW_GUARDS") return { status: 200,
     jsonBody: await require("./commissioningReviewGuardProbe").verifyCommissioningReviewGuards() };
+  if (body.mode === "EXECUTE_NEXT_ASSESSMENT") {
+    if (env.JM1_GLORY_NEXT_ASSESSMENT_ENABLED !== "true") return { status: 403, jsonBody: {
+      code: "REVIEW_RECOVERY_NEXT_DISABLED", businessEffects: 0, executionEffects: 0, modelInvocationAttempts: 0 } };
+    const deps = supplied.containerClient ? supplied : { ...nativeDependencies(env), ...supplied };
+    const result = await require("./gloryNextAssessmentOwner").executeGloryNextAssessment(deps);
+    return { status: 200, jsonBody: { status: result.status, executionId: c.EXECUTION_ID,
+      attempts: result.attempts, receiptReference: result.receiptReference, modelInvocationAttempts: result.modelInvocationAttempts,
+      businessEffects: 0, automaticRetryAuthorized: false } };
+  }
   if (body.mode === "PREPARE_NEXT_ASSESSMENT") {
     const deps = supplied.containerClient ? supplied : { ...nativeDependencies(env), ...supplied };
     return { status: 200, jsonBody: await require("./gloryNextAssessmentProposal").prepareGloryNextAssessmentProposal(deps) };

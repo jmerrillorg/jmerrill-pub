@@ -76,7 +76,9 @@ async function runGloryNextAssessmentRecovery(input, deps = {}) {
       if (response?.ok && (response.recoveryBudgetVerified !== true || cost?.requestSha256 !== approval.requestSha256 ||
           cost?.tariffSha256 !== approval.tariffSha256 || !Number.isSafeInteger(cost?.actualMicroUsd) ||
           cost.actualMicroUsd < 0 || cost.actualMicroUsd > Math.floor(approval.maxCostUsd * 1000000))) {
-        deny("REVIEW_RECOVERY_ACTUAL_USAGE_REQUIRES_REVIEW");
+        // Let the existing producer quarantine the rejected output and usage;
+        // rejecting here would discard the only attributable provider result.
+        return { ...response, recoveryBudgetVerified: false };
       }
       return response;
     } });
