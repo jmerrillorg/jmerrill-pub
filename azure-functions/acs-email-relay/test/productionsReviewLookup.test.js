@@ -40,7 +40,7 @@ test("checkpoint templates have independent exact transition keys and reference-
   assert.notEqual(overdue.value.idempotencyKey, resolved.value.idempotencyKey);
   assert.equal(overdue.value.idempotencyKey, repeated.value.idempotencyKey);
   assert.equal(overdue.value.correlationId, payload.templateData.transitionId);
-  for (const extra of [{ body: "private" }, { to: "wrong@example.com" }, { templateData: { ...payload.templateData, private: "text" } }]) {
+  for (const extra of [{ body: "private" }, { to: "wrong@example.com" }, { templateId: "__proto__" }, { templateId: "constructor" }, { templateData: { ...payload.templateData, private: "text" } }]) {
     assert.equal(renderProductionsBp09Notice({ ...payload, ...extra }).ok, false);
   }
 });

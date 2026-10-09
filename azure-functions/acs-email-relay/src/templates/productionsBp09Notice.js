@@ -27,7 +27,7 @@ function renderProductionsBp09Notice(payload) {
   if (!exactKeys(payload, TOP_FIELDS)) return deny("BP09_REFERENCE_ENVELOPE_REQUIRED");
   if (payload.brand !== "JMPRODUCTIONS") return deny("BP09_BRAND_MISMATCH");
   if (payload.to !== "productions@jmerrill.one") return deny("BP09_DESTINATION_MISMATCH");
-  const phase = REVIEW_TEMPLATES[payload.templateId];
+  const phase = Object.hasOwn(REVIEW_TEMPLATES, payload.templateId || "") ? REVIEW_TEMPLATES[payload.templateId] : undefined;
   if ((!phase && payload.templateId !== TEMPLATE_ID) || payload.templateVersion !== TEMPLATE_VERSION) {
     return deny("BP09_TEMPLATE_MISMATCH");
   }
