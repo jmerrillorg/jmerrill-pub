@@ -32,7 +32,9 @@ async function runTitleCommissioningIntakeRuntime(deps = {}) {
           typeof request.authorityReference !== "string" || !request.authorityReference.trim()) throw new Error("request provenance missing");
       const scope = await readers.readScope(titleId);
       if (scope.authorityReference !== request.authorityReference) throw new Error("request authority mismatch");
-      const result = await processTitleCommissioningIntake(request, { ...deps, client, containerClient, ...readers });
+      const workerDeps = require("./titleCommissioningAcceptanceFault").acceptanceFaultDeps(request,
+        { ...deps, client, containerClient, ...readers }, env);
+      const result = await processTitleCommissioningIntake(request, workerDeps);
       results.push({ titleId, executionId: result.executionId, status: result.status, receiptReference: result.receiptReference || null });
       if (result.status === "HELD" || result.status === "RETRY_PENDING") failures.push({ titleId, code: result.failureCode, status: result.status });
     } catch (error) {

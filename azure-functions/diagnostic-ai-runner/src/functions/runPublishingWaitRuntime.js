@@ -31,10 +31,15 @@ if (process.env.JM1_PUBLISHING_WAIT_RUNTIME_ENABLED === "true" || process.env.JM
     schedule: "0 */5 * * * *", handler: async (_timer, context) => {
       let waitFailures = [];
       if (process.env.JM1_PUBLISHING_WAIT_RUNTIME_ENABLED === "true" || process.env.JM1_PUBLISHING_WAIT_OBSERVATION_ENABLED === "true") {
-        const result = await runWaitReconciliation(createPublishingWaitRuntime({ observe: (event) => context.info(JSON.stringify(event)) }),
-        { observationOnly: process.env.JM1_PUBLISHING_WAIT_RUNTIME_ENABLED !== "true" });
-        context.info(`Publishing wait health: ${JSON.stringify(result.health)}`);
-        waitFailures = result.health.failures;
+        try {
+          const result = await runWaitReconciliation(createPublishingWaitRuntime({ observe: (event) => context.info(JSON.stringify(event)) }),
+            { observationOnly: process.env.JM1_PUBLISHING_WAIT_RUNTIME_ENABLED !== "true" });
+          context.info(`Publishing wait health: ${JSON.stringify(result.health)}`);
+          waitFailures = result.health.failures;
+        } catch {
+          waitFailures = [{ code: "PUBLISHING_WAIT_OBSERVATION_UNAVAILABLE" }];
+          context.info("Publishing wait health: PUBLISHING_WAIT_OBSERVATION_UNAVAILABLE");
+        }
       }
       const intake = await require("../lifecycle/titleCommissioningIntakeRuntime").runTitleCommissioningIntakeRuntime();
       if (intake.enabled) context.info(`Publishing commissioning intake: ${JSON.stringify(intake)}`);

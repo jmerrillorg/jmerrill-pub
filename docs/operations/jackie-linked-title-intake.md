@@ -132,3 +132,23 @@ stateful failure/resolution rule against this timer's latest metadata-only
 observation and the existing Publishing operations action group. It neither
 changes recipients nor introduces a scheduler or agent. Actual failure and
 resolution email delivery remain live acceptance items after protected release.
+
+## Controlled live recovery exercise
+
+Only the fixed compiled Establishing Glory request permits an acceptance fault.
+Set a unique UUID in `JM1_TITLE_COMMISSIONING_ACCEPTANCE_ID` and one of
+`RECEIPT_WRITE_TRANSIENT` or `AFTER_CLAIM_PAUSE` in
+`JM1_TITLE_COMMISSIONING_ACCEPTANCE_FAULT`. Unknown modes, titles and IDs fail
+closed. The default is no fault. The reviewed mechanism records a create-only
+exercise reference; it cannot send, generate a manuscript, advance a stage or
+modify the source bytes.
+
+The receipt fault permits plan persistence but fails before the intake receipt
+write. Observe the same execution's retry state and actual alert. Remove the
+fault to restore the receipt dependency. For the restart exercise, the next
+claim pauses six minutes before intake; restart the host and remove the control,
+then observe natural expired-claim recovery with the same execution identity.
+Do not count an injected fault as a spontaneous provider outage. Capture the
+original production settings first; keep wait and broad stage dispatch disabled.
+After the receipt completes, prove exact replay and remove both temporary
+acceptance settings. Retain all exercise and execution records.
