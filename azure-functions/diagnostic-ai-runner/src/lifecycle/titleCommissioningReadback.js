@@ -77,7 +77,7 @@ async function titleCommissioningReadback(body, deps = {}) {
     titleId: plan.titleId, executionId: plan.executionId, bindingHash: plan.bindingHash,
     nativeAuthorityAndBytes: "PASS", artifactBindings: authority.artifacts, scopePersisted, reviewAuthority,
     reviewExecution: reviewExecution ? { etag: reviewExecution.etag, status: reviewExecution.value.status,
-      attempts: reviewExecution.value.attempts, failureCode: reviewExecution.value.failureCode,
+      attempts: reviewExecution.value.attempts, failureCode: reviewExecution.value.failureCode, causeCode: reviewExecution.value.causeCode,
       nextAttemptAt: reviewExecution.value.nextAttemptAt, completedAt: reviewExecution.value.completedAt } : null,
     reviewReceipt: reviewReceipt ? { etag: reviewReceipt.etag, status: reviewReceipt.value.status,
       binding: reviewReceipt.value.binding, reportSha256: reviewReceipt.value.reportSha256,
