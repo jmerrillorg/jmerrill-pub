@@ -12,6 +12,12 @@ function deterministicId(value) {
 }
 const myAiWorkReference = "VELLUM_BOOK_UUID:46642F52-B290-4FC2-A707-11A812F4CDD5";
 const policies = Object.freeze({
+  INTENTIONAL: Object.freeze({ titleId: "e797232b-da7a-f111-ab0f-00224820105b", titleName: "The Intentional Leader Volume I",
+    itemId: "01DF3SEQJQ4TOTWXAVD5GZ5SOR3R7VPFKF", format: "docx", bytes: 1053763,
+    sha256: "701c16b72ff107603f0c09acd264434e97146b93b80ba4f175fb7bdbe3515d06", retainedSourceKey: "INTENTIONAL_CONTINUED" }),
+  INTENTIONAL_CONTINUED: Object.freeze({ titleId: "e797232b-da7a-f111-ab0f-00224820105b", titleName: "The Intentional Leader - continued",
+    itemId: "01DF3SEQO7LTRYYPL3Y5AYBVEAFAVFJFZF", format: "docx", bytes: 753827, retainedOnly: true,
+    sha256: "94b46204db5e0e81d739f507c26905f693888949a494d2c4d64463ebe2a90312" }),
   TIL_DEATH: Object.freeze({ titleId: "f79006b7-f595-f111-8076-00224820105b", intakeId: "383b6d6c-f595-f111-8076-7c1e525b15c2",
     intakeReference: "JMP-INT-202608-3W6Q6L", correlationId: "0d083eb5-45dc-4b0d-a16a-d19ddde61785",
     titleName: "'TIL DEATH DO US PART", itemId: "01DF3SEQLS4HFC4AAJSRE2LVY7XVZTLH2Y", format: "md", bytes: 133593,
@@ -23,7 +29,7 @@ const policies = Object.freeze({
     retainedAliasItemId: "01DF3SEQIMJ3UTBC335ND3FHJ4LOEZNNG3", format: "vellum", bytes: 271999,
     sha256: "a2cde55aadc51d96a49f7ee8a11ec16449262b34e40ca755fde30832af34bffd" })
 });
-function policyForTitle(titleId) { return Object.values(policies).find(p => p.titleId === titleId) || null; }
+function policyForTitle(titleId) { return Object.values(policies).find(p => p.titleId === titleId && !p.retainedOnly) || null; }
 function sourceArtifactId(policy) { return deterministicId(`${policy.titleId}:${driveId}:${policy.itemId}:${policy.sha256}:RECEIVED_ORIGINAL:v1`); }
 async function sourceBytes(itemId, deps) {
   return require("../editorial/productionTitleAuthorityReader").graphBytes({ jm1pub_repositorydriveid: driveId, jm1pub_repositoryitemid: itemId },
@@ -42,6 +48,19 @@ async function sourceMetadata(policy, deps) {
 function verifySourceMetadata(policy, metadata) {
   let url, path;
   try { url = new URL(metadata.webUrl); path = decodeURIComponent(url.pathname); } catch { fail("COMMISSIONING_RECEIVED_LOCATION_INVALID"); }
+  // Office may return a viewer URL. Resolve location from the exact native
+  // parent path, never from a supplied title/name search or sharing URL.
+  if (policy.format === "docx" && path === "/sites/publishing/_layouts/15/Doc.aspx") {
+    const parent = decodeURIComponent(metadata.parentReference?.path || "").split("root:");
+    const expectedParent = "/01_Pipeline_A-Z/02 - Intake/Smith, Jackie - The Intentional Leader Volume I/02 - Intake";
+    if (url.hostname !== "jmerrillfoundation.sharepoint.com" || url.protocol !== "https:" || url.hash || url.port ||
+        parent.length !== 2 || parent[1] !== expectedParent || url.searchParams.get("file") !== metadata.name ||
+        !/^\{[a-f0-9-]{36}\}$/i.test(url.searchParams.get("sourcedoc") || "") || /[/\\]/.test(metadata.name || "")) {
+      fail("COMMISSIONING_RECEIVED_LOCATION_INVALID");
+    }
+    url = new URL(`/sites/publishing/Shared%20Documents${expectedParent.split("/").map(encodeURIComponent).join("/")}/${encodeURIComponent(metadata.name)}`, url.origin);
+    path = decodeURIComponent(url.pathname);
+  }
   if (metadata.id !== policy.itemId || metadata.size !== policy.bytes || !metadata.file || !metadata.eTag ||
       metadata.parentReference?.driveId !== driveId || url.protocol !== "https:" ||
       url.hostname !== "jmerrillfoundation.sharepoint.com" || url.search || url.hash ||
@@ -56,6 +75,16 @@ async function readReceivedSourceProof(policy, deps) {
   const custody = verifySourceMetadata(policy, await (deps.sourceMetadata || sourceMetadata)(policy, deps));
   const source = await sourceBytes(policy.itemId, deps);
   if (!Buffer.isBuffer(source) || source.length !== policy.bytes || hash(source) !== policy.sha256) fail("COMMISSIONING_RECEIVED_SOURCE_BYTES_CHANGED");
+  if (policy.format === "docx") {
+    const zip = await require("jszip").loadAsync(source, { checkCRC32: true });
+    if (!zip.file("word/document.xml") || !zip.file("[Content_Types].xml") || zip.file("word/vbaProject.bin")) {
+      fail("COMMISSIONING_RECEIVED_DOCX_INVALID");
+    }
+    const retainedProof = policy.retainedSourceKey ? await readReceivedSourceProof(policies[policy.retainedSourceKey], deps) : null;
+    return { ...custody, kind: "EXACT_RECEIVED_CALENDAR_SOURCE_NOT_EDITORIAL_SELECTION", originalFileName: custody.sourceName,
+      sourceRole: policy.retainedOnly ? "RETAINED_RECEIVED_ORIGINAL" : "RECEIVED_ORIGINAL",
+      editorialApproval: false, quarterlySplitApproved: false, ...(retainedProof ? { retainedProof } : {}) };
+  }
   if (policy.intakeId) {
     const intake = await deps.client.first("jm1_publishingintakes", { $filter: `jm1_publishingintakeid eq ${policy.intakeId}` });
     if (intake?.jm1_publishingintakeid !== policy.intakeId || intake._jm1_linkedcontact_value !== contactId ||
@@ -158,6 +187,10 @@ async function registerReceivedSource(policy, deps) {
     const candidates = await deps.client.list("jm1pub_editorialartifacts", { $filter: `jm1pub_repositoryitemid eq '${policy.itemId}'`, $top: "5000" });
     if (candidates.length) fail("COMMISSIONING_RECEIVED_EXISTING_ARTIFACT_CONFLICT");
   }
+  // Both originals must be registered and reverified before the primary
+  // request/scope can be provisioned. Partial creation recovers by exact ID.
+  const retainedSource = policy.retainedSourceKey
+    ? await registerReceivedSource(policies[policy.retainedSourceKey], deps) : null;
   if (!title) {
     const candidates = await deps.client.list("jm1pub_titles", { $filter: `jm1_sourceauthority eq '${policy.newTitleWorkReference}' or jm1pub_titlename eq '${policy.titleName}'`, $top: "5000" });
     if (candidates.length) fail("COMMISSIONING_NEW_WORK_CROSSWALK_REQUIRES_REVIEW");
@@ -193,7 +226,7 @@ async function registerReceivedSource(policy, deps) {
   }
   await verifySourceRegistration(policy, row, deps);
   return { titleId: policy.titleId, artifactId: id, version: String(row.versionnumber), sha256: policy.sha256,
-    role: "RECEIVED_ORIGINAL", editorialApproval: false, proof };
+    role: "RECEIVED_ORIGINAL", editorialApproval: false, proof, ...(retainedSource ? { retainedSource } : {}) };
 }
 
 async function withRegistrationClaim(policy, deps, operation) {

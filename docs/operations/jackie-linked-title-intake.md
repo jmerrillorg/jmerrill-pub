@@ -153,6 +153,15 @@ settings afterward. Broad stage/wait workers remain disabled. Any ambiguous
 write requires same-ID readback and forward recovery, not a new ID or reset.
 No linked source registration commissions the complete Publishing pipeline.
 
+The Intentional Leader intake binds the exact V2 and continued DOCX originals
+as one received-source request with a retained-source reference. Both files
+must match pinned IDs, bytes and checksums. Neither registration is approved;
+the first-file request anchor does not select an editorial controlling version.
+The existing title, stage, full originals and duplicate-date candidates remain
+unchanged. Missing/conflicting second-source custody prevents scope provisioning.
+Office viewer links resolve only through the exact native Intake parent path.
+Quarterly allocation and any source/content selection remain editorial decisions.
+
 The October 9 founder-completed Intake folder renames for Til Death and My AI
 Journey are accepted only as the exact reviewed old-to-new URL pairs, with
 unchanged relative file path, drive/item ID, title binding and checksum.

@@ -109,3 +109,61 @@ test("ambiguous creation is retried by exact ID and never a second create identi
   await assert.rejects(received.registerReceivedSource(x.policy, x.deps), /timeout/);
   x.deps.client.create = create; await received.registerReceivedSource(x.policy, x.deps); assert.equal(x.creates(), 1);
 });
+
+test("Intentional Leader receives both originals without title reset, approval or duplicate registration", async () => {
+  const x = fixture(received.policies.INTENTIONAL), before = structuredClone(x.title);
+  const result = await received.registerReceivedSource(x.policy, x.deps);
+  assert.equal(result.retainedSource.artifactId, received.sourceArtifactId(received.policies.INTENTIONAL_CONTINUED));
+  assert.equal(x.creates(), 2); assert.deepEqual(x.title, before);
+  const bindings = await require("../src/lifecycle/titleCommissioningOwnerBindings").resolveOwnerBinding(x.policy.titleId, x.deps);
+  assert.equal(bindings.scope.sourceRole, "RECEIVED_ORIGINAL");
+  assert.deepEqual(bindings.scope.retainedArtifactIds, [result.retainedSource.artifactId]);
+  assert.equal(bindings.request.retainedArtifacts[0].sha256, received.policies.INTENTIONAL_CONTINUED.sha256);
+  await received.registerReceivedSource(x.policy, x.deps); assert.equal(x.creates(), 2);
+  for (const row of x.rows.values()) if (row.jm1pub_editorialartifactid) assert.equal(row.jm1pub_iscurrentapproved, false);
+});
+
+test("Intentional Leader missing or conflicting second source cannot provision a linked run", async () => {
+  const x = fixture(received.policies.INTENTIONAL);
+  await received.registerReceivedSource(x.policy, x.deps);
+  const retainedKey = `jm1pub_editorialartifacts:${received.sourceArtifactId(received.policies.INTENTIONAL_CONTINUED)}`;
+  const row = x.rows.get(retainedKey); x.rows.delete(retainedKey);
+  const resolve = require("../src/lifecycle/titleCommissioningOwnerBindings").resolveOwnerBinding;
+  assert.equal(await resolve(x.policy.titleId, x.deps), null);
+  x.rows.set(retainedKey, { ...row, jm1pub_sha256: "a".repeat(64) });
+  await assert.rejects(resolve(x.policy.titleId, x.deps), /REGISTRATION_CONFLICT/);
+});
+
+test("Intentional Leader second-source failure and partial creation recover without a second identity", async () => {
+  const x = fixture(received.policies.INTENTIONAL), proof = x.deps.readReceivedSourceProof;
+  x.deps.readReceivedSourceProof = async policy => {
+    if (policy.retainedOnly) throw Error("SECOND_SOURCE_CHANGED");
+    return proof(policy);
+  };
+  await assert.rejects(received.registerReceivedSource(x.policy, x.deps), /SECOND_SOURCE_CHANGED/);
+  assert.equal(x.creates(), 0);
+  x.deps.readReceivedSourceProof = proof;
+  const create = x.deps.client.create;
+  x.deps.client.create = async (...args) => { await create(...args); throw Object.assign(Error("ambiguous-create"), { status: 504 }); };
+  await assert.rejects(received.registerReceivedSource(x.policy, x.deps), /ambiguous-create/);
+  assert.equal(x.creates(), 1);
+  x.deps.client.create = create;
+  await received.registerReceivedSource(x.policy, x.deps); assert.equal(x.creates(), 2);
+});
+
+test("Office viewer URL resolves only exact native Intentional Leader source parent", () => {
+  const policy = received.policies.INTENTIONAL;
+  const name = "The Intentional Leader Volume I - V2 Intake Source.docx";
+  const metadata = { id: policy.itemId, name, size: policy.bytes, eTag: "fixed", file: {},
+    webUrl: `https://jmerrillfoundation.sharepoint.com/sites/publishing/_layouts/15/Doc.aspx?sourcedoc=%7B3BDDE430-155C-4D1F-9EC9-D1DC7F579545%7D&file=${encodeURIComponent(name)}&action=default`,
+    parentReference: { driveId: received.driveId, id: "parent", path: "/drives/fixed/root:/01_Pipeline_A-Z/02 - Intake/Smith, Jackie - The Intentional Leader Volume I/02 - Intake" } };
+  const result = received.verifySourceMetadata(policy, metadata);
+  assert.match(result.repositoryPath, /Shared%20Documents.*01_Pipeline_A-Z/);
+  assert.equal(new URL(result.repositoryPath).search, "");
+  for (const change of [m => m.parentReference.path = m.parentReference.path.replace("02 - Intake/Smith", "03 - Editorial Review/Smith"),
+    m => m.webUrl = m.webUrl.replace("jmerrillfoundation.sharepoint.com", "other.sharepoint.com"),
+    m => m.id = "other", m => m.webUrl = m.webUrl.replace("file=", "other=")]) {
+    const changed = structuredClone(metadata); change(changed);
+    assert.throws(() => received.verifySourceMetadata(policy, changed), /LOCATION_INVALID/);
+  }
+});
