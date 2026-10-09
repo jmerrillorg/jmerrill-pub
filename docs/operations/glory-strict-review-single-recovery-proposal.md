@@ -1,7 +1,9 @@
 # Glory single additional recovery proposal
 
-INACTIVE_REVIEW_CANDIDATE: no approval record, timer, enablement or model call.
-The registered one-off route is default DENY. Ordinary five-attempt budget unchanged.
+The one-off route defaults DENY. Ordinary five-attempt budget is unchanged.
+PR950 deployed the native readers inactive; PR951 adds bounded owner custody
+for the October9 direct human decision recorded below. Current execution and
+activation must be determined from live evidence, not this proposal's history.
 
 Same title f1908dc9-5775-f111-ab0f-6045bdd69435 and execution binding
 db8d5c1739326938f7ac0c8c06396ecae5190cefbddb84f9b4cb13be13374150.
@@ -12,8 +14,9 @@ Source/canon/rejected-candidate hashes are pinned in the candidate module.
 Before CAS require independently verified attributable unexpired approval,
 full preimage hash, ETag, producer release, fresh source/canon/authorship/
 scope, input-token count and current provider tariff/budget. These mandatory
-owner-reader bindings are not yet production wired. A caller cannot certify
-its own approval. The recovery artifact will have its own reviewed SHA.
+owner-reader bindings are production wired, but a successful actual preflight
+is still required. A caller cannot certify its own approval. Every recovery
+artifact has its own reviewed SHA.
 
 Proposed bounds: one additional attempt6, not reset; zero retries/fallback;
 240000ms provider timeout;8192 output tokens; <=125000 verified input tokens.
@@ -21,8 +24,9 @@ Azure October9 metadata: jm1-editorial-devline-primary,claude-sonnet-5/version2,
 GlobalStandard,Succeeded. Prior request114646input/5694output. At published
 $2/$10 per million tokens,114646input/8192output estimates $0.311212;
 125000input/8192output estimates $0.33192 before tax/negotiated terms.
-Proposed ceiling $1 incremental model spend before tax. This is an estimate,
-not verified tenant billing or spend authority.
+Ceiling $1 incremental model spend before tax was approved in the attributed
+October9 decision below. These calculations remain estimates, not tenant
+settlement evidence; fresh native count and current tariff are mandatory.
 Source: https://platform.claude.com/docs/en/about-claude/pricing (October9
 readback, Foundry Marketplace CCU pricing).
 
