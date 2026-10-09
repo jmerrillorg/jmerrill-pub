@@ -48,6 +48,9 @@ async function processTitleCommissioningStep(input, deps, contract) {
     if (conflict(error)) return { status: "CLAIM_CONFLICT", executionId: plan.executionId };
     if (error?.statusCode !== 404) throw error;
   }
+  // Additional budget claims belong to their separately reviewed recovery owner.
+  // Ordinary timer/expired-lease recovery must never initiate another model call.
+  if (state?.additionalRecovery) return state;
   const repairRecovery = state?.status === "HELD" && state.attempts < MAX_ATTEMPTS &&
     typeof contract.recoverHeld === "function" && contract.recoverHeld(state) === true;
   if (state?.status === "COMPLETED" || (state?.status === "HELD" && !repairRecovery)) return state;
