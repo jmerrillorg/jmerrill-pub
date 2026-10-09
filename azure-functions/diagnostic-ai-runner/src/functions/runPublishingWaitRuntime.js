@@ -26,13 +26,19 @@ if (process.env.JM1_PUBLISHING_WAIT_RUNTIME_ENABLED === "true") {
     }
   });
 }
-if (process.env.JM1_PUBLISHING_WAIT_RUNTIME_ENABLED === "true" || process.env.JM1_PUBLISHING_WAIT_OBSERVATION_ENABLED === "true") {
+if (process.env.JM1_PUBLISHING_WAIT_RUNTIME_ENABLED === "true" || process.env.JM1_PUBLISHING_WAIT_OBSERVATION_ENABLED === "true" || process.env.JM1_TITLE_COMMISSIONING_INTAKE_ENABLED === "true") {
   app.timer("reconcile-publishing-waits", {
     schedule: "0 */5 * * * *", handler: async (_timer, context) => {
-      const result = await runWaitReconciliation(createPublishingWaitRuntime({ observe: (event) => context.info(JSON.stringify(event)) }),
+      let waitFailures = [];
+      if (process.env.JM1_PUBLISHING_WAIT_RUNTIME_ENABLED === "true" || process.env.JM1_PUBLISHING_WAIT_OBSERVATION_ENABLED === "true") {
+        const result = await runWaitReconciliation(createPublishingWaitRuntime({ observe: (event) => context.info(JSON.stringify(event)) }),
         { observationOnly: process.env.JM1_PUBLISHING_WAIT_RUNTIME_ENABLED !== "true" });
-      context.info(`Publishing wait health: ${JSON.stringify(result.health)}`);
-      if (result.health.failures.length) throw Object.assign(new Error("Publishing waits require owner review"), { safeCode: "PUBLISHING_WAIT_FAILURES" });
+        context.info(`Publishing wait health: ${JSON.stringify(result.health)}`);
+        waitFailures = result.health.failures;
+      }
+      const intake = await require("../lifecycle/titleCommissioningIntakeRuntime").runTitleCommissioningIntakeRuntime();
+      if (intake.enabled) context.info(`Publishing commissioning intake: ${JSON.stringify(intake)}`);
+      if (waitFailures.length || intake.failures.length) throw Object.assign(new Error("Publishing runtime requires owner review"), { safeCode: "PUBLISHING_WAIT_FAILURES" });
     }
   });
 }

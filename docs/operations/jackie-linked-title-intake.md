@@ -43,9 +43,9 @@ advance a production stage. Pending requirements remain explicit in the receipt.
 
 ## Integration boundary
 
-`executeTitleCommissioningIntake` is an adapter, not a scheduled runtime. It is
-not yet registered in the deployed worker. Wire it through the existing owner
-dispatch and durable wait/retry controls; do not introduce another scheduler.
+`executeTitleCommissioningIntake` is an adapter. The draft runtime binds it to
+the existing `reconcile-publishing-waits` five-minute timer; it is not yet deployed.
+No additional scheduler or stage queue consumer is introduced.
 The linked execution must never bypass current production-stage authority.
 
 Prohibited effects: author communications, money movement, fulfillment, new
@@ -78,3 +78,29 @@ acceptance are not established by this reader's source tests.
 
 Artifact verification reuses the existing production SharePoint byte reader
 and checks the registered SHA-256 without retaining manuscript text in receipts.
+
+## Bounded intake worker (draft, disabled by default)
+
+`JM1_TITLE_COMMISSIONING_INTAKE_ENABLED=true` and an exact, lowercase GUID
+allowlist in `JM1_TITLE_COMMISSIONING_INTAKE_TITLE_IDS` are both required.
+The list is bounded to five distinct title IDs. This setting does not enable
+the author-response queue or broad stage worker.
+
+The timer reads only `commissioning-requests/<title-id>.json`, using its ETag.
+Requests require schema version 1 and an authority reference identical to the
+separately read owner scope. Scope/request provisioning remains a governed
+technical release task; existence of a blob is not approval of a manuscript.
+
+Execution records at `commissioning-executions/<title-id>/<binding-hash>.json`
+use create-only or ETag compare-and-swap claims. The claim lasts five minutes;
+an expired claim resumes the same idempotent intake adapter. Transient provider
+errors retry with exponential backoff for at most five attempts. Authority or
+result failures become HELD, not automatically retried. Failure receipts and
+timer telemetry contain only title/execution references and fixed safe codes.
+Live alert delivery is still an acceptance requirement, not a source-test claim.
+
+Completion points to the immutable intake receipt and does not complete or
+advance any canonical stage. Replay returns the existing execution result.
+If ownership changes while work is running, the stale claimant cannot overwrite
+the new result. Disablement stops new timer dispatch; it does not delete claims,
+receipts, source history, or current title state.
