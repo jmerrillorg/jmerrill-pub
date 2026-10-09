@@ -84,6 +84,7 @@ async function executeCommissioningEditorialReview(input, deps = {}) {
     if (model?.failureCode === "MODEL_REQUEST_TIMEOUT") fail("REVIEW_MODEL_REQUEST_TIMEOUT");
     if (model?.failureCode === "MODEL_TRANSPORT_UNAVAILABLE") fail("REVIEW_MODEL_TRANSPORT_UNAVAILABLE");
     if (model?.failureCode === "MODEL_OUTPUT_TRUNCATED") fail("REVIEW_MODEL_OUTPUT_TRUNCATED");
+    if (model?.failureCode === "MODEL_STRICT_TOOL_OUTPUT_MISSING") fail("REVIEW_MODEL_STRICT_TOOL_OUTPUT_MISSING");
     if ([400, 401, 403, 404].includes(model?.httpStatus) || model?.configMissing?.length ||
         (model?.ok && model.provider !== "microsoft-foundry-claude")) fail("REVIEW_MODEL_AUTHORITY_OR_CONFIGURATION_REQUIRED");
     fail("COMMISSIONING_DEPENDENCY_UNAVAILABLE");

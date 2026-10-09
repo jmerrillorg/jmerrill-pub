@@ -80,6 +80,22 @@ afterEach(() => {
 });
 
 describe("microsoftFoundryClaudeProvider", () => {
+  test("assessment cannot substitute text JSON for the forced strict tool", async () => {
+    const { loaded, restore } = loadProviderWithStubs({ fetchImpl: async (_url, options) => {
+      assert.equal(JSON.parse(options.body).tools[0].strict, true);
+      return { ok: true, status: 200, headers: new Headers(), json: async () => ({
+        content: [{ type: "text", text: '{"assessment":"not a tool"}' }], usage: { input_tokens: 1, output_tokens: 2 }
+      }) };
+    } });
+    try {
+      await withEnv({ AZURE_FOUNDRY_ENDPOINT: "https://ais-jm1-foundry.services.ai.azure.com/" }, async () => {
+        const result = await loaded.call({ promptBody: "bounded assessment", diagnosticId: "fixture",
+          route: { deploymentName: "jm1-editorial-devline-primary", promptVersion: "JMP-EDITORIAL-REVIEW-ASSESSMENT-V1" } });
+        assert.equal(result.ok, false); assert.equal(result.output, null);
+        assert.equal(result.failureCode, "MODEL_STRICT_TOOL_OUTPUT_MISSING");
+      });
+    } finally { restore(); }
+  });
   test("assessment truncation fails closed rather than accepting partial tool input", async () => {
     const { loaded, restore } = loadProviderWithStubs({ fetchImpl: async () => ({ ok: true, status: 200,
       headers: new Headers(), json: async () => ({ stop_reason: "max_tokens", usage: { input_tokens: 10, output_tokens: 8192 },
@@ -104,7 +120,9 @@ describe("microsoftFoundryClaudeProvider", () => {
       assert.deepEqual(schema.required, SECTIONS);
       assert.equal(schema.additionalProperties, false);
       assert.deepEqual(schema.properties.categoryScores.required, CATEGORIES);
-      assert.equal(schema.properties.categoryScores.properties.STRUCTURE_FLOW.maximum, 5);
+      assert.deepEqual(schema.properties.categoryScores.properties.STRUCTURE_FLOW.enum, [1, 2, 3, 4, 5]);
+      assert.equal(loaded.selectStructuredOutputTool("", { promptVersion: "JMP-EDITORIAL-REVIEW-ASSESSMENT-V1" }).strict, true);
+      assert.equal(loaded.selectStructuredOutputTool("plain", {}).strict, undefined);
       assert.equal(schema.properties.intakeSummary.properties.wordCount.type, "integer");
       assert.equal(schema.properties.integrityFlags.items.properties.hardStop.type, "boolean");
       assert.equal(schema.properties.recommendation.additionalProperties, false);

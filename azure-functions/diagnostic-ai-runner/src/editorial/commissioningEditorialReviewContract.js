@@ -28,6 +28,23 @@ const EDITORIAL_REVIEW_OUTPUT_SCHEMA = fieldsSchema({
   recommendation: fieldsSchema({ pathway: { type: "string", enum: [...PATHWAYS] }, rationale: stringSchema, forwardChecklist: { type: "array", minItems: 1, items: stringSchema }, resubmissionEligibility: stringSchema })
 });
 const hash = value => createHash("sha256").update(value).digest("hex");
+function strictProviderReviewSchema() {
+  const schema = structuredClone(EDITORIAL_REVIEW_OUTPUT_SCHEMA);
+  // Native strict tools enforce shape; unsupported bounds remain in the local validator.
+  function project(node) {
+    const bounds = [];
+    for (const key of ["minimum", "maximum", "minLength", "maxLength", "maxItems"]) {
+      if (Object.hasOwn(node, key)) { bounds.push(`${key}=${node[key]}`); delete node[key]; }
+    }
+    if (node.minItems > 1) { bounds.push(`minItems=${node.minItems}`); node.minItems = 1; }
+    if (bounds.length) node.description = [node.description, `Locally validated constraints: ${bounds.join(", ")}.`].filter(Boolean).join(" ");
+    for (const child of Object.values(node.properties || {})) project(child);
+    if (node.items) project(node.items);
+  }
+  project(schema);
+  for (const category of CATEGORIES) schema.properties.categoryScores.properties[category].enum = [1, 2, 3, 4, 5];
+  return schema;
+}
 function deny(code) { throw Object.assign(new Error(code), { safeCode: code }); }
 function object(value) { return value && typeof value === "object" && !Array.isArray(value); }
 function text(value) { return typeof value === "string" && value.trim().length > 0 && value.length <= 12000; }
@@ -115,4 +132,4 @@ function assembleReviewPrompt({ titleId, sourceSha256, sourceVersion, manuscript
   return { prompt, promptSha256: hash(prompt), provenance };
 }
 
-module.exports = { CATEGORIES, SECTIONS, EDITORIAL_REVIEW_OUTPUT_SCHEMA, verifyReviewAuthority, validateEditorialReview, assembleReviewPrompt };
+module.exports = { CATEGORIES, SECTIONS, EDITORIAL_REVIEW_OUTPUT_SCHEMA, strictProviderReviewSchema, verifyReviewAuthority, validateEditorialReview, assembleReviewPrompt };

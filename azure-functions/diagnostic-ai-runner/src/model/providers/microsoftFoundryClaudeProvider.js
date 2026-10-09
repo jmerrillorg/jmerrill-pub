@@ -221,6 +221,13 @@ async function call({ promptBody, diagnosticId, telemetry = null, route }) {
         request: { deployment, maxOutputTokens: requestBody.max_tokens, responseContract: "anthropic-messages-tool", stopReason: "max_tokens" } };
     }
     const toolInput = extractStructuredToolInput(responseBody);
+    if (route.promptVersion === "JMP-EDITORIAL-REVIEW-ASSESSMENT-V1" && !toolInput) {
+      return { ok: false, provider: "microsoft-foundry-claude", output: null,
+        tokenCounts: { input: usage.input_tokens || 0, output: usage.output_tokens || 0,
+          total: (usage.input_tokens || 0) + (usage.output_tokens || 0) },
+        httpStatus, failureCode: "MODEL_STRICT_TOOL_OUTPUT_MISSING", error: "MODEL_STRICT_TOOL_OUTPUT_MISSING",
+        request: { deployment, maxOutputTokens: requestBody.max_tokens, responseContract: "anthropic-messages-tool", strictTool: true } };
+    }
     if (toolInput) {
       return {
         ok: true,
@@ -236,7 +243,8 @@ async function call({ promptBody, diagnosticId, telemetry = null, route }) {
         request: {
           deployment,
           maxOutputTokens: requestBody.max_tokens,
-          responseContract: "anthropic-messages-tool"
+          responseContract: "anthropic-messages-tool",
+          ...(route.promptVersion === "JMP-EDITORIAL-REVIEW-ASSESSMENT-V1" ? { strictTool: true } : {})
         },
         rateLimit,
         error: null,
@@ -332,7 +340,8 @@ function selectStructuredOutputTool(promptBody, route = {}) {
   if (route.promptVersion === "JMP-EDITORIAL-REVIEW-ASSESSMENT-V1") return {
     name: STRUCTURED_OUTPUT_TOOL.name,
     description: "Submit the complete nine-section assessment only; no edited manuscript or approval.",
-    input_schema: require("../../editorial/commissioningEditorialReviewContract").EDITORIAL_REVIEW_OUTPUT_SCHEMA
+    strict: true,
+    input_schema: require("../../editorial/commissioningEditorialReviewContract").strictProviderReviewSchema()
   };
   if (isLineEditingChunkPrompt(promptBody)) return LINE_EDITING_CHUNK_OUTPUT_TOOL;
   if (isDevelopmentalEditingChunkPrompt(promptBody)) return DEVELOPMENTAL_EDITING_CHUNK_OUTPUT_TOOL;
