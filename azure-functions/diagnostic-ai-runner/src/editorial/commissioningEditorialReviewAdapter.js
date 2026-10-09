@@ -65,7 +65,8 @@ async function executeCommissioningEditorialReview(input, deps = {}) {
   };
   try { return await readExisting(); }
   catch (error) { if (error?.statusCode !== 404) throw error; }
-  const limits = require("../model/providerSupport").getProviderRuntimeOptions("AZURE_FOUNDRY");
+  const limits = require("../model/providers/microsoftFoundryClaudeProvider")
+    .selectRuntimeOptions({ promptVersion: binding.contractVersion });
   const maximumProviderTime = (limits.maxRetries + 1) * limits.timeoutMs +
     limits.maxRetries * limits.maxRetryDelayMs * (1 + limits.jitterRatio);
   if (!Number.isFinite(maximumProviderTime) || maximumProviderTime > 10 * 60 * 1000) fail("REVIEW_MODEL_RETRY_BUDGET_EXCEEDED");
@@ -79,6 +80,8 @@ async function executeCommissioningEditorialReview(input, deps = {}) {
   if (!model?.ok || model.provider !== "microsoft-foundry-claude" ||
       model.route?.deploymentAlias !== "jm1-editorial-devline-primary") {
     if (model?.gateBlocked) fail("REVIEW_MODEL_GATE_CLOSED");
+    if (model?.failureCode === "MODEL_REQUEST_TIMEOUT") fail("REVIEW_MODEL_REQUEST_TIMEOUT");
+    if (model?.failureCode === "MODEL_TRANSPORT_UNAVAILABLE") fail("REVIEW_MODEL_TRANSPORT_UNAVAILABLE");
     if ([400, 401, 403, 404].includes(model?.httpStatus) || model?.configMissing?.length ||
         (model?.ok && model.provider !== "microsoft-foundry-claude")) fail("REVIEW_MODEL_AUTHORITY_OR_CONFIGURATION_REQUIRED");
     fail("COMMISSIONING_DEPENDENCY_UNAVAILABLE");
@@ -97,6 +100,7 @@ async function executeCommissioningEditorialReview(input, deps = {}) {
   const receipt = { schemaVersion: 1, bindingHash, binding, report, reportSha256: sha(JSON.stringify(report)),
     status: "EDITORIAL_REVIEW_READY_FOR_PUBLISHER", completedAt: (deps.now || (() => new Date()))().toISOString(),
     provider: model.provider, deploymentAlias: model.route.deploymentAlias,
+    providerRequestPolicy: { timeoutMs: limits.timeoutMs, maxProviderRetries: limits.maxRetries },
     tokenCounts: model.tokenCounts, productionStageChanged: false, authorDecisionInferred: false,
     forbiddenEffects: run.forbiddenEffects,
     documentReference: reference.replace(/\.json$/, ".md"),

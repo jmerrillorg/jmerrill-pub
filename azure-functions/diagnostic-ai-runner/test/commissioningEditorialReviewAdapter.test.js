@@ -95,3 +95,17 @@ test("permission denial is held rather than retried through another provider", a
   const result = await worker(x.input, x.deps); assert.equal(result.status, "HELD");
   assert.equal([...x.saved.keys()].some(name => name.endsWith(".md")), false);
 });
+test("provider timeout preserves a safe cause and resumes the same review", async () => {
+  const x = fixture(), original = x.deps.callModel;
+  x.deps.callModel = async () => ({ ok: false, failureCode: "MODEL_REQUEST_TIMEOUT",
+    error: "private provider response must not be stored" });
+  const failed = await worker(x.input, x.deps);
+  assert.equal(failed.status, "RETRY_PENDING");
+  assert.equal(failed.causeCode, "REVIEW_MODEL_REQUEST_TIMEOUT");
+  assert.equal(JSON.stringify(failed).includes("private provider"), false);
+  x.advance(60000); x.deps.callModel = original;
+  const recovered = await worker(x.input, x.deps);
+  assert.equal(recovered.status, "COMPLETED");
+  assert.equal(recovered.executionId, failed.executionId);
+  assert.equal(recovered.attempts, 2);
+});
