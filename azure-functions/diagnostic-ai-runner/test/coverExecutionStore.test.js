@@ -37,25 +37,26 @@ test("atomic reservation prevents a second in-flight execution and returns compl
   assert.deepEqual(await store.reserveExecution(key), { status: "EXISTING", record });
 });
 
-test("failed attempt retries under a new execution ID; stale completion is denied", async () => {
+test("failed attempt preserves its identity and denies blind provider retry", async () => {
   const store = fixture();
   const first = await store.reserveExecution(key);
   await store.failExecution(key, { executionId: first.executionId, code: "COVER_IMAGE_PROVIDER_FAILED" });
   const retry = await store.reserveExecution(key);
-  assert.equal(retry.status, "ACQUIRED");
-  assert.notEqual(retry.executionId, first.executionId);
+  assert.equal(retry.status, "RECOVERY_REQUIRED");
+  assert.equal(retry.executionId, first.executionId);
+  assert.deepEqual(await store.reserveExecution(key), retry);
   await assert.rejects(store.completeExecution(key, { executionId: first.executionId }), /COVER_EXECUTION_STALE_TRANSITION/);
-  await store.completeExecution(key, { executionId: retry.executionId });
 });
 
-test("expired in-progress attempt can be atomically superseded", async () => {
+test("expired claim cannot regenerate an image while provider outcome is unknown", async () => {
   let current = new Date("2026-09-30T12:00:00.000Z");
   const store = fixture({ now: () => current, staleAfterMs: 5 * 60 * 1000 });
   const first = await store.reserveExecution(key);
   current = new Date("2026-09-30T12:05:01.000Z");
   const retry = await store.reserveExecution(key);
-  assert.equal(retry.status, "ACQUIRED");
-  assert.notEqual(retry.executionId, first.executionId);
-  await assert.rejects(store.completeExecution(key, { executionId: first.executionId }), /COVER_EXECUTION_STALE_TRANSITION/);
-  await store.completeExecution(key, { executionId: retry.executionId });
+  assert.equal(retry.status, "RECOVERY_REQUIRED");
+  assert.equal(retry.executionId, first.executionId);
+  assert.deepEqual(await store.reserveExecution(key), retry);
+  await store.completeExecution(key, { executionId: first.executionId });
+  assert.equal((await store.reserveExecution(key)).status, "EXISTING");
 });

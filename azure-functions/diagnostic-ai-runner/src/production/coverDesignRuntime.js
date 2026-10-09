@@ -2,6 +2,7 @@
 
 const { createHash } = require("node:crypto");
 const { resolveCoverAuthorityBundle, projectCoverAuthority } = require("./coverAuthorityBundle");
+const { JACKIE_CANONICAL_AUTHOR_CONTACT_ID } = require("../author/jackieTitleSystemCommissioningPolicy");
 
 const CONTRACT_VERSION = "OP-006-COVER-1.0";
 const PROMPT_TEMPLATE_VERSION = "OP-006-ART-1.0";
@@ -163,12 +164,16 @@ function validateConceptResult(result) {
 
 async function generateConceptSet(titleId, deps, options = {}) {
   if (!GUID.test(value(titleId))) return { ok: false, code: "COVER_TITLE_ID_REQUIRED" };
+  if (deps?.generationEnabled !== true) return { ok: false, code: "COVER_GENERATION_DISABLED" };
   if (!deps || typeof deps.loadTitleAuthority !== "function") {
     return { ok: false, code: "COVER_TITLE_AUTHORITY_READER_NOT_CONFIGURED" };
   }
   const candidates = await deps.loadTitleAuthority(titleId);
   const resolved = resolveCoverAuthorityBundle(titleId, candidates, { executionMode: "INTERNAL_CONCEPT" });
   if (!resolved.ok) return resolved;
+  if (value(resolved.bundle.fields.authorId.value).toLowerCase() !== JACKIE_CANONICAL_AUTHOR_CONTACT_ID) {
+    return { ok: false, code: "COVER_JACKIE_IDENTITY_DENIED" };
+  }
   if (typeof deps.reserveExecution !== "function" || typeof deps.persistAuthoritySnapshot !== "function" ||
       typeof deps.persistGenerationRequest !== "function" ||
       typeof deps.completeExecution !== "function" ||
@@ -182,10 +187,19 @@ async function generateConceptSet(titleId, deps, options = {}) {
   if (feedback.length && !revisionOf) return { ok: false, code: "REVISION_PARENT_REQUIRED" };
   const key = digest({ titleId, authorityDigest: resolved.bundle.sha256, count, feedback, revisionOf, promptVersion: PROMPT_TEMPLATE_VERSION });
   const reservation = await deps.reserveExecution(key);
+  if (reservation?.status === "RECOVERY_REQUIRED") return { ok: false, code: "COVER_RECOVERY_REQUIRED",
+    executionId: reservation.executionId, idempotencyKey: key };
   if (!reservation || !["ACQUIRED", "EXISTING", "IN_PROGRESS"].includes(reservation.status)) {
     return { ok: false, code: "COVER_EXECUTION_RESERVATION_FAILED" };
   }
-  if (reservation.status === "EXISTING") return { ...reservation.record, replay: true };
+  if (reservation.status === "EXISTING") {
+    const record = reservation.record;
+    if (record?.ok !== true || record.state !== STATES.CONCEPTS_READY || record.titleId !== titleId ||
+        record.authorId !== JACKIE_CANONICAL_AUTHOR_CONTACT_ID || record.idempotencyKey !== key ||
+        record.generationRequest?.authoritySnapshotSha256 !== resolved.bundle.sha256 ||
+        !GUID.test(value(record.executionId))) return { ok: false, code: "COVER_EXECUTION_REPLAY_UNBOUND" };
+    return { ...record, replay: true };
+  }
   if (reservation.status === "IN_PROGRESS") return { ok: false, code: "COVER_EXECUTION_IN_PROGRESS", idempotencyKey: key };
   if (!GUID.test(value(reservation.executionId))) return { ok: false, code: "COVER_EXECUTION_RESERVATION_INVALID" };
   const executionId = reservation.executionId;

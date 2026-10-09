@@ -3,6 +3,28 @@
 Status: CONTINUE_INTERNAL_IMPLEMENTATION
 Scope: OP-006 within Production and Distribution
 
+## October 9 Jackie-only scope reconciliation
+
+The BYWB observations below are preserved October 1 historical evidence, not
+authority to automate an external author's title. Current commissioning is
+Jackie-only. The native cover reader now requires the existing private title
+commissioning scope and shared Contact/profile identity resolver, retaining
+conflicting references as denial rather than stripping them. A production
+factory reuses the canonical scope reader; no second scope store was created.
+
+Generation defaults to disabled. Authority bundles for non-Jackie authors are
+denied before execution reservation, persistence, or provider calls. Completed
+replays must match title, author, semantic key, execution and authority snapshot.
+Failed or expired attempts retain their original identity and return
+`RECOVERY_REQUIRED`; they no longer automatically repeat potentially paid calls.
+Provider-result reconciliation and exact spend authority remain required before
+enabling generation. No image call, title advancement, public metadata change,
+author communication, or production worker enablement occurred in this revision.
+
+These changes are source acceptance, not commissioned cover production. Existing
+October 1 fixture claims about automatic failed/stale retry are superseded by
+the fail-closed provider-outcome recovery rule above.
+
 ## Continue-03 internal-category correction
 
 - `COVER-INTERNAL-CATEGORY-1` derives a narrow internal creative-working category only from title-bound, current, checksum-identified governed evidence. It records the source IDs, versions, checksums, rule version, confidence, and verification time. It is not a BISAC or retail-category classifier.

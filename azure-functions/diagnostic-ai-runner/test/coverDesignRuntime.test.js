@@ -12,7 +12,7 @@ const {
 } = require("../src/production/coverDesignRuntime");
 
 const TITLE_ID = "91c5e1ef-2980-f111-ab0f-7c1e525b15c2";
-const AUTHOR_ID = "d60b4f5c-f823-4a84-ae3e-115428cff204";
+const AUTHOR_ID = "d38aa56a-882a-f111-88b4-6045bdd69678";
 const EVIDENCE_ID = "be13a019-8468-4ee7-b0ea-9e7b9305a49b";
 const EXECUTION_ID = "df8f7a54-2c12-45be-ad19-dcf2a123fa24";
 
@@ -20,9 +20,9 @@ function title(overrides = {}) {
   return {
     titleId: TITLE_ID,
     authorId: AUTHOR_ID,
-    title: "Before You Were Born",
+    title: "Synthetic Jackie Commissioning Title",
     subtitle: "Discovering God's Plan for Your Life",
-    authorDisplay: "Sean Arron Crowley",
+    authorDisplay: "Jackie Smith, Jr.",
     package: "STARTER",
     genre: "Christian living",
     audience: "Adult Christian readers",
@@ -66,7 +66,7 @@ test("cover brief binds title, format entitlement, and source authority", () => 
   assert.equal(result.brief.titleId, TITLE_ID);
   assert.match(result.brief.briefId, /^[a-f0-9]{64}$/);
   assert.equal(result.brief.subtitle, "Discovering God's Plan for Your Life");
-  assert.equal(result.brief.authorDisplay, "Sean Arron Crowley");
+  assert.equal(result.brief.authorDisplay, "Jackie Smith, Jr.");
   assert.deepEqual(result.brief.formats, ["EBOOK", "PAPERBACK"]);
   assert.equal(result.brief.paperback.pageCount, 102);
   assert.equal(result.brief.formats.includes("HARDCOVER"), false);
@@ -86,6 +86,7 @@ test("concept runtime is idempotent and review remains a genuine human gate", as
   let calls = 0;
   let savedRequest;
   const deps = {
+    generationEnabled: true,
     modelDeployment: "jm1-pub-cover-image-primary",
     loadTitleAuthority: async (titleId) => authorityCandidates({ titleId }),
     persistAuthoritySnapshot: async (bundle, executionId) => snapshot(bundle, executionId),
@@ -179,6 +180,7 @@ test("same runtime accepts another title and revisions need an earlier execution
   });
   assert.equal(prepareCreativeBrief(second).ok, true);
   const result = await generateConceptSet(second.titleId, {
+    generationEnabled: true,
     modelDeployment: "jm1-pub-cover-image-primary",
     loadTitleAuthority: async () => authorityCandidates(second),
     persistAuthoritySnapshot: async (bundle, executionId) => snapshot(bundle, executionId),
@@ -192,16 +194,46 @@ test("same runtime accepts another title and revisions need an earlier execution
   assert.equal(result.code, "REVISION_PARENT_REQUIRED");
 });
 
+test("disabled generation and non-Jackie authority produce no persistence or provider effects", async () => {
+  let effects = 0;
+  const effect = async () => { effects++; throw new Error("unexpected effect"); };
+  const deps = { loadTitleAuthority: effect, reserveExecution: effect, generateImage: effect };
+  assert.equal((await generateConceptSet(TITLE_ID, deps)).code, "COVER_GENERATION_DISABLED");
+  const result = await generateConceptSet(TITLE_ID, { ...deps, generationEnabled: true,
+    loadTitleAuthority: async () => authorityCandidates({ authorId: EVIDENCE_ID }) });
+  assert.equal(result.code, "COVER_JACKIE_IDENTITY_DENIED");
+  assert.equal(effects, 0);
+});
+
 test("generation refuses an unbound title authority response", async () => {
   const result = await generateConceptSet(TITLE_ID, {
+    generationEnabled: true,
     loadTitleAuthority: async () => authorityCandidates({ titleId: "6bd7e606-cb8d-4aab-a07b-0463536b9869" })
   });
   assert.equal(result.code, "COVER_AUTHORITY_UNRESOLVED");
 });
 
+test("stored replay conflict and unresolved recovery never call persistence or the provider", async () => {
+  let effects = 0;
+  const effect = async () => { effects++; throw new Error("unexpected effect"); };
+  const deps = { generationEnabled: true, loadTitleAuthority: async () => authorityCandidates(),
+    persistAuthoritySnapshot: effect, persistGenerationRequest: effect, completeExecution: effect,
+    failExecution: effect, generateImage: effect, preflightConcept: effect };
+  const replay = await generateConceptSet(TITLE_ID, { ...deps,
+    reserveExecution: async () => ({ status: "EXISTING", record: { ok: true,
+      titleId: EVIDENCE_ID, state: STATES.CONCEPTS_READY } }) });
+  assert.equal(replay.code, "COVER_EXECUTION_REPLAY_UNBOUND");
+  const recovery = await generateConceptSet(TITLE_ID, { ...deps,
+    reserveExecution: async () => ({ status: "RECOVERY_REQUIRED", executionId: EXECUTION_ID }) });
+  assert.equal(recovery.code, "COVER_RECOVERY_REQUIRED");
+  assert.equal(recovery.executionId, EXECUTION_ID);
+  assert.equal(effects, 0);
+});
+
 test("failed generation records a retryable failure without a reviewable package", async () => {
   let failed;
   const result = await generateConceptSet(TITLE_ID, {
+    generationEnabled: true,
     modelDeployment: "jm1-pub-cover-image-primary",
     loadTitleAuthority: async () => authorityCandidates(),
     persistAuthoritySnapshot: async (bundle, executionId) => snapshot(bundle, executionId),
@@ -220,6 +252,7 @@ test("missing durable request storage blocks the Foundry call", async () => {
   let providerCalls = 0;
   let failure;
   const result = await generateConceptSet(TITLE_ID, {
+    generationEnabled: true,
     modelDeployment: "jm1-pub-cover-image-primary",
     loadTitleAuthority: async () => authorityCandidates(),
     persistAuthoritySnapshot: async (bundle, executionId) => snapshot(bundle, executionId),
@@ -239,6 +272,7 @@ test("changed authority after request persistence blocks Foundry before an image
   let reads = 0;
   let providerCalls = 0;
   const result = await generateConceptSet(TITLE_ID, {
+    generationEnabled: true,
     modelDeployment: "jm1-pub-cover-image-primary",
     loadTitleAuthority: async () => authorityCandidates(reads++ === 0 ? {} : { subtitle: "Changed subtitle" }),
     persistAuthoritySnapshot: async (bundle, executionId) => snapshot(bundle, executionId),
@@ -257,6 +291,7 @@ test("missing or mismatched authority snapshot blocks the brief and Foundry call
   let providerCalls = 0;
   let requestCalls = 0;
   const result = await generateConceptSet(TITLE_ID, {
+    generationEnabled: true,
     modelDeployment: "jm1-pub-cover-image-primary",
     loadTitleAuthority: async () => authorityCandidates(),
     reserveExecution: async () => ({ status: "ACQUIRED", executionId: EXECUTION_ID }),
@@ -275,6 +310,7 @@ test("missing or mismatched authority snapshot blocks the brief and Foundry call
 test("missing deployment identity blocks the Foundry call", async () => {
   let providerCalls = 0;
   const result = await generateConceptSet(TITLE_ID, {
+    generationEnabled: true,
     loadTitleAuthority: async () => authorityCandidates(),
     persistAuthoritySnapshot: async (bundle, executionId) => snapshot(bundle, executionId),
     reserveExecution: async () => ({ status: "ACQUIRED", executionId: EXECUTION_ID }),

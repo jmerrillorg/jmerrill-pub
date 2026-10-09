@@ -61,18 +61,10 @@ function createCoverExecutionStore(options = {}) {
         !Number.isSafeInteger(current.record.attempt) || current.record.attempt < 1) {
       throw new Error("COVER_EXECUTION_RECORD_INVALID");
     }
-    const prior = { executionId: current.record.executionId, state: stale ? "STALE" : "FAILED",
-      startedAt: current.record.startedAt, finishedAt: current.record.finishedAt,
-      result: current.record.result };
-    const retry = { ...record, attempt: current.record.attempt + 1,
-      previousAttempts: [...(current.record.previousAttempts || []), prior] };
-    try {
-      await writeRecord(blob, retry, { ifMatch: current.etag });
-      return { status: "ACQUIRED", executionId: retry.executionId };
-    } catch (error) {
-      if ([409, 412].includes(error?.statusCode)) return { status: "IN_PROGRESS" };
-      throw error;
-    }
+    // A lost provider response can hide a paid generation. Preserve the claim
+    // until provider/result reconciliation proves whether another call is safe.
+    return { status: "RECOVERY_REQUIRED", executionId: current.record.executionId,
+      reason: stale ? "STALE_PROVIDER_RESULT_UNVERIFIED" : "FAILED_PROVIDER_RESULT_UNVERIFIED" };
   }
 
   async function transition(key, executionId, state, result) {
