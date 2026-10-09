@@ -57,6 +57,7 @@ require("./functions/runPublishingMailboxReplyCheck");
 require("./functions/runPublishingMailboxAttachmentReadback");
 require("./functions/runPublishingLifecycleReadback");
 require("./functions/runGloryReviewRecovery");
+require("./functions/runTitleCommissioningSourceRegistration");
 require("./functions/runJackieTitleSystemAcceptance");
 require("./functions/runEnterpriseMailboxReadbackHealth");
 require("./functions/runCommercialEligibilityA2");
