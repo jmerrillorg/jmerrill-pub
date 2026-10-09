@@ -89,3 +89,12 @@ The reviewed `EDITORIAL_REVIEW_EXACT_TOOL_SCHEMA_V1` repair may recover a
 preserves the held preimage and execution identity, respects the existing
 attempt limit, and does not recover permission, authority, identity or
 substantive editorial holds. A second structural failure remains held.
+
+The subsequent `EDITORIAL_REVIEW_OUTPUT_CUSTODY_V2` repair can recover that
+specific previous repair hold once, still within the same five-attempt budget.
+It provides private, create-only rejected-candidate custody outside publishable
+review receipts and records only its exact reference in execution state.
+Candidate bytes never appear in logs or publisher previews. Native readback
+exposes the reference only. Replay compares exact bytes, never overwrites them.
+Assessment output is bounded at 8,192 tokens; an explicit provider max-token
+stop is rejected as truncation, never treated as a complete assessment.

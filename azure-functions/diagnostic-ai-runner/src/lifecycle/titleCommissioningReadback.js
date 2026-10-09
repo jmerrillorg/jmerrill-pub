@@ -96,6 +96,7 @@ async function titleCommissioningReadback(body, deps = {}) {
     commissioningIdentity: authority.identityProof,
     reviewExecution: reviewExecution ? { etag: reviewExecution.etag, status: reviewExecution.value.status,
       attempts: reviewExecution.value.attempts, failureCode: reviewExecution.value.failureCode, causeCode: reviewExecution.value.causeCode,
+      quarantineReference: reviewExecution.value.quarantineReference,
       claimedAt: reviewExecution.value.claimedAt, leaseUntil: reviewExecution.value.leaseUntil,
       nextAttemptAt: reviewExecution.value.nextAttemptAt, completedAt: reviewExecution.value.completedAt } : null,
     reviewReceipt: reviewReceipt ? { etag: reviewReceipt.etag, status: reviewReceipt.value.status,

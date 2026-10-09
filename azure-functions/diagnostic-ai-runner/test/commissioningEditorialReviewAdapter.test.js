@@ -61,7 +61,11 @@ test("missing intake and changed source deny before inference", async () => {
 test("model fallback and edited output never persist assessment", async () => {
   const x = fixture(); x.deps.callModel = async () => ({ ok: true, provider: "anthropic-direct" });
   await assert.rejects(execute(x.input, x.deps), /AUTHORITY_OR_CONFIGURATION_REQUIRED/); assert.equal(x.saved.size, 1);
-  const y = fixture(); y.report.edits = []; await assert.rejects(execute(y.input, y.deps), /SECTIONS_INVALID/); assert.equal(y.saved.size, 1);
+  const y = fixture(); y.report.edits = []; await assert.rejects(execute(y.input, y.deps), /SECTIONS_INVALID/);
+  assert.equal(y.saved.size, 2);
+  assert.equal([...y.saved.keys()].some(name => name.startsWith("commissioning-editorial-review/")), false);
+  const quarantined = [...y.saved.entries()].find(([name]) => name.startsWith("commissioning-review-quarantine/"));
+  assert.equal(JSON.parse(quarantined[1].bytes).status, "QUARANTINED_INVALID_ASSESSMENT");
 });
 test("authority revocation after model call prevents publication", async () => {
   const x = fixture(), original = x.deps.callModel;
@@ -118,6 +122,8 @@ test("schema repair does not loop when the repaired producer still returns inval
   await worker(x.input, x.deps);
   const heldAgain = await worker(x.input, x.deps);
   assert.equal(heldAgain.status, "HELD");
+  assert.match(heldAgain.quarantineReference, /^commissioning-review-quarantine\//);
+  assert.equal(JSON.stringify(heldAgain).includes('"output"'), false);
   assert.equal(heldAgain.attempts, 2);
   assert.deepEqual(await worker(x.input, x.deps), heldAgain);
   assert.equal(calls, 2);
@@ -135,6 +141,20 @@ test("provider timeout preserves a safe cause and resumes the same review", asyn
   assert.equal(recovered.status, "COMPLETED");
   assert.equal(recovered.executionId, failed.executionId);
   assert.equal(recovered.attempts, 2);
+});
+test("custody repair preserves prior schema repair and cannot exceed the existing attempt budget", async () => {
+  const x = fixture();
+  x.deps.callModel = async () => ({ ok: true, provider: "microsoft-foundry-claude",
+    route: { deploymentAlias: "jm1-editorial-devline-primary" }, output: {} });
+  const held = await worker(x.input, x.deps);
+  const name = [...x.saved.keys()].find(key => key.startsWith("commissioning-review-executions/"));
+  const prior = { ...held, attempts: 4, repairRecovery: { version: "EDITORIAL_REVIEW_EXACT_TOOL_SCHEMA_V1", previousState: held } };
+  x.saved.get(name).bytes = Buffer.from(JSON.stringify(prior));
+  const final = await worker(x.input, x.deps);
+  assert.equal(final.status, "HELD"); assert.equal(final.attempts, 5);
+  assert.deepEqual(final.repairRecovery.previousState, prior);
+  assert.equal(final.repairRecovery.version, "EDITORIAL_REVIEW_OUTPUT_CUSTODY_V2");
+  assert.deepEqual(await worker(x.input, x.deps), final);
 });
 test("verified profile identity is pinned and a mid-assessment version change holds output", async () => {
   const x = fixture(), profileId = "00000000-0000-4000-8000-000000000003";
