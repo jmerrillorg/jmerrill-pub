@@ -10,6 +10,7 @@ const sha = bytes => createHash("sha256").update(bytes).digest("hex");
 // This adapter produces an internal assessment only. Its receipt is linked-run
 // evidence, never a Dataverse stage transition or approval authority.
 async function prepareCommissioningEditorialReview(input, deps = {}) {
+  if (input?.source?.role === "RECEIVED_ORIGINAL") fail("REVIEW_RECEIVED_SOURCE_NOT_APPROVED_CONTROLLING");
   const run = planTitleCommissioningRun(input);
   if (typeof deps.readReviewAuthority !== "function" || typeof deps.downloadSource !== "function") {
     fail("REVIEW_OWNER_READERS_NOT_BOUND");

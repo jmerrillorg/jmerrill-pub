@@ -19,11 +19,14 @@ every invocation and replay is automatic. It is not another human approval.
 Changed business scope or editorial choices require their appropriate decision;
 an unchanged authorized technical retry does not.
 
-The original controlling source and retained approved work are separate exact
-artifact bindings. For each, require title ID, active registration, current
-approval, unsuperseded state, registry version, registered SHA-256 and independent
-byte verification. Approval flags alone do not establish custody or permission
-to reuse an artifact as the controlling manuscript for a later stage.
+Received originals, approved controlling sources and retained review work are
+separate exact artifact roles. Every role requires title ID, active registration,
+registry version, registered SHA-256 and independent byte verification.
+Approved controlling sources additionally require current approval and an
+unsuperseded state. Retained unapproved work does not acquire approval by reuse.
+Received originals require exact intake/immutable-manifest authority or the
+founder-scoped Vellum work UUID; they cannot dispatch an editorial model call.
+Approval flags alone do not establish custody or later-stage authority.
 
 ## Persistence and recovery
 
@@ -113,7 +116,42 @@ An enabled allowlisted timer can provision only these scope/request records,
 after fresh native title, artifact and byte checks. It uses create-only writes;
 any existing conflicting or revoked scope wins. A partial write recovers forward
 without replacing the preserved scope. No operator storage key is substituted.
-Other titles have no compiled bootstrap authority and remain unbound.
+The additional bindings below are release candidates, not live acceptance proof.
+
+## Received-source registration and identity reconciliation
+
+The authenticated `publishing/commissioning/source-registration` route accepts
+only compiled exact title IDs and a fixed mode. `PREFLIGHT` is read-only.
+`REGISTER_INTAKE` requires both `JM1_TITLE_COMMISSIONING_REGISTRATION_ENABLED=true`
+and the exact bounded `JM1_TITLE_COMMISSIONING_REGISTRATION_TITLE_IDS` list.
+Ordinary editorial inference must remain disabled. Registration uses the existing
+private stage-runtime container, create-only intent and result records, and a
+renewed exclusive blob lease. Conflicting or revoked scope is never overwritten.
+
+Til Death registration preserves the real title and binds its original source
+to its existing intake and immutable manifest. My AI Journey proposes an
+explicit new internal title tied to its fixed Vellum book UUID, never an inferred
+existing ID. Any existing work-reference, name or source-item candidate prevents
+creation until its crosswalk is resolved. Original/alias bytes must agree.
+Native source metadata must establish exact ID, size, ETag, Publishing host/drive
+and current Pipeline A-Z location. Registry location records the SharePoint URL,
+not a Graph transport URL. Registrations remain explicitly unapproved.
+
+The Long Watch `IDENTITY_PREFLIGHT` mode checks the exact historical execution
+log, intake, retained asset and approved original, plus the current title
+preimage. `RECONCILE_IDENTITY` additionally requires
+`JM1_TITLE_COMMISSIONING_LONGWATCH_RECONCILIATION_ENABLED=true` and inference off.
+It changes only the proven canonical Contact reference with an If-Match write,
+preserves the full business preimage and independently verifies all other fields.
+It does not merge Contacts, approve edited material or advance a stage.
+
+Before release, require full tests and current-head review. After protected
+deployment, require exact release SHA, native read-only preflight, bounded
+registration/correction, independent registry and intake readback, and exact-ID
+replay without duplicate effects. Remove temporary registration/reconciliation
+settings afterward. Broad stage/wait workers remain disabled. Any ambiguous
+write requires same-ID readback and forward recovery, not a new ID or reset.
+No linked source registration commissions the complete Publishing pipeline.
 
 The original local draft plan is preserved. The governed runtime plan replaces
 its local inventory-file history reference with an exact Dataverse title history
