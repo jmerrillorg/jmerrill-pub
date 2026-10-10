@@ -1,0 +1,27 @@
+{
+  "solutionUniqueName": "JMP_PublishingV2_Phase6_Portable",
+  "solutionVersion": "1.2.0.2",
+  "packageType": "Managed",
+  "sourceEnvironment": "JM1-Dev",
+  "sourceOrganizationId": "579864ae-44cc-f011-95c7-000d3a37fe06",
+  "role": {
+    "id": "a3fc4c02-7d09-4ca1-8e32-2090ad209dc2",
+    "name": "JMP Fresh Title Commissioning Runtime",
+    "businessUnit": "Root business unit in the target environment",
+    "privileges": [
+      { "name": "prvCreatejmpv2_LifecycleInstance", "depth": "Basic" },
+      { "name": "prvCreatejmpv2_PublishingEngagement", "depth": "Basic" },
+      { "name": "prvCreatejmpv2_StageInstance", "depth": "Basic" },
+      { "name": "prvReadjmpv2_LifecycleInstance", "depth": "Basic" },
+      { "name": "prvReadjmpv2_PublishingEngagement", "depth": "Basic" },
+      { "name": "prvReadjmpv2_StageDefinition", "depth": "Basic" },
+      { "name": "prvReadjmpv2_StageInstance", "depth": "Basic" }
+    ],
+    "assignedUsersAtSource": 0
+  },
+  "file": "JMP_PublishingV2_Phase6_Portable_1_2_0_2_managed.zip",
+  "sha256": "14fc42c5b9af6f785f458704ce53d57240d99b82932568b8d676affa71219a97",
+  "productionImport": "NOT YET RUN",
+  "runtimeIdentityAssignment": "NOT INCLUDED",
+  "workerActivation": "NOT AUTHORIZED BY THIS PACKAGE"
+}
