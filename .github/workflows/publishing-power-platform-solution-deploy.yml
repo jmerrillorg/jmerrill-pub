@@ -118,6 +118,17 @@ jobs:
     runs-on: ubuntu-latest
     environment: jm1-power-platform-production
     steps:
+      - name: Deny unrelated import during fresh-title release window
+        shell: bash
+        env:
+          FRESH_TITLE_RELEASE_LOCK: ${{ vars.JMP_FRESH_TITLE_APPROVED_SOURCE_SHA }}
+        run: |
+          set -euo pipefail
+          if [ -n "${FRESH_TITLE_RELEASE_LOCK:-}" ]; then
+            echo "::error::Publishing solution import is locked during fresh-title role release."
+            exit 1
+          fi
+
       - name: Checkout Repository
         uses: actions/checkout@v7
 

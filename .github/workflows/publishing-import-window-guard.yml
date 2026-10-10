@@ -1,0 +1,28 @@
+name: Publishing Import Window Guard
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - .github/workflows/publishing-power-platform-solution-deploy.yml
+      - .github/workflows/publishing-import-window-guard.yml
+      - scripts/publishing-import-window.test.mjs
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/publishing-power-platform-solution-deploy.yml
+      - .github/workflows/publishing-import-window-guard.yml
+      - scripts/publishing-import-window.test.mjs
+
+permissions:
+  contents: read
+
+jobs:
+  guard:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '24'
+      - run: node --test scripts/publishing-import-window.test.mjs
