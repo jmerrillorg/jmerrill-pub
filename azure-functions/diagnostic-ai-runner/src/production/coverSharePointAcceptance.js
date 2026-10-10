@@ -3,6 +3,7 @@
 const { createCoverOwnerStore, digest, hash } = require("./coverOwnerStore");
 const { createCoverSharePointPersistence, permissionDigest } = require("./coverSharePointPersistence");
 const { nativeGraph } = require("./coverNativeOwner");
+const { createCoverReviewUploadJournal } = require("./coverReviewUploadJournal");
 const DESTINATION = Object.freeze({
   driveId: "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se",
   folderId: "01DF3SEQLBSAC7VNOAQNAJ2WLORL6STRJA", folderPath: "/Preview Runtime Certification",
@@ -29,6 +30,11 @@ async function runCoverSharePointAcceptance(containerClient, context = {}) {
     reviewerId: "33333333-3333-4333-8333-333333333333",
     reviewerAuthoritySha256: digest({ class: "SYNTHETIC_REVIEWER_NOT_HUMAN_APPROVAL" }), destination: DESTINATION };
   const graph = context.graph || nativeGraph(context);
+  const journal = createCoverReviewUploadJournal(store, {
+    intentSha256: "5ce697aba483e4d574f34400882d7737dc9ecdb9767c5856f8af17b74bd632bd",
+    sourceSha256: "4765ceeabd93d17b6289847613964a3bb0e915cb2a39cd660ac11d8f420bc311",
+    sourceRelease: "a3ae1c063a3227caf7dc542aa96d87e27f6af5c2", observedAt: "2026-10-10T01:12:27.844Z", status: 400
+  });
   let uploadCalls = 0;
   let committedResponseLost = false;
   const persist = createCoverSharePointPersistence({ graph, fetchImpl: async (url, options) => {
@@ -45,12 +51,7 @@ async function runCoverSharePointAcceptance(containerClient, context = {}) {
     },
     verifyAuthority: async input => digest(input) === digest(binding) &&
       context.env?.JM1_COVER_ADAPTER_ACCEPTANCE_ENABLED === "true",
-    reserveUploadIntent: async intent => {
-      const intentKey = digest({ bindingSha256: intent.bindingSha256 });
-      if (await store.read("review-upload-intents", intentKey)) return false;
-      try { await store.writeJson("review-upload-intents", intentKey, { ...intent, synthetic: true }); return true; }
-      catch (error) { if ([409, 412].includes(error.statusCode)) return false; throw error; }
-    } });
+    ...journal });
   const result = await persist.persist(binding, row.bytes);
   const saved = await store.writeJson("review-deliveries", digest(binding), { ...result, synthetic: true }, { immutable: true });
   const replay = await persist.persist(binding, row.bytes);

@@ -78,9 +78,11 @@ function createCoverSharePointPersistence(deps) {
         await deps.reserveUploadIntent({ bindingSha256: digest(binding), checksum, filename }) !== true) {
       deny("COVER_REVIEW_UPLOAD_RECONCILIATION_REQUIRED");
     }
-    const session = await deps.graph(`${target}:/createUploadSession`, { method: "POST",
+    let session;
+    try { session = await deps.graph(`${target}:/createUploadSession`, { method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ item: { name: filename, "@microsoft.graph.conflictBehavior": "fail" } }) });
+      body: JSON.stringify({ item: { name: filename, "@microsoft.graph.conflictBehavior": "fail" } }) }); }
+    catch (error) { if (deps.recordUploadSessionFailure) await deps.recordUploadSessionFailure(error); throw error; }
     let upload;
     try { upload = new URL(session.uploadUrl); } catch { deny("COVER_REVIEW_UPLOAD_SESSION_INVALID"); }
     if (upload.protocol !== "https:" || upload.hostname !== destination.host || upload.username || upload.password) {

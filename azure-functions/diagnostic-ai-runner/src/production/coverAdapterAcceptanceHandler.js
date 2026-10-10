@@ -29,7 +29,10 @@ async function coverAdapterAcceptanceHandler(request, deps = {}) {
   } catch (error) {
     return { status: 503, jsonBody: { code: "COVER_ACCEPTANCE_NATIVE_ADAPTER_FAILED", retryRequiresReadback: true,
       ...(body.action === "SHAREPOINT" ? { dependencyStatus: error.statusCode || null,
-        safeCode: /^COVER_[A-Z_]+$/.test(error.safeCode || "") ? error.safeCode : "COVER_SHAREPOINT_DEPENDENCY_FAILED" } : {}) } };
+        safeCode: /^COVER_[A-Z_]+$/.test(error.safeCode || "") ? error.safeCode : "COVER_SHAREPOINT_DEPENDENCY_FAILED",
+        providerCode: /^[A-Za-z][A-Za-z0-9_]{0,63}$/.test(error.providerCode || "") ? error.providerCode : null,
+        category: ["FILE_POLICY", "PATH_POLICY", "CAPACITY", "UNSUPPORTED_TYPE", "UNCLASSIFIED"].includes(error.category) ? error.category : null,
+        requestId: /^[a-f0-9-]{36}$/i.test(error.requestId || "") ? error.requestId : null } : {}) } };
   }
 }
 

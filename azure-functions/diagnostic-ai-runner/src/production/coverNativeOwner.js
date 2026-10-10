@@ -14,6 +14,7 @@ const SHA = /^[a-f0-9]{64}$/;
 const GUID = /^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/;
 const { JACKIE_CANONICAL_AUTHOR_CONTACT_ID } = require("../author/jackieTitleSystemCommissioningPolicy");
 const { createCoverSharePointPersistence, verifyPrintGeometry } = require("./coverSharePointPersistence");
+const { createCoverReviewUploadJournal } = require("./coverReviewUploadJournal");
 
 function nativeContext(deps = {}) {
   const env = deps.env || process.env;
@@ -100,7 +101,18 @@ function nativeGraph(deps) {
     if (!response.ok) {
       const operation = path.endsWith("/permissions") ? "PERMISSIONS" : path.endsWith("createUploadSession") ? "UPLOAD_SESSION" :
         path.endsWith("/content") ? "CONTENT" : path.includes(":/") ? "TARGET" : "METADATA";
-      throw Object.assign(new Error("COVER_GRAPH_DEPENDENCY_FAILED"), { statusCode: response.status, safeCode: `COVER_GRAPH_${operation}_FAILED` });
+      let error;
+      try { error = (await response.json()).error; } catch { /* No response body is retained. */ }
+      const providerCode = ["invalidRequest", "accessDenied", "notAllowed", "itemNotFound", "generalException",
+        "resourceModified", "nameAlreadyExists", "quotaLimitReached", "notSupported", "badRequest", "activityLimitReached"].includes(error?.code) ? error.code : "UNKNOWN";
+      const message = typeof error?.message === "string" ? error.message : "";
+      const category = /file.*(blocked|not allowed|prohibited)/i.test(message) ? "FILE_POLICY" :
+        /invalid.*(path|name)/i.test(message) ? "PATH_POLICY" : /quota|storage limit/i.test(message) ? "CAPACITY" :
+          /unsupported.*(file|type)/i.test(message) ? "UNSUPPORTED_TYPE" : "UNCLASSIFIED";
+      const requestId = response.headers?.get("request-id");
+      throw Object.assign(new Error("COVER_GRAPH_DEPENDENCY_FAILED"), { statusCode: response.status,
+        safeCode: `COVER_GRAPH_${operation}_FAILED`, operation, providerCode, category,
+        requestId: /^[a-f0-9-]{36}$/i.test(requestId || "") ? requestId : null });
     }
     return options.responseType === "buffer" ? Buffer.from(await response.arrayBuffer()) : response.json();
   };
@@ -132,12 +144,7 @@ async function persistNativeCoverReview(input, context, store) {
         assignment.privateAccessVerified === true && current?.sha256 === input.request.authoritySha256 &&
         await verifyNativeCoverAuthority(input.request, current.value, context) === true;
     },
-    reserveUploadIntent: async intent => {
-      const key = digest({ bindingSha256: intent.bindingSha256 });
-      if (await store.read("review-upload-intents", key)) return false;
-      try { await store.writeJson("review-upload-intents", key, intent); return true; }
-      catch (error) { if ([409, 412].includes(error.statusCode)) return false; throw error; }
-    } });
+    ...createCoverReviewUploadJournal(store) });
   const result = await runtime.persist(binding, input.bytes);
   if (input.readOnly === true) return result;
   const saved = await store.writeJson("review-deliveries", digest(binding), result, { immutable: true });
