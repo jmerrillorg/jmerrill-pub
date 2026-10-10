@@ -29,7 +29,8 @@ test("scope-denied readback never accesses storage or author data", async () => 
 });
 test("native readback returns exact metadata and zero effects", async () => {
   const x = fixture(); const identity = { titleId, executionId: x.plan.executionId, bindingHash: x.plan.bindingHash };
-  x.records.set(`commissioning-executions/${titleId}/${x.plan.bindingHash}.json`, { ...identity, status: "COMPLETED", attempts: 1 });
+  x.records.set(`commissioning-executions/${titleId}/${x.plan.bindingHash}.json`, { ...identity, status: "COMPLETED", attempts: 1,
+    receiptReference: `commissioning-intake/${titleId}/${x.plan.bindingHash}.json` });
   x.records.set(`commissioning-intake/${titleId}/${x.plan.bindingHash}.json`, { ...identity, status: "INTAKE_MATERIALS_VERIFIED", productionStageChanged: false, source: ownerBinding(titleId).request.source });
   const result = await read({ mode: "COMMISSIONING_INTAKE_READ_ONLY", titleId }, x.deps);
   assert.equal(result.status, 200); assert.equal(result.jsonBody.effects, 0); assert.equal(result.jsonBody.nativeAuthorityAndBytes, "PASS");
@@ -38,6 +39,20 @@ test("native readback returns exact metadata and zero effects", async () => {
 test("cross-title stored receipt is denied, never projected as complete", async () => {
   const x = fixture(); x.records.set(`commissioning-intake/${titleId}/${x.plan.bindingHash}.json`, { titleId: "other", executionId: x.plan.executionId, bindingHash: x.plan.bindingHash });
   await assert.rejects(read({ mode: "COMMISSIONING_INTAKE_READ_ONLY", titleId }, x.deps), /IDENTITY_CONFLICT/);
+});
+test("completed intake rejects missing, altered or misplaced receipt without writes", async () => {
+  for (const variant of ["missing", "source", "status", "path", "stage"]) {
+    const x = fixture(), identity = { titleId, executionId: x.plan.executionId, bindingHash: x.plan.bindingHash };
+    x.records.set(`commissioning-executions/${titleId}/${x.plan.bindingHash}.json`, {
+      ...identity, status: "COMPLETED", attempts: 1,
+      receiptReference: variant === "path" ? "other/receipt.json" : `commissioning-intake/${titleId}/${x.plan.bindingHash}.json`
+    });
+    if (variant !== "missing") x.records.set(`commissioning-intake/${titleId}/${x.plan.bindingHash}.json`, {
+      ...identity, status: variant === "status" ? "PENDING" : "INTAKE_MATERIALS_VERIFIED",
+      productionStageChanged: variant === "stage", source: variant === "source" ? { ...x.plan.source, version: "changed" } : x.plan.source
+    });
+    await assert.rejects(read({ mode: "COMMISSIONING_INTAKE_READ_ONLY", titleId }, x.deps), /COMPLETED_INTAKE_RECEIPT_INVALID/);
+  }
 });
 test("rejected candidate readback verifies exact custody and returns shapes, never private content", async () => {
   const x = fixture();
