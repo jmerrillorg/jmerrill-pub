@@ -4,6 +4,7 @@ on:
   workflow_dispatch:
 
 permissions:
+  actions: read
   contents: read
   id-token: write
 
@@ -12,11 +13,10 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  PACKAGE_PATH: powerplatform/solutions/JMPPublishingV2Phase6/artifacts/JMP_PublishingV2_Phase6_Portable_1_2_0_2_managed.zip
-  PACKAGE_SHA256: 14fc42c5b9af6f785f458704ce53d57240d99b82932568b8d676affa71219a97
-  SOLUTION_NAME: JMP_PublishingV2_Phase6_Portable
-  PREVIOUS_SOLUTION_VERSION: 1.2.0.1
-  SOLUTION_VERSION: 1.2.0.2
+  PACKAGE_PATH: powerplatform/solutions/JMPFreshTitleRuntimeRole/artifacts/JMP_FreshTitleRuntimeRole_1_0_0_0_managed_candidate.zip
+  PACKAGE_SHA256: 1bc8f785288345c6f3d7b3289c51971aa6e5c3c812c270edd42d31c011686a19
+  SOLUTION_NAME: JMP_FreshTitleRuntimeRole
+  SOLUTION_VERSION: 1.0.0.0
   ROLE_ID: a3fc4c02-7d09-4ca1-8e32-2090ad209dc2
   PROD_ENVIRONMENT_URL: https://jm1hq.crm.dynamics.com/
   PROD_ENVIRONMENT_ID: dc4b2a13-3dbb-e0d1-95b8-f0e7d3a26e10
@@ -31,7 +31,7 @@ jobs:
       - uses: actions/checkout@v7
 
       - name: Test source role contract
-        run: node --test scripts/fresh_title_commissioning_role.test.mjs scripts/fresh-title-role-policy.test.mjs scripts/fresh-title-release-binding.test.mjs .github/tests/fresh-title-role-auth.test.mjs powerplatform/deployment/dataverse-github-oidc-token.test.mjs powerplatform/deployment/reconcile-fresh-title-role-oidc.test.mjs
+        run: node --test powerplatform/solutions/JMPFreshTitleRuntimeRole/test/package.test.mjs .github/tests/role-only-production.test.mjs
 
       - name: Validate immutable package
         shell: bash
@@ -67,6 +67,7 @@ jobs:
     needs: validate
     runs-on: ubuntu-latest
     environment: jm1-power-platform-production
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v7
         with:
@@ -86,6 +87,16 @@ jobs:
       - name: Install Power Platform CLI
         uses: microsoft/powerplatform-actions/actions-install@v1
 
+      - name: Read successful native sandbox acceptance
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ACCEPTANCE_RUN_ID: ${{ vars.JMP_FRESH_ROLE_ACCEPTANCE_RUN_ID }}
+        run: |
+          set -euo pipefail
+          test -n "$ACCEPTANCE_RUN_ID"
+          gh run view "$ACCEPTANCE_RUN_ID" --repo "$GITHUB_REPOSITORY" --json status,conclusion --jq 'select(.status == "completed" and .conclusion == "success") | .status' | grep -Fx completed
+          gh run download "$ACCEPTANCE_RUN_ID" --repo "$GITHUB_REPOSITORY" --name role-only-native-acceptance --dir /tmp/native-acceptance
+
       - name: Authenticate with GitHub OIDC
         shell: bash
         run: |
@@ -98,19 +109,8 @@ jobs:
             --githubFederated \
             --environment "$PROD_ENVIRONMENT_URL"
 
-      - name: Verify production target and existing package version
-        shell: bash
-        run: |
-          set -euo pipefail
-          PAC_CLI="${POWERPLATFORMTOOLS_PACPATH:-pac}"
-          test "$PROD_ENVIRONMENT_URL" = "https://jm1hq.crm.dynamics.com/"
-          test "$PROD_ENVIRONMENT_ID" = "dc4b2a13-3dbb-e0d1-95b8-f0e7d3a26e10"
-          test "$PROD_ORGANIZATION_ID" = "9dafb403-b493-f011-a700-000d3a106f37"
-          "$PAC_CLI" org who --environment "$PROD_ENVIRONMENT_URL" | tee /tmp/target-org.txt
-          grep -Fi "$PROD_ORGANIZATION_ID" /tmp/target-org.txt
-          "$PAC_CLI" solution list --environment "$PROD_ENVIRONMENT_URL" > /tmp/solutions-before.txt
-          grep -Eq "^${SOLUTION_NAME}[[:space:]]+.*${PREVIOUS_SOLUTION_VERSION}[[:space:]]+True$" \
-            /tmp/solutions-before.txt
+      - name: Verify target, effective scope, isolation and protected role
+        run: node powerplatform/deployment/verify-role-only-production.mjs before
 
       - name: Import managed solution update
         shell: bash
@@ -144,11 +144,16 @@ jobs:
           grep -F "$SOLUTION_NAME" /tmp/fresh-title-role-readback/solutions.txt
           grep -F "$SOLUTION_VERSION" /tmp/fresh-title-role-readback/solutions.txt
 
+      - name: Independently verify unchanged Phase6 role
+        run: node powerplatform/deployment/verify-role-only-production.mjs after
+
       - name: Preserve production readback
+        if: always()
         uses: actions/upload-artifact@v7
         with:
           name: publishing-fresh-title-role-production-readback
           path: |
             /tmp/fresh-title-role-readback/solutions.txt
             /tmp/fresh-title-role-readback.json
+            /tmp/role-only-production.json
           if-no-files-found: error
