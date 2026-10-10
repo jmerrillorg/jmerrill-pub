@@ -91,11 +91,13 @@ async function execute(input, deps) {
 
 async function processCustody(deps) {
   const current = await (deps.readOriginalAuthority || readAuthority)(deps);
-  return processTitleCommissioningStep(current.input, deps, { plan, namespace: "commissioning-fresh-custody-executions",
+  const result = await processTitleCommissioningStep(current.input, deps, { plan, namespace: "commissioning-fresh-custody-executions",
     executionSuffix: "", execute, validate: result => result?.receipt?.status === "ORIGINAL_CUSTODY_COPY_VERIFIED" &&
       result.receipt.bindingHash === plan(current.input).bindingHash,
     reference: () => `commissioning-fresh-custody/${TITLE_ID}/${plan(current.input).bindingHash}/receipt.json`,
     completionEffects: () => ({ productionStageChanged: false, historicalSourceChanged: false, originalCopyOnly: true }) });
+  if (result.status === "COMPLETED") await readPreparedOriginal(deps);
+  return result;
 }
 
 async function readPreparedOriginal(deps) {
