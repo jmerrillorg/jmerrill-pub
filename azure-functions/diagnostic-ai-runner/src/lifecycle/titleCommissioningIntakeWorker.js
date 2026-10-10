@@ -28,7 +28,7 @@ async function processTitleCommissioningIntake(input, deps = {}) {
 // Internal step contracts reuse the same lease/CAS/backoff control. They are
 // supplied by reviewed owner code, never an invocation or persisted request.
 async function processTitleCommissioningStep(input, deps, contract) {
-  const plan = planTitleCommissioningRun(input);
+  const plan = (contract.plan || planTitleCommissioningRun)(input);
   plan.executionId += contract.executionSuffix;
   if (typeof deps.containerClient?.getBlockBlobClient !== "function" ||
       typeof deps.readScope !== "function") fail("COMMISSIONING_WORKER_NOT_BOUND");
@@ -87,13 +87,13 @@ async function processTitleCommissioningStep(input, deps, contract) {
   if (!claimEtag) fail("COMMISSIONING_CLAIM_VERSION_MISSING");
   let result;
   try {
-    const intake = await contract.execute(input, deps);
+    const intake = await contract.execute(input, deps, { startedAt: claimed.startedAt });
     if (!contract.validate(intake, plan)) {
       fail("COMMISSIONING_INTAKE_RESULT_INVALID");
     }
     result = { ...claimed, status: "COMPLETED", completedAt: (deps.now || (() => new Date()))().toISOString(),
       receiptReference: contract.reference(intake, plan),
-      productionStageChanged: false };
+      ...(contract.completionEffects ? contract.completionEffects(intake) : { productionStageChanged: false }) };
   } catch (error) {
     const canRetry = retryable(error) && claimed.attempts < MAX_ATTEMPTS;
     result = { ...claimed, status: canRetry ? "RETRY_PENDING" : "HELD",

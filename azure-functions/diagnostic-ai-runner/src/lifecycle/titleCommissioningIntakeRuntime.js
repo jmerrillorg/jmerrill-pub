@@ -6,6 +6,20 @@ const GUID = /^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/;
 
 async function runTitleCommissioningIntakeRuntime(deps = {}) {
   const env = deps.env || process.env;
+  if (env.JM1_TITLE_COMMISSIONING_FRESH_ENABLED === "true") {
+    const fresh = require("./freshTitleIntake");
+    const ids = (env.JM1_TITLE_COMMISSIONING_FRESH_TITLE_IDS || "").split(",").filter(Boolean);
+    if (!ids.length || ids.some(id => !fresh.enabled(id, env))) throw Object.assign(new Error("COMMISSIONING_FRESH_ALLOWLIST_INVALID"), { safeCode: "COMMISSIONING_FRESH_ALLOWLIST_INVALID" });
+    const context = fresh.nativeDeps(deps), results = [], failures = [];
+    for (const titleId of ids) {
+      try {
+        const result = await fresh.processFreshTitleIntake(titleId, context);
+        results.push({ titleId, executionId: result.executionId, status: result.status, receiptReference: result.receiptReference || null });
+        if (["HELD", "RETRY_PENDING"].includes(result.status)) failures.push({ titleId, code: result.failureCode, status: result.status });
+      } catch { failures.push({ titleId, code: "COMMISSIONING_FRESH_READ_OR_DISPATCH_FAILED" }); }
+    }
+    return { enabled: true, results, failures, mode: "FRESH_INTAKE_ONLY" };
+  }
   if (env.JM1_TITLE_COMMISSIONING_INTAKE_ENABLED !== "true") return { enabled: false, results: [], failures: [] };
   const ids = (env.JM1_TITLE_COMMISSIONING_INTAKE_TITLE_IDS || "").split(",").map(s => s.trim()).filter(Boolean);
   if (!ids.length || ids.length > 5 || ids.some(id => !GUID.test(id)) || new Set(ids).size !== ids.length) {

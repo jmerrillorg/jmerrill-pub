@@ -9,6 +9,10 @@ async function sourceRegistrationHandler(request, deps = {}) {
   }
   let body;
   try { body = await request.json(); } catch { return { status: 400, jsonBody: { code: "INVALID_JSON", effects: 0 } }; }
+  if (body && ["FRESH_PREFLIGHT", "FRESH_INTAKE", "FRESH_READBACK"].includes(body.mode)) {
+    if (Object.keys(body).some(k => !["titleId", "mode"].includes(k))) return { status: 400, jsonBody: { code: "COMMISSIONING_FRESH_SCOPE_DENIED", effects: 0 } };
+    return require("./freshTitleIntake").handler(body, deps);
+  }
   const reconciliation = require("./longWatchCommissioningIdentityReconciliation");
   if (body?.titleId === reconciliation.titleId && ["IDENTITY_PREFLIGHT", "RECONCILE_IDENTITY"].includes(body.mode) &&
       !Object.keys(body).some(k => !["titleId", "mode"].includes(k))) {
