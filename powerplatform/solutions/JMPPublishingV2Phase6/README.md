@@ -10,7 +10,9 @@ JM1-Test certification invokes the command through `func-jm1-publishing-inbound-
 
 The signing key is governed outside Git. Set `JMP_PHASE6_SIGNING_KEY_PATH` to the approved strong-name key before running `node scripts/build-plugin.mjs`.
 
-The portable solution is `JMP_PublishingV2_Phase6_Portable`, version `1.2.0.1`. It contains the seven Phase 6-owned tables and their relationship/key subcomponents, plugin assembly and two plugin types, Custom API and contract children, three synchronous guard steps, the two environment-variable definitions, and the least-privilege Phase 6 runtime role. It contains no Phase 7 component. Version `1.2.0.1` refreshes the managed security-role layer after the authoritative base Publishing solution made the engagement and lifecycle tables available in downstream environments.
+The portable solution is `JMP_PublishingV2_Phase6_Portable`, version `1.2.0.2` in this proposed source revision. It contains the seven Phase 6-owned tables and their relationship/key subcomponents, plugin assembly and two plugin types, Custom API and contract children, three synchronous guard steps, the two environment-variable definitions, and the least-privilege Phase 6 runtime role. It contains no Phase 7 component. Version `1.2.0.2` adds the separately named fresh title commissioning runtime role without changing the existing Phase 6 role.
+
+The fresh title commissioning role is not yet deployed or assigned. Its contract is exactly Basic Read/Create on `jmpv2_publishingengagement`, `jmpv2_lifecycleinstance`, and `jmpv2_stageinstance`, plus Basic Read on `jmpv2_stagedefinition`. It has no Write, Delete, Assign, Share, posting, financial, or administration privileges. Runtime access to StageDefinition remains limited to the separately platform-shared 16 exact active definitions. The identity, role assignment, row shares, host attachment, and environment binding require independent live readback before the intake flags can be enabled.
 
 ## Environment binding
 

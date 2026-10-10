@@ -8,7 +8,7 @@
     <Descriptions>
       <Description description="Portable Phase 6 onboarding command, guard steps, configuration, and author-access authority." languagecode="1033" />
     </Descriptions>
-    <Version>1.2.0.1</Version>
+    <Version>1.2.0.2</Version>
     <Managed>0</Managed>
     <Publisher>
       <UniqueName>JMPPublishingV2</UniqueName>
@@ -92,6 +92,7 @@
       <RootComponent type="92" id="{f097d0e4-efab-f111-aaab-000d3a30bedf}" behavior="0" />
       <RootComponent type="92" id="{f397d0e4-efab-f111-aaab-000d3a30bedf}" behavior="0" />
       <RootComponent type="20" id="{2f957237-1ab4-f111-aaac-70a8a59b112b}" behavior="0" />
+      <RootComponent type="20" id="{A3FC4C02-7D09-4CA1-8E32-2090AD209DC2}" behavior="0" />
     </RootComponents>
     <MissingDependencies />
   </SolutionManifest>

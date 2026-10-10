@@ -1,0 +1,129 @@
+name: Publishing Fresh Title Role Deploy
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: publishing-fresh-title-role-production
+  cancel-in-progress: false
+
+env:
+  PACKAGE_PATH: powerplatform/solutions/JMPPublishingV2Phase6/artifacts/JMP_PublishingV2_Phase6_Portable_1_2_0_2_managed.zip
+  PACKAGE_SHA256: 14fc42c5b9af6f785f458704ce53d57240d99b82932568b8d676affa71219a97
+  SOLUTION_NAME: JMP_PublishingV2_Phase6_Portable
+  PREVIOUS_SOLUTION_VERSION: 1.2.0.1
+  SOLUTION_VERSION: 1.2.0.2
+  ROLE_ID: a3fc4c02-7d09-4ca1-8e32-2090ad209dc2
+  PROD_ENVIRONMENT_URL: https://jm1hq.crm.dynamics.com/
+  PROD_ENVIRONMENT_ID: dc4b2a13-3dbb-e0d1-95b8-f0e7d3a26e10
+  PROD_ORGANIZATION_ID: 9dafb403-b493-f011-a700-000d3a106f37
+  PAC_TENANT_ID: 352d075e-8e17-4169-9f8e-22e6946ce66d
+  PAC_APPLICATION_ID: 97891ed1-6623-487c-b890-633bea440e22
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Test source role contract
+        run: node --test scripts/fresh_title_commissioning_role.test.mjs
+
+      - name: Validate immutable package
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f "$PACKAGE_PATH"
+          echo "$PACKAGE_SHA256  $PACKAGE_PATH" | sha256sum --check --status
+          unzip -t "$PACKAGE_PATH"
+          unzip -p "$PACKAGE_PATH" solution.xml > /tmp/solution.xml
+          grep -Fq "<UniqueName>$SOLUTION_NAME</UniqueName>" /tmp/solution.xml
+          grep -Fq "<Version>$SOLUTION_VERSION</Version>" /tmp/solution.xml
+          grep -Fiq "<RootComponent type=\"20\" id=\"{$ROLE_ID}\"" /tmp/solution.xml
+          unzip -p "$PACKAGE_PATH" customizations.xml > /tmp/customizations.xml
+          grep -Fq 'name="JMP Fresh Title Commissioning Runtime"' /tmp/customizations.xml
+          grep -Fq 'name="prvCreatejmpv2_PublishingEngagement" level="Basic"' /tmp/customizations.xml
+          grep -Fq 'name="prvCreatejmpv2_LifecycleInstance" level="Basic"' /tmp/customizations.xml
+          grep -Fq 'name="prvCreatejmpv2_StageInstance" level="Basic"' /tmp/customizations.xml
+          grep -Fq 'name="prvReadjmpv2_PublishingEngagement" level="Basic"' /tmp/customizations.xml
+          grep -Fq 'name="prvReadjmpv2_LifecycleInstance" level="Basic"' /tmp/customizations.xml
+          grep -Fq 'name="prvReadjmpv2_StageDefinition" level="Basic"' /tmp/customizations.xml
+          grep -Fq 'name="prvReadjmpv2_StageInstance" level="Basic"' /tmp/customizations.xml
+          test "$(sed -n '/name="JMP Fresh Title Commissioning Runtime"/,/<\/Role>/p' /tmp/customizations.xml | grep -c '<RolePrivilege ')" -eq 7
+          ! sed -n '/name="JMP Fresh Title Commissioning Runtime"/,/<\/Role>/p' /tmp/customizations.xml | grep -Eqi 'level="(Local|Deep|Global)"|prv(Delete|Write|Assign|Share|Append|AppendTo|Override|ActOnBehalfOf)'
+
+      - name: Preserve package validation evidence
+        uses: actions/upload-artifact@v7
+        with:
+          name: publishing-fresh-title-role-package-validation
+          path: ${{ env.PACKAGE_PATH }}
+          if-no-files-found: error
+
+  production-import:
+    needs: validate
+    runs-on: ubuntu-latest
+    environment: jm1-power-platform-production
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install Power Platform CLI
+        uses: microsoft/powerplatform-actions/actions-install@v1
+
+      - name: Authenticate with GitHub OIDC
+        shell: bash
+        run: |
+          set -euo pipefail
+          PAC_CLI="${POWERPLATFORMTOOLS_PACPATH:-pac}"
+          "$PAC_CLI" auth create \
+            --name jm1-pub-prod-fresh-title-role-oidc \
+            --applicationId "$PAC_APPLICATION_ID" \
+            --tenant "$PAC_TENANT_ID" \
+            --githubFederated \
+            --environment "$PROD_ENVIRONMENT_URL"
+
+      - name: Verify production target and existing package version
+        shell: bash
+        run: |
+          set -euo pipefail
+          PAC_CLI="${POWERPLATFORMTOOLS_PACPATH:-pac}"
+          test "$PROD_ENVIRONMENT_URL" = "https://jm1hq.crm.dynamics.com/"
+          test "$PROD_ENVIRONMENT_ID" = "dc4b2a13-3dbb-e0d1-95b8-f0e7d3a26e10"
+          test "$PROD_ORGANIZATION_ID" = "9dafb403-b493-f011-a700-000d3a106f37"
+          "$PAC_CLI" org who --environment "$PROD_ENVIRONMENT_URL" | tee /tmp/target-org.txt
+          grep -Fi "$PROD_ORGANIZATION_ID" /tmp/target-org.txt
+          "$PAC_CLI" solution list --environment "$PROD_ENVIRONMENT_URL" > /tmp/solutions-before.txt
+          grep -Eq "^${SOLUTION_NAME}[[:space:]]+.*${PREVIOUS_SOLUTION_VERSION}[[:space:]]+True$" \
+            /tmp/solutions-before.txt
+
+      - name: Import managed solution update
+        shell: bash
+        run: |
+          set -euo pipefail
+          PAC_CLI="${POWERPLATFORMTOOLS_PACPATH:-pac}"
+          echo "$PACKAGE_SHA256  $PACKAGE_PATH" | sha256sum --check --status
+          "$PAC_CLI" solution import \
+            --environment "$PROD_ENVIRONMENT_URL" \
+            --path "$PACKAGE_PATH" \
+            --publish-changes
+
+      - name: Read back production solution
+        shell: bash
+        run: |
+          set -euo pipefail
+          PAC_CLI="${POWERPLATFORMTOOLS_PACPATH:-pac}"
+          mkdir -p /tmp/fresh-title-role-readback
+          "$PAC_CLI" solution list --environment "$PROD_ENVIRONMENT_URL" \
+            | tee /tmp/fresh-title-role-readback/solutions.txt
+          grep -F "$SOLUTION_NAME" /tmp/fresh-title-role-readback/solutions.txt
+          grep -F "$SOLUTION_VERSION" /tmp/fresh-title-role-readback/solutions.txt
+
+      - name: Preserve production readback
+        uses: actions/upload-artifact@v7
+        with:
+          name: publishing-fresh-title-role-production-readback
+          path: /tmp/fresh-title-role-readback/solutions.txt
+          if-no-files-found: error
