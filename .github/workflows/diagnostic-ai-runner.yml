@@ -2,6 +2,16 @@ name: Diagnostic AI Runner CI/CD
 
 on:
   workflow_dispatch:
+    inputs:
+      release_mode:
+        description: Standard approved configuration or settings-preserving source-only release
+        type: choice
+        options: [standard, source-only]
+        default: standard
+      expected_previous_release:
+        description: Exact live SHA required for a source-only release
+        type: string
+        default: ""
   pull_request:
     branches:
       - main
@@ -9,6 +19,8 @@ on:
       - "azure-functions/diagnostic-ai-runner/**"
       - "docs/implementation/canon-cache/jm1-publishing-editorial/**"
       - ".github/workflows/diagnostic-ai-runner.yml"
+      - ".github/scripts/diagnostic-source-only-release.mjs"
+      - ".github/tests/diagnostic-source-only-release.test.mjs"
   push:
     branches:
       - main
@@ -16,6 +28,8 @@ on:
       - "azure-functions/diagnostic-ai-runner/**"
       - "docs/implementation/canon-cache/jm1-publishing-editorial/**"
       - ".github/workflows/diagnostic-ai-runner.yml"
+      - ".github/scripts/diagnostic-source-only-release.mjs"
+      - ".github/tests/diagnostic-source-only-release.test.mjs"
 
 permissions:
   contents: read
@@ -53,6 +67,9 @@ jobs:
       - name: Run full package validation
         working-directory: azure-functions/diagnostic-ai-runner
         run: npm test
+
+      - name: Validate settings-preserving release guard
+        run: node --test .github/tests/diagnostic-source-only-release.test.mjs
 
       - name: Build deterministic deployment package
         id: package
@@ -140,6 +157,9 @@ jobs:
       cancel-in-progress: false
     if: (github.event_name == 'push' && github.ref == 'refs/heads/main') || github.event_name == 'workflow_dispatch'
     needs: validate-and-package
+    env:
+      RELEASE_MODE: ${{ github.event_name == 'workflow_dispatch' && inputs.release_mode || 'standard' }}
+      EXPECTED_PREVIOUS_RELEASE: ${{ inputs.expected_previous_release }}
     runs-on: ubuntu-latest
     environment:
       name: jmerrill-pub-production
@@ -148,6 +168,11 @@ jobs:
       contents: read
       id-token: write
     steps:
+      - name: Checkout exact reviewed release tooling
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ github.sha }}
+
       - name: Download immutable deployment artifact
         uses: actions/download-artifact@v8
         with:
@@ -182,7 +207,16 @@ jobs:
             echo "JM1_PACKAGE_SHA256=$artifact_sha256"
           } >> "$GITHUB_ENV"
 
+      - name: Capture source-only settings preimage
+        if: env.RELEASE_MODE == 'source-only'
+        run: node .github/scripts/diagnostic-source-only-release.mjs preflight
+
+      - name: Activate source-only package without business settings
+        if: env.RELEASE_MODE == 'source-only'
+        run: node .github/scripts/diagnostic-source-only-release.mjs activate
+
       - name: Activate immutable Function App package
+        if: env.RELEASE_MODE == 'standard'
         shell: bash
         run: |
           set -euo pipefail
@@ -377,6 +411,10 @@ jobs:
           PY
           echo "Stripe Connect monitor live read-only production correlation — PASS"
 
+      - name: Verify final source-only settings preservation
+        if: env.RELEASE_MODE == 'source-only'
+        run: node .github/scripts/diagnostic-source-only-release.mjs verify
+
       - name: Upload deployment evidence
         uses: actions/upload-artifact@v7
         if: always()
@@ -387,6 +425,7 @@ jobs:
             ${{ runner.temp }}/diagnostic-ai-runner-health.json
             ${{ runner.temp }}/*-probe.json
             ${{ runner.temp }}/stripe-connect-monitor-*.json
+            ${{ runner.temp }}/diagnostic-source-only-*.json
           if-no-files-found: warn
           retention-days: 90
 
@@ -443,7 +482,7 @@ jobs:
           EXPECTED_FUNCTION_COUNT: ${{ needs.validate-and-package.outputs.expected_function_count }}
 
       - name: Roll back to last-known-good package on validation failure
-        if: failure()
+        if: failure() && env.RELEASE_MODE == 'standard'
         shell: bash
         run: |
           set -euo pipefail
@@ -490,3 +529,16 @@ jobs:
           done
           echo "Rollback to last-known-good package failed health verification." >&2
           exit 1
+
+      - name: Restore exact source-only release preimage on failure
+        if: failure() && env.RELEASE_MODE == 'source-only'
+        run: node .github/scripts/diagnostic-source-only-release.mjs rollback
+
+      - name: Preserve source-only recovery receipt
+        if: always() && env.RELEASE_MODE == 'source-only'
+        uses: actions/upload-artifact@v7
+        with:
+          name: diagnostic-source-only-recovery-${{ github.sha }}
+          path: ${{ runner.temp }}/diagnostic-source-only-rollback.json
+          if-no-files-found: ignore
+          retention-days: 90
