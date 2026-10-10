@@ -61,6 +61,9 @@ Engagement creation reserves that title key before original-byte storage or
 lifecycle/stage writes. An unreadable competing owner is rejected by the
 provider key and remains held; it is not copied, overwritten or excluded.
 Every transactional readback also requires the expected application owner ID.
+The fresh native Dataverse client explicitly uses the same existing managed
+identity credential as Graph; it does not fall back to environment client
+secrets or an administrator identity.
 
 A partial successful reservation remains visible as incomplete intake, not
 stage completion. Recovery reuses the same deterministic IDs and exact

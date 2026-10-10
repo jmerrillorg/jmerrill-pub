@@ -213,7 +213,13 @@ function nativeDeps(deps = {}) {
   const env = deps.env || process.env;
   const credential = deps.credential || new (require("@azure/identity").ManagedIdentityCredential)();
   const client = deps.client || require("../orchestration/authorReviewResponseConsumer").createDataverseClient({
-    apiBase: env.DATAVERSE_WEB_API_BASE_URL, resourceUrl: env.DATAVERSE_RESOURCE_URL });
+    apiBase: env.DATAVERSE_WEB_API_BASE_URL, resourceUrl: env.DATAVERSE_RESOURCE_URL }, {
+    getToken: async resourceUrl => {
+      const result = await credential.getToken(`${resourceUrl.replace(/\/$/, "")}/.default`);
+      if (!result?.token) deny("COMMISSIONING_FRESH_RUNTIME_TOKEN_UNAVAILABLE");
+      return result.token;
+    }
+  });
   const containerClient = deps.containerClient || require("@azure/storage-blob").BlobServiceClient
     .fromConnectionString(env.AzureWebJobsStorage).getContainerClient("jm1-publishing-stage-runtime");
   const sourceMetadata = deps.sourceMetadata || (async policy => {
