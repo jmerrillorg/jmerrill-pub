@@ -90,12 +90,34 @@ async function verifyNativeCoverSpend(request, bundle, deps) {
     tariff.value.maxMicroUsdPerImage * request.variantCount <= value.maxCostMicroUsd;
 }
 
+async function claimNativeCoverSpend(request, bundle, deps, execution) {
+  if (!SHA.test(execution?.executionKey || "") || !SHA.test(execution?.bindingHash || "") ||
+      await verifyNativeCoverSpend(request, bundle, deps) !== true) return false;
+  const approval = await deps.store.read("sources", request.paidApprovalKey);
+  if (approval?.sha256 !== request.paidApprovalSha256) return false;
+  // Key by the exact authenticated decision bytes, not a refreshable snapshot.
+  const key = digest({ kind: "COVER_SPEND_DECISION", decisionSha256: approval.value.decisionEvidenceSha256 });
+  const claim = { schemaVersion: 1, kind: "COVER_SPEND_DECISION", status: "RESERVED",
+    decisionSha256: approval.value.decisionEvidenceSha256, executionKey: execution.executionKey,
+    bindingHash: execution.bindingHash, titleId: request.titleId, editionId: request.editionId };
+  const current = await deps.store.read("spend-claims", key);
+  if (current) return digest(current.value) === digest(claim);
+  try {
+    const saved = await deps.store.writeJson("spend-claims", key, claim, { immutable: true });
+    return digest(saved.value) === digest(claim);
+  } catch (error) {
+    if ([409, 412].includes(error.statusCode) || error.safeCode === "COVER_OWNER_STORE_READBACK_CONFLICT") return false;
+    throw error;
+  }
+}
+
 function createNativeCoverOwner(deps = {}) {
   const context = nativeContext(deps);
   const store = createCoverOwnerStore(context);
   const owner = { ...context, store, generationEnabled: context.env.JM1_COVER_GENERATION_ENABLED === "true",
     verifyCurrentAuthority: (request, input) => verifyNativeCoverAuthority(request, input, context),
     verifySpendAuthority: (request, bundle) => verifyNativeCoverSpend(request, bundle, { ...context, store }),
+    reserveSpendAuthority: (request, bundle, execution) => claimNativeCoverSpend(request, bundle, { ...context, store }, execution),
     readProviderOutcome: async key => (await store.read("provider-receipts", key))?.value };
   owner.generateImage = async request => {
     // Instantiation is lazy: missing spend/source authority never reaches identity,
@@ -153,4 +175,4 @@ async function runNativeCoverOwners(deps = {}) {
   return { enabled: true, results, failures };
 }
 
-module.exports = { IDS, nativeContext, createNativeCoverOwner, verifyNativeCoverAuthority, verifyNativeCoverSpend, runNativeCoverOwners };
+module.exports = { IDS, nativeContext, createNativeCoverOwner, verifyNativeCoverAuthority, verifyNativeCoverSpend, claimNativeCoverSpend, runNativeCoverOwners };

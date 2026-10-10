@@ -14,7 +14,7 @@ function createCoverOwnerStore({ containerClient, acceptance = false } = {}) {
   if (typeof containerClient?.getBlockBlobClient !== "function") deny("COVER_OWNER_STORE_NOT_BOUND");
   const prefix = acceptance ? ACCEPTANCE_PREFIX : PRODUCTION_PREFIX;
   const path = (kind, key) => {
-    if (!["requests", "authority", "sources", "executions", "outcomes", "provider-receipts", "receipts", "packages", "assets", "alerts", "faults"].includes(kind) ||
+    if (!["requests", "authority", "sources", "executions", "outcomes", "provider-receipts", "receipts", "packages", "assets", "alerts", "faults", "spend-claims"].includes(kind) ||
         !SHA.test(key || "")) deny("COVER_OWNER_STORE_REFERENCE_INVALID");
     return `${prefix}/${kind}/${key}`;
   };
