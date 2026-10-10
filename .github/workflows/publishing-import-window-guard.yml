@@ -7,12 +7,20 @@ on:
       - .github/workflows/publishing-power-platform-solution-deploy.yml
       - .github/workflows/publishing-import-window-guard.yml
       - .github/tests/publishing-import-window.test.mjs
+      - .github/workflows/publishing-fresh-title-role-deploy.yml
+      - .github/tests/fresh-title-role-auth.test.mjs
+      - powerplatform/deployment/dataverse-github-oidc-token*.mjs
+      - powerplatform/deployment/reconcile-fresh-title-role-oidc*.mjs
   push:
     branches: [main]
     paths:
       - .github/workflows/publishing-power-platform-solution-deploy.yml
       - .github/workflows/publishing-import-window-guard.yml
       - .github/tests/publishing-import-window.test.mjs
+      - .github/workflows/publishing-fresh-title-role-deploy.yml
+      - .github/tests/fresh-title-role-auth.test.mjs
+      - powerplatform/deployment/dataverse-github-oidc-token*.mjs
+      - powerplatform/deployment/reconcile-fresh-title-role-oidc*.mjs
 
 permissions:
   contents: read
@@ -26,3 +34,5 @@ jobs:
         with:
           node-version: '24'
       - run: node --test .github/tests/publishing-import-window.test.mjs
+      - name: Test protected fresh-role authentication and readback
+        run: node --test scripts/fresh_title_commissioning_role.test.mjs scripts/fresh-title-role-policy.test.mjs scripts/fresh-title-release-binding.test.mjs .github/tests/fresh-title-role-auth.test.mjs powerplatform/deployment/dataverse-github-oidc-token.test.mjs powerplatform/deployment/reconcile-fresh-title-role-oidc.test.mjs
