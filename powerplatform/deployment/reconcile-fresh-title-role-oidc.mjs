@@ -13,7 +13,7 @@ try {
     applicationId: process.env.PAC_APPLICATION_ID,
     tenantId: process.env.PAC_TENANT_ID,
   })
-  await import('./reconcile-fresh-title-role.mjs')
+  await import('../../scripts/reconcile-fresh-title-role.mjs')
 } finally {
   delete process.env.DATAVERSE_ACCESS_TOKEN
 }
