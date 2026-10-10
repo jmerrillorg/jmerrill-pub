@@ -2,7 +2,7 @@ import { writeFileSync, readFileSync } from 'node:fs'
 import { execFileSync } from 'node:child_process'
 import { createHash } from 'node:crypto'
 import { dataverseGithubOidcToken } from './dataverse-github-oidc-token.mjs'
-import { planRoleNormalization } from '../../scripts/fresh-title-role-policy.mjs'
+import { planRoleNormalization, canonicalRolePrivilegePairs } from '../../scripts/fresh-title-role-policy.mjs'
 
 const env = 'https://jm1test.crm.dynamics.com'
 const app = '97891ed1-6623-487c-b890-633bea440e22'
@@ -32,7 +32,7 @@ async function snapshot(id) {
   if (identity.status !== 200) throw Error('PROTECTED_ROLE_ABSENT')
   const rights = await request(`roleprivilegescollection?$select=privilegeid,privilegedepthmask&$filter=roleid eq ${id}`)
   if (rights.data['@odata.nextLink']) throw Error('RIGHTS_INCOMPLETE')
-  return { identity: identity.data, rights: rights.data.value.sort((a,b) => a.privilegeid.localeCompare(b.privilegeid)) }
+  return { identity: identity.data, rights: canonicalRolePrivilegePairs(rights.data.value) }
 }
 try {
   const who = (await request('WhoAmI()')).data
