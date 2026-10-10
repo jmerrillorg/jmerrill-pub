@@ -15,7 +15,8 @@ function createCoverReviewUploadJournal(store, legacyProof) {
     } else if (original.value.bindingSha256 !== intent.bindingSha256 || original.value.checksum !== intent.checksum ||
         original.value.filename !== intent.filename) return false;
     let attempt = await store.read("review-upload-attempts", key);
-    if (!created && !attempt && original.sha256 === legacyProof?.intentSha256 && store.acceptance === true && legacyProof?.status === 400) {
+    if (!created && !attempt && original.sha256 === legacyProof?.intentSha256 && store.acceptance === true &&
+        legacyProof?.status === 400 && legacyProof.operation === "UPLOAD_SESSION" && legacyProof.uploadCalls === 0) {
       await store.writeJson("review-upload-failures", digest({ key, attempt: 0 }), {
         kind: "SOURCE_BACKED_PREUPLOAD_REJECTION", bindingSha256: intent.bindingSha256,
         intentSha256: original.sha256, sourceSha256: legacyProof.sourceSha256,

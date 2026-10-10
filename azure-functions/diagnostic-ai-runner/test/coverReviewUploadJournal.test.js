@@ -36,8 +36,10 @@ test("unknown session outcome, changed bytes, and lost PUT response never author
 test("legacy recovery is exact source-backed acceptance only and preserves original intent", async () => {
   const f = fixture(true), key = digest({ bindingSha256: intent.bindingSha256 });
   const old = await f.store.writeJson("review-upload-intents", key, { ...intent, synthetic: true });
-  const proof = { intentSha256: old.sha256, status: 400, sourceSha256: "d".repeat(64), sourceRelease: "e".repeat(40), observedAt: "2026-10-10T01:12:27.844Z" };
+  const proof = { intentSha256: old.sha256, status: 400, operation: "UPLOAD_SESSION", uploadCalls: 0,
+    sourceSha256: "d".repeat(64), sourceRelease: "e".repeat(40), observedAt: "2026-10-10T01:12:27.844Z" };
   assert.equal(await createCoverReviewUploadJournal(f.store).reserveUploadIntent(intent), false);
+  assert.equal(await createCoverReviewUploadJournal(f.store, { ...proof, operation: "UNKNOWN" }).reserveUploadIntent(intent), false);
   assert.equal(await createCoverReviewUploadJournal(f.store, { ...proof, intentSha256: "f".repeat(64) }).reserveUploadIntent(intent), false);
   assert.equal(await createCoverReviewUploadJournal(f.store, proof).reserveUploadIntent(intent), true);
   assert.deepEqual(await f.store.read("review-upload-intents", key), old);
