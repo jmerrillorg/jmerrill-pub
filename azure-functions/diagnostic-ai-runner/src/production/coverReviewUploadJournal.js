@@ -45,7 +45,8 @@ function createCoverReviewUploadJournal(store, legacyProof, transport = "SESSION
     }
     try {
       current = await store.writeJson("review-upload-attempts", key, { bindingSha256: intent.bindingSha256,
-        checksum: intent.checksum, filename: intent.filename, number, transport, state: "SESSION_RESERVED",
+        checksum: intent.checksum, filename: intent.filename, number, transport,
+        state: transport === "SESSION" ? "SESSION_RESERVED" : "CREATE_ONLY_RESERVED",
         synthetic: store.acceptance === true }, attempt ? { etag: attempt.etag } : undefined);
       current.key = key;
       return true;

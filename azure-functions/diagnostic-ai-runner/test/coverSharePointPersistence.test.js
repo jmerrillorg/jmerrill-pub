@@ -128,7 +128,8 @@ test("small create-only route reconciles committed loss and replay without overw
 test("native Graph accepts only exact create-only content query and rejects overwrite or other query", async () => {
   let calls = 0;
   const graph = nativeGraph({ credential: { getToken: async () => ({ token: "fixture" }) },
-    fetchImpl: async () => { calls++; return { ok: true, json: async () => ({ id: "fixture" }) }; } });
+    fetchImpl: async (url, options) => { calls++; assert.equal(options.redirect, "error");
+      return { ok: true, json: async () => ({ id: "fixture" }) }; } });
   await graph("drives/fixture/items/parent:/fixture.html:/content?@microsoft.graph.conflictBehavior=fail", { method: "PUT" });
   await assert.rejects(graph("drives/fixture/items/parent:/fixture.html:/content?@microsoft.graph.conflictBehavior=replace", { method: "PUT" }), /PATH_DENIED/);
   await assert.rejects(graph("drives/fixture/items/parent:/fixture.html:/content?@microsoft.graph.conflictBehavior=fail", { method: "GET" }), /PATH_DENIED/);

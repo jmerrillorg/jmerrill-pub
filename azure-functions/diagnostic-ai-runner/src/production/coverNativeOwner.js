@@ -100,7 +100,7 @@ function nativeGraph(deps) {
     try { token = await (deps.credential || new ManagedIdentityCredential()).getToken("https://graph.microsoft.com/.default"); }
     catch (error) { throw Object.assign(new Error("COVER_GRAPH_TOKEN_FAILED"), { safeCode: "COVER_GRAPH_TOKEN_FAILED", statusCode: error.statusCode }); }
     const response = await (deps.fetchImpl || fetch)(`https://graph.microsoft.com/v1.0/${path}`, {
-      ...options, signal: AbortSignal.timeout(45000),
+      ...options, ...(options.method === "PUT" ? { redirect: "error" } : {}), signal: AbortSignal.timeout(45000),
       headers: { ...options.headers, Authorization: `Bearer ${token.token}` } });
     if (!response.ok) {
       const operation = basePath.endsWith("/permissions") ? "PERMISSIONS" : basePath.endsWith("createUploadSession") ? "UPLOAD_SESSION" :
