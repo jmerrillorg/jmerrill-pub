@@ -3,7 +3,7 @@ import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 import { spawnSync } from 'node:child_process'
 
-const workflow = readFileSync(new URL('../.github/workflows/publishing-power-platform-solution-deploy.yml', import.meta.url), 'utf8')
+const workflow = readFileSync(new URL('../workflows/publishing-power-platform-solution-deploy.yml', import.meta.url), 'utf8')
 const production = workflow.split('\n  production-import:\n')[1]
 const name = 'Deny unrelated import during fresh-title release window'
 const guard = production?.match(/      - name: Deny unrelated import during fresh-title release window\n([\s\S]*?)(?=\n      - name:)/)?.[1]
