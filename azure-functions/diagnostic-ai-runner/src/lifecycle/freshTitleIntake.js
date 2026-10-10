@@ -38,7 +38,13 @@ const POLICIES = Object.freeze({
       eTag: '"{8CE35CDF-7B3D-41C7-80D4-80282A549725},16"',
       parent: "/01_Pipeline_A-Z/02 - Intake/Smith, Jackie - The Intentional Leader Volume I/02 - Intake/_ORIGINAL" })
   ]) }),
-  "a69b9dfa-bb7b-f111-ab0f-7c1e525b15c2": Object.freeze({ format: "docx", recoveredOriginal: true })
+  "a69b9dfa-bb7b-f111-ab0f-7c1e525b15c2": Object.freeze({ format: "docx", recoveredOriginal: true }),
+  "0e127af9-fcb3-5671-a0fa-e4af63c307d1": Object.freeze({ itemId: "01DF3SEQNJKOYB65P7EZHKLV3FDSPULDHL",
+    name: "CHAD-AND-ME-manuscript-v003.docx", bytes: 414642, format: "docx",
+    sha256: "e03b0a2b6da9b6318352b9724e024713aaf7ffba24f1fd426f9def2fb8540175",
+    eTag: '"{1FB053A9-FF75-4E26-A5D7-651C9F458CEB},1"',
+    parent: "/01_Pipeline_A-Z/02 - Intake/Smith, Jackie - My AI Journey/02 Manuscript Development and Editing/_ORIGINAL",
+    handoffReference: "codex:01a10bb0-3832-7e03-b3a7-2cc488694143:message:01a12773-117d-7901-b43a-5f4d567d3662" })
 });
 function deny(code) { throw Object.assign(new Error(code), { safeCode: code }); }
 const hash = value => createHash("sha256").update(value).digest("hex");
@@ -73,7 +79,7 @@ async function readSource(titleId, deps) {
     source: { reference: collection ? `sharepoint:collection:${collection.custodyHash}` : `sharepoint:drive:${driveId}:item:${p.itemId}`,
       version: collection?.custodyHash || representative.custody.eTag, sha256: collection?.custodyHash || p.sha256, role: "RECEIVED_ORIGINAL" },
     retainedArtifacts: [], historyReference: `dataverse:jm1pub_title:${titleId}:PRESERVE_HISTORY`, authorityReference: reference,
-    handoff: { state: "READY", reference }, sourceCustody: representative.custody,
+    handoff: { state: "READY", reference: p.handoffReference || reference }, sourceCustody: representative.custody,
     ...(collection ? { sourceComponents: collection.components } : {}) };
   return { input, bytes: representative.bytes, components: parts, identity, titleName: title.jm1pub_titlename };
 }
