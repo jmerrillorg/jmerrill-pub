@@ -67,7 +67,8 @@ function createCoverOwnerStore({ containerClient, acceptance = false } = {}) {
 }
 
 function validateOwnerBinding(request) {
-  if (request?.schemaVersion !== 1 || !GUID.test(request.titleId || "") || !GUID.test(request.editionId || "") ||
+  if (request?.schemaVersion !== 1 || request.revoked === true || request.enabled === false ||
+      !GUID.test(request.titleId || "") || !GUID.test(request.editionId || "") ||
       request.stageId !== "12_COVER_DESIGN" || request.executionMode !== "INTERNAL_CONCEPT" ||
       !GUID.test(request.source?.artifactId || "") || !SHA.test(request.source?.sha256 || "") ||
       typeof request.source.version !== "string" || !request.source.version.trim() ||

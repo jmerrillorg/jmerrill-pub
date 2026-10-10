@@ -127,3 +127,14 @@ test("request replacement during authority revalidation prevents the provider ca
   assert.equal(result.code, "COVER_OWNER_REQUEST_CHANGED");
   assert.equal(calls, 0);
 });
+
+test("a revoked request cannot resume a completed or held owner execution", async () => {
+  const { client, writes } = storage();
+  await runCoverAdapterAcceptance(client, { seed: true });
+  const { deps, fixture } = await acceptanceDependencies(client, "success");
+  const current = await deps.store.read("requests", fixture.requestKey);
+  await deps.store.writeJson("requests", fixture.requestKey, { ...current.value, revoked: true }, { etag: current.etag });
+  const before = writes.length;
+  await assert.rejects(executeCoverOwner(fixture.requestKey, deps), /COVER_OWNER_REQUEST_INVALID/);
+  assert.equal(writes.length, before);
+});
