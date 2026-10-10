@@ -34,6 +34,8 @@ jobs:
       - name: Install locked validation dependencies
         working-directory: azure-functions/diagnostic-ai-runner
         run: npm ci --ignore-scripts
+      - name: Test disposable package rejection and isolation
+        run: node --test scripts/verify-local-role-sandbox.test.mjs
       - name: Validate isolated fixture before credentials
         env:
           FIXTURE_BASE64: ${{ inputs.package_base64 }}
