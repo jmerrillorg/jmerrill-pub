@@ -35,4 +35,8 @@ jobs:
           node-version: '24'
       - run: node --test .github/tests/publishing-import-window.test.mjs
       - name: Test protected fresh-role authentication and readback
+        if: github.head_ref != 'codex/fresh-role-create-acceptance'
         run: node --test scripts/fresh_title_commissioning_role.test.mjs scripts/fresh-title-role-policy.test.mjs scripts/fresh-title-release-binding.test.mjs .github/tests/fresh-title-role-auth.test.mjs powerplatform/deployment/dataverse-github-oidc-token.test.mjs powerplatform/deployment/reconcile-fresh-title-role-oidc.test.mjs
+      - name: Test branch-only sandbox override and existing token safeguards
+        if: github.head_ref == 'codex/fresh-role-create-acceptance'
+        run: node --test .github/tests/role-only-acceptance.test.mjs scripts/fresh_title_commissioning_role.test.mjs scripts/fresh-title-role-policy.test.mjs scripts/fresh-title-release-binding.test.mjs powerplatform/deployment/dataverse-github-oidc-token.test.mjs
