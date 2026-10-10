@@ -11,6 +11,10 @@ on:
       - .github/tests/fresh-title-role-auth.test.mjs
       - powerplatform/deployment/dataverse-github-oidc-token*.mjs
       - powerplatform/deployment/reconcile-fresh-title-role-oidc*.mjs
+      - powerplatform/deployment/verify-role-only-production.mjs
+      - .github/tests/role-only-production.test.mjs
+      - scripts/role-privilege-pairs.test.mjs
+      - scripts/fresh-title-role-policy.mjs
   push:
     branches: [main]
     paths:
@@ -21,6 +25,10 @@ on:
       - .github/tests/fresh-title-role-auth.test.mjs
       - powerplatform/deployment/dataverse-github-oidc-token*.mjs
       - powerplatform/deployment/reconcile-fresh-title-role-oidc*.mjs
+      - powerplatform/deployment/verify-role-only-production.mjs
+      - .github/tests/role-only-production.test.mjs
+      - scripts/role-privilege-pairs.test.mjs
+      - scripts/fresh-title-role-policy.mjs
 
 permissions:
   contents: read
@@ -35,4 +43,4 @@ jobs:
           node-version: '24'
       - run: node --test .github/tests/publishing-import-window.test.mjs
       - name: Test protected fresh-role authentication and readback
-        run: node --test scripts/fresh_title_commissioning_role.test.mjs scripts/fresh-title-role-policy.test.mjs scripts/fresh-title-release-binding.test.mjs .github/tests/fresh-title-role-auth.test.mjs powerplatform/deployment/dataverse-github-oidc-token.test.mjs powerplatform/deployment/reconcile-fresh-title-role-oidc.test.mjs
+        run: node --test scripts/fresh_title_commissioning_role.test.mjs scripts/fresh-title-role-policy.test.mjs scripts/fresh-title-release-binding.test.mjs .github/tests/fresh-title-role-auth.test.mjs powerplatform/deployment/dataverse-github-oidc-token.test.mjs powerplatform/deployment/reconcile-fresh-title-role-oidc.test.mjs .github/tests/role-only-production.test.mjs scripts/role-privilege-pairs.test.mjs
