@@ -44,6 +44,7 @@ require("./functions/runPublisherReviewDecision");
 require("./functions/runPublishingIntakeAutostartRecovery");
 require("./functions/runPublishingStageRuntimeWorker");
 require("./functions/runPublishingWaitRuntime");
+require("./functions/runCoverAdapterAcceptance");
 require("./functions/runPublishingInboundDeltaReconciliation");
 require("./functions/runPublishingInboundNotification");
 require("./functions/runPublishingInboundReadback");
