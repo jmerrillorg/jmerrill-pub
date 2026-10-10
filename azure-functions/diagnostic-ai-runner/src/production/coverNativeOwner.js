@@ -119,6 +119,8 @@ async function persistNativeCoverReview(input, context, store) {
       return reviewer?.sha256 === destination.reviewerAuthoritySha256 && assignment?.kind === "CANONICAL_COVER_REVIEW_ASSIGNMENT" &&
         assignment.revoked !== true && assignment.titleId === input.request.titleId && assignment.editionId === input.request.editionId &&
         assignment.sourceSha256 === input.request.source.sha256 && assignment.reviewerId === destination.reviewerId &&
+        Number.isFinite(Date.parse(assignment.accessVerifiedAt)) &&
+        Math.abs(Date.now() - Date.parse(assignment.accessVerifiedAt)) <= 15 * 60 * 1000 &&
         assignment.driveId === destination.driveId && assignment.folderId === destination.folderId &&
         assignment.folderPath === destination.folderPath && assignment.permissionsSha256 === destination.permissionsSha256 &&
         assignment.privateAccessVerified === true && current?.sha256 === input.request.authoritySha256 &&
@@ -131,6 +133,7 @@ async function persistNativeCoverReview(input, context, store) {
       catch (error) { if ([409, 412].includes(error.statusCode)) return false; throw error; }
     } });
   const result = await runtime.persist(binding, input.bytes);
+  if (input.readOnly === true) return result;
   const saved = await store.writeJson("review-deliveries", digest(binding), result, { immutable: true });
   return saved.value;
 }
@@ -193,6 +196,11 @@ function createNativeCoverOwner(deps = {}) {
     verifySpendAuthority: (request, bundle) => verifyNativeCoverSpend(request, bundle, { ...context, store }),
     reserveSpendAuthority: (request, bundle, execution) => claimNativeCoverSpend(request, bundle, { ...context, store }, execution),
     persistReviewPackage: input => persistNativeCoverReview(input, context, store),
+    verifyReviewDelivery: async input => {
+      const result = await persistNativeCoverReview({ ...input, executionKey: input.receipt.executionKey,
+        readOnly: true, assertClaim: async () => { throw new Error("COVER_REVIEW_READ_ONLY_CUSTODY_MISSING"); } }, context, store);
+      return digest(result) === digest(input.receipt.reviewDelivery);
+    },
     readProviderOutcome: async key => (await store.read("provider-receipts", key))?.value };
   owner.generateImage = async request => {
     // Instantiation is lazy: missing spend/source authority never reaches identity,

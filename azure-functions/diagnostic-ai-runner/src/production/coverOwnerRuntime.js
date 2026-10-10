@@ -42,6 +42,10 @@ async function executeCoverOwner(requestKey, deps = {}) {
     const artifact = receipt && await deps.store.read("packages", receipt.value.packageKey, "html");
     if (!receipt || receipt.value.bindingHash !== bindingHash || !artifact || artifact.sha256 !== receipt.value.packageSha256 ||
         receipt.value.executionKey !== executionKey) deny("COVER_OWNER_COMPLETED_REPLAY_UNBOUND");
+    if (deps.store.acceptance !== true && (typeof deps.verifyReviewDelivery !== "function" ||
+        !receipt.value.reviewDelivery || await deps.verifyReviewDelivery({ request, receipt: receipt.value, bytes: artifact.bytes }) !== true)) {
+      deny("COVER_OWNER_COMPLETED_REVIEW_CUSTODY_FAILED");
+    }
     const alertKey = digest({ executionKey, kind: "COVER_OWNER_RECOVERY" });
     const alert = await deps.store.read("alerts", alertKey);
     if (alert?.value.status === "OPEN") await deps.store.writeJson("alerts", alertKey,

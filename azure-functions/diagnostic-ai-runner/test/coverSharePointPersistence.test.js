@@ -35,6 +35,7 @@ function fixture(mode) {
     }
   };
   return { deps, stats: () => ({ uploads, sessions }), revoke: () => { allowed = false; },
+    loseCustody: () => { item = undefined; },
     corrupt: () => { bytes = Buffer.from("conflicting bytes"); } };
 }
 test("exact SharePoint bytes survive restart and replay with stable receipt and one upload", async () => {
@@ -81,4 +82,13 @@ test("permission drift and cross-folder custody deny before upload", async () =>
   await assert.rejects(createCoverSharePointPersistence(f.deps).persist({ ...binding,
     destination: { ...binding.destination, folderPath: "/Wrong title" } }, Buffer.from("fixture")), /FOLDER_MISMATCH/);
   assert.deepEqual(f.stats(), { uploads: 0, sessions: 0 });
+});
+test("read-only completed custody verification never repairs a missing SharePoint file", async () => {
+  const f = fixture(); const bytes = Buffer.from("fixture");
+  const first = await createCoverSharePointPersistence(f.deps).persist(binding, bytes);
+  f.deps.assertClaim = async () => { throw new Error("READ_ONLY_CUSTODY_MISSING"); };
+  const readOnly = createCoverSharePointPersistence(f.deps);
+  assert.deepEqual(await readOnly.persist(binding, bytes), first);
+  f.loseCustody(); await assert.rejects(readOnly.persist(binding, bytes), /READ_ONLY_CUSTODY_MISSING/);
+  assert.deepEqual(f.stats(), { uploads: 1, sessions: 1 });
 });
