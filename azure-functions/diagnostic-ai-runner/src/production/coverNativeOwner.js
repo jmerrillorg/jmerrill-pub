@@ -91,16 +91,20 @@ async function verifyNativeCoverAuthority(request, input, deps) {
 
 function nativeGraph(deps) {
   return async (path, options = {}) => {
-    if (!path.startsWith("drives/") || path.includes("..") || path.includes("?")) throw new Error("COVER_GRAPH_PATH_DENIED");
+    const [basePath, query, ...extra] = path.split("?");
+    if (!path.startsWith("drives/") || path.includes("..") || (query !== undefined &&
+        (options.method !== "PUT" || !basePath.endsWith(":/content") || query !== "@microsoft.graph.conflictBehavior=fail" || extra.length))) {
+      throw new Error("COVER_GRAPH_PATH_DENIED");
+    }
     let token;
     try { token = await (deps.credential || new ManagedIdentityCredential()).getToken("https://graph.microsoft.com/.default"); }
     catch (error) { throw Object.assign(new Error("COVER_GRAPH_TOKEN_FAILED"), { safeCode: "COVER_GRAPH_TOKEN_FAILED", statusCode: error.statusCode }); }
     const response = await (deps.fetchImpl || fetch)(`https://graph.microsoft.com/v1.0/${path}`, {
-      ...options, signal: AbortSignal.timeout(45000),
+      ...options, ...(options.method === "PUT" ? { redirect: "error" } : {}), signal: AbortSignal.timeout(45000),
       headers: { ...options.headers, Authorization: `Bearer ${token.token}` } });
     if (!response.ok) {
-      const operation = path.endsWith("/permissions") ? "PERMISSIONS" : path.endsWith("createUploadSession") ? "UPLOAD_SESSION" :
-        path.endsWith("/content") ? "CONTENT" : path.includes(":/") ? "TARGET" : "METADATA";
+      const operation = basePath.endsWith("/permissions") ? "PERMISSIONS" : basePath.endsWith("createUploadSession") ? "UPLOAD_SESSION" :
+        basePath.endsWith("/content") ? "CONTENT" : basePath.includes(":/") ? "TARGET" : "METADATA";
       let error;
       try { error = (await response.json()).error; } catch { /* No response body is retained. */ }
       const providerCode = ["invalidRequest", "accessDenied", "notAllowed", "itemNotFound", "generalException",
@@ -122,13 +126,15 @@ async function persistNativeCoverReview(input, context, store) {
   const authority = await store.read("authority", input.request.authorityKey);
   if (authority?.sha256 !== input.request.authoritySha256) throw new Error("COVER_REVIEW_AUTHORITY_CHANGED");
   const destination = authority.value.reviewDelivery;
+  const uploadMode = destination?.uploadMode || "SESSION";
+  if (!["SESSION", "SMALL_CREATE_ONLY"].includes(uploadMode)) throw new Error("COVER_REVIEW_TRANSPORT_INVALID");
   if (!destination || destination.reviewerId !== JACKIE_CANONICAL_AUTHOR_CONTACT_ID ||
       !destination.folderPath?.startsWith("/01_Pipeline_A-Z/") ||
       !SHA.test(destination.reviewerAuthorityKey || "")) throw new Error("COVER_REVIEW_DESTINATION_NOT_BOUND");
   const binding = { titleId: input.request.titleId, editionId: input.request.editionId, executionKey: input.executionKey,
     sourceSha256: input.request.source.sha256, authoritySha256: input.request.authoritySha256,
     reviewerId: destination.reviewerId, reviewerAuthoritySha256: destination.reviewerAuthoritySha256, destination };
-  const runtime = createCoverSharePointPersistence({ graph: nativeGraph(context), fetchImpl: context.fetchImpl,
+  const runtime = createCoverSharePointPersistence({ graph: nativeGraph(context), fetchImpl: context.fetchImpl, uploadMode,
     assertClaim: input.assertClaim,
     verifyAuthority: async () => {
       const current = await store.read("authority", input.request.authorityKey);
@@ -142,9 +148,10 @@ async function persistNativeCoverReview(input, context, store) {
         assignment.driveId === destination.driveId && assignment.folderId === destination.folderId &&
         assignment.folderPath === destination.folderPath && assignment.permissionsSha256 === destination.permissionsSha256 &&
         assignment.privateAccessVerified === true && current?.sha256 === input.request.authoritySha256 &&
+        (assignment.uploadMode || "SESSION") === uploadMode &&
         await verifyNativeCoverAuthority(input.request, current.value, context) === true;
     },
-    ...createCoverReviewUploadJournal(store) });
+    ...createCoverReviewUploadJournal(store, undefined, uploadMode) });
   const result = await runtime.persist(binding, input.bytes);
   if (input.readOnly === true) return result;
   const saved = await store.writeJson("review-deliveries", digest(binding), result, { immutable: true });
