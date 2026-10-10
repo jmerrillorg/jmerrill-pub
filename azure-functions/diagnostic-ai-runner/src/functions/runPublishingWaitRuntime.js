@@ -26,7 +26,7 @@ if (process.env.JM1_PUBLISHING_WAIT_RUNTIME_ENABLED === "true") {
     }
   });
 }
-if (process.env.JM1_PUBLISHING_WAIT_RUNTIME_ENABLED === "true" || process.env.JM1_PUBLISHING_WAIT_OBSERVATION_ENABLED === "true" || process.env.JM1_TITLE_COMMISSIONING_INTAKE_ENABLED === "true") {
+if (process.env.JM1_PUBLISHING_WAIT_RUNTIME_ENABLED === "true" || process.env.JM1_PUBLISHING_WAIT_OBSERVATION_ENABLED === "true" || process.env.JM1_TITLE_COMMISSIONING_INTAKE_ENABLED === "true" || process.env.JM1_TITLE_COMMISSIONING_COVER_ENABLED === "true" || process.env.JM1_COVER_ADAPTER_ACCEPTANCE_ENABLED === "true") {
   app.timer("reconcile-publishing-waits", {
     schedule: "0 */5 * * * *", handler: async (_timer, context) => {
       let waitFailures = [];
@@ -43,7 +43,11 @@ if (process.env.JM1_PUBLISHING_WAIT_RUNTIME_ENABLED === "true" || process.env.JM
       }
       const intake = await require("../lifecycle/titleCommissioningIntakeRuntime").runTitleCommissioningIntakeRuntime();
       if (intake.enabled) context.info(`Publishing commissioning intake: ${JSON.stringify(intake)}`);
-      if (waitFailures.length || intake.failures.length) throw Object.assign(new Error("Publishing runtime requires owner review"), { safeCode: "PUBLISHING_WAIT_FAILURES" });
+      const cover = await require("../production/coverNativeOwner").runNativeCoverOwners();
+      if (cover.enabled) context.info(`Publishing commissioning cover: ${JSON.stringify(cover)}`);
+      const acceptance = await require("../production/coverAdapterAcceptanceHandler").runScheduledCoverAdapterAcceptance();
+      if (acceptance.enabled) context.info(`Publishing cover adapter acceptance: ${JSON.stringify(acceptance)}`);
+      if (waitFailures.length || intake.failures.length || cover.failures.length) throw Object.assign(new Error("Publishing runtime requires owner review"), { safeCode: "PUBLISHING_WAIT_FAILURES" });
     }
   });
 }

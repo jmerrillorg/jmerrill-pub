@@ -77,7 +77,7 @@ async function verifyCommissioningProductionGuards() {
     fetchFn: async () => { throw Error("PENDING_MUST_NOT_FETCH"); } });
   if (notLive.status !== "PENDING" || notLive.publicAvailabilityVerified !== false) throw Error("PROBE_STAGE15_PENDING_GUARD_FAILED");
   checks.stage15PendingIsNotPublication = true;
-  return checks;
+  return { ...checks, ...await require("../production/coverCommissioningGuardProbe").verifyCoverCommissioningGuards() };
 }
 
 module.exports = { verifyCommissioningProductionGuards };
