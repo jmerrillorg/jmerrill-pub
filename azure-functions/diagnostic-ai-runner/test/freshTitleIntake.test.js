@@ -140,3 +140,24 @@ test("fresh canonical replay verifies actual row owner without assigning or shar
   const client = { first: async () => ({ ...payload, _ownerid_value: "other-owner" }), create: () => assert.fail("no mutation") };
   await assert.rejects(fresh.createExact(client, "items", "itemid", payload, fresh.RUNTIME_OWNER_ID), /CANONICAL_OWNER_CONFLICT/);
 });
+test("fresh Dataverse identity requires a distinct platform-bound principal and owner", async () => {
+  const ownerId = "11111111-1111-4111-a111-111111111111", clientId = "22222222-2222-4222-a222-222222222222";
+  for (const config of [{}, { JM1_TITLE_COMMISSIONING_FRESH_DATAVERSE_CLIENT_ID: clientId,
+    JM1_TITLE_COMMISSIONING_FRESH_DATAVERSE_USER_ID: fresh.RUNTIME_OWNER_ID }]) {
+    assert.throws(() => fresh.freshDataverseIdentityBinding(config), /ISOLATED_IDENTITY_UNBOUND/);
+  }
+  let reportedOwner = ownerId;
+  const context = fresh.nativeDeps({
+    env: { JM1_TITLE_COMMISSIONING_FRESH_DATAVERSE_CLIENT_ID: clientId, JM1_TITLE_COMMISSIONING_FRESH_DATAVERSE_USER_ID: ownerId,
+      DATAVERSE_RESOURCE_URL: "https://jm1hq.crm.dynamics.com", DATAVERSE_WEB_API_BASE_URL: "https://jm1hq.crm.dynamics.com/api/data/v9.2/" },
+    authorityClient: { first: () => assert.fail("no legacy read for identity test") }, containerClient: {},
+    credential: { getToken: () => assert.fail("fresh identity must not use shared credential") },
+    freshCredential: { getToken: async audience => { assert.equal(audience, "https://jm1hq.crm.dynamics.com/.default"); return { token: "synthetic-token" }; } },
+    fetchImpl: async url => { assert.match(url, /\/WhoAmI$/); return { ok: true, json: async () => ({ UserId: reportedOwner,
+      OrganizationId: "9dafb403-b493-f011-a700-000d3a106f37" }) }; }
+  });
+  assert.equal(context.ownerId, ownerId);
+  await context.verifyRuntimeIdentity();
+  reportedOwner = fresh.RUNTIME_OWNER_ID;
+  await assert.rejects(context.verifyRuntimeIdentity(), /RUNTIME_IDENTITY_MISMATCH/);
+});

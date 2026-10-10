@@ -32,7 +32,23 @@ The existing application user cb6e97e5-1d6a-f111-a826-000d3a9eacee resides in
 root HQ, not a Publishing-only business unit. The earlier Local Read proposal
 is superseded; do not grant it from this document.
 
-Proposed minimal runtime rights, requiring platform-owner validation:
+The existing identity also inherits financial and organization-wide rights.
+Narrow additive grants do not isolate it. The successor uses an opt-in,
+separately constrained user-assigned identity for fresh V2 Dataverse calls on
+the existing Function/worker; provisioning is NOT authorized by this document.
+No separate scheduler, queue, or pipeline is proposed.
+
+The platform contract must supply the actual Azure identity resource ID,
+Entra principal/object ID and client ID, Dataverse application-user ID and BU,
+approved role ID and exact definition-share readbacks. No identifiers are
+invented here. Configure the reviewed client ID and application-user ID via
+`JM1_TITLE_COMMISSIONING_FRESH_DATAVERSE_CLIENT_ID` and
+`JM1_TITLE_COMMISSIONING_FRESH_DATAVERSE_USER_ID`; missing/legacy identity is
+denied. Runtime WhoAmI must match that user and the existing organization
+before any fresh write. Token audience remains
+`https://jm1hq.crm.dynamics.com/.default`; no client-secret fallback.
+
+Proposed minimal rights for that constrained identity, requiring platform validation:
 
 | Table | Operations | Scope |
 | --- | --- | --- |
@@ -41,10 +57,20 @@ Proposed minimal runtime rights, requiring platform-owner validation:
 | StageInstance | Read, Create | Basic, runtime-owned records |
 | StageDefinition | Read | Basic plus supported read-only sharing of the exact 16 existing rows |
 
-No Write, Delete, Assign, Share privilege, financial permission, new identity,
-or shared-role removal is required by this intake proposal. Sharing the 16
+No Write, Delete, Assign, Share privilege, financial permission, or
+shared-role removal is requested. A new/reused independently constrained
+identity requires separate security authorization; none is provisioned.
+Sharing the 16
 definitions is a platform-owner operation, not a runtime Share privilege.
 Its effective positive and negative scope must be proved before enablement.
+The constrained principal needs no Graph, Exchange, Stripe, provider, or blob
+grant. Existing system identity remains the bounded read-only legacy authority
+reader (exact titles, Jackie Contact/profile and original artifact), Graph
+source/custody owner, and existing storage/lease owner. Those broader inherited
+rights are not stripped or falsely described as isolated. Credential separation
+on the same host is not a process-level compromise containment boundary.
+If platform policy requires process isolation, that is a separate reviewed
+hosting decision, not silently satisfied by token selection.
 Metadata-read access to EntityDefinitions/Keys must also be verified using
 the actual runtime identity, not an administrator readback.
 
@@ -61,9 +87,10 @@ Engagement creation reserves that title key before original-byte storage or
 lifecycle/stage writes. An unreadable competing owner is rejected by the
 provider key and remains held; it is not copied, overwritten or excluded.
 Every transactional readback also requires the expected application owner ID.
-The fresh native Dataverse client explicitly uses the same existing managed
-identity credential as Graph; it does not fall back to environment client
-secrets or an administrator identity.
+The fresh native Dataverse client uses the separately configured managed
+identity, not the existing Graph/legacy credential or environment client
+secrets. Transactional owner checks use its platform-bound application-user
+ID, not the formerly hardcoded shared application user.
 
 A partial successful reservation remains visible as incomplete intake, not
 stage completion. Recovery reuses the same deterministic IDs and exact
@@ -74,8 +101,9 @@ completion are emitted only after all required records and bytes read back.
 
 1. Review this exact successor head and mandatory CI; do not infer approval
    from focused tests. Keep all fresh and custody flags disabled.
-2. OPS validates the reduced Basic rights, exact definition shares, active
-   title uniqueness and negative scope. Do not remove unrelated shared roles.
+2. OPS obtains separate authorization for the constrained identity contract,
+   validates reduced Basic rights, exact definition shares, active title
+   uniqueness and negative scope. Do not remove unrelated shared roles.
 3. Serialize any protected successor deployment with the platform-owner
    preflight. Match the reviewed merge artifact, release SHA and health.
 4. Run current-SHA native read-only preflight. Verify effective record ownership,
@@ -91,6 +119,12 @@ completion are emitted only after all required records and bytes read back.
 Rollback: disable fresh and custody flags first, preserve intents, copies and
 partial reservations, then deploy the prior reviewed artifact if necessary.
 Never delete an uncertain copy or restore historical outputs as fresh proof.
+Do not change the scoped identity/owner after successful reservation without
+governed owner/custody migration: Basic Read would no longer expose its rows.
+No such migration is needed for the current zero-record preflight, but it must
+be rechecked immediately before activation. No paid model/provider resource
+is introduced; platform must verify incremental identity/hosting cost and any
+tenant limitation rather than claim an unverified zero-spend guarantee.
 
 Focused fixtures exercise collection binding, successful/ambiguous upload,
 restart, changed-source rejection, hidden-owner conflict, inactive/mismatched

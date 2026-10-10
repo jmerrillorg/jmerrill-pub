@@ -9,6 +9,14 @@ const AUTHORITY = Object.freeze({ threadId: "01a10bb0-3832-7e03-b3a7-2cc48869414
   classification: "FRESH_SYSTEM_COMMISSIONING_NOT_EDITORIAL_OR_FINANCIAL_APPROVAL" });
 const driveId = "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se";
 const RUNTIME_OWNER_ID = "cb6e97e5-1d6a-f111-a826-000d3a9eacee";
+const GUID = /^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/;
+function freshDataverseIdentityBinding(env) {
+  const clientId = env.JM1_TITLE_COMMISSIONING_FRESH_DATAVERSE_CLIENT_ID;
+  const ownerId = env.JM1_TITLE_COMMISSIONING_FRESH_DATAVERSE_USER_ID;
+  if (!GUID.test(clientId || "") || !GUID.test(ownerId || "") || ownerId === RUNTIME_OWNER_ID ||
+      clientId === "dc8d1429-8c1b-473b-83ca-f9545fad8074") deny("COMMISSIONING_FRESH_ISOLATED_IDENTITY_UNBOUND");
+  return { clientId, ownerId };
+}
 const POLICIES = Object.freeze({
   "f79006b7-f595-f111-8076-00224820105b": Object.freeze({ itemId: "01DF3SEQLS4HFC4AAJSRE2LVY7XVZTLH2Y",
     name: "JMP-INT-202608-3W6Q6L - Til Death Do Us Part Full Manuscript.md", bytes: 133593, format: "md",
@@ -44,8 +52,9 @@ function enabled(titleId, env) {
 function scope(titleId) { return { enabled: true, revoked: false, titleId, mode: "JACKIE_TITLE_INTERNAL_COMMISSIONING" }; }
 async function readSource(titleId, deps) {
   let p = POLICIES[titleId]; if (!p) deny("COMMISSIONING_FRESH_SOURCE_SCOPE_DENIED");
-  const title = await deps.client.first("jm1pub_titles", { $filter: `jm1pub_titleid eq ${titleId}` });
-  const identity = await require("../author/jackieCommissioningIdentityReader").readJackieCommissioningIdentity(title, scope(titleId), deps.client);
+  const authorityClient = deps.authorityClient || deps.client;
+  const title = await authorityClient.first("jm1pub_titles", { $filter: `jm1pub_titleid eq ${titleId}` });
+  const identity = await require("../author/jackieCommissioningIdentityReader").readJackieCommissioningIdentity(title, scope(titleId), authorityClient);
   if (!identity || identity.contactId !== contactId || title.statecode !== 0) deny("COMMISSIONING_FRESH_AUTHOR_IDENTITY_DENIED");
   if (p.recoveredOriginal) p = await require("./freshLongWatchCustody").readPreparedOriginal(deps);
   const parts = [];
@@ -113,8 +122,10 @@ function proof(run) { return { current: true, titleId: run.titleId, authorityRef
   jackieAuthorshipVerified: true, stableHandoffVerified: true }; }
 async function execute(input, deps, execution = {}) {
   if (!Number.isFinite(Date.parse(execution.startedAt))) deny("COMMISSIONING_FRESH_EXECUTION_INTENT_REQUIRED");
+  if (deps.verifyRuntimeIdentity) await deps.verifyRuntimeIdentity();
   const read = deps.readFreshSource || readSource;
   const current = await read(input.title.jm1pub_titleid, deps), run = planFreshTitleRun(input);
+  const ownerId = deps.ownerId || RUNTIME_OWNER_ID;
   if (planFreshTitleRun(current.input).bindingHash !== run.bindingHash) deny("COMMISSIONING_FRESH_REQUEST_CHANGED");
   await verifyCanonicalTitleKey(deps.client);
   await persistFreshTitleRun(input, { containerClient: deps.containerClient, readCurrentSourceAuthority: async () => proof(run) });
@@ -135,7 +146,7 @@ async function execute(input, deps, execution = {}) {
     jmpv2_lifecycleinstanceid: lifecycle, jmpv2_currentstage: "02_INTAKE", jmpv2_firstv2stage: "01_INQUIRY",
     jmpv2_originsystem: "PUBLISHING_FRESH_OWNER", jmpv2_correlationid: run.bindingHash,
     jmpv2_idempotencykey: run.bindingHash, jmpv2_testclassification: "LIVE_JACKIE_FRESH_COMMISSIONING",
-    jmpv2_activationclassification: "NOT_COMMERCIALLY_ACTIVATED" }, RUNTIME_OWNER_ID);
+    jmpv2_activationclassification: "NOT_COMMERCIALLY_ACTIVATED" }, ownerId);
   const prefix = `commissioning-fresh-results/${run.titleId}/${run.bindingHash}`;
   if (run.sourceCollection) {
     if (!Array.isArray(current.components) || current.components.length !== run.sourceCollection.components.length) deny("COMMISSIONING_FRESH_COLLECTION_BYTES_UNBOUND");
@@ -152,12 +163,12 @@ async function execute(input, deps, execution = {}) {
   const lifePayload = { jmpv2_lifecycleinstanceid: lifecycle, jmpv2_lifecyclekey: lifecycle,
     jmpv2_lifecycleversion: 2, jmpv2_currentstagecode: "02_INTAKE", jmpv2_currentstageinstancekey: stageIds[1],
     jmpv2_isactive: true, jmpv2_testclassification: "LIVE_JACKIE_FRESH_COMMISSIONING" };
-  await createExact(deps.client, "jmpv2_lifecycleinstances", "jmpv2_lifecycleinstanceid", lifePayload, RUNTIME_OWNER_ID);
+  await createExact(deps.client, "jmpv2_lifecycleinstances", "jmpv2_lifecycleinstanceid", lifePayload, ownerId);
   for (const [i, stageCode] of ["01_INQUIRY", "02_INTAKE"].entries()) {
     await createExact(deps.client, "jmpv2_stageinstances", "jmpv2_stageinstanceid", {
       jmpv2_stageinstanceid: stageIds[i], jmpv2_stageinstancekey: stageIds[i], jmpv2_lifecyclekey: lifecycle,
       jmpv2_stagecode: stageCode, jmpv2_status: "CLOSED", jmpv2_openedbytransitionkey: id(`${run.runId}:${stageCode}:open`),
-      jmpv2_closedbytransitionkey: id(`${run.runId}:${stageCode}:complete`) }, RUNTIME_OWNER_ID);
+      jmpv2_closedbytransitionkey: id(`${run.runId}:${stageCode}:complete`) }, ownerId);
   }
   const journal = require("./stageRuntimeJournal");
   for (const [i, stageCode] of ["01_INQUIRY", "02_INTAKE"].entries()) {
@@ -200,6 +211,7 @@ async function verifyCanonicalTitleKey(client) {
   return { enforcement: "ACTIVE_CANONICAL_TITLE_ALTERNATE_KEY", crossOwnerVisibilityClaimed: false };
 }
 async function processFreshTitleIntake(titleId, deps) {
+  if (deps.verifyRuntimeIdentity) await deps.verifyRuntimeIdentity();
   const current = await (deps.readFreshSource || readSource)(titleId, deps), run = planFreshTitleRun(current.input);
   return processTitleCommissioningStep(current.input, { ...deps, readScope: async () => scope(titleId) }, {
     plan: planFreshTitleRun, namespace: "commissioning-fresh-executions", executionSuffix: "", execute,
@@ -212,14 +224,32 @@ async function processFreshTitleIntake(titleId, deps) {
 function nativeDeps(deps = {}) {
   const env = deps.env || process.env;
   const credential = deps.credential || new (require("@azure/identity").ManagedIdentityCredential)();
-  const client = deps.client || require("../orchestration/authorReviewResponseConsumer").createDataverseClient({
+  function dataverseClient(tokenCredential) {
+    return require("../orchestration/authorReviewResponseConsumer").createDataverseClient({
     apiBase: env.DATAVERSE_WEB_API_BASE_URL, resourceUrl: env.DATAVERSE_RESOURCE_URL }, {
     getToken: async resourceUrl => {
-      const result = await credential.getToken(`${resourceUrl.replace(/\/$/, "")}/.default`);
+      const result = await tokenCredential.getToken(`${resourceUrl.replace(/\/$/, "")}/.default`);
       if (!result?.token) deny("COMMISSIONING_FRESH_RUNTIME_TOKEN_UNAVAILABLE");
       return result.token;
     }
   });
+  }
+  const authorityClient = deps.authorityClient || deps.client || dataverseClient(credential);
+  const binding = deps.client || deps.authorityOnly ? null : freshDataverseIdentityBinding(env);
+  const freshCredential = binding ? deps.freshCredential || new (require("@azure/identity").ManagedIdentityCredential)(binding.clientId) : null;
+  const client = deps.client || (deps.authorityOnly ? authorityClient : dataverseClient(freshCredential));
+  const verifyRuntimeIdentity = binding ? async () => {
+    const token = await freshCredential.getToken(`${env.DATAVERSE_RESOURCE_URL.replace(/\/$/, "")}/.default`);
+    const response = await (deps.fetchImpl || fetch)(`${env.DATAVERSE_WEB_API_BASE_URL.replace(/\/$/, "")}/WhoAmI`, {
+      method: "GET", redirect: "error", signal: AbortSignal.timeout(30000),
+      headers: { Authorization: `Bearer ${token.token}`, "OData-Version": "4.0" } });
+    if (!response.ok) deny("COMMISSIONING_FRESH_RUNTIME_IDENTITY_UNAVAILABLE");
+    const identity = await response.json();
+    if (identity.UserId !== binding.ownerId || identity.OrganizationId !== "9dafb403-b493-f011-a700-000d3a106f37") {
+      deny("COMMISSIONING_FRESH_RUNTIME_IDENTITY_MISMATCH");
+    }
+    return { userId: identity.UserId, organizationId: identity.OrganizationId };
+  } : deps.verifyRuntimeIdentity;
   const containerClient = deps.containerClient || require("@azure/storage-blob").BlobServiceClient
     .fromConnectionString(env.AzureWebJobsStorage).getContainerClient("jm1-publishing-stage-runtime");
   const sourceMetadata = deps.sourceMetadata || (async policy => {
@@ -242,17 +272,21 @@ function nativeDeps(deps = {}) {
       safeCode: "COMMISSIONING_FRESH_GRAPH_REQUEST_FAILED", statusCode: response.status });
     return response.json();
   });
-  return { ...deps, env, client, containerClient, sourceMetadata, sourceBytes, graph };
+  return { ...deps, env, client, authorityClient, ownerId: binding?.ownerId || deps.ownerId || RUNTIME_OWNER_ID,
+    verifyRuntimeIdentity, containerClient, sourceMetadata, sourceBytes, graph };
 }
 async function handler(body, deps = {}) {
   const env = deps.env || process.env;
   const readOnly = ["FRESH_PREFLIGHT", "FRESH_READBACK"].includes(body.mode) && Object.hasOwn(POLICIES, body.titleId || "") &&
     ["JM1_TITLE_COMMISSIONING_REVIEW_ENABLED", "JM1_PUBLISHING_STAGE_RUNTIME_ENABLED", "JM1_PUBLISHING_WAIT_RUNTIME_ENABLED"].every(k => env[k] === "false");
   if (!readOnly && !enabled(body.titleId, env)) return { status: 403, jsonBody: { code: "COMMISSIONING_FRESH_DISABLED", effects: 0 } };
-  const context = nativeDeps(deps);
   let attempted = false;
   let phase = "SOURCE_READ";
   try {
+    const context = nativeDeps(deps);
+    phase = "RUNTIME_IDENTITY_READ";
+    if (context.verifyRuntimeIdentity) await context.verifyRuntimeIdentity();
+    phase = "SOURCE_READ";
     const current = await readSource(body.titleId, context);
     phase = "RUN_PLAN";
     const run = planFreshTitleRun(current.input);
@@ -288,5 +322,5 @@ async function handler(body, deps = {}) {
       mutationAttempted: attempted, recovery: "EXACT_RUN_READBACK_FORWARD_ONLY", modelCalls: 0, communications: 0, payments: 0 } };
   }
 }
-module.exports = { AUTHORITY, POLICIES, driveId, RUNTIME_OWNER_ID, enabled, readSource, readComponent, immutable,
+module.exports = { AUTHORITY, POLICIES, driveId, RUNTIME_OWNER_ID, freshDataverseIdentityBinding, enabled, readSource, readComponent, immutable,
   processFreshTitleIntake, execute, createExact, verifyCanonicalTitleKey, nativeDeps, handler };

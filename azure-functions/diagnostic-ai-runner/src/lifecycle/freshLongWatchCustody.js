@@ -22,11 +22,12 @@ function plan(input) {
 
 async function readAuthority(deps) {
   const fresh = require("./freshTitleIntake");
-  const title = await deps.client.first("jm1pub_titles", { $filter: `jm1pub_titleid eq ${TITLE_ID}` });
+  const client = deps.authorityClient || deps.client;
+  const title = await client.first("jm1pub_titles", { $filter: `jm1pub_titleid eq ${TITLE_ID}` });
   const identity = await require("../author/jackieCommissioningIdentityReader").readJackieCommissioningIdentity(title,
-    { enabled: true, revoked: false, titleId: TITLE_ID, mode: "JACKIE_TITLE_INTERNAL_COMMISSIONING" }, deps.client);
+    { enabled: true, revoked: false, titleId: TITLE_ID, mode: "JACKIE_TITLE_INTERNAL_COMMISSIONING" }, client);
   if (!identity || title?.statecode !== 0) deny("COMMISSIONING_FRESH_AUTHOR_IDENTITY_DENIED");
-  const artifact = await deps.client.first("jm1pub_editorialartifacts", { $filter: `jm1pub_editorialartifactid eq ${ARTIFACT_ID}` });
+  const artifact = await client.first("jm1pub_editorialartifacts", { $filter: `jm1pub_editorialartifactid eq ${ARTIFACT_ID}` });
   if (artifact?.jm1pub_repositoryitemid !== SOURCE.itemId || artifact.jm1pub_sha256 !== SOURCE.sha256 ||
       artifact._jm1pub_titleid_value !== TITLE_ID || artifact.jm1pub_repositorydriveid !== fresh.driveId) {
     deny("COMMISSIONING_FRESH_ORIGINAL_CROSSWALK_CHANGED");
@@ -129,7 +130,7 @@ async function handler(body, deps) {
     return { status: 403, jsonBody: { code: "COMMISSIONING_FRESH_CUSTODY_DISABLED", effects: 0 } };
   }
   try {
-    const fresh = require("./freshTitleIntake"), context = fresh.nativeDeps(deps);
+    const fresh = require("./freshTitleIntake"), context = fresh.nativeDeps({ ...deps, authorityOnly: true });
     if (!executeRequested) {
       const current = await readAuthority(context);
       return { status: 200, jsonBody: { plan: plan(current.input), source: current.source.custody, effects: 0 } };
