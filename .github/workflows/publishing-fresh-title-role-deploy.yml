@@ -31,7 +31,7 @@ jobs:
       - uses: actions/checkout@v7
 
       - name: Test source role contract
-        run: node --test scripts/fresh_title_commissioning_role.test.mjs
+        run: node --test scripts/fresh_title_commissioning_role.test.mjs scripts/fresh-title-role-policy.test.mjs
 
       - name: Validate immutable package
         shell: bash
@@ -110,6 +110,21 @@ jobs:
             --path "$PACKAGE_PATH" \
             --publish-changes
 
+      - name: Enforce and independently verify effective role privileges
+        shell: bash
+        env:
+          DATAVERSE_ENVIRONMENT_URL: ${{ env.PROD_ENVIRONMENT_URL }}
+          EXPECTED_ORGANIZATION_ID: ${{ env.PROD_ORGANIZATION_ID }}
+          FRESH_TITLE_ROLE_EVIDENCE: /tmp/fresh-title-role-readback.json
+        run: |
+          set -euo pipefail
+          PAC_CLI="${POWERPLATFORMTOOLS_PACPATH:-pac}"
+          TOKEN="$("$PAC_CLI" auth token)"
+          test -n "$TOKEN"
+          echo "::add-mask::$TOKEN"
+          DATAVERSE_ACCESS_TOKEN="$TOKEN" node scripts/reconcile-fresh-title-role.mjs
+          unset TOKEN
+
       - name: Read back production solution
         shell: bash
         run: |
@@ -125,5 +140,7 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: publishing-fresh-title-role-production-readback
-          path: /tmp/fresh-title-role-readback/solutions.txt
+          path: |
+            /tmp/fresh-title-role-readback/solutions.txt
+            /tmp/fresh-title-role-readback.json
           if-no-files-found: error
