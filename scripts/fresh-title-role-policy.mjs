@@ -20,6 +20,18 @@ export const knownImportDefaults = new Map([
   ['prvWriteSharePointData', 8],
 ])
 
+export function canonicalRolePrivilegePairs(rows) {
+  const seen = new Set()
+  return rows.map(({ privilegeid, privilegedepthmask }) => {
+    if (typeof privilegeid !== 'string' || !/^[a-f0-9-]{36}$/i.test(privilegeid) ||
+        ![1, 2, 4, 8].includes(privilegedepthmask) || seen.has(privilegeid.toLowerCase())) {
+      throw new Error('INVALID_ROLE_PRIVILEGE_PAIR')
+    }
+    seen.add(privilegeid.toLowerCase())
+    return { privilegeid: privilegeid.toLowerCase(), privilegedepthmask }
+  }).sort((a, b) => a.privilegeid.localeCompare(b.privilegeid))
+}
+
 export function planRoleNormalization({ assignedUserCount, privileges }) {
   if (assignedUserCount !== 0) throw new Error('ROLE_ALREADY_ASSIGNED')
 
