@@ -166,13 +166,22 @@ async function executeCoverOwner(requestKey, deps = {}) {
     const reviewPackage = await composer.composeReviewPackage(record);
     const preflight = await composer.preflightReviewPackage({ record, reviewPackage });
     if (!preflight.passed) return await hold("COVER_OWNER_REVIEW_PREFLIGHT_FAILED");
+    let reviewDelivery;
+    if (deps.store.acceptance !== true) {
+      if (typeof deps.persistReviewPackage !== "function") return await hold("COVER_REVIEW_DESTINATION_NOT_BOUND");
+      reviewDelivery = await deps.persistReviewPackage({ request, executionKey, bindingHash,
+        bytes: reviewPackage.bytes, sha256: reviewPackage.sha256, assertClaim: verifyClaim });
+      if (!reviewDelivery?.itemId || reviewDelivery.sha256 !== reviewPackage.sha256) {
+        return await hold("COVER_REVIEW_DESTINATION_READBACK_FAILED");
+      }
+    }
     const receipt = { schemaVersion: 1, status: "AWAITING_REVIEW", executionKey, bindingHash,
       titleId: request.titleId, editionId: request.editionId, source: request.source,
       authorityReference: request.authorityReference, authoritySha256: request.authoritySha256,
       coverBundleSha256: prepared.bundle.sha256, briefSha256: prepared.brief.authorityDigest,
       packageKey, packageSha256: reviewPackage.sha256, preflightEvidenceId: preflight.evidenceId,
       concepts, synthetic: deps.store.acceptance === true, stageAdvanced: false,
-      authorCommunication: false, creativeApproval: "PENDING" };
+      authorCommunication: false, creativeApproval: "PENDING", ...(reviewDelivery ? { reviewDelivery } : {}) };
     const receiptKey = digest(receipt);
     const receiptRow = await deps.store.writeJson("receipts", receiptKey, receipt, { immutable: true });
     await verifyClaim();

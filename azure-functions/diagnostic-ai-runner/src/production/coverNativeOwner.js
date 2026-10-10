@@ -13,6 +13,7 @@ const IDS = Object.freeze(["f1908dc9-5775-f111-ab0f-6045bdd69435", "e797232b-da7
 const SHA = /^[a-f0-9]{64}$/;
 const GUID = /^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/;
 const { JACKIE_CANONICAL_AUTHOR_CONTACT_ID } = require("../author/jackieTitleSystemCommissioningPolicy");
+const { createCoverSharePointPersistence, verifyPrintGeometry } = require("./coverSharePointPersistence");
 
 function nativeContext(deps = {}) {
   const env = deps.env || process.env;
@@ -58,7 +59,80 @@ async function verifyNativeCoverAuthority(request, input, deps) {
       interior.jm1pub_iscurrentapproved !== true || interior.jm1pub_supersededon || interior.statecode !== 0 ||
       String(interior.versionnumber) !== input.printInterior.version || interior.jm1pub_sha256 !== input.printInterior.sha256 ||
       await readers.verifyArtifactBytes(interior, input.printInterior.sha256) !== true) return false;
+  if (interior.jm1pub_fileextension !== "pdf" || input.printInterior.editionId !== request.editionId ||
+      !SHA.test(input.printInterior.approvalKey || "") || !SHA.test(input.printInterior.approvalSha256 || "")) return false;
+  const store = createCoverOwnerStore(deps);
+  const approval = await store.read("sources", input.printInterior.approvalKey);
+  const proof = approval?.value;
+  if (approval?.sha256 !== input.printInterior.approvalSha256 || proof?.kind !== "AUTHENTICATED_FOUNDER_DECISION" ||
+      proof.decision !== "APPROVED" || proof.revoked === true || proof.founderContactId !== JACKIE_CANONICAL_AUTHOR_CONTACT_ID ||
+      !GUID.test(proof.authenticatedPrincipalId || "") ||
+      proof.approvedPayloadSha256 !== digest(proof.approvedPayload) ||
+      proof.approvedPayload?.titleId !== request.titleId || proof.approvedPayload.editionId !== request.editionId ||
+      proof.approvedPayload.artifactId !== input.printInterior.artifactId ||
+      proof.approvedPayload.version !== input.printInterior.version || proof.approvedPayload.sha256 !== input.printInterior.sha256) return false;
+  const trimGeometry = require("./fullWrapExecutor").parseTrimSize(proof.approvedPayload.trimSize);
+  if (!trimGeometry || Math.abs(trimGeometry.width * 72 - proof.approvedPayload.widthPoints) > 0.01 ||
+      Math.abs(trimGeometry.height * 72 - proof.approvedPayload.heightPoints) > 0.01) return false;
+  const bytes = await require("../editorial/productionTitleAuthorityReader").graphBytes(interior,
+    { ...deps, credential: deps.credential || new ManagedIdentityCredential() });
+  await verifyPrintGeometry(bytes, { ...proof.approvedPayload, sha256: input.printInterior.sha256 });
+  const pages = candidates.filter(row => row.field === "pageCount");
+  const trim = candidates.filter(row => row.field === "trimSize");
+  if (!pages.length || pages.some(row => row.value !== proof.approvedPayload.pageCount || row.sourceChecksum !== input.printInterior.sha256) ||
+      !trim.length || trim.some(row => row.value !== proof.approvedPayload.trimSize)) return false;
+  const after = await deps.client.first("jm1pub_editorialartifacts", {
+    $filter: `jm1pub_editorialartifactid eq ${input.printInterior.artifactId}` });
+  if (after?.versionnumber !== interior.versionnumber || after.jm1pub_sha256 !== interior.jm1pub_sha256 ||
+      after.jm1pub_iscurrentapproved !== true || after.jm1pub_supersededon || after.statecode !== 0) return false;
   return true;
+}
+
+function nativeGraph(deps) {
+  return async (path, options = {}) => {
+    if (!path.startsWith("drives/") || path.includes("..") || path.includes("?")) throw new Error("COVER_GRAPH_PATH_DENIED");
+    const token = await (deps.credential || new ManagedIdentityCredential()).getToken("https://graph.microsoft.com/.default");
+    const response = await (deps.fetchImpl || fetch)(`https://graph.microsoft.com/v1.0/${path}`, {
+      ...options, signal: AbortSignal.timeout(45000),
+      headers: { ...options.headers, Authorization: `Bearer ${token.token}` } });
+    if (!response.ok) throw Object.assign(new Error("COVER_GRAPH_DEPENDENCY_FAILED"), { statusCode: response.status });
+    return options.responseType === "buffer" ? Buffer.from(await response.arrayBuffer()) : response.json();
+  };
+}
+
+async function persistNativeCoverReview(input, context, store) {
+  const authority = await store.read("authority", input.request.authorityKey);
+  if (authority?.sha256 !== input.request.authoritySha256) throw new Error("COVER_REVIEW_AUTHORITY_CHANGED");
+  const destination = authority.value.reviewDelivery;
+  if (!destination || destination.reviewerId !== JACKIE_CANONICAL_AUTHOR_CONTACT_ID ||
+      !destination.folderPath?.startsWith("/01_Pipeline_A-Z/") ||
+      !SHA.test(destination.reviewerAuthorityKey || "")) throw new Error("COVER_REVIEW_DESTINATION_NOT_BOUND");
+  const binding = { titleId: input.request.titleId, editionId: input.request.editionId, executionKey: input.executionKey,
+    sourceSha256: input.request.source.sha256, authoritySha256: input.request.authoritySha256,
+    reviewerId: destination.reviewerId, reviewerAuthoritySha256: destination.reviewerAuthoritySha256, destination };
+  const runtime = createCoverSharePointPersistence({ graph: nativeGraph(context), fetchImpl: context.fetchImpl,
+    assertClaim: input.assertClaim,
+    verifyAuthority: async () => {
+      const current = await store.read("authority", input.request.authorityKey);
+      const reviewer = await store.read("sources", destination.reviewerAuthorityKey);
+      const assignment = reviewer?.value;
+      return reviewer?.sha256 === destination.reviewerAuthoritySha256 && assignment?.kind === "CANONICAL_COVER_REVIEW_ASSIGNMENT" &&
+        assignment.revoked !== true && assignment.titleId === input.request.titleId && assignment.editionId === input.request.editionId &&
+        assignment.sourceSha256 === input.request.source.sha256 && assignment.reviewerId === destination.reviewerId &&
+        assignment.driveId === destination.driveId && assignment.folderId === destination.folderId &&
+        assignment.folderPath === destination.folderPath && assignment.permissionsSha256 === destination.permissionsSha256 &&
+        assignment.privateAccessVerified === true && current?.sha256 === input.request.authoritySha256 &&
+        await verifyNativeCoverAuthority(input.request, current.value, context) === true;
+    },
+    reserveUploadIntent: async intent => {
+      const key = digest({ bindingSha256: intent.bindingSha256 });
+      if (await store.read("review-upload-intents", key)) return false;
+      try { await store.writeJson("review-upload-intents", key, intent); return true; }
+      catch (error) { if ([409, 412].includes(error.statusCode)) return false; throw error; }
+    } });
+  const result = await runtime.persist(binding, input.bytes);
+  const saved = await store.writeJson("review-deliveries", digest(binding), result, { immutable: true });
+  return saved.value;
 }
 
 async function verifyNativeCoverSpend(request, bundle, deps) {
@@ -118,6 +192,7 @@ function createNativeCoverOwner(deps = {}) {
     verifyCurrentAuthority: (request, input) => verifyNativeCoverAuthority(request, input, context),
     verifySpendAuthority: (request, bundle) => verifyNativeCoverSpend(request, bundle, { ...context, store }),
     reserveSpendAuthority: (request, bundle, execution) => claimNativeCoverSpend(request, bundle, { ...context, store }, execution),
+    persistReviewPackage: input => persistNativeCoverReview(input, context, store),
     readProviderOutcome: async key => (await store.read("provider-receipts", key))?.value };
   owner.generateImage = async request => {
     // Instantiation is lazy: missing spend/source authority never reaches identity,
@@ -175,4 +250,5 @@ async function runNativeCoverOwners(deps = {}) {
   return { enabled: true, results, failures };
 }
 
-module.exports = { IDS, nativeContext, createNativeCoverOwner, verifyNativeCoverAuthority, verifyNativeCoverSpend, claimNativeCoverSpend, runNativeCoverOwners };
+module.exports = { IDS, nativeContext, createNativeCoverOwner, verifyNativeCoverAuthority, verifyNativeCoverSpend, claimNativeCoverSpend,
+  nativeGraph, persistNativeCoverReview, runNativeCoverOwners };
