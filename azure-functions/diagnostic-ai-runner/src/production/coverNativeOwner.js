@@ -91,11 +91,17 @@ async function verifyNativeCoverAuthority(request, input, deps) {
 function nativeGraph(deps) {
   return async (path, options = {}) => {
     if (!path.startsWith("drives/") || path.includes("..") || path.includes("?")) throw new Error("COVER_GRAPH_PATH_DENIED");
-    const token = await (deps.credential || new ManagedIdentityCredential()).getToken("https://graph.microsoft.com/.default");
+    let token;
+    try { token = await (deps.credential || new ManagedIdentityCredential()).getToken("https://graph.microsoft.com/.default"); }
+    catch (error) { throw Object.assign(new Error("COVER_GRAPH_TOKEN_FAILED"), { safeCode: "COVER_GRAPH_TOKEN_FAILED", statusCode: error.statusCode }); }
     const response = await (deps.fetchImpl || fetch)(`https://graph.microsoft.com/v1.0/${path}`, {
       ...options, signal: AbortSignal.timeout(45000),
       headers: { ...options.headers, Authorization: `Bearer ${token.token}` } });
-    if (!response.ok) throw Object.assign(new Error("COVER_GRAPH_DEPENDENCY_FAILED"), { statusCode: response.status });
+    if (!response.ok) {
+      const operation = path.endsWith("/permissions") ? "PERMISSIONS" : path.endsWith("createUploadSession") ? "UPLOAD_SESSION" :
+        path.endsWith("/content") ? "CONTENT" : path.includes(":/") ? "TARGET" : "METADATA";
+      throw Object.assign(new Error("COVER_GRAPH_DEPENDENCY_FAILED"), { statusCode: response.status, safeCode: `COVER_GRAPH_${operation}_FAILED` });
+    }
     return options.responseType === "buffer" ? Buffer.from(await response.arrayBuffer()) : response.json();
   };
 }

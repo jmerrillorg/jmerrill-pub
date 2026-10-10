@@ -4,6 +4,16 @@ const assert = require("node:assert/strict");
 const { PDFDocument, degrees } = require("pdf-lib");
 const { hash } = require("../src/production/coverOwnerStore");
 const { createCoverSharePointPersistence, verifyPrintGeometry, permissionDigest } = require("../src/production/coverSharePointPersistence");
+const { nativeGraph } = require("../src/production/coverNativeOwner");
+test("native Graph failure diagnostics contain only operation and status", async () => {
+  const graph = nativeGraph({ credential: { getToken: async () => ({ token: "fixture-secret" }) },
+    fetchImpl: async () => ({ ok: false, status: 400 }) });
+  await assert.rejects(graph("drives/fixture/items/folder/permissions"), error =>
+    error.safeCode === "COVER_GRAPH_PERMISSIONS_FAILED" && error.statusCode === 400 && !error.message.includes("fixture"));
+  const tokenFailure = nativeGraph({ credential: { getToken: async () => { throw Object.assign(new Error("secret"), { statusCode: 400 }); } } });
+  await assert.rejects(tokenFailure("drives/fixture/items/folder"), error =>
+    error.safeCode === "COVER_GRAPH_TOKEN_FAILED" && error.message === "COVER_GRAPH_TOKEN_FAILED");
+});
 const binding = { titleId: "11111111-1111-4111-8111-111111111111", editionId: "22222222-2222-4222-8222-222222222222",
   executionKey: "a".repeat(64), sourceSha256: "b".repeat(64), authoritySha256: "c".repeat(64),
   reviewerId: "33333333-3333-4333-8333-333333333333", reviewerAuthoritySha256: "d".repeat(64),
