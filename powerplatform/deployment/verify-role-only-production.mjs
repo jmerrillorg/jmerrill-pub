@@ -1,5 +1,6 @@
 import { readFileSync, writeFileSync } from 'node:fs'
 import { dataverseGithubOidcToken } from './dataverse-github-oidc-token.mjs'
+import { canonicalRolePrivilegePairs } from '../../scripts/fresh-title-role-policy.mjs'
 
 const env = 'https://jm1hq.crm.dynamics.com'
 const app = '97891ed1-6623-487c-b890-633bea440e22'
@@ -26,7 +27,7 @@ async function snapshot() {
   r.systemuserroles_association.sort((a,b)=>a.systemuserid.localeCompare(b.systemuserid))
   const rights = (await request(`roleprivilegescollection?$select=privilegeid,privilegedepthmask&$filter=roleid eq ${protectedRole}`)).data.value
   if (rights.length !== 45) throw Error('PHASE6_ROLE_PARITY_COUNT_CHANGED')
-  return {role:r,rights:rights.sort((a,b)=>a.privilegeid.localeCompare(b.privilegeid))}
+  return {role:r,rights:canonicalRolePrivilegePairs(rights)}
 }
 try {
   const who = (await request('WhoAmI()')).data
