@@ -63,6 +63,8 @@ function createAzureFoundryCoverImageProvider(config = {}, deps = {}) {
       throw error;
     }
     const payload = await response.json();
+    const providerReceiptId = response.headers?.get?.("apim-request-id") || response.headers?.get?.("x-ms-request-id") ||
+      response.headers?.get?.("x-request-id") || null;
     const base64 = payload?.data?.[0]?.b64_json;
     if (typeof base64 !== "string" || !/^[A-Za-z0-9+/]+={0,2}$/.test(base64)) {
       throw new Error("COVER_IMAGE_PROVIDER_RESULT_INVALID");
@@ -95,7 +97,8 @@ function createAzureFoundryCoverImageProvider(config = {}, deps = {}) {
       model: deployment,
       modelVersion,
       safetyPassed: true,
-      safetyEvidenceId: safety.evidenceId
+      safetyEvidenceId: safety.evidenceId,
+      providerReceiptId
     };
   };
 }

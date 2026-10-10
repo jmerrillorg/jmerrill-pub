@@ -92,7 +92,8 @@ function resolveCoverAuthorityBundle(titleId, candidates, options = {}) {
     const relevant = candidates.filter((item) => item.field === field && item.current === true && item.titleId === titleId &&
       priority.includes(item.sourceType) && validValue(field, item.value) && item.sourceId && item.sourceVersion &&
       validAuthorityClass(item) &&
-      (executionMode === "INTERNAL_CONCEPT" || item.authorityClass !== "SYSTEM_DERIVED_GOVERNED_INTERNAL") &&
+      (executionMode === "INTERNAL_CONCEPT" ||
+        (item.authorityClass !== "SYSTEM_DERIVED_GOVERNED_INTERNAL" && item.sourceType !== "SYSTEM_DERIVED_INTERNAL_CREATIVE")) &&
       Number.isFinite(Date.parse(item.lastVerified)) && Math.abs(nowMs - Date.parse(item.lastVerified)) <= MAX_READ_AGE_MS &&
       (!item.sourceChecksum || SHA256.test(item.sourceChecksum)) &&
       (!["CURRENT_INTERIOR_PROOF", "BRAND_ASSET_REGISTRY"].includes(item.sourceType) || SHA256.test(item.sourceChecksum || "")));
