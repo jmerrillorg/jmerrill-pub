@@ -62,6 +62,10 @@ test("concrete store/composer path survives owner restart, lost response, stale 
   assert.equal([...blobs.keys()].filter(name => name.includes("/packages/")).length, 3);
   assert.equal([...blobs.keys()].filter(name => name.includes("/receipts/")).length, 3);
   assert.equal([...blobs.keys()].filter(name => name.includes("/provider-receipts/")).length, 6);
+  const alerts = await createCoverOwnerStore({ containerClient: client, acceptance: true }).list("alerts");
+  assert.equal(alerts.length, 2);
+  assert.equal(alerts.filter(row => row.value.status === "RESOLVED").length, 1);
+  assert.equal(alerts.filter(row => row.value.status === "OPEN").length, 1);
   assert.ok([...blobs.keys()].every(name => name.startsWith("publishing/cover/acceptance/v1/")));
 });
 

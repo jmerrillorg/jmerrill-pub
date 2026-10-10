@@ -12,6 +12,9 @@ async function coverAdapterAcceptanceHandler(request, deps = {}) {
   if (env.JM1_COVER_ADAPTER_ACCEPTANCE_ENABLED !== "true") {
     return { status: 403, jsonBody: { code: "COVER_ADAPTER_ACCEPTANCE_DISABLED" } };
   }
+  if (!env.JM1_DIAGNOSTIC_RUNNER_KEY || request.headers?.get?.("x-jm1-diagnostic-runner-key") !== env.JM1_DIAGNOSTIC_RUNNER_KEY) {
+    return { status: 403, jsonBody: { code: "COVER_ACCEPTANCE_AUTHORIZATION_DENIED" } };
+  }
   let body;
   try { body = await request.json(); } catch { return { status: 400, jsonBody: { code: "COVER_ACCEPTANCE_REQUEST_INVALID" } }; }
   if (!body || Object.keys(body).length !== 1 || !["READ", "SEED", "DISPATCH"].includes(body.action)) {

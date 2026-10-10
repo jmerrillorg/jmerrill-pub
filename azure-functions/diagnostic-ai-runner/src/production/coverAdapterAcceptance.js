@@ -131,7 +131,7 @@ async function readCoverAdapterAcceptance(containerClient) {
   const store = createCoverOwnerStore({ containerClient, acceptance: true });
   const counts = {};
   const executions = [];
-  for (const kind of ["requests", "executions", "outcomes", "provider-receipts", "receipts", "packages", "assets"]) {
+  for (const kind of ["requests", "executions", "outcomes", "provider-receipts", "receipts", "packages", "assets", "alerts"]) {
     const rows = await store.list(kind);
     counts[kind] = rows.length;
     if (kind === "executions") for (const row of rows) executions.push({

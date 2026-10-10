@@ -42,6 +42,10 @@ async function executeCoverOwner(requestKey, deps = {}) {
     const artifact = receipt && await deps.store.read("packages", receipt.value.packageKey, "html");
     if (!receipt || receipt.value.bindingHash !== bindingHash || !artifact || artifact.sha256 !== receipt.value.packageSha256 ||
         receipt.value.executionKey !== executionKey) deny("COVER_OWNER_COMPLETED_REPLAY_UNBOUND");
+    const alertKey = digest({ executionKey, kind: "COVER_OWNER_RECOVERY" });
+    const alert = await deps.store.read("alerts", alertKey);
+    if (alert?.value.status === "OPEN") await deps.store.writeJson("alerts", alertKey,
+      { ...alert.value, status: "RESOLVED", receiptKey: existing.value.receiptKey }, { etag: alert.etag });
     return { status: "AWAITING_REVIEW", replay: true, executionKey, receiptReference: receipt.reference,
       packageReference: artifact.reference, packageSha256: artifact.sha256, providerCalls: 0 };
   }
@@ -170,6 +174,10 @@ async function executeCoverOwner(requestKey, deps = {}) {
     await verifyClaim();
     await deps.store.writeJson("executions", executionKey, { ...execution.value, status: "AWAITING_REVIEW", receiptKey,
       completedAt: now.toISOString(), leaseUntil: null }, { etag: execution.etag });
+    const alertKey = digest({ executionKey, kind: "COVER_OWNER_RECOVERY" });
+    const alert = await deps.store.read("alerts", alertKey);
+    if (alert?.value.status === "OPEN") await deps.store.writeJson("alerts", alertKey,
+      { ...alert.value, status: "RESOLVED", receiptKey }, { etag: alert.etag });
     return { status: "AWAITING_REVIEW", executionKey, receiptReference: receiptRow.reference,
       packageReference: reviewPackage.location, packageSha256: reviewPackage.sha256, providerCalls };
   } catch (error) {
@@ -184,6 +192,12 @@ async function executeCoverOwner(requestKey, deps = {}) {
       await deps.store.writeJson("executions", executionKey, { ...current.value, status: "RECOVERY_REQUIRED",
         failureCode: /^COVER_[A-Z_]+$/.test(code) ? code : "COVER_OWNER_RECOVERY_REQUIRED", leaseUntil: null,
         nextAttemptAt: new Date(now.getTime() + Math.min(300000, 1000 * 2 ** Math.min(current.value.attempts, 8))).toISOString() }, { etag: current.etag });
+      const alertKey = digest({ executionKey, kind: "COVER_OWNER_RECOVERY" });
+      if (!await deps.store.read("alerts", alertKey)) await deps.store.writeJson("alerts", alertKey, {
+        schemaVersion: 1, kind: "COVER_OWNER_RECOVERY", status: "OPEN", executionKey, bindingHash,
+        failureCode: /^COVER_[A-Z_]+$/.test(code) ? code : "COVER_OWNER_RECOVERY_REQUIRED",
+        automaticPaidRetry: false, synthetic: deps.store.acceptance === true
+      }, { immutable: true });
     }
     return { status: "RECOVERY_REQUIRED", code, executionKey, providerCalls, automaticPaidRetry: false };
   }

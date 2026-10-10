@@ -141,7 +141,12 @@ async function runNativeCoverOwners(deps = {}) {
       if (binding.titleId !== id || !SHA.test(binding.requestKey || "")) throw new Error("COVER_OWNER_POINTER_UNBOUND");
       const request = await owner.store.read("requests", binding.requestKey);
       if (request?.value.titleId !== id) throw new Error("COVER_OWNER_POINTER_UNBOUND");
-      results.push({ titleId: id, ...await executeCoverOwner(binding.requestKey, owner) });
+      const result = await executeCoverOwner(binding.requestKey, owner);
+      results.push({ titleId: id, ...result });
+      if (["RECOVERY_REQUIRED", "RECEIPT_RECONCILIATION_REQUIRED"].includes(result.status) ||
+          result.code === "COVER_PROVIDER_RECONCILIATION_REQUIRED") {
+        failures.push({ titleId: id, executionKey: result.executionKey, code: result.code || "COVER_OWNER_RECOVERY_REQUIRED" });
+      }
     } catch (error) { failures.push({ titleId: id, code: error.statusCode === 404 ? "COVER_OWNER_INPUTS_NOT_BOUND" :
       /^COVER_[A-Z_]+$/.test(error.safeCode || "") ? error.safeCode : "COVER_OWNER_READ_OR_DISPATCH_FAILED" }); }
   }
