@@ -26,7 +26,7 @@ if (process.env.JM1_PUBLISHING_WAIT_RUNTIME_ENABLED === "true") {
     }
   });
 }
-if (process.env.JM1_PUBLISHING_WAIT_RUNTIME_ENABLED === "true" || process.env.JM1_PUBLISHING_WAIT_OBSERVATION_ENABLED === "true" || process.env.JM1_TITLE_COMMISSIONING_INTAKE_ENABLED === "true" || process.env.JM1_TITLE_COMMISSIONING_COVER_ENABLED === "true" || process.env.JM1_COVER_ADAPTER_ACCEPTANCE_ENABLED === "true") {
+if (process.env.JM1_PUBLISHING_WAIT_RUNTIME_ENABLED === "true" || process.env.JM1_PUBLISHING_WAIT_OBSERVATION_ENABLED === "true" || process.env.JM1_TITLE_COMMISSIONING_INTAKE_ENABLED === "true" || process.env.JM1_TITLE_COMMISSIONING_FRESH_ENABLED === "true" || process.env.JM1_TITLE_COMMISSIONING_COVER_ENABLED === "true" || process.env.JM1_COVER_ADAPTER_ACCEPTANCE_ENABLED === "true") {
   app.timer("reconcile-publishing-waits", {
     schedule: "0 */5 * * * *", handler: async (_timer, context) => {
       let waitFailures = [];
