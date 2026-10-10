@@ -174,7 +174,9 @@ function nativeDeps(deps = {}) {
 }
 async function handler(body, deps = {}) {
   const env = deps.env || process.env;
-  if (!enabled(body.titleId, env)) return { status: 403, jsonBody: { code: "COMMISSIONING_FRESH_DISABLED", effects: 0 } };
+  const readOnly = ["FRESH_PREFLIGHT", "FRESH_READBACK"].includes(body.mode) && Object.hasOwn(POLICIES, body.titleId || "") &&
+    ["JM1_TITLE_COMMISSIONING_REVIEW_ENABLED", "JM1_PUBLISHING_STAGE_RUNTIME_ENABLED", "JM1_PUBLISHING_WAIT_RUNTIME_ENABLED"].every(k => env[k] === "false");
+  if (!readOnly && !enabled(body.titleId, env)) return { status: 403, jsonBody: { code: "COMMISSIONING_FRESH_DISABLED", effects: 0 } };
   const context = nativeDeps(deps);
   let attempted = false;
   try {
