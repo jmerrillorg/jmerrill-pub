@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { redirect } from 'next/navigation'
 
 import { PublisherOperatingCenterClient } from '../_components/PublisherOperatingCenterClient'
 import { getPublisherOperatingCenterSession } from '@/lib/server/author-durable-auth'
@@ -13,8 +14,14 @@ export const metadata: Metadata = {
   },
 }
 
-export default async function PublisherOperatingCenterPage() {
+export default async function PublisherOperatingCenterPage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>
+}) {
   const session = await getPublisherOperatingCenterSession()
+  const requestedDetails = Object.keys(await searchParams).length > 0
+  if (session && !requestedDetails) redirect('/publisher/pipeline')
   const snapshot = session ? await buildPublisherOperatingCenterSnapshot() : null
 
   return (

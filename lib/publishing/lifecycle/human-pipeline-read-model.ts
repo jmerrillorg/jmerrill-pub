@@ -28,7 +28,7 @@ export type HumanPipelineStageId =
   | '15_PUBLICATION'
   | '16_POST_PUBLICATION'
 
-export type HumanPipelineWaitingOn = 'Jackie' | 'Author' | 'System' | 'External' | 'Not Waiting'
+export type HumanPipelineWaitingOn = 'Jackie' | 'Author' | 'JM Publishing' | 'System' | 'External' | 'Not Waiting'
 
 export type HumanPipelineAttention = 'On Track' | 'Attention' | 'Blocked' | 'Exception'
 
@@ -57,6 +57,10 @@ export type HumanPipelineCard = {
   nextAction: string
   blocker: string
   targetDate: string
+  waitingSince: string
+  waitAgeDays: number | null
+  workspaceStateSupported: boolean
+  workspaceReason: string
   recentMovement: string
   operatingCenterUrl: string
   confidence: 'HIGH' | 'MEDIUM'
@@ -89,6 +93,8 @@ export type HumanPipelineView = {
     suppressedHistoricalReferences: number
     needsJackie: number
     waitingOnAuthor: number
+    waitingOnPublishing: number
+    waitingOnProvider: number
     waitingOnSystem: number
     blocked: number
     exceptions: number
@@ -125,13 +131,15 @@ export function buildHumanPublishingPipelineView(
     reconciliationRequired,
     suppressedHistoricalReferences,
     summary: {
-      totalTitles: liveCards.length,
+      totalTitles: currentProjected.length,
       placedTitles: placed.length,
       reconciliationRequired: reconciliationRequired.length,
       suppressedHistoricalReferences: suppressedHistoricalReferences.length,
-      needsJackie: placed.filter((card) => card.waitingOn === 'Jackie').length,
-      waitingOnAuthor: placed.filter((card) => card.waitingOn === 'Author').length,
-      waitingOnSystem: placed.filter((card) => card.waitingOn === 'System').length,
+      needsJackie: currentProjected.filter((card) => card.waitingOn === 'Jackie').length,
+      waitingOnAuthor: currentProjected.filter((card) => card.waitingOn === 'Author').length,
+      waitingOnPublishing: currentProjected.filter((card) => card.waitingOn === 'JM Publishing' || card.waitingOn === 'System').length,
+      waitingOnProvider: currentProjected.filter((card) => card.waitingOn === 'External').length,
+      waitingOnSystem: currentProjected.filter((card) => card.waitingOn === 'System').length,
       blocked: placed.filter((card) => card.attention === 'Blocked').length,
       exceptions: placed.filter((card) => card.attention === 'Exception').length + reconciliationRequired.length,
     },
@@ -184,7 +192,6 @@ function projectHumanPipelineCard(
     package: firstUseful([
       card.canonicalLifecycle.packageAccepted,
       card.canonicalLifecycle.packageRecommendation,
-      card.currentArtifact.reviewState,
     ], 'Package pending'),
     conciseStatus: conciseStatusFor(card),
     waitingOn: waitingOnForCard(card),
@@ -194,6 +201,10 @@ function projectHumanPipelineCard(
     nextAction: readable(card.nextAction || card.canonicalLifecycle.nextGovernedAction.action),
     blocker: readable(card.blocker),
     targetDate: readable(card.targetDate),
+    waitingSince: card.canonicalLifecycle.waitingTruth.waitingStartedAt,
+    waitAgeDays: card.canonicalLifecycle.waitingTruth.elapsedDays,
+    workspaceStateSupported: card.canonicalLifecycle.lifecycleEvidence.authorWorkspace.activeWorkspace.status === 'SUPPORTED',
+    workspaceReason: card.canonicalLifecycle.lifecycleEvidence.authorWorkspace.activeWorkspace.reason,
     recentMovement: readable(card.latestMovement),
     operatingCenterUrl: operatingCenterUrlForCard(card),
   }
@@ -293,6 +304,7 @@ function waitingOnForCard(card: PublisherTitleOperatingCard): HumanPipelineWaiti
   if (card.waitingOn === 'Jackie') return 'Jackie'
   if (card.waitingOn === 'Author') return 'Author'
   if (card.waitingOn === 'Automation') return 'System'
+  if (card.waitingOn === 'Publishing Team') return 'JM Publishing'
   if (card.waitingOn === 'External') return 'External'
   return 'Not Waiting'
 }
