@@ -3,7 +3,8 @@
 const { digest } = require("./coverOwnerStore");
 const rejected = status => [400, 401, 403, 404, 405, 413, 415, 422].includes(status);
 
-function createCoverReviewUploadJournal(store, legacyProof) {
+function createCoverReviewUploadJournal(store, legacyProof, transport = "SESSION") {
+  if (!["SESSION", "SMALL_CREATE_ONLY"].includes(transport)) throw new Error("COVER_REVIEW_TRANSPORT_INVALID");
   let current;
   async function reserveUploadIntent(intent) {
     const key = digest({ bindingSha256: intent.bindingSha256 });
@@ -23,20 +24,28 @@ function createCoverReviewUploadJournal(store, legacyProof) {
         sourceRelease: legacyProof.sourceRelease, observedAt: legacyProof.observedAt,
         operation: "UPLOAD_SESSION", status: 400, uploadCalls: 0, synthetic: true
       }, { immutable: true });
-    } else if (!created && !attempt && original.value.reservationVersion !== 1) return false;
+    } else if (!created && !attempt && original.value.reservationVersion !== 1 && transport !== "SMALL_CREATE_ONLY") return false;
     const number = attempt ? attempt.value.number + 1 : 1;
     if (number > 3) return false;
     if (attempt) {
       const failure = await store.read("review-upload-failures", digest({ key, attempt: attempt.value.number }));
       if (failure?.value.kind !== "PREUPLOAD_REJECTION" || failure.value.attemptSha256 !== attempt.sha256 ||
           !rejected(failure.value.status) || failure.value.uploadCalls !== 0) return false;
-    } else if (!created && !legacyProof && original.value.reservationVersion !== 1) {
+    } else if (!created && !legacyProof && original.value.reservationVersion !== 1 && transport !== "SMALL_CREATE_ONLY") {
       // Existing legacy intents have no trustworthy attempt boundary.
       return false;
     }
+    if (transport === "SMALL_CREATE_ONLY") {
+      await store.writeJson("review-upload-failures", digest({ key, kind: "CREATE_ONLY_RECOVERY_AUTHORITY" }), {
+        kind: "CREATE_ONLY_SAME_TARGET_RECOVERY", originalIntentSha256: original.sha256,
+        bindingSha256: intent.bindingSha256, checksum: intent.checksum, filename: intent.filename,
+        priorOutcome: "NOT_INFERRED", conflictBehavior: "fail", renameAllowed: false, overwriteAllowed: false,
+        synthetic: store.acceptance === true
+      }, { immutable: true });
+    }
     try {
       current = await store.writeJson("review-upload-attempts", key, { bindingSha256: intent.bindingSha256,
-        checksum: intent.checksum, filename: intent.filename, number, state: "SESSION_RESERVED",
+        checksum: intent.checksum, filename: intent.filename, number, transport, state: "SESSION_RESERVED",
         synthetic: store.acceptance === true }, attempt ? { etag: attempt.etag } : undefined);
       current.key = key;
       return true;

@@ -51,3 +51,14 @@ test("parallel claim contenders cannot both reserve the same session attempt", a
   const results = await Promise.all([createCoverReviewUploadJournal(f.store).reserveUploadIntent(intent), createCoverReviewUploadJournal(f.store).reserveUploadIntent(intent)]);
   assert.equal(results.filter(Boolean).length, 1);
 });
+test("create-only recovery preserves ambiguous original and never blindly retries unknown PUT", async () => {
+  const f = fixture(true), key = digest({ bindingSha256: intent.bindingSha256 });
+  const original = await f.store.writeJson("review-upload-intents", key, { ...intent, synthetic: true });
+  const journal = createCoverReviewUploadJournal(f.store, undefined, "SMALL_CREATE_ONLY");
+  assert.equal(await journal.reserveUploadIntent(intent), true);
+  assert.deepEqual(await f.store.read("review-upload-intents", key), original);
+  assert.equal(await createCoverReviewUploadJournal(f.store, undefined, "SMALL_CREATE_ONLY").reserveUploadIntent(intent), false);
+  const authority = [...f.rows.values()].find(x => x.value.kind === "CREATE_ONLY_SAME_TARGET_RECOVERY");
+  assert.equal(authority.value.overwriteAllowed, false); assert.equal(authority.value.priorOutcome, "NOT_INFERRED");
+  assert.equal(await journal.reserveUploadIntent({ ...intent, filename: "another.html" }), false);
+});

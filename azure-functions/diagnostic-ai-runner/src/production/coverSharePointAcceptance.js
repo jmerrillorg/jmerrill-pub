@@ -30,10 +30,16 @@ async function runCoverSharePointAcceptance(containerClient, context = {}) {
     reviewerId: "33333333-3333-4333-8333-333333333333",
     reviewerAuthoritySha256: digest({ class: "SYNTHETIC_REVIEWER_NOT_HUMAN_APPROVAL" }), destination: DESTINATION };
   const graph = context.graph || nativeGraph(context);
-  const journal = createCoverReviewUploadJournal(store);
+  const journal = createCoverReviewUploadJournal(store, undefined, "SMALL_CREATE_ONLY");
   let uploadCalls = 0;
   let committedResponseLost = false;
-  const persist = createCoverSharePointPersistence({ graph, fetchImpl: async (url, options) => {
+  const persist = createCoverSharePointPersistence({ uploadMode: "SMALL_CREATE_ONLY", graph: async (path, options) => {
+    const write = options?.method === "PUT" && path.endsWith(":/content?@microsoft.graph.conflictBehavior=fail");
+    if (write) uploadCalls++;
+    const result = await graph(path, options);
+    if (write) { committedResponseLost = true; throw new Error("CONTROLLED_SYNTHETIC_COMMITTED_RESPONSE_LOSS"); }
+    return result;
+  }, fetchImpl: async (url, options) => {
     uploadCalls++;
     const response = await (context.fetchImpl || fetch)(url, options);
     if ([200, 201].includes(response.status)) {

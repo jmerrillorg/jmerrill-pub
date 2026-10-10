@@ -47,6 +47,8 @@ function createCoverSharePointPersistence(deps) {
   async function persist(binding, bytes) {
     if (!Buffer.isBuffer(bytes) || bytes.length > 20 * 1024 * 1024 || !bytes.length) deny("COVER_REVIEW_BYTES_INVALID");
     const destination = await authority(binding);
+    const transport = deps.uploadMode || "SESSION";
+    if (!["SESSION", "SMALL_CREATE_ONLY"].includes(transport)) deny("COVER_REVIEW_TRANSPORT_INVALID");
     const checksum = hash(bytes);
     const filename = `cover-review-${digest({ binding, checksum })}.html`;
     const parent = `drives/${encodeURIComponent(destination.driveId)}/items/${encodeURIComponent(destination.folderId)}`;
@@ -77,6 +79,22 @@ function createCoverSharePointPersistence(deps) {
     if (typeof deps.reserveUploadIntent !== "function" ||
         await deps.reserveUploadIntent({ bindingSha256: digest(binding), checksum, filename }) !== true) {
       deny("COVER_REVIEW_UPLOAD_RECONCILIATION_REQUIRED");
+    }
+    if (transport === "SMALL_CREATE_ONLY") {
+      await deps.assertClaim();
+      await authority(binding);
+      try {
+        await deps.graph(`${target}:/content?@microsoft.graph.conflictBehavior=fail`, { method: "PUT",
+          headers: { "Content-Type": "text/plain" }, body: bytes });
+      } catch (error) {
+        const reconciled = await read();
+        if (reconciled) { await authority(binding); return reconciled; }
+        throw error;
+      }
+      const saved = await read();
+      if (!saved) deny("COVER_REVIEW_UPLOAD_OUTCOME_UNKNOWN");
+      await authority(binding);
+      return saved;
     }
     let session;
     try { session = await deps.graph(`${target}:/createUploadSession`, { method: "POST",
