@@ -105,6 +105,10 @@ async function executeCoverOwner(requestKey, deps = {}) {
         if (deps.generationEnabled !== true || typeof deps.verifySpendAuthority !== "function" ||
             await deps.verifySpendAuthority(request, prepared.bundle) !== true) return await hold("COVER_PAID_AUTHORITY_MISSING");
         if (typeof deps.generateImage !== "function") return await hold("COVER_PROVIDER_NOT_BOUND");
+        if (deps.store.acceptance !== true && (typeof deps.reserveSpendAuthority !== "function" ||
+            await deps.reserveSpendAuthority(request, prepared.bundle, { executionKey, bindingHash }) !== true)) {
+          return await hold("COVER_SPEND_RESERVATION_DENIED");
+        }
         const intent = { schemaVersion: 1, executionKey, bindingHash, titleId: request.titleId, editionId: request.editionId,
           direction, status: "INTENT_PERSISTED", providerRequestId: outcomeKey,
           promptSha256: hash(Buffer.from(conceptPrompt(prepared.brief, direction - 1))) };
