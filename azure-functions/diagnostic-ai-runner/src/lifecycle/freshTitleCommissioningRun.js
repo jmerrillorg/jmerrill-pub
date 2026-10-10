@@ -3,19 +3,25 @@
 const { createHash } = require("node:crypto");
 const { planTitleCommissioningRun } = require("./titleCommissioningRun");
 const { STAGE_CODES } = require("./stageRuntimeJournal");
+const { bindSourceCollection } = require("./freshSourceCollection");
 const exact = value => typeof value === "string" && value.length > 0 && value === value.trim() && !/[\r\n]/.test(value);
 function deny(code) { throw Object.assign(new Error(code), { safeCode: code }); }
 
 // Reuses the existing plan/journal owner. Historical work stays evidence-only.
 function planFreshTitleRun(input) {
   const { authorityReference, sourceCustody, handoff } = input || {};
+  const collection = input?.sourceComponents === undefined ? null : bindSourceCollection(input.sourceComponents);
   if (!exact(authorityReference) || handoff?.state !== "READY" || !exact(handoff.reference)) {
     deny("FRESH_RUN_STABLE_SOURCE_HANDOFF_REQUIRED");
   }
   if (!exact(sourceCustody?.driveId) || !exact(sourceCustody.itemId) || !exact(sourceCustody.eTag) ||
       !Number.isSafeInteger(sourceCustody.bytes) || sourceCustody.bytes <= 0 ||
       !exact(sourceCustody.path) || !/^\/01_Pipeline_A-Z\/.+\/_original\//i.test(sourceCustody.path) ||
-      sourceCustody.sha256 !== input.source?.sha256 || input.source?.role !== "RECEIVED_ORIGINAL") {
+      (collection ? collection.custodyHash !== input.source?.sha256 ||
+        !collection.components.some(component => JSON.stringify(component) === JSON.stringify({
+          driveId: sourceCustody.driveId, itemId: sourceCustody.itemId, eTag: sourceCustody.eTag,
+          path: sourceCustody.path, sha256: sourceCustody.sha256, bytes: sourceCustody.bytes })) :
+        sourceCustody.sha256 !== input.source?.sha256) || input.source?.role !== "RECEIVED_ORIGINAL") {
     deny("FRESH_RUN_ORIGINAL_SOURCE_CUSTODY_REQUIRED");
   }
   if (sourceCustody.path.split("/").some(segment => segment === "." || segment === ".." || /%2e|%2f|%5c/i.test(segment))) {
@@ -25,7 +31,8 @@ function planFreshTitleRun(input) {
   const custody = { driveId: sourceCustody.driveId, itemId: sourceCustody.itemId,
     eTag: sourceCustody.eTag, bytes: sourceCustody.bytes, path: sourceCustody.path, sha256: sourceCustody.sha256 };
   const identity = { purpose: "FRESH_ALL_16_STAGES", authorityReference, titleId: plan.titleId,
-    revision: plan.revision, source: plan.source, custody, handoffReference: handoff.reference };
+    revision: plan.revision, source: plan.source, custody, handoffReference: handoff.reference,
+    ...(collection ? { sourceCollection: collection } : {}) };
   const bindingHash = createHash("sha256").update(JSON.stringify(identity)).digest("hex");
   const runId = `commissioning-fresh:${plan.titleId}:v${plan.revision}:${bindingHash}`;
   return { ...plan, ...identity, schemaVersion: 2, bindingHash, executionId: runId, runId,
@@ -56,6 +63,7 @@ async function persistFreshTitleRun(input, deps = {}) {
       proof.sourceSha256 !== run.source.sha256 || proof.sourceETag !== run.custody.eTag ||
       proof.sourceItemId !== run.custody.itemId || proof.sourceDriveId !== run.custody.driveId ||
       proof.sourceBytes !== run.custody.bytes || proof.sourcePath !== run.custody.path ||
+      (run.sourceCollection && proof.sourceCollectionHash !== run.sourceCollection.custodyHash) ||
       proof.jackieAuthorshipVerified !== true || proof.stableHandoffVerified !== true) {
     deny("FRESH_RUN_OWNER_AUTHORITY_CHANGED");
   }

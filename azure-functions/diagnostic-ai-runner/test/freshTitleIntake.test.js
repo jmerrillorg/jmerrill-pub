@@ -45,8 +45,10 @@ test("fresh request cannot inject source or authority into the keyed owner route
     { env: { ...env, JM1_DIAGNOSTIC_RUNNER_KEY: "fixture-key" } });
   assert.equal(result.status, 400); assert.equal(result.jsonBody.effects, 0);
 });
-test("fresh owner persists new canonical intake and journal outcomes; restart repeats no creates", async () => {
+for (const variant of ["single-source", "multipart", "multipart-timeout", "hidden-owner-conflict"]) test(`${variant} fresh owner persistence and replay`, async () => {
+  const multipart = variant.startsWith("multipart");
   const blobs = new Map(), rows = new Map(); let creates = 0, version = 0;
+  let interrupted = false, clock = new Date("2026-10-10T05:00:00.000Z");
   const missing = () => Object.assign(new Error("missing"), { statusCode: 404 });
   const conflict = () => Object.assign(new Error("conflict"), { statusCode: 412 });
   const containerClient = { createIfNotExists: async () => {}, getBlockBlobClient: path => ({
@@ -55,16 +57,22 @@ test("fresh owner persists new canonical intake and journal outcomes; restart re
       if (row.etag !== options.conditions.ifMatch) throw conflict(); return row.bytes; },
     uploadData: async (bytes, options) => { const row = blobs.get(path);
       if (options.conditions.ifNoneMatch && row || options.conditions.ifMatch && row?.etag !== options.conditions.ifMatch) throw conflict();
-      const etag = String(++version); blobs.set(path, { bytes: Buffer.from(bytes), etag }); return { etag }; }
+      const etag = String(++version); blobs.set(path, { bytes: Buffer.from(bytes), etag });
+      if (variant === "multipart-timeout" && path.endsWith("/components/second-item.docx") && !interrupted) {
+        interrupted = true;
+        throw Object.assign(new Error("lost successful upload response"), { code: "ETIMEDOUT" });
+      }
+      return { etag }; }
   }) };
   const client = { first: async (set, query) => rows.get(`${set}:${query.$filter.split(" eq ")[1]}`),
-    list: async set => set === "jmpv2_stagedefinitions" ? [
+    list: async set => set.includes("/Keys") ? [{ KeyAttributes: ["jmpv2_canonicaltitleid"], EntityKeyIndexStatus: "Active" }] : set === "jmpv2_stagedefinitions" ? [
       { jmpv2_stagecode: "01_INQUIRY", jmpv2_validnextstagecode: "02_INTAKE" },
       { jmpv2_stagecode: "02_INTAKE", jmpv2_validnextstagecode: "03_EDITORIAL_REVIEW" }
     ] : [...rows].filter(([key]) => key.startsWith(`${set}:`)).map(([, row]) => row),
     create: async (set, payload) => { const pk = { jmpv2_lifecycleinstances: "jmpv2_lifecycleinstanceid",
       jmpv2_stageinstances: "jmpv2_stageinstanceid", jmpv2_publishingengagements: "jmpv2_publishingengagementid" }[set];
-      rows.set(`${set}:${payload[pk]}`, { ...payload }); creates++; }
+      if (variant === "hidden-owner-conflict" && set === "jmpv2_publishingengagements") throw conflict();
+      rows.set(`${set}:${payload[pk]}`, { ...payload, _ownerid_value: fresh.RUNTIME_OWNER_ID }); creates++; }
   };
   const contact = require("../src/author/jackieTitleSystemCommissioningPolicy").JACKIE_CANONICAL_AUTHOR_CONTACT_ID;
   const bytes = Buffer.from("Synthetic original. No author content."), sha256 = require("node:crypto").createHash("sha256").update(bytes).digest("hex");
@@ -73,13 +81,103 @@ test("fresh owner persists new canonical intake and journal outcomes; restart re
     historyReference: "dataverse:preserved", authorityReference: "human:fixture", handoff: { state: "READY", reference: "human:fixture" },
     sourceCustody: { driveId: "fixture-drive", itemId: "fixture-item", eTag: "fixture-etag", bytes: bytes.length,
       path: "/01_Pipeline_A-Z/02 - Intake/fixture/_Original/source.md", sha256 } };
-  const deps = { client, containerClient, now: () => new Date("2026-10-10T05:00:00.000Z"),
-    readFreshSource: async () => ({ input, bytes, identity: { contactId: contact }, titleName: "Synthetic fixture" }) };
-  const first = await fresh.processFreshTitleIntake(titleId, deps);
+  let components;
+  if (multipart) {
+    input.title.jm1pub_titleid = "e797232b-da7a-f111-ab0f-00224820105b";
+    input.sourceComponents = [input.sourceCustody, { ...input.sourceCustody, itemId: "second-item",
+      path: "/01_Pipeline_A-Z/02 - Intake/fixture/_Original/continued.docx" }];
+    const collection = require("../src/lifecycle/freshSourceCollection").bindSourceCollection(input.sourceComponents);
+    input.source.sha256 = collection.custodyHash;
+    input.source.reference = `sharepoint:collection:${collection.custodyHash}`;
+    input.source.version = collection.custodyHash;
+    components = input.sourceComponents.map(custody => ({ custody, bytes }));
+  }
+  const fixtureTitleId = input.title.jm1pub_titleid;
+  const deps = { client, containerClient, now: () => clock,
+    readFreshSource: async () => ({ input, bytes, components, identity: { contactId: contact }, titleName: "Synthetic fixture" }) };
+  let first = await fresh.processFreshTitleIntake(fixtureTitleId, deps);
+  if (variant === "hidden-owner-conflict") {
+    assert.equal(first.status, "HELD");
+    assert.equal(creates, 0);
+    assert.equal([...blobs.keys()].some(path => path.startsWith("commissioning-fresh-results/") || path.startsWith("stages/")), false);
+    assert.deepEqual(await fresh.processFreshTitleIntake(fixtureTitleId, { ...deps }), first);
+    return;
+  }
+  if (variant === "multipart-timeout") {
+    assert.equal(first.status, "RETRY_PENDING");
+    assert.equal(creates, 1);
+    const original = new Map([...blobs].filter(([path]) => path.includes("/components/")));
+    assert.equal(original.size, 2);
+    clock = new Date("2026-10-10T05:02:00.000Z");
+    first = await fresh.processFreshTitleIntake(fixtureTitleId, { ...deps });
+    for (const [path, saved] of original) assert.deepEqual(blobs.get(path), saved);
+  }
   assert.equal(first.status, "COMPLETED"); assert.equal(creates, 4);
   const journals = [...blobs].filter(([path]) => path.startsWith("stages/")).map(([, row]) => JSON.parse(row.bytes));
   assert.equal(journals.length, 2); assert.equal(journals.every(row => row.phase === "COMPLETED" && row.events.length === 3), true);
-  assert.deepEqual(await fresh.processFreshTitleIntake(titleId, { ...deps }), first); assert.equal(creates, 4);
+  assert.deepEqual(await fresh.processFreshTitleIntake(fixtureTitleId, { ...deps }), first); assert.equal(creates, 4);
   await fresh.execute(input, deps, { startedAt: "2026-10-10T05:00:00.000Z" }); assert.equal(creates, 4);
-  assert.equal([...blobs].filter(([path]) => path.endsWith("original.md")).length, 1);
+  assert.equal([...blobs].filter(([path]) => multipart ? path.includes("/components/") : path.endsWith("original.md")).length, multipart ? 2 : 1);
+  if (multipart) {
+    const receipt = JSON.parse([...blobs].find(([path]) => path.endsWith("/receipt.json"))[1].bytes);
+    assert.equal(receipt.downstreamGate, "SOURCE_COMPONENT_ORDER_AUTHORITY_REQUIRED");
+    assert.equal(receipt.concatenationAuthorized, false);
+    const stable = { ...input.sourceComponents[1] };
+    input.sourceComponents[1].eTag = "changed";
+    await assert.rejects(fresh.processFreshTitleIntake(fixtureTitleId, deps), /ORIGINAL_SOURCE_CUSTODY_REQUIRED/);
+    input.sourceComponents[1] = stable;
+    assert.equal(creates, 4);
+  }
+  const run = require("../src/lifecycle/freshTitleCommissioningRun").planFreshTitleRun(input);
+  const verified = await fresh.readFreshReceipt(run, deps);
+  assert.equal(verified.stageJournalsVerified, true);
+  assert.equal(verified.custodyVerified, true);
+  const stageRow = [...rows.values()].find(row => row.jmpv2_stagecode === "02_INTAKE");
+  stageRow._ownerid_value = "other-owner";
+  await assert.rejects(fresh.processFreshTitleIntake(fixtureTitleId, deps), /STAGE_READBACK_CHANGED/);
+  stageRow._ownerid_value = fresh.RUNTIME_OWNER_ID;
+  const originalPath = [...blobs.keys()].find(path => multipart ? path.includes("/components/") : path.endsWith("original.md"));
+  const originalBytes = blobs.get(originalPath).bytes;
+  blobs.get(originalPath).bytes = Buffer.from("changed preserved bytes");
+  await assert.rejects(fresh.readFreshReceipt(run, deps), /CUSTODY_READBACK_CHANGED/);
+  blobs.get(originalPath).bytes = originalBytes;
+  const journalPath = [...blobs.keys()].find(path => path.startsWith("stages/"));
+  const journalBytes = blobs.get(journalPath).bytes;
+  const journal = JSON.parse(journalBytes); journal.phase = "RUNNING";
+  blobs.get(journalPath).bytes = Buffer.from(JSON.stringify(journal));
+  await assert.rejects(fresh.readFreshReceipt(run, deps), /JOURNAL_READBACK_CHANGED/);
+  blobs.get(journalPath).bytes = journalBytes;
+  assert.equal(creates, 4);
+});
+test("canonical conflict safety requires active exact-title uniqueness, not guessed metadata", async () => {
+  for (const keys of [[], [{ KeyAttributes: ["jmpv2_canonicaltitleid"], EntityKeyIndexStatus: "Pending" }],
+    [{ KeyAttributes: ["jmpv2_canonicaltitleid", "ownerid"], EntityKeyIndexStatus: "Active" }]]) {
+    await assert.rejects(fresh.verifyCanonicalTitleKey({ list: async () => keys }), /UNIQUENESS_UNPROVEN/);
+  }
+});
+test("fresh canonical replay verifies actual row owner without assigning or sharing", async () => {
+  const payload = { itemid: "00000000-0000-5000-a000-000000000001" };
+  const client = { first: async () => ({ ...payload, _ownerid_value: "other-owner" }), create: () => assert.fail("no mutation") };
+  await assert.rejects(fresh.createExact(client, "items", "itemid", payload, fresh.RUNTIME_OWNER_ID), /CANONICAL_OWNER_CONFLICT/);
+});
+test("fresh Dataverse identity requires a distinct platform-bound principal and owner", async () => {
+  const ownerId = "11111111-1111-4111-a111-111111111111", clientId = "22222222-2222-4222-a222-222222222222";
+  for (const config of [{}, { JM1_TITLE_COMMISSIONING_FRESH_DATAVERSE_CLIENT_ID: clientId,
+    JM1_TITLE_COMMISSIONING_FRESH_DATAVERSE_USER_ID: fresh.RUNTIME_OWNER_ID }]) {
+    assert.throws(() => fresh.freshDataverseIdentityBinding(config), /ISOLATED_IDENTITY_UNBOUND/);
+  }
+  let reportedOwner = ownerId;
+  const context = fresh.nativeDeps({
+    env: { JM1_TITLE_COMMISSIONING_FRESH_DATAVERSE_CLIENT_ID: clientId, JM1_TITLE_COMMISSIONING_FRESH_DATAVERSE_USER_ID: ownerId,
+      DATAVERSE_RESOURCE_URL: "https://jm1hq.crm.dynamics.com", DATAVERSE_WEB_API_BASE_URL: "https://jm1hq.crm.dynamics.com/api/data/v9.2/" },
+    authorityClient: { first: () => assert.fail("no legacy read for identity test") }, containerClient: {},
+    credential: { getToken: () => assert.fail("fresh identity must not use shared credential") },
+    freshCredential: { getToken: async audience => { assert.equal(audience, "https://jm1hq.crm.dynamics.com/.default"); return { token: "synthetic-token" }; } },
+    fetchImpl: async url => { assert.match(url, /\/WhoAmI$/); return { ok: true, json: async () => ({ UserId: reportedOwner,
+      OrganizationId: "9dafb403-b493-f011-a700-000d3a106f37" }) }; }
+  });
+  assert.equal(context.ownerId, ownerId);
+  await context.verifyRuntimeIdentity();
+  reportedOwner = fresh.RUNTIME_OWNER_ID;
+  await assert.rejects(context.verifyRuntimeIdentity(), /RUNTIME_IDENTITY_MISMATCH/);
 });
