@@ -135,3 +135,23 @@ test("native Graph accepts only exact create-only content query and rejects over
   await assert.rejects(graph("drives/fixture/items/parent?arbitrary=true"), /PATH_DENIED/);
   assert.equal(calls, 1);
 });
+test("create-only race409 reconciles matching custody and denies different bytes without overwrite", async () => {
+  for (const changed of [false, true]) {
+    const f = fixture(), bytes = Buffer.from("fixture"); let writes = 0, raced = false;
+    const baseGraph = f.deps.graph;
+    f.deps.uploadMode = "SMALL_CREATE_ONLY";
+    f.deps.graph = async (path, options) => {
+      if (options?.method === "PUT") { writes++; raced = true; throw Object.assign(new Error("exists"), { statusCode: 409 }); }
+      if (raced && path.endsWith("/content")) return changed ? Buffer.from("different custody") : bytes;
+      if (raced && !path.endsWith("/items/folder") && !path.endsWith("/permissions")) return {
+        id: "item", name: `cover-review-${require("../src/production/coverOwnerStore").digest({ binding, checksum: hash(bytes) })}.html`,
+        file: {}, eTag: "preserved", parentReference: { driveId: "drive", id: "folder" },
+        webUrl: "https://jmerrillfoundation.sharepoint.com/preview/item" };
+      return baseGraph(path, options);
+    };
+    const runtime = createCoverSharePointPersistence(f.deps);
+    if (changed) await assert.rejects(runtime.persist(binding, bytes), /BYTES_CONFLICT/);
+    else assert.equal((await runtime.persist(binding, bytes)).etag, "preserved");
+    assert.equal(writes, 1);
+  }
+});

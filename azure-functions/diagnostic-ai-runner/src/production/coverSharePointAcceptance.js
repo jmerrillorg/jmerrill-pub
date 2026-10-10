@@ -89,8 +89,32 @@ async function runCoverSharePointAcceptance(containerClient, context = {}) {
   const saved = await store.writeJson("review-deliveries", digest(binding), { ...result, synthetic: true }, { immutable: true });
   const replay = await persist.persist(binding, row.bytes);
   if (digest(replay) !== digest(result)) throw new Error("COVER_REVIEW_REPLAY_CONFLICT");
+  const conflictKey = digest({ binding, kind: "SMALL_CREATE_ONLY_CONFLICT_PROOF_V1" });
+  const conflictResultKey = digest({ conflictKey, kind: "RESULT" });
+  let conflict = await store.read("faults", conflictResultKey);
+  let conflictProbeCalls = 0;
+  if (!conflict) {
+    if (await store.read("faults", conflictKey)) throw new Error("COVER_ACCEPTANCE_CONFLICT_PROOF_HELD");
+    await store.writeJson("faults", conflictKey, { kind: "CREATE_ONLY_CONFLICT_PROOF_RESERVED", synthetic: true,
+      bindingSha256: digest(binding), expectedEtag: result.etag, expectedSha256: row.sha256 });
+    if (context.env?.JM1_COVER_ADAPTER_ACCEPTANCE_ENABLED !== "true") throw new Error("COVER_ACCEPTANCE_DISABLED");
+    conflictProbeCalls++;
+    let status = 200;
+    try {
+      const filename = `cover-review-${digest({ binding, checksum: row.sha256 })}.html`;
+      await graph(`drives/${encodeURIComponent(DESTINATION.driveId)}/items/${encodeURIComponent(DESTINATION.folderId)}:/${filename}:/content?@microsoft.graph.conflictBehavior=fail`,
+        { method: "PUT", headers: { "Content-Type": "text/plain" }, body: row.bytes });
+    } catch (error) { status = error.statusCode || 0; }
+    conflict = await store.writeJson("faults", conflictResultKey, { kind: "CREATE_ONLY_CONFLICT_PROOF_RESULT",
+      synthetic: true, httpStatus: status, expectedEtag: result.etag, expectedSha256: row.sha256 }, { immutable: true });
+  }
+  const afterConflict = await persist.persist(binding, row.bytes);
+  if (conflict.value.httpStatus !== 409 || digest(afterConflict) !== digest(result)) {
+    throw new Error("COVER_ACCEPTANCE_CREATE_ONLY_NOT_PROVEN");
+  }
   return { proofClass: "CONTROLLED_SYNTHETIC_SHAREPOINT_NOT_TITLE_ACCEPTANCE", receiptReference: saved.reference,
-    ...saved.value, replayVerified: true, uploadCalls, committedResponseLost,
+    ...saved.value, replayVerified: true, uploadCalls, committedResponseLost, conflictProbeCalls,
+    createOnlyConflictStatus: conflict.value.httpStatus, createOnlyConflictVerified: true,
     paidProviderInvocations: 0, businessStageEffects: 0, authorCommunications: 0 };
 }
 module.exports = { runCoverSharePointAcceptance, DESTINATION };
