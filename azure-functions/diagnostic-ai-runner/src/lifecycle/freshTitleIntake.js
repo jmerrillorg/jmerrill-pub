@@ -179,16 +179,22 @@ async function handler(body, deps = {}) {
   if (!readOnly && !enabled(body.titleId, env)) return { status: 403, jsonBody: { code: "COMMISSIONING_FRESH_DISABLED", effects: 0 } };
   const context = nativeDeps(deps);
   let attempted = false;
+  let phase = "SOURCE_READ";
   try {
-    const current = await readSource(body.titleId, context), run = planFreshTitleRun(current.input);
+    const current = await readSource(body.titleId, context);
+    phase = "RUN_PLAN";
+    const run = planFreshTitleRun(current.input);
     if (body.mode === "FRESH_PREFLIGHT") {
+      phase = "CANONICAL_ENGAGEMENT_READ";
       const existing = await context.client.list("jmpv2_publishingengagements", { $filter: `jmpv2_canonicaltitleid eq '${run.titleId}'`, $top: "2" });
+      phase = "CANONICAL_DEFINITION_READ";
       const definitions = await context.client.list("jmpv2_stagedefinitions", { $filter: "jmpv2_isactive eq true", $top: "100" });
       return { status: 200, jsonBody: { runId: run.runId, bindingHash: run.bindingHash, titleId: run.titleId,
         source: run.custody, identity: current.identity, existingEngagementIds: existing.map(x => x.jmpv2_publishingengagementid),
         definitions: definitions.map(x => ({ code: x.jmpv2_stagecode, next: x.jmpv2_validnextstagecode })), effects: 0 } };
     }
     if (body.mode === "FRESH_READBACK") {
+      phase = "RECEIPT_READ";
       const blob = context.containerClient.getBlockBlobClient(`commissioning-fresh-results/${run.titleId}/${run.bindingHash}/receipt.json`);
       const properties = await blob.getProperties();
       const receipt = JSON.parse((await blob.downloadToBuffer(0, undefined, { conditions: { ifMatch: properties.etag } })).toString("utf8"));
@@ -196,10 +202,13 @@ async function handler(body, deps = {}) {
       return { status: 200, jsonBody: { receipt, effects: 0 } };
     }
     attempted = true;
+    phase = "INTAKE_EXECUTION";
     const result = await processFreshTitleIntake(body.titleId, context);
     return { status: 200, jsonBody: { result, modelCalls: 0, communications: 0, payments: 0 } };
   } catch (error) {
-    return { status: 409, jsonBody: { code: /^COMMISSIONING_[A-Z_]{1,100}$/.test(error.safeCode || "") ? error.safeCode : "COMMISSIONING_FRESH_DEPENDENCY_FAILED",
+    const providerStatus = error.statusCode ?? error.status;
+    return { status: 409, jsonBody: { code: /^(?:COMMISSIONING|FRESH_RUN|DATAVERSE|JACKIE_AUTHOR)_[A-Z_]{1,100}$/.test(error.safeCode || "") ? error.safeCode : "COMMISSIONING_FRESH_DEPENDENCY_FAILED",
+      phase, ...(Number.isInteger(providerStatus) && providerStatus >= 400 && providerStatus <= 599 ? { providerStatus } : {}),
       mutationAttempted: attempted, recovery: "EXACT_RUN_READBACK_FORWARD_ONLY", modelCalls: 0, communications: 0, payments: 0 } };
   }
 }
