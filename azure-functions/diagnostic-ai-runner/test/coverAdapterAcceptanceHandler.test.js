@@ -3,6 +3,11 @@ const test = require("node:test");
 const assert = require("node:assert/strict");
 const { coverAdapterAcceptanceHandler, runScheduledCoverAdapterAcceptance } = require("../src/production/coverAdapterAcceptanceHandler");
 
+test("the deployed explicit entry point registers the acceptance module exactly once", () => {
+  const source = require("node:fs").readFileSync(require.resolve("../src/index.js"), "utf8");
+  assert.equal(source.split('require("./functions/runCoverAdapterAcceptance");').length - 1, 1);
+});
+
 test("disabled acceptance never reads a body, storage or credentials", async () => {
   const result = await coverAdapterAcceptanceHandler({ json: () => { throw new Error("must not read"); } }, { env: {} });
   assert.equal(result.status, 403);
