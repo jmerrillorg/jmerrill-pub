@@ -31,7 +31,7 @@ jobs:
       - uses: actions/checkout@v7
 
       - name: Test source role contract
-        run: node --test scripts/fresh_title_commissioning_role.test.mjs scripts/fresh-title-role-policy.test.mjs scripts/fresh-title-release-binding.test.mjs .github/tests/fresh-title-role-auth.test.mjs
+        run: node --test scripts/fresh_title_commissioning_role.test.mjs scripts/fresh-title-role-policy.test.mjs scripts/fresh-title-release-binding.test.mjs .github/tests/fresh-title-role-auth.test.mjs scripts/dataverse-github-oidc-token.test.mjs scripts/reconcile-fresh-title-role-oidc.test.mjs
 
       - name: Validate immutable package
         shell: bash
@@ -131,12 +131,7 @@ jobs:
           FRESH_TITLE_ROLE_EVIDENCE: /tmp/fresh-title-role-readback.json
         run: |
           set -euo pipefail
-          PAC_CLI="${POWERPLATFORMTOOLS_PACPATH:-pac}"
-          TOKEN="$("$PAC_CLI" auth token)"
-          test -n "$TOKEN"
-          echo "::add-mask::$TOKEN"
-          DATAVERSE_ACCESS_TOKEN="$TOKEN" node scripts/reconcile-fresh-title-role.mjs
-          unset TOKEN
+          node scripts/reconcile-fresh-title-role-oidc.mjs
 
       - name: Read back production solution
         shell: bash
