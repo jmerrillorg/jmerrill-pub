@@ -97,15 +97,23 @@ stage completion. Recovery reuses the same deterministic IDs and exact
 payload; it never creates an alternative engagement. Stage events and final
 completion are emitted only after all required records and bytes read back.
 
+Completed-worker replay and the readback route independently verify the stored
+original bytes, canonical record owners, exact stage receipts and completed
+stage journals. A cached completion alone cannot certify current custody.
+Changed bytes, owners or journal phase fail closed without creating records.
+
 ## Acceptance and release serialization
 
 1. Review this exact successor head and mandatory CI; do not infer approval
    from focused tests. Keep all fresh and custody flags disabled.
-2. OPS obtains separate authorization for the constrained identity contract,
-   validates reduced Basic rights, exact definition shares, active title
-   uniqueness and negative scope. Do not remove unrelated shared roles.
-3. Serialize any protected successor deployment with the platform-owner
-   preflight. Match the reviewed merge artifact, release SHA and health.
+2. Under existing protected release authority, a reviewed successor may deploy
+   with all fresh, custody, review, stage and wait flags OFF. Verify concurrent
+   releases and workflow-setting parity; match merge artifact, SHA and health.
+   Missing identity configuration is not authority to enable or invoke intake.
+3. OPS completes the constrained identity contract under its existing scoped
+   authority and validates Basic rights, exact definition shares, active title
+   uniqueness and negative scope. Do not remove unrelated shared roles. Any
+   materially broader security or hosting decision remains a separate gate.
 4. Run current-SHA native read-only preflight. Verify effective record ownership,
    metadata/key visibility and definition reads; never substitute admin identity.
 5. Only then enable the bounded, approved title allowlist (maximum two).

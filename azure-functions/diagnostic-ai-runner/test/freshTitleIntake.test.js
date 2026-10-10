@@ -128,6 +128,26 @@ for (const variant of ["single-source", "multipart", "multipart-timeout", "hidde
     input.sourceComponents[1] = stable;
     assert.equal(creates, 4);
   }
+  const run = require("../src/lifecycle/freshTitleCommissioningRun").planFreshTitleRun(input);
+  const verified = await fresh.readFreshReceipt(run, deps);
+  assert.equal(verified.stageJournalsVerified, true);
+  assert.equal(verified.custodyVerified, true);
+  const stageRow = [...rows.values()].find(row => row.jmpv2_stagecode === "02_INTAKE");
+  stageRow._ownerid_value = "other-owner";
+  await assert.rejects(fresh.processFreshTitleIntake(fixtureTitleId, deps), /STAGE_READBACK_CHANGED/);
+  stageRow._ownerid_value = fresh.RUNTIME_OWNER_ID;
+  const originalPath = [...blobs.keys()].find(path => multipart ? path.includes("/components/") : path.endsWith("original.md"));
+  const originalBytes = blobs.get(originalPath).bytes;
+  blobs.get(originalPath).bytes = Buffer.from("changed preserved bytes");
+  await assert.rejects(fresh.readFreshReceipt(run, deps), /CUSTODY_READBACK_CHANGED/);
+  blobs.get(originalPath).bytes = originalBytes;
+  const journalPath = [...blobs.keys()].find(path => path.startsWith("stages/"));
+  const journalBytes = blobs.get(journalPath).bytes;
+  const journal = JSON.parse(journalBytes); journal.phase = "RUNNING";
+  blobs.get(journalPath).bytes = Buffer.from(JSON.stringify(journal));
+  await assert.rejects(fresh.readFreshReceipt(run, deps), /JOURNAL_READBACK_CHANGED/);
+  blobs.get(journalPath).bytes = journalBytes;
+  assert.equal(creates, 4);
 });
 test("canonical conflict safety requires active exact-title uniqueness, not guessed metadata", async () => {
   for (const keys of [[], [{ KeyAttributes: ["jmpv2_canonicaltitleid"], EntityKeyIndexStatus: "Pending" }],

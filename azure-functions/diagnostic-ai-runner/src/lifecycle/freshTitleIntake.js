@@ -1,6 +1,6 @@
 "use strict";
 const { createHash } = require("node:crypto");
-const { planFreshTitleRun, persistFreshTitleRun } = require("./freshTitleCommissioningRun");
+const { planFreshTitleRun, persistFreshTitleRun, assertFreshStageReceipt } = require("./freshTitleCommissioningRun");
 const { processTitleCommissioningStep } = require("./titleCommissioningIntakeWorker");
 const { JACKIE_CANONICAL_AUTHOR_CONTACT_ID: contactId } = require("../author/jackieTitleSystemCommissioningPolicy");
 const { bindSourceCollection } = require("./freshSourceCollection");
@@ -210,16 +210,77 @@ async function verifyCanonicalTitleKey(client) {
   }
   return { enforcement: "ACTIVE_CANONICAL_TITLE_ALTERNATE_KEY", crossOwnerVisibilityClaimed: false };
 }
+async function readBlob(container, path) {
+  const blob = container.getBlockBlobClient(path), properties = await blob.getProperties();
+  if (!properties.etag) deny("COMMISSIONING_FRESH_READBACK_UNVERSIONED");
+  return blob.downloadToBuffer(0, undefined, { conditions: { ifMatch: properties.etag } });
+}
+async function readFreshReceipt(run, deps) {
+  const prefix = `commissioning-fresh-results/${run.titleId}/${run.bindingHash}`;
+  const receipt = JSON.parse((await readBlob(deps.containerClient, `${prefix}/receipt.json`)).toString("utf8"));
+  const ownerId = deps.ownerId || RUNTIME_OWNER_ID;
+  const lifecycleId = id(`${run.runId}:lifecycle`), engagementId = id(`${run.runId}:engagement`);
+  if (receipt.bindingHash !== run.bindingHash || receipt.runId !== run.runId || receipt.titleId !== run.titleId ||
+      receipt.status !== "FRESH_INTAKE_CANONICAL_READBACK_COMPLETE" || receipt.lifecycleId !== lifecycleId ||
+      receipt.engagementId !== engagementId || !Array.isArray(receipt.stages) || receipt.stages.length !== 2) {
+    deny("COMMISSIONING_FRESH_RECEIPT_CONFLICT");
+  }
+  const engagement = await deps.client.first("jmpv2_publishingengagements", { $filter: `jmpv2_publishingengagementid eq ${engagementId}` });
+  const lifecycle = await deps.client.first("jmpv2_lifecycleinstances", { $filter: `jmpv2_lifecycleinstanceid eq ${lifecycleId}` });
+  if (engagement?.jmpv2_canonicaltitleid !== run.titleId || engagement.jmpv2_canonicalauthorid !== contactId ||
+      engagement.jmpv2_lifecycleinstanceid !== lifecycleId || engagement.jmpv2_correlationid !== run.bindingHash ||
+      engagement._ownerid_value !== ownerId || lifecycle?.jmpv2_lifecyclekey !== lifecycleId || lifecycle._ownerid_value !== ownerId) {
+    deny("COMMISSIONING_FRESH_CANONICAL_READBACK_CHANGED");
+  }
+  const intake = JSON.parse((await readBlob(deps.containerClient, `${prefix}/intake.json`)).toString("utf8"));
+  if (intake.runId !== run.runId || intake.titleId !== run.titleId || intake.identity?.contactId !== contactId ||
+      JSON.stringify(intake.source) !== JSON.stringify(run.custody) ||
+      JSON.stringify(intake.sourceCollection) !== JSON.stringify(run.sourceCollection)) deny("COMMISSIONING_FRESH_INTAKE_READBACK_CHANGED");
+  const components = run.sourceCollection?.components || [run.custody];
+  for (const component of components) {
+    const path = run.sourceCollection ? `${prefix}/components/${component.itemId}.docx` : `${prefix}/original.${POLICIES[run.titleId].format}`;
+    const bytes = await readBlob(deps.containerClient, path);
+    if (bytes.length !== component.bytes || hash(bytes) !== component.sha256) deny("COMMISSIONING_FRESH_CUSTODY_READBACK_CHANGED");
+  }
+  const journal = require("./stageRuntimeJournal");
+  for (const stageCode of ["01_INQUIRY", "02_INTAKE"]) {
+    const stageId = id(`${run.runId}:${stageCode}`);
+    const entries = receipt.stages.filter(entry => entry.stageCode === stageCode);
+    if (entries.length !== 1 || entries[0].stageId !== stageId) deny("COMMISSIONING_FRESH_STAGE_RECEIPT_CHANGED");
+    assertFreshStageReceipt(run, entries[0]);
+    const row = await deps.client.first("jmpv2_stageinstances", { $filter: `jmpv2_stageinstanceid eq ${stageId}` });
+    if (row?.jmpv2_stagecode !== stageCode || row.jmpv2_lifecyclekey !== lifecycleId || row.jmpv2_status !== "CLOSED" ||
+        row._ownerid_value !== ownerId) deny("COMMISSIONING_FRESH_STAGE_READBACK_CHANGED");
+    const state = JSON.parse((await readBlob(deps.containerClient, journal.blobName({ titleId: run.titleId, stageId,
+      executionId: `${run.runId}:${stageCode}` }))).toString("utf8"));
+    if (state.phase !== "COMPLETED" || state.titleId !== run.titleId || state.stageId !== stageId ||
+        state.stageCode !== stageCode || state.executionId !== `${run.runId}:${stageCode}` || !Array.isArray(state.events)) {
+      deny("COMMISSIONING_FRESH_JOURNAL_READBACK_CHANGED");
+    }
+    for (const eventType of ["STAGE_ELIGIBLE", "STAGE_STARTED", "STAGE_COMPLETED"]) {
+      const events = state.events.filter(event => event.eventType === eventType);
+      if (events.length !== 1 || events[0].evidenceReference !== `${prefix}/intake.json` || events[0].stageId !== stageId ||
+          events[0].titleId !== run.titleId || events[0].stageCode !== stageCode || events[0].executionId !== state.executionId) {
+        deny("COMMISSIONING_FRESH_JOURNAL_READBACK_CHANGED");
+      }
+      journal.validateEvent(events[0]);
+    }
+  }
+  return { receipt, currentStage: engagement.jmpv2_currentstage, custodyVerified: true, canonicalOwnerVerified: true,
+    stageJournalsVerified: true };
+}
 async function processFreshTitleIntake(titleId, deps) {
   if (deps.verifyRuntimeIdentity) await deps.verifyRuntimeIdentity();
   const current = await (deps.readFreshSource || readSource)(titleId, deps), run = planFreshTitleRun(current.input);
-  return processTitleCommissioningStep(current.input, { ...deps, readScope: async () => scope(titleId) }, {
+  const result = await processTitleCommissioningStep(current.input, { ...deps, readScope: async () => scope(titleId) }, {
     plan: planFreshTitleRun, namespace: "commissioning-fresh-executions", executionSuffix: "", execute,
     validate: result => result?.receipt?.runId === run.runId && result.receipt.bindingHash === run.bindingHash &&
       result.receipt.status === "FRESH_INTAKE_CANONICAL_READBACK_COMPLETE",
     reference: () => `commissioning-fresh-results/${run.titleId}/${run.bindingHash}/receipt.json`,
     completionEffects: () => ({ productionStageChanged: true, legacyTitleChanged: false, freshCanonicalIntakeOnly: true })
   });
+  if (result.status === "COMPLETED") await readFreshReceipt(run, deps);
+  return result;
 }
 function nativeDeps(deps = {}) {
   const env = deps.env || process.env;
@@ -305,11 +366,7 @@ async function handler(body, deps = {}) {
     }
     if (body.mode === "FRESH_READBACK") {
       phase = "RECEIPT_READ";
-      const blob = context.containerClient.getBlockBlobClient(`commissioning-fresh-results/${run.titleId}/${run.bindingHash}/receipt.json`);
-      const properties = await blob.getProperties();
-      const receipt = JSON.parse((await blob.downloadToBuffer(0, undefined, { conditions: { ifMatch: properties.etag } })).toString("utf8"));
-      if (receipt.bindingHash !== run.bindingHash || receipt.runId !== run.runId) deny("COMMISSIONING_FRESH_RECEIPT_CONFLICT");
-      return { status: 200, jsonBody: { receipt, effects: 0 } };
+      return { status: 200, jsonBody: { ...await readFreshReceipt(run, context), effects: 0 } };
     }
     attempted = true;
     phase = "INTAKE_EXECUTION";
@@ -323,4 +380,4 @@ async function handler(body, deps = {}) {
   }
 }
 module.exports = { AUTHORITY, POLICIES, driveId, RUNTIME_OWNER_ID, freshDataverseIdentityBinding, enabled, readSource, readComponent, immutable,
-  processFreshTitleIntake, execute, createExact, verifyCanonicalTitleKey, nativeDeps, handler };
+  processFreshTitleIntake, execute, createExact, verifyCanonicalTitleKey, readFreshReceipt, nativeDeps, handler };
