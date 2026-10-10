@@ -17,19 +17,23 @@ async function coverAdapterAcceptanceHandler(request, deps = {}) {
   }
   let body;
   try { body = await request.json(); } catch { return { status: 400, jsonBody: { code: "COVER_ACCEPTANCE_REQUEST_INVALID" } }; }
-  if (!body || Object.keys(body).length !== 1 || !["READ", "SEED", "DISPATCH", "SHAREPOINT"].includes(body.action)) {
+  if (!body || Object.keys(body).length !== 1 || !["READ", "SEED", "DISPATCH", "SHAREPOINT", "SHAREPOINT_SESSION_DIAGNOSTIC"].includes(body.action)) {
     return { status: 400, jsonBody: { code: "COVER_ACCEPTANCE_REQUEST_INVALID" } };
   }
   try {
     const container = deps.containerClient || acceptanceContainer(env);
-    const result = body.action === "SHAREPOINT" ? await require("./coverSharePointAcceptance").runCoverSharePointAcceptance(container, { ...deps, env }) :
+    const result = body.action.startsWith("SHAREPOINT") ? await require("./coverSharePointAcceptance").runCoverSharePointAcceptance(container,
+      { ...deps, env, sessionDiagnostic: body.action === "SHAREPOINT_SESSION_DIAGNOSTIC" }) :
       body.action === "READ" ? await readCoverAdapterAcceptance(container) :
       await runCoverAdapterAcceptance(container, { seed: body.action === "SEED" });
     return { status: 200, jsonBody: result };
   } catch (error) {
     return { status: 503, jsonBody: { code: "COVER_ACCEPTANCE_NATIVE_ADAPTER_FAILED", retryRequiresReadback: true,
-      ...(body.action === "SHAREPOINT" ? { dependencyStatus: error.statusCode || null,
-        safeCode: /^COVER_[A-Z_]+$/.test(error.safeCode || "") ? error.safeCode : "COVER_SHAREPOINT_DEPENDENCY_FAILED" } : {}) } };
+      ...(body.action.startsWith("SHAREPOINT") ? { dependencyStatus: error.statusCode || null,
+        safeCode: /^COVER_[A-Z_]+$/.test(error.safeCode || "") ? error.safeCode : "COVER_SHAREPOINT_DEPENDENCY_FAILED",
+        providerCode: /^[A-Za-z][A-Za-z0-9_]{0,63}$/.test(error.providerCode || "") ? error.providerCode : null,
+        category: ["FILE_POLICY", "PATH_POLICY", "CAPACITY", "UNSUPPORTED_TYPE", "UNCLASSIFIED"].includes(error.category) ? error.category : null,
+        requestId: /^[a-f0-9-]{36}$/i.test(error.requestId || "") ? error.requestId : null } : {}) } };
   }
 }
 
