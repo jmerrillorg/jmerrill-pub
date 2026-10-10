@@ -35,7 +35,7 @@ jobs:
         working-directory: azure-functions/diagnostic-ai-runner
         run: npm ci --ignore-scripts
       - name: Test disposable package rejection and isolation
-        run: node --test scripts/verify-local-role-sandbox.test.mjs
+        run: node --test scripts/verify-local-role-sandbox.test.mjs scripts/dataverse-github-oidc-token.test.mjs
       - name: Validate isolated fixture before credentials
         env:
           FIXTURE_BASE64: ${{ inputs.package_base64 }}
@@ -54,9 +54,7 @@ jobs:
           set -euo pipefail
           PAC_CLI="${POWERPLATFORMTOOLS_PACPATH:-pac}"
           "$PAC_CLI" auth create --name jm1-pub-local-sandbox --applicationId "$SANDBOX_APPLICATION_ID" --tenant 352d075e-8e17-4169-9f8e-22e6946ce66d --githubFederated --environment "$DATAVERSE_ENVIRONMENT_URL"
-          TOKEN="$("$PAC_CLI" auth token)"
-          echo "::add-mask::$TOKEN"
-          DATAVERSE_ACCESS_TOKEN="$TOKEN" node scripts/verify-local-role-sandbox.mjs before
+          node scripts/verify-local-role-sandbox.mjs before
       - name: Import exactly one disposable managed role
         run: |
           set -euo pipefail
@@ -65,10 +63,7 @@ jobs:
       - name: Normalize and verify disposable imported role
         run: |
           set -euo pipefail
-          PAC_CLI="${POWERPLATFORMTOOLS_PACPATH:-pac}"
-          TOKEN="$("$PAC_CLI" auth token)"
-          echo "::add-mask::$TOKEN"
-          DATAVERSE_ACCESS_TOKEN="$TOKEN" node scripts/verify-local-role-sandbox.mjs after
+          node scripts/verify-local-role-sandbox.mjs after
       - name: Preserve acceptance receipts
         if: always()
         uses: actions/upload-artifact@v7

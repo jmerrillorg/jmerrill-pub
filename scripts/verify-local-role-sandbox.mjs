@@ -1,6 +1,7 @@
 import { readFileSync, writeFileSync } from 'node:fs'
 import assert from 'node:assert/strict'
 import { createRequire } from 'node:module'
+import { dataverseGithubOidcToken } from './dataverse-github-oidc-token.mjs'
 const require = createRequire(new URL('../azure-functions/diagnostic-ai-runner/package.json', import.meta.url))
 const { DOMParser } = require('@xmldom/xmldom')
 const expected = new Set(['prvCreatejmpv2_LifecycleInstance', 'prvCreatejmpv2_PublishingEngagement', 'prvCreatejmpv2_StageInstance', 'prvReadjmpv2_LifecycleInstance', 'prvReadjmpv2_PublishingEngagement', 'prvReadjmpv2_StageInstance', 'prvReadjmpv2_StageDefinition'])
@@ -35,9 +36,10 @@ if (mode === 'package') {
   const base = process.env.DATAVERSE_ENVIRONMENT_URL
   assert.equal(base, 'https://jm1test.crm.dynamics.com')
   assert.equal(process.env.SANDBOX_ROLE_ID, roleId)
+  const token = await dataverseGithubOidcToken({ environmentUrl: base, applicationId: process.env.SANDBOX_APPLICATION_ID, tenantId: '352d075e-8e17-4169-9f8e-22e6946ce66d' })
   const evidence = { mode, at: new Date().toISOString(), requests: [] }
   async function request(path, method = 'GET', body, allow404 = false) {
-    const r = await fetch(`${base}/api/data/v9.2/${path}`, { method, headers: { Authorization: `Bearer ${process.env.DATAVERSE_ACCESS_TOKEN}`, 'Content-Type': 'application/json' }, body: body ? JSON.stringify(body) : undefined, signal: AbortSignal.timeout(30000) })
+    const r = await fetch(`${base}/api/data/v9.2/${path}`, { method, headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }, body: body ? JSON.stringify(body) : undefined, signal: AbortSignal.timeout(30000) })
     const text = await r.text(); const data = text ? JSON.parse(text) : {}
     evidence.requests.push({ path, method, status: r.status, requestId: r.headers.get('x-ms-service-request-id'), result: data })
     if (r.status === 404 && allow404) return null
