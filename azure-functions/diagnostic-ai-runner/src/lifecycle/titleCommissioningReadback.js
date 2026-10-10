@@ -136,10 +136,21 @@ async function titleCommissioningReadback(body, deps = {}) {
       throw Object.assign(new Error("COMMISSIONING_READBACK_IDENTITY_CONFLICT"), { safeCode: "COMMISSIONING_READBACK_IDENTITY_CONFLICT" });
     }
   }
+  if (execution?.value.status === "COMPLETED" &&
+      (execution.value.receiptReference !== `commissioning-intake/${plan.titleId}/${plan.bindingHash}.json` ||
+       !receipt || receipt.value.status !== "INTAKE_MATERIALS_VERIFIED" ||
+       receipt.value.productionStageChanged !== false ||
+       JSON.stringify(receipt.value.source) !== JSON.stringify(plan.source))) {
+    throw new Error("COMMISSIONING_COMPLETED_INTAKE_RECEIPT_INVALID");
+  }
+  const eligibility = require("./titleCommissioningEligibilityProjection").projectCommissioningEligibility({
+    source: plan.source, scopePersisted, execution: execution?.value, receipt: receipt?.value,
+    reviewExecution: reviewExecution?.value, reviewReceipt: reviewReceipt?.value
+  });
   return { status: 200, jsonBody: { mode: body.mode, effects: 0, observedAt: new Date().toISOString(),
     titleId: plan.titleId, executionId: plan.executionId, bindingHash: plan.bindingHash,
     nativeAuthorityAndBytes: "PASS", artifactBindings: authority.artifacts, scopePersisted, reviewAuthority,
-    commissioningIdentity: authority.identityProof,
+    commissioningIdentity: authority.identityProof, eligibility,
     reviewRejection,
     reviewExecution: reviewExecution ? { etag: reviewExecution.etag, status: reviewExecution.value.status,
       attempts: reviewExecution.value.attempts, failureCode: reviewExecution.value.failureCode, causeCode: reviewExecution.value.causeCode,
