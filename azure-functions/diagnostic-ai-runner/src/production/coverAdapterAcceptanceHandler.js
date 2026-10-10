@@ -17,16 +17,19 @@ async function coverAdapterAcceptanceHandler(request, deps = {}) {
   }
   let body;
   try { body = await request.json(); } catch { return { status: 400, jsonBody: { code: "COVER_ACCEPTANCE_REQUEST_INVALID" } }; }
-  if (!body || Object.keys(body).length !== 1 || !["READ", "SEED", "DISPATCH"].includes(body.action)) {
+  if (!body || Object.keys(body).length !== 1 || !["READ", "SEED", "DISPATCH", "SHAREPOINT"].includes(body.action)) {
     return { status: 400, jsonBody: { code: "COVER_ACCEPTANCE_REQUEST_INVALID" } };
   }
   try {
     const container = deps.containerClient || acceptanceContainer(env);
-    const result = body.action === "READ" ? await readCoverAdapterAcceptance(container) :
+    const result = body.action === "SHAREPOINT" ? await require("./coverSharePointAcceptance").runCoverSharePointAcceptance(container, { ...deps, env }) :
+      body.action === "READ" ? await readCoverAdapterAcceptance(container) :
       await runCoverAdapterAcceptance(container, { seed: body.action === "SEED" });
     return { status: 200, jsonBody: result };
-  } catch {
-    return { status: 503, jsonBody: { code: "COVER_ACCEPTANCE_NATIVE_ADAPTER_FAILED", retryRequiresReadback: true } };
+  } catch (error) {
+    return { status: 503, jsonBody: { code: "COVER_ACCEPTANCE_NATIVE_ADAPTER_FAILED", retryRequiresReadback: true,
+      ...(body.action === "SHAREPOINT" ? { dependencyStatus: error.statusCode || null,
+        safeCode: /^COVER_[A-Z_]+$/.test(error.safeCode || "") ? error.safeCode : "COVER_SHAREPOINT_DEPENDENCY_FAILED" } : {}) } };
   }
 }
 
