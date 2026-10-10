@@ -1,159 +1,76 @@
-name: Publishing Fresh Title Role Deploy
-
+name: Publishing Disposable Local Role Sandbox
 on:
   workflow_dispatch:
-
+    inputs:
+      package_base64:
+        description: Reviewed disposable role-only fixture
+        required: true
+      package_sha256:
+        description: Exact fixture SHA256
+        required: true
 permissions:
   contents: read
   id-token: write
-
 concurrency:
-  group: publishing-fresh-title-role-production
+  group: publishing-local-role-disposable-sandbox
   cancel-in-progress: false
-
 env:
-  PACKAGE_PATH: powerplatform/solutions/JMPPublishingV2Phase6/artifacts/JMP_PublishingV2_Phase6_Portable_1_2_0_2_managed.zip
-  PACKAGE_SHA256: 14fc42c5b9af6f785f458704ce53d57240d99b82932568b8d676affa71219a97
-  SOLUTION_NAME: JMP_PublishingV2_Phase6_Portable
-  PREVIOUS_SOLUTION_VERSION: 1.2.0.1
-  SOLUTION_VERSION: 1.2.0.2
-  ROLE_ID: a3fc4c02-7d09-4ca1-8e32-2090ad209dc2
-  PROD_ENVIRONMENT_URL: https://jm1hq.crm.dynamics.com/
-  PROD_ENVIRONMENT_ID: dc4b2a13-3dbb-e0d1-95b8-f0e7d3a26e10
-  PROD_ORGANIZATION_ID: 9dafb403-b493-f011-a700-000d3a106f37
-  PAC_TENANT_ID: 352d075e-8e17-4169-9f8e-22e6946ce66d
-  PAC_APPLICATION_ID: 97891ed1-6623-487c-b890-633bea440e22
-
+  DATAVERSE_ENVIRONMENT_URL: https://jm1test.crm.dynamics.com
+  EXPECTED_ORGANIZATION_ID: bb7a9d9e-8e73-f111-b27b-000d3a31ff17
+  SANDBOX_APPLICATION_ID: ad828303-3ce0-4bbb-8a6f-fbf410526b22
+  SANDBOX_USER_ID: e20f91bb-a5c4-f111-aaad-7ced8d70583e
+  SANDBOX_ROLE_ID: 7d151c32-7534-4ef4-8b91-9e76f5a9fe45
 jobs:
-  validate:
+  disposable-import:
+    if: github.ref == 'refs/heads/codex/fresh-role-sandbox-acceptance'
     runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v7
-
-      - name: Test source role contract
-        run: node --test scripts/fresh_title_commissioning_role.test.mjs scripts/fresh-title-role-policy.test.mjs scripts/fresh-title-release-binding.test.mjs .github/tests/fresh-title-role-auth.test.mjs
-
-      - name: Validate immutable package
-        shell: bash
-        run: |
-          set -euo pipefail
-          test -f "$PACKAGE_PATH"
-          echo "$PACKAGE_SHA256  $PACKAGE_PATH" | sha256sum --check --status
-          unzip -t "$PACKAGE_PATH"
-          unzip -p "$PACKAGE_PATH" solution.xml > /tmp/solution.xml
-          grep -Fq "<UniqueName>$SOLUTION_NAME</UniqueName>" /tmp/solution.xml
-          grep -Fq "<Version>$SOLUTION_VERSION</Version>" /tmp/solution.xml
-          grep -Fiq "<RootComponent type=\"20\" id=\"{$ROLE_ID}\"" /tmp/solution.xml
-          unzip -p "$PACKAGE_PATH" customizations.xml > /tmp/customizations.xml
-          grep -Fq 'name="JMP Fresh Title Commissioning Runtime"' /tmp/customizations.xml
-          grep -Fq 'name="prvCreatejmpv2_PublishingEngagement" level="Basic"' /tmp/customizations.xml
-          grep -Fq 'name="prvCreatejmpv2_LifecycleInstance" level="Basic"' /tmp/customizations.xml
-          grep -Fq 'name="prvCreatejmpv2_StageInstance" level="Basic"' /tmp/customizations.xml
-          grep -Fq 'name="prvReadjmpv2_PublishingEngagement" level="Basic"' /tmp/customizations.xml
-          grep -Fq 'name="prvReadjmpv2_LifecycleInstance" level="Basic"' /tmp/customizations.xml
-          grep -Fq 'name="prvReadjmpv2_StageDefinition" level="Basic"' /tmp/customizations.xml
-          grep -Fq 'name="prvReadjmpv2_StageInstance" level="Basic"' /tmp/customizations.xml
-          test "$(sed -n '/name="JMP Fresh Title Commissioning Runtime"/,/<\/Role>/p' /tmp/customizations.xml | grep -c '<RolePrivilege ')" -eq 7
-          ! sed -n '/name="JMP Fresh Title Commissioning Runtime"/,/<\/Role>/p' /tmp/customizations.xml | grep -Eqi 'level="(Local|Deep|Global)"|prv(Delete|Write|Assign|Share|Append|AppendTo|Override|ActOnBehalfOf)'
-
-      - name: Preserve package validation evidence
-        uses: actions/upload-artifact@v7
-        with:
-          name: publishing-fresh-title-role-package-validation
-          path: ${{ env.PACKAGE_PATH }}
-          if-no-files-found: error
-
-  production-import:
-    needs: validate
-    runs-on: ubuntu-latest
-    environment: jm1-power-platform-production
     steps:
       - uses: actions/checkout@v7
         with:
           ref: ${{ github.sha }}
-
-      - name: Verify approved immutable release binding before credentials
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+      - name: Install locked validation dependencies
+        working-directory: azure-functions/diagnostic-ai-runner
+        run: npm ci --ignore-scripts
+      - name: Validate isolated fixture before credentials
         env:
-          APPROVED_SOURCE_SHA: ${{ vars.JMP_FRESH_TITLE_APPROVED_SOURCE_SHA }}
-          EXPECTED_RELEASE_REF: refs/heads/main
-          RUN_SHA: ${{ github.sha }}
-          WORKFLOW_SHA: ${{ github.workflow_sha }}
-          RUN_REF: ${{ github.ref }}
-          PACKAGE_PATH: ${{ env.PACKAGE_PATH }}
-          PACKAGE_SHA256: ${{ env.PACKAGE_SHA256 }}
-        run: node scripts/verify-fresh-title-release-binding.mjs
-
-      - name: Install Power Platform CLI
-        uses: microsoft/powerplatform-actions/actions-install@v1
-
-      - name: Authenticate with GitHub OIDC
-        shell: bash
+          FIXTURE_BASE64: ${{ inputs.package_base64 }}
+          FIXTURE_SHA256: ${{ inputs.package_sha256 }}
+        run: |
+          set -euo pipefail
+          test "$FIXTURE_SHA256" = "b4819aefaea7394239562fa33b8e3afb399cc32564964c5a7aaf64c4cb7740a0"
+          printf '%s' "$FIXTURE_BASE64" | base64 --decode > /tmp/fixture.zip
+          printf '%s  /tmp/fixture.zip\n' "$FIXTURE_SHA256" | sha256sum --check --status
+          unzip -p /tmp/fixture.zip solution.xml > /tmp/fixture-solution.xml
+          unzip -p /tmp/fixture.zip customizations.xml > /tmp/fixture-customizations.xml
+          node scripts/verify-local-role-sandbox.mjs package
+      - uses: microsoft/powerplatform-actions/actions-install@v1
+      - name: Authenticate disposable branch-bound identity
         run: |
           set -euo pipefail
           PAC_CLI="${POWERPLATFORMTOOLS_PACPATH:-pac}"
-          "$PAC_CLI" auth create \
-            --name jm1-pub-fresh-role-oidc \
-            --applicationId "$PAC_APPLICATION_ID" \
-            --tenant "$PAC_TENANT_ID" \
-            --githubFederated \
-            --environment "$PROD_ENVIRONMENT_URL"
-
-      - name: Verify production target and existing package version
-        shell: bash
+          "$PAC_CLI" auth create --name jm1-pub-local-sandbox --applicationId "$SANDBOX_APPLICATION_ID" --tenant 352d075e-8e17-4169-9f8e-22e6946ce66d --githubFederated --environment "$DATAVERSE_ENVIRONMENT_URL"
+          TOKEN="$("$PAC_CLI" auth token)"
+          echo "::add-mask::$TOKEN"
+          DATAVERSE_ACCESS_TOKEN="$TOKEN" node scripts/verify-local-role-sandbox.mjs before
+      - name: Import exactly one disposable managed role
         run: |
           set -euo pipefail
           PAC_CLI="${POWERPLATFORMTOOLS_PACPATH:-pac}"
-          test "$PROD_ENVIRONMENT_URL" = "https://jm1hq.crm.dynamics.com/"
-          test "$PROD_ENVIRONMENT_ID" = "dc4b2a13-3dbb-e0d1-95b8-f0e7d3a26e10"
-          test "$PROD_ORGANIZATION_ID" = "9dafb403-b493-f011-a700-000d3a106f37"
-          "$PAC_CLI" org who --environment "$PROD_ENVIRONMENT_URL" | tee /tmp/target-org.txt
-          grep -Fi "$PROD_ORGANIZATION_ID" /tmp/target-org.txt
-          "$PAC_CLI" solution list --environment "$PROD_ENVIRONMENT_URL" > /tmp/solutions-before.txt
-          grep -Eq "^${SOLUTION_NAME}[[:space:]]+.*${PREVIOUS_SOLUTION_VERSION}[[:space:]]+True$" \
-            /tmp/solutions-before.txt
-
-      - name: Import managed solution update
-        shell: bash
-        run: |
-          set -euo pipefail
-          PAC_CLI="${POWERPLATFORMTOOLS_PACPATH:-pac}"
-          echo "$PACKAGE_SHA256  $PACKAGE_PATH" | sha256sum --check --status
-          "$PAC_CLI" solution import \
-            --environment "$PROD_ENVIRONMENT_URL" \
-            --path "$PACKAGE_PATH" \
-            --publish-changes
-
-      - name: Enforce and independently verify effective role privileges
-        shell: bash
-        env:
-          DATAVERSE_ENVIRONMENT_URL: ${{ env.PROD_ENVIRONMENT_URL }}
-          EXPECTED_ORGANIZATION_ID: ${{ env.PROD_ORGANIZATION_ID }}
-          FRESH_TITLE_ROLE_EVIDENCE: /tmp/fresh-title-role-readback.json
+          "$PAC_CLI" solution import --environment "$DATAVERSE_ENVIRONMENT_URL" --path /tmp/fixture.zip
+      - name: Normalize and verify disposable imported role
         run: |
           set -euo pipefail
           PAC_CLI="${POWERPLATFORMTOOLS_PACPATH:-pac}"
           TOKEN="$("$PAC_CLI" auth token)"
-          test -n "$TOKEN"
           echo "::add-mask::$TOKEN"
-          DATAVERSE_ACCESS_TOKEN="$TOKEN" node scripts/reconcile-fresh-title-role.mjs
-          unset TOKEN
-
-      - name: Read back production solution
-        shell: bash
-        run: |
-          set -euo pipefail
-          PAC_CLI="${POWERPLATFORMTOOLS_PACPATH:-pac}"
-          mkdir -p /tmp/fresh-title-role-readback
-          "$PAC_CLI" solution list --environment "$PROD_ENVIRONMENT_URL" \
-            | tee /tmp/fresh-title-role-readback/solutions.txt
-          grep -F "$SOLUTION_NAME" /tmp/fresh-title-role-readback/solutions.txt
-          grep -F "$SOLUTION_VERSION" /tmp/fresh-title-role-readback/solutions.txt
-
-      - name: Preserve production readback
+          DATAVERSE_ACCESS_TOKEN="$TOKEN" node scripts/verify-local-role-sandbox.mjs after
+      - name: Preserve acceptance receipts
+        if: always()
         uses: actions/upload-artifact@v7
         with:
-          name: publishing-fresh-title-role-production-readback
-          path: |
-            /tmp/fresh-title-role-readback/solutions.txt
-            /tmp/fresh-title-role-readback.json
-          if-no-files-found: error
+          name: publishing-local-role-sandbox-readback
+          path: /tmp/local-role-sandbox-*.json
+          if-no-files-found: warn
