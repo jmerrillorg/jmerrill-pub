@@ -7,8 +7,9 @@ const expected = new Set(['prvCreatejmpv2_LifecycleInstance', 'prvCreatejmpv2_Pu
 const roleId = '7d151c32-7534-4ef4-8b91-9e76f5a9fe45'
 const mode = process.argv[2]
 if (mode === 'package') {
-  const solution = readFileSync('/tmp/fixture-solution.xml', 'utf8')
-  const custom = readFileSync('/tmp/fixture-customizations.xml', 'utf8')
+  const directory = process.env.SANDBOX_PACKAGE_DIRECTORY || '/tmp'
+  const solution = readFileSync(`${directory}/fixture-solution.xml`, 'utf8')
+  const custom = readFileSync(`${directory}/fixture-customizations.xml`, 'utf8')
   function parse(xml) {
     assert.ok(!/<!DOCTYPE|<!ENTITY/i.test(xml))
     return new DOMParser({ errorHandler: { warning: () => {}, error: message => { throw Error(message) }, fatalError: message => { throw Error(message) } } }).parseFromString(xml, 'application/xml')
