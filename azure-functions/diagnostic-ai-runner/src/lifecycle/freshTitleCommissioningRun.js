@@ -18,6 +18,9 @@ function planFreshTitleRun(input) {
       sourceCustody.sha256 !== input.source?.sha256 || input.source?.role !== "RECEIVED_ORIGINAL") {
     deny("FRESH_RUN_ORIGINAL_SOURCE_CUSTODY_REQUIRED");
   }
+  if (sourceCustody.path.split("/").some(segment => segment === "." || segment === ".." || /%2e|%2f|%5c/i.test(segment))) {
+    deny("FRESH_RUN_ORIGINAL_SOURCE_CUSTODY_REQUIRED");
+  }
   const plan = planTitleCommissioningRun(input);
   const custody = { driveId: sourceCustody.driveId, itemId: sourceCustody.itemId,
     eTag: sourceCustody.eTag, bytes: sourceCustody.bytes, path: sourceCustody.path, sha256: sourceCustody.sha256 };
@@ -43,4 +46,32 @@ function assertFreshStageReceipt(run, receipt) {
   return true;
 }
 
-module.exports = { planFreshTitleRun, assertFreshStageReceipt };
+async function persistFreshTitleRun(input, deps = {}) {
+  const run = planFreshTitleRun(input);
+  if (typeof deps.readCurrentSourceAuthority !== "function" || !deps.containerClient) {
+    deny("FRESH_RUN_OWNER_AUTHORITY_READER_REQUIRED");
+  }
+  const proof = await deps.readCurrentSourceAuthority(run);
+  if (proof?.current !== true || proof.titleId !== run.titleId || proof.authorityReference !== run.authorityReference ||
+      proof.sourceSha256 !== run.source.sha256 || proof.sourceETag !== run.custody.eTag ||
+      proof.sourceItemId !== run.custody.itemId || proof.sourceDriveId !== run.custody.driveId ||
+      proof.sourceBytes !== run.custody.bytes || proof.sourcePath !== run.custody.path ||
+      proof.jackieAuthorshipVerified !== true || proof.stableHandoffVerified !== true) {
+    deny("FRESH_RUN_OWNER_AUTHORITY_CHANGED");
+  }
+  const blob = deps.containerClient.getBlockBlobClient(`commissioning-fresh-runs/${run.titleId}/${run.bindingHash}.json`);
+  const body = Buffer.from(JSON.stringify(run));
+  try {
+    await blob.uploadData(body, { conditions: { ifNoneMatch: "*" }, blobHTTPHeaders: { blobContentType: "application/json" } });
+    return { run, duplicate: false, stagesExecuted: 0 };
+  } catch (error) {
+    if (![409, 412].includes(error?.statusCode)) throw error;
+    const properties = await blob.getProperties();
+    if (!properties.etag || !(await blob.downloadToBuffer(0, undefined, { conditions: { ifMatch: properties.etag } })).equals(body)) {
+      deny("FRESH_RUN_OWNER_REPLAY_CONFLICT");
+    }
+    return { run, duplicate: true, stagesExecuted: 0 };
+  }
+}
+
+module.exports = { planFreshTitleRun, assertFreshStageReceipt, persistFreshTitleRun };
