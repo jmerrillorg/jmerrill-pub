@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Role id="{A3FC4C02-7D09-4CA1-8E32-2090AD209DC2}" name="JMP Fresh Title Commissioning Runtime" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <IsCustomizable>1</IsCustomizable>
+  <IsAutoAssigned>0</IsAutoAssigned>
+  <RolePrivileges>
+    <RolePrivilege name="prvCreatejmpv2_LifecycleInstance" level="Basic" />
+    <RolePrivilege name="prvCreatejmpv2_PublishingEngagement" level="Basic" />
+    <RolePrivilege name="prvCreatejmpv2_StageInstance" level="Basic" />
+    <RolePrivilege name="prvReadjmpv2_LifecycleInstance" level="Basic" />
+    <RolePrivilege name="prvReadjmpv2_PublishingEngagement" level="Basic" />
+    <RolePrivilege name="prvReadjmpv2_StageDefinition" level="Basic" />
+    <RolePrivilege name="prvReadjmpv2_StageInstance" level="Basic" />
+  </RolePrivileges>
+</Role>
