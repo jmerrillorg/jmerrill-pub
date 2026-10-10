@@ -184,4 +184,5 @@ async function persistStageEvent(event, deps = {}) {
   throw safeCode("PUBLISHING_STAGE_CONCURRENT_UPDATE_RETRY_EXHAUSTED");
 }
 
-module.exports = { applyEvent, blobName, keyFor, persistStageEvent, validateEvent };
+module.exports = { applyEvent, blobName, keyFor, persistStageEvent, validateEvent,
+  STAGE_CODES: Object.freeze([...STAGES]) };
