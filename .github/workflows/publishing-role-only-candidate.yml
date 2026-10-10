@@ -1,0 +1,30 @@
+name: Publishing Role-only Candidate Review
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - powerplatform/solutions/JMPFreshTitleRuntimeRole/**
+      - .github/workflows/publishing-role-only-candidate.yml
+
+permissions:
+  contents: read
+
+jobs:
+  candidate-review:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '24'
+      - name: Install existing XML parser dependencies without lifecycle scripts
+        run: npm ci --ignore-scripts --prefix azure-functions/diagnostic-ai-runner
+      - name: Verify reviewed immutable candidate
+        run: |
+          echo '1bc8f785288345c6f3d7b3289c51971aa6e5c3c812c270edd42d31c011686a19  powerplatform/solutions/JMPFreshTitleRuntimeRole/artifacts/JMP_FreshTitleRuntimeRole_1_0_0_0_managed_candidate.zip' | sha256sum --check --status
+          echo '14fc42c5b9af6f785f458704ce53d57240d99b82932568b8d676affa71219a97  powerplatform/solutions/JMPPublishingV2Phase6/artifacts/JMP_PublishingV2_Phase6_Portable_1_2_0_2_managed.zip' | sha256sum --check --status
+      - name: Validate source and actual managed package
+        env:
+          CANDIDATE_ZIP: powerplatform/solutions/JMPFreshTitleRuntimeRole/artifacts/JMP_FreshTitleRuntimeRole_1_0_0_0_managed_candidate.zip
+        run: node --test powerplatform/solutions/JMPFreshTitleRuntimeRole/test/package.test.mjs
