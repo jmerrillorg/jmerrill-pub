@@ -102,6 +102,7 @@ test('campaign readiness rejects empty and placeholder destinations without hidi
     assert.ok(result.missing.includes('MISSING_COVER') || result.missing.includes('MISSING_DESCRIPTION') || result.missing.includes('MISSING_FORMAT'))
     assert.equal(projection.evaluatePublicCatalogReadiness(title(overrides)).status, 'READY')
   }
+  assert.ok(projection.evaluateCampaignDestinationReadiness(title({formats:['Other'],isbnByFormat:[]})).missing.includes('UNVERIFIED_EDITION_FORMAT'))
 })
 
 test('title cannot verify live without a JMP-controlled title page', () => {
