@@ -3,6 +3,9 @@ import { existsSync, readFileSync, symlinkSync, unlinkSync } from 'node:fs'
 import test, { after } from 'node:test'
 
 const shims = [
+  ['../data/hagher-backlist-content', 'hagher-backlist-content.ts'],
+  ['../data/public-backlist-content', 'public-backlist-content.ts'],
+  ['../data/book-retailer-enrichment-overrides', 'book-retailer-enrichment-overrides.ts'],
   ['../lib/catalog/public-projection', 'public-projection.ts'],
   ['../lib/catalog/types', 'types.ts'],
   ['../lib/publishing/lifecycle/validation', 'validation.ts'],
@@ -21,6 +24,21 @@ after(() => {
 })
 
 const projection = await import('../lib/catalog/public-projection.ts')
+const { hagherBacklistContent } = await import('../data/hagher-backlist-content.ts')
+
+test('governed Hagher presentation reaches shared cards with exact-ID replay safety', () => {
+  for (const [slug, entry] of Object.entries(hagherBacklistContent)) {
+    const input = title({ id: entry.titleId, slug })
+    const [result] = projection.projectPublicCatalogTitles([input])
+    assert.equal(result.coverUrl, entry.coverUrl)
+    assert.equal(result.certifiedImprint, 'JM Signature')
+    assert.equal(result.shortDescription, entry.shortDescription)
+    assert.deepEqual(result.formats, ['Paperback', 'Hardcover', 'eBook'])
+    assert.deepEqual(projection.projectPublicCatalogTitles([result]), [result])
+    const wrongId = title({ id: 'unrelated-work', slug })
+    assert.equal(projection.projectPublicCatalogTitles([wrongId])[0].coverUrl, wrongId.coverUrl)
+  }
+})
 const validation = await import('../lib/publishing/lifecycle/validation.ts')
 
 function title(overrides = {}) {
@@ -75,6 +93,47 @@ test('complete public title is ready for page verification', () => {
   const result = projection.evaluatePublicCatalogReadiness(title())
   assert.equal(result.status, 'READY')
   assert.deepEqual(result.issues, [])
+})
+
+test('campaign readiness rejects empty and placeholder destinations without hiding the catalog', () => {
+  for (const overrides of [{ coverUrl: '' }, { coverUrl: 'https://placehold.co/300x400' }, { shortDescription: '' }, { shortDescription: 'Description coming soon' }, { formats: [] }]) {
+    const result = projection.evaluateCampaignDestinationReadiness(title(overrides))
+    assert.equal(result.status, 'HOLD')
+    assert.ok(result.missing.includes('MISSING_COVER') || result.missing.includes('MISSING_DESCRIPTION') || result.missing.includes('MISSING_FORMAT'))
+    assert.equal(projection.evaluatePublicCatalogReadiness(title(overrides)).status, 'READY')
+  }
+  assert.ok(projection.evaluateCampaignDestinationReadiness(title({formats:['Other'],isbnByFormat:[]})).missing.includes('UNVERIFIED_EDITION_FORMAT'))
+})
+
+test('confirmed duplicate pairs consolidate exact IDs and retain distinct editions', () => {
+  const canonical = title({id:'67137ed6-c27a-f111-ab0f-6045bdd69738',slug:'music-ministry-unplugged',formats:['Paperback'],isbnByFormat:[{format:'Paperback',isbn:'9781961475724',assetId:'print',assetStatus:'Live'}]})
+  const duplicate = title({id:'982156cd-c37a-f111-ab0f-00224820105b',slug:'music-ministry-unplugged-real-lessons-for-those-who-lead-and-serve-in-music-ministry',formats:['eBook'],isbnByFormat:[{format:'eBook',isbn:'9781961475731',assetId:'digital',assetStatus:'Live'}]})
+  const distinct = title({id:'other-edition',slug:'music-ministry-unplugged-large-print',title:'Music Ministry Unplugged: Large Print'})
+  const result = projection.consolidateConfirmedPublicTitles([canonical, duplicate, distinct])
+  assert.equal(result.length, 2)
+  assert.equal(result[0].subtitle, 'Real Lessons for Those who Lead and Serve in Music Ministry')
+  assert.deepEqual(result[0].formats,['Paperback','eBook'])
+  assert.equal(result[0].isbnByFormat.length,2)
+  assert.equal(result[1],distinct)
+  assert.deepEqual(projection.consolidateConfirmedPublicTitles(result),result)
+  assert.equal(projection.canonicalPublicTitleSlug(duplicate.slug),canonical.slug)
+  assert.equal(projection.canonicalPublicTitleSlug(duplicate.id),canonical.slug)
+  assert.equal(projection.canonicalPublicTitleSlug(distinct.slug),distinct.slug)
+  assert.deepEqual(projection.consolidateConfirmedPublicTitles([duplicate]),[duplicate])
+})
+
+test('all explicit duplicate rules expose stable canonical aliases without changing source records', () => {
+  const rules = JSON.parse(readFileSync(new URL('../data/public-title-consolidations.json', import.meta.url), 'utf8'))
+  for (const rule of rules) {
+    const retained = title({id:rule.canonicalId,slug:rule.canonicalSlug})
+    const aliases = projection.publicTitleAliases([retained])
+    for (const id of rule.duplicateIds) {
+      assert.equal(projection.canonicalPublicTitleSlug(id),rule.canonicalSlug)
+      assert.ok(aliases.some(alias => alias.id === id && alias.canonicalId === rule.canonicalId))
+    }
+    for (const slug of rule.retiredSlugs) assert.equal(projection.canonicalPublicTitleSlug(slug),rule.canonicalSlug)
+    assert.equal(retained.id,rule.canonicalId)
+  }
 })
 
 test('title cannot verify live without a JMP-controlled title page', () => {
@@ -171,14 +230,14 @@ test('duplicate title and author slugs are surfaced as public projection holds',
 
 test('public title projection disambiguates duplicate slugs with stable title identity', () => {
   const titles = projection.projectPublicCatalogTitles([
-    title({ id: 'fec27b7a-cc7a-f111-ab0f-6045bdd69435', slug: 'warrior-s-breed', title: "Warrior's Breed" }),
-    title({ id: '935f72d0-c27a-f111-ab0f-6045bdd69738', slug: 'warrior-s-breed', title: "Warrior's Breed" }),
+    title({ id: 'fec27b7b-cc7a-f111-ab0f-6045bdd69435', slug: 'distinct-editions', title: 'Distinct Editions' }),
+    title({ id: '935f72d1-c27a-f111-ab0f-6045bdd69738', slug: 'distinct-editions', title: 'Distinct Editions' }),
   ])
   assert.deepEqual(
     titles.map((item) => [item.id, item.slug]),
     [
-      ['935f72d0-c27a-f111-ab0f-6045bdd69738', 'warrior-s-breed'],
-      ['fec27b7a-cc7a-f111-ab0f-6045bdd69435', 'warrior-s-breed-fec27b7a'],
+      ['935f72d1-c27a-f111-ab0f-6045bdd69738', 'distinct-editions'],
+      ['fec27b7b-cc7a-f111-ab0f-6045bdd69435', 'distinct-editions-fec27b7b'],
     ],
   )
 })

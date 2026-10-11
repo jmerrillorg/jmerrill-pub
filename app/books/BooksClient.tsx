@@ -77,7 +77,7 @@ export default function BooksClient({ books, imprints, unavailable = false }: Bo
       if (format !== 'All Formats' && !book.formats.includes(format as never)) return false
       if (
         search &&
-        !book.title.toLowerCase().includes(search.toLowerCase()) &&
+        !`${book.title} ${book.subtitle}`.toLowerCase().includes(search.toLowerCase()) &&
         !authorName.toLowerCase().includes(search.toLowerCase())
       ) {
         return false

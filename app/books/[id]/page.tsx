@@ -1,11 +1,11 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import Image from 'next/image'
-import { notFound } from 'next/navigation'
+import { notFound, permanentRedirect } from 'next/navigation'
 import { BookCard } from '@/components/content/BookCard'
 import { CTASection } from '@/components/content/CTASection'
 import { catalogAuthorDisplayName, catalogTitleToBookCardRecord } from '@/lib/catalog/display'
-import { publicCatalogPageUrls } from '@/lib/catalog/public-projection'
+import { publicCatalogPageUrls, canonicalPublicTitleSlug } from '@/lib/catalog/public-projection'
 import type { CatalogTitleDetail } from '@/lib/catalog/types'
 import { getPublicCatalogTitleBySlug } from '@/lib/server/dataverse/catalog'
 import { getImprintStrategyByLabel } from '@/data/imprints'
@@ -91,6 +91,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function BookPage({ params }: Props) {
   const { id } = await params
+  const canonicalSlug = canonicalPublicTitleSlug(id)
+  if (canonicalSlug !== id) permanentRedirect(`/books/${canonicalSlug}`)
   const result = await getPublicCatalogTitleBySlug(id)
   if (!result.ok) return <CatalogUnavailable />
   if (!result.data) notFound()
@@ -129,9 +131,9 @@ export default async function BookPage({ params }: Props) {
   }
   const isbnDisplay =
     book.isbnByFormat.length > 1
-      ? book.isbnByFormat.map((item) => `${item.format}: ${item.isbn}`).join(' · ')
+      ? book.isbnByFormat.map((item) => `${item.format === 'Other' ? 'Edition' : item.format}: ${item.isbn}`).join(' · ')
       : book.primaryIsbn || book.isbnByFormat[0]?.isbn || 'Catalog record pending'
-  const primaryFormat = book.formats[0] || 'Catalog format pending'
+  const primaryFormat = book.formats[0] === 'Other' ? 'Edition' : book.formats[0] || 'Edition'
 
   return (
     <div className="min-h-screen bg-[#070710] pt-[76px]">
@@ -191,10 +193,10 @@ export default async function BookPage({ params }: Props) {
               {book.formats.map((format) => (
                 <div key={format} className="flex items-center justify-between rounded-xl border border-white/6 bg-white/[0.03] px-4 py-3">
                   <div>
-                    <div className="text-[13px] font-medium text-white">{format}</div>
-                    <div className="text-[11px] font-light text-white/30">Catalog-ready format support</div>
+                    <div className="text-[13px] font-medium text-white">{format === 'Other' ? 'Edition' : format}</div>
+                    <div className="text-[11px] font-light text-white/60">Published edition metadata</div>
                   </div>
-                  <span className="font-mono text-[11px] text-blue-400">Live</span>
+                  <span className="font-mono text-[11px] text-blue-400">Edition</span>
                 </div>
               ))}
             </div>
@@ -308,7 +310,7 @@ export default async function BookPage({ params }: Props) {
                   <span className="block h-px w-8 bg-blue-500" />
                   <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-blue-400">About the title</span>
                 </div>
-                <p className="text-[15px] font-light leading-[1.9] text-white/55">
+                <p className="whitespace-pre-line text-[15px] font-light leading-[1.9] text-white/80">
                   {book.longDescription || book.shortDescription || 'Full title description pending.'}
                 </p>
 

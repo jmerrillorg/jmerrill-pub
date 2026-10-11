@@ -69,6 +69,16 @@ test('public author fallback does not leak titles across corrected governed auth
   assert.equal(authors.get('dennis-brown')?.titles.includes('connected'), true)
 })
 
+test('Zuri belongs only to Gwendolyn without removing Jaylonna own titles', () => {
+  const authors = buildRepositoryAuthors()
+  assert.equal(books.find((book) => book.id === 'when-zuri-came-to-earth').author, 'Gwendolyn Rucker-Carr')
+  assert.equal(authors.get('gwendolyn-rucker-carr')?.titles.includes('when-zuri-came-to-earth'), true)
+  assert.equal(authors.get('jaylonna-stevette')?.titles.includes('when-zuri-came-to-earth'), false)
+  for (const slug of ['almost-happy', 'getting-back-2-happy', 'have-you-considered-my-servant']) {
+    assert.equal(authors.get('jaylonna-stevette')?.titles.includes(slug), true)
+  }
+})
+
 function buildRepositoryAuthors() {
   const authors = new Map()
 

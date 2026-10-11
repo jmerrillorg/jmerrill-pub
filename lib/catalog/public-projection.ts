@@ -1,11 +1,16 @@
 import type {
   CatalogAuthorSummary,
+  CatalogFormat,
   CatalogTitleSummary,
   PublicCatalogPageUrls,
   PublicCatalogProjectionSummary,
   PublicCatalogReadiness,
   PublicCatalogReadinessIssue,
 } from './types'
+import { getHagherBacklistContent, hagherAuthor } from '../../data/hagher-backlist-content'
+import { getPublicBacklistContent } from '../../data/public-backlist-content'
+import { bookRetailerEnrichmentOverrides } from '../../data/book-retailer-enrichment-overrides'
+import publicTitleConsolidations from '../../data/public-title-consolidations.json' with { type: 'json' }
 
 export const PUBLIC_CATALOG_AUTHORITY = {
   sourceOfTruth: 'Dataverse jm1pub_title + publishing assets + marketplace records',
@@ -71,6 +76,17 @@ export function evaluatePublicCatalogReadiness(
   }
 }
 
+// Campaign quality is independent of lifecycle eligibility and catalog visibility.
+export function evaluateCampaignDestinationReadiness(title: CatalogTitleSummary) {
+  const missing: PublicCatalogReadinessIssue[] = [...evaluatePublicCatalogReadiness(title).issues]
+  if (!title.coverUrl || /placeholder|placehold\.co/i.test(title.coverUrl)) missing.push('MISSING_COVER')
+  if (!title.shortDescription?.trim() || /^(description coming soon|coming soon|j merrill publishing author family)[.!]?$/i.test(title.shortDescription.trim()) || / is listed in the J Merrill Publishing public catalog\.$/i.test(title.shortDescription.trim())) missing.push('MISSING_DESCRIPTION')
+  if (!title.primaryIsbn && !title.isbnByFormat.length) missing.push('MISSING_ISBN')
+  if (!title.formats.length) missing.push('MISSING_FORMAT')
+  if (title.formats.includes('Other') || title.isbnByFormat.some(item => item.format === 'Other')) missing.push('UNVERIFIED_EDITION_FORMAT')
+  return { status: missing.length ? 'HOLD' as const : 'READY' as const, missing }
+}
+
 export function buildPublicCatalogProjectionSummary(
   titles: CatalogTitleSummary[],
   authors: CatalogAuthorSummary[],
@@ -99,13 +115,82 @@ export function buildPublicCatalogProjectionSummary(
 // release date, or both undated) break by title A-Z, then id for full
 // determinism.
 export function projectPublicCatalogTitles(titles: CatalogTitleSummary[]): CatalogTitleSummary[] {
-  return disambiguatePublicTitleSlugs(titles).sort((a, b) => {
+  const presented = titles.map((title) => {
+    const content = getHagherBacklistContent(title.slug, title.id)
+    if (!content) {
+      const backlist = getPublicBacklistContent(title)
+      const prior = bookRetailerEnrichmentOverrides[title.slug]
+      // Reuse existing verified presentation copy; never elevate retailer dates,
+      // formats, or search links into canonical edition/distribution authority.
+      const shortDescription = backlist?.shortDescription || title.shortDescription || (prior?.retailerMatchStatus === 'verified' ? prior.retailerDescription : '') || ''
+      const isbnByFormat = title.isbnByFormat.map(item => ({ ...item, format: (backlist?.editionFormats?.[item.isbn] || item.format) as CatalogFormat }))
+      for (const edition of backlist?.sourceBoundEditions || []) {
+        if (!isbnByFormat.some(item => item.isbn === edition.isbn)) isbnByFormat.push({ isbn: edition.isbn, format: edition.format, assetId: edition.sourceId, assetStatus: 'Verified backlist edition source' })
+      }
+      return { ...title, coverUrl: backlist?.coverUrl || title.coverUrl, shortDescription, primaryIsbn: title.primaryIsbn || isbnByFormat.find(item => item.format === 'Paperback')?.isbn || isbnByFormat[0]?.isbn || '', isbnByFormat, formats: isbnByFormat.length ? Array.from(new Set(isbnByFormat.map(item => item.format))).filter(Boolean) : title.formats }
+    }
+    return {
+      ...title, coverUrl: content.coverUrl, shortDescription: content.shortDescription,
+      genre: content.genre, releaseDate: content.releaseDate,
+      displayYear: content.releaseDate.slice(0, 4), certifiedImprint: 'JM Signature',
+      formats: ['Paperback', 'Hardcover', 'eBook'] as CatalogTitleSummary['formats'],
+      primaryIsbn: content.isbns.Paperback,
+      isbnByFormat: Object.entries(content.isbns).map(([format, isbn]) => ({
+        format: format as CatalogTitleSummary['formats'][number], isbn, assetId: '', assetStatus: 'Published metadata',
+      })),
+      authors: title.authors.map((author) => author.slug === hagherAuthor.slug
+        ? { ...author, contactId: hagherAuthor.contactId } : author),
+    }
+  })
+  return disambiguatePublicTitleSlugs(consolidateConfirmedPublicTitles(presented)).sort((a, b) => {
     const dateCompare = compareReleaseDateDescending(a.releaseDate, b.releaseDate)
     if (dateCompare !== 0) return dateCompare
     const title = a.title.localeCompare(b.title)
     if (title !== 0) return title
     return a.id.localeCompare(b.id)
   })
+}
+
+export function canonicalPublicTitleSlug(slug: string): string {
+  const match = publicTitleConsolidations.find(entry => entry.retiredSlugs.includes(slug) || entry.duplicateIds.includes(slug))
+  return match?.canonicalSlug || slug
+}
+
+export function publicTitleAliases(titles: CatalogTitleSummary[]) {
+  return publicTitleConsolidations.filter(rule => titles.some(title => title.id === rule.canonicalId))
+    .flatMap(rule => rule.duplicateIds.map(id => ({ id, canonicalId: rule.canonicalId, canonicalSlug: rule.canonicalSlug, retiredSlugs: rule.retiredSlugs })))
+}
+
+// Only exact, governed duplicate IDs consolidate; title similarity is not authority.
+export function consolidateConfirmedPublicTitles(titles: CatalogTitleSummary[]): CatalogTitleSummary[] {
+  const result = [...titles]
+  for (const rule of publicTitleConsolidations) {
+    const index = result.findIndex(title => title.id === rule.canonicalId || title.id === rule.canonicalSlug)
+    if (index < 0) continue
+    const canonical = result[index]
+    const duplicates = result.filter(title => rule.duplicateIds.includes(title.id))
+    const editions = [...canonical.isbnByFormat]
+    const purchases = [...canonical.purchaseLinks]
+    for (const duplicate of duplicates) {
+      for (const edition of duplicate.isbnByFormat) {
+        if (!editions.some(item => item.isbn === edition.isbn && item.format === edition.format)) editions.push(edition)
+      }
+      for (const link of duplicate.purchaseLinks) {
+        if (!purchases.some(item => item.href === link.href)) purchases.push(link)
+      }
+    }
+    result[index] = {
+      ...canonical, slug: rule.canonicalSlug, title: rule.title, subtitle: rule.subtitle,
+      isbnByFormat: editions, purchaseLinks: purchases,
+      formats: Array.from(new Set([...canonical.formats, ...duplicates.flatMap(title => title.formats.filter(format => format !== 'Other' || title.isbnByFormat.some(item => item.format === 'Other')))])),
+      coverUrl: canonical.coverUrl || duplicates.find(title => title.coverUrl)?.coverUrl || '',
+      shortDescription: canonical.shortDescription || duplicates.find(title => title.shortDescription)?.shortDescription || '',
+    }
+    for (let i = result.length - 1; i >= 0; i--) {
+      if (rule.duplicateIds.includes(result[i].id)) result.splice(i, 1)
+    }
+  }
+  return result
 }
 
 function compareReleaseDateDescending(a: string, b: string): number {
