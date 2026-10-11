@@ -2396,9 +2396,14 @@
         {
           "id": "01DF3SEQJSYIBZN533ENGLWSPEMLLTCY5C",
           "sha256": "ecf790957a5f485a03e1648670f8821be0fa8aece5b9525a55c0893d70a6fb0f"
+        },
+        {
+          "id": "01DF3SEQPMJKB4FFVTZBDJ6JVD7RTCNMPF",
+          "sha256": "75882d2b8c384063b848c2075e7eb86e03cd0a76708602a4e10116f63c35488e"
         }
       ],
-      "photoUrl": "/backlist/catalog/shana-byrd-portrait.jpg"
+      "photoUrl": "/backlist/catalog/shana-byrd-portrait.jpg",
+      "biography": "She has devoted her life to working with pregnant and parenting youth by helping them obtain the tools to break the cycles of abuse and poverty. Her book, Focus, Trust, and Follow is a book of devotions that use some of her real life experiences to make God\u2019s word relatable to others. It is her hope that those who read her book are inspired and encouraged to focus on God, trust His word, and Follow Him with reckless abandon."
     },
     "darlene-carson": {
       "name": "Darlene Carson",
@@ -2456,9 +2461,14 @@
         {
           "id": "01DF3SEQL5U7EZLIZP3ZAZQEMGC3VJKERJ",
           "sha256": "f6af129541c2846ccf2112ed95d26a7e707477cb73bae9c7be70f12918445f42"
+        },
+        {
+          "id": "01DF3SEQP4JNTJZ32CVRGKS6A4YSS7TUS6",
+          "sha256": "0ea77b22021a593b5793d31bf6fad67375652b849de0a7c7470402c9287d47b9"
         }
       ],
-      "photoUrl": "/backlist/catalog/deborah-eiland-portrait.jpg"
+      "photoUrl": "/backlist/catalog/deborah-eiland-portrait.jpg",
+      "biography": "Because of my love for books and reading, I have always thought about writing a children\u2019s book."
     },
     "deanna-jones": {
       "name": "Deanna Jones",
@@ -2524,6 +2534,20 @@
         }
       ],
       "photoUrl": "/backlist/catalog/ericka-thornton-portrait.jpg"
+    },
+    "christina-banner": {
+      "name": "Christina Banner",
+      "titleIds": [
+        "come-out-of-hiding",
+        "the-little-girl-with-the-plow"
+      ],
+      "sources": [
+        {
+          "id": "01DF3SEQI5SOSISLNB3NGLSSSYYMP42XBZ",
+          "sha256": "b8f0f55defa9bb06c4a5cbb80ae91d1cbbac3f320dbfc25a5719cef5c5031969"
+        }
+      ],
+      "biography": "Christina Has worked with children since she was a little girl herself! From directing The \u201cRosebud\u201dchoir at her childhood church, to working at daycares and coordinating her first Vacation Bible School! She has had a love for making children smile!\n\nChristina is thankful for so many mentors along the way! And those yet to come!"
     }
   }
 }
