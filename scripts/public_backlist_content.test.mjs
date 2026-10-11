@@ -42,4 +42,6 @@ test('presentation omits placeholder author text, private contacts and copied te
   const runtime = readFileSync(new URL('../lib/server/dataverse/catalog.ts', import.meta.url),'utf8')
   assert.match(runtime, /ASSET_SELECT,[\s\S]*?'_jm1pub_titleid_value'/)
   assert.match(runtime, /_jm1pub_publishingassetid_value/)
+  assert.match(runtime, /'jm1_catalogidentifiernormalized'/)
+  assert.match(runtime, /\^\(978\|979\)\\d\{10\}\$/)
 })

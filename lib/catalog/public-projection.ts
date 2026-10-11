@@ -81,7 +81,8 @@ export function evaluateCampaignDestinationReadiness(title: CatalogTitleSummary)
   if (!title.coverUrl || /placeholder|placehold\.co/i.test(title.coverUrl)) missing.push('MISSING_COVER')
   if (!title.shortDescription?.trim() || /^(description coming soon|coming soon|j merrill publishing author family)[.!]?$/i.test(title.shortDescription.trim()) || / is listed in the J Merrill Publishing public catalog\.$/i.test(title.shortDescription.trim())) missing.push('MISSING_DESCRIPTION')
   if (!title.primaryIsbn && !title.isbnByFormat.length) missing.push('MISSING_ISBN')
-  if (title.isbnByFormat.some(item => item.format === 'Other')) missing.push('UNVERIFIED_EDITION_FORMAT')
+  if (!title.formats.length) missing.push('MISSING_FORMAT')
+  if (title.formats.includes('Other') || title.isbnByFormat.some(item => item.format === 'Other')) missing.push('UNVERIFIED_EDITION_FORMAT')
   return { status: missing.length ? 'HOLD' as const : 'READY' as const, missing }
 }
 
