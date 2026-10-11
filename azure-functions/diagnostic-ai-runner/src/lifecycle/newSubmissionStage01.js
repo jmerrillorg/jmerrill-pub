@@ -20,6 +20,15 @@ function plan(current) {
 function parseBinding(row) {
   try { return JSON.parse(row.jm1_additionalnotes || "").newSubmissionStage01; } catch { return null; }
 }
+function storedBinding(p) {
+  const binding = { titleId: p.titleId, contactId, fingerprint: p.fingerprint, components: p.components };
+  const serialize = value => JSON.stringify({ newSubmissionStage01: value });
+  if (serialize(binding).length <= 1000) return binding;
+  // The full source fingerprint and durable receipt retain paths; the intake index retains exact custody identifiers.
+  const compact = { ...binding, components: p.components.map(({ path, ...custody }) => custody) };
+  if (serialize(compact).length > 1000) deny("COMMISSIONING_SUBMISSION_BINDING_TOO_LARGE");
+  return compact;
+}
 function findExact(rows, p) {
   const matches = [];
   for (const row of rows) {
@@ -30,7 +39,7 @@ function findExact(rows, p) {
     const overlaps = p.components.some(c => urls.includes(c.itemId) || urls.includes(c.sha256));
     if (!structured && !key && !overlaps) continue;
     if (!binding || binding.titleId !== p.titleId || binding.contactId !== contactId ||
-        binding.fingerprint !== p.fingerprint || JSON.stringify(binding.components) !== JSON.stringify(p.components) ||
+        binding.fingerprint !== p.fingerprint || ![p.components, storedBinding(p).components].some(components => JSON.stringify(binding.components) === JSON.stringify(components)) ||
         row.jm1_idempotencykey !== p.key) deny("COMMISSIONING_SUBMISSION_DUPLICATE_AUTHORITY_CONFLICT");
     matches.push(row);
   }
@@ -196,7 +205,7 @@ async function handler(body, deps = {}) {
         jm1_firstname: author.firstname, jm1_lastname: author.lastname, jm1_email: author.emailaddress1,
         jm1_projecttitle: current.titleName, jm1_idempotencykey: p.key, jm1_intakereferencecode: p.reference,
         jm1_manuscriptreceived: true, jm1_manuscripturl: current.input.source.reference,
-        jm1_additionalnotes: JSON.stringify({ newSubmissionStage01: { titleId: p.titleId, contactId, fingerprint: p.fingerprint, components: p.components } }),
+        jm1_additionalnotes: JSON.stringify({ newSubmissionStage01: storedBinding(p) }),
         jm1_acknowledgmentsent: false, jm1_acknowledgmentstatus: 835500002,
         jm1_acknowledgmenterror: "Acknowledgment owned by idempotent canonical Stage 01 sender.",
         jm1_stage0handoffstatus: 835500003, jm1_stage0handofferror: "Stage 02 pending; no title processing authorized." };
@@ -222,4 +231,4 @@ async function handler(body, deps = {}) {
   } catch (e) { return { status: 409, jsonBody: { code: /^COMMISSIONING_[A-Z_]+$/.test(e.safeCode || "") ? e.safeCode : "COMMISSIONING_SUBMISSION_DEPENDENCY_FAILED", phase,
       ...(e.statusCode ? { providerStatus: e.statusCode } : {}), mutationAttempted: attempted, recovery: "EXACT_SOURCE_AND_RECEIPT_READBACK", communicationState: phase === "AUTHOR_ACKNOWLEDGMENT" || phase === "OUTPUT_PERSIST" ? "READ_CANONICAL_RELAY_RECEIPT" : "NOT_ATTEMPTED", modelCalls: 0, payments: 0 } }; }
 }
-module.exports = { MODES, COLUMNS, plan, findExact, inventory, verifyAccess, rowFingerprint, verifyCensus, verifyRecipient, handler };
+module.exports = { MODES, COLUMNS, plan, storedBinding, findExact, inventory, verifyAccess, rowFingerprint, verifyCensus, verifyRecipient, handler };

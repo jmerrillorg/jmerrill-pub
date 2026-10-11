@@ -4,6 +4,21 @@ const stage = require("../src/lifecycle/newSubmissionStage01");
 const fresh = require("../src/lifecycle/freshTitleIntake");
 const contactId = require("../src/author/jackieTitleSystemCommissioningPolicy").JACKIE_CANONICAL_AUTHOR_CONTACT_ID;
 const titleId = Object.keys(fresh.POLICIES)[0];
+test("two-source intake index fits notes without weakening full source identity",()=>{
+  const components = ["A","B"].map(itemId=>({itemId:itemId.repeat(26),driveId:"d".repeat(90),eTag:"e".repeat(40),bytes:12345,sha256:itemId.toLowerCase().repeat(64),path:"/"+itemId.repeat(180)}));
+  const current={input:{title:{jm1pub_titleid:titleId}},components:components.map(custody=>({custody}))};
+  const p=stage.plan(current), compact=stage.storedBinding(p);
+  assert.ok(JSON.stringify({newSubmissionStage01:compact}).length<=1000);
+  assert.equal(compact.fingerprint,p.fingerprint);assert.equal(compact.components[0].path,undefined);
+  const row={jm1_publishingintakeid:p.intakeId,jm1_idempotencykey:p.key,jm1_additionalnotes:JSON.stringify({newSubmissionStage01:compact})};
+  assert.equal(stage.findExact([row],p),row);
+  const full={...row,jm1_additionalnotes:JSON.stringify({newSubmissionStage01:{...compact,components:p.components}})};
+  assert.equal(stage.findExact([full],p),full);
+  compact.components[0].sha256="c".repeat(64);
+  assert.throws(()=>stage.findExact([{...row,jm1_additionalnotes:JSON.stringify({newSubmissionStage01:compact})}],p),/AUTHORITY_CONFLICT/);
+  current.components[0].custody.path+="changed";
+  assert.notEqual(stage.plan(current).fingerprint,p.fingerprint);
+});
 function fixture() {
   const rows = [], blobs = new Map(), counts = { creates: 0, sends: 0 };
   const current = { titleName: "Fixture new submission", identity: { contactId },
