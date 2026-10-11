@@ -18,7 +18,10 @@ async function consumeWorkingSource(output, deps) {
   } else if ((output.packaging && output.packaging !== "NONE") || !output.path.endsWith(".md")) {
     deny("STAGE03_SOURCE_FORMAT_UNSUPPORTED");
   }
-  if (bytes.length !== output.sourceBytes || hash(bytes) !== output.sourceSha256) deny("STAGE03_SOURCE_HASH_MISMATCH");
+  // Accepted unwrapped Markdown receipts predate the ZIP lineage fields.
+  const sourceLength = output.packaging === "ZIP_SINGLE_SOURCE_V1" ? output.sourceBytes : (output.sourceBytes ?? output.bytes);
+  const sourceHash = output.packaging === "ZIP_SINGLE_SOURCE_V1" ? output.sourceSha256 : (output.sourceSha256 ?? output.sha256);
+  if (bytes.length !== sourceLength || hash(bytes) !== sourceHash) deny("STAGE03_SOURCE_HASH_MISMATCH");
   const name = output.entryName || output.path.split("/").pop();
   const text = await require("../editorial/commissioningSourceText").extractCommissioningSourceText(bytes, { repositoryPath: name });
   if (!text.trim() || text.includes("\u0000")) deny("STAGE03_SOURCE_TEXT_INVALID");
