@@ -8,6 +8,7 @@ on:
     paths:
       - "app/**"
       - "lib/**"
+      - "data/**"
       - "public/**"
       - "scripts/**"
       - "package.json"
@@ -95,7 +96,7 @@ jobs:
         run: |
           for attempt in {1..18}; do
             code="$(curl -fsS -o /tmp/health.json -w '%{http_code}' --max-time 20 "$PRODUCTION_HEALTH_URL" || true)"
-            if [ "$code" = "200" ]; then
+            if [ "$code" = "200" ] && jq -e --arg sha "${{ github.sha }}" '.release == $sha and .status == "ready"' /tmp/health.json >/dev/null; then
               exit 0
             fi
             sleep 10

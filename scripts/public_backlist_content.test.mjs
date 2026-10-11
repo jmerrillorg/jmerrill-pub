@@ -44,4 +44,7 @@ test('presentation omits placeholder author text, private contacts and copied te
   assert.match(runtime, /_jm1pub_publishingassetid_value/)
   assert.match(runtime, /'jm1_catalogidentifiernormalized'/)
   assert.match(runtime, /\^\(978\|979\)\\d\{10\}\$/)
+  const deployment = readFileSync(new URL('../.github/workflows/azure-app-service-premium.yml', import.meta.url),'utf8')
+  assert.match(deployment, /"data\/\*\*"/)
+  assert.match(deployment, /\.release == \$sha and \.status == "ready"/)
 })
