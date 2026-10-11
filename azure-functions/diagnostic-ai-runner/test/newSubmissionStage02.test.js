@@ -62,6 +62,13 @@ test("Stage02 preflight is read-only, requires exact completed Stage01 and does 
   x.blobs.delete(x.p.stage01Output);
   assert.equal((await stage.handler({ titleId: x.titleId, mode: "SUBMISSION_02_EXECUTE" }, x.deps)).jsonBody.code, "COMMISSIONING_STAGE02_STAGE01_REQUIRED");
 });
+test("bounded transport readback exposes hashes only and performs no writes", async () => {
+  const x = fixture();
+  const r = await stage.handler({ titleId: x.titleId, mode: "SUBMISSION_02_TRANSPORT_READBACK" }, x.deps);
+  assert.equal(r.status, 200); assert.equal(r.jsonBody.effects, 0);
+  assert.equal(r.jsonBody.observations[0].stored, false);
+  assert.equal(x.counts.files, 0); assert.equal(x.counts.folders, 0);
+});
 test("Stage02 rejects forged source arguments, disabled scope and broad worker enablement", async () => {
   const x = fixture();
   assert.equal((await stage.handler({ titleId: x.titleId, mode: "SUBMISSION_02_EXECUTE", source: "forged" }, x.deps)).status, 400);

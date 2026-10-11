@@ -3,7 +3,7 @@ const { createHash } = require("node:crypto");
 const fresh = require("./freshTitleIntake");
 const stage01 = require("./newSubmissionStage01");
 const { processTitleCommissioningStep } = require("./titleCommissioningIntakeWorker");
-const MODES = ["SUBMISSION_02_PREFLIGHT", "SUBMISSION_02_EXECUTE", "SUBMISSION_02_READBACK"];
+const MODES = ["SUBMISSION_02_PREFLIGHT", "SUBMISSION_02_EXECUTE", "SUBMISSION_02_READBACK", "SUBMISSION_02_TRANSPORT_READBACK"];
 const BROAD = ["JM1_TITLE_COMMISSIONING_REVIEW_ENABLED", "JM1_PUBLISHING_STAGE_RUNTIME_ENABLED", "JM1_PUBLISHING_WAIT_RUNTIME_ENABLED"];
 const CONTRACT = "EDITORIAL_SYSTEM_STAGE_CONTRACTS:02_INTAKE:PUBLISHING.INTAKE_NORMALIZATION";
 const hash = bytes => createHash("sha256").update(bytes).digest("hex");
@@ -102,6 +102,31 @@ async function verifyTransport(source, stored, name) {
   }
   return { rule: "SHAREPOINT_CUSTOM_PROPERTIES_ONLY_V1", changedParts };
 }
+async function transportReadback(current, p, deps) {
+  const observations = [];
+  for (const part of current.components) {
+    const root = `drives/${encodeURIComponent(fresh.driveId)}/items/`;
+    const originalFolder = await deps.graph(root + encodeURIComponent(part.parentReference.id));
+    const folder = await readOptional(deps, `${root}${encodeURIComponent(originalFolder.parentReference.id)}:/_WORKING_STAGE02_${p.fingerprint.slice(0,16)}`);
+    const item = folder && await readOptional(deps, `${root}${encodeURIComponent(folder.id)}:/${encodeURIComponent(part.policy.name)}`);
+    if (!item) { observations.push({ sourceItemId: part.custody.itemId, stored: false }); continue; }
+    const bytes = await deps.sourceBytes({ itemId: item.id }), differences = [];
+    if (part.policy.format === "docx") {
+      const Zip = require("jszip"), packages = await Promise.all([part.bytes, bytes].map(b => Zip.loadAsync(b, { checkCRC32: true })));
+      for (const path of new Set(packages.flatMap(z => Object.keys(z.files)))) {
+        if (packages.every(z => !z.files[path] || z.files[path].dir)) continue;
+        const data = await Promise.all(packages.map(z => z.file(path)?.async("nodebuffer") || null));
+        if (data.every(Boolean) && data[0].equals(data[1])) continue;
+        differences.push({ path, sourceHash: data[0] ? hash(data[0]) : null, storedHash: data[1] ? hash(data[1]) : null,
+          ...(data.every(Boolean) && ["[Content_Types].xml", "_rels/.rels"].includes(path)
+            ? { routingEquivalent: routingXml(data[0], path) === routingXml(data[1], path) } : {}) });
+      }
+    }
+    observations.push({ sourceItemId: part.custody.itemId, storedItemId: item.id, stored: true,
+      sourceBytes: part.bytes.length, storedBytes: bytes.length, sourceHash: hash(part.bytes), storedHash: hash(bytes), differences });
+  }
+  return observations;
+}
 async function verifyOutput(output, deps) {
   const item = await deps.graph(`drives/${encodeURIComponent(fresh.driveId)}/items/${encodeURIComponent(output.itemId)}`);
   const path = decodeURIComponent(item.parentReference?.path || "").split("root:")[1];
@@ -174,6 +199,8 @@ async function handler(body, deps = {}) {
     if (context.containerClient.getProperties && (await context.containerClient.getProperties()).blobPublicAccess) deny("COMMISSIONING_STAGE02_PUBLIC_STORAGE_DENIED");
     const current = await (deps.readSource || fresh.readSource)(body.titleId, context), { p, prior } = await load(current, context);
     for (const part of current.components) await qa(part);
+    if (body.mode === "SUBMISSION_02_TRANSPORT_READBACK") return { status: 200, jsonBody: {
+      titleId: p.titleId, observations: await transportReadback(current, p, context), effects: 0, stage03: "NOT_STARTED" } };
     const existing = await receipt(p, context);
     if (existing) return { status: 200, jsonBody: { receipt: existing, replay: true, stage03: "NOT_STARTED", effects: 0 } };
     if (!executeRequested) return { status: 200, jsonBody: { titleId: p.titleId, intakeId: p.intakeId, sourceFingerprint: p.fingerprint,
