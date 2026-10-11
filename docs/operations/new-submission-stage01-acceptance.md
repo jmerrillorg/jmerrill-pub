@@ -1,0 +1,13 @@
+# Five-original Stage 01 acceptance
+
+Publishing owns this bounded entry. It uses the existing Function managed identity and ordinary jm1_publishingintakes receipt store; it does not import roles or replace the isolated fresh-title path.
+
+The exact five source policies and current bytes must pass Jackie identity/custody validation. No prior completion or approval is reused. The first operation is read-only SUBMISSION_01_PREFLIGHT on the existing keyed source-registration route. Caller-provided source, identity or policy fields are rejected.
+
+Local duplicate visibility must be paired with a complete administrator-authorized read-only census of the same selected intake fields. The private attestation stores only record IDs and field fingerprints, expires within ten minutes, and must exactly match runtime reads. No security privilege is added. Changed/incomplete census, source identity overlap without an exact binding, and multiple matches hold before creation. This bounded attestation is not a recurring scheduler or a substitute for estate-wide commissioning.
+
+Execution is disabled by default and requires JM1_NEW_SUBMISSION_STAGE01_ENABLED=true and the exact approved five-title allowlist. Broad stage, wait and editorial workers stay disabled. Reserve a deterministic ordinary intake ID, re-read exact source binding, and persist a durable Stage 01 output. Stage 02 stays pending; no V2 lifecycle history or book-state transitions are invented.
+
+Send the canonical inquiry acknowledgment through the existing ACS renderer/delivery ledger, with the exact submission reference and canonical Jackie contact. Neither provider acceptance nor the Publishing CC mailbox copy proves recipient delivery. Exact immutable-message readback from Jackie's canonical mailbox is required; missing recipient verification leaves Stage 01 waiting for delivery proof. Relay idempotency owns ambiguous-send reconciliation; never bypass its hold or auto-resend with another key. Completed receipt replay returns the same output and performs no send. Stage 01 is informational and does not require an author approval; later input/approval gates must use the canonical response workflow and cannot be satisfied from chat.
+
+Release through protected settings-preserving source-only deployment, retaining the existing package preimage for rollback. Enable only this entry after read-only preflight. Disable it after bounded acceptance; retain all records and original files. No paid provider, financial, external-author processing or public publication action is authorized here.
