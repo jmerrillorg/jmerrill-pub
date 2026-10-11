@@ -54,6 +54,7 @@ export async function GET() {
       genre: title.genre,
       displayYear: title.displayYear,
       formats: title.formats,
+      primaryIsbn: title.primaryIsbn,
       coverUrl: title.coverUrl,
       isbnByFormat: title.isbnByFormat.map((item) => ({
         format: item.format,

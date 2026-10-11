@@ -96,10 +96,10 @@ test('complete public title is ready for page verification', () => {
 })
 
 test('campaign readiness rejects empty and placeholder destinations without hiding the catalog', () => {
-  for (const overrides of [{ coverUrl: '' }, { coverUrl: 'https://placehold.co/300x400' }, { shortDescription: '' }, { shortDescription: 'Description coming soon' }]) {
+  for (const overrides of [{ coverUrl: '' }, { coverUrl: 'https://placehold.co/300x400' }, { shortDescription: '' }, { shortDescription: 'Description coming soon' }, { formats: [] }]) {
     const result = projection.evaluateCampaignDestinationReadiness(title(overrides))
     assert.equal(result.status, 'HOLD')
-    assert.ok(result.missing.includes('MISSING_COVER') || result.missing.includes('MISSING_DESCRIPTION'))
+    assert.ok(result.missing.includes('MISSING_COVER') || result.missing.includes('MISSING_DESCRIPTION') || result.missing.includes('MISSING_FORMAT'))
     assert.equal(projection.evaluatePublicCatalogReadiness(title(overrides)).status, 'READY')
   }
 })
