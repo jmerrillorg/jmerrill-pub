@@ -9,6 +9,9 @@ async function sourceRegistrationHandler(request, deps = {}) {
   }
   let body;
   try { body = await request.json(); } catch { return { status: 400, jsonBody: { code: "INVALID_JSON", effects: 0 } }; }
+  if (body?.mode === require("./newSubmissionStage03Preflight").MODE) {
+    return require("./newSubmissionStage03Preflight").handler(body, deps);
+  }
   if (body && require("./newSubmissionStage02").MODES.includes(body.mode)) {
     if (Object.keys(body).some(k => !["titleId", "mode"].includes(k))) return { status: 400, jsonBody: { code: "COMMISSIONING_SUBMISSION_SCOPE_DENIED", effects: 0 } };
     return require("./newSubmissionStage02").handler(body, deps);
