@@ -98,7 +98,7 @@ export function BookCard({ book, compact = false }: { book: BookCardRecord; comp
         <div className="mt-4 flex flex-wrap gap-1.5">
           {book.formats.map((format) => (
             <span key={format} className="rounded-full border border-white/8 bg-white/[0.03] px-2 py-1 text-[10px] text-white/35">
-              {format}
+              {format === 'Other' ? 'Edition' : format}
             </span>
           ))}
         </div>

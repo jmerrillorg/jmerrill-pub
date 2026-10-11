@@ -1,5 +1,6 @@
 import type {
   CatalogAuthorSummary,
+  CatalogFormat,
   CatalogTitleSummary,
   PublicCatalogPageUrls,
   PublicCatalogProjectionSummary,
@@ -7,6 +8,8 @@ import type {
   PublicCatalogReadinessIssue,
 } from './types'
 import { getHagherBacklistContent, hagherAuthor } from '../../data/hagher-backlist-content'
+import { getPublicBacklistContent } from '../../data/public-backlist-content'
+import { bookRetailerEnrichmentOverrides } from '../../data/book-retailer-enrichment-overrides'
 
 export const PUBLIC_CATALOG_AUTHORITY = {
   sourceOfTruth: 'Dataverse jm1pub_title + publishing assets + marketplace records',
@@ -72,6 +75,16 @@ export function evaluatePublicCatalogReadiness(
   }
 }
 
+// Campaign quality is independent of lifecycle eligibility and catalog visibility.
+export function evaluateCampaignDestinationReadiness(title: CatalogTitleSummary) {
+  const missing: PublicCatalogReadinessIssue[] = [...evaluatePublicCatalogReadiness(title).issues]
+  if (!title.coverUrl || /placeholder|placehold\.co/i.test(title.coverUrl)) missing.push('MISSING_COVER')
+  if (!title.shortDescription?.trim() || /^(description coming soon|coming soon|j merrill publishing author family)[.!]?$/i.test(title.shortDescription.trim()) || / is listed in the J Merrill Publishing public catalog\.$/i.test(title.shortDescription.trim())) missing.push('MISSING_DESCRIPTION')
+  if (!title.primaryIsbn && !title.isbnByFormat.length) missing.push('MISSING_ISBN')
+  if (title.isbnByFormat.some(item => item.format === 'Other')) missing.push('UNVERIFIED_EDITION_FORMAT')
+  return { status: missing.length ? 'HOLD' as const : 'READY' as const, missing }
+}
+
 export function buildPublicCatalogProjectionSummary(
   titles: CatalogTitleSummary[],
   authors: CatalogAuthorSummary[],
@@ -102,7 +115,15 @@ export function buildPublicCatalogProjectionSummary(
 export function projectPublicCatalogTitles(titles: CatalogTitleSummary[]): CatalogTitleSummary[] {
   const presented = titles.map((title) => {
     const content = getHagherBacklistContent(title.slug, title.id)
-    if (!content) return title
+    if (!content) {
+      const backlist = getPublicBacklistContent(title)
+      const prior = bookRetailerEnrichmentOverrides[title.slug]
+      // Reuse existing verified presentation copy; never elevate retailer dates,
+      // formats, or search links into canonical edition/distribution authority.
+      const shortDescription = backlist?.shortDescription || title.shortDescription || (prior?.retailerMatchStatus === 'verified' ? prior.retailerDescription : '') || ''
+      const isbnByFormat = title.isbnByFormat.map(item => ({ ...item, format: (backlist?.editionFormats?.[item.isbn] || item.format) as CatalogFormat }))
+      return { ...title, coverUrl: backlist?.coverUrl || title.coverUrl, shortDescription, isbnByFormat, formats: isbnByFormat.length ? Array.from(new Set(isbnByFormat.map(item => item.format))).filter(Boolean) : title.formats }
+    }
     return {
       ...title, coverUrl: content.coverUrl, shortDescription: content.shortDescription,
       genre: content.genre, releaseDate: content.releaseDate,
