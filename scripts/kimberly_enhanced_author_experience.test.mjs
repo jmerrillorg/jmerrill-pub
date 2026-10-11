@@ -10,6 +10,13 @@ const authorsIndexSource = await readFile(new URL('app/authors/page.tsx', root),
 const homeSource = await readFile(new URL('components/home/ModularHomePage.tsx', root), 'utf8')
 const catalogSource = await readFile(new URL('lib/server/dataverse/catalog.ts', root), 'utf8')
 
+test('Kimberly edition projection binds the preserved EPUB, not the conflicting inventory label', async () => {
+  const presentation = JSON.parse(await readFile(new URL('data/public-backlist-presentation.json', root), 'utf8'))
+  const entry = presentation.titles['b34b00d4-c27a-f111-ab0f-00224820105b']
+  assert.deepEqual(entry.sourceBoundEditions, [{ isbn: '9781961475755', format: 'eBook', sourceId: '01DF3SEQK74QN3B6PG3NC3AFJYMW3G32RC' }])
+  assert.ok(entry.sources.some(s => s.id === entry.sourceBoundEditions[0].sourceId && s.sha256 === '44e32a468929cc12f1b94b2f26bcf8eaee7e6e672e984b4c973867ac5f7183a6'))
+})
+
 const {
   enhancedAuthorExperiences,
   featuredAuthorExperiences,
