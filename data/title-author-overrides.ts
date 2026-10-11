@@ -99,6 +99,7 @@ export const titleAuthorOverrides: Record<string, string> = {
   'warrior-s-breed': 'Dean Wilson',
   'warriors-and-angels': 'Shelley McIntosh',
   'when-a-thug-meets-jesus': 'Mack Hughley',
+  'when-zuri-came-to-earth': 'Gwendolyn Rucker-Carr',
   'words-of-a-troubled-soul': 'David Williams',
   'you-re-still-not-crazy': 'Carolyn Pierce',
   'your-brain-has-too-much-what-mommy': 'Essence Easley',
