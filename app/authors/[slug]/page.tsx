@@ -2,7 +2,6 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import Image from 'next/image'
 import { notFound, redirect } from 'next/navigation'
-import { CTASection } from '@/components/content/CTASection'
 import { BookCard } from '@/components/content/BookCard'
 import { EnhancedAuthorProfile } from '@/components/content/EnhancedAuthorProfile'
 import { getEnhancedAuthorExperience, getFeaturedAuthorExperience, getFeaturedAuthorRuntimeState, resolveFeaturedAuthorTitle } from '@/data/author-experience'
@@ -198,7 +197,7 @@ export default async function AuthorProfilePage({ params }: Props) {
               >
                 {author.name}
               </h1>
-              <p className={`mt-5 max-w-[760px] text-[18px] font-light leading-[1.8] ${author.slug === 'iyorwuese-hagher' ? 'whitespace-pre-line text-white/80' : 'text-white/50'}`}>
+              <p className="mt-5 max-w-[760px] whitespace-pre-line text-[18px] font-light leading-[1.8] text-white/80">
                 {author.longBio || author.shortBio || 'J Merrill Publishing author family.'}
               </p>
 
@@ -207,7 +206,7 @@ export default async function AuthorProfilePage({ params }: Props) {
                   { label: 'Titles in catalog', value: String(author.titleCount) },
                   { label: 'Primary genres', value: author.genres.slice(0, 2).join(', ') || 'Publishing catalog' },
                   { label: 'Imprints', value: author.imprints.slice(0, 2).join(', ') || 'J Merrill Publishing' },
-                  { label: 'Location', value: author.location || 'J Merrill Publishing author family' },
+                  ...(author.location ? [{ label: 'Location', value: author.location }] : []),
                 ].map((item) => (
                   <div key={item.label} className="rounded-xl border border-white/8 bg-white/[0.03] px-4 py-4">
                     <div className="mb-1 font-mono text-[10px] uppercase tracking-[0.1em] text-white/20">{item.label}</div>
@@ -237,9 +236,6 @@ export default async function AuthorProfilePage({ params }: Props) {
                 <em className="not-italic italic text-blue-500">{author.name}</em>
               </h2>
             </div>
-            {author.slug !== 'iyorwuese-hagher' ? <blockquote className="rounded-[24px] border border-gray-200 bg-[#F7F8FA] p-6 text-[15px] font-light leading-[1.8] text-gray-500">
-              “Every author page should make the person behind the work visible.”
-            </blockquote> : null}
           </div>
 
           {author.titles.length > 0 ? (
@@ -256,20 +252,6 @@ export default async function AuthorProfilePage({ params }: Props) {
         </div>
       </section>
 
-      {author.slug !== 'iyorwuese-hagher' ? <CTASection
-        eyebrow="Author Growth Infrastructure"
-        title={
-          <>
-            Author pages are now part of
-            <br />
-            the flagship platform
-          </>
-        }
-        description="This profile structure is ready for richer bios, photos, media kits, quotes, and future Dataverse-driven author relationship data."
-        primary={{ label: 'Browse all authors', href: '/authors' }}
-        secondary={{ label: 'Join the Family', href: '/join' }}
-        dark={false}
-      /> : null}
     </div>
   )
 }

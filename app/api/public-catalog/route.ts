@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { buildPublicCatalogProjectionSummary, evaluatePublicCatalogReadiness } from '@/lib/catalog/public-projection'
+import { buildPublicCatalogProjectionSummary, evaluatePublicCatalogReadiness, evaluateCampaignDestinationReadiness } from '@/lib/catalog/public-projection'
 import { listPublicAuthors, listPublicCatalogTitles } from '@/lib/server/dataverse/catalog'
 
 export const dynamic = 'force-dynamic'
@@ -54,11 +54,13 @@ export async function GET() {
       genre: title.genre,
       displayYear: title.displayYear,
       formats: title.formats,
+      coverUrl: title.coverUrl,
       isbnByFormat: title.isbnByFormat.map((item) => ({
         format: item.format,
         isbn: item.isbn,
       })),
       pageReadiness: evaluatePublicCatalogReadiness(title, duplicateTitleSlugs, duplicateAuthorSlugs),
+      campaignReadiness: evaluateCampaignDestinationReadiness(title),
     })),
     authors: authorsResult.data.map((author) => ({
       slug: author.slug,
@@ -66,6 +68,11 @@ export async function GET() {
       titleCount: author.titleCount,
       genres: author.genres,
       imprints: author.imprints,
+      photoUrl: author.photoUrl,
+      campaignReadiness: {
+        status: author.photoUrl && author.shortBio && author.shortBio !== 'J Merrill Publishing author family.' ? 'READY' : 'HOLD',
+        missing: [!author.photoUrl ? 'MISSING_PORTRAIT' : '', !author.shortBio || author.shortBio === 'J Merrill Publishing author family.' ? 'MISSING_BIOGRAPHY' : ''].filter(Boolean),
+      },
     })),
   }, {
     headers: {

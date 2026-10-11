@@ -1,0 +1,2383 @@
+{
+  "verifiedAt": "2026-10-11T12:22:20.549Z",
+  "titleCount": 128,
+  "productionTitleCount": 113,
+  "titles": {
+    "69b21fc6-c27a-f111-ab0f-000d3a14673b": {
+      "titleId": "69b21fc6-c27a-f111-ab0f-000d3a14673b",
+      "slug": "365-days-of-transparency",
+      "isbns": [
+        "9781950719914",
+        "9781950719921"
+      ],
+      "sources": [
+        {
+          "id": "01DF3SEQOPTREBBKQ2RREK65ECZHDIKN62",
+          "sha256": "9d618d17637ef2bb79cb6d5113a0dd933d37985b74d845ff7fe881769cf88b5a"
+        }
+      ],
+      "editionFormats": {},
+      "coverUrl": "/backlist/catalog/365-days-of-transparency-cover.jpg"
+    },
+    "841a04cd-c27a-f111-ab0f-000d3a14673b": {
+      "titleId": "841a04cd-c27a-f111-ab0f-000d3a14673b",
+      "slug": "a-principal-s-tale",
+      "isbns": [
+        "9781950719655",
+        "9781950719662"
+      ],
+      "sources": [
+        {
+          "id": "01DF3SEQOZO767JSEMI5CK3THCWCCP77XU",
+          "sha256": "e5206a985f034c2696681f460f81b6a64e498e2a343d4e418ee117fe389ade20"
+        }
+      ],
+      "editionFormats": {},
+      "coverUrl": "/backlist/catalog/a-principal-s-tale-cover.jpg"
+    },
+    "901a04cd-c27a-f111-ab0f-000d3a14673b": {
+      "titleId": "901a04cd-c27a-f111-ab0f-000d3a14673b",
+      "slug": "bodacious",
+      "isbns": [
+        "9781954414037",
+        "9781954414044"
+      ],
+      "sources": [
+        {
+          "id": "01DF3SEQOALHYV3HILENE33SU6NX2XJLOX",
+          "sha256": "afe93723221c2976cbf680f07d325ec393212712e7db74fc91cc4e453de131cc"
+        }
+      ],
+      "editionFormats": {},
+      "coverUrl": "/backlist/catalog/bodacious-cover.jpg"
+    },
+    "911a04cd-c27a-f111-ab0f-000d3a14673b": {
+      "titleId": "911a04cd-c27a-f111-ab0f-000d3a14673b",
+      "slug": "connected",
+      "isbns": [
+        "9781954414150"
+      ],
+      "sources": [],
+      "editionFormats": {}
+    },
+    "921a04cd-c27a-f111-ab0f-000d3a14673b": {
+      "titleId": "921a04cd-c27a-f111-ab0f-000d3a14673b",
+      "slug": "focus-trust-and-follow",
+      "isbns": [
+        "9781950719495"
+      ],
+      "sources": [
+        {
+          "id": "01DF3SEQLYCQ62OH7OBVCZET5QQ6TUZXH5",
+          "sha256": "f09aba6f8b096e3e3d2eec97f2edc0ec9bcf4b9e0fdafbd1e0a18800d688ae2e"
+        }
+      ],
+      "editionFormats": {},
+      "longDescription": "Focus, Trust, and Follow is a collection of experiences I had that made God real to me. I was able to learn that God will use the quietness of a shy child, the boldness of a defiant preteen, and even math equations that don\u2019t make sense to make His word plain. In each individual devotion, I was reminded to either Focus on God, Trust Him and what He was telling me to do, and finally to Follow Him with reckless abandon. These are the 3 steps that God gave to me a few years ago to keep me on track with Him. Because of He is a merciful God, He offers me the opportunity to start over at which ever step I may be lacking. Whether I have lost focus, struggling with trust, or refusing to follow His direction I always have another chance. With that being said, this book certainly can be read in the order it is written but also allows the reader to go straight to the devotion that encourages them the most.",
+      "shortDescription": "Focus, Trust, and Follow is a collection of experiences I had that made God real to me. I was able to learn that God will use the quietness of a shy child, the boldness of a defiant preteen, and even math equations that don\u2019t make sense to make His word plain. In each individual devotion, I was reminded to either Focus on God, Trust Him and what He was telling me to do, and finally to Follow Him with reckless abandon. These are the 3 steps that God gave to me a few years ago to keep me on track with Him. Because of He is a merciful God, He offers me the opportunity to start over at which ever step I may be lacking. Whether I have lost focus, struggling with trust, or refusing to follow His direction I always have another chance. With that being said, this book certainly can be read in the order it is written but also allows the reader to go straight to the devotion that encourages them the most."
+    },
+    "971a04cd-c27a-f111-ab0f-000d3a14673b": {
+      "titleId": "971a04cd-c27a-f111-ab0f-000d3a14673b",
+      "slug": "inspirations-from-god",
+      "isbns": [
+        "9781950719792",
+        "9781950719808"
+      ],
+      "sources": [
+        {
+          "id": "01DF3SEQMF2Z2NBIIJRJAZHZQUS6YPGXMJ",
+          "sha256": "29cd50f2222f99263747e8008e038b8f4f95e25f5658e23d885db07a6c7e17f3"
+        }
+      ],
+      "editionFormats": {},
+      "coverUrl": "/backlist/catalog/inspirations-from-god-cover.jpg"
+    },
+    "991a04cd-c27a-f111-ab0f-000d3a14673b": {
+      "titleId": "991a04cd-c27a-f111-ab0f-000d3a14673b",
+      "slug": "love-lucy",
+      "isbns": [
+        "9781950719938",
+        "9781950719945"
+      ],
+      "sources": [
+        {
+          "id": "01DF3SEQJ6QAERVBJSENHJHTLQML5J4SZV",
+          "sha256": "a7fd65b2f146c7c5202f80be56626565d58e3e2a2ce7b9fc5fb8774e7488e977"
+        }
+      ],
+      "editionFormats": {},
+      "coverUrl": "/backlist/catalog/love-lucy-cover.jpg"
+    },
+    "9a1a04cd-c27a-f111-ab0f-000d3a14673b": {
+      "titleId": "9a1a04cd-c27a-f111-ab0f-000d3a14673b",
+      "slug": "love-of-my-life",
+      "isbns": [
+        "9781954414266",
+        "9781954414273",
+        "9781954414969"
+      ],
+      "sources": [
+        {
+          "id": "01DF3SEQNKRKXLKJ3H6NFIOA3UMQO36M6A",
+          "sha256": "16de188bec5e8469f3601e9e146c92783499a790bf3eada03559b7cebf3cd694"
+        }
+      ],
+      "editionFormats": {},
+      "coverUrl": "/backlist/catalog/love-of-my-life-cover.jpg"
+    },
+    "bff603d3-c27a-f111-ab0f-000d3a14673b": {
+      "titleId": "bff603d3-c27a-f111-ab0f-000d3a14673b",
+      "slug": "speech-therapy-works",
+      "isbns": [
+        "9781950719556",
+        "9781950719563"
+      ],
+      "sources": [],
+      "editionFormats": {}
+    },
+    "c1f603d3-c27a-f111-ab0f-000d3a14673b": {
+      "titleId": "c1f603d3-c27a-f111-ab0f-000d3a14673b",
+      "slug": "the-essence-of-life-love-letters-to-christ",
+      "isbns": [],
+      "sources": [],
+      "editionFormats": {}
+    },
+    "c2f603d3-c27a-f111-ab0f-000d3a14673b": {
+      "titleId": "c2f603d3-c27a-f111-ab0f-000d3a14673b",
+      "slug": "the-hood",
+      "isbns": [
+        "9781950719471",
+        "9781950719488"
+      ],
+      "sources": [],
+      "editionFormats": {}
+    },
+    "c3f603d3-c27a-f111-ab0f-000d3a14673b": {
+      "titleId": "c3f603d3-c27a-f111-ab0f-000d3a14673b",
+      "slug": "the-master-s-piece",
+      "isbns": [
+        "9781954414471",
+        "9781954414488",
+        "9781961475014"
+      ],
+      "sources": [
+        {
+          "id": "01DF3SEQM7QA2SFHZ2D5E2FD3XPDA2ATQO",
+          "sha256": "362cd0c5d848f3a9f73ae40fbb2e387ddd7ffcd45b094fb61e187bc12b4c54f0"
+        }
+      ],
+      "editionFormats": {},
+      "coverUrl": "/backlist/catalog/the-master-s-piece-cover.jpg"
+    },
+    "c9f603d3-c27a-f111-ab0f-000d3a14673b": {
+      "titleId": "c9f603d3-c27a-f111-ab0f-000d3a14673b",
+      "slug": "uncomfortable-conversations-with-god",
+      "isbns": [
+        "9780578523712",
+        "9781950719112"
+      ],
+      "sources": [],
+      "editionFormats": {}
+    },
+    "d0f603d3-c27a-f111-ab0f-000d3a14673b": {
+      "titleId": "d0f603d3-c27a-f111-ab0f-000d3a14673b",
+      "slug": "27-days-to-overcoming-depression",
+      "isbns": [
+        "9781735425031",
+        "9781735428031",
+        "9781961475366"
+      ],
+      "sources": [
+        {
+          "id": "01DF3SEQNPS26WQVBCXFD27ZXOAGVEOJN4",
+          "sha256": "a0b56739c6902f015b08b3a0cd602a5b012300dbaa207b9257f9eb2a16c5061d"
+        }
+      ],
+      "editionFormats": {},
+      "coverUrl": "/backlist/catalog/27-days-to-overcoming-depression-cover.jpg"
+    },
+    "d4f603d3-c27a-f111-ab0f-000d3a14673b": {
+      "titleId": "d4f603d3-c27a-f111-ab0f-000d3a14673b",
+      "slug": "more-than-a-village",
+      "isbns": [
+        "9781954414136",
+        "9781954414143"
+      ],
+      "sources": [],
+      "editionFormats": {}
+    },
+    "d6f603d3-c27a-f111-ab0f-000d3a14673b": {
+      "titleId": "d6f603d3-c27a-f111-ab0f-000d3a14673b",
+      "slug": "the-flame",
+      "isbns": [
+        "9781954414600",
+        "9781961475113"
+      ],
+      "sources": [],
+      "editionFormats": {}
+    },
+    "d7f603d3-c27a-f111-ab0f-000d3a14673b": {
+      "titleId": "d7f603d3-c27a-f111-ab0f-000d3a14673b",
+      "slug": "the-release-of-the-spirit",
+      "isbns": [
+        "9781950719631",
+        "9781950719648"
+      ],
+      "sources": [],
+      "editionFormats": {}
+    },
+    "d9f603d3-c27a-f111-ab0f-000d3a14673b": {
+      "titleId": "d9f603d3-c27a-f111-ab0f-000d3a14673b",
+      "slug": "warriors-and-angels",
+      "isbns": [
+        "9781961475519",
+        "9781961475526"
+      ],
+      "sources": [],
+      "editionFormats": {}
+    },
+    "dcf603d3-c27a-f111-ab0f-000d3a14673b": {
+      "titleId": "dcf603d3-c27a-f111-ab0f-000d3a14673b",
+      "slug": "100-wisdom-lessons-for-life-and-living",
+      "isbns": [],
+      "sources": [],
+      "editionFormats": {}
+    },
+    "1159fcc8-c37a-f111-ab0f-000d3a14673b": {
+      "titleId": "1159fcc8-c37a-f111-ab0f-000d3a14673b",
+      "slug": null,
+      "isbns": [],
+      "sources": [],
+      "editionFormats": {}
+    },
+    "7a064bcd-c27a-f111-ab0f-00224820105b": {
+      "titleId": "7a064bcd-c27a-f111-ab0f-00224820105b",
+      "slug": "aligned",
+      "isbns": [
+        "9781954414051",
+        "9781954414068"
+      ],
+      "sources": [
+        {
+          "id": "01DF3SEQPM63B3ODHC4NGIIKLSZTSTBX3Q",
+          "sha256": "77bbcf7f02a4a052a4b4f9c668a8d469d19c1612d595731ea9f3b08d79e8d8e5"
+        },
+        {
+          "id": "01DF3SEQKAVQ76ONAPZNFZ3GWYMSGKR6FM",
+          "sha256": "d12441b2ba2a24990bbd4b92fafa90771ecd6aab831dac4f05ac24def8ea92d2"
+        }
+      ],
+      "longDescription": "What is faith\u2014really? Is it belief, confidence, doctrine, spiritual effort, or something more?\n\nIn Aligned! Unlocking the DNA of Authentic Faith, veteran minister and missionary Dennis E. Brown challenges common assumptions about faith and invites readers to rediscover it at its most fundamental level. Rather than defining faith by what it produces or how strongly it is held, Brown explores faith as a relational reality\u2014an alignment with the nature, character, and purposes of God.\n\nRooted in Scripture and shaped by decades of cross-cultural ministry experience, this book traces the essence of faith back to the creation event itself. Brown argues that faith flows from humanity\u2019s unique design: being created in the image of God and invited into relationship with Him. From this foundation, faith becomes not a tool to wield or a force to master, but a lived experience that shapes identity, perspective, and daily life.\n\nThrough thoughtful teaching, practical insights, and memorable illustrations, Aligned! addresses questions such as:\n\t\u2022\tWhat distinguishes authentic faith from cultural or religious substitutes?\n\t\u2022\tHow does faith function in real life, especially in times of struggle and uncertainty?\n\t\u2022\tWhy is relationship\u2014not performance\u2014the true source of spiritual growth?\n\nWritten for thoughtful Christians, ministry leaders, and anyone seeking clarity about faith, Aligned! is well suited for individual reading, small-group discussion, and church or library collections. It offers a compelling vision of faith as alignment with God\u2014simple in essence, profound in impact, and transformative in practice.",
+      "shortDescription": "Aligned! explores faith at its core, revealing authentic faith as a lived relationship with God. Through Scripture and reflection, Dennis E. Brown invites readers to discover faith as alignment with God\u2019s nature rather than mere belief.",
+      "editionFormats": {},
+      "coverUrl": "/backlist/catalog/aligned-cover.jpg"
+    },
+    "7b064bcd-c27a-f111-ab0f-00224820105b": {
+      "titleId": "7b064bcd-c27a-f111-ab0f-00224820105b",
+      "slug": "almost-happy",
+      "isbns": [
+        "9781954414570",
+        "9781954414587",
+        "9781954414594"
+      ],
+      "sources": [
+        {
+          "id": "01DF3SEQINVFFVYHAR2RFKHLUFGSOEJSDH",
+          "sha256": "71fde34fd6c563ede24a216d662661274a640b5a1d6a49b0b40053af2fa1faa0"
+        },
+        {
+          "id": "01DF3SEQNR3SIVU6UVVNAZNE2ND6CU7CJH",
+          "sha256": "bb13af0404ab3bcb299f487bbafa19b00a83aeeedc10424c2e995572769be416"
+        }
+      ],
+      "longDescription": "Tabby has survived heartbreak before\u2014but this time, she\u2019s determined not just to survive, but to reclaim her happiness.\n\nRecently divorced and emotionally guarded, Tabby is no stranger to loss, betrayal, or disappointment. When a younger, magnetic man enters her life, he awakens a passion she thought she had buried for good. Their connection is intense, intoxicating, and deeply sensual\u2014offering Tabby a glimpse of the joy she\u2019s been craving.\n\nBut desire has consequences. As love, lust, and emotional baggage collide, Tabby finds herself navigating toxic patterns, blurred boundaries, and painful self-realizations. The more she gives of herself, the more she must confront the truth about who she is, what she deserves, and whether love should come at the cost of her peace.\n\nAlmost Happy: The Chronicles of Tabby is a bold, erotic, and emotionally resonant novel that explores modern relationships, Black female identity, and the complicated journey toward self-love. With unflinching honesty and sensual intensity, Jaylonna Stevette delivers a story about desire, healing, and the courage it takes to stop settling for \u201calmost\u201d and start choosing yourself.\n\nIntended for mature readers (18+).",
+      "shortDescription": "Tabby thought she was getting back to happy\u2014until love pulled her into desire, betrayal, and self-reckoning. Almost Happy is a raw, sensual journey through heartbreak, healing, and the cost of choosing love again.",
+      "editionFormats": {},
+      "coverUrl": "/backlist/catalog/almost-happy-cover.jpg"
+    },
+    "80064bcd-c27a-f111-ab0f-00224820105b": {
+      "titleId": "80064bcd-c27a-f111-ab0f-00224820105b",
+      "slug": "discipline-and-direction",
+      "isbns": [
+        "9781954414914",
+        "9781954414921"
+      ],
+      "sources": [
+        {
+          "id": "01DF3SEQPIZRKNO4WEMNAKGODTCXVNOHNL",
+          "sha256": "f3f55e922cdfd36775c881b74d1d46c5309721749c134277f60b09e5b0300319"
+        }
+      ],
+      "editionFormats": {},
+      "coverUrl": "/backlist/catalog/discipline-and-direction-cover.jpg"
+    },
+    "82064bcd-c27a-f111-ab0f-00224820105b": {
+      "titleId": "82064bcd-c27a-f111-ab0f-00224820105b",
+      "slug": "god-s-business-plan",
+      "isbns": [
+        "9781961475083"
+      ],
+      "sources": [],
+      "editionFormats": {}
+    },
+    "99064bcd-c27a-f111-ab0f-00224820105b": {
+      "titleId": "99064bcd-c27a-f111-ab0f-00224820105b",
+      "slug": "help-god-i-am-confused",
+      "isbns": [
+        "9781950719778",
+        "9781950719785"
+      ],
+      "sources": [
+        {
+          "id": "01DF3SEQMIQM3NFC7MVFHL5CRZB24TOCGK",
+          "sha256": "ee7a159813823202c93af0b9896f22a14f454bd873c7435aed5a576926e87945"
+        }
+      ],
+      "editionFormats": {},
+      "coverUrl": "/backlist/catalog/help-god-i-am-confused-cover.jpg"
+    },
+    "a5084bcd-c27a-f111-ab0f-00224820105b": {
+      "titleId": "a5084bcd-c27a-f111-ab0f-00224820105b",
+      "slug": "jewels-by-lady-j",
+      "isbns": [
+        "9781950719273",
+        "9781950719280",
+        "9781950719297"
+      ],
+      "sources": [],
+      "editionFormats": {}
+    },
+    "aa084bcd-c27a-f111-ab0f-00224820105b": {
+      "titleId": "aa084bcd-c27a-f111-ab0f-00224820105b",
+      "slug": "kingdom-equipment-101",
+      "isbns": [
+        "9781954414761",
+        "9781954414778"
+      ],
+      "sources": [
+        {
+          "id": "01DF3SEQOQQKZ5XEE6QVBJC4GF2NS6TATV",
+          "sha256": "decee96dda7c568b277f610cfcce8caac4b81bbcbf3b9d8cc71b8301b9b2e869"
+        }
+      ],
+      "editionFormats": {},
+      "coverUrl": "/backlist/catalog/kingdom-equipment-101-cover.jpg"
+    },
+    "ab084bcd-c27a-f111-ab0f-00224820105b": {
+      "titleId": "ab084bcd-c27a-f111-ab0f-00224820105b",
+      "slug": "lady-daphanny-s-altar",
+      "isbns": [
+        "9781961475090",
+        "9781961475106"
+      ],
+      "sources": [],
+      "editionFormats": {}
+    },
+    "b3084bcd-c27a-f111-ab0f-00224820105b": {
+      "titleId": "b3084bcd-c27a-f111-ab0f-00224820105b",
+      "slug": "life-after-detour",
+      "isbns": [
+        "9781950719389",
+        "9781950719396"
+      ],
+      "sources": [
+        {
+          "id": "01DF3SEQKHCTBVSNJBLZGZO2E4WCRVITMO",
+          "sha256": "a3903db6c589618d31133605227454f7739509173e6674b51b67ef3e02380263"
+        }
+      ],
+      "editionFormats": {},
+      "coverUrl": "/backlist/catalog/life-after-detour-cover.jpg"
+    },
+    "d5084bcd-c27a-f111-ab0f-00224820105b": {
+      "titleId": "d5084bcd-c27a-f111-ab0f-00224820105b",
+      "slug": "my-abc-s",
+      "isbns": [
+        "9781954414457",
+        "9781954414464"
+      ],
+      "sources": [
+        {
+          "id": "01DF3SEQOK2BCP2FPS4RDKY4SVG2524LGB",
+          "sha256": "67e572a21fa1a67f057df70f7cc53832f142882d61278747237692a44153140a"
+        }
+      ],
+      "editionFormats": {},
+      "coverUrl": "/backlist/catalog/my-abc-s-cover.jpg"
+    },
+    "f0084bcd-c27a-f111-ab0f-00224820105b": {
+      "titleId": "f0084bcd-c27a-f111-ab0f-00224820105b",
+      "slug": "pieces-of-me-all-over-the-place",
+      "isbns": [
+        "9781950719679",
+        "9781950719686"
+      ],
+      "sources": [],
+      "editionFormats": {}
+    },
+    "944b00d4-c27a-f111-ab0f-00224820105b": {
+      "titleId": "944b00d4-c27a-f111-ab0f-00224820105b",
+      "slug": "the-journey",
+      "isbns": [
+        "9781954414280",
+        "9781954414297"
+      ],
+      "sources": [
+        {
+          "id": "01DF3SEQO5Q2NKPETSRJGYRKIJTAPM5JTT",
+          "sha256": "c5597b85c3270ee65837e0254b5e62580d5db26e9cefb7da4b388c4e1c6226a1"
+        }
+      ],
+      "editionFormats": {},
+      "coverUrl": "/backlist/catalog/the-journey-cover.jpg"
+    },
+    "994b00d4-c27a-f111-ab0f-00224820105b": {
+      "titleId": "994b00d4-c27a-f111-ab0f-00224820105b",
+      "slug": "understanding-the-misunderstood",
+      "isbns": [
+        "9781954414013",
+        "9781954414020"
+      ],
+      "sources": [
+        {
+          "id": "01DF3SEQPOFBIYIUIY3RBJGSZV75W4KCJR",
+          "sha256": "5a84012e03600aad223ab9a63d77549d000f1c7e1332114ac35c3327a2034ddd"
+        }
+      ],
+      "editionFormats": {},
+      "coverUrl": "/backlist/catalog/understanding-the-misunderstood-cover.jpg"
+    },
+    "9a4b00d4-c27a-f111-ab0f-00224820105b": {
+      "titleId": "9a4b00d4-c27a-f111-ab0f-00224820105b",
+      "slug": "when-a-thug-meets-jesus",
+      "isbns": [
+        "9781961475977",
+        "9781961475984"
+      ],
+      "sources": [
+        {
+          "id": "01DF3SEQKYS3ZJ6QVJJZBYU4LFA3BVYHO7",
+          "sha256": "6cba7700ba0b5c956842eebf16897eadb20d6bced1b1a508a60f627685562991"
+        }
+      ],
+      "editionFormats": {},
+      "coverUrl": "/backlist/catalog/when-a-thug-meets-jesus-cover.jpg"
+    },
+    "9b4b00d4-c27a-f111-ab0f-00224820105b": {
+      "titleId": "9b4b00d4-c27a-f111-ab0f-00224820105b",
+      "slug": "because-the-lord-is-my-shepherd",
+      "isbns": [
+        "9781950719440",
+        "9781950719457"
+      ],
+      "sources": [],
+      "editionFormats": {}
+    },
+    "9c4b00d4-c27a-f111-ab0f-00224820105b": {
+      "titleId": "9c4b00d4-c27a-f111-ab0f-00224820105b",
+      "slug": "destined-to-break-the-curse",
+      "isbns": [
+        "9781950719341",
+        "9781950719358"
+      ],
+      "sources": [],
+      "editionFormats": {}
+    },
+    "a74b00d4-c27a-f111-ab0f-00224820105b": {
+      "titleId": "a74b00d4-c27a-f111-ab0f-00224820105b",
+      "slug": "you-re-still-not-crazy",
+      "isbns": [
+        "9781954414228",
+        "9781954414235"
+      ],
+      "sources": [
+        {
+          "id": "01DF3SEQIP347IOOPCNZCL5KKTO6AGEXWL",
+          "sha256": "ab72cf27268a51a13fb3fd85ef2e0964132c820b7138bf2c912626b3687b1ce4"
+        }
+      ],
+      "editionFormats": {},
+      "coverUrl": "/backlist/catalog/you-re-still-not-crazy-cover.jpg"
+    },
+    "b34b00d4-c27a-f111-ab0f-00224820105b": {
+      "titleId": "b34b00d4-c27a-f111-ab0f-00224820105b",
+      "slug": "girl-did-you-know",
+      "isbns": [
+        "9781961475755"
+      ],
+      "sources": [
+        {
+          "id": "01DF3SEQN2RHXYFQTPFVDJKUUK3LG3WXXX",
+          "sha256": "01551f5a10bb0b705477d047731f96eb4181b0c551f2e1b1750b3c8b15c0c5c0"
+        },
+        {
+          "id": "01DF3SEQK74QN3B6PG3NC3AFJYMW3G32RC",
+          "sha256": "44e32a468929cc12f1b94b2f26bcf8eaee7e6e672e984b4c973867ac5f7183a6"
+        }
+      ],
+      "longDescription": "Girl, Did You Know\u2026? is a deeply personal and faith-centered journey of healing, truth, and restoration. In this compelling and transparent work, Kimberly Reeder invites women into an honest conversation about pain, identity, relationships, and the long-lasting impact of past choices.\n\nThrough powerful storytelling and spiritual reflection, the author shares her lived experiences\u2014navigating broken relationships, emotional wounds, and cycles that repeated over time. Rather than masking the past, she brings it into the light, revealing how unresolved pain, misunderstanding, and misplaced beliefs can shape a woman\u2019s life in ways she may not immediately recognize.\n\nThis book addresses the deeper realities behind emotional struggles, including the weight of past decisions, the importance of forgiveness, and the process of healing from within. It encourages readers to confront what has been buried, acknowledge patterns that may be holding them back, and begin the work of true restoration.\n\nGrounded in faith, Girl, Did You Know\u2026? emphasizes the importance of understanding one\u2019s identity through a relationship with God. It highlights how spiritual awareness, personal accountability, and intentional growth can lead to lasting transformation. With a balance of vulnerability and guidance, the author speaks directly to women who may feel lost, overlooked, or uncertain about their worth.\n\nThis is not a story of perfection\u2014it is a story of process. It reminds readers that healing is layered, growth takes time, and restoration is possible. For women seeking clarity, direction, and a deeper connection to their faith, this book offers both encouragement and a path forward.",
+      "shortDescription": "A faith-based journey of healing and restoration, Girl, Did You Know\u2026? helps women confront past pain, break destructive cycles, and rediscover their identity through truth, forgiveness, and a deeper relationship with God.",
+      "editionFormats": {},
+      "coverUrl": "/backlist/catalog/girl-did-you-know-cover.jpg"
+    },
+    "c44b00d4-c27a-f111-ab0f-00224820105b": {
+      "titleId": "c44b00d4-c27a-f111-ab0f-00224820105b",
+      "slug": "the-conquest-of-azenga",
+      "isbns": [
+        "9781961475762",
+        "9781961475779",
+        "9781961475786"
+      ],
+      "sources": []
+    },
+    "c74b00d4-c27a-f111-ab0f-00224820105b": {
+      "titleId": "c74b00d4-c27a-f111-ab0f-00224820105b",
+      "slug": "a-portrait-of-paradise",
+      "isbns": [
+        "9781961475656",
+        "9781961475663",
+        "9781961475670"
+      ],
+      "sources": []
+    },
+    "c84b00d4-c27a-f111-ab0f-00224820105b": {
+      "titleId": "c84b00d4-c27a-f111-ab0f-00224820105b",
+      "slug": "the-fight-for-the-promiseland",
+      "isbns": [
+        "9781961475632",
+        "9781961475649"
+      ],
+      "sources": [
+        {
+          "id": "01DF3SEQMCTQTXWPL235EKG3V2P4IMH2XL",
+          "sha256": "25ca1c19951338906da11ed0467d0bb8124e3dde2d36d319c47c192c4d71e11a"
+        },
+        {
+          "id": "01DF3SEQJ4APES4OYE35BLG7RSBQYZSOYM",
+          "sha256": "333fa95e572c9c2ec510808a0ba90d8244472a6c48b04bc315b2db2723400536"
+        }
+      ],
+      "longDescription": "Why do we have to fight for what God has already promised?\n\nIn The Fight for the Promiseland: Battle Strategies for Victorious People, Cheryl Cook explores the spiritual paradox of promise and perseverance. If God has declared victory, why must we still endure resistance, doubt, and delay?\n\nUsing the biblical story of the children of Israel as a spiritual framework, this faith-centered guide reveals how internal battles\u2014fear, indecision, distraction, and unbelief\u2014often present greater obstacles than external challenges. Through personal reflection, biblical insight, and practical application, Cook offers seven transformative principles designed to help readers grow in clarity, confidence, and spiritual endurance.\n\nThis inspirational work invites readers to:\n\t\u2022\tStrengthen their faith in seasons of uncertainty\n\t\u2022\tMake courageous, God-led decisions\n\t\u2022\tEmbrace necessary change\n\t\u2022\tWalk boldly toward a God-prepared future\n\nThe Promised Land is more than a physical place\u2014it represents purpose, growth, and \u201csomething better.\u201d Victory does not come through passivity but through partnership with God, intentional preparation, and steadfast trust.\n\nFor anyone longing to move beyond fear and into faith, this book offers encouragement, wisdom, and a reminder that with God, the battle is never fought alone.",
+      "shortDescription": "A faith-filled guide to overcoming fear, gaining clarity, and stepping boldly into God\u2019s promises. Through biblical insight and practical encouragement, The Fight for the Promiseland reveals how to fight in faith and walk confidently toward your future.",
+      "editionFormats": {},
+      "coverUrl": "/backlist/catalog/the-fight-for-the-promiseland-cover.jpg"
+    },
+    "cc4b00d4-c27a-f111-ab0f-00224820105b": {
+      "titleId": "cc4b00d4-c27a-f111-ab0f-00224820105b",
+      "slug": "divinely-inspired",
+      "isbns": [
+        "9781961475175",
+        "9781961475182",
+        "9781961475205"
+      ],
+      "sources": [
+        {
+          "id": "01DF3SEQP7VBNKHERVQFGZNWLSJOBTA6DF",
+          "sha256": "df63baaee3f1c1c8979b23a998c1020ef548edd127c21e53759dd06bbe0184dd"
+        }
+      ],
+      "editionFormats": {},
+      "coverUrl": "/backlist/catalog/divinely-inspired-cover.jpg"
+    },
+    "982156cd-c37a-f111-ab0f-00224820105b": {
+      "titleId": "982156cd-c37a-f111-ab0f-00224820105b",
+      "slug": null,
+      "isbns": [],
+      "sources": [],
+      "editionFormats": {}
+    },
+    "952556cd-c37a-f111-ab0f-00224820105b": {
+      "titleId": "952556cd-c37a-f111-ab0f-00224820105b",
+      "slug": null,
+      "isbns": [],
+      "sources": [],
+      "editionFormats": {}
+    },
+    "fb3174cd-c27a-f111-ab0f-6045bdd69435": {
+      "titleId": "fb3174cd-c27a-f111-ab0f-6045bdd69435",
+      "slug": "establishing-glory-2",
+      "isbns": [],
+      "sources": [],
+      "editionFormats": {}
+    },
+    "1c3274cd-c27a-f111-ab0f-6045bdd69435": {
+      "titleId": "1c3274cd-c27a-f111-ab0f-6045bdd69435",
+      "slug": "god-s-nudge",
+      "isbns": [
+        "9781950719877",
+        "9781950719884"
+      ],
+      "sources": [
+        {
+          "id": "01DF3SEQLNNQYNTQW5ZBGIJC57SUQX575W",
+          "sha256": "b2d9170ab8aa537152a5f4ec8ea8d5c1cb13f704a7ed01b2cd4d79ed53f8076d"
+        }
+      ],
+      "editionFormats": {},
+      "coverUrl": "/backlist/catalog/god-s-nudge-cover.jpg"
+    },
+    "293274cd-c27a-f111-ab0f-6045bdd69435": {
+      "titleId": "293274cd-c27a-f111-ab0f-6045bdd69435",
+      "slug": "help-god-i-am-afraid",
+      "isbns": [
+        "9781950719167",
+        "9781950719174"
+      ],
+      "sources": [
+        {
+          "id": "01DF3SEQLQPNSPWCY52NAJHHBV46ANFWLS",
+          "sha256": "3163da133ac248d520c9baffb5bf2945c046fb9167da1ab853efdd16f2e7802a"
+        }
+      ],
+      "editionFormats": {},
+      "coverUrl": "/backlist/catalog/help-god-i-am-afraid-cover.jpg"
+    },
+    "343274cd-c27a-f111-ab0f-6045bdd69435": {
+      "titleId": "343274cd-c27a-f111-ab0f-6045bdd69435",
+      "slug": "help-god-i-am-hurt",
+      "isbns": [
+        "9781950719303",
+        "9781950719310"
+      ],
+      "sources": [
+        {
+          "id": "01DF3SEQNKOO7AB3GGHFB2GL4RLRP76EQI",
+          "sha256": "de79be09079c991bde9592be31df9520a31f29767819e86d9ea5efc5c4966cc6"
+        }
+      ],
+      "editionFormats": {},
+      "coverUrl": "/backlist/catalog/help-god-i-am-hurt-cover.jpg"
+    },
+    "563274cd-c27a-f111-ab0f-6045bdd69435": {
+      "titleId": "563274cd-c27a-f111-ab0f-6045bdd69435",
+      "slug": "i-am-my-worst-enemy",
+      "isbns": [
+        "9781950719532",
+        "9781950719549"
+      ],
+      "sources": [
+        {
+          "id": "01DF3SEQLT62NY2PMPBVCK2GWE67B77D5Z",
+          "sha256": "6d878729629be45ccf5e0164e0feafb16a3a5dea26f1eb0f76a843e0d91627ad"
+        }
+      ],
+      "editionFormats": {},
+      "coverUrl": "/backlist/catalog/i-am-my-worst-enemy-cover.jpg"
+    },
+    "903274cd-c27a-f111-ab0f-6045bdd69435": {
+      "titleId": "903274cd-c27a-f111-ab0f-6045bdd69435",
+      "slug": "memoir-of-a-black-christian-nationalist",
+      "isbns": [
+        "9781954414174",
+        "9781954414181",
+        "9781954414198",
+        "9781961475373"
+      ],
+      "sources": [],
+      "editionFormats": {}
+    },
+    "9e3274cd-c27a-f111-ab0f-6045bdd69435": {
+      "titleId": "9e3274cd-c27a-f111-ab0f-6045bdd69435",
+      "slug": "never-give-up-on-love",
+      "isbns": [
+        "9781950719518",
+        "9781950719525"
+      ],
+      "sources": [],
+      "editionFormats": {}
+    },
+    "b73274cd-c27a-f111-ab0f-6045bdd69435": {
+      "titleId": "b73274cd-c27a-f111-ab0f-6045bdd69435",
+      "slug": "seasons-of-life",
+      "isbns": [
+        "9781961475069",
+        "9781961475076"
+      ],
+      "sources": [
+        {
+          "id": "01DF3SEQMSLMNJDMO6QRDLKFXOK36DHFWA",
+          "sha256": "562d5a825e3935c3b3b422685c48464e6d40cd4801e72efd8bac65cce4d17161"
+        }
+      ],
+      "editionFormats": {},
+      "coverUrl": "/backlist/catalog/seasons-of-life-cover.jpg"
+    },
+    "d13274cd-c27a-f111-ab0f-6045bdd69435": {
+      "titleId": "d13274cd-c27a-f111-ab0f-6045bdd69435",
+      "slug": "the-doctrine-of-last-things",
+      "isbns": [],
+      "sources": [],
+      "editionFormats": {}
+    },
+    "930f6fd3-c27a-f111-ab0f-6045bdd69435": {
+      "titleId": "930f6fd3-c27a-f111-ab0f-6045bdd69435",
+      "slug": "the-messenger",
+      "isbns": [
+        "9781961475151",
+        "9781961475168"
+      ],
+      "sources": [
+        {
+          "id": "01DF3SEQM2LARUVRDARBDLAQ65XKIDF6AL",
+          "sha256": "91d6296496d1503bd6700c333894c87745b46d67510740640887453c0e34c313"
+        }
+      ],
+      "editionFormats": {},
+      "coverUrl": "/backlist/catalog/the-messenger-cover.jpg"
+    },
+    "c70f6fd3-c27a-f111-ab0f-6045bdd69435": {
+      "titleId": "c70f6fd3-c27a-f111-ab0f-6045bdd69435",
+      "slug": "delicious-ideas",
+      "isbns": [
+        "9781961475335",
+        "9781961475342",
+        "9781961475359"
+      ],
+      "sources": [
+        {
+          "id": "01DF3SEQOUKVW65YPG25FZJPHUQVFPECAT",
+          "sha256": "05ab7f5b58112eeea27affd6dd7a760b83d1bfaa49691a31931702421a900770"
+        }
+      ],
+      "editionFormats": {},
+      "coverUrl": "/backlist/catalog/delicious-ideas-cover.jpg"
+    },
+    "df0f6fd3-c27a-f111-ab0f-6045bdd69435": {
+      "titleId": "df0f6fd3-c27a-f111-ab0f-6045bdd69435",
+      "slug": "inner-peace-through-life-s-storms",
+      "isbns": [
+        "9781961475496",
+        "9781961475502"
+      ],
+      "sources": [],
+      "editionFormats": {}
+    },
+    "ec0f6fd3-c27a-f111-ab0f-6045bdd69435": {
+      "titleId": "ec0f6fd3-c27a-f111-ab0f-6045bdd69435",
+      "slug": "loving-the-addict",
+      "isbns": [
+        "9781950719570",
+        "9781950719587"
+      ],
+      "sources": [],
+      "editionFormats": {}
+    },
+    "07106fd3-c27a-f111-ab0f-6045bdd69435": {
+      "titleId": "07106fd3-c27a-f111-ab0f-6045bdd69435",
+      "slug": "the-paper-champ",
+      "isbns": [
+        "9781961475533",
+        "9781961475540"
+      ],
+      "sources": [],
+      "editionFormats": {}
+    },
+    "33106fd3-c27a-f111-ab0f-6045bdd69435": {
+      "titleId": "33106fd3-c27a-f111-ab0f-6045bdd69435",
+      "slug": "damaged",
+      "isbns": [
+        "9781961475700",
+        "9781961475717"
+      ],
+      "sources": [
+        {
+          "id": "01DF3SEQIEAV2SY7CYTZD37LVCLQGOY5QZ",
+          "sha256": "4192ee8e808ed5b9858d9481f96ff0438fb48165df9a1cfe704bed1edc1a861b"
+        },
+        {
+          "id": "01DF3SEQIDWFCXXGZAAZAYXYOQXGTDEPUX",
+          "sha256": "f642fbfb4ee66d26c64ecb180085be4595ba34ebf0b0edb1a33c1ee45db559a3"
+        }
+      ],
+      "longDescription": "Damaged is a compelling urban romance about love, loyalty, and second chances. Mario \u201cStoney\u201d Johnson is determined to leave behind the life that once defined him, but his past refuses to let him go. Latoya, strong yet guarded, has built walls around her heart after enduring deep emotional pain.\n\nWhen their worlds collide, the chemistry between them is undeniable. But as their relationship grows, so do the risks. Old enemies, hidden secrets, and unresolved trauma threaten to tear them apart before they have a chance to build something real.\n\nSet against the backdrop of street life and survival, Damaged explores whether love can truly overcome the scars of the past.",
+      "shortDescription": "An intense urban romance where love, loyalty, and betrayal collide as two wounded souls fight to overcome their past and build a future together.",
+      "editionFormats": {},
+      "coverUrl": "/backlist/catalog/damaged-cover.jpg"
+    },
+    "fec27b7a-cc7a-f111-ab0f-6045bdd69435": {
+      "titleId": "fec27b7a-cc7a-f111-ab0f-6045bdd69435",
+      "slug": "warrior-s-breed",
+      "isbns": [
+        "9781954414655"
+      ],
+      "sources": [
+        {
+          "id": "01DF3SEQMC7WOKEZPLDNHLRGWJBQBGSV5V",
+          "sha256": "771b286e28a82003e3c8e4b2e86d83b5742c8478b6922737199790f064d0c2f2"
+        }
+      ],
+      "editionFormats": {},
+      "coverUrl": "/backlist/catalog/warrior-s-breed-cover.jpg"
+    },
+    "3e09d7cb-c27a-f111-ab0f-6045bdd69678": {
+      "titleId": "3e09d7cb-c27a-f111-ab0f-6045bdd69678",
+      "slug": "7-step-jumpstart-to-becoming-your-best-self",
+      "isbns": [
+        "9781954414730",
+        "9781954414747",
+        "9781954414754"
+      ],
+      "sources": [
+        {
+          "id": "01DF3SEQJJTLQLS3C4PFCJDVDND4TFKL3R",
+          "sha256": "244f63a1418631dfa131e795df03e14b28b1aef2467f0b61d8217cf2b53db469"
+        },
+        {
+          "id": "01DF3SEQKHV6CKRW53VVHIP5ZW3T5NOXRQ",
+          "sha256": "8018073b14241ad6008fca7ffbc45ea8de88d8b5e7033c3cdf0a492bdf96f3e8"
+        }
+      ],
+      "longDescription": "Change does not happen overnight\u2014it happens through intentional steps taken with courage, consistency, and self-awareness. 7 Step Jumpstart to Becoming Your Best Self is an inspiring self-help guide created to support readers as they begin or recommit to their personal growth journey.\n\nAuthor Ericka Johnson Settles presents seven thoughtfully designed steps that guide readers through internal exploration, mindset transformation, and purposeful living. Each chapter focuses on a core area of growth, including trusting the process, building self-confidence, understanding the power of words, identifying self-sabotaging behaviors, recalibrating focus, and embracing authenticity.\n\nThis book is more than encouragement\u2014it is a practical tool. Readers are invited to reflect, write, and actively engage with the material through affirmations and guided moments of reflection that reinforce accountability and clarity. With a compassionate and relatable voice, the author shares insights drawn from lived experience, offering reassurance that growth is achievable, even when the process feels uncomfortable.\n\nWhether you feel stuck, uncertain, or simply ready for more, 7 Step Jumpstart to Becoming Your Best Self provides a supportive framework to help you move forward with intention. Ideal for individual reading, group study, or personal reflection, this book encourages readers to show up for themselves, live with purpose, and confidently step into who they are becoming.",
+      "shortDescription": "A practical and inspiring guide to personal growth, 7 Step Jumpstart to Becoming Your Best Self equips readers with seven intentional steps to build confidence, overcome fear, and live authentically with purpose.",
+      "editionFormats": {},
+      "coverUrl": "/backlist/catalog/7-step-jumpstart-to-becoming-your-best-self-cover.jpg"
+    },
+    "3f09d7cb-c27a-f111-ab0f-6045bdd69678": {
+      "titleId": "3f09d7cb-c27a-f111-ab0f-6045bdd69678",
+      "slug": "a-truebies-guide-part-1",
+      "isbns": [],
+      "sources": [],
+      "editionFormats": {}
+    },
+    "4009d7cb-c27a-f111-ab0f-6045bdd69678": {
+      "titleId": "4009d7cb-c27a-f111-ab0f-6045bdd69678",
+      "slug": "are-you-sure-that-you-are-ready",
+      "isbns": [
+        "9781950719204",
+        "9781950719228"
+      ],
+      "sources": [
+        {
+          "id": "01DF3SEQICN4HON7EDHJC22YMXNCKWGQHY",
+          "sha256": "eceb9c2929711aa703968fa431bcc10bd60ca45e6c604c7a5fc404b0c7494594"
+        }
+      ],
+      "editionFormats": {},
+      "coverUrl": "/backlist/catalog/are-you-sure-that-you-are-ready-cover.jpg"
+    },
+    "6109d7cb-c27a-f111-ab0f-6045bdd69678": {
+      "titleId": "6109d7cb-c27a-f111-ab0f-6045bdd69678",
+      "slug": "getting-back-2-happy",
+      "isbns": [
+        "9781950719426",
+        "9781950719433"
+      ],
+      "sources": [
+        {
+          "id": "01DF3SEQNOSOGCZQ7E6ZBYEGOF77BZYMRC",
+          "sha256": "5324d153d90849a1d474a97806d4d254e6825bc8f1ab0ade85c1778688b04392"
+        }
+      ],
+      "editionFormats": {},
+      "longDescription": "Getting Back 2 Happy is the sweet escape you need from your reality.\n\nWant to put some SPICE back in your life? Tabby DEFINITELY has the story for you.\n\nThe pressures of life lead Tabby down a spiral of addiction, one filled with pleasure and pain.\n\nAs you take this journey of self-discovery with Tabby, she shares her insights on who she is and how she got there. Finding her way back to happy may mean giving up the cookie-cutter life that she has created.\n\nDive deep into Tabby\u2019s life as she searches for a pleasurable escape from the reality that has become hers.",
+      "shortDescription": "Getting Back 2 Happy is the sweet escape you need from your reality."
+    },
+    "6309d7cb-c27a-f111-ab0f-6045bdd69678": {
+      "titleId": "6309d7cb-c27a-f111-ab0f-6045bdd69678",
+      "slug": "help-god-i-am-angry",
+      "isbns": [
+        "9781950719242",
+        "9781950719259"
+      ],
+      "sources": [
+        {
+          "id": "01DF3SEQP3FBPPNVRLWRCY2GLMGJ744L4E",
+          "sha256": "b3607a5f424d0c23f926ca3c926bf7fb4ad8eae3f5492fcf7910833d8d8357cc"
+        }
+      ],
+      "editionFormats": {},
+      "coverUrl": "/backlist/catalog/help-god-i-am-angry-cover.jpg"
+    },
+    "6409d7cb-c27a-f111-ab0f-6045bdd69678": {
+      "titleId": "6409d7cb-c27a-f111-ab0f-6045bdd69678",
+      "slug": "help-god-i-am-lonely",
+      "isbns": [
+        "9781950719815",
+        "9781950719822"
+      ],
+      "sources": [
+        {
+          "id": "01DF3SEQJ4SSBOV7USDFFIUOXXCTCX7MPI",
+          "sha256": "f9d65e476d732491486aa7537863020640008e47a3378d198942bc69bca0158f"
+        }
+      ],
+      "editionFormats": {},
+      "coverUrl": "/backlist/catalog/help-god-i-am-lonely-cover.jpg"
+    },
+    "6509d7cb-c27a-f111-ab0f-6045bdd69678": {
+      "titleId": "6509d7cb-c27a-f111-ab0f-6045bdd69678",
+      "slug": "help-god-i-am-sad",
+      "isbns": [
+        "9781950719754",
+        "9781950719761"
+      ],
+      "sources": [
+        {
+          "id": "01DF3SEQJMALAUCV4ONJEJUTWDY24EJXL7",
+          "sha256": "5e48a5dba33ded0b0ab50eb8216318694e7d19f047bc60c5cd8e759060b89f75"
+        }
+      ],
+      "editionFormats": {},
+      "coverUrl": "/backlist/catalog/help-god-i-am-sad-cover.jpg"
+    },
+    "6909d7cb-c27a-f111-ab0f-6045bdd69678": {
+      "titleId": "6909d7cb-c27a-f111-ab0f-6045bdd69678",
+      "slug": "let-me-tell-you-about-it",
+      "isbns": [
+        "9781954414983",
+        "9781954414990"
+      ],
+      "sources": [
+        {
+          "id": "01DF3SEQOJBLRK3LTQZBDIXVZTCPETOXYS",
+          "sha256": "4068c6fbf7880357fd588daf65fd71348edd87c245de14c5169beaa032ee8e32"
+        }
+      ],
+      "editionFormats": {},
+      "coverUrl": "/backlist/catalog/let-me-tell-you-about-it-cover.jpg"
+    },
+    "15e01ad3-c27a-f111-ab0f-6045bdd69678": {
+      "titleId": "15e01ad3-c27a-f111-ab0f-6045bdd69678",
+      "slug": "support-beyond-the-cycle",
+      "isbns": [
+        "9781950719952",
+        "9781950719969"
+      ],
+      "sources": [
+        {
+          "id": "01DF3SEQNFCBZYOELE7JBK3Q4XNMBQQKP2",
+          "sha256": "0a6dd07b1693af3d433307bb767377906955d9ed554f4cafb6ba192c89b1476f"
+        }
+      ],
+      "editionFormats": {},
+      "coverUrl": "/backlist/catalog/support-beyond-the-cycle-cover.jpg"
+    },
+    "16e01ad3-c27a-f111-ab0f-6045bdd69678": {
+      "titleId": "16e01ad3-c27a-f111-ab0f-6045bdd69678",
+      "slug": "the-celestial-advantage",
+      "isbns": [
+        "9781950719082",
+        "9781950719099"
+      ],
+      "sources": [],
+      "editionFormats": {}
+    },
+    "17e01ad3-c27a-f111-ab0f-6045bdd69678": {
+      "titleId": "17e01ad3-c27a-f111-ab0f-6045bdd69678",
+      "slug": "the-girl-with-the-ebony-locs-and-the-three-bears",
+      "isbns": [
+        "9781950719068",
+        "9781950719075"
+      ],
+      "sources": [
+        {
+          "id": "01DF3SEQPMGHQJN4BODFB2XB6KXROBWHBO",
+          "sha256": "a87fc2fb2f91a8694d2672676281a138fbecc07b1a1d9549d8f102668054a86b"
+        }
+      ],
+      "editionFormats": {},
+      "coverUrl": "/backlist/catalog/the-girl-with-the-ebony-locs-and-the-three-bears-cover.jpg"
+    },
+    "19e01ad3-c27a-f111-ab0f-6045bdd69678": {
+      "titleId": "19e01ad3-c27a-f111-ab0f-6045bdd69678",
+      "slug": "the-princess-and-the-black-eyed-pea",
+      "isbns": [
+        "9781954414679",
+        "9781954414686",
+        "9781954414693"
+      ],
+      "sources": [
+        {
+          "id": "01DF3SEQJ4OKEPJ65WNREYCGKO432DJ54M",
+          "sha256": "5a861a9a26768eca234360187a41481d8c4b4e39f6ad9a7959cedf0c82c555db"
+        }
+      ],
+      "editionFormats": {},
+      "coverUrl": "/backlist/catalog/the-princess-and-the-black-eyed-pea-cover.jpg"
+    },
+    "24e01ad3-c27a-f111-ab0f-6045bdd69678": {
+      "titleId": "24e01ad3-c27a-f111-ab0f-6045bdd69678",
+      "slug": "from-stylist-to-ceo",
+      "isbns": [
+        "9781961475236",
+        "9781961475243",
+        "9781961475250"
+      ],
+      "sources": [],
+      "editionFormats": {}
+    },
+    "25e01ad3-c27a-f111-ab0f-6045bdd69678": {
+      "titleId": "25e01ad3-c27a-f111-ab0f-6045bdd69678",
+      "slug": "girl-you-re-not-crazy-you-re-dealing-with-a-narcissist",
+      "isbns": [
+        "9781950719402",
+        "9781950719419"
+      ],
+      "sources": [],
+      "editionFormats": {}
+    },
+    "26e01ad3-c27a-f111-ab0f-6045bdd69678": {
+      "titleId": "26e01ad3-c27a-f111-ab0f-6045bdd69678",
+      "slug": "jalen-becomes-a-big-brother",
+      "isbns": [
+        "9781961475403",
+        "9781961475410",
+        "9781961475427"
+      ],
+      "sources": [],
+      "editionFormats": {}
+    },
+    "4be01ad3-c27a-f111-ab0f-6045bdd69678": {
+      "titleId": "4be01ad3-c27a-f111-ab0f-6045bdd69678",
+      "slug": "peaches-can-do-it",
+      "isbns": [
+        "9781961475472"
+      ],
+      "sources": [],
+      "editionFormats": {}
+    },
+    "733cd77a-cc7a-f111-ab0f-6045bdd69678": {
+      "titleId": "733cd77a-cc7a-f111-ab0f-6045bdd69678",
+      "slug": "the-master-s-piece",
+      "isbns": [
+        "9781954414488"
+      ],
+      "sources": [],
+      "editionFormats": {}
+    },
+    "6f8904ca-c27a-f111-ab0f-6045bdd69738": {
+      "titleId": "6f8904ca-c27a-f111-ab0f-6045bdd69738",
+      "slug": "a-blended-family",
+      "isbns": [
+        "9781954414112",
+        "9781954414129",
+        "9781954414426"
+      ],
+      "sources": [
+        {
+          "id": "01DF3SEQP6IZMUO5FP3JCYJ5OLANGMXMCM",
+          "sha256": "03e5d44f55d8c952212ce23a7119a85aaa2f0fd318c311fbc2d15153e37660cc"
+        },
+        {
+          "id": "01DF3SEQICGCQXO3NXV5EJUSQSMW3MEFZB",
+          "sha256": "ca4c25bb0a1afc9c52838c012f9d706747d9e7d22e2019d50f0660c416401ed8"
+        },
+        {
+          "id": "01DF3SEQOWALERQR5V3NH3U7OYDVAR7W2X",
+          "sha256": "499af6ec1c35b6fc9f58e5365f9d294e033edc181811a7e08cb48c9c6ee387a5"
+        }
+      ],
+      "longDescription": "A Blended Family gently explores the joys and challenges of bringing families together through the voice of TJ, a child learning what it means to belong to a blended family. As his parents unite their households, TJ reflects on the changes, the adjustments, and the emotions that come with becoming a new family.\n\nThe story honestly addresses early struggles, especially the strained relationship between his sisters, while showing how consistent love, support, and patience from caring parents help guide the family forward. Over time, misunderstandings soften, bonds grow stronger, and the family learns how to support one another through change.\n\nWritten from a child\u2019s point of view, this picture book helps young readers feel seen and understood while encouraging empathy and emotional growth. With a faith-inspired message rooted in love, A Blended Family offers reassurance to children navigating family transitions and celebrates the power of unity, compassion, and Godly love within the home.",
+      "shortDescription": "A warm children\u2019s picture book told from a child\u2019s perspective, A Blended Family shares how love, patience, and faith help a stepfamily grow into a strong, united home.",
+      "editionFormats": {},
+      "coverUrl": "/backlist/catalog/a-blended-family-cover.jpg"
+    },
+    "848904ca-c27a-f111-ab0f-6045bdd69738": {
+      "titleId": "848904ca-c27a-f111-ab0f-6045bdd69738",
+      "slug": "a-truebies-guide-part-2",
+      "isbns": [],
+      "sources": [],
+      "editionFormats": {}
+    },
+    "928904ca-c27a-f111-ab0f-6045bdd69738": {
+      "titleId": "928904ca-c27a-f111-ab0f-6045bdd69738",
+      "slug": "biblical-prescriptions-for-life-s-troubles",
+      "isbns": [
+        "9781954414891",
+        "9781954414907"
+      ],
+      "sources": [
+        {
+          "id": "01DF3SEQOYHPHS24E7UZCZAQGOAT5GPP4B",
+          "sha256": "0dcf4a8be4b6f1e69d90ac169bcfcaa252d10f6a1afa005314dc96b4f30f8bd9"
+        },
+        {
+          "id": "01DF3SEQI5Z3TEDXGY2VDKZQXK4IIORQYG",
+          "sha256": "199ef93c392c49c7171c3c47ef66d7d6f2b2680b681c37ab8d2263e87e5eb364"
+        }
+      ],
+      "longDescription": "Every believer will face trouble\u2014but not every believer knows how to respond to it biblically. In Biblical Prescriptions for Life\u2019s Troubles, Terry Stephens offers a scripturally grounded framework for understanding adversity and responding with spiritual wisdom rather than fear, confusion, or frustration.\n\nUsing the metaphor of medicine and diagnosis, Stephens identifies six distinct types of trouble found throughout Scripture: internal conflict, people trouble, personal principle trouble, demonic resistance, bad trouble that God allows, and good trouble that advances God\u2019s purposes. Through careful biblical exposition and practical teaching, he explains that not all trouble is the same\u2014and therefore not all responses should be the same.\n\nRather than promoting escape-based faith, this book emphasizes endurance, discernment, and obedience. Readers are guided to activate biblical tools such as peace, praise, forgiveness, humility, prayer, and thanksgiving\u2014what the author calls \u201cKingdom equipment\u201d\u2014to navigate seasons of adversity with spiritual maturity. Drawing from the lives of figures such as Job, Joseph, Daniel, Moses, and the Hebrew boys, Stephens shows how God works both in trouble and through it.\n\nWritten for pastors, ministry leaders, and everyday believers alike, Biblical Prescriptions for Life\u2019s Troubles encourages readers to stop misdiagnosing their struggles and start responding with biblical clarity. The result is not only survival through trouble, but spiritual growth, deeper faith, and alignment with God\u2019s purposes in every season of life.",
+      "shortDescription": "Life brings trouble\u2014but Scripture brings answers. Biblical Prescriptions for Life\u2019s Troubles equips believers with biblical insight and spiritual tools to respond to adversity with faith, peace, and perseverance.`",
+      "editionFormats": {},
+      "coverUrl": "/backlist/catalog/biblical-prescriptions-for-life-s-troubles-cover.jpg"
+    },
+    "958904ca-c27a-f111-ab0f-6045bdd69738": {
+      "titleId": "958904ca-c27a-f111-ab0f-6045bdd69738",
+      "slug": "for-what-it-s-worth",
+      "isbns": [
+        "9781950719716",
+        "9781950719723"
+      ],
+      "sources": [
+        {
+          "id": "01DF3SEQM2JHMEKAXSD5A3ERZSMRB4A5I2",
+          "sha256": "1bd11172ba1195457c269e087a2f67d05c740ef41cd2254d2280d6f7e82a007a"
+        }
+      ],
+      "editionFormats": {},
+      "coverUrl": "/backlist/catalog/for-what-it-s-worth-cover.jpg"
+    },
+    "9a8904ca-c27a-f111-ab0f-6045bdd69738": {
+      "titleId": "9a8904ca-c27a-f111-ab0f-6045bdd69738",
+      "slug": "grandmothers-educating-minds-2nd-edition",
+      "isbns": [],
+      "sources": [],
+      "editionFormats": {}
+    },
+    "7b5f72d0-c27a-f111-ab0f-6045bdd69738": {
+      "titleId": "7b5f72d0-c27a-f111-ab0f-6045bdd69738",
+      "slug": "help-god-i-am-the-collection",
+      "isbns": [
+        "9781954414341"
+      ],
+      "sources": [
+        {
+          "id": "01DF3SEQLCX2QHG4OXXNCJ5OESOYPZD6QJ",
+          "sha256": "eab08fad49cdebb8091d953922acf34c1c44fc4b0bc418374f5a28d4e3873c29"
+        }
+      ],
+      "editionFormats": {},
+      "coverUrl": "/backlist/catalog/help-god-i-am-the-collection-cover.jpg"
+    },
+    "835f72d0-c27a-f111-ab0f-6045bdd69738": {
+      "titleId": "835f72d0-c27a-f111-ab0f-6045bdd69738",
+      "slug": "love-is-an-action-word",
+      "isbns": [
+        "9781950719976",
+        "9781950719983"
+      ],
+      "sources": [
+        {
+          "id": "01DF3SEQK3NWGPPFCLTVCKMFZULLWUMZKR",
+          "sha256": "c642c179dd958f657525157cb0d83a67141e96d239765a51a2eb9ef3f1119b32"
+        }
+      ],
+      "editionFormats": {},
+      "coverUrl": "/backlist/catalog/love-is-an-action-word-cover.jpg"
+    },
+    "865f72d0-c27a-f111-ab0f-6045bdd69738": {
+      "titleId": "865f72d0-c27a-f111-ab0f-6045bdd69738",
+      "slug": "number-23-and-me",
+      "isbns": [
+        "9781950719105",
+        "9781950719129"
+      ],
+      "sources": [
+        {
+          "id": "01DF3SEQILXOTIBWCTOJDZOWGJSCM3UPRV",
+          "sha256": "295c2bcb452f67b6e23c8c57f02c16908bc9da5beeaf12e9fe7d24db36c83b96"
+        }
+      ],
+      "editionFormats": {},
+      "coverUrl": "/backlist/catalog/number-23-and-me-cover.jpg"
+    },
+    "885f72d0-c27a-f111-ab0f-6045bdd69738": {
+      "titleId": "885f72d0-c27a-f111-ab0f-6045bdd69738",
+      "slug": "the-healed-me",
+      "isbns": [
+        "9781954414617",
+        "9781954414624",
+        "9781954414839"
+      ],
+      "sources": [
+        {
+          "id": "01DF3SEQOQRWCIAZCA2VE2YLVJSUKZU24D",
+          "sha256": "94ab8b3a34706f377dcf6e5849b864b6e0a5ba03a96d9b6d18eeb198079d354a"
+        }
+      ],
+      "editionFormats": {},
+      "coverUrl": "/backlist/catalog/the-healed-me-cover.jpg"
+    },
+    "935f72d0-c27a-f111-ab0f-6045bdd69738": {
+      "titleId": "935f72d0-c27a-f111-ab0f-6045bdd69738",
+      "slug": "warrior-s-breed",
+      "isbns": [
+        "9781954414655",
+        "9781954414662"
+      ],
+      "sources": [
+        {
+          "id": "01DF3SEQMC7WOKEZPLDNHLRGWJBQBGSV5V",
+          "sha256": "771b286e28a82003e3c8e4b2e86d83b5742c8478b6922737199790f064d0c2f2"
+        }
+      ],
+      "editionFormats": {},
+      "coverUrl": "/backlist/catalog/warrior-s-breed-cover.jpg"
+    },
+    "a05f72d0-c27a-f111-ab0f-6045bdd69738": {
+      "titleId": "a05f72d0-c27a-f111-ab0f-6045bdd69738",
+      "slug": "naughty-tales",
+      "isbns": [
+        "9781954414846",
+        "9781954414853"
+      ],
+      "sources": [],
+      "editionFormats": {}
+    },
+    "60137ed6-c27a-f111-ab0f-6045bdd69738": {
+      "titleId": "60137ed6-c27a-f111-ab0f-6045bdd69738",
+      "slug": "taylor-made",
+      "isbns": [
+        "9781961475212",
+        "9781961475229",
+        "9781961475298",
+        "9781961475304"
+      ],
+      "sources": [
+        {
+          "id": "01DF3SEQNGS3FYWASV7NG3H2SX5O6SHLOU",
+          "sha256": "55b13834668f031223e840a69201be0f3a78f7087c933bd39574142faa85aad7"
+        },
+        {
+          "id": "01DF3SEQPFZ4IR5D4T2NAKJGLR72VKLTLE",
+          "sha256": "759cd5cdd02d488e249e8c5b8bf752ce8acce21d077b6c2c984e7804fd5ff9d5"
+        }
+      ],
+      "longDescription": "\"Taylor Made: My Life, My Story\" is an autobiographical exploration of Dr. Will Harris's remarkable journey through life, music, and faith. Born and raised in the small yet vibrant town of Taylor, Mississippi, Dr. Harris's narrative captures the essence of a soul nurtured by gospel music and tested by life's numerous trials. From his early days playing the piano in church to his pivotal role as a Minister of Music, this book traces his ascent against a backdrop of personal and familial challenges, including growing up with parents who battled mental illness.\n\nDr. Harris delves deep into the influences that shaped his career and personal life\u2014from his formidable years under the guidance of community choirs to his academic and spiritual development at Rust College. He shares the profound impact of leading the Baptist Student Union Gospel Choir, which became a cornerstone of his musical and leadership skills. His move to Fayetteville, North Carolina, marks a significant phase where he took on the full-time role of Minister of Music at Lewis Chapel Missionary Baptist Church, further solidifying his impact on the gospel music scene.\n\nThe narrative does not shy away from the struggles inherent in balancing a demanding career with personal growth. Dr. Harris discusses the financial and emotional toll of striving for success in the competitive music industry, his eventual realization of the need to recalibrate his dreams, and his strategic steps towards sustainable artistry without compromising his spiritual calling.\n\n\"Taylor Made\" also highlights Dr. Harris's innovative contributions to music education, illustrating his passion for mentoring young musicians and his visionary approach to music ministry. The memoir is replete with lessons on resilience, the importance of authenticity in one\u2019s craft, and the unyielding power of faith.\n\nThrough candid reflections and heartwarming anecdotes, Dr. Will Harris invites readers into the intimate quarters of his life, making \"Taylor Made: My Life, My Story\" not just a memoir, but a beacon of hope and a testament to the transformative power of music and faith in overcoming life's greatest challenges.",
+      "shortDescription": "\"Taylor Made: My Life, My Story\" is an evocative autobiography by Dr. Will Harris, chronicling his journey from the small town of Taylor, Mississippi, to becoming a celebrated gospel musician and educator. This deeply personal memoir reveals the challenges and triumphs of Harris\u2019s life, from navigating his early days in a musical but tumultuous family environment to his influential role as a Minister of Music. It delves into his spiritual journey, his professional achievements in the world of gospel music, and his passionate commitment to musical education. Dr. Harris's story is one of faith, resilience, and the redemptive power of music, offering readers a unique glimpse into the life of a man truly \"Taylor Made\" by his experiences and his faith.",
+      "editionFormats": {
+        "9781961475229": "eBook"
+      },
+      "coverUrl": "/backlist/catalog/taylor-made-cover.jpg"
+    },
+    "62137ed6-c27a-f111-ab0f-6045bdd69738": {
+      "titleId": "62137ed6-c27a-f111-ab0f-6045bdd69738",
+      "slug": "the-sun-the-shadow-and-the-silence",
+      "isbns": [
+        "9781961475557",
+        "9781961475564"
+      ],
+      "sources": [
+        {
+          "id": "01DF3SEQN4DBU2FDKB6JCIF54ASR2FZFG3",
+          "sha256": "125f133d6617a0670896f421f0e69dbe67de740acbabd74f372857682ae0a1a1"
+        },
+        {
+          "id": "01DF3SEQO66KJOSHKSRZHLISBACJ6VNOEQ",
+          "sha256": "2ceea28c14995a8f6b4a7634171d05d7efd52fda36cfc083c84fb8ac0bec37cf"
+        }
+      ],
+      "longDescription": "The Sun, the Shadow, and the Silence is a deeply intimate debut from poet R. Dorian Night, offering a stunning meditation on love, loss, emotional memory, and healing through language.\n\nStructured in three powerful parts\u2014The Sun, The Shadow, and The Silence\u2014this collection moves from radiant longing to quiet devastation and finally to a reckoning with identity, truth, and resilience. Blending classical influence with contemporary emotion, each poem explores the complexity of human connection with unflinching honesty.\n\nWhether through sonnet-like verse or modern confessionals, Night\u2019s work navigates the sacred and the broken, the idealized and the real. These are poems for those who have loved too hard, survived heartbreak, grieved silently, or searched for meaning in moments of emotional wreckage.\n\nThe Sun, the Shadow, and the Silence invites readers to sit with their feelings\u2014not to solve them, but to witness them fully. It is a book to be read slowly, felt deeply, and returned to often.\n\nPerfect for readers of:\n\u2013 Contemporary literary poetry\n\u2013 Breakup and recovery literature\n\u2013 Poets like Ocean Vuong, Rupi Kaur, or Sabrina Benaim\n\u2013 Anyone who has felt the ache of unspoken words or unresolved love\n\nSometimes, survival isn\u2019t loud. Sometimes, it\u2019s a whisper in the silence\u2014and a poem that stays.",
+      "shortDescription": "A lyrical journey through love, loss, and longing\u2014this debut poetry collection explores heartbreak, healing, and the quiet truths we dare not say aloud.",
+      "editionFormats": {
+        "9781961475564": "Other"
+      },
+      "coverUrl": "/backlist/catalog/the-sun-the-shadow-and-the-silence-cover.jpg"
+    },
+    "65137ed6-c27a-f111-ab0f-6045bdd69738": {
+      "titleId": "65137ed6-c27a-f111-ab0f-6045bdd69738",
+      "slug": "when-zuri-came-to-earth",
+      "isbns": [
+        "9781954414952",
+        "9781961475991"
+      ],
+      "sources": [],
+      "editionFormats": {}
+    },
+    "66137ed6-c27a-f111-ab0f-6045bdd69738": {
+      "titleId": "66137ed6-c27a-f111-ab0f-6045bdd69738",
+      "slug": "your-peace-is-a-priority",
+      "isbns": [
+        "9781961475458",
+        "9781961475465"
+      ],
+      "sources": [
+        {
+          "id": "01DF3SEQODTYDIHKSVDVF3O4FFKWJ2OXT5",
+          "sha256": "e92fa10fea4973458466c68a132c5ab714c206dc147e1f7968955c78e3d600c9"
+        },
+        {
+          "id": "01DF3SEQIGM4K5I5LCYRDKCUBT3QWN4APB",
+          "sha256": "cace37cd57b7dbf3e53ee0248f76053b9d8973574960cc1966a8ba92bc5bb345"
+        }
+      ],
+      "longDescription": "Your Peace is a Priority: A Devotional Journal is a transformative 30-day devotional designed to help readers rediscover inner peace through the grounding power of scripture, prayer, and self-reflection. Written by Dr. Kiena S. Hughley, a respected spiritual leader and educator, this devotional journal invites individuals to embark on a deeply personal journey toward emotional healing and spiritual renewal\u2014especially in times of uncertainty and transition.\n\nDrawing from biblical wisdom, practical insights, and lived experience, Dr. Hughley gently guides readers through three powerful stages of personal growth: identifying what disrupts their peace, examining their inner life and relationships, and reclaiming God\u2019s promises with clarity and courage. Each day features thoughtfully selected scriptures, daily affirmations, reflection prompts, and open space for prayer, making it ideal for morning quiet time, evening journaling, or group devotionals.\n\nOrganized with purpose and intentionality, the journal begins with a section on \u201cRenewing the Mind, Body & Soul in a Time of Uncertainty,\u201d offering actionable strategies for managing stress, creating clarity, and building positive spiritual habits. The midsection explores deeper emotional triggers\u2014including bitterness, grief, and guilt\u2014while encouraging accountability and forgiveness. The final phase empowers readers to walk in victory, embrace their calling, and pursue a lifestyle of peace rooted in faith.\n\nInspired by the author\u2019s personal experiences of grief, career shifts, and spiritual breakthroughs during and after the COVID-19 pandemic, this devotional is more than a book\u2014it\u2019s a companion for those who feel overwhelmed, stuck, or spiritually dry. It speaks especially to women of faith navigating life\u2019s challenges while trying to remain anchored in purpose and peace.\n\nWhether you are experiencing loss, burnout, spiritual disconnection, or are simply seeking more intentional time with God, Your Peace is a Priority offers a gentle yet empowering path back to stillness, healing, and joy. Dr. Hughley\u2019s candid storytelling, scriptural depth, and encouraging tone make this devotional a trusted tool for anyone ready to declutter the noise of life and reconnect with what truly matters.\n\nPerfect for individual study, small groups, or as a gift of encouragement, this devotional journal reminds us that peace isn\u2019t a luxury\u2014it\u2019s a promise. And with intention, prayer, and reflection, it can be reclaimed one day at a time.",
+      "shortDescription": "A 30-day devotional journal guiding readers toward peace through scripture, prayer, and daily reflection.",
+      "editionFormats": {
+        "9781961475465": "Other"
+      },
+      "coverUrl": "/backlist/catalog/your-peace-is-a-priority-cover.jpg"
+    },
+    "67137ed6-c27a-f111-ab0f-6045bdd69738": {
+      "titleId": "67137ed6-c27a-f111-ab0f-6045bdd69738",
+      "slug": "music-ministry-unplugged",
+      "isbns": [
+        "9781961475724",
+        "9781961475731"
+      ],
+      "sources": [
+        {
+          "id": "01DF3SEQLPWTS3CII7GFGYPNUF3ZJPY46O",
+          "sha256": "b65dbd63842143458ae29649a1fc71fb46f66fec4be59158076e199d6a392cae"
+        },
+        {
+          "id": "01DF3SEQJCF6VVVWCJ3VGKFRCAASL45YPF",
+          "sha256": "7be3e61f899d2de19163b036498889352277a8096e8b7615974cfd4a44212379"
+        }
+      ],
+      "longDescription": "Music ministry is more than leading songs\u2014it is leadership, discipleship, and spiritual service.\n\nIn Music Ministry Unplugged, Dr. Will Harris brings together decades of experience as a minister of music, educator, and gospel artist to offer a candid and practical guide for those called to lead in worship and music ministry. This book speaks directly to the realities of ministry life\u2014balancing musical excellence with spiritual responsibility, navigating relationships, and leading people with both skill and sensitivity.\n\nThrough biblical insight, personal stories, and real-world application, Dr. Harris walks readers through the essential components of effective music ministry. He explores what it means to truly answer the call, emphasizing that music ministry is not about performance, but about service, discipleship, and creating space for people to encounter God.\n\nReaders will gain practical guidance on:\n\n* Understanding the spiritual calling of music ministry\n* Building strong, respectful relationships between pastors and music leaders\n* Discovering and developing gifts within the congregation\n* Leading musicians, psalmists, and worship teams effectively\n* Selecting music that aligns with scripture and supports the church\u2019s vision\n* Curating meaningful worship experiences that engage and transform\n\nThe book also addresses the human side of ministry\u2014conflict, growth, leadership maturity, and the responsibility of shaping a worship culture that reflects both excellence and compassion.\n\nWhether you are directing a choir, leading a praise team, or stepping into music ministry for the first time, Music Ministry Unplugged offers encouragement, clarity, and actionable tools to strengthen your leadership and deepen your impact.\n\nMusic ministry is not simply about sound\u2014it is about service.\nIt is not about recognition\u2014it is about responsibility.\n\nThis is a resource for those who understand that worship leadership is sacred work\u2014and are committed to doing it well.",
+      "shortDescription": "A practical, faith-based guide for music ministry leaders. Dr. Will Harris shares real-world insight on leadership, worship planning, team development, and spiritual responsibility\u2014helping leaders serve with purpose, wisdom, and excellence.",
+      "editionFormats": {},
+      "coverUrl": "/backlist/catalog/music-ministry-unplugged-cover.jpg"
+    },
+    "69137ed6-c27a-f111-ab0f-6045bdd69738": {
+      "titleId": "69137ed6-c27a-f111-ab0f-6045bdd69738",
+      "slug": "the-messenger-2",
+      "isbns": [
+        "9781961475618",
+        "9781961475625"
+      ],
+      "sources": [
+        {
+          "id": "01DF3SEQK64IGNPUJYOFC3WHFOI3QO7MLZ",
+          "sha256": "453a01fb97cf7ab34080cc5160c13851c732e88c12563c1b18c5e9cb8f88f131"
+        },
+        {
+          "id": "01DF3SEQM2XUPYAHF2WVCKIUKPQPOKFQD2",
+          "sha256": "eba3060c5324e5610de239729dd51e05a6206bc3846e3b4a12f7485b385ef232"
+        }
+      ],
+      "longDescription": "In a time of distraction and spiritual compromise, The Messenger 2 calls believers back to unwavering faith and intentional obedience.\n\nDrawing from biblical figures such as Esther, Job, Moses, and Paul, Daphanny C. Baker delivers Scripture-centered reflections that challenge readers to stand firm in adversity, strengthen their prayer life, and live out authentic Christian faith. Each chapter addresses real struggles\u2014doubt, endurance, forgiveness, spiritual discipline, and trusting God when life feels uncertain.\n\nThis devotional-style collection goes beyond surface religion and invites readers into a deeper relationship with God marked by conviction, perseverance, and love. From learning to resist the enemy\u2019s schemes to understanding the refining fire of God\u2019s discipline, the messages are practical, heartfelt, and biblically grounded.\n\nWhether you are navigating hardship, rebuilding your faith, or seeking renewed spiritual strength, The Messenger 2 reminds you that God is present, purposeful, and faithful. Faith requires commitment. Growth requires surrender. And when faith is tested, commitment is revealed.\n\nThis is your call to stand firm.",
+      "shortDescription": "Through reflections inspired by biblical figures such as Esther and Job, Daphanny C. Baker encourages readers to deepen their prayer life, trust God in adversity, and live out authentic Christian faith. Addressing doubt, endurance, forgiveness, and spiritual discipline, each chapter challenges believers to stand firm when tested.\n\nWhen faith is tested, commitment is revealed. This is your call to stand firm.",
+      "editionFormats": {},
+      "coverUrl": "/backlist/catalog/the-messenger-2-cover.jpg"
+    },
+    "998797ca-c27a-f111-ab0f-7c1e525b15c2": {
+      "titleId": "998797ca-c27a-f111-ab0f-7c1e525b15c2",
+      "slug": "bee-careful",
+      "isbns": [
+        "9781954414709",
+        "9781954414716",
+        "9781954414723",
+        "9781954414808",
+        "9781954414815",
+        "9781954414822"
+      ],
+      "sources": [
+        {
+          "id": "01DF3SEQKRVZNNY42YS5FYWDGNLNWAIHDG",
+          "sha256": "107e1edeccd666540e26951c4364a0fe08440f8c5035b85793c39524167cae7b"
+        },
+        {
+          "id": "01DF3SEQL5B2BNW2CS3RCIPOH7YXGMY2C4",
+          "sha256": "a2bdc8edf9f08c26c11789898dc042eda7924b7f47b9f862ded7e56faa5077d5"
+        }
+      ],
+      "longDescription": "BEE Careful is a heartwarming children\u2019s picture book that follows three young bees\u2014Brittany, Breauna, and Braden\u2014on an unforgettable journey through the meadow and forest.\n\nOne sunny morning, Brittany finds herself sneezing again and again. Concerned, she asks the Queen Bee for help and learns about a special sunflower said to be found somewhere beyond the safety of the hive. Although warned that the forest can be dangerous, Brittany\u2019s brother and sister choose to support her and quietly set off together to search for the flower.\n\nAlong the way, the bees encounter a variety of forest animals, including a mosquito, a frog, a rabbit, a fox, and a wise old owl. Each meeting brings new challenges and lessons, encouraging the bees to be polite, patient, and brave. Through moments of uncertainty and reassurance, the siblings learn that caring for one another and listening to guidance can help them face even the most unfamiliar paths.\n\nWith engaging, colorful illustrations and gentle storytelling, BEE Careful emphasizes themes of kindness, teamwork, perseverance, and family support. The story invites young readers to explore nature while learning about empathy and cooperation in a way that feels accessible and reassuring.\n\nIdeal for children ages 4\u20138, BEE Careful is well suited for read-aloud sessions, classrooms, and library collections. It offers a thoughtful, comforting adventure that encourages children to help others, face fears together, and believe in the strength found in family and friendship.",
+      "shortDescription": "BEE Careful is a charming picture book about three young bees who set off on a brave adventure to help their sneezing sister. Along the way, they learn kindness, teamwork, and the importance of helping others.",
+      "editionFormats": {},
+      "coverUrl": "/backlist/catalog/bee-careful-cover.jpg"
+    },
+    "9a8797ca-c27a-f111-ab0f-7c1e525b15c2": {
+      "titleId": "9a8797ca-c27a-f111-ab0f-7c1e525b15c2",
+      "slug": "conquer-your-fears-and-win",
+      "isbns": [
+        "9781950719365",
+        "9781950719372",
+        "9781950719464"
+      ],
+      "sources": [
+        {
+          "id": "01DF3SEQMSNB4NAOLQKNE3YPVCDJQ2TV4W",
+          "sha256": "2435e2e80e502c4d2884654de55263db1944ef273e970c1a19a5688e5f3fdb11"
+        }
+      ],
+      "editionFormats": {},
+      "coverUrl": "/backlist/catalog/conquer-your-fears-and-win-cover.jpg"
+    },
+    "9b8797ca-c27a-f111-ab0f-7c1e525b15c2": {
+      "titleId": "9b8797ca-c27a-f111-ab0f-7c1e525b15c2",
+      "slug": "destined-to-break-the-curse-devotional",
+      "isbns": [
+        "9781950719181"
+      ],
+      "sources": [],
+      "editionFormats": {}
+    },
+    "9c8797ca-c27a-f111-ab0f-7c1e525b15c2": {
+      "titleId": "9c8797ca-c27a-f111-ab0f-7c1e525b15c2",
+      "slug": "establishing-glory-3",
+      "isbns": [],
+      "sources": [],
+      "editionFormats": {}
+    },
+    "9d8797ca-c27a-f111-ab0f-7c1e525b15c2": {
+      "titleId": "9d8797ca-c27a-f111-ab0f-7c1e525b15c2",
+      "slug": "establishing-glory",
+      "isbns": [
+        "BKACX0172577"
+      ],
+      "sources": [],
+      "editionFormats": {}
+    },
+    "9e8797ca-c27a-f111-ab0f-7c1e525b15c2": {
+      "titleId": "9e8797ca-c27a-f111-ab0f-7c1e525b15c2",
+      "slug": "help-god-i-am-lost",
+      "isbns": [
+        "9781950719693",
+        "9781950719709"
+      ],
+      "sources": [
+        {
+          "id": "01DF3SEQIVC52XXEJNE5HYYORDWQBR6AUB",
+          "sha256": "98a9bccfd0abefb806c84eb3c71dc7595ef34b2fecb6315bc43c92ea3cbe4c10"
+        }
+      ],
+      "editionFormats": {},
+      "coverUrl": "/backlist/catalog/help-god-i-am-lost-cover.jpg"
+    },
+    "554797d0-c27a-f111-ab0f-7c1e525b15c2": {
+      "titleId": "554797d0-c27a-f111-ab0f-7c1e525b15c2",
+      "slug": "hodge-podge-of-life",
+      "isbns": [
+        "9781954414938",
+        "9781954414945"
+      ],
+      "sources": [
+        {
+          "id": "01DF3SEQMMEUNIDNXQYJEI4PJKHZMJYSUR",
+          "sha256": "b0d9099395027308efdb8025da6b96043a9b41b11f0fe45487a579fbc1c85cb7"
+        }
+      ],
+      "editionFormats": {},
+      "coverUrl": "/backlist/catalog/hodge-podge-of-life-cover.jpg"
+    },
+    "594797d0-c27a-f111-ab0f-7c1e525b15c2": {
+      "titleId": "594797d0-c27a-f111-ab0f-7c1e525b15c2",
+      "slug": "mirror-of-refining-insight",
+      "isbns": [
+        "9781954414365",
+        "9781954414372",
+        "9781954414976"
+      ],
+      "sources": [
+        {
+          "id": "01DF3SEQP33FGM5QOBEJDYHZ3A72FI3FTS",
+          "sha256": "ea4ee23aa008c511bb34165a55a56ea91af447fe8e1cd2051f5c48a8b089dae4"
+        }
+      ],
+      "editionFormats": {},
+      "coverUrl": "/backlist/catalog/mirror-of-refining-insight-cover.jpg"
+    },
+    "5b4797d0-c27a-f111-ab0f-7c1e525b15c2": {
+      "titleId": "5b4797d0-c27a-f111-ab0f-7c1e525b15c2",
+      "slug": "one-soul",
+      "isbns": [
+        "9781950719594",
+        "9781950719600"
+      ],
+      "sources": [
+        {
+          "id": "01DF3SEQMKBEHHACLIG5BYUPTNTPPX2622",
+          "sha256": "b105800c62890c4eaf24e190854fc68732b4d1b9dd723a6a34ba982c83ab2163"
+        }
+      ],
+      "editionFormats": {},
+      "coverUrl": "/backlist/catalog/one-soul-cover.jpg"
+    },
+    "5c4797d0-c27a-f111-ab0f-7c1e525b15c2": {
+      "titleId": "5c4797d0-c27a-f111-ab0f-7c1e525b15c2",
+      "slug": "ordinary-people-searching-for-greatness",
+      "isbns": [
+        "9781954414860",
+        "9781954414877",
+        "9781954414884"
+      ],
+      "sources": [
+        {
+          "id": "01DF3SEQPERNEICVICN5GLEQX3ZSEFR2Z3",
+          "sha256": "bf85413ce3a4aaecaeb236a609d106ac7534c9cbe50c9a840c395e9bd07f214d"
+        }
+      ],
+      "editionFormats": {},
+      "coverUrl": "/backlist/catalog/ordinary-people-searching-for-greatness-cover.jpg"
+    },
+    "5d4797d0-c27a-f111-ab0f-7c1e525b15c2": {
+      "titleId": "5d4797d0-c27a-f111-ab0f-7c1e525b15c2",
+      "slug": "the-great-hair-restart",
+      "isbns": [
+        "9781961475120",
+        "9781961475137",
+        "9781961475144",
+        "9781961475267",
+        "9781961475274",
+        "9781961475281"
+      ],
+      "sources": [],
+      "editionFormats": {}
+    },
+    "5e4797d0-c27a-f111-ab0f-7c1e525b15c2": {
+      "titleId": "5e4797d0-c27a-f111-ab0f-7c1e525b15c2",
+      "slug": "the-i-am-in-me-part-2",
+      "isbns": [],
+      "sources": [],
+      "editionFormats": {}
+    },
+    "5f4797d0-c27a-f111-ab0f-7c1e525b15c2": {
+      "titleId": "5f4797d0-c27a-f111-ab0f-7c1e525b15c2",
+      "slug": "the-i-am-in-me",
+      "isbns": [],
+      "sources": [],
+      "editionFormats": {}
+    },
+    "604797d0-c27a-f111-ab0f-7c1e525b15c2": {
+      "titleId": "604797d0-c27a-f111-ab0f-7c1e525b15c2",
+      "slug": "words-of-a-troubled-soul",
+      "isbns": [
+        "9781954414556",
+        "9781954414563",
+        "9781961475021"
+      ],
+      "sources": [
+        {
+          "id": "01DF3SEQNRRJKPN52LTFDIF4NDO4NPJIKJ",
+          "sha256": "ebe78d4322758338a16bb8dbdd0f617b495f343674a409fd7baf8cad33155654"
+        }
+      ],
+      "editionFormats": {},
+      "coverUrl": "/backlist/catalog/words-of-a-troubled-soul-cover.jpg"
+    },
+    "614797d0-c27a-f111-ab0f-7c1e525b15c2": {
+      "titleId": "614797d0-c27a-f111-ab0f-7c1e525b15c2",
+      "slug": "abortion",
+      "isbns": [
+        "9781950719990",
+        "9781954414006"
+      ],
+      "sources": [],
+      "editionFormats": {}
+    },
+    "624797d0-c27a-f111-ab0f-7c1e525b15c2": {
+      "titleId": "624797d0-c27a-f111-ab0f-7c1e525b15c2",
+      "slug": "have-you-considered-my-servant",
+      "isbns": [
+        "9781961475311",
+        "9781961475328"
+      ],
+      "sources": [
+        {
+          "id": "01DF3SEQJRJSAP2EXOZZBYFHL6P66JP7MH",
+          "sha256": "86b0346d383393b2e68fa68b1d6fc71ef68e1f49a396ab5f803c9d1f9df4e628"
+        }
+      ],
+      "editionFormats": {},
+      "coverUrl": "/backlist/catalog/have-you-considered-my-servant-cover.jpg"
+    },
+    "9d8ffdd6-c27a-f111-ab0f-7c1e525b15c2": {
+      "titleId": "9d8ffdd6-c27a-f111-ab0f-7c1e525b15c2",
+      "slug": "war-mother",
+      "isbns": [
+        "9781961475380",
+        "9781961475397"
+      ],
+      "sources": [
+        {
+          "id": "01DF3SEQPL7UDEVOYCLREYDYRIUWYNKVX5",
+          "sha256": "28e1eb05acd9815f4da9060c4a6be642a22855d8d6095863420fc818d6f40291"
+        },
+        {
+          "id": "01DF3SEQJ2ESGWKQLUUVHYAULW4XPGRB5G",
+          "sha256": "32d1d54e693a29811a571be9416b43c591035453b464d54e0e7b4d8079c5c670"
+        }
+      ],
+      "longDescription": "War Mother is a spiritually empowering devotional written for mothers who recognize that parenting is not just a responsibility\u2014it\u2019s a battlefield. With profound love and unwavering faith, author Win Dockery equips women to pray intentionally and boldly over their children\u2019s lives, drawing from her personal journey as a wife, mother of six, and founder of Journey with Grace and Mercy LLC.\n\nThis powerful prayer manual features 17 scripture-rich prayers that speak directly to the emotional, spiritual, and practical challenges children face in today\u2019s world. From abandonment, rebellion, and identity issues to peer pressure, purity, and even future spouses, each prayer is rooted in biblical truth and crafted to help mothers declare God\u2019s promises over their families.\n\nDesigned to uplift, empower, and activate a mother\u2019s spiritual authority, War Mother speaks to the warrior spirit in every woman. It\u2019s a clarion call to rise up in faith, take a stand in prayer, and lead your family with holy purpose. Whether you are a new mother, a seasoned parent, or a spiritual guardian of the next generation, this book provides both guidance and strength for the journey.\n\nIdeal for Christian women, prayer warriors, ministry leaders, and those in parenting or mentoring roles, War Mother is more than a devotional\u2014it\u2019s a declaration. Your prayers are powerful. Your presence is purposeful. And you were born for this battle.",
+      "shortDescription": "A powerful collection of scripture-based prayers equipping Christian mothers to spiritually protect, guide, and uplift their children through life\u2019s challenges.",
+      "editionFormats": {},
+      "coverUrl": "/backlist/catalog/war-mother-cover.jpg"
+    },
+    "9e8ffdd6-c27a-f111-ab0f-7c1e525b15c2": {
+      "titleId": "9e8ffdd6-c27a-f111-ab0f-7c1e525b15c2",
+      "slug": "why-faith-works-for-some-and-not-for-others",
+      "isbns": [
+        "9781954414242",
+        "9781954414259"
+      ],
+      "sources": [],
+      "editionFormats": {}
+    },
+    "7e000573-cc7a-f111-ab0f-7c1e525b15c2": {
+      "titleId": "7e000573-cc7a-f111-ab0f-7c1e525b15c2",
+      "slug": "god-s-nudge",
+      "isbns": [
+        "9781950719884"
+      ],
+      "sources": [],
+      "editionFormats": {}
+    },
+    "a-little-bit-of-everything": {
+      "titleId": "a-little-bit-of-everything",
+      "slug": "a-little-bit-of-everything",
+      "isbns": [
+        "9781954414389",
+        "9781954414396"
+      ],
+      "sources": [
+        {
+          "id": "01DF3SEQNU4CHQY23EXBG3W2HVLKWMSXWT",
+          "sha256": "bc509e3f21fbbe82fc079070dfb013f07ed38180e58e8e308aee0dc7fa635559"
+        }
+      ],
+      "editionFormats": {},
+      "coverUrl": "/backlist/catalog/a-little-bit-of-everything-cover.jpg"
+    },
+    "according-to-mark": {
+      "titleId": "according-to-mark",
+      "slug": "according-to-mark",
+      "isbns": [
+        "9781954414532",
+        "9781954414549",
+        "9781961475007"
+      ],
+      "sources": [
+        {
+          "id": "01DF3SEQNUYCO2OPWYBNHKCRN5UOFZZXDL",
+          "sha256": "0b540a4e14910b46a78085a2aa3055d3a4242d21db0d000cb125e22a7afb1c0c"
+        },
+        {
+          "id": "01DF3SEQNLN4GAGQQY6FDLBKXX33WRUJVP",
+          "sha256": "5b54acf0f1b5a41bf2d3a2d44d1b0eac7411341636a406ce93d2d204667b1a62"
+        }
+      ],
+      "longDescription": "According to Mark: The Gospel of Jesus Christ Begins is a sincere and faith-filled testimony rooted in Scripture and personal experience. Centered on the first chapter of the Gospel of Mark, this book emphasizes the importance of beginning the Gospel where it truly starts\u2014at the proclamation of Jesus Christ and the call to repentance, baptism, and new life.\n\nAlice V. Pryor shares her own journey of salvation with humility and conviction, recounting her experience of being baptized in water and in the Holy Ghost. Through reflection, testimony, and extensive Scripture references, she explains how the Gospel is not merely a message to be studied, but a life to be lived and a transformation to be experienced.\n\nThis book is written not to condemn or judge, but to invite. It speaks directly to sinners, backsliders, and seekers, offering encouragement, clarity, and hope through the power of Jesus Christ. Included are Scripture passages from the Gospels, Acts, Romans, Corinthians, Hebrews, and Jude, reinforcing the biblical foundation of the testimony.\n\nAccording to Mark also preserves the author\u2019s original handwritten work in an appendix, underscoring the authenticity and legacy of this spiritual message. Written as both a witness and a call to faith, this book is intended to inspire readers to understand the Gospel, receive salvation, and walk in newness of life.",
+      "shortDescription": "According to Mark is a powerful Christian testimony that invites readers to the beginning of the Gospel of Jesus Christ, sharing a lived experience of salvation, baptism, and the transforming power of the Holy Ghost.",
+      "editionFormats": {},
+      "coverUrl": "/backlist/catalog/according-to-mark-cover.jpg"
+    },
+    "come-out-of-hiding": {
+      "titleId": "come-out-of-hiding",
+      "slug": "come-out-of-hiding",
+      "isbns": [
+        "9781950719266"
+      ],
+      "sources": [
+        {
+          "id": "01DF3SEQLIJDZG23FYFFGYBNO6Y4NAM7PK",
+          "sha256": "db644db511cdaac621da2e2a41902c1fab5024379b094e6e60857cb605335b16"
+        }
+      ],
+      "editionFormats": {},
+      "coverUrl": "/backlist/catalog/come-out-of-hiding-cover.jpg",
+      "longDescription": "This is your moment to BREAK FREE!Break Agreement with habits, struggles, and strongholds.Learn to align your life with those things that will prosper you!Activate your gift and your true authentic nature.Come Out Of Hiding is a book that has been compiled from the journey of a woman whose life shifted from the background of life's struggles to the foreground as one of God's most powerful women in The Kingdom today!You are NEXT! You are NOW!",
+      "shortDescription": "This is your moment to BREAK FREE!Break Agreement with habits, struggles, and strongholds.Learn to align your life with those things that will prosper you!Activate your gift and your true authentic nature.Come Out Of Hiding is a book that has been compiled from the journey of a woman whose life shifted from the background of life's struggles to the foreground as one of God's most powerful women in The Kingdom today!You are NEXT! You are NOW!"
+    },
+    "department-of-the-air-force-mission-driven-leadership": {
+      "titleId": "department-of-the-air-force-mission-driven-leadership",
+      "slug": "department-of-the-air-force-mission-driven-leadership",
+      "isbns": [
+        "9781961475687",
+        "9781961475694"
+      ],
+      "sources": [],
+      "editionFormats": {}
+    },
+    "god-s-word-for-this-world": {
+      "titleId": "god-s-word-for-this-world",
+      "slug": "god-s-word-for-this-world",
+      "isbns": [
+        "9781954414402",
+        "9781954414419"
+      ],
+      "sources": [
+        {
+          "id": "01DF3SEQK27PK2ZACDQ5DL57HE3TAOXKIC",
+          "sha256": "369efcc33168c424ebf428faec55322d94aaa41b0f4099a1e10fa9436bbffea4"
+        }
+      ],
+      "editionFormats": {},
+      "coverUrl": "/backlist/catalog/god-s-word-for-this-world-cover.jpg"
+    },
+    "grandmothers-educating-minds": {
+      "titleId": "grandmothers-educating-minds",
+      "slug": "grandmothers-educating-minds",
+      "isbns": [
+        "9781954414211"
+      ],
+      "sources": [
+        {
+          "id": "01DF3SEQJGZ4TK6JAD5ZGL2SQH6LWKNUF3",
+          "sha256": "6e5dc462c3efdfe478a61c65a17bb36b4e1a300361c57f8ab328d532115389a0"
+        }
+      ],
+      "editionFormats": {},
+      "coverUrl": "/backlist/catalog/grandmothers-educating-minds-cover.jpg"
+    },
+    "hop-hop-hop": {
+      "titleId": "hop-hop-hop",
+      "slug": "hop-hop-hop",
+      "isbns": [
+        "9781954414099",
+        "9781954414105"
+      ],
+      "sources": [
+        {
+          "id": "01DF3SEQM5HPSRXLBHQ5FZYE473H4FR6ME",
+          "sha256": "391a7dc06bef51eaeb7cd70f0c30908f38448d45597d7856692a6eee95ab4338"
+        }
+      ],
+      "editionFormats": {},
+      "coverUrl": "/backlist/catalog/hop-hop-hop-cover.jpg"
+    },
+    "just-what-i-needed": {
+      "titleId": "just-what-i-needed",
+      "slug": "just-what-i-needed",
+      "isbns": [
+        "9781950719853",
+        "9781950719860"
+      ],
+      "sources": [
+        {
+          "id": "01DF3SEQOB7TQQILYOLVHLGYPP5NQ5N5D6",
+          "sha256": "f8acca1c85c6eadb14ab297e04859b62354f80c0ea3dd680741ae1945372a473"
+        }
+      ],
+      "editionFormats": {},
+      "coverUrl": "/backlist/catalog/just-what-i-needed-cover.jpg"
+    },
+    "melodies-from-heaven": {
+      "titleId": "melodies-from-heaven",
+      "slug": "melodies-from-heaven",
+      "isbns": [
+        "9781950719730",
+        "9781950719747"
+      ],
+      "sources": [
+        {
+          "id": "01DF3SEQKFE7VYR4MR5VFLIZ4SZ2EBEEBH",
+          "sha256": "d322e4620e6b75a8c3a6c6c7b4872b8596b441684dd3bfa21422e68d4611a1af"
+        }
+      ],
+      "editionFormats": {},
+      "coverUrl": "/backlist/catalog/melodies-from-heaven-cover.jpg"
+    },
+    "pretty-wings": {
+      "titleId": "pretty-wings",
+      "slug": "pretty-wings",
+      "isbns": [
+        "9781954414075",
+        "9781954414082"
+      ],
+      "sources": [
+        {
+          "id": "01DF3SEQOYPKPEWC2NWZALU2BAHCPX372E",
+          "sha256": "39e2cedea9188acbe3861788b6b8ae9fc732e231ef7a4589e03cc45635271b94"
+        }
+      ],
+      "editionFormats": {},
+      "coverUrl": "/backlist/catalog/pretty-wings-cover.jpg"
+    },
+    "rhyming-it-up-with-church-stuff": {
+      "titleId": "rhyming-it-up-with-church-stuff",
+      "slug": "rhyming-it-up-with-church-stuff",
+      "isbns": [
+        "9781961475434",
+        "9781961475441"
+      ],
+      "sources": [
+        {
+          "id": "01DF3SEQIYERX64IUR5FA2XRECK6D77DRD",
+          "sha256": "e8433c0ed2cf348684f151a3cd65d2add04bd8203707737d6e15ff0fe6f41977"
+        },
+        {
+          "id": "01DF3SEQNJ434TMU2DUZDY7P5H7FNEHOGU",
+          "sha256": "22e3460f59a40de639e2dc0aff21f65b1cc9bc91cd77e7eb373ebe6764e8962d"
+        }
+      ],
+      "longDescription": "Rhyming It Up with Church Stuff is a heartwarming and humorous collection of faith-inspired poetry by Juanita Travis. With wit, rhythm, and a deep reverence for church culture, Travis takes readers on a poetic journey through the ups and downs of Christian life\u2014from choir mishaps and mirror talks to the road to heaven and high-spirited Sundays. Rich in African-American vernacular and grounded in deep spiritual conviction, these poems speak to both the struggles and the joy of living a life of faith. A lifelong member of New Jerusalem Missionary Baptist Church, Juanita captures the rhythms of worship and fellowship that shape church communities across generations. Perfect for seniors, congregants, and anyone who finds laughter and truth in the pews.",
+      "shortDescription": "A witty and heartfelt collection of Christian poems that celebrate African-American church life with humor, grace, and spiritual insight.",
+      "editionFormats": {
+        "9781961475441": "eBook"
+      },
+      "coverUrl": "/backlist/catalog/rhyming-it-up-with-church-stuff-cover.jpg"
+    },
+    "she": {
+      "titleId": "she",
+      "slug": "she",
+      "isbns": [
+        "9781950719891",
+        "9781950719907"
+      ],
+      "sources": [
+        {
+          "id": "01DF3SEQMN2CHINYYHIVHKQYV6JTZ4IS4C",
+          "sha256": "b381aa095ff1dfc08e0133132779de57733eab3e5ce6ca211770abaf7672a3e8"
+        }
+      ],
+      "editionFormats": {},
+      "coverUrl": "/backlist/catalog/she-cover.jpg"
+    },
+    "the-little-girl-with-the-plow": {
+      "titleId": "the-little-girl-with-the-plow",
+      "slug": "the-little-girl-with-the-plow",
+      "isbns": [
+        "9781954414327",
+        "9781954414334"
+      ],
+      "sources": [
+        {
+          "id": "01DF3SEQL4UAMJONUYS5BKFBR2MEFMOXTR",
+          "sha256": "87c0fea8a2b0ad428133c4fe7c4f6eec444878e237280b0834258dfb9f57fe2e"
+        }
+      ],
+      "editionFormats": {},
+      "coverUrl": "/backlist/catalog/the-little-girl-with-the-plow-cover.jpg",
+      "longDescription": "The Little Girl with the Plow is a fun story about sibling love, overcoming insecurities, family unity, and Girl Power! Never let anyone make you feel small or like you are not good enough. God created you wonderfully, and you can do anything you set your mind to. \u2029This book reminds me that family is special, so we must cherish each moment, love each other and be there for each other no matter what! Your family is your Field, and Love brings your Harvest. So Never Stop Plowing! \u2029\u2029My father\u2019s life inspired me to write this book as he always taught me to be strong, independent, and courageous. I hope that every child who reads this book will be empowered to do Big Things.\u2029\u2029Not only is this a fun story, but there are also a few activities in the back of the book for you to join in on the fun! There are coloring pages, places to draw, and there\u2019s even a word search. I hope you enjoy this book as much as I enjoyed writing it for you! I hope you will share this book with someone you know. And most of all, I hope you are inspired to do great things!",
+      "shortDescription": "The Little Girl with the Plow is a fun story about sibling love, overcoming insecurities, family unity, and Girl Power! Never let anyone make you feel small or like you are not good enough. God created you wonderfully, and you can do anything you set your mind to. \u2029This book reminds me that family is special, so we must cherish each moment, love each other and be there for each other no matter what! Your family is your Field, and Love brings your Harvest. So Never Stop Plowing! \u2029\u2029My father\u2019s life inspired me to write this book as he always taught me to be strong, independent, and courageous. I hope that every child who reads this book will be empowered to do Big Things.\u2029\u2029Not only is this a fun story, but there are also a few activities in the back of the book for you to join in on the fun! There are coloring pages, places to draw, and there\u2019s even a word search. I hope you enjoy this book as much as I enjoyed writing it for you! I hope you will share this book with someone you know. And most of all, I hope you are inspired to do great things!"
+    },
+    "the-never-before-told-story-of-the-gelatin-monster": {
+      "titleId": "the-never-before-told-story-of-the-gelatin-monster",
+      "slug": "the-never-before-told-story-of-the-gelatin-monster",
+      "isbns": [
+        "9781954414631",
+        "9781954414648"
+      ],
+      "sources": [
+        {
+          "id": "01DF3SEQJAPKZROZJGEBBZ37K7VLHDPD7H",
+          "sha256": "32d30fbf855b68157d752772798401a4ba61abf34ecc7451f9000a073670238e"
+        }
+      ],
+      "editionFormats": {},
+      "coverUrl": "/backlist/catalog/the-never-before-told-story-of-the-gelatin-monster-cover.jpg"
+    },
+    "your-brain-has-too-much-what-mommy": {
+      "titleId": "your-brain-has-too-much-what-mommy",
+      "slug": "your-brain-has-too-much-what-mommy",
+      "isbns": [
+        "9781954414785",
+        "9781954414792"
+      ],
+      "sources": [
+        {
+          "id": "01DF3SEQICWN7QNFUG35FZ7PVAZSTHK2X7",
+          "sha256": "1e04e2d85ff6a224b16dfc02cbf9866d6557b424523fb2b275b029a6ef5862d9"
+        }
+      ],
+      "editionFormats": {},
+      "coverUrl": "/backlist/catalog/your-brain-has-too-much-what-mommy-cover.jpg"
+    }
+  },
+  "authors": {
+    "alice-pryor": {
+      "name": "Alice Pryor",
+      "titleIds": [
+        "according-to-mark"
+      ],
+      "biography": "She is from Ward, West Virginia but has been residing in Central, Ohio over 50 years. Mrs. Pryor accepted Jesus Christ as her Lord and Savior at a young age. Mrs. Pryor has been called to win souls, spread the Gospel of Jesus Christ, and let others know the importance of being baptized with water and the Holy Ghost.",
+      "sources": [
+        {
+          "id": "01DF3SEQNLN4GAGQQY6FDLBKXX33WRUJVP",
+          "sha256": "5b54acf0f1b5a41bf2d3a2d44d1b0eac7411341636a406ce93d2d204667b1a62"
+        }
+      ]
+    },
+    "cheryl-travis": {
+      "name": "Cheryl Travis",
+      "titleIds": [
+        "7b5f72d0-c27a-f111-ab0f-6045bdd69738",
+        "6409d7cb-c27a-f111-ab0f-6045bdd69678",
+        "99064bcd-c27a-f111-ab0f-00224820105b",
+        "6509d7cb-c27a-f111-ab0f-6045bdd69678",
+        "9e8797ca-c27a-f111-ab0f-7c1e525b15c2",
+        "343274cd-c27a-f111-ab0f-6045bdd69435",
+        "6309d7cb-c27a-f111-ab0f-6045bdd69678",
+        "293274cd-c27a-f111-ab0f-6045bdd69435"
+      ],
+      "biography": "Cheryl M. Travis spends her days reviewing and investigating death claims for an insurance company in Columbus, Ohio. Because she loves what she does, Cheryl has over 30 years\u2019 experience communicating and advocating for the sick and grieving families. She is also a strong advocate for the Deaf and hard of hearing that began when her eldest child was diagnosed as profoundly deaf.\n\nCheryl surrendered her life to Christ in 1989. Her teaching ministry began in 1995 at Higher Ground Always Abounding Assemblies under the leadership of the Beloved and honorable Bishop Sherman S. Watkins.",
+      "sources": [
+        {
+          "id": "01DF3SEQJYJOMWJLQQOBDZISXSQRQMI4KX",
+          "sha256": "cf88a817e53c8d6fd3d1201f1d15fc34f384e016637cb04a25e8e3cae2fd52f5"
+        }
+      ]
+    },
+    "daphanny-baker": {
+      "name": "Daphanny Baker",
+      "titleIds": [
+        "69137ed6-c27a-f111-ab0f-6045bdd69738",
+        "4be01ad3-c27a-f111-ab0f-6045bdd69678",
+        "ab084bcd-c27a-f111-ab0f-00224820105b",
+        "930f6fd3-c27a-f111-ab0f-6045bdd69435",
+        "69b21fc6-c27a-f111-ab0f-000d3a14673b"
+      ],
+      "biography": "A Pennsylvania resident, she shares her life with her husband\u2014a Pastor\u2014and their four children. Daphanny holds a B.S. in Criminal Justice, an MBA, and a Master of Divinity. Her diverse career includes serving as an astute corrections officer, supervisor in the juvenile justice system, esteemed Pastor\u2019s wife, and Elder in the Lord\u2019s Church. Her spiritual journey has taken her across the globe, including Europe, as she continues to walk boldly in her God-given assignment.",
+      "sources": [
+        {
+          "id": "01DF3SEQM2XUPYAHF2WVCKIUKPQPOKFQD2",
+          "sha256": "eba3060c5324e5610de239729dd51e05a6206bc3846e3b4a12f7485b385ef232"
+        },
+        {
+          "id": "01DF3SEQPL37XVAWDNSFALDOBIDGKBXKM6",
+          "sha256": "132f2e478a2382d0349096d935351cf8e4a53f1234cd2e76c28949390ecf9c7e"
+        }
+      ],
+      "photoUrl": "/backlist/catalog/daphanny-baker-portrait.jpg"
+    },
+    "david-williams": {
+      "name": "David Williams",
+      "titleIds": [
+        "604797d0-c27a-f111-ab0f-7c1e525b15c2"
+      ],
+      "biography": "David A. Williams Jr. has always had a creative and entrepreneurial mind; growing up is what allowed him to become more attached to writing. His relationship with God shows in his work, not neglecting the fact that we are all human. In Words of a Troubled Soul, David mirrors his feelings and takes on life through his work.\n\nThis book starts like David\u2019s rough, dark, and hopeless life, and as you continue to read, you\u2019ll notice some helpful sayings and quotes along the way. As you reach the middle and end of the book, you\u2019ll see that his writings become brighter and display hope.",
+      "sources": [
+        {
+          "id": "01DF3SEQNRRJKPN52LTFDIF4NDO4NPJIKJ",
+          "sha256": "ebe78d4322758338a16bb8dbdd0f617b495f343674a409fd7baf8cad33155654"
+        }
+      ]
+    },
+    "dean-wilson": {
+      "name": "Dean Wilson",
+      "titleIds": [
+        "935f72d0-c27a-f111-ab0f-6045bdd69738",
+        "fec27b7a-cc7a-f111-ab0f-6045bdd69435"
+      ],
+      "biography": "Dean Duvantie Wilson is a serial entrepreneur and financial coach from Hartford, Ct. He co-founded JAH Financial Services & Real Estate, a business solutions firm, and owns Golden Touch Personal Care and the Josette and Dean Wilson Foundation. Through their foundation, Dean teaches aspiring entrepreneurs and small businesses how to empower others, propelling them toward success and prosperity. Dean is also an author, visionary, and philanthropist who is committed to making a positive impact in the world. With a wealth of experience in Commercial Real Estate, Dean has successfully invested in numerous projects within this domain. His full-service CPA Firm offers a comprehensive range of services, including IRS tax resolution, personal and corporate income tax preparation, estate taxes, payroll, bookkeeping services, business funding, insurance and retirement services, and assistance with US Citizenship and Immigration. Dean's background is quite diverse; he is an expert in CAA Forensic, a certified money broker, and holds licenses as a life and health insurance agent, public notary, 10X trainer, travel agent, and accountant. His impressive skills and knowledge make him an invaluable asset to any business that seeks to grow and achieve financial success.\n\nDean is driven by an unwavering passion to effect meaningful change in the lives of others. Whether through my philanthropic initiatives, expertise in Commercial Real Estate, or the range of comprehensive services offered by J.A.H. Financial Service & Real Estate. Dean also takes immense pride in being a devoted father to four wonderful children: two delightful little girls and two handsome young men. He feels fortunate to be married to the epitome of selflessness, Mrs. Josette Hill-Wilson, who has been an extraordinary inspiration throughout my life.",
+      "sources": [
+        {
+          "id": "01DF3SEQMC7WOKEZPLDNHLRGWJBQBGSV5V",
+          "sha256": "771b286e28a82003e3c8e4b2e86d83b5742c8478b6922737199790f064d0c2f2"
+        }
+      ]
+    },
+    "diane-johnson": {
+      "name": "Diane Johnson",
+      "titleIds": [
+        "991a04cd-c27a-f111-ab0f-000d3a14673b"
+      ],
+      "biography": "Diane Johnson is a recent retiree of the Defense Finance and Accounting Service Columbus, Ohio where she served 30 years in many positions to include; supervisor, branch chief, division chief and training and procedures specialist. She has many talents and now has time to explore her gifts and express her creative nature. She has always enjoyed writing poetry, song lyrics and short stories.\n\nDiane graduated from Marion-Franklin high school in 1977 and went on to graduate from the Ohio State University in 1982 with a Bachelors of Arts in communication. She also went on to pursue a Masters of Arts from Central Michigan University in 2010. With a thirst for knowledge Diane has also achieved certification as a grantwriter, paralegal and notary public.",
+      "sources": [
+        {
+          "id": "01DF3SEQJ6QAERVBJSENHJHTLQML5J4SZV",
+          "sha256": "a7fd65b2f146c7c5202f80be56626565d58e3e2a2ce7b9fc5fb8774e7488e977"
+        }
+      ]
+    },
+    "donjia-walls": {
+      "name": "Donjia Walls",
+      "titleIds": [
+        "d0f603d3-c27a-f111-ab0f-000d3a14673b"
+      ],
+      "biography": "Donjia M. Walls was born in 1990 in Newark, New Jersey. She was raised in East Orange, New Jersey, and later returned to Newark in 2009 at the age of 18. Donjia holds an Associate of Arts in Early Childhood Education, a Bachelor of Arts in Sociology, and a Post-Baccalaureate Certificate in Prejudice Reduction and Teaching the History of the Holocaust.\n\nDonjia is a devoted wife and mother, a Behavior Assistant, an event and wedding coordinator, a youth leader with over ten years of experience, a recording artist, and an author. Her previous work includes The Path 2 Take, a youth and young adult Christian fiction novel.",
+      "sources": [
+        {
+          "id": "01DF3SEQNPS26WQVBCXFD27ZXOAGVEOJN4",
+          "sha256": "a0b56739c6902f015b08b3a0cd602a5b012300dbaa207b9257f9eb2a16c5061d"
+        }
+      ]
+    },
+    "ericka-johnson-settles": {
+      "name": "Ericka Johnson-Settles",
+      "titleIds": [
+        "3e09d7cb-c27a-f111-ab0f-6045bdd69678"
+      ],
+      "biography": "Growing up, Ericka often joined her mother in evangelist ministry by the visitation of homebound members, feeding the less fortunate, and singing to those who listened. Thus, a seed of compassion was planted and began to grow.\n\nFacing and overcoming challenges of childhood trauma, becoming a teenage mother, and a failed marriage, Ericka has been able to use each obstacle as a driving force to become more resilient and serve others.",
+      "sources": [
+        {
+          "id": "01DF3SEQKHV6CKRW53VVHIP5ZW3T5NOXRQ",
+          "sha256": "8018073b14241ad6008fca7ffbc45ea8de88d8b5e7033c3cdf0a492bdf96f3e8"
+        }
+      ]
+    },
+    "gloria-patterson": {
+      "name": "Gloria Patterson",
+      "titleIds": [
+        "9a8797ca-c27a-f111-ab0f-7c1e525b15c2"
+      ],
+      "biography": "I am a devoted wife to Isaiah Hezekiah Patterson. I married my husband on September 22, 2004. We have three daughters together, Elisabeth, Hannah, and Naomi. I also have a stepdaughter, Sarah Patterson.\n\nI enjoy inspiring women to believe in themselves, exercise their faith, and overcome adversity, by shifting their mindset. I am a firm believer in whatever the mind can perceive it can achieve. Reading motivational books inspires me to lead and mentor others to success. Stay afloat by quoting the promises of God.",
+      "sources": [
+        {
+          "id": "01DF3SEQMSNB4NAOLQKNE3YPVCDJQ2TV4W",
+          "sha256": "2435e2e80e502c4d2884654de55263db1944ef273e970c1a19a5688e5f3fdb11"
+        },
+        {
+          "id": "01DF3SEQM7VRVHZVWX4NBLPJWKNALKVJHZ",
+          "sha256": "a5c793871b29c66bdb774df2991ef831d7368f72e8f7326966088e31dcb47df0"
+        }
+      ],
+      "photoUrl": "/backlist/catalog/gloria-patterson-portrait.jpg"
+    },
+    "jaylonna-stevette": {
+      "name": "Jaylonna Stevette",
+      "titleIds": [
+        "624797d0-c27a-f111-ab0f-7c1e525b15c2",
+        "7b064bcd-c27a-f111-ab0f-00224820105b",
+        "6109d7cb-c27a-f111-ab0f-6045bdd69678",
+        "a05f72d0-c27a-f111-ab0f-6045bdd69738"
+      ],
+      "biography": "Jaylonna Stevette is a writer, speaker, mentor, entertainer, and entrepreneur who transitioned from a six-figure corporate America salary to guiding others in fulfilling their life\u2019s work. A spiritualist at heart, Jaylonna believes we possess the power within to dramatically change our circumstances. Described as smart, fierce, sexy, and in control, she is an executor who gets things done. Raised by a single mother of four, Jaylonna understands the challenges of single motherhood and the complexities of life in such circumstances.\n\nJaylonna\u2019s childhood was marked by experiences that deeply influenced her, with writing and entertainment as safe outlets for expression. Her stories, rooted in real-life themes, resonate with readers. Jaylonna\u2019s writing style is diverse, spanning various fiction genres to self-help and personal testimonials, showcasing her ability to tap into different streams of her artistic talent.",
+      "sources": [
+        {
+          "id": "01DF3SEQJRJSAP2EXOZZBYFHL6P66JP7MH",
+          "sha256": "86b0346d383393b2e68fa68b1d6fc71ef68e1f49a396ab5f803c9d1f9df4e628"
+        },
+        {
+          "id": "01DF3SEQON4SBW3YRNGREJA24KW4FWQVEN",
+          "sha256": "35aa3257f31e6f48385fff726ed30b56aca5127d0884898a54a60f0305af1903"
+        }
+      ],
+      "photoUrl": "/backlist/catalog/jaylonna-stevette-portrait.jpg"
+    },
+    "juanita-travis": {
+      "name": "Juanita Travis",
+      "titleIds": [
+        "rhyming-it-up-with-church-stuff"
+      ],
+      "biography": "Author Jaunita Travis was born in 1935, in Steubenville Ohio and grew up in Columbus Ohio where the values of faith, family, and community were deeply ingrained. Her Christian faith has been a guiding light throughout her life, influencing her worldview and her writing.\n\nJuanita is blessed with a large and loving family. She and her late husband Daniel Travis have four children. Of those four children she has eleven grandchildren, and eighteen great-grandchildren. Her family has always been her greatest source of joy and inspiration, often finding their way into her poetry.",
+      "sources": [
+        {
+          "id": "01DF3SEQNJ434TMU2DUZDY7P5H7FNEHOGU",
+          "sha256": "22e3460f59a40de639e2dc0aff21f65b1cc9bc91cd77e7eb373ebe6764e8962d"
+        },
+        {
+          "id": "01DF3SEQNPAP5FNK5W5ZFZ7QGBEHI5WO7N",
+          "sha256": "8b2168d574b9bc25b9c1e69fb872bd55c2956d6a7eb974bda5d39ea99c6e6847"
+        }
+      ],
+      "photoUrl": "/backlist/catalog/juanita-travis-portrait.jpg"
+    },
+    "kimberly-reeder": {
+      "name": "Kimberly Reeder",
+      "titleIds": [
+        "b34b00d4-c27a-f111-ab0f-00224820105b"
+      ],
+      "biography": "Kimberly Reeder is an author, mentor, and healthy hair specialist with more than forty years of experience serving women and families from many walks of life. Known for her commitment to healthy hair and personalized care, she has built lasting relationships with the clients who sit in her chair.\n\nFor Kimberly, the salon has become more than a place for hair care\u2014it is a space for encouragement, wisdom, and meaningful conversation. Through her compassion, attentive listening, and faith, many have found hope, healing, and a deeper awareness of God\u2019s love in everyday moments.",
+      "sources": [
+        {
+          "id": "01DF3SEQK74QN3B6PG3NC3AFJYMW3G32RC",
+          "sha256": "44e32a468929cc12f1b94b2f26bcf8eaee7e6e672e984b4c973867ac5f7183a6"
+        },
+        {
+          "id": "01DF3SEQLZDTD22ZPJ4BA3SGAVMHCFQNSL",
+          "sha256": "aa283afd4c9a9ab632bfe092b2aa6444e699bcbfba0a884857f015f49c480801"
+        }
+      ],
+      "photoUrl": "/backlist/catalog/kimberly-reeder-portrait.jpg"
+    },
+    "kurt-broadnax": {
+      "name": "Kurt Broadnax",
+      "titleIds": [
+        "b73274cd-c27a-f111-ab0f-6045bdd69435",
+        "835f72d0-c27a-f111-ab0f-6045bdd69738"
+      ],
+      "biography": "Before embarking on his ministerial journey, Kurt dedicated fifteen years to military service as an enlisted and non-commissioned officer. He also worked for a decade as a veteran service representative. He is academically accomplished and holds associate degrees in Air Conditioning and General Studies from Central Texas College. He is a graduate of the ministry program at Texas Southwest Jurisdictional School of Ministry, Church of God in Christ, located in San Antonio, Texas.\n\nIn the literary world, Kurt has penned thought-provoking works such as \"Love Is An Action Word\" and \"Love is Love Can.\" His most recent publication, \"Seasons of Life,\" guides readers through life's challenges and spiritual landscapes. Celebrating 29 years of marriage and acting as a spiritual parent, Kurt taps into his own reservoir of life experiences and spiritual wisdom to enrich his readers and congregation alike.",
+      "sources": [
+        {
+          "id": "01DF3SEQMSLMNJDMO6QRDLKFXOK36DHFWA",
+          "sha256": "562d5a825e3935c3b3b422685c48464e6d40cd4801e72efd8bac65cce4d17161"
+        },
+        {
+          "id": "01DF3SEQIVDC3Z7S5ZEJH2477HMFVVZ3XM",
+          "sha256": "73993ab5eaea47835a831d298e53f635687a09ab8cb13132e449f39033a5a0cd"
+        }
+      ],
+      "photoUrl": "/backlist/catalog/kurt-broadnax-portrait.jpg"
+    },
+    "mack-hughley": {
+      "name": "Mack Hughley",
+      "titleIds": [
+        "9a4b00d4-c27a-f111-ab0f-00224820105b"
+      ],
+      "biography": "Mack Hughley experienced a spiritual awakening and was filled with the Holy Ghost on January 13, 2002. Soon after, he joined Pentecostal Determine COG, solidifying his commitment to his faith. From 2003 to 2005, Mack served faithfully as a deacon within the church. Feeling a divine calling, he stepped into ministry as a minister in 2006, preaching his first sermon in December of that year.\n\nHis dedication didn\u2019t go unnoticed. In 2011, he was ordained an elder of Pentecostal Determine COG, assuming a vital leadership role. Throughout these years, he was not only a faithful armor-bearer and assistant to Bishop W.B. Hanna but also a committed student at the PDC Bible College Institute, where he was nurtured under the careful directorship and tutelage of Bishop W.B. Hanna.",
+      "sources": [
+        {
+          "id": "01DF3SEQKYS3ZJ6QVJJZBYU4LFA3BVYHO7",
+          "sha256": "6cba7700ba0b5c956842eebf16897eadb20d6bced1b1a508a60f627685562991"
+        },
+        {
+          "id": "01DF3SEQNOUT4SYJ43VZGZNXTN37UEVOG6",
+          "sha256": "519847ee9c92bf4bb6815d1be5ca12a839fe696c4b11e8c635624309307d10c1"
+        }
+      ],
+      "photoUrl": "/backlist/catalog/mack-hughley-portrait.jpg"
+    },
+    "maurche-reed": {
+      "name": "Maurche Reed",
+      "titleIds": [
+        "885f72d0-c27a-f111-ab0f-6045bdd69738",
+        "563274cd-c27a-f111-ab0f-6045bdd69435"
+      ],
+      "biography": "Maurche Reed, a.k.a \u201cMaurche the Dreamer,\u201d published her first book, \u201cI Am My Worst Enemy.\"\n\nMaurche Reed is an inspirational speaker and author. She helps break barriers mentally by transforming your thoughts to renew your mind. She helps individuals to dream big and turn those dreams into reality. She speaks the word of God and encouragement around the world. She is dedicated full-time to bringing her message to conferences, meetings, workshops, and worldwide. As a keynote speaker or workshop leader, she breaks through the boundaries limiting your team. She helps transform ordinary people to become warriors.",
+      "sources": [
+        {
+          "id": "01DF3SEQOQRWCIAZCA2VE2YLVJSUKZU24D",
+          "sha256": "94ab8b3a34706f377dcf6e5849b864b6e0a5ba03a96d9b6d18eeb198079d354a"
+        },
+        {
+          "id": "01DF3SEQIYC27Q6D5Q3JB3BAJXMCSWYU2X",
+          "sha256": "100fdf49c9da991eb9b3a40cd5bf3f5aeabbdbc4db295543a1652445daf36990"
+        }
+      ],
+      "photoUrl": "/backlist/catalog/maurche-reed-portrait.jpg"
+    },
+    "rosetta-perry": {
+      "name": "Rosetta Perry",
+      "titleIds": [
+        "944b00d4-c27a-f111-ab0f-00224820105b"
+      ],
+      "biography": "Rosetta Perry was born and raised in Youngstown, Ohio. She grew up in a loving Christian home and knew that she loved singing and acting, and making people laugh at an early age. Rosetta is the youngest sibling; she has a brother and a sister. She has one son and three grandsons. After graduation from her Alma Mater, Youngstown State University, she relocated to Columbus, Ohio, pursuing her passion for singing and acting.\n\nRosetta has acted on many stages around the country with Words 2 Life Drama Ministry and Stew Jacks Entertainment. She also performed in the 2014 Washington DC Urban Theater Festival. In addition, she has recorded two Gospel CDs and one live Comedy CD.",
+      "sources": [
+        {
+          "id": "01DF3SEQO5Q2NKPETSRJGYRKIJTAPM5JTT",
+          "sha256": "c5597b85c3270ee65837e0254b5e62580d5db26e9cefb7da4b388c4e1c6226a1"
+        }
+      ]
+    },
+    "tekisha-wimbush": {
+      "name": "Tekisha Wimbush",
+      "titleIds": [
+        "1c3274cd-c27a-f111-ab0f-6045bdd69435",
+        "7e000573-cc7a-f111-ab0f-7c1e525b15c2",
+        "5e4797d0-c27a-f111-ab0f-7c1e525b15c2",
+        "5f4797d0-c27a-f111-ab0f-7c1e525b15c2"
+      ],
+      "biography": "Pastor Tekisha D. Wimbush is a Native of Cleveland, Ohio. She is a minister of the Gospel of Jesus Christ and the wife of Bishop Willie J. Wimbush Jr., Church of the Reform Church of Love in Cleveland, Ohio.\n\nLady Wimbush\u2019s commitment to serving and helping others is evident through her lifestyle of service and dedication to the families and communities she serves. She diligently works with the Women\u2019s Ministry at Church of the Reform Church of Love to promote unity and sisterhood. She frequently hosts prayer and Women\u2019s Forum meetings, retreats, workshops, and other events to empower women to develop and grow in the love of God. In addition, Lady Wimbush serves in various ministries within The Church of the Reform, including Adult Sunday School Teacher, Church Finance/Administration Committee, Praise Team, Engagement / Program Coordinator, Youth Ministry, and Outreach.",
+      "sources": [
+        {
+          "id": "01DF3SEQLNNQYNTQW5ZBGIJC57SUQX575W",
+          "sha256": "b2d9170ab8aa537152a5f4ec8ea8d5c1cb13f704a7ed01b2cd4d79ed53f8076d"
+        }
+      ]
+    },
+    "terry-stephens": {
+      "name": "Terry Stephens",
+      "titleIds": [
+        "80064bcd-c27a-f111-ab0f-00224820105b",
+        "928904ca-c27a-f111-ab0f-6045bdd69738",
+        "82064bcd-c27a-f111-ab0f-00224820105b",
+        "aa084bcd-c27a-f111-ab0f-00224820105b"
+      ],
+      "biography": "Apostle Terry Stephens II is a powerful apostolic and prophetic leader used by God to usher in a fresh perspective concerning Kingdom government and leadership. His mission is to unite the body of Christ for the last days\u2019 stand. He operates with a unique, revelatory anointing that focuses on breaking the chains of religion and tradition. With a military perspective, Apostle Stephens is passionate about fivefold-ministry leadership aligned with a Kingdom agenda.\n\nWhile serving in the United States Army and deployed to Iraq, God began imparting the vision for Truth & Wholeness Ministries to Apostle Stephens. Guided by the Spirit of God, Truth & Wholeness Ministries aims to resemble the Army through cultural diversity, developing leaders, and establishing a distinct Kingdom culture. The ministry was founded in June 2011 and continues to grow and expand its reach.",
+      "sources": [
+        {
+          "id": "01DF3SEQPIZRKNO4WEMNAKGODTCXVNOHNL",
+          "sha256": "f3f55e922cdfd36775c881b74d1d46c5309721749c134277f60b09e5b0300319"
+        }
+      ]
+    },
+    "thomas-johnson": {
+      "name": "Thomas Johnson",
+      "titleIds": [
+        "god-s-word-for-this-world"
+      ],
+      "biography": "Bishop Thomas Lee Johnson, Sr. is a man after God\u2019s own heart. He is dedicated to the work of the lord, knowing that his life is not his own. Therefore, he has submitted to the will and work of our most high God. Bishop is a native of Detroit, MI, where he was educated in the Detroit Public School system. He is a graduate of Chadsey High School (1965).\n\nLater in life, he was inspired to further his education at Marygrove College. He also holds an honorary (DD) Doctor of Divinity degree from the Detroit Urban Bible College. Bishop Johnson met Jesus Christ on his personal road of Damascus in 1970 and received the baptism of the Holy Spirit shortly after. After faithfully serving under the leadership of his pastor, he was ordained as an elder in 1974. In 1975, he yielded to the call of God and established Immanuel House of Prayer Church. In 1994, he was found worthy of being elevated and ordained as a Bishop. Again, following the leading of the Lord in 2010.",
+      "sources": [
+        {
+          "id": "01DF3SEQK27PK2ZACDQ5DL57HE3TAOXKIC",
+          "sha256": "369efcc33168c424ebf428faec55322d94aaa41b0f4099a1e10fa9436bbffea4"
+        },
+        {
+          "id": "01DF3SEQM25HVUBXFSJNEKUI5HY7FJSHNG",
+          "sha256": "ff3bdd9c25e39751804bbe595bc3c13e3bfd8f5d0a0c4fc9fc7365e600ac6d11"
+        }
+      ],
+      "photoUrl": "/backlist/catalog/thomas-johnson-portrait.jpg"
+    },
+    "will-harris": {
+      "name": "Will Harris",
+      "titleIds": [
+        "67137ed6-c27a-f111-ab0f-6045bdd69738",
+        "982156cd-c37a-f111-ab0f-00224820105b",
+        "60137ed6-c27a-f111-ab0f-6045bdd69738"
+      ],
+      "biography": "Dr. Will Harris is a renowned singer, songwriter, musician, recording artist, and author. A native of Oxford, Mississippi, Harris began playing piano and singing in church at an early age and assumed his first Minister of Music role at just fourteen.\n\nDr. Harris currently serves as the Director of Music and Fine Arts at the Historic Metropolitan Baptist Church in Washington, DC.",
+      "sources": [
+        {
+          "id": "01DF3SEQJCF6VVVWCJ3VGKFRCAASL45YPF",
+          "sha256": "7be3e61f899d2de19163b036498889352277a8096e8b7615974cfd4a44212379"
+        }
+      ]
+    },
+    "jackie-smith-jr": {
+      "name": "Jackie Smith Jr",
+      "titleIds": [
+        "9d8797ca-c27a-f111-ab0f-7c1e525b15c2",
+        "fb3174cd-c27a-f111-ab0f-6045bdd69435",
+        "9c8797ca-c27a-f111-ab0f-7c1e525b15c2",
+        "department-of-the-air-force-mission-driven-leadership"
+      ],
+      "sources": [
+        {
+          "id": "01DF3SEQO7JGDKSMTKS5H3XYGYABB46NVS",
+          "sha256": "a6fa967735a9371b0c83f708aab2c3eddbcb3ce8aed54b2feb098ad3a521c845"
+        },
+        {
+          "id": "repository:data/authors.ts@d848372cbce22cd1b0f03e0952194a3fbc2cc4fc",
+          "sha256": "20edc0e19443403d70afa9e7cdd9b6475061f1022d95250ada17672761223028"
+        }
+      ],
+      "photoUrl": "/backlist/catalog/jackie-smith-jr-portrait.jpg",
+      "biography": "Jackie Smith, Jr. is the founder of J Merrill Publishing, Inc. and the visionary behind J Merrill One. His work centers on helping authors protect their intellectual property, publish with excellence, and build platforms that outlast a single launch cycle."
+    },
+    "leslie-banks": {
+      "name": "Leslie Banks",
+      "titleIds": [
+        "c9f603d3-c27a-f111-ab0f-000d3a14673b"
+      ],
+      "sources": [
+        {
+          "id": "01DF3SEQLKFMZZBW35SNAK2UCE5ZPWDGQH",
+          "sha256": "4bb9322e5862520b9066724720bb580f3b30bdd029ba89f75c9c00321dc3c763"
+        }
+      ],
+      "photoUrl": "/backlist/catalog/leslie-banks-portrait.jpg"
+    },
+    "dennis-brown": {
+      "name": "Dennis Brown",
+      "titleIds": [
+        "7a064bcd-c27a-f111-ab0f-00224820105b",
+        "911a04cd-c27a-f111-ab0f-000d3a14673b",
+        "d6f603d3-c27a-f111-ab0f-000d3a14673b"
+      ],
+      "sources": [
+        {
+          "id": "01DF3SEQJGL4OOYKFTOFCIIYPXDKY7RLHY",
+          "sha256": "d2e214f62276b8c58ee43e8ce43b842671088c888fffbfcb268f116722898d0b"
+        },
+        {
+          "id": "01DF3SEQJY2RN6KBCGFRBIA3Y42NSMHO5L",
+          "sha256": "88f7a5358c9d96056fdd9792567b1fb3104c9ed7756100af31aaa9c15ca2893f"
+        }
+      ],
+      "photoUrl": "/backlist/catalog/dennis-brown-portrait.jpg",
+      "biography": "Dennis Brown writes from the heart of a teacher and pastor including a wealth of cross-cultural experience in Mexico, Papua New Guinea and earlier short-term ministries in the West Indies.\n\nDennis is a graduate of Fuller Theological Seminary\u2019s School of International Studies (previously, School of World Mission) as well as Ohio Christian University (previously, Circleville Bible College).  He has also studied graduate level courses in Organizational Development (Azusa University) and Sociology (Texas A&M)."
+    },
+    "shana-byrd": {
+      "name": "Shana Byrd",
+      "titleIds": [
+        "921a04cd-c27a-f111-ab0f-000d3a14673b"
+      ],
+      "sources": [
+        {
+          "id": "01DF3SEQJSYIBZN533ENGLWSPEMLLTCY5C",
+          "sha256": "ecf790957a5f485a03e1648670f8821be0fa8aece5b9525a55c0893d70a6fb0f"
+        }
+      ],
+      "photoUrl": "/backlist/catalog/shana-byrd-portrait.jpg"
+    },
+    "darlene-carson": {
+      "name": "Darlene Carson",
+      "titleIds": [
+        "she"
+      ],
+      "sources": [
+        {
+          "id": "01DF3SEQKV623HYTLWVVCY6EK4JT35HPBP",
+          "sha256": "f971ae699286516adb61f2f1af5ad2af34f3994b3b75fe87e87d84a908767b53"
+        }
+      ],
+      "photoUrl": "/backlist/catalog/darlene-carson-portrait.jpg"
+    },
+    "edith-clay": {
+      "name": "Edith Clay",
+      "titleIds": [
+        "971a04cd-c27a-f111-ab0f-000d3a14673b"
+      ],
+      "sources": [
+        {
+          "id": "01DF3SEQICU7QIU2IJNREYAR27IEWDB7SC",
+          "sha256": "1d11bc69fb2e50a378c9b557ec7445955866b81b75dc8c195fc50430ad7f21f8"
+        },
+        {
+          "id": "01DF3SEQICV3DDWHVORVDZ7KDZGL7DKIF6",
+          "sha256": "191f4f2631d2244a2f96c8ec869c6fca8612a4d46c6566787bca26de74db05de"
+        }
+      ],
+      "photoUrl": "/backlist/catalog/edith-clay-portrait.jpg",
+      "biography": "Edith V. Clay came to Columbus with her parents. Graduated from West High School, and soon after married her husband John. They had two sons. John and Anthony. It was doing different times and situations in her life that God gave her words of inspirations that helped her as well as others."
+    },
+    "essence-easley": {
+      "name": "Essence Easley",
+      "titleIds": [
+        "your-brain-has-too-much-what-mommy"
+      ],
+      "sources": [
+        {
+          "id": "01DF3SEQPCI36HVJYH6RF3OSMVZTSWBJ45",
+          "sha256": "87be77451e0212f14d60cf6a768dc4524bebc96f6424e15831bb122113729d19"
+        }
+      ],
+      "photoUrl": "/backlist/catalog/essence-easley-portrait.jpg"
+    },
+    "deborah-eiland": {
+      "name": "Deborah Eiland",
+      "titleIds": [
+        "26e01ad3-c27a-f111-ab0f-6045bdd69678",
+        "998797ca-c27a-f111-ab0f-7c1e525b15c2",
+        "19e01ad3-c27a-f111-ab0f-6045bdd69678",
+        "17e01ad3-c27a-f111-ab0f-6045bdd69678"
+      ],
+      "sources": [
+        {
+          "id": "01DF3SEQL5U7EZLIZP3ZAZQEMGC3VJKERJ",
+          "sha256": "f6af129541c2846ccf2112ed95d26a7e707477cb73bae9c7be70f12918445f42"
+        }
+      ],
+      "photoUrl": "/backlist/catalog/deborah-eiland-portrait.jpg"
+    },
+    "deanna-jones": {
+      "name": "Deanna Jones",
+      "titleIds": [
+        "b3084bcd-c27a-f111-ab0f-00224820105b"
+      ],
+      "sources": [
+        {
+          "id": "01DF3SEQPRETVQT3RFNRHYWI6KSNR3CVQM",
+          "sha256": "f5631668db8fe1a86f51c1b0ebbce6b63a7ffc7d11ced2b9ba2f1b1cb59b8df1"
+        }
+      ],
+      "photoUrl": "/backlist/catalog/deanna-jones-portrait.jpg"
+    },
+    "tawonna-mars": {
+      "name": "Tawonna Mars",
+      "titleIds": [
+        "hop-hop-hop"
+      ],
+      "sources": [
+        {
+          "id": "01DF3SEQJ5NYKMBKOWCRF2Q4REHUSZAHOV",
+          "sha256": "1d0b92c24617d91651d149a428db303ff69338680ea1f0daeffdb0f4b2619245"
+        }
+      ],
+      "photoUrl": "/backlist/catalog/tawonna-mars-portrait.jpg"
+    },
+    "earline-neal": {
+      "name": "Earline Neal",
+      "titleIds": [
+        "5c4797d0-c27a-f111-ab0f-7c1e525b15c2"
+      ],
+      "sources": [
+        {
+          "id": "01DF3SEQJUSIVN744CFFFYVKXINFUA43VI",
+          "sha256": "4ecd57b6f128aa0432f0e927f98cb307ab74f15e3bd11a562aa4e3116cb6c48f"
+        }
+      ],
+      "photoUrl": "/backlist/catalog/earline-neal-portrait.jpg"
+    },
+    "pamela-smith": {
+      "name": "Pamela Smith",
+      "titleIds": [
+        "9e3274cd-c27a-f111-ab0f-6045bdd69435"
+      ],
+      "sources": [
+        {
+          "id": "01DF3SEQL67X7SF4K2M5GZVP67ZTMRBAPU",
+          "sha256": "5c9fa471aca7e0aed20d6beeb1170abd292fe8fdb9c2ee4d0f67ae8dcb4a4f58"
+        }
+      ],
+      "photoUrl": "/backlist/catalog/pamela-smith-portrait.jpg"
+    },
+    "ericka-thornton": {
+      "name": "Ericka Thornton",
+      "titleIds": [
+        "4009d7cb-c27a-f111-ab0f-6045bdd69678"
+      ],
+      "sources": [
+        {
+          "id": "01DF3SEQMVK626QMPUVNELBGMZYVSIZBUV",
+          "sha256": "649bf76e693104fe0723925b5143a12b06cb990cbff3aeb09e64103529538f04"
+        }
+      ],
+      "photoUrl": "/backlist/catalog/ericka-thornton-portrait.jpg"
+    }
+  }
+}

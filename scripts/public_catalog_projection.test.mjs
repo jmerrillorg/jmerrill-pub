@@ -4,6 +4,8 @@ import test, { after } from 'node:test'
 
 const shims = [
   ['../data/hagher-backlist-content', 'hagher-backlist-content.ts'],
+  ['../data/public-backlist-content', 'public-backlist-content.ts'],
+  ['../data/book-retailer-enrichment-overrides', 'book-retailer-enrichment-overrides.ts'],
   ['../lib/catalog/public-projection', 'public-projection.ts'],
   ['../lib/catalog/types', 'types.ts'],
   ['../lib/publishing/lifecycle/validation', 'validation.ts'],
@@ -91,6 +93,15 @@ test('complete public title is ready for page verification', () => {
   const result = projection.evaluatePublicCatalogReadiness(title())
   assert.equal(result.status, 'READY')
   assert.deepEqual(result.issues, [])
+})
+
+test('campaign readiness rejects empty and placeholder destinations without hiding the catalog', () => {
+  for (const overrides of [{ coverUrl: '' }, { coverUrl: 'https://placehold.co/300x400' }, { shortDescription: '' }, { shortDescription: 'Description coming soon' }]) {
+    const result = projection.evaluateCampaignDestinationReadiness(title(overrides))
+    assert.equal(result.status, 'HOLD')
+    assert.ok(result.missing.includes('MISSING_COVER') || result.missing.includes('MISSING_DESCRIPTION'))
+    assert.equal(projection.evaluatePublicCatalogReadiness(title(overrides)).status, 'READY')
+  }
 })
 
 test('title cannot verify live without a JMP-controlled title page', () => {

@@ -18,6 +18,7 @@ import {
 } from '@/lib/catalog/public-author-identity'
 import { titleAuthorOverrides } from '@/data/title-author-overrides'
 import { getHagherBacklistContent, hagherAuthor } from '@/data/hagher-backlist-content'
+import { getPublicBacklistContent, applyPublicBacklistAuthor } from '@/data/public-backlist-content'
 import { bookRetailerEnrichmentOverrides } from '@/data/book-retailer-enrichment-overrides'
 import { getDataverseRuntimeAccessToken, getPublisherRuntimeAuthMode } from '@/lib/server/publisher-runtime-auth'
 import { readFileSync } from 'node:fs'
@@ -77,6 +78,7 @@ const TITLE_SELECT = [
   'jm1pub_authordisplayname',
   'jm1pub_authorname',
   '_jm1_author_value',
+  '_jm1_primaryauthor_value',
   'jm1pub_shortdescription',
   'jm1pub_longdescription',
   'jm1pub_certifiedimprint',
@@ -95,9 +97,9 @@ const ASSET_SELECT = [
   'jm1pub_name',
   'jm1pub_assetformat',
   'jm1pub_isbn13',
-  'jm1pub_coverurl',
+  'jm1pub_coverfilereference',
   'jm1pub_assetstatus',
-  '_jm1pub_title_value',
+  '_jm1pub_titleid_value',
 ]
 
 const MARKETPLACE_SELECT = [
@@ -106,7 +108,7 @@ const MARKETPLACE_SELECT = [
   'jm1pub_marketplaceidentifier',
   'jm1pub_listingurl',
   'jm1pub_marketplacestatus',
-  '_jm1pub_title_value',
+  '_jm1pub_publishingassetid_value',
 ]
 
 const CONTACT_SELECT = [
@@ -159,7 +161,7 @@ export async function getPublicCatalogTitleBySlug(slug: string): Promise<Catalog
 
     return {
       ...summary,
-      longDescription: getHagherBacklistContent(summary.slug, summary.id)?.longDescription || stringField(row, 'jm1pub_longdescription'),
+      longDescription: getHagherBacklistContent(summary.slug, summary.id)?.longDescription || getPublicBacklistContent(summary)?.longDescription || stringField(row, 'jm1pub_longdescription') || summary.shortDescription,
       series: stringField(row, 'jm1pub_series'),
       seriesOrder: numberField(row, 'jm1pub_seriesorder'),
       keywords: buildKeywords(summary),
@@ -180,7 +182,7 @@ export function resolveRepositoryPublicCatalogTitleBySlug(slug: string): Catalog
 
   return {
     ...summary,
-    longDescription: getHagherBacklistContent(summary.slug, summary.id)?.longDescription || summary.shortDescription,
+    longDescription: getHagherBacklistContent(summary.slug, summary.id)?.longDescription || getPublicBacklistContent(summary)?.longDescription || summary.shortDescription,
     series: '',
     seriesOrder: null,
     keywords: buildKeywords(summary),
@@ -459,6 +461,7 @@ function buildAuthorSummaries(contactRows: DataverseRecord[], titles: CatalogTit
 
   return Array.from(bySlug.values())
     .filter((author) => author.titleCount > 0)
+    .map(author => applyPublicBacklistAuthor(author, titles))
     .sort((a, b) => a.name.localeCompare(b.name))
 }
 
@@ -490,8 +493,9 @@ function mergeRepositoryAuthorSummaries(authors: CatalogAuthorSummary[]): Catalo
 
 function repositoryAuthorSummaries(): CatalogAuthorSummary[] {
   const bySlug = new Map<string, CatalogAuthorSummary>()
+  const titles = repositoryPublicCatalogTitles()
 
-  for (const title of repositoryPublicCatalogTitles()) {
+  for (const title of titles) {
     for (const author of title.authors) {
       const current = bySlug.get(author.slug) || {
         contactId: author.contactId,
@@ -510,7 +514,7 @@ function repositoryAuthorSummaries(): CatalogAuthorSummary[] {
     }
   }
 
-  return Array.from(bySlug.values())
+  return Array.from(bySlug.values()).map(author => applyPublicBacklistAuthor(author, titles))
 }
 
 function repositoryAuthorTitles(slug: string): CatalogTitleSummary[] {
@@ -618,22 +622,26 @@ async function loadRelatedCatalogData(
       token,
       config.assetEntitySet,
       ASSET_SELECT,
-      '_jm1pub_title_value',
+      '_jm1pub_titleid_value',
       titleIds,
     ).catch(() => []),
-    dataverseGetCollectionByLookup(
-      config,
-      token,
-      config.marketplaceEntitySet,
-      MARKETPLACE_SELECT,
-      '_jm1pub_title_value',
-      titleIds,
-    ).catch(() => []),
+    dataverseGetCollection(config, token, config.marketplaceEntitySet, {
+      select: MARKETPLACE_SELECT,
+      filter: 'statecode eq 0 and jm1pub_listingurl ne null',
+    }).catch(() => []),
   ])
 
+  const assetTitles = new Map(assets.map(asset => [stringField(asset, 'jm1pub_publishingassetid'), stringField(asset, '_jm1pub_titleid_value')]))
+  const marketplacesByTitleId = new Map<string, DataverseRecord[]>()
+  for (const marketplace of marketplaces) {
+    const titleId = assetTitles.get(stringField(marketplace, '_jm1pub_publishingassetid_value'))
+    if (!titleId) continue
+    marketplacesByTitleId.set(titleId, [...(marketplacesByTitleId.get(titleId) || []), marketplace])
+  }
+
   return {
-    assetsByTitleId: groupRowsByLookup(assets, '_jm1pub_title_value'),
-    marketplacesByTitleId: groupRowsByLookup(marketplaces, '_jm1pub_title_value'),
+    assetsByTitleId: groupRowsByLookup(assets, '_jm1pub_titleid_value'),
+    marketplacesByTitleId,
   }
 }
 
@@ -650,7 +658,7 @@ function buildTitleSummary(row: DataverseRecord, related: CatalogRelatedData): C
   const slug = stringField(row, 'jm1pub_slug') || slugify(title)
   const titleDisplayName = stringField(row, 'jm1pub_authordisplayname')
   const governedTitleAuthorName = stringField(row, 'jm1pub_authorname')
-  const legalAuthorName = stringField(row, '_jm1_author_value@OData.Community.Display.V1.FormattedValue')
+  const legalAuthorName = stringField(row, '_jm1_author_value@OData.Community.Display.V1.FormattedValue') || stringField(row, '_jm1_primaryauthor_value@OData.Community.Display.V1.FormattedValue')
   const titleRelationshipPenName = distinctPublicAttribution(titleDisplayName, [
     legalAuthorName,
     governedTitleAuthorName,
@@ -663,12 +671,12 @@ function buildTitleSummary(row: DataverseRecord, related: CatalogRelatedData): C
     titleRelationshipPenName,
     governedPublicAuthorName: titleDisplayName || governedTitleAuthorName,
     publicAuthorName: titleDisplayName || governedTitleAuthorName,
-    contactId: stringField(row, '_jm1_author_value'),
+    contactId: stringField(row, '_jm1_author_value') || stringField(row, '_jm1_primaryauthor_value'),
   })
   const publicAttribution = publicAuthorIdentity.publicAuthorName
   const suppressAuthorProfile = suppressesPersonalAuthorIdentity(publicAuthorIdentity)
   const authorDisplayName = publicAttribution
-  const authorLookupId = stringField(row, '_jm1_author_value')
+  const authorLookupId = stringField(row, '_jm1_author_value') || stringField(row, '_jm1_primaryauthor_value')
   const retailerCoverUrl = bookRetailerEnrichmentOverrides[slug]?.retailerCoverUrl?.trim() || ''
 
   return {
@@ -699,7 +707,7 @@ function buildTitleSummary(row: DataverseRecord, related: CatalogRelatedData): C
     formats: normalizeFormats(formatIsbns),
     primaryIsbn: formatIsbns[0]?.isbn || '',
     isbnByFormat: formatIsbns,
-    coverUrl: firstString(assets, 'jm1pub_coverurl') || retailerCoverUrl,
+    coverUrl: firstString(assets, 'jm1pub_coverfilereference') || retailerCoverUrl,
     shortDescription: stringField(row, 'jm1pub_shortdescription'),
     purchaseLinks,
     marketplaceStatus: purchaseLinks[0]?.marketplaceStatus || '',
