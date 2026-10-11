@@ -91,3 +91,19 @@ test("Stage02 contract agrees with canonical input/output, persistence and no ap
   assert.ok(line.includes("'PUBLISHING.INTAKE_NORMALIZATION', true, ['EDITORIAL_WORKING_SOURCE'], qa, ['EDITORIAL_WORKING_SOURCE'], 'NONE'"));
   assert.ok(line.includes("['ORIGINAL_AUTHOR_SUBMISSION']"));
 });
+test("SharePoint custom-property promotion permits no manuscript or formatting changes", async () => {
+  const Zip = require("jszip"), source = new Zip();
+  source.file("word/document.xml", "<document>Exact words</document>");
+  source.file("word/styles.xml", "<styles>Exact formatting</styles>");
+  source.file("[Content_Types].xml", '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Override PartName="/word/document.xml" ContentType="document"/></Types>');
+  source.file("_rels/.rels", '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="document" Target="word/document.xml"/></Relationships>');
+  const bytes = await source.generateAsync({ type: "nodebuffer" });
+  const stored = await Zip.loadAsync(bytes);
+  stored.file("docProps/custom.xml", "<Properties>SharePoint custody metadata</Properties>");
+  stored.file("[Content_Types].xml", '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Override PartName="/word/document.xml" ContentType="document"/><Override PartName="/docProps/custom.xml" ContentType="application/vnd.openxmlformats-officedocument.custom-properties+xml"/></Types>');
+  stored.file("_rels/.rels", '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="document" Target="word/document.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/custom-properties" Target="docProps/custom.xml"/></Relationships>');
+  assert.equal((await stage.verifyTransport(bytes, await stored.generateAsync({ type: "nodebuffer" }), "Source.docx")).rule, "SHAREPOINT_CUSTOM_PROPERTIES_ONLY_V1");
+  stored.file("word/styles.xml", "Changed");
+  await assert.rejects(stage.verifyTransport(bytes, await stored.generateAsync({ type: "nodebuffer" }), "Source.docx"), /SUBSTANTIVE_PACKAGE_CHANGE/);
+  await assert.rejects(stage.verifyTransport(Buffer.from("a"), Buffer.from("b"), "Source.md"), /OUTPUT_BYTES_CONFLICT/);
+});

@@ -63,11 +63,44 @@ async function persistFile(folder, name, bytes, contentType, deps) {
     item = item || await deps.graph(target);
   }
   if (!item.file || !item.eTag || item.name !== name || item.parentReference?.id !== folder.id ||
-      item.parentReference.driveId !== fresh.driveId || item.size !== bytes.length) deny("COMMISSIONING_STAGE02_OUTPUT_CONFLICT");
+      item.parentReference.driveId !== fresh.driveId) deny("COMMISSIONING_STAGE02_OUTPUT_CONFLICT");
   const readback = await deps.sourceBytes({ itemId: item.id });
-  if (!readback.equals(bytes)) deny("COMMISSIONING_STAGE02_OUTPUT_BYTES_CONFLICT");
-  return { driveId: fresh.driveId, itemId: item.id, eTag: item.eTag, sha256: hash(bytes), bytes: bytes.length,
+  if (item.size !== readback.length) deny("COMMISSIONING_STAGE02_OUTPUT_CONFLICT");
+  const transport = await verifyTransport(bytes, readback, name);
+  return { driveId: fresh.driveId, itemId: item.id, eTag: item.eTag, sha256: hash(readback), bytes: readback.length,
+    sourceSha256: hash(bytes), sourceBytes: bytes.length, transport,
     path: `${folder.path}/${name}`, webUrl: item.webUrl || null };
+}
+function routingXml(bytes, name) {
+  const { DOMParser } = require("@xmldom/xmldom");
+  let invalid = false;
+  const doc = new DOMParser({ errorHandler: { warning: () => { invalid = true; }, error: () => { invalid = true; }, fatalError: () => { invalid = true; } } }).parseFromString(bytes.toString("utf8"), "application/xml");
+  if (invalid || doc.doctype) deny("COMMISSIONING_STAGE02_PACKAGE_XML_INVALID");
+  const root = doc.documentElement;
+  const nodes = [...Array(root.childNodes.length)].map((_, i) => root.childNodes[i]).filter(n => n.nodeType === 1);
+  const filtered = nodes.filter(n => name === "[Content_Types].xml"
+    ? !(n.localName === "Override" && n.getAttribute("PartName") === "/docProps/custom.xml" && n.getAttribute("ContentType") === "application/vnd.openxmlformats-officedocument.custom-properties+xml")
+    : !(n.localName === "Relationship" && n.getAttribute("Type") === "http://schemas.openxmlformats.org/officeDocument/2006/relationships/custom-properties" && n.getAttribute("Target") === "docProps/custom.xml"));
+  return JSON.stringify({ root: root.localName, namespace: root.namespaceURI,
+    children: filtered.map(n => ({ name: n.localName, namespace: n.namespaceURI,
+      attrs: [...Array(n.attributes.length)].map((_, i) => n.attributes[i]).map(a => [a.name, a.value]).sort(),
+      text: n.textContent })).sort((a, b) => JSON.stringify(a).localeCompare(JSON.stringify(b))) });
+}
+async function verifyTransport(source, stored, name) {
+  if (source.equals(stored)) return { rule: "EXACT_BYTES", changedParts: [] };
+  if (!name.toLowerCase().endsWith(".docx")) deny("COMMISSIONING_STAGE02_OUTPUT_BYTES_CONFLICT");
+  const Zip = require("jszip"), packages = await Promise.all([source, stored].map(b => Zip.loadAsync(b, { checkCRC32: true })));
+  const changedParts = [];
+  for (const part of new Set(packages.flatMap(z => Object.keys(z.files)))) {
+    if (packages.every(z => !z.files[part] || z.files[part].dir)) continue;
+    const entries = packages.map(z => z.file(part)), data = await Promise.all(entries.map(e => e ? e.async("nodebuffer") : null));
+    if (data[0] && data[1] && data[0].equals(data[1])) continue;
+    changedParts.push(part);
+    if (part === "docProps/custom.xml") continue;
+    if (["[Content_Types].xml", "_rels/.rels"].includes(part) && data.every(Boolean) && routingXml(data[0], part) === routingXml(data[1], part)) continue;
+    deny("COMMISSIONING_STAGE02_SUBSTANTIVE_PACKAGE_CHANGE");
+  }
+  return { rule: "SHAREPOINT_CUSTOM_PROPERTIES_ONLY_V1", changedParts };
 }
 async function verifyOutput(output, deps) {
   const item = await deps.graph(`drives/${encodeURIComponent(fresh.driveId)}/items/${encodeURIComponent(output.itemId)}`);
@@ -91,7 +124,7 @@ async function receipt(p, deps) {
     }
     for (const [i, output] of r.outputs.entries()) {
       if (output.role !== "EDITORIAL_WORKING_SOURCE" || output.sourceItemId !== p.components[i].itemId ||
-          output.sha256 !== p.components[i].sha256 || output.bytes !== p.components[i].bytes) deny("COMMISSIONING_STAGE02_LINEAGE_CONFLICT");
+          (output.sourceSha256 || output.sha256) !== p.components[i].sha256 || (output.sourceBytes || output.bytes) !== p.components[i].bytes) deny("COMMISSIONING_STAGE02_LINEAGE_CONFLICT");
       await verifyOutput(output, deps);
     }
     await verifyOutput(r.manifest, deps);
@@ -151,6 +184,8 @@ async function handler(body, deps = {}) {
       ...context, readScope: async () => ({ enabled: env.JM1_NEW_SUBMISSION_STAGE02_ENABLED === "true", revoked: false,
         titleId: p.titleId, mode: "JACKIE_TITLE_INTERNAL_COMMISSIONING" }) }, {
       namespace: "new-submission-stage02-executions", executionSuffix: "", plan: input => ({ ...input, executionId: p.executionId }), execute,
+      repairVersion: "SHAREPOINT_CUSTOM_PROPERTIES_ONLY_V1",
+      recoverHeld: state => state.causeCode === "COMMISSIONING_STAGE02_OUTPUT_CONFLICT" && !state.repairRecovery,
       validate: result => result?.receipt?.status === "COMPLETED" && result.receipt.sourceFingerprint === p.fingerprint,
       reference: () => p.output, completionEffects: () => ({ stage03: "NOT_STARTED", originalBytesChanged: false }) });
     const result = state.status === "COMPLETED" ? await receipt(p, context) : null;
@@ -158,4 +193,4 @@ async function handler(body, deps = {}) {
   } catch (e) { return { status: 409, jsonBody: { code: /^COMMISSIONING_[A-Z0-9_]+$/.test(e.safeCode || "") ? e.safeCode : "COMMISSIONING_STAGE02_DEPENDENCY_FAILED",
     mutationAttempted: attempted, providerStatus: e.statusCode || null, recovery: "SAME_SOURCE_CLAIM_AND_EXACT_OUTPUT_READBACK", communications: 0, stage03: "NOT_STARTED" } }; }
 }
-module.exports = { MODES, CONTRACT, plan, qa, receipt, handler, execute, verifyOutput };
+module.exports = { MODES, CONTRACT, plan, qa, receipt, handler, execute, verifyOutput, verifyTransport };
