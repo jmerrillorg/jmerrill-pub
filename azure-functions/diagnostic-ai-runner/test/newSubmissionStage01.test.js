@@ -43,6 +43,23 @@ function fixture() {
   };
   return {deps,rows,blobs,counts,current};
 }
+test("external delivery observation is exact-source bound and never an author approval",async()=>{
+  const x=fixture(),p=stage.plan(x.current),author=await x.deps.authorityClient.first();
+  const email={generated:true,sent:true,internetMessageId:"fixture",providerMessageId:"provider",communicationRecordId:"communication",expectedSubject:"Fixture acknowledgment",responseRequired:false,actedUpon:"NOT_REQUIRED_INFORMATIONAL_STAGE"};
+  x.deps.recipientReadback=async()=>({value:[],proofUnavailable:"EXTERNAL_RECIPIENT_DELIVERY_TELEMETRY_REQUIRED"});
+  assert.equal((await stage.verifyRecipient(email,author,p,x.deps)).delivered,false);
+  const observation={schemaVersion:1,proofClass:"AUTHORIZED_RECIPIENT_MAILBOX_OBSERVATION",titleId:p.titleId,sourceFingerprint:p.fingerprint,intakeId:p.intakeId,
+    providerMessageId:"provider",communicationRecordId:"communication",internetMessageId:"fixture",subject:email.expectedSubject,to:author.emailaddress1,from:"publishing@email.jmerrill.one",
+    observedAt:new Date().toISOString(),receivedAt:"2026-10-11T00:00:00Z",sourceUrl:"https://mail.google.com/mail/u/1/?view=om&permmsgid=msg-f:123",recipientMessageId:"msg-f:123",headerSummarySha256:"a".repeat(64)};
+  const path=`new-submission-stage01/${p.titleId}/${p.fingerprint}/recipient-observations/provider.json`;
+  x.blobs.set(path,Buffer.from(JSON.stringify(observation)));
+  const result=await stage.verifyRecipient(email,author,p,x.deps);
+  assert.equal(result.delivered,true);assert.equal(result.automatedRecipientMonitoring,false);assert.equal(result.actedUpon,"NOT_REQUIRED_INFORMATIONAL_STAGE");
+  for(const field of ["titleId","sourceFingerprint","intakeId","providerMessageId","communicationRecordId","internetMessageId","subject","to","from","recipientMessageId","sourceUrl","headerSummarySha256"]){
+    x.blobs.set(path,Buffer.from(JSON.stringify({...observation,[field]:"conflict"})));
+    await assert.rejects(stage.verifyRecipient(email,author,p,x.deps));
+  }
+});
 test("new original Stage01 creates ordinary intake only and replay preserves one delivered result",async()=>{
   const x=fixture();const body={titleId,mode:"SUBMISSION_01_EXECUTE"};
   const one=await stage.handler(body,x.deps),two=await stage.handler(body,x.deps);

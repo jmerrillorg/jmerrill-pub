@@ -167,13 +167,39 @@ async function verifyRecipient(email, author, p, deps) {
   const data = await deps.recipientReadback(email.internetMessageId, author.emailaddress1);
   if (!Array.isArray(data.value) || data["@odata.nextLink"] || data.value.length > 1) deny("COMMISSIONING_SUBMISSION_RECIPIENT_IDENTITY_CONFLICT");
   const message = data.value[0];
-  if (!message) return { ...email, delivered: false, deliveryGap: data.proofUnavailable || "EXACT_RECIPIENT_MESSAGE_NOT_YET_FOUND" };
+  if (!message) {
+    if (data.proofUnavailable === "EXTERNAL_RECIPIENT_DELIVERY_TELEMETRY_REQUIRED") {
+      const observed = await readRecipientObservation(email, author, p, deps);
+      if (observed) return observed;
+    }
+    return { ...email, delivered: false, deliveryGap: data.proofUnavailable || "EXACT_RECIPIENT_MESSAGE_NOT_YET_FOUND" };
+  }
   if (message.internetMessageId !== email.internetMessageId || !message.id || !Number.isFinite(Date.parse(message.receivedDateTime)) ||
       !message.toRecipients?.some(r => r.emailAddress?.address?.toLowerCase() === author.emailaddress1.toLowerCase()) ||
       message.from?.emailAddress?.address?.toLowerCase() !== "publishing@email.jmerrill.one" ||
       message.subject !== email.expectedSubject) deny("COMMISSIONING_SUBMISSION_RECIPIENT_IDENTITY_CONFLICT");
   return { ...email, delivered: true, recipientMessageId: message.id, deliveredAt: message.receivedDateTime,
     deliveryProof: "EXACT_IMMUTABLE_MESSAGE_IN_CANONICAL_AUTHOR_MAILBOX" };
+}
+async function readRecipientObservation(email, author, p, deps) {
+  const reference = `new-submission-stage01/${p.titleId}/${p.fingerprint}/recipient-observations/${email.providerMessageId}.json`;
+  try {
+    const blob = deps.containerClient.getBlockBlobClient(reference), properties = await blob.getProperties();
+    const observation = JSON.parse((await blob.downloadToBuffer(0, undefined, { conditions: { ifMatch: properties.etag } })).toString("utf8"));
+    const at = Date.parse(observation.observedAt), received = Date.parse(observation.receivedAt);
+    const url = new URL(observation.sourceUrl);
+    if (observation.schemaVersion !== 1 || observation.proofClass !== "AUTHORIZED_RECIPIENT_MAILBOX_OBSERVATION" ||
+        observation.titleId !== p.titleId || observation.sourceFingerprint !== p.fingerprint || observation.intakeId !== p.intakeId ||
+        observation.providerMessageId !== email.providerMessageId || observation.communicationRecordId !== email.communicationRecordId ||
+        observation.internetMessageId !== email.internetMessageId || observation.subject !== email.expectedSubject ||
+        observation.to !== author.emailaddress1.toLowerCase() || observation.from !== "publishing@email.jmerrill.one" ||
+        !Number.isFinite(at) || !Number.isFinite(received) || received > at || at > Date.now() ||
+        url.origin !== "https://mail.google.com" || url.searchParams.get("view") !== "om" ||
+        url.searchParams.get("permmsgid") !== observation.recipientMessageId || !/^msg-f:\d+$/.test(observation.recipientMessageId) ||
+        !/^[a-f0-9]{64}$/.test(observation.headerSummarySha256 || "")) deny("COMMISSIONING_SUBMISSION_RECIPIENT_OBSERVATION_CONFLICT");
+    return { ...email, delivered: true, deliveredAt: observation.receivedAt, recipientMessageId: observation.recipientMessageId,
+      deliveryProof: observation.proofClass, deliveryEvidenceReference: reference, automatedRecipientMonitoring: false };
+  } catch (e) { if (e.statusCode === 404) return null; throw e; }
 }
 async function handler(body, deps = {}) {
   const env = deps.env || process.env;
@@ -231,4 +257,4 @@ async function handler(body, deps = {}) {
   } catch (e) { return { status: 409, jsonBody: { code: /^COMMISSIONING_[A-Z_]+$/.test(e.safeCode || "") ? e.safeCode : "COMMISSIONING_SUBMISSION_DEPENDENCY_FAILED", phase,
       ...(e.statusCode ? { providerStatus: e.statusCode } : {}), mutationAttempted: attempted, recovery: "EXACT_SOURCE_AND_RECEIPT_READBACK", communicationState: phase === "AUTHOR_ACKNOWLEDGMENT" || phase === "OUTPUT_PERSIST" ? "READ_CANONICAL_RELAY_RECEIPT" : "NOT_ATTEMPTED", modelCalls: 0, payments: 0 } }; }
 }
-module.exports = { MODES, COLUMNS, plan, storedBinding, findExact, inventory, verifyAccess, rowFingerprint, verifyCensus, verifyRecipient, handler };
+module.exports = { MODES, COLUMNS, plan, storedBinding, findExact, inventory, verifyAccess, rowFingerprint, verifyCensus, verifyRecipient, readRecipientObservation, handler };
