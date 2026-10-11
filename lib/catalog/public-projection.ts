@@ -77,7 +77,7 @@ export function evaluatePublicCatalogReadiness(
 
 // Campaign quality is independent of lifecycle eligibility and catalog visibility.
 export function evaluateCampaignDestinationReadiness(title: CatalogTitleSummary) {
-  const missing: PublicCatalogReadinessIssue[] = []
+  const missing: PublicCatalogReadinessIssue[] = [...evaluatePublicCatalogReadiness(title).issues]
   if (!title.coverUrl || /placeholder|placehold\.co/i.test(title.coverUrl)) missing.push('MISSING_COVER')
   if (!title.shortDescription?.trim() || /^(description coming soon|coming soon|j merrill publishing author family)[.!]?$/i.test(title.shortDescription.trim()) || / is listed in the J Merrill Publishing public catalog\.$/i.test(title.shortDescription.trim())) missing.push('MISSING_DESCRIPTION')
   if (!title.primaryIsbn && !title.isbnByFormat.length) missing.push('MISSING_ISBN')
