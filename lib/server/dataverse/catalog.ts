@@ -249,7 +249,7 @@ export async function getPublicAuthorBySlug(slug: string): Promise<CatalogReadRe
     return {
       ...summary,
       longBio: summary.slug === hagherAuthor.slug ? hagherAuthor.biography : contact ? stringField(contact, 'jm1pub_publicauthorbio') || summary.shortBio : summary.shortBio,
-      location: contact
+      location: summary.slug === hagherAuthor.slug ? 'Dayton, Ohio' : contact
         ? [stringField(contact, 'address1_city'), stringField(contact, 'address1_stateorprovince')].filter(Boolean).join(', ')
         : '',
       specialties: summary.genres,
@@ -265,7 +265,7 @@ export function resolveRepositoryPublicAuthorBySlug(slug: string): CatalogAuthor
   return {
     ...summary,
     longBio: summary.slug === hagherAuthor.slug ? hagherAuthor.biography : summary.shortBio,
-    location: '',
+    location: summary.slug === hagherAuthor.slug ? 'Dayton, Ohio' : '',
     specialties: summary.genres,
     titles: repositoryAuthorTitles(summary.slug),
   }

@@ -33,3 +33,12 @@ test('published pictures preserve exact governed source bytes', () => {
     assert.equal(createHash('sha256').update(bytes).digest('hex'), hash)
   }
 })
+
+test('focused presentation distinguishes edition metadata from retailer availability', () => {
+  const book = readFileSync(new URL('../app/books/[id]/page.tsx', import.meta.url), 'utf8')
+  const author = readFileSync(new URL('../app/authors/[slug]/page.tsx', import.meta.url), 'utf8')
+  assert.match(book, /Published edition metadata/)
+  assert.match(book, /authorSlug === 'iyorwuese-hagher' \? 'Edition' : 'Live'/)
+  assert.match(author, /author.slug !== 'iyorwuese-hagher' \? <CTASection/)
+  assert.match(author, /whitespace-pre-line text-white\/80/)
+})
