@@ -1,0 +1,47 @@
+[
+  {
+    "canonicalId": "67137ed6-c27a-f111-ab0f-6045bdd69738",
+    "canonicalSlug": "music-ministry-unplugged",
+    "duplicateIds": ["982156cd-c37a-f111-ab0f-00224820105b"],
+    "retiredSlugs": ["music-ministry-unplugged-real-lessons-for-those-who-lead-and-serve-in-music-ministry"],
+    "title": "Music Ministry Unplugged",
+    "subtitle": "Real Lessons for Those who Lead and Serve in Music Ministry",
+    "authority": "Founder-confirmed duplicate pair; exact ISBN EPUB title metadata"
+  },
+  {
+    "canonicalId": "c84b00d4-c27a-f111-ab0f-00224820105b",
+    "canonicalSlug": "the-fight-for-the-promiseland",
+    "duplicateIds": ["952556cd-c37a-f111-ab0f-00224820105b"],
+    "retiredSlugs": ["the-fight-for-the-promiseland-battle-strategies-for-victorious-people"],
+    "title": "The Fight for the Promiseland",
+    "subtitle": "Battle Strategies for Victorious People",
+    "authority": "Founder-confirmed duplicate pair; exact ISBN EPUB title metadata"
+  },
+  {
+    "canonicalId": "1c3274cd-c27a-f111-ab0f-6045bdd69435",
+    "canonicalSlug": "god-s-nudge",
+    "duplicateIds": ["7e000573-cc7a-f111-ab0f-7c1e525b15c2"],
+    "retiredSlugs": ["god-s-nudge-7e000573"],
+    "title": "God's Nudge",
+    "subtitle": "",
+    "authority": "Exact paperback ISBN 9781950719884 already in canonical work; same Tekisha Wimbush attribution; preserved distribution worksheet and published EPUB"
+  },
+  {
+    "canonicalId": "c3f603d3-c27a-f111-ab0f-000d3a14673b",
+    "canonicalSlug": "the-master-s-piece",
+    "duplicateIds": ["733cd77a-cc7a-f111-ab0f-6045bdd69678"],
+    "retiredSlugs": ["the-master-s-piece-c3f603d3"],
+    "title": "The Master's Piece",
+    "subtitle": "",
+    "authority": "Exact paperback ISBN 9781954414488 already in canonical work; same Sylvia Benson attribution; preserved distribution worksheet and published EPUB; hardcover retained separately within work"
+  },
+  {
+    "canonicalId": "935f72d0-c27a-f111-ab0f-6045bdd69738",
+    "canonicalSlug": "warrior-s-breed",
+    "duplicateIds": ["fec27b7a-cc7a-f111-ab0f-6045bdd69435"],
+    "retiredSlugs": ["warrior-s-breed-fec27b7a"],
+    "title": "Warrior's Breed",
+    "subtitle": "",
+    "authority": "Exact eBook ISBN 9781954414655 already in canonical work; same Dean Wilson attribution; published EPUB source identifiers and artwork agree; print ISBN retained"
+  }
+]

@@ -1,11 +1,11 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import Image from 'next/image'
-import { notFound } from 'next/navigation'
+import { notFound, permanentRedirect } from 'next/navigation'
 import { BookCard } from '@/components/content/BookCard'
 import { CTASection } from '@/components/content/CTASection'
 import { catalogAuthorDisplayName, catalogTitleToBookCardRecord } from '@/lib/catalog/display'
-import { publicCatalogPageUrls } from '@/lib/catalog/public-projection'
+import { publicCatalogPageUrls, canonicalPublicTitleSlug } from '@/lib/catalog/public-projection'
 import type { CatalogTitleDetail } from '@/lib/catalog/types'
 import { getPublicCatalogTitleBySlug } from '@/lib/server/dataverse/catalog'
 import { getImprintStrategyByLabel } from '@/data/imprints'
@@ -91,6 +91,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function BookPage({ params }: Props) {
   const { id } = await params
+  const canonicalSlug = canonicalPublicTitleSlug(id)
+  if (canonicalSlug !== id) permanentRedirect(`/books/${canonicalSlug}`)
   const result = await getPublicCatalogTitleBySlug(id)
   if (!result.ok) return <CatalogUnavailable />
   if (!result.data) notFound()
