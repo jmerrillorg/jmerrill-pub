@@ -19,6 +19,18 @@ Paradise means `2025-Hagher-APortraitOfParadise`; Conquest means
 `2025-Hagher-TheConquestOfAzenga`. Folder years are not publication authority.
 Workbook sheet: Metadata (Non-Audio Products), exact ISBN rows.
 
+Conquest's final print copyright page independently corroborates all three
+ISBNs, JM Signature, and Second Edition, 2026. Source item
+`01DF3SEQOFV2EIL6GDMRHLQ7M2WWDFMYFH`; governed eBook item
+`01DF3SEQOJBRZFRK2MJJFYRMAZSXNR5HUI`. Its latest workbook contains print
+rows, so the eBook identifier is not attributed to a nonexistent workbook row.
+
+Live visual acceptance follow-up: use the published biography's Dayton, Ohio
+location rather than a generic author-family placeholder. Remove the generic
+template quote and unfinished-profile marketing block only from Hagher's page.
+Preserve source paragraph breaks and improve description contrast. Format
+labels represent edition metadata, not independently verified retailer stock.
+
 Dataverse title IDs: Paradise `c74b00d4-c27a-f111-ab0f-00224820105b`;
 Conquest `c44b00d4-c27a-f111-ab0f-00224820105b`. Both live certified imprints
 are JM Signature, value 100000004, and release dates already match the workbooks.

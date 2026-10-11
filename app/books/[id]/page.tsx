@@ -192,9 +192,9 @@ export default async function BookPage({ params }: Props) {
                 <div key={format} className="flex items-center justify-between rounded-xl border border-white/6 bg-white/[0.03] px-4 py-3">
                   <div>
                     <div className="text-[13px] font-medium text-white">{format}</div>
-                    <div className="text-[11px] font-light text-white/30">Catalog-ready format support</div>
+                    <div className="text-[11px] font-light text-white/60">{authorSlug === 'iyorwuese-hagher' ? 'Published edition metadata' : 'Catalog-ready format support'}</div>
                   </div>
-                  <span className="font-mono text-[11px] text-blue-400">Live</span>
+                  <span className="font-mono text-[11px] text-blue-400">{authorSlug === 'iyorwuese-hagher' ? 'Edition' : 'Live'}</span>
                 </div>
               ))}
             </div>
@@ -308,7 +308,7 @@ export default async function BookPage({ params }: Props) {
                   <span className="block h-px w-8 bg-blue-500" />
                   <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-blue-400">About the title</span>
                 </div>
-                <p className="text-[15px] font-light leading-[1.9] text-white/55">
+                <p className={`text-[15px] font-light leading-[1.9] ${authorSlug === 'iyorwuese-hagher' ? 'whitespace-pre-line text-white/80' : 'text-white/55'}`}>
                   {book.longDescription || book.shortDescription || 'Full title description pending.'}
                 </p>
 

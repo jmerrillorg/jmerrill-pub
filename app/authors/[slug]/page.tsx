@@ -198,7 +198,7 @@ export default async function AuthorProfilePage({ params }: Props) {
               >
                 {author.name}
               </h1>
-              <p className="mt-5 max-w-[760px] text-[18px] font-light leading-[1.8] text-white/50">
+              <p className={`mt-5 max-w-[760px] text-[18px] font-light leading-[1.8] ${author.slug === 'iyorwuese-hagher' ? 'whitespace-pre-line text-white/80' : 'text-white/50'}`}>
                 {author.longBio || author.shortBio || 'J Merrill Publishing author family.'}
               </p>
 
@@ -237,9 +237,9 @@ export default async function AuthorProfilePage({ params }: Props) {
                 <em className="not-italic italic text-blue-500">{author.name}</em>
               </h2>
             </div>
-            <blockquote className="rounded-[24px] border border-gray-200 bg-[#F7F8FA] p-6 text-[15px] font-light leading-[1.8] text-gray-500">
+            {author.slug !== 'iyorwuese-hagher' ? <blockquote className="rounded-[24px] border border-gray-200 bg-[#F7F8FA] p-6 text-[15px] font-light leading-[1.8] text-gray-500">
               “Every author page should make the person behind the work visible.”
-            </blockquote>
+            </blockquote> : null}
           </div>
 
           {author.titles.length > 0 ? (
@@ -256,7 +256,7 @@ export default async function AuthorProfilePage({ params }: Props) {
         </div>
       </section>
 
-      <CTASection
+      {author.slug !== 'iyorwuese-hagher' ? <CTASection
         eyebrow="Author Growth Infrastructure"
         title={
           <>
@@ -269,7 +269,7 @@ export default async function AuthorProfilePage({ params }: Props) {
         primary={{ label: 'Browse all authors', href: '/authors' }}
         secondary={{ label: 'Join the Family', href: '/join' }}
         dark={false}
-      />
+      /> : null}
     </div>
   )
 }
