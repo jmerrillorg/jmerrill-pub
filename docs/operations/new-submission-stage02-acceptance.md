@@ -1,5 +1,15 @@
 # Five-original Stage 02 acceptance
 
+DOCX working sources use `ZIP_SINGLE_SOURCE_V1`: one original-named DOCX inside
+a deterministic `.docx.working-source.zip` envelope. SharePoint promoted custom
+XML when directly uploading an Office document during live acceptance. The
+envelope prevents that transformation; both stored-envelope and inner-source
+hashes are verified independently. Consumers must validate the receipt and
+extract exactly its single named entry before DOCX processing. Unwrapped altered
+working copies remain preserved evidence and are not accepted stage outputs.
+Original files and completed Stage 01 receipts are unchanged. This is storage
+packaging, not editorial alteration, title assembly or author approval.
+
 Stage 01 remains immutable. `SUBMISSION_02_PREFLIGHT`, `SUBMISSION_02_EXECUTE` and `SUBMISSION_02_READBACK` share the protected source-registration entry. Caller-supplied source, author, policy, approval and delivery claims are rejected. Execution requires `JM1_NEW_SUBMISSION_STAGE02_ENABLED=true` and the exact title allowlist; broad editorial/stage/wait workers must remain false.
 
 The controlling requirement is `EDITORIAL_SYSTEM_STAGE_CONTRACTS['02_INTAKE']`: `PUBLISHING.INTAKE_NORMALIZATION`, original author submission to QA-passed `EDITORIAL_WORKING_SOURCE`, source lineage, checksum/version and governed SharePoint persistence. The adapter creates lossless separate working files beside the preserved original folder and a normalized provenance manifest. It does not edit manuscript substance, concatenate components, infer component order, import historical completion or create an approval.

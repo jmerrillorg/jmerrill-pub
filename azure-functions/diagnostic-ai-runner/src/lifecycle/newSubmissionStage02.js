@@ -87,20 +87,21 @@ function routingXml(bytes, name) {
       text: n.textContent })).sort((a, b) => JSON.stringify(a).localeCompare(JSON.stringify(b))) });
 }
 async function verifyTransport(source, stored, name) {
-  if (source.equals(stored)) return { rule: "EXACT_BYTES", changedParts: [] };
-  if (!name.toLowerCase().endsWith(".docx")) deny("COMMISSIONING_STAGE02_OUTPUT_BYTES_CONFLICT");
-  const Zip = require("jszip"), packages = await Promise.all([source, stored].map(b => Zip.loadAsync(b, { checkCRC32: true })));
-  const changedParts = [];
-  for (const part of new Set(packages.flatMap(z => Object.keys(z.files)))) {
-    if (packages.every(z => !z.files[part] || z.files[part].dir)) continue;
-    const entries = packages.map(z => z.file(part)), data = await Promise.all(entries.map(e => e ? e.async("nodebuffer") : null));
-    if (data[0] && data[1] && data[0].equals(data[1])) continue;
-    changedParts.push(part);
-    if (part === "docProps/custom.xml") continue;
-    if (["[Content_Types].xml", "_rels/.rels"].includes(part) && data.every(Boolean) && routingXml(data[0], part) === routingXml(data[1], part)) continue;
-    deny("COMMISSIONING_STAGE02_SUBSTANTIVE_PACKAGE_CHANGE");
-  }
-  return { rule: "SHAREPOINT_CUSTOM_PROPERTIES_ONLY_V1", changedParts };
+  if (!source.equals(stored)) deny("COMMISSIONING_STAGE02_OUTPUT_BYTES_CONFLICT");
+  return { rule: "EXACT_BYTES", changedParts: [] };
+}
+async function packWorkingSource(bytes, name) {
+  if (!name || /[\\/]/.test(name)) deny("COMMISSIONING_STAGE02_PACKAGE_NAME_INVALID");
+  const zip = new (require("jszip"))();
+  zip.file(name, bytes, { date: new Date("2000-01-01T00:00:00Z"), createFolders: false });
+  return zip.generateAsync({ type: "nodebuffer", compression: "STORE", platform: "DOS" });
+}
+async function verifyWorkingPackage(bytes, output) {
+  const zip = await require("jszip").loadAsync(bytes, { checkCRC32: true });
+  const entries = Object.values(zip.files).filter(e => !e.dir);
+  if (entries.length !== 1 || entries[0].name !== output.entryName) deny("COMMISSIONING_STAGE02_PACKAGE_SCOPE_CHANGED");
+  const source = await entries[0].async("nodebuffer");
+  if (source.length !== output.sourceBytes || hash(source) !== output.sourceSha256) deny("COMMISSIONING_STAGE02_PACKAGE_SOURCE_CHANGED");
 }
 async function transportReadback(current, p, deps) {
   const observations = [];
@@ -134,6 +135,7 @@ async function verifyOutput(output, deps) {
       `${path}/${item.name}` !== output.path) deny("COMMISSIONING_STAGE02_OUTPUT_CUSTODY_CHANGED");
   const bytes = await deps.sourceBytes({ itemId: output.itemId });
   if (bytes.length !== output.bytes || hash(bytes) !== output.sha256) deny("COMMISSIONING_STAGE02_OUTPUT_BYTES_CHANGED");
+  if (output.packaging === "ZIP_SINGLE_SOURCE_V1") await verifyWorkingPackage(bytes, output);
 }
 async function receipt(p, deps) {
   const blob = deps.containerClient.getBlockBlobClient(p.output);
@@ -164,10 +166,16 @@ async function execute(input, deps) {
     const part = current.components.find(x => x.custody.itemId === source.itemId);
     const quality = await qa(part), folder = await ensureFolder(part, p, deps);
     folders.set(folder.id, folder);
-    const output = await persistFile(folder, part.policy.name, part.bytes,
-      quality.format === "docx" ? "application/vnd.openxmlformats-officedocument.wordprocessingml.document" : "text/markdown; charset=utf-8", deps);
+    const packaged = quality.format === "docx";
+    const workingBytes = packaged ? await packWorkingSource(part.bytes, part.policy.name) : part.bytes;
+    const output = await persistFile(folder, packaged ? `${part.policy.name}.working-source.zip` : part.policy.name, workingBytes,
+      packaged ? "application/zip" : "text/markdown; charset=utf-8", deps);
     if (output.itemId === source.itemId) deny("COMMISSIONING_STAGE02_ORIGINAL_OVERWRITE_DENIED");
-    outputs.push({ ...output, role: "EDITORIAL_WORKING_SOURCE", sourceItemId: source.itemId, qa: quality });
+    const bound = { ...output, format: quality.format, packaging: packaged ? "ZIP_SINGLE_SOURCE_V1" : "NONE",
+      ...(packaged ? { entryName: part.policy.name } : {}), sourceSha256: source.sha256, sourceBytes: source.bytes,
+      role: "EDITORIAL_WORKING_SOURCE", sourceItemId: source.itemId, qa: quality };
+    if (packaged) await verifyWorkingPackage(await deps.sourceBytes({ itemId: bound.itemId }), bound);
+    outputs.push(bound);
   }
   const after = await (deps.readSource || fresh.readSource)(p.titleId, deps);
   if (plan(after).fingerprint !== p.fingerprint) deny("COMMISSIONING_STAGE02_SOURCE_CHANGED_DURING_EXECUTION");
@@ -211,8 +219,8 @@ async function handler(body, deps = {}) {
       ...context, readScope: async () => ({ enabled: env.JM1_NEW_SUBMISSION_STAGE02_ENABLED === "true", revoked: false,
         titleId: p.titleId, mode: "JACKIE_TITLE_INTERNAL_COMMISSIONING" }) }, {
       namespace: "new-submission-stage02-executions", executionSuffix: "", plan: input => ({ ...input, executionId: p.executionId }), execute,
-      repairVersion: "SHAREPOINT_CUSTOM_PROPERTIES_ONLY_V1",
-      recoverHeld: state => state.causeCode === "COMMISSIONING_STAGE02_OUTPUT_CONFLICT" && !state.repairRecovery,
+      repairVersion: "ZIP_SINGLE_SOURCE_V1",
+      recoverHeld: state => ["COMMISSIONING_STAGE02_OUTPUT_CONFLICT", "COMMISSIONING_STAGE02_SUBSTANTIVE_PACKAGE_CHANGE"].includes(state.causeCode) && state.repairRecovery?.version !== "ZIP_SINGLE_SOURCE_V1",
       validate: result => result?.receipt?.status === "COMPLETED" && result.receipt.sourceFingerprint === p.fingerprint,
       reference: () => p.output, completionEffects: () => ({ stage03: "NOT_STARTED", originalBytesChanged: false }) });
     const result = state.status === "COMPLETED" ? await receipt(p, context) : null;
@@ -220,4 +228,4 @@ async function handler(body, deps = {}) {
   } catch (e) { return { status: 409, jsonBody: { code: /^COMMISSIONING_[A-Z0-9_]+$/.test(e.safeCode || "") ? e.safeCode : "COMMISSIONING_STAGE02_DEPENDENCY_FAILED",
     mutationAttempted: attempted, providerStatus: e.statusCode || null, recovery: "SAME_SOURCE_CLAIM_AND_EXACT_OUTPUT_READBACK", communications: 0, stage03: "NOT_STARTED" } }; }
 }
-module.exports = { MODES, CONTRACT, plan, qa, receipt, handler, execute, verifyOutput, verifyTransport };
+module.exports = { MODES, CONTRACT, plan, qa, receipt, handler, execute, verifyOutput, verifyTransport, packWorkingSource, verifyWorkingPackage };
