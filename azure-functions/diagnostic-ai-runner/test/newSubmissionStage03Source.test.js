@@ -35,6 +35,13 @@ test("Stage03 consumes exact Markdown working source", async () => {
   const x = await fixture(), r = await consumeWorkingSource({ ...x.output, packaging: "NONE" }, x.deps);
   assert.equal(r.text, x.source.toString());
 });
+test("Stage03 accepts legacy exact-byte Markdown receipts without ZIP lineage fields", async () => {
+  const x = await fixture();
+  const { sourceBytes, sourceSha256, ...legacy } = x.output;
+  const r = await consumeWorkingSource(legacy, x.deps);
+  assert.equal(r.provenance.sourceSha256, legacy.sha256);
+  assert.equal(r.provenance.sourceBytes, legacy.bytes);
+});
 test("Stage03 rejects source hash mismatch and non-working roles", async () => {
   const x = await fixture();
   await assert.rejects(consumeWorkingSource({ ...x.output, sourceSha256: "0".repeat(64) }, x.deps), /STAGE03_SOURCE_HASH_MISMATCH/);
