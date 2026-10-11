@@ -4,6 +4,21 @@ const stage = require("../src/lifecycle/newSubmissionStage01");
 const fresh = require("../src/lifecycle/freshTitleIntake");
 const contactId = require("../src/author/jackieTitleSystemCommissioningPolicy").JACKIE_CANONICAL_AUTHOR_CONTACT_ID;
 const titleId = Object.keys(fresh.POLICIES)[0];
+test("two-source intake index fits notes without weakening full source identity",()=>{
+  const components = ["A","B"].map(itemId=>({itemId:itemId.repeat(26),driveId:"d".repeat(90),eTag:"e".repeat(40),bytes:12345,sha256:itemId.toLowerCase().repeat(64),path:"/"+itemId.repeat(180)}));
+  const current={input:{title:{jm1pub_titleid:titleId}},components:components.map(custody=>({custody}))};
+  const p=stage.plan(current), compact=stage.storedBinding(p);
+  assert.ok(JSON.stringify({newSubmissionStage01:compact}).length<=1000);
+  assert.equal(compact.fingerprint,p.fingerprint);assert.equal(compact.components[0].path,undefined);
+  const row={jm1_publishingintakeid:p.intakeId,jm1_idempotencykey:p.key,jm1_additionalnotes:JSON.stringify({newSubmissionStage01:compact})};
+  assert.equal(stage.findExact([row],p),row);
+  const full={...row,jm1_additionalnotes:JSON.stringify({newSubmissionStage01:{...compact,components:p.components}})};
+  assert.equal(stage.findExact([full],p),full);
+  compact.components[0].sha256="c".repeat(64);
+  assert.throws(()=>stage.findExact([{...row,jm1_additionalnotes:JSON.stringify({newSubmissionStage01:compact})}],p),/AUTHORITY_CONFLICT/);
+  current.components[0].custody.path+="changed";
+  assert.notEqual(stage.plan(current).fingerprint,p.fingerprint);
+});
 function fixture() {
   const rows = [], blobs = new Map(), counts = { creates: 0, sends: 0 };
   const current = { titleName: "Fixture new submission", identity: { contactId },
@@ -28,6 +43,23 @@ function fixture() {
   };
   return {deps,rows,blobs,counts,current};
 }
+test("external delivery observation is exact-source bound and never an author approval",async()=>{
+  const x=fixture(),p=stage.plan(x.current),author=await x.deps.authorityClient.first();
+  const email={generated:true,sent:true,internetMessageId:"fixture",providerMessageId:"provider",communicationRecordId:"communication",expectedSubject:"Fixture acknowledgment",responseRequired:false,actedUpon:"NOT_REQUIRED_INFORMATIONAL_STAGE"};
+  x.deps.recipientReadback=async()=>({value:[],proofUnavailable:"EXTERNAL_RECIPIENT_DELIVERY_TELEMETRY_REQUIRED"});
+  assert.equal((await stage.verifyRecipient(email,author,p,x.deps)).delivered,false);
+  const observation={schemaVersion:1,proofClass:"AUTHORIZED_RECIPIENT_MAILBOX_OBSERVATION",titleId:p.titleId,sourceFingerprint:p.fingerprint,intakeId:p.intakeId,
+    providerMessageId:"provider",communicationRecordId:"communication",internetMessageId:"fixture",subject:email.expectedSubject,to:author.emailaddress1,from:"publishing@email.jmerrill.one",
+    observedAt:new Date().toISOString(),receivedAt:"2026-10-11T00:00:00Z",sourceUrl:"https://mail.google.com/mail/u/1/?view=om&permmsgid=msg-f:123",recipientMessageId:"msg-f:123",headerSummarySha256:"a".repeat(64)};
+  const path=`new-submission-stage01/${p.titleId}/${p.fingerprint}/recipient-observations/provider.json`;
+  x.blobs.set(path,Buffer.from(JSON.stringify(observation)));
+  const result=await stage.verifyRecipient(email,author,p,x.deps);
+  assert.equal(result.delivered,true);assert.equal(result.automatedRecipientMonitoring,false);assert.equal(result.actedUpon,"NOT_REQUIRED_INFORMATIONAL_STAGE");
+  for(const field of ["titleId","sourceFingerprint","intakeId","providerMessageId","communicationRecordId","internetMessageId","subject","to","from","recipientMessageId","sourceUrl","headerSummarySha256"]){
+    x.blobs.set(path,Buffer.from(JSON.stringify({...observation,[field]:"conflict"})));
+    await assert.rejects(stage.verifyRecipient(email,author,p,x.deps));
+  }
+});
 test("new original Stage01 creates ordinary intake only and replay preserves one delivered result",async()=>{
   const x=fixture();const body={titleId,mode:"SUBMISSION_01_EXECUTE"};
   const one=await stage.handler(body,x.deps),two=await stage.handler(body,x.deps);
