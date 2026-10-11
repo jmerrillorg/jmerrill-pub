@@ -257,4 +257,4 @@ async function handler(body, deps = {}) {
   } catch (e) { return { status: 409, jsonBody: { code: /^COMMISSIONING_[A-Z_]+$/.test(e.safeCode || "") ? e.safeCode : "COMMISSIONING_SUBMISSION_DEPENDENCY_FAILED", phase,
       ...(e.statusCode ? { providerStatus: e.statusCode } : {}), mutationAttempted: attempted, recovery: "EXACT_SOURCE_AND_RECEIPT_READBACK", communicationState: phase === "AUTHOR_ACKNOWLEDGMENT" || phase === "OUTPUT_PERSIST" ? "READ_CANONICAL_RELAY_RECEIPT" : "NOT_ATTEMPTED", modelCalls: 0, payments: 0 } }; }
 }
-module.exports = { MODES, COLUMNS, plan, storedBinding, findExact, inventory, verifyAccess, rowFingerprint, verifyCensus, verifyRecipient, readRecipientObservation, handler };
+module.exports = { MODES, COLUMNS, plan, storedBinding, findExact, inventory, verifyAccess, rowFingerprint, verifyCensus, verifyRecipient, readRecipientObservation, readReceipt, native, handler };
