@@ -6,6 +6,7 @@ import type {
   PublicCatalogReadiness,
   PublicCatalogReadinessIssue,
 } from './types'
+import { getHagherBacklistContent, hagherAuthor } from '../../data/hagher-backlist-content'
 
 export const PUBLIC_CATALOG_AUTHORITY = {
   sourceOfTruth: 'Dataverse jm1pub_title + publishing assets + marketplace records',
@@ -99,7 +100,23 @@ export function buildPublicCatalogProjectionSummary(
 // release date, or both undated) break by title A-Z, then id for full
 // determinism.
 export function projectPublicCatalogTitles(titles: CatalogTitleSummary[]): CatalogTitleSummary[] {
-  return disambiguatePublicTitleSlugs(titles).sort((a, b) => {
+  const presented = titles.map((title) => {
+    const content = getHagherBacklistContent(title.slug, title.id)
+    if (!content) return title
+    return {
+      ...title, coverUrl: content.coverUrl, shortDescription: content.shortDescription,
+      genre: content.genre, releaseDate: content.releaseDate,
+      displayYear: content.releaseDate.slice(0, 4), certifiedImprint: 'JM Signature',
+      formats: ['Paperback', 'Hardcover', 'eBook'] as CatalogTitleSummary['formats'],
+      primaryIsbn: content.isbns.Paperback,
+      isbnByFormat: Object.entries(content.isbns).map(([format, isbn]) => ({
+        format: format as CatalogTitleSummary['formats'][number], isbn, assetId: '', assetStatus: 'Published metadata',
+      })),
+      authors: title.authors.map((author) => author.slug === hagherAuthor.slug
+        ? { ...author, contactId: hagherAuthor.contactId } : author),
+    }
+  })
+  return disambiguatePublicTitleSlugs(presented).sort((a, b) => {
     const dateCompare = compareReleaseDateDescending(a.releaseDate, b.releaseDate)
     if (dateCompare !== 0) return dateCompare
     const title = a.title.localeCompare(b.title)

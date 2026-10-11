@@ -17,6 +17,7 @@ import {
   suppressesPersonalAuthorIdentity,
 } from '@/lib/catalog/public-author-identity'
 import { titleAuthorOverrides } from '@/data/title-author-overrides'
+import { getHagherBacklistContent, hagherAuthor } from '@/data/hagher-backlist-content'
 import { bookRetailerEnrichmentOverrides } from '@/data/book-retailer-enrichment-overrides'
 import { getDataverseRuntimeAccessToken, getPublisherRuntimeAuthMode } from '@/lib/server/publisher-runtime-auth'
 import { readFileSync } from 'node:fs'
@@ -158,7 +159,7 @@ export async function getPublicCatalogTitleBySlug(slug: string): Promise<Catalog
 
     return {
       ...summary,
-      longDescription: stringField(row, 'jm1pub_longdescription'),
+      longDescription: getHagherBacklistContent(summary.slug, summary.id)?.longDescription || stringField(row, 'jm1pub_longdescription'),
       series: stringField(row, 'jm1pub_series'),
       seriesOrder: numberField(row, 'jm1pub_seriesorder'),
       keywords: buildKeywords(summary),
@@ -179,7 +180,7 @@ export function resolveRepositoryPublicCatalogTitleBySlug(slug: string): Catalog
 
   return {
     ...summary,
-    longDescription: summary.shortDescription,
+    longDescription: getHagherBacklistContent(summary.slug, summary.id)?.longDescription || summary.shortDescription,
     series: '',
     seriesOrder: null,
     keywords: buildKeywords(summary),
@@ -247,7 +248,7 @@ export async function getPublicAuthorBySlug(slug: string): Promise<CatalogReadRe
 
     return {
       ...summary,
-      longBio: contact ? stringField(contact, 'jm1pub_publicauthorbio') || summary.shortBio : summary.shortBio,
+      longBio: summary.slug === hagherAuthor.slug ? hagherAuthor.biography : contact ? stringField(contact, 'jm1pub_publicauthorbio') || summary.shortBio : summary.shortBio,
       location: contact
         ? [stringField(contact, 'address1_city'), stringField(contact, 'address1_stateorprovince')].filter(Boolean).join(', ')
         : '',
@@ -263,7 +264,7 @@ export function resolveRepositoryPublicAuthorBySlug(slug: string): CatalogAuthor
 
   return {
     ...summary,
-    longBio: summary.shortBio,
+    longBio: summary.slug === hagherAuthor.slug ? hagherAuthor.biography : summary.shortBio,
     location: '',
     specialties: summary.genres,
     titles: repositoryAuthorTitles(summary.slug),
@@ -427,8 +428,8 @@ function buildAuthorSummaries(contactRows: DataverseRecord[], titles: CatalogTit
       contactId: stringField(row, 'contactid'),
       slug,
       name: identity.publicAuthorName,
-      shortBio: stringField(row, 'jm1pub_publicauthorbio') || 'J Merrill Publishing author family.',
-      photoUrl: identity.exposeHeadshot ? stringField(row, 'jm1pub_authorphoto') : '',
+      shortBio: slug === hagherAuthor.slug ? hagherAuthor.biography : stringField(row, 'jm1pub_publicauthorbio') || 'J Merrill Publishing author family.',
+      photoUrl: identity.exposeHeadshot ? slug === hagherAuthor.slug ? hagherAuthor.photoUrl : stringField(row, 'jm1pub_authorphoto') : '',
       titleCount: 0,
       genres: [],
       imprints: [],
@@ -443,8 +444,8 @@ function buildAuthorSummaries(contactRows: DataverseRecord[], titles: CatalogTit
         contactId: link.contactId,
         slug,
         name: link.name,
-        shortBio: 'J Merrill Publishing author family.',
-        photoUrl: '',
+        shortBio: slug === hagherAuthor.slug ? hagherAuthor.biography : 'J Merrill Publishing author family.',
+        photoUrl: slug === hagherAuthor.slug ? hagherAuthor.photoUrl : '',
         titleCount: 0,
         genres: [],
         imprints: [],
@@ -496,8 +497,8 @@ function repositoryAuthorSummaries(): CatalogAuthorSummary[] {
         contactId: author.contactId,
         slug: author.slug,
         name: author.name,
-        shortBio: 'J Merrill Publishing author family.',
-        photoUrl: '',
+        shortBio: author.slug === hagherAuthor.slug ? hagherAuthor.biography : 'J Merrill Publishing author family.',
+        photoUrl: author.slug === hagherAuthor.slug ? hagherAuthor.photoUrl : '',
         titleCount: 0,
         genres: [],
         imprints: [],

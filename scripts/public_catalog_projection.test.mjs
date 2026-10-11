@@ -3,6 +3,7 @@ import { existsSync, readFileSync, symlinkSync, unlinkSync } from 'node:fs'
 import test, { after } from 'node:test'
 
 const shims = [
+  ['../data/hagher-backlist-content', 'hagher-backlist-content.ts'],
   ['../lib/catalog/public-projection', 'public-projection.ts'],
   ['../lib/catalog/types', 'types.ts'],
   ['../lib/publishing/lifecycle/validation', 'validation.ts'],
@@ -21,6 +22,21 @@ after(() => {
 })
 
 const projection = await import('../lib/catalog/public-projection.ts')
+const { hagherBacklistContent } = await import('../data/hagher-backlist-content.ts')
+
+test('governed Hagher presentation reaches shared cards with exact-ID replay safety', () => {
+  for (const [slug, entry] of Object.entries(hagherBacklistContent)) {
+    const input = title({ id: entry.titleId, slug })
+    const [result] = projection.projectPublicCatalogTitles([input])
+    assert.equal(result.coverUrl, entry.coverUrl)
+    assert.equal(result.certifiedImprint, 'JM Signature')
+    assert.equal(result.shortDescription, entry.shortDescription)
+    assert.deepEqual(result.formats, ['Paperback', 'Hardcover', 'eBook'])
+    assert.deepEqual(projection.projectPublicCatalogTitles([result]), [result])
+    const wrongId = title({ id: 'unrelated-work', slug })
+    assert.equal(projection.projectPublicCatalogTitles([wrongId])[0].coverUrl, wrongId.coverUrl)
+  }
+})
 const validation = await import('../lib/publishing/lifecycle/validation.ts')
 
 function title(overrides = {}) {
