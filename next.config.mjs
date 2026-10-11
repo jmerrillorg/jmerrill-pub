@@ -1,3 +1,5 @@
+import publicTitleConsolidations from './data/public-title-consolidations.json' with { type: 'json' }
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   output: 'standalone',
@@ -25,6 +27,11 @@ const nextConfig = {
   // Redirect /pricing → /packages (canonical URL)
   async redirects() {
     return [
+      ...publicTitleConsolidations.flatMap(entry => [...entry.retiredSlugs, ...entry.duplicateIds].map(slug => ({
+        source: `/books/${slug}`,
+        destination: `/books/${entry.canonicalSlug}`,
+        permanent: true,
+      }))),
       {
         source: '/pricing',
         destination: '/packages',

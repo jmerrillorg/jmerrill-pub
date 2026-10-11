@@ -11,7 +11,7 @@ import type {
   PublishingMarketingAuthority,
 } from '@/lib/catalog/types'
 import { authorNameToMasterName } from '@/data/author-name-to-master-name'
-import { projectPublicCatalogTitles } from '@/lib/catalog/public-projection'
+import { projectPublicCatalogTitles, canonicalPublicTitleSlug } from '@/lib/catalog/public-projection'
 import {
   resolvePublicAuthorIdentity,
   suppressesPersonalAuthorIdentity,
@@ -142,6 +142,7 @@ export async function listPublicCatalogTitles(): Promise<CatalogReadResult<Catal
 }
 
 export async function getPublicCatalogTitleBySlug(slug: string): Promise<CatalogReadResult<CatalogTitleDetail | null>> {
+  slug = canonicalPublicTitleSlug(slug)
   return withCatalogRead(async (config, token) => {
     const titleRows = await dataverseGetCollection(config, token, config.titleEntitySet, {
       select: TITLE_SELECT,
@@ -285,25 +286,15 @@ export async function listTitlesByCertifiedImprint(imprint: string): Promise<Cat
 }
 
 export async function getCatalogStats(): Promise<CatalogReadResult<CatalogStats>> {
-  return withCatalogRead(async (config, token) => {
-    const [titles, authors] = await Promise.all([
-      dataverseGetCollection(config, token, config.titleEntitySet, {
-        select: ['jm1pub_titleid', 'jm1pub_certifiedimprint'],
-        filter: PUBLIC_CATALOG_FILTER,
-      }),
-      dataverseGetCollection(config, token, config.contactEntitySet, {
-        select: ['contactid'],
-        filter: 'statecode eq 0 and jm1pub_isauthor eq true',
-      }),
-    ])
-
-    return {
-      totalTitles: titles.length,
-      activeAuthors: authors.length,
-      imprintCount: new Set(titles.map((title) => stringField(title, 'jm1pub_certifiedimprint')).filter(Boolean)).size,
-      lastUpdated: new Date().toISOString(),
-    }
-  })
+  const [titles, authors] = await Promise.all([listPublicCatalogTitles(), listPublicAuthors()])
+  if (!titles.ok) return titles
+  if (!authors.ok) return authors
+  return { ok: true, data: {
+    totalTitles: titles.data.length,
+    activeAuthors: authors.data.length,
+    imprintCount: new Set(titles.data.map(title => title.certifiedImprint).filter(Boolean)).size,
+    lastUpdated: new Date().toISOString(),
+  } }
 }
 
 export async function listPublishingMarketingAuthority(): Promise<CatalogReadResult<PublishingMarketingAuthority[]>> {

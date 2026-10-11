@@ -16,7 +16,9 @@
           "sha256": "9d618d17637ef2bb79cb6d5113a0dd933d37985b74d845ff7fe881769cf88b5a"
         }
       ],
-      "editionFormats": {},
+      "editionFormats": {
+        "9781950719914": "eBook"
+      },
       "coverUrl": "/backlist/catalog/365-days-of-transparency-cover.jpg"
     },
     "841a04cd-c27a-f111-ab0f-000d3a14673b": {
@@ -46,10 +48,16 @@
         {
           "id": "01DF3SEQOALHYV3HILENE33SU6NX2XJLOX",
           "sha256": "afe93723221c2976cbf680f07d325ec393212712e7db74fc91cc4e453de131cc"
+        },
+        {
+          "id": "01DF3SEQP65KY2D4GYIBAZPYZ5USOYUNFY",
+          "sha256": "dcb7c8b83134cba0bada81c1dfa6f566e7f67f524dbac75ef21b30f56309af0e"
         }
       ],
       "editionFormats": {},
-      "coverUrl": "/backlist/catalog/bodacious-cover.jpg"
+      "coverUrl": "/backlist/catalog/bodacious-cover.jpg",
+      "longDescription": "Bodacious is a study guide of the Law of Moses that breaks down the different difficulties of understanding New Testament Grace superseding the indictment of The Old Covenant Law. The main point and key idea focus on tithing with a deeper, more applicable layer of blessing for the reader internalizing its message. It feeds the spiritual, enlightens, and empowers. Bodacious will enhance and intensify interest in scriptures! I am very excited and proud to publish this book.",
+      "shortDescription": "Bodacious is a study guide of the Law of Moses that breaks down the different difficulties of understanding New Testament Grace superseding the indictment of The Old Covenant Law. The main point and key idea focus on tithing with a deeper, more applicable layer of blessing for the reader internalizing its message. It feeds the spiritual, enlightens, and empowers. Bodacious will enhance and intensify interest in scriptures! I am very excited and proud to publish this book."
     },
     "911a04cd-c27a-f111-ab0f-000d3a14673b": {
       "titleId": "911a04cd-c27a-f111-ab0f-000d3a14673b",
@@ -87,10 +95,16 @@
         {
           "id": "01DF3SEQMF2Z2NBIIJRJAZHZQUS6YPGXMJ",
           "sha256": "29cd50f2222f99263747e8008e038b8f4f95e25f5658e23d885db07a6c7e17f3"
+        },
+        {
+          "id": "01DF3SEQMOWNICTUSFUFBYVY63OH34NMJ6",
+          "sha256": "15afc096a81d0d3aa0c1a2d29d11f8ffe69712d461379c445e8ceebac2f9f59e"
         }
       ],
       "editionFormats": {},
-      "coverUrl": "/backlist/catalog/inspirations-from-god-cover.jpg"
+      "coverUrl": "/backlist/catalog/inspirations-from-god-cover.jpg",
+      "longDescription": "Inside this book, Inspirations from God, you will find poems that tell of God\u2019s love and constant care for us. I have found that he is always there in whatever we may be going through, whether in good or bad times. Along with him being there for us, he puts people in our lives to guide, lift our spirits, and be of comfort. Whether it\u2019s family or friends, God is always watching out for us. His Word is always there to guide us. He gives us the knowledge to help us along our way. Before I started reciting my poetry in church, I thought the poems were for me alone. I soon found out that the messages were meant for others as well. Our God is so amazing. I pray that the words in this book speak to you as they have to me. To God be the Glory.",
+      "shortDescription": "Inside this book, Inspirations from God, you will find poems that tell of God\u2019s love and constant care for us. I have found that he is always there in whatever we may be going through, whether in good or bad times. Along with him being there for us, he puts people in our lives to guide, lift our spirits, and be of comfort. Whether it\u2019s family or friends, God is always watching out for us. His Word is always there to guide us. He gives us the knowledge to help us along our way. Before I started reciting my poetry in church, I thought the poems were for me alone. I soon found out that the messages were meant for others as well. Our God is so amazing. I pray that the words in this book speak to you as they have to me. To God be the Glory."
     },
     "991a04cd-c27a-f111-ab0f-000d3a14673b": {
       "titleId": "991a04cd-c27a-f111-ab0f-000d3a14673b",
@@ -103,10 +117,18 @@
         {
           "id": "01DF3SEQJ6QAERVBJSENHJHTLQML5J4SZV",
           "sha256": "a7fd65b2f146c7c5202f80be56626565d58e3e2a2ce7b9fc5fb8774e7488e977"
+        },
+        {
+          "id": "01DF3SEQMSD2UOZQX26ZBIX6AS6HFYGCAF",
+          "sha256": "c7489fb72aacda3741a45d0a2dfe5a0ba9f4fec5a942455401467c4564f75d93"
         }
       ],
-      "editionFormats": {},
-      "coverUrl": "/backlist/catalog/love-lucy-cover.jpg"
+      "editionFormats": {
+        "9781950719938": "eBook"
+      },
+      "coverUrl": "/backlist/catalog/love-lucy-cover.jpg",
+      "longDescription": "Lucy Mae Johnson\u2019s life journey will make you appreciate miracles, challenges, overcoming obstacles, and above all, love. Her journey will make you smile, laugh and cry and appreciate the power of faith in God. Lucy was a friend, comrade, spiritual guide, and as her daughter lovingly calls her, \u201cmother hero.\u201d She always wanted to document her life story and provided her only daughter with a great oral history of her growing up in the rural south. Love Lucy will carry you through a range of emotions as it depicts a kind soul coming of age in life, love, and God. Her story as a spiritual and birth mother is profound and describes her impact of love and sweet potato pie. Love Lucy will remind you of the mother hero in your life, that person who loves you unconditionally, and how their quiet, powerful presence impacts your journey every day.",
+      "shortDescription": "Lucy Mae Johnson\u2019s life journey will make you appreciate miracles, challenges, overcoming obstacles, and above all, love. Her journey will make you smile, laugh and cry and appreciate the power of faith in God. Lucy was a friend, comrade, spiritual guide, and as her daughter lovingly calls her, \u201cmother hero.\u201d She always wanted to document her life story and provided her only daughter with a great oral history of her growing up in the rural south. Love Lucy will carry you through a range of emotions as it depicts a kind soul coming of age in life, love, and God. Her story as a spiritual and birth mother is profound and describes her impact of love and sweet potato pie. Love Lucy will remind you of the mother hero in your life, that person who loves you unconditionally, and how their quiet, powerful presence impacts your journey every day."
     },
     "9a1a04cd-c27a-f111-ab0f-000d3a14673b": {
       "titleId": "9a1a04cd-c27a-f111-ab0f-000d3a14673b",
@@ -120,9 +142,24 @@
         {
           "id": "01DF3SEQNKRKXLKJ3H6NFIOA3UMQO36M6A",
           "sha256": "16de188bec5e8469f3601e9e146c92783499a790bf3eada03559b7cebf3cd694"
+        },
+        {
+          "id": "01DF3SEQJXZDR64YNRCNGZTFQNSHUYIUIZ",
+          "sha256": "7b079947089e3bbf498a46a3d7129c471d858af8865560595fdb610941a0e5da"
+        },
+        {
+          "id": "01DF3SEQL7BUKOD7TBYZHZR6VFSVO4JKOI",
+          "sha256": "c5743c3df79ec1213603dd58ec0ecd79010a535baae320a6fae6cb4628d1d44a"
+        },
+        {
+          "id": "01DF3SEQJDUSXSRQ5BGJAJ4BUB2YNV2YMX",
+          "sha256": "13b64cfa82bd86d5c0b028e916e12b966926c3f9dd951e919f06b0825851afab"
         }
       ],
-      "editionFormats": {},
+      "editionFormats": {
+        "9781954414266": "eBook",
+        "9781954414273": "Paperback"
+      },
       "coverUrl": "/backlist/catalog/love-of-my-life-cover.jpg"
     },
     "bff603d3-c27a-f111-ab0f-000d3a14673b": {
@@ -132,8 +169,15 @@
         "9781950719556",
         "9781950719563"
       ],
-      "sources": [],
-      "editionFormats": {}
+      "sources": [
+        {
+          "id": "01DF3SEQLEMAZI4EOLWFGLGXOQHFWI2HFD",
+          "sha256": "f5abdd3e7d17a3c96219bd4e6772c0a1de146aaff999f53eff281949177cc08a"
+        }
+      ],
+      "editionFormats": {},
+      "longDescription": "This story goes into detail about a young lady's journey with speech therapy, and how she goes from frustration to victory. It is intended to encourage other students going through speech therapy, and to let them know that they are not alone.",
+      "shortDescription": "This story goes into detail about a young lady's journey with speech therapy, and how she goes from frustration to victory. It is intended to encourage other students going through speech therapy, and to let them know that they are not alone."
     },
     "c1f603d3-c27a-f111-ab0f-000d3a14673b": {
       "titleId": "c1f603d3-c27a-f111-ab0f-000d3a14673b",
@@ -149,8 +193,16 @@
         "9781950719471",
         "9781950719488"
       ],
-      "sources": [],
-      "editionFormats": {}
+      "sources": [
+        {
+          "id": "01DF3SEQM4T6RDQPXZZFF2TEVKGEOVPF56",
+          "sha256": "856f6477ac64a6fa543f8f55e81c198c08726c4e4ca508368fc79162daf01e66"
+        }
+      ],
+      "editionFormats": {},
+      "longDescription": "We live in a big world that is waiting for all of us to make our mark. So, get on your mark, get set, and let\u2019s go! The Hood is a must-have power-packed journal. This journal poetically presents a word in the form of a letter that allows you to navigate through the different hoods that we encounter in life. You are also invited to ponder information, as well as express your thoughts and feelings by answering questions related to the topic of each poem. Life on earth is temporal, but the impact one can have on a life is eternal. Join a collective effort to establish dialogue as well as encourage, motivate, and inspire the next generation leaders!",
+      "shortDescription": "We live in a big world that is waiting for all of us to make our mark. So, get on your mark, get set, and let\u2019s go! The Hood is a must-have power-packed journal. This journal poetically presents a word in the form of a letter that allows you to navigate through the different hoods that we encounter in life. You are also invited to ponder information, as well as express your thoughts and feelings by answering questions related to the topic of each poem. Life on earth is temporal, but the impact one can have on a life is eternal. Join a collective effort to establish dialogue as well as encourage, motivate, and inspire the next generation leaders!",
+      "coverUrl": "/backlist/catalog/the-hood-cover.jpg"
     },
     "c3f603d3-c27a-f111-ab0f-000d3a14673b": {
       "titleId": "c3f603d3-c27a-f111-ab0f-000d3a14673b",
@@ -168,9 +220,16 @@
         {
           "id": "01DF3SEQJ5TFALORY4BVC2PCRJMNMGDE52",
           "sha256": "c25efa26c52e1824ef9f4a84612fd0857c092c7913116084f5a29848ab9692ef"
+        },
+        {
+          "id": "01DF3SEQKXJEURUYPTJRC2AUSTFYU5CBO5",
+          "sha256": "8441b2648b1f93f1d4118230ab025ba22009afe021f4b1d0dc727ae65343caa7"
         }
       ],
-      "editionFormats": {},
+      "editionFormats": {
+        "9781954414471": "eBook",
+        "9781954414488": "Paperback"
+      },
       "coverUrl": "/backlist/catalog/the-master-s-piece-cover.jpg",
       "longDescription": "TRIGGER WARNING INCEST. RAPE. MOLESTATION. ABORTION. Reader discretion is advised. Read the story from the source of a 15-year-old girl, in a desperate search to locate her biological father. In her stages of discovery, Sylvia dug up a part of her life that almost led to her demise. Out of the shadows, appeared a world full of perversion, incest, concubines, lies, and deceit. The life-altering reality resulted in Sylvia being in a 7-year legal marriage with her newfound biological father. Did she lose her faith? What was the threshold of pain Sylvia weathered through before planning her escape?",
       "shortDescription": "TRIGGER WARNING INCEST. RAPE. MOLESTATION. ABORTION. Reader discretion is advised. Read the story from the source of a 15-year-old girl, in a desperate search to locate her biological father. In her stages of discovery, Sylvia dug up a part of her life that almost led to her demise. Out of the shadows, appeared a world full of perversion, incest, concubines, lies, and deceit. The life-altering reality resulted in Sylvia being in a 7-year legal marriage with her newfound biological father. Did she lose her faith? What was the threshold of pain Sylvia weathered through before planning her escape?"
@@ -189,7 +248,9 @@
         }
       ],
       "editionFormats": {},
-      "coverUrl": "/backlist/catalog/uncomfortable-conversations-with-god-cover.jpg"
+      "coverUrl": "/backlist/catalog/uncomfortable-conversations-with-god-cover.jpg",
+      "longDescription": "Have you ever had a time in your life when it seemed difficult to talk to God? Do you find it hard to hear from God when you pray? This journal will help you focus on both, speaking to God and listening to the still voice of God. Uncomfortable Conversations with God will minister to you and guide you on a 31-day spiritual journey. You'll be touched by the author's personal stories, as well as find prompts that will encourage you to communicate directly with God. This journal includes 31 days of journal pages, daily Scriptures for inspiration and motivation, personal stories from the author, and guides for assisting you with building a better relationship with God. This journal is perfect for anyone who is looking to connect or reconnect with God and strengthen their prayer life. Be prepared to be motivated and inspired as the author discusses her personal journey of transformation.",
+      "shortDescription": "Have you ever had a time in your life when it seemed difficult to talk to God? Do you find it hard to hear from God when you pray? This journal will help you focus on both, speaking to God and listening to the still voice of God. Uncomfortable Conversations with God will minister to you and guide you on a 31-day spiritual journey. You'll be touched by the author's personal stories, as well as find prompts that will encourage you to communicate directly with God. This journal includes 31 days of journal pages, daily Scriptures for inspiration and motivation, personal stories from the author, and guides for assisting you with building a better relationship with God. This journal is perfect for anyone who is looking to connect or reconnect with God and strengthen their prayer life. Be prepared to be motivated and inspired as the author discusses her personal journey of transformation."
     },
     "d0f603d3-c27a-f111-ab0f-000d3a14673b": {
       "titleId": "d0f603d3-c27a-f111-ab0f-000d3a14673b",
@@ -203,10 +264,16 @@
         {
           "id": "01DF3SEQNPS26WQVBCXFD27ZXOAGVEOJN4",
           "sha256": "a0b56739c6902f015b08b3a0cd602a5b012300dbaa207b9257f9eb2a16c5061d"
+        },
+        {
+          "id": "01DF3SEQKYTCZMHK4ZSFDINGYS6NDFPJT6",
+          "sha256": "011adc31461f04b95bea690d4a38699024bd3a6e22b92672a647b914718bd08b"
         }
       ],
       "editionFormats": {},
-      "coverUrl": "/backlist/catalog/27-days-to-overcoming-depression-cover.jpg"
+      "coverUrl": "/backlist/catalog/27-days-to-overcoming-depression-cover.jpg",
+      "longDescription": "\"27 Days to Overcoming Depression: Debunking All the Lies\" is a transformative devotional journey designed to help individuals combat depression and embrace healing through faith. Donjia M. Walls shares her personal experiences and revelations, blending scripture, prayer, and actionable exercises in a 27-day format that supports spiritual growth and emotional resilience. Each devotional day offers scripture-based reflections, journaling prompts, and heartfelt prayers that guide readers toward embracing God's light in their darkest moments. This book is not just a devotional-it's a testimony of triumph over despair and a roadmap for anyone seeking God's peace and joy.\n\nThrough tools like Faith in the Wait, The Joy in Suffering, and Don't Go Back, Keep Working, readers are empowered to confront negative narratives, align their thoughts with God's Word, and develop habits that nurture emotional and spiritual well-being. Perfect for personal use or small group discussions, this devotional equips readers to rediscover their purpose, lean on God's promises, and experience lasting transformation.",
+      "shortDescription": "\"27 Days to Overcoming Depression: Debunking All the Lies\" is a transformative devotional journey designed to help individuals combat depression and embrace healing through faith. Donjia M. Walls shares her personal experiences and revelations, blending scripture, prayer, and actionable exercises in a 27-day format that supports spiritual growth and emotional resilience. Each devotional day offers scripture-based reflections, journaling prompts, and heartfelt prayers that guide readers toward embracing God's light in their darkest moments. This book is not just a devotional-it's a testimony of triumph over despair and a roadmap for anyone seeking God's peace and joy."
     },
     "d4f603d3-c27a-f111-ab0f-000d3a14673b": {
       "titleId": "d4f603d3-c27a-f111-ab0f-000d3a14673b",
@@ -277,11 +344,22 @@
         {
           "id": "01DF3SEQKAVQ76ONAPZNFZ3GWYMSGKR6FM",
           "sha256": "d12441b2ba2a24990bbd4b92fafa90771ecd6aab831dac4f05ac24def8ea92d2"
+        },
+        {
+          "id": "01DF3SEQKMMEKTNJB4NZHI3IPYYSQR3RBN",
+          "sha256": "495368c49c573f1df7b75e7de4ef2f36c112ee2a971722f10917758f6e816a5d"
+        },
+        {
+          "id": "01DF3SEQKI7V5Y7IE4WNDZXDYITG6SVL5M",
+          "sha256": "29a40cd0e3249dc54711f8127635d35dc9b2aa13b58505532941def9da8b4d58"
         }
       ],
       "longDescription": "What is faith\u2014really? Is it belief, confidence, doctrine, spiritual effort, or something more?\n\nIn Aligned! Unlocking the DNA of Authentic Faith, veteran minister and missionary Dennis E. Brown challenges common assumptions about faith and invites readers to rediscover it at its most fundamental level. Rather than defining faith by what it produces or how strongly it is held, Brown explores faith as a relational reality\u2014an alignment with the nature, character, and purposes of God.\n\nRooted in Scripture and shaped by decades of cross-cultural ministry experience, this book traces the essence of faith back to the creation event itself. Brown argues that faith flows from humanity\u2019s unique design: being created in the image of God and invited into relationship with Him. From this foundation, faith becomes not a tool to wield or a force to master, but a lived experience that shapes identity, perspective, and daily life.\n\nThrough thoughtful teaching, practical insights, and memorable illustrations, Aligned! addresses questions such as:\n\t\u2022\tWhat distinguishes authentic faith from cultural or religious substitutes?\n\t\u2022\tHow does faith function in real life, especially in times of struggle and uncertainty?\n\t\u2022\tWhy is relationship\u2014not performance\u2014the true source of spiritual growth?\n\nWritten for thoughtful Christians, ministry leaders, and anyone seeking clarity about faith, Aligned! is well suited for individual reading, small-group discussion, and church or library collections. It offers a compelling vision of faith as alignment with God\u2014simple in essence, profound in impact, and transformative in practice.",
       "shortDescription": "Aligned! explores faith at its core, revealing authentic faith as a lived relationship with God. Through Scripture and reflection, Dennis E. Brown invites readers to discover faith as alignment with God\u2019s nature rather than mere belief.",
-      "editionFormats": {},
+      "editionFormats": {
+        "9781954414051": "eBook",
+        "9781954414068": "Paperback"
+      },
       "coverUrl": "/backlist/catalog/aligned-cover.jpg"
     },
     "7b064bcd-c27a-f111-ab0f-00224820105b": {
@@ -300,11 +378,18 @@
         {
           "id": "01DF3SEQNR3SIVU6UVVNAZNE2ND6CU7CJH",
           "sha256": "bb13af0404ab3bcb299f487bbafa19b00a83aeeedc10424c2e995572769be416"
+        },
+        {
+          "id": "01DF3SEQPYGNLJ6KAJNBBZKEE3YNGJQDSQ",
+          "sha256": "d35eeef3aa9183623f7d2f6a59f5292cb7adca01d03f020db0bfda568ca4da47"
         }
       ],
       "longDescription": "Tabby has survived heartbreak before\u2014but this time, she\u2019s determined not just to survive, but to reclaim her happiness.\n\nRecently divorced and emotionally guarded, Tabby is no stranger to loss, betrayal, or disappointment. When a younger, magnetic man enters her life, he awakens a passion she thought she had buried for good. Their connection is intense, intoxicating, and deeply sensual\u2014offering Tabby a glimpse of the joy she\u2019s been craving.\n\nBut desire has consequences. As love, lust, and emotional baggage collide, Tabby finds herself navigating toxic patterns, blurred boundaries, and painful self-realizations. The more she gives of herself, the more she must confront the truth about who she is, what she deserves, and whether love should come at the cost of her peace.\n\nAlmost Happy: The Chronicles of Tabby is a bold, erotic, and emotionally resonant novel that explores modern relationships, Black female identity, and the complicated journey toward self-love. With unflinching honesty and sensual intensity, Jaylonna Stevette delivers a story about desire, healing, and the courage it takes to stop settling for \u201calmost\u201d and start choosing yourself.\n\nIntended for mature readers (18+).",
       "shortDescription": "Tabby thought she was getting back to happy\u2014until love pulled her into desire, betrayal, and self-reckoning. Almost Happy is a raw, sensual journey through heartbreak, healing, and the cost of choosing love again.",
-      "editionFormats": {},
+      "editionFormats": {
+        "9781954414570": "eBook",
+        "9781954414587": "Paperback"
+      },
       "coverUrl": "/backlist/catalog/almost-happy-cover.jpg"
     },
     "80064bcd-c27a-f111-ab0f-00224820105b": {
@@ -356,8 +441,16 @@
         "9781950719280",
         "9781950719297"
       ],
-      "sources": [],
-      "editionFormats": {}
+      "sources": [
+        {
+          "id": "01DF3SEQI77B5GV4YW3ZDJIJWY43MYAOBB",
+          "sha256": "a9b3e13418e99821d93dd62ce23f68daf847284b35cfcc970265e99b52ae9afa"
+        }
+      ],
+      "editionFormats": {},
+      "longDescription": "This book is for every woman in their jewel process, being shaped and formed in His image. While putting together this powerful book of devotion, I thought about how precious we are to God and how closed we often are to receiving the unconditional love He extends to us. We are, indeed, His jewels - precious in His sight - and He sees us better than we will ever see ourselves. I pray that while reading, you will receive a glimpse of His constant, unfailing love and will begin to see yourself in the image of God. Prepare to transform your mind and your life through these short yet powerful Words of encouragement and empowerment. These are moments with God speaking to me, giants that I had to slay, that I have made transparent to share with the world. Now, let's grow!",
+      "shortDescription": "This book is for every woman in their jewel process, being shaped and formed in His image. While putting together this powerful book of devotion, I thought about how precious we are to God and how closed we often are to receiving the unconditional love He extends to us. We are, indeed, His jewels - precious in His sight - and He sees us better than we will ever see ourselves. I pray that while reading, you will receive a glimpse of His constant, unfailing love and will begin to see yourself in the image of God. Prepare to transform your mind and your life through these short yet powerful Words of encouragement and empowerment. These are moments with God speaking to me, giants that I had to slay, that I have made transparent to share with the world. Now, let's grow!",
+      "coverUrl": "/backlist/catalog/jewels-by-lady-j-cover.jpg"
     },
     "aa084bcd-c27a-f111-ab0f-00224820105b": {
       "titleId": "aa084bcd-c27a-f111-ab0f-00224820105b",
@@ -370,9 +463,15 @@
         {
           "id": "01DF3SEQOQQKZ5XEE6QVBJC4GF2NS6TATV",
           "sha256": "decee96dda7c568b277f610cfcce8caac4b81bbcbf3b9d8cc71b8301b9b2e869"
+        },
+        {
+          "id": "01DF3SEQOMVIKUJ6FBM5HKBTCRMVYDSCPB",
+          "sha256": "003730aca6f377a0d4ac4331711149eaa780e91b55a4a12d24308ca4866926c6"
         }
       ],
-      "editionFormats": {},
+      "editionFormats": {
+        "9781954414778": "Paperback"
+      },
       "coverUrl": "/backlist/catalog/kingdom-equipment-101-cover.jpg"
     },
     "ab084bcd-c27a-f111-ab0f-00224820105b": {
@@ -382,8 +481,15 @@
         "9781961475090",
         "9781961475106"
       ],
-      "sources": [],
-      "editionFormats": {}
+      "sources": [
+        {
+          "id": "01DF3SEQPG4LZXZKZUB5G3UL6ZE2DRSPIR",
+          "sha256": "450bb5daaee8d8ffb5eba8e05e45cf8a9f3e542ba8574c69ba5bc7a5b8bdbdc2"
+        }
+      ],
+      "editionFormats": {},
+      "longDescription": "Lady Daphanny\u2019s Altar by Daphanny Baker is a powerful 100-day devotional book that emphasizes prayer as an act of invocation for connecting with the Savior. Through daily prayers and reflections, Baker explores how sincere prayer can actualize God's promises and protect against the devil's wiles. The book combines personal stories, biblical teachings, and practical advice, focusing on virtues like patience, purpose, and self-control. Baker's commitment to standing on Nehemiah\u2019s wall and her persistence in praying for God\u2019s people are central themes, highlighting the potential of steadfast prayer to bear fruit in one's spiritual journey. Lady Daphanny\u2019s Altar is an ideal guide for anyone seeking to deepen their faith through prayer and live a Christ-centered life, making it a valuable tool for both personal growth and group study.",
+      "shortDescription": "Lady Daphanny\u2019s Altar by Daphanny Baker is a powerful 100-day devotional book that emphasizes prayer as an act of invocation for connecting with the Savior. Through daily prayers and reflections, Baker explores how sincere prayer can actualize God's promises and protect against the devil's wiles. The book combines personal stories, biblical teachings, and practical advice, focusing on virtues like patience, purpose, and self-control. Baker's commitment to standing on Nehemiah\u2019s wall and her persistence in praying for God\u2019s people are central themes, highlighting the potential of steadfast prayer to bear fruit in one's spiritual journey. Lady Daphanny\u2019s Altar is an ideal guide for anyone seeking to deepen their faith through prayer and live a Christ-centered life, making it a valuable tool for both personal growth and group study."
     },
     "b3084bcd-c27a-f111-ab0f-00224820105b": {
       "titleId": "b3084bcd-c27a-f111-ab0f-00224820105b",
@@ -396,10 +502,16 @@
         {
           "id": "01DF3SEQKHCTBVSNJBLZGZO2E4WCRVITMO",
           "sha256": "a3903db6c589618d31133605227454f7739509173e6674b51b67ef3e02380263"
+        },
+        {
+          "id": "01DF3SEQIGA7I2LWISYVBYHZFJ52SAQ55G",
+          "sha256": "774c772eea7a2edef6c13128dd4974e6d30185f22c5c59d501596ba66f02b19e"
         }
       ],
       "editionFormats": {},
-      "coverUrl": "/backlist/catalog/life-after-detour-cover.jpg"
+      "coverUrl": "/backlist/catalog/life-after-detour-cover.jpg",
+      "longDescription": "The journey you are on as a new parent brings an inherent set of challenges, questions, and blessings. Being a young parent compounds this. This road of parenthood now intersects with several aspects of who you are. What better person to hear from than someone who has been on that road! They have faced the barriers you are facing and come out on the other side. If you are still in high school, the journey into parenthood intersects with your roles as a student, child, athlete, and possibly even siblings. Deanna has met those challenges and shares her advice for overcoming them. Deanna uses her own experience as a teen mother to bring that unique perspective not likely found in other parenting/self-help books. With this book, you will be empowered to come out stronger and more ready to go on the other side.",
+      "shortDescription": "The journey you are on as a new parent brings an inherent set of challenges, questions, and blessings. Being a young parent compounds this. This road of parenthood now intersects with several aspects of who you are. What better person to hear from than someone who has been on that road! They have faced the barriers you are facing and come out on the other side. If you are still in high school, the journey into parenthood intersects with your roles as a student, child, athlete, and possibly even siblings. Deanna has met those challenges and shares her advice for overcoming them. Deanna uses her own experience as a teen mother to bring that unique perspective not likely found in other parenting/self-help books. With this book, you will be empowered to come out stronger and more ready to go on the other side."
     },
     "d5084bcd-c27a-f111-ab0f-00224820105b": {
       "titleId": "d5084bcd-c27a-f111-ab0f-00224820105b",
@@ -412,9 +524,16 @@
         {
           "id": "01DF3SEQOK2BCP2FPS4RDKY4SVG2524LGB",
           "sha256": "67e572a21fa1a67f057df70f7cc53832f142882d61278747237692a44153140a"
+        },
+        {
+          "id": "01DF3SEQNE6GZBCKOOG5BK3STOHM5PF2FG",
+          "sha256": "783ad194e4124cbd7e94aa47abbbe7d50fbc9aa6e59ec5c99b965262cf951d08"
         }
       ],
-      "editionFormats": {},
+      "editionFormats": {
+        "9781954414457": "eBook",
+        "9781954414464": "Paperback"
+      },
       "coverUrl": "/backlist/catalog/my-abc-s-cover.jpg"
     },
     "f0084bcd-c27a-f111-ab0f-00224820105b": {
@@ -424,8 +543,16 @@
         "9781950719679",
         "9781950719686"
       ],
-      "sources": [],
-      "editionFormats": {}
+      "sources": [
+        {
+          "id": "01DF3SEQPZPRWQEDES6FBI6YALZKQGJK7M",
+          "sha256": "e0262c7561194ed9080e3d2c81ccac8830b7a6a401970499ace04c73da91b71f"
+        }
+      ],
+      "editionFormats": {},
+      "longDescription": "Pieces of Me All Over the Place is a poetic biography reflecting many different pieces of Ashanti\u2019s life. This book takes you on a roller coaster ride of many twists and turns. It covers such topics as self-esteem, domestic violence, love, heartbreak, prayers, self-worth, social injustice, and the demise of African-Americans. Poems such as Am I Good Enough and Broken Vessel dive into self-esteem as Ashanti questions her own self-worth in relationships. Teach Me is Ashanti\u2019s personal prayer to God as she seeks to learn His ways and acknowledges that her own free-will tends to get her off track. Finally, in the poem No More, Ashanti shares her personal story of enduring and escaping domestic violence. You will experience more pieces of Ashanti\u2019s life and spiritual lessons as you read Pieces of Me all Over the Place.",
+      "shortDescription": "Pieces of Me All Over the Place is a poetic biography reflecting many different pieces of Ashanti\u2019s life. This book takes you on a roller coaster ride of many twists and turns. It covers such topics as self-esteem, domestic violence, love, heartbreak, prayers, self-worth, social injustice, and the demise of African-Americans. Poems such as Am I Good Enough and Broken Vessel dive into self-esteem as Ashanti questions her own self-worth in relationships. Teach Me is Ashanti\u2019s personal prayer to God as she seeks to learn His ways and acknowledges that her own free-will tends to get her off track. Finally, in the poem No More, Ashanti shares her personal story of enduring and escaping domestic violence. You will experience more pieces of Ashanti\u2019s life and spiritual lessons as you read Pieces of Me all Over the Place.",
+      "coverUrl": "/backlist/catalog/pieces-of-me-all-over-the-place-cover.jpg"
     },
     "944b00d4-c27a-f111-ab0f-00224820105b": {
       "titleId": "944b00d4-c27a-f111-ab0f-00224820105b",
@@ -460,10 +587,27 @@
         {
           "id": "01DF3SEQPOFBIYIUIY3RBJGSZV75W4KCJR",
           "sha256": "5a84012e03600aad223ab9a63d77549d000f1c7e1332114ac35c3327a2034ddd"
+        },
+        {
+          "id": "01DF3SEQI6HRYZGLTHKBFZW5JBZPDT4O7O",
+          "sha256": "775785ad99aaf1c9d0e524e99438410b16ce858d79c769cca39cec594391f19f"
+        },
+        {
+          "id": "01DF3SEQLBNL2G3ZHDQBB3KPRKQB3ZUGJO",
+          "sha256": "0474c32a858acea414e96c36dad3df95814f53e50c2ee05a6e70c8ac4f75694c"
+        },
+        {
+          "id": "01DF3SEQLMSGBWM4YRA5C2Y7BFPAZUGVLY",
+          "sha256": "25130cf3c921934bb8384e7a45ff25d13a85bbce40d7764712fcbd5d7928649a"
         }
       ],
-      "editionFormats": {},
-      "coverUrl": "/backlist/catalog/understanding-the-misunderstood-cover.jpg"
+      "editionFormats": {
+        "9781954414013": "eBook",
+        "9781954414020": "Hardcover"
+      },
+      "coverUrl": "/backlist/catalog/understanding-the-misunderstood-cover.jpg",
+      "longDescription": "Christy is a young girl trying to discover who she is and where she comes from but finds dark family secrets and even makes some secrets of her own. What adventure will she find herself on? What new things will she learn from her past, like who killed her mother? Is love really a thing? What is she missing in her life? No matter what, understanding some things can become confusing when it's all just a misunderstanding to being misunderstood.",
+      "shortDescription": "Christy is a young girl trying to discover who she is and where she comes from but finds dark family secrets and even makes some secrets of her own. What adventure will she find herself on? What new things will she learn from her past, like who killed her mother? Is love really a thing? What is she missing in her life? No matter what, understanding some things can become confusing when it's all just a misunderstanding to being misunderstood."
     },
     "9a4b00d4-c27a-f111-ab0f-00224820105b": {
       "titleId": "9a4b00d4-c27a-f111-ab0f-00224820105b",
@@ -482,7 +626,9 @@
           "sha256": "a3946c9d7c51192c1c1adcfbd3b79384eee23b0d0b738ac46549dd938e32fb83"
         }
       ],
-      "editionFormats": {},
+      "editionFormats": {
+        "9781961475984": "eBook"
+      },
       "coverUrl": "/backlist/catalog/when-a-thug-meets-jesus-cover.jpg",
       "longDescription": "Mack\u2019s life takes on a profound new direction through the loving embrace of a church community, the guiding hand of mentors like Bishop W.B. Hanna, and a newfound faith in Jesus Christ. He becomes a deacon, a minister, a pastor, and a loving husband and father. This book is not just Mack\u2019s story but a universal tale of redemption and hope. It\u2019s a testament to the transformative power of faith and an encouragement to anyone feeling lost or overwhelmed.",
       "shortDescription": "Mack\u2019s life takes on a profound new direction through the loving embrace of a church community, the guiding hand of mentors like Bishop W.B. Hanna, and a newfound faith in Jesus Christ. He becomes a deacon, a minister, a pastor, and a loving husband and father. This book is not just Mack\u2019s story but a universal tale of redemption and hope. It\u2019s a testament to the transformative power of faith and an encouragement to anyone feeling lost or overwhelmed."
@@ -541,7 +687,9 @@
       ],
       "longDescription": "Girl, Did You Know\u2026? is a deeply personal and faith-centered journey of healing, truth, and restoration. In this compelling and transparent work, Kimberly Reeder invites women into an honest conversation about pain, identity, relationships, and the long-lasting impact of past choices.\n\nThrough powerful storytelling and spiritual reflection, the author shares her lived experiences\u2014navigating broken relationships, emotional wounds, and cycles that repeated over time. Rather than masking the past, she brings it into the light, revealing how unresolved pain, misunderstanding, and misplaced beliefs can shape a woman\u2019s life in ways she may not immediately recognize.\n\nThis book addresses the deeper realities behind emotional struggles, including the weight of past decisions, the importance of forgiveness, and the process of healing from within. It encourages readers to confront what has been buried, acknowledge patterns that may be holding them back, and begin the work of true restoration.\n\nGrounded in faith, Girl, Did You Know\u2026? emphasizes the importance of understanding one\u2019s identity through a relationship with God. It highlights how spiritual awareness, personal accountability, and intentional growth can lead to lasting transformation. With a balance of vulnerability and guidance, the author speaks directly to women who may feel lost, overlooked, or uncertain about their worth.\n\nThis is not a story of perfection\u2014it is a story of process. It reminds readers that healing is layered, growth takes time, and restoration is possible. For women seeking clarity, direction, and a deeper connection to their faith, this book offers both encouragement and a path forward.",
       "shortDescription": "A faith-based journey of healing and restoration, Girl, Did You Know\u2026? helps women confront past pain, break destructive cycles, and rediscover their identity through truth, forgiveness, and a deeper relationship with God.",
-      "editionFormats": {},
+      "editionFormats": {
+        "9781961475755": "eBook"
+      },
       "coverUrl": "/backlist/catalog/girl-did-you-know-cover.jpg"
     },
     "c44b00d4-c27a-f111-ab0f-00224820105b": {
@@ -552,7 +700,15 @@
         "9781961475779",
         "9781961475786"
       ],
-      "sources": []
+      "sources": [
+        {
+          "id": "01DF3SEQOJBRZFRK2MJJFYRMAZSXNR5HUI",
+          "sha256": "bd692e1cb020d0a205a0be901c32937da07f1e8042bc643f374b15284cf3759c"
+        }
+      ],
+      "editionFormats": {
+        "9781961475786": "eBook"
+      }
     },
     "c74b00d4-c27a-f111-ab0f-00224820105b": {
       "titleId": "c74b00d4-c27a-f111-ab0f-00224820105b",
@@ -562,7 +718,15 @@
         "9781961475663",
         "9781961475670"
       ],
-      "sources": []
+      "sources": [
+        {
+          "id": "01DF3SEQIFOGT3ZLGDRVE2A5FND77UPMMP",
+          "sha256": "29cc49d4fd6a69e29d69fc10984650b009b999278580806ee496f84264fe1b95"
+        }
+      ],
+      "editionFormats": {
+        "9781961475670": "eBook"
+      }
     },
     "c84b00d4-c27a-f111-ab0f-00224820105b": {
       "titleId": "c84b00d4-c27a-f111-ab0f-00224820105b",
@@ -583,7 +747,10 @@
       ],
       "longDescription": "Why do we have to fight for what God has already promised?\n\nIn The Fight for the Promiseland: Battle Strategies for Victorious People, Cheryl Cook explores the spiritual paradox of promise and perseverance. If God has declared victory, why must we still endure resistance, doubt, and delay?\n\nUsing the biblical story of the children of Israel as a spiritual framework, this faith-centered guide reveals how internal battles\u2014fear, indecision, distraction, and unbelief\u2014often present greater obstacles than external challenges. Through personal reflection, biblical insight, and practical application, Cook offers seven transformative principles designed to help readers grow in clarity, confidence, and spiritual endurance.\n\nThis inspirational work invites readers to:\n\t\u2022\tStrengthen their faith in seasons of uncertainty\n\t\u2022\tMake courageous, God-led decisions\n\t\u2022\tEmbrace necessary change\n\t\u2022\tWalk boldly toward a God-prepared future\n\nThe Promised Land is more than a physical place\u2014it represents purpose, growth, and \u201csomething better.\u201d Victory does not come through passivity but through partnership with God, intentional preparation, and steadfast trust.\n\nFor anyone longing to move beyond fear and into faith, this book offers encouragement, wisdom, and a reminder that with God, the battle is never fought alone.",
       "shortDescription": "A faith-filled guide to overcoming fear, gaining clarity, and stepping boldly into God\u2019s promises. Through biblical insight and practical encouragement, The Fight for the Promiseland reveals how to fight in faith and walk confidently toward your future.",
-      "editionFormats": {},
+      "editionFormats": {
+        "9781961475632": "Paperback",
+        "9781961475649": "eBook"
+      },
       "coverUrl": "/backlist/catalog/the-fight-for-the-promiseland-cover.jpg"
     },
     "cc4b00d4-c27a-f111-ab0f-00224820105b": {
@@ -639,9 +806,16 @@
         {
           "id": "01DF3SEQINF3MVNT7QXZHJZQ66YSJ4PHSX",
           "sha256": "b336b21f62cf795758c28617aae1bf03cb0679b7d7024e49842f2035a779ee47"
+        },
+        {
+          "id": "01DF3SEQKPENOLCAM74NDZPVRMLGGWC4Z4",
+          "sha256": "678d8e39c98aaef50d79c3f681c2edc872aca27f7aad0551c9c2d843f85e7cb0"
         }
       ],
-      "editionFormats": {},
+      "editionFormats": {
+        "9781950719877": "eBook",
+        "9781950719884": "Paperback"
+      },
       "coverUrl": "/backlist/catalog/god-s-nudge-cover.jpg",
       "longDescription": "Have you ever experienced God\u2019s Nudge? The Nudge of God is that non-verbal, internal thought or that still audible voice you hear to guide you in the direction that is pleasing to His will. Every now and then, one need\u2019s the Nudge of God to stay the course to stay led, directed, and guided by God. The Nudge illuminates the word that it will shine like a lamp unto your feet and a light unto your path. Why God\u2019s Nudge? God\u2019s Nudge was written during a worldwide pandemic (Covid-19). Anxiety , depression, sadness, fear, doubt, the spirit of \u201cquit,\u201d and so many other symptomology and emotions were present, which filled many hearts and minds. Because God is our refuge and strength, a present help in trouble, he offers His infallible word to bring comfort and guidance. In reading God\u2019s Nudge, there is fresh Rhema in each chapter providing support to the readers with reflective insight to search the scriptures to gain deeper understanding, knowledge, and life application. God\u2019s Nudge is thought-provoking and enlightening. It will ignite the branches of readers to \u201clevel up\u201d in your journey .",
       "shortDescription": "Have you ever experienced God\u2019s Nudge? The Nudge of God is that non-verbal, internal thought or that still audible voice you hear to guide you in the direction that is pleasing to His will. Every now and then, one need\u2019s the Nudge of God to stay the course to stay led, directed, and guided by God. The Nudge illuminates the word that it will shine like a lamp unto your feet and a light unto your path. Why God\u2019s Nudge? God\u2019s Nudge was written during a worldwide pandemic (Covid-19). Anxiety , depression, sadness, fear, doubt, the spirit of \u201cquit,\u201d and so many other symptomology and emotions were present, which filled many hearts and minds. Because God is our refuge and strength, a present help in trouble, he offers His infallible word to bring comfort and guidance. In reading God\u2019s Nudge, there is fresh Rhema in each chapter providing support to the readers with reflective insight to search the scriptures to gain deeper understanding, knowledge, and life application. God\u2019s Nudge is thought-provoking and enlightening. It will ignite the branches of readers to \u201clevel up\u201d in your journey ."
@@ -703,8 +877,15 @@
         "9781954414198",
         "9781961475373"
       ],
-      "sources": [],
-      "editionFormats": {}
+      "sources": [
+        {
+          "id": "01DF3SEQI5ZEDBD6LI3FFLDMYWVNUHAKU3",
+          "sha256": "c11ea85a83cc2d440b1e5cbfcd5214f783b9283588304aa9651114f4bfc48f78"
+        }
+      ],
+      "editionFormats": {},
+      "longDescription": "These days are filled with social unrest. Lack of compassion from elected officials, police brutality, unjust laws that create poverty through minimal wages but soaring profits for capitalists, benign neglect of blighted neighborhoods, and crime within the cities and in governments create a landscape of oppression that directly diminishes the quality of life, especially for African Americans. What is the role of the Black church and Black Christians in light of these realities? Just to save souls is not enough! Memoir of a Black Christian Nationalist: Seeds of Liberation is a poignant personal story of the author\u2019s thirty-year experience of being a Black Christian Nationalist. The theological framework, program, and organization re-establishing the Black church\u2019s relevancy to the liberation struggle are eloquently and informatively interwoven in . . . 4 The DNA Research about the Race of Jesus 4 The Powerful Leadership of Reverend Albert B. Cleage Jr., Founder of the Shrines of the Black Madonna 4 The T ransformation of Black People 4 The Seeds of Liberation\u2014Answers for the Black Church 4 Practices That Create Freedom, Power, and a More Humane World",
+      "shortDescription": "These days are filled with social unrest. Lack of compassion from elected officials, police brutality, unjust laws that create poverty through minimal wages but soaring profits for capitalists, benign neglect of blighted neighborhoods, and crime within the cities and in governments create a landscape of oppression that directly diminishes the quality of life, especially for African Americans. What is the role of the Black church and Black Christians in light of these realities? Just to save souls is not enough! Memoir of a Black Christian Nationalist: Seeds of Liberation is a poignant personal story of the author\u2019s thirty-year experience of being a Black Christian Nationalist. The theological framework, program, and organization re-establishing the Black church\u2019s relevancy to the liberation struggle are eloquently and informatively interwoven in . . . 4 The DNA Research about the Race of Jesus 4 The Powerful Leadership of Reverend Albert B. Cleage Jr., Founder of the Shrines of the Black Madonna 4 The T ransformation of Black People 4 The Seeds of Liberation\u2014Answers for the Black Church 4 Practices That Create Freedom, Power, and a More Humane World"
     },
     "9e3274cd-c27a-f111-ab0f-6045bdd69435": {
       "titleId": "9e3274cd-c27a-f111-ab0f-6045bdd69435",
@@ -713,8 +894,16 @@
         "9781950719518",
         "9781950719525"
       ],
-      "sources": [],
-      "editionFormats": {}
+      "sources": [
+        {
+          "id": "01DF3SEQMVU4UJVOX6BRGLNOSOFU3UGXNR",
+          "sha256": "f3caed422b334b606565ba0f1ea1b461d66c9a84748ec7ed0c80d922bf6eb18f"
+        }
+      ],
+      "editionFormats": {},
+      "longDescription": "In this easy to read autobiography , written by Pamela Smith, she tells the story of her life from her youth to adulthood. She shares the emotional and physical struggles of her life and the miraculous breakthroughs that the God she serves provided. In this beautiful retelling of Pamela\u2019s life, she shares some basic life principles that can help you live in and move towards the life that God wants for you. These lessons include: \uf076 Embracing and Letting Go of the Past \uf076 Living God\u2019s Best in the Present \uf076 Trusting God for the Future",
+      "shortDescription": "In this easy to read autobiography , written by Pamela Smith, she tells the story of her life from her youth to adulthood. She shares the emotional and physical struggles of her life and the miraculous breakthroughs that the God she serves provided. In this beautiful retelling of Pamela\u2019s life, she shares some basic life principles that can help you live in and move towards the life that God wants for you. These lessons include: \uf076 Embracing and Letting Go of the Past \uf076 Living God\u2019s Best in the Present \uf076 Trusting God for the Future",
+      "coverUrl": "/backlist/catalog/never-give-up-on-love-cover.jpg"
     },
     "b73274cd-c27a-f111-ab0f-6045bdd69435": {
       "titleId": "b73274cd-c27a-f111-ab0f-6045bdd69435",
@@ -733,7 +922,9 @@
           "sha256": "cdd3ba4eac7446561e4c12ceb693961f36fe769947f53a5a034e9c2b5eaf0c06"
         }
       ],
-      "editionFormats": {},
+      "editionFormats": {
+        "9781961475076": "eBook"
+      },
       "coverUrl": "/backlist/catalog/seasons-of-life-cover.jpg",
       "longDescription": "Discover a transformative guide to navigating life's ups and downs with \"Seasons of Life\" by Kurt Broadnax. This compelling book offers a powerful blend of practical wisdom and faith-based insights, taking you on a journey through the ever-changing phases of life.",
       "shortDescription": "Discover a transformative guide to navigating life's ups and downs with \"Seasons of Life\" by Kurt Broadnax. This compelling book offers a powerful blend of practical wisdom and faith-based insights, taking you on a journey through the ever-changing phases of life."
@@ -833,7 +1024,10 @@
       ],
       "longDescription": "Damaged is a compelling urban romance about love, loyalty, and second chances. Mario \u201cStoney\u201d Johnson is determined to leave behind the life that once defined him, but his past refuses to let him go. Latoya, strong yet guarded, has built walls around her heart after enduring deep emotional pain.\n\nWhen their worlds collide, the chemistry between them is undeniable. But as their relationship grows, so do the risks. Old enemies, hidden secrets, and unresolved trauma threaten to tear them apart before they have a chance to build something real.\n\nSet against the backdrop of street life and survival, Damaged explores whether love can truly overcome the scars of the past.",
       "shortDescription": "An intense urban romance where love, loyalty, and betrayal collide as two wounded souls fight to overcome their past and build a future together.",
-      "editionFormats": {},
+      "editionFormats": {
+        "9781961475700": "Paperback",
+        "9781961475717": "eBook"
+      },
       "coverUrl": "/backlist/catalog/damaged-cover.jpg"
     },
     "fec27b7a-cc7a-f111-ab0f-6045bdd69435": {
@@ -846,10 +1040,23 @@
         {
           "id": "01DF3SEQMC7WOKEZPLDNHLRGWJBQBGSV5V",
           "sha256": "771b286e28a82003e3c8e4b2e86d83b5742c8478b6922737199790f064d0c2f2"
+        },
+        {
+          "id": "01DF3SEQJ6EPFKP7NJKZGKMOY4ZSKBNGEV",
+          "sha256": "6dcc4dd66e838536f312ead7e3819b65f8156e21339f39b35e3a77f5cc303e46"
         }
       ],
-      "editionFormats": {},
-      "coverUrl": "/backlist/catalog/warrior-s-breed-cover.jpg"
+      "editionFormats": {
+        "9781954414655": "eBook"
+      },
+      "coverUrl": "/backlist/catalog/warrior-s-breed-cover.jpg",
+      "sourceBoundEditions": [
+        {
+          "isbn": "9781954414655",
+          "format": "eBook",
+          "sourceId": "01DF3SEQMC7WOKEZPLDNHLRGWJBQBGSV5V"
+        }
+      ]
     },
     "3e09d7cb-c27a-f111-ab0f-6045bdd69678": {
       "titleId": "3e09d7cb-c27a-f111-ab0f-6045bdd69678",
@@ -867,11 +1074,22 @@
         {
           "id": "01DF3SEQKHV6CKRW53VVHIP5ZW3T5NOXRQ",
           "sha256": "8018073b14241ad6008fca7ffbc45ea8de88d8b5e7033c3cdf0a492bdf96f3e8"
+        },
+        {
+          "id": "01DF3SEQK34YMVDJ526JEZ5QKDADNJTIYY",
+          "sha256": "29f6da426bd72911d95828c9b40dba21983a1785267795be27008ce1e64fe800"
+        },
+        {
+          "id": "01DF3SEQMUBXWCNNYDQNBITBFAK6BVGCBX",
+          "sha256": "335fd4a08cf00e01ba777693c9ea9e79af911948f13779788cabf7eb6010df68"
         }
       ],
       "longDescription": "Change does not happen overnight\u2014it happens through intentional steps taken with courage, consistency, and self-awareness. 7 Step Jumpstart to Becoming Your Best Self is an inspiring self-help guide created to support readers as they begin or recommit to their personal growth journey.\n\nAuthor Ericka Johnson Settles presents seven thoughtfully designed steps that guide readers through internal exploration, mindset transformation, and purposeful living. Each chapter focuses on a core area of growth, including trusting the process, building self-confidence, understanding the power of words, identifying self-sabotaging behaviors, recalibrating focus, and embracing authenticity.\n\nThis book is more than encouragement\u2014it is a practical tool. Readers are invited to reflect, write, and actively engage with the material through affirmations and guided moments of reflection that reinforce accountability and clarity. With a compassionate and relatable voice, the author shares insights drawn from lived experience, offering reassurance that growth is achievable, even when the process feels uncomfortable.\n\nWhether you feel stuck, uncertain, or simply ready for more, 7 Step Jumpstart to Becoming Your Best Self provides a supportive framework to help you move forward with intention. Ideal for individual reading, group study, or personal reflection, this book encourages readers to show up for themselves, live with purpose, and confidently step into who they are becoming.",
       "shortDescription": "A practical and inspiring guide to personal growth, 7 Step Jumpstart to Becoming Your Best Self equips readers with seven intentional steps to build confidence, overcome fear, and live authentically with purpose.",
-      "editionFormats": {},
+      "editionFormats": {
+        "9781954414747": "Paperback",
+        "9781954414754": "eBook"
+      },
       "coverUrl": "/backlist/catalog/7-step-jumpstart-to-becoming-your-best-self-cover.jpg"
     },
     "3f09d7cb-c27a-f111-ab0f-6045bdd69678": {
@@ -977,9 +1195,16 @@
         {
           "id": "01DF3SEQOHKIYLJ4CUEZFLVQ6LHBBC2X25",
           "sha256": "7b475c349a7f7d39241dc60a1d7e87ab527314770fc23abdc5551294147744eb"
+        },
+        {
+          "id": "01DF3SEQPKAARVWSA3HZC23QOJWCSXAXA3",
+          "sha256": "76744d80f11a772f91d4b57c346440239a112c573de5d45fa7c544cd8f1833a5"
         }
       ],
-      "editionFormats": {},
+      "editionFormats": {
+        "9781954414983": "Paperback",
+        "9781954414990": "eBook"
+      },
       "coverUrl": "/backlist/catalog/let-me-tell-you-about-it-cover.jpg",
       "longDescription": "Let Me Tell You About It is a compilation of short stories, poems, and other works written by 8th-grade students. Each student was given free rein to choose what they wanted to share with others to read. Let Me Tell You About It is from the perspective of teenage students in the small town of Chillicothe, Ohio. Some students chose to share meaningful lessons or important memories, while others chose to be more creative. Let Me Tell You About It represents the average American teenager and what they are thinking. It is a collection of writings that matter to young men and women.",
       "shortDescription": "Let Me Tell You About It is a compilation of short stories, poems, and other works written by 8th-grade students. Each student was given free rein to choose what they wanted to share with others to read. Let Me Tell You About It is from the perspective of teenage students in the small town of Chillicothe, Ohio. Some students chose to share meaningful lessons or important memories, while others chose to be more creative. Let Me Tell You About It represents the average American teenager and what they are thinking. It is a collection of writings that matter to young men and women."
@@ -995,10 +1220,16 @@
         {
           "id": "01DF3SEQNFCBZYOELE7JBK3Q4XNMBQQKP2",
           "sha256": "0a6dd07b1693af3d433307bb767377906955d9ed554f4cafb6ba192c89b1476f"
+        },
+        {
+          "id": "01DF3SEQJZR2I5GJVSLRGLH5RX5L4NRFIM",
+          "sha256": "b36f5a3b47215a4a2957af4e02b2dfc423b66c096608c487774c0734f3f71290"
         }
       ],
       "editionFormats": {},
-      "coverUrl": "/backlist/catalog/support-beyond-the-cycle-cover.jpg"
+      "coverUrl": "/backlist/catalog/support-beyond-the-cycle-cover.jpg",
+      "longDescription": "This is for the husbands and soon to be fathers that are suffering with infertility. Many times we are forgotten about; not on purpose or out of neglect but simply out of the need to be STRONG for our wives and mothers to be. We often forget about our own needs to restore and rejuvenate, often becoming exhausted and potentially ready to give up. This book is set aside to be a daily guide to help you through the trials of trying for a family. I hope that in this you will build your FAITH in God, yourself, and your wife. I applaud you for taking the right steps to try and seek GUIDANCE rather than suffer alone in silence. We all can use a helping hand through the steps of life at times from those that have gone ahead of you in a similar journey. May you be blessed and remember that you are a child of the most high God and he will take care of you. Give this situation over to him and allow him to shine through you so others might see his GRACE and mercies.",
+      "shortDescription": "This is for the husbands and soon to be fathers that are suffering with infertility. Many times we are forgotten about; not on purpose or out of neglect but simply out of the need to be STRONG for our wives and mothers to be. We often forget about our own needs to restore and rejuvenate, often becoming exhausted and potentially ready to give up. This book is set aside to be a daily guide to help you through the trials of trying for a family. I hope that in this you will build your FAITH in God, yourself, and your wife. I applaud you for taking the right steps to try and seek GUIDANCE rather than suffer alone in silence. We all can use a helping hand through the steps of life at times from those that have gone ahead of you in a similar journey. May you be blessed and remember that you are a child of the most high God and he will take care of you. Give this situation over to him and allow him to shine through you so others might see his GRACE and mercies."
     },
     "16e01ad3-c27a-f111-ab0f-6045bdd69678": {
       "titleId": "16e01ad3-c27a-f111-ab0f-6045bdd69678",
@@ -1021,10 +1252,16 @@
         {
           "id": "01DF3SEQPMGHQJN4BODFB2XB6KXROBWHBO",
           "sha256": "a87fc2fb2f91a8694d2672676281a138fbecc07b1a1d9549d8f102668054a86b"
+        },
+        {
+          "id": "01DF3SEQILLB3IYGNWWBFI4HHOQPFUSS5Q",
+          "sha256": "5975a471e68401fbf5b1f2185dff187c32fce67d685b647fccdcf8040d01410b"
         }
       ],
       "editionFormats": {},
-      "coverUrl": "/backlist/catalog/the-girl-with-the-ebony-locs-and-the-three-bears-cover.jpg"
+      "coverUrl": "/backlist/catalog/the-girl-with-the-ebony-locs-and-the-three-bears-cover.jpg",
+      "longDescription": "As a child you may have heard the fairytale of the little girl going into the home of a family of bears, eating their porridge, breaking a chair and falling asleep, soon after to be woken up by the family of bears. The Girl with the Ebony Locs and the Three Bears puts a modern cultural twist on the old fairytale. Children may not have known what porridge was, so in this book it is given a name many children will recognize. The book is more descriptive as the title character goes throughout the bears' home wreaking havoc and eventually caught sleeping in the baby bear's bed. The Girl with the Ebony Locs and the Three Bears is generously filled with pictures and illustrations to keep children engaged while reading the story.",
+      "shortDescription": "As a child you may have heard the fairytale of the little girl going into the home of a family of bears, eating their porridge, breaking a chair and falling asleep, soon after to be woken up by the family of bears. The Girl with the Ebony Locs and the Three Bears puts a modern cultural twist on the old fairytale. Children may not have known what porridge was, so in this book it is given a name many children will recognize. The book is more descriptive as the title character goes throughout the bears' home wreaking havoc and eventually caught sleeping in the baby bear's bed. The Girl with the Ebony Locs and the Three Bears is generously filled with pictures and illustrations to keep children engaged while reading the story."
     },
     "19e01ad3-c27a-f111-ab0f-6045bdd69678": {
       "titleId": "19e01ad3-c27a-f111-ab0f-6045bdd69678",
@@ -1042,9 +1279,16 @@
         {
           "id": "01DF3SEQOBWVINN7OS7RHYNMP2HNHO32Z2",
           "sha256": "50546168ec9df5d3cd4dc3364b353408b6cf24bd335f9ad4d791f924f2a49788"
+        },
+        {
+          "id": "01DF3SEQLHN3VSTZUVMZC27OSJMCZKIMEK",
+          "sha256": "65cb54b051efe41b12c094a9b7b7dd78aeb391e8a2696801610c5d4d32a6c325"
         }
       ],
-      "editionFormats": {},
+      "editionFormats": {
+        "9781954414686": "Hardcover",
+        "9781954414693": "Paperback"
+      },
       "coverUrl": "/backlist/catalog/the-princess-and-the-black-eyed-pea-cover.jpg",
       "longDescription": "This book is an adaptation of the fairytale, The Princess and the Pea. This version focuses on one of the characters in the story, the Princess Come along as we see the adventures of Princess Breauna on her way to the Dinner Celebration for the Prince. You will also discover how a Queen and a black-eyed pea help two people develop a true friendship.",
       "shortDescription": "This book is an adaptation of the fairytale, The Princess and the Pea. This version focuses on one of the characters in the story, the Princess Come along as we see the adventures of Princess Breauna on her way to the Dinner Celebration for the Prince. You will also discover how a Queen and a black-eyed pea help two people develop a true friendship."
@@ -1112,9 +1356,15 @@
         {
           "id": "01DF3SEQJ5TFALORY4BVC2PCRJMNMGDE52",
           "sha256": "c25efa26c52e1824ef9f4a84612fd0857c092c7913116084f5a29848ab9692ef"
+        },
+        {
+          "id": "01DF3SEQKXJEURUYPTJRC2AUSTFYU5CBO5",
+          "sha256": "8441b2648b1f93f1d4118230ab025ba22009afe021f4b1d0dc727ae65343caa7"
         }
       ],
-      "editionFormats": {},
+      "editionFormats": {
+        "9781954414488": "Paperback"
+      },
       "longDescription": "TRIGGER WARNING INCEST. RAPE. MOLESTATION. ABORTION. Reader discretion is advised. Read the story from the source of a 15-year-old girl, in a desperate search to locate her biological father. In her stages of discovery, Sylvia dug up a part of her life that almost led to her demise. Out of the shadows, appeared a world full of perversion, incest, concubines, lies, and deceit. The life-altering reality resulted in Sylvia being in a 7-year legal marriage with her newfound biological father. Did she lose her faith? What was the threshold of pain Sylvia weathered through before planning her escape?",
       "shortDescription": "TRIGGER WARNING INCEST. RAPE. MOLESTATION. ABORTION. Reader discretion is advised. Read the story from the source of a 15-year-old girl, in a desperate search to locate her biological father. In her stages of discovery, Sylvia dug up a part of her life that almost led to her demise. Out of the shadows, appeared a world full of perversion, incest, concubines, lies, and deceit. The life-altering reality resulted in Sylvia being in a 7-year legal marriage with her newfound biological father. Did she lose her faith? What was the threshold of pain Sylvia weathered through before planning her escape?"
     },
@@ -1138,11 +1388,19 @@
         {
           "id": "01DF3SEQOWALERQR5V3NH3U7OYDVAR7W2X",
           "sha256": "499af6ec1c35b6fc9f58e5365f9d294e033edc181811a7e08cb48c9c6ee387a5"
+        },
+        {
+          "id": "01DF3SEQKFOHYASMUIAFCIIZV6M6X73NZH",
+          "sha256": "29afe60babe1433916f1082e4607469b178b0a5a26acb7af78126db67d09189e"
         }
       ],
       "longDescription": "A Blended Family gently explores the joys and challenges of bringing families together through the voice of TJ, a child learning what it means to belong to a blended family. As his parents unite their households, TJ reflects on the changes, the adjustments, and the emotions that come with becoming a new family.\n\nThe story honestly addresses early struggles, especially the strained relationship between his sisters, while showing how consistent love, support, and patience from caring parents help guide the family forward. Over time, misunderstandings soften, bonds grow stronger, and the family learns how to support one another through change.\n\nWritten from a child\u2019s point of view, this picture book helps young readers feel seen and understood while encouraging empathy and emotional growth. With a faith-inspired message rooted in love, A Blended Family offers reassurance to children navigating family transitions and celebrates the power of unity, compassion, and Godly love within the home.",
       "shortDescription": "A warm children\u2019s picture book told from a child\u2019s perspective, A Blended Family shares how love, patience, and faith help a stepfamily grow into a strong, united home.",
-      "editionFormats": {},
+      "editionFormats": {
+        "9781954414112": "eBook",
+        "9781954414129": "Paperback",
+        "9781954414426": "Hardcover"
+      },
       "coverUrl": "/backlist/catalog/a-blended-family-cover.jpg"
     },
     "848904ca-c27a-f111-ab0f-6045bdd69738": {
@@ -1167,11 +1425,34 @@
         {
           "id": "01DF3SEQI5Z3TEDXGY2VDKZQXK4IIORQYG",
           "sha256": "199ef93c392c49c7171c3c47ef66d7d6f2b2680b681c37ab8d2263e87e5eb364"
+        },
+        {
+          "id": "01DF3SEQMJZ6LANM7SIJH3JIECHJ43ZWWA",
+          "sha256": "8e385a8e8311299ade5d24822b927c4a684f29141c4208fd1a3cee5de7aa4041"
+        },
+        {
+          "id": "01DF3SEQJG35LPQJKSQJDJM54KYYKXAKTX",
+          "sha256": "87a0402f38d139333171d49a04e3ddc2af5c33f8d746924525e4175899cafeed"
+        },
+        {
+          "id": "01DF3SEQIUHPMTV2F3FBBZHUOEBJJSYBKK",
+          "sha256": "de37bcb80cbcb6e5fdbe7ca478e46b32584df8b30c2d25f5bff5f8beccb56367"
+        },
+        {
+          "id": "01DF3SEQPLKYB6WEQJARDY62NDJES2UNXX",
+          "sha256": "ebd51b6f6c46d5ce47802a4e63508dae601a87f3bc754daf8708cde0f8305b1a"
+        },
+        {
+          "id": "01DF3SEQJLF4CLWV3NDVHYU2PEJOYZ76NC",
+          "sha256": "4721ceaabdf16e39c2c1707b122bc36a201f78c75e4910dd3937245c5fb311bf"
         }
       ],
       "longDescription": "Every believer will face trouble\u2014but not every believer knows how to respond to it biblically. In Biblical Prescriptions for Life\u2019s Troubles, Terry Stephens offers a scripturally grounded framework for understanding adversity and responding with spiritual wisdom rather than fear, confusion, or frustration.\n\nUsing the metaphor of medicine and diagnosis, Stephens identifies six distinct types of trouble found throughout Scripture: internal conflict, people trouble, personal principle trouble, demonic resistance, bad trouble that God allows, and good trouble that advances God\u2019s purposes. Through careful biblical exposition and practical teaching, he explains that not all trouble is the same\u2014and therefore not all responses should be the same.\n\nRather than promoting escape-based faith, this book emphasizes endurance, discernment, and obedience. Readers are guided to activate biblical tools such as peace, praise, forgiveness, humility, prayer, and thanksgiving\u2014what the author calls \u201cKingdom equipment\u201d\u2014to navigate seasons of adversity with spiritual maturity. Drawing from the lives of figures such as Job, Joseph, Daniel, Moses, and the Hebrew boys, Stephens shows how God works both in trouble and through it.\n\nWritten for pastors, ministry leaders, and everyday believers alike, Biblical Prescriptions for Life\u2019s Troubles encourages readers to stop misdiagnosing their struggles and start responding with biblical clarity. The result is not only survival through trouble, but spiritual growth, deeper faith, and alignment with God\u2019s purposes in every season of life.",
       "shortDescription": "Life brings trouble\u2014but Scripture brings answers. Biblical Prescriptions for Life\u2019s Troubles equips believers with biblical insight and spiritual tools to respond to adversity with faith, peace, and perseverance.`",
-      "editionFormats": {},
+      "editionFormats": {
+        "9781954414891": "Paperback",
+        "9781954414907": "eBook"
+      },
       "coverUrl": "/backlist/catalog/biblical-prescriptions-for-life-s-troubles-cover.jpg"
     },
     "958904ca-c27a-f111-ab0f-6045bdd69738": {
@@ -1189,9 +1470,20 @@
         {
           "id": "01DF3SEQNOIUUB5CR2XNA2B3263STB7IL5",
           "sha256": "066f10917a76b37f2c5ae6d5e9d7640f44b2e86534172c0c2284cbd30f7d51f8"
+        },
+        {
+          "id": "01DF3SEQIVVKFUCGVC4VCJNQ5M3NCC4ZXG",
+          "sha256": "751caae4e5d6e79fb5adce6d928c2b4d84e34f66902028f8c9f0afeb77783eee"
+        },
+        {
+          "id": "01DF3SEQNBMLMMZGVZ3VGKF7YSAVYKABC3",
+          "sha256": "dcccc92a20418020b0d014c2cb9cbcf7f4097a333f62f2aabea50e9e503b6871"
         }
       ],
-      "editionFormats": {},
+      "editionFormats": {
+        "9781950719716": "eBook",
+        "9781950719723": "Paperback"
+      },
       "coverUrl": "/backlist/catalog/for-what-it-s-worth-cover.jpg",
       "longDescription": "As an entry-level broadcast journalist in 1968, stubborn and strong- willed Becca Schmidt has been working behind the scenes to cover the war. When she meets Jesse Wanger, her immediate attraction to him rocks her to the core. Jesse is just as taken with the raven-haired beauty, but is hiding a painful past that has taught him to keep those he cares about at arm\u2019s length.",
       "shortDescription": "As an entry-level broadcast journalist in 1968, stubborn and strong- willed Becca Schmidt has been working behind the scenes to cover the war. When she meets Jesse Wanger, her immediate attraction to him rocks her to the core. Jesse is just as taken with the raven-haired beauty, but is hiding a painful past that has taught him to keep those he cares about at arm\u2019s length."
@@ -1213,10 +1505,27 @@
         {
           "id": "01DF3SEQLCX2QHG4OXXNCJ5OESOYPZD6QJ",
           "sha256": "eab08fad49cdebb8091d953922acf34c1c44fc4b0bc418374f5a28d4e3873c29"
+        },
+        {
+          "id": "01DF3SEQOZ7VCCY6RL2REJ2Y6DLBHTZNAS",
+          "sha256": "c2e5be8746e74a07f9fa052ebaac3d73f7caaca8e9c0bce83acb8a31818c185e"
+        },
+        {
+          "id": "01DF3SEQJYJOMWJLQQOBDZISXSQRQMI4KX",
+          "sha256": "cf88a817e53c8d6fd3d1201f1d15fc34f384e016637cb04a25e8e3cae2fd52f5"
         }
       ],
-      "editionFormats": {},
-      "coverUrl": "/backlist/catalog/help-god-i-am-the-collection-cover.jpg"
+      "editionFormats": {
+        "9781954414341": "eBook"
+      },
+      "coverUrl": "/backlist/catalog/help-god-i-am-the-collection-cover.jpg",
+      "sourceBoundEditions": [
+        {
+          "isbn": "9781954414341",
+          "format": "eBook",
+          "sourceId": "01DF3SEQJYJOMWJLQQOBDZISXSQRQMI4KX"
+        }
+      ]
     },
     "835f72d0-c27a-f111-ab0f-6045bdd69738": {
       "titleId": "835f72d0-c27a-f111-ab0f-6045bdd69738",
@@ -1229,10 +1538,16 @@
         {
           "id": "01DF3SEQK3NWGPPFCLTVCKMFZULLWUMZKR",
           "sha256": "c642c179dd958f657525157cb0d83a67141e96d239765a51a2eb9ef3f1119b32"
+        },
+        {
+          "id": "01DF3SEQJFEUSJVY6IOFCZQ72AGNHGPXU6",
+          "sha256": "a2a32fc3dfc1639ec8342afd0f7288dec311af9b19806f693f57b1dd121a5be0"
         }
       ],
       "editionFormats": {},
-      "coverUrl": "/backlist/catalog/love-is-an-action-word-cover.jpg"
+      "coverUrl": "/backlist/catalog/love-is-an-action-word-cover.jpg",
+      "longDescription": "\u201cLove Is An Action Word\u201d is supported biblically , as the Word of God shows us how to Love the way God intended. Let\u2019s work on our love walk and create healthy relationships with God\u2019s help. \u201cLove Is An Action Word\u201d is designed to give a practical perspective on love in a relationship between a man and a woman and love as a single in the current times. As a result, it will cause you to examine various areas of your love for yourself and the one you\u2019re in a relationship with. And, it will help the single person who may be considering marriage in the future. The approach of",
+      "shortDescription": "\u201cLove Is An Action Word\u201d is supported biblically , as the Word of God shows us how to Love the way God intended. Let\u2019s work on our love walk and create healthy relationships with God\u2019s help. \u201cLove Is An Action Word\u201d is designed to give a practical perspective on love in a relationship between a man and a woman and love as a single in the current times. As a result, it will cause you to examine various areas of your love for yourself and the one you\u2019re in a relationship with. And, it will help the single person who may be considering marriage in the future. The approach of"
     },
     "865f72d0-c27a-f111-ab0f-6045bdd69738": {
       "titleId": "865f72d0-c27a-f111-ab0f-6045bdd69738",
@@ -1245,10 +1560,16 @@
         {
           "id": "01DF3SEQILXOTIBWCTOJDZOWGJSCM3UPRV",
           "sha256": "295c2bcb452f67b6e23c8c57f02c16908bc9da5beeaf12e9fe7d24db36c83b96"
+        },
+        {
+          "id": "01DF3SEQMCBEUGVQ3NJFDLVFORVZD7S4UN",
+          "sha256": "a0c63832d068c65bc1e4db1e03a12bb2c71e98a8bca7fa7b35e4dfdae51cf0c1"
         }
       ],
       "editionFormats": {},
-      "coverUrl": "/backlist/catalog/number-23-and-me-cover.jpg"
+      "coverUrl": "/backlist/catalog/number-23-and-me-cover.jpg",
+      "longDescription": "This is not just a sports story. This is not just a political story, nor is this just a pop culture story. This is a story about a script written in 1984 about a star baller, who cares deeply about his community, has no father in the home, with the last name James who skipped college and went straight to the pros just like Lebron James. I believe and will testify to all facts herein. I believe that this is a prophetic message to our nation sent 35 years ago from God for today.",
+      "shortDescription": "This is not just a sports story. This is not just a political story, nor is this just a pop culture story. This is a story about a script written in 1984 about a star baller, who cares deeply about his community, has no father in the home, with the last name James who skipped college and went straight to the pros just like Lebron James. I believe and will testify to all facts herein. I believe that this is a prophetic message to our nation sent 35 years ago from God for today."
     },
     "885f72d0-c27a-f111-ab0f-6045bdd69738": {
       "titleId": "885f72d0-c27a-f111-ab0f-6045bdd69738",
@@ -1266,9 +1587,17 @@
         {
           "id": "01DF3SEQKTBW75S3IQ4RG3XVAKT6FBQLYM",
           "sha256": "3a0591ae2bd1bd4d8146066a90aff3445ac5f5371e73fca0598ca85d7ade164f"
+        },
+        {
+          "id": "01DF3SEQMZXR6A3JQ3NJAYNE7BWXSGE3AQ",
+          "sha256": "aaaa0787426b5a7c68a8486e02dfc52ca9280e0db2d8fcca419f212cf0f47a9b"
         }
       ],
-      "editionFormats": {},
+      "editionFormats": {
+        "9781954414624": "Paperback",
+        "9781954414839": "Hardcover",
+        "9781954414617": "eBook"
+      },
       "coverUrl": "/backlist/catalog/the-healed-me-cover.jpg",
       "longDescription": "Are you struggling right now? Is there hurt in your life that won\u2019t go away? Do you want to be healed but don\u2019t know where to start? Maybe it\u2019s depression or past scars that don\u2019t seem to heal. Maybe some unresolved trauma needs to be revealed so God can finally heal it. It\u2019s important to remember that the Lord is our Healer and that His Word is our medicine. Speaking Scripture and a\ufb03rmations over our lives does wonders for us. Healing always starts and ends with Him. Healing may not always come immediately, but it will come, so have faith in Him and His perfect timing. God\u2019s begun a good work in you, so trust Him to see you through.",
       "shortDescription": "Are you struggling right now? Is there hurt in your life that won\u2019t go away? Do you want to be healed but don\u2019t know where to start? Maybe it\u2019s depression or past scars that don\u2019t seem to heal. Maybe some unresolved trauma needs to be revealed so God can finally heal it. It\u2019s important to remember that the Lord is our Healer and that His Word is our medicine. Speaking Scripture and a\ufb03rmations over our lives does wonders for us. Healing always starts and ends with Him. Healing may not always come immediately, but it will come, so have faith in Him and His perfect timing. God\u2019s begun a good work in you, so trust Him to see you through."
@@ -1284,9 +1613,15 @@
         {
           "id": "01DF3SEQMC7WOKEZPLDNHLRGWJBQBGSV5V",
           "sha256": "771b286e28a82003e3c8e4b2e86d83b5742c8478b6922737199790f064d0c2f2"
+        },
+        {
+          "id": "01DF3SEQJ6EPFKP7NJKZGKMOY4ZSKBNGEV",
+          "sha256": "6dcc4dd66e838536f312ead7e3819b65f8156e21339f39b35e3a77f5cc303e46"
         }
       ],
-      "editionFormats": {},
+      "editionFormats": {
+        "9781954414655": "eBook"
+      },
       "coverUrl": "/backlist/catalog/warrior-s-breed-cover.jpg"
     },
     "a05f72d0-c27a-f111-ab0f-6045bdd69738": {
@@ -1345,7 +1680,7 @@
       "longDescription": "The Sun, the Shadow, and the Silence is a deeply intimate debut from poet R. Dorian Night, offering a stunning meditation on love, loss, emotional memory, and healing through language.\n\nStructured in three powerful parts\u2014The Sun, The Shadow, and The Silence\u2014this collection moves from radiant longing to quiet devastation and finally to a reckoning with identity, truth, and resilience. Blending classical influence with contemporary emotion, each poem explores the complexity of human connection with unflinching honesty.\n\nWhether through sonnet-like verse or modern confessionals, Night\u2019s work navigates the sacred and the broken, the idealized and the real. These are poems for those who have loved too hard, survived heartbreak, grieved silently, or searched for meaning in moments of emotional wreckage.\n\nThe Sun, the Shadow, and the Silence invites readers to sit with their feelings\u2014not to solve them, but to witness them fully. It is a book to be read slowly, felt deeply, and returned to often.\n\nPerfect for readers of:\n\u2013 Contemporary literary poetry\n\u2013 Breakup and recovery literature\n\u2013 Poets like Ocean Vuong, Rupi Kaur, or Sabrina Benaim\n\u2013 Anyone who has felt the ache of unspoken words or unresolved love\n\nSometimes, survival isn\u2019t loud. Sometimes, it\u2019s a whisper in the silence\u2014and a poem that stays.",
       "shortDescription": "A lyrical journey through love, loss, and longing\u2014this debut poetry collection explores heartbreak, healing, and the quiet truths we dare not say aloud.",
       "editionFormats": {
-        "9781961475564": "Other"
+        "9781961475564": "eBook"
       },
       "coverUrl": "/backlist/catalog/the-sun-the-shadow-and-the-silence-cover.jpg"
     },
@@ -1374,12 +1709,16 @@
         {
           "id": "01DF3SEQIGM4K5I5LCYRDKCUBT3QWN4APB",
           "sha256": "cace37cd57b7dbf3e53ee0248f76053b9d8973574960cc1966a8ba92bc5bb345"
+        },
+        {
+          "id": "01DF3SEQLD6C7EMPTC5JD2X6JHUWZSXSTY",
+          "sha256": "cace37cd57b7dbf3e53ee0248f76053b9d8973574960cc1966a8ba92bc5bb345"
         }
       ],
       "longDescription": "Your Peace is a Priority: A Devotional Journal is a transformative 30-day devotional designed to help readers rediscover inner peace through the grounding power of scripture, prayer, and self-reflection. Written by Dr. Kiena S. Hughley, a respected spiritual leader and educator, this devotional journal invites individuals to embark on a deeply personal journey toward emotional healing and spiritual renewal\u2014especially in times of uncertainty and transition.\n\nDrawing from biblical wisdom, practical insights, and lived experience, Dr. Hughley gently guides readers through three powerful stages of personal growth: identifying what disrupts their peace, examining their inner life and relationships, and reclaiming God\u2019s promises with clarity and courage. Each day features thoughtfully selected scriptures, daily affirmations, reflection prompts, and open space for prayer, making it ideal for morning quiet time, evening journaling, or group devotionals.\n\nOrganized with purpose and intentionality, the journal begins with a section on \u201cRenewing the Mind, Body & Soul in a Time of Uncertainty,\u201d offering actionable strategies for managing stress, creating clarity, and building positive spiritual habits. The midsection explores deeper emotional triggers\u2014including bitterness, grief, and guilt\u2014while encouraging accountability and forgiveness. The final phase empowers readers to walk in victory, embrace their calling, and pursue a lifestyle of peace rooted in faith.\n\nInspired by the author\u2019s personal experiences of grief, career shifts, and spiritual breakthroughs during and after the COVID-19 pandemic, this devotional is more than a book\u2014it\u2019s a companion for those who feel overwhelmed, stuck, or spiritually dry. It speaks especially to women of faith navigating life\u2019s challenges while trying to remain anchored in purpose and peace.\n\nWhether you are experiencing loss, burnout, spiritual disconnection, or are simply seeking more intentional time with God, Your Peace is a Priority offers a gentle yet empowering path back to stillness, healing, and joy. Dr. Hughley\u2019s candid storytelling, scriptural depth, and encouraging tone make this devotional a trusted tool for anyone ready to declutter the noise of life and reconnect with what truly matters.\n\nPerfect for individual study, small groups, or as a gift of encouragement, this devotional journal reminds us that peace isn\u2019t a luxury\u2014it\u2019s a promise. And with intention, prayer, and reflection, it can be reclaimed one day at a time.",
       "shortDescription": "A 30-day devotional journal guiding readers toward peace through scripture, prayer, and daily reflection.",
       "editionFormats": {
-        "9781961475465": "Other"
+        "9781961475465": "eBook"
       },
       "coverUrl": "/backlist/catalog/your-peace-is-a-priority-cover.jpg"
     },
@@ -1402,7 +1741,10 @@
       ],
       "longDescription": "Music ministry is more than leading songs\u2014it is leadership, discipleship, and spiritual service.\n\nIn Music Ministry Unplugged, Dr. Will Harris brings together decades of experience as a minister of music, educator, and gospel artist to offer a candid and practical guide for those called to lead in worship and music ministry. This book speaks directly to the realities of ministry life\u2014balancing musical excellence with spiritual responsibility, navigating relationships, and leading people with both skill and sensitivity.\n\nThrough biblical insight, personal stories, and real-world application, Dr. Harris walks readers through the essential components of effective music ministry. He explores what it means to truly answer the call, emphasizing that music ministry is not about performance, but about service, discipleship, and creating space for people to encounter God.\n\nReaders will gain practical guidance on:\n\n* Understanding the spiritual calling of music ministry\n* Building strong, respectful relationships between pastors and music leaders\n* Discovering and developing gifts within the congregation\n* Leading musicians, psalmists, and worship teams effectively\n* Selecting music that aligns with scripture and supports the church\u2019s vision\n* Curating meaningful worship experiences that engage and transform\n\nThe book also addresses the human side of ministry\u2014conflict, growth, leadership maturity, and the responsibility of shaping a worship culture that reflects both excellence and compassion.\n\nWhether you are directing a choir, leading a praise team, or stepping into music ministry for the first time, Music Ministry Unplugged offers encouragement, clarity, and actionable tools to strengthen your leadership and deepen your impact.\n\nMusic ministry is not simply about sound\u2014it is about service.\nIt is not about recognition\u2014it is about responsibility.\n\nThis is a resource for those who understand that worship leadership is sacred work\u2014and are committed to doing it well.",
       "shortDescription": "A practical, faith-based guide for music ministry leaders. Dr. Will Harris shares real-world insight on leadership, worship planning, team development, and spiritual responsibility\u2014helping leaders serve with purpose, wisdom, and excellence.",
-      "editionFormats": {},
+      "editionFormats": {
+        "9781961475724": "Paperback",
+        "9781961475731": "eBook"
+      },
       "coverUrl": "/backlist/catalog/music-ministry-unplugged-cover.jpg"
     },
     "69137ed6-c27a-f111-ab0f-6045bdd69738": {
@@ -1424,7 +1766,10 @@
       ],
       "longDescription": "In a time of distraction and spiritual compromise, The Messenger 2 calls believers back to unwavering faith and intentional obedience.\n\nDrawing from biblical figures such as Esther, Job, Moses, and Paul, Daphanny C. Baker delivers Scripture-centered reflections that challenge readers to stand firm in adversity, strengthen their prayer life, and live out authentic Christian faith. Each chapter addresses real struggles\u2014doubt, endurance, forgiveness, spiritual discipline, and trusting God when life feels uncertain.\n\nThis devotional-style collection goes beyond surface religion and invites readers into a deeper relationship with God marked by conviction, perseverance, and love. From learning to resist the enemy\u2019s schemes to understanding the refining fire of God\u2019s discipline, the messages are practical, heartfelt, and biblically grounded.\n\nWhether you are navigating hardship, rebuilding your faith, or seeking renewed spiritual strength, The Messenger 2 reminds you that God is present, purposeful, and faithful. Faith requires commitment. Growth requires surrender. And when faith is tested, commitment is revealed.\n\nThis is your call to stand firm.",
       "shortDescription": "Through reflections inspired by biblical figures such as Esther and Job, Daphanny C. Baker encourages readers to deepen their prayer life, trust God in adversity, and live out authentic Christian faith. Addressing doubt, endurance, forgiveness, and spiritual discipline, each chapter challenges believers to stand firm when tested.\n\nWhen faith is tested, commitment is revealed. This is your call to stand firm.",
-      "editionFormats": {},
+      "editionFormats": {
+        "9781961475618": "Paperback",
+        "9781961475625": "eBook"
+      },
       "coverUrl": "/backlist/catalog/the-messenger-2-cover.jpg"
     },
     "998797ca-c27a-f111-ab0f-7c1e525b15c2": {
@@ -1450,7 +1795,10 @@
       ],
       "longDescription": "BEE Careful is a heartwarming children\u2019s picture book that follows three young bees\u2014Brittany, Breauna, and Braden\u2014on an unforgettable journey through the meadow and forest.\n\nOne sunny morning, Brittany finds herself sneezing again and again. Concerned, she asks the Queen Bee for help and learns about a special sunflower said to be found somewhere beyond the safety of the hive. Although warned that the forest can be dangerous, Brittany\u2019s brother and sister choose to support her and quietly set off together to search for the flower.\n\nAlong the way, the bees encounter a variety of forest animals, including a mosquito, a frog, a rabbit, a fox, and a wise old owl. Each meeting brings new challenges and lessons, encouraging the bees to be polite, patient, and brave. Through moments of uncertainty and reassurance, the siblings learn that caring for one another and listening to guidance can help them face even the most unfamiliar paths.\n\nWith engaging, colorful illustrations and gentle storytelling, BEE Careful emphasizes themes of kindness, teamwork, perseverance, and family support. The story invites young readers to explore nature while learning about empathy and cooperation in a way that feels accessible and reassuring.\n\nIdeal for children ages 4\u20138, BEE Careful is well suited for read-aloud sessions, classrooms, and library collections. It offers a thoughtful, comforting adventure that encourages children to help others, face fears together, and believe in the strength found in family and friendship.",
       "shortDescription": "BEE Careful is a charming picture book about three young bees who set off on a brave adventure to help their sneezing sister. Along the way, they learn kindness, teamwork, and the importance of helping others.",
-      "editionFormats": {},
+      "editionFormats": {
+        "9781954414808": "Paperback",
+        "9781954414815": "Hardcover"
+      },
       "coverUrl": "/backlist/catalog/bee-careful-cover.jpg"
     },
     "9a8797ca-c27a-f111-ab0f-7c1e525b15c2": {
@@ -1465,10 +1813,18 @@
         {
           "id": "01DF3SEQMSNB4NAOLQKNE3YPVCDJQ2TV4W",
           "sha256": "2435e2e80e502c4d2884654de55263db1944ef273e970c1a19a5688e5f3fdb11"
+        },
+        {
+          "id": "01DF3SEQI2P4KXK2XL6VHY6UBIPZ4ZMSZ7",
+          "sha256": "405daaea14da426c2b89b35e8f8293cd7c9653e8704f64665038505c6fa150eb"
         }
       ],
-      "editionFormats": {},
-      "coverUrl": "/backlist/catalog/conquer-your-fears-and-win-cover.jpg"
+      "editionFormats": {
+        "9781950719372": "eBook"
+      },
+      "coverUrl": "/backlist/catalog/conquer-your-fears-and-win-cover.jpg",
+      "longDescription": "Believing is a state of mind, whatever you put your mind too, just do it, don\u2019t allow no one or anything to stop you or get in the way! You are a child of a king, and you were designed and created to become your best you. My favorite scripture and promise in God\u2019s word are, \u201cYou can do all things through Christ that strengthens you!\u201d Don\u2019t stop or quit until you WIN! My book was written to inspire any woman or man who has been told that they are not good enough. We are all good enough. We are fearfully and wonderfully made, according to Psalms 138:14. Your power is in your Thinking! So, let go of your insecurities, doubts, and fears, and... \u201cConquer Your Fears and Win.\u201d",
+      "shortDescription": "Believing is a state of mind, whatever you put your mind too, just do it, don\u2019t allow no one or anything to stop you or get in the way! You are a child of a king, and you were designed and created to become your best you. My favorite scripture and promise in God\u2019s word are, \u201cYou can do all things through Christ that strengthens you!\u201d Don\u2019t stop or quit until you WIN! My book was written to inspire any woman or man who has been told that they are not good enough. We are all good enough. We are fearfully and wonderfully made, according to Psalms 138:14. Your power is in your Thinking! So, let go of your insecurities, doubts, and fears, and... \u201cConquer Your Fears and Win.\u201d"
     },
     "9b8797ca-c27a-f111-ab0f-7c1e525b15c2": {
       "titleId": "9b8797ca-c27a-f111-ab0f-7c1e525b15c2",
@@ -1482,9 +1838,42 @@
     "9c8797ca-c27a-f111-ab0f-7c1e525b15c2": {
       "titleId": "9c8797ca-c27a-f111-ab0f-7c1e525b15c2",
       "slug": "establishing-glory-3",
-      "isbns": [],
-      "sources": [],
-      "editionFormats": {}
+      "isbns": [
+        "9781950719136",
+        "9781950719143",
+        "9781950719150"
+      ],
+      "sources": [
+        {
+          "id": "01DF3SEQPQ7KS7ETJ4EFBKVVTINBEIJZ3D",
+          "sha256": "b9c2285025f04b6c0b7000e090e420a8c6b8300e8c34dd4fe71129ea77a66a55"
+        },
+        {
+          "id": "01DF3SEQK4AG7V7ICWBFEKXTJGGN3VFVGK",
+          "sha256": "b22f0905bb43f1a5cb50a4ed77d26b02b6a7f79b741aae7231865e91b6d83487"
+        }
+      ],
+      "editionFormats": {},
+      "sourceBoundEditions": [
+        {
+          "isbn": "9781950719136",
+          "format": "Paperback",
+          "sourceId": "01DF3SEQK4AG7V7ICWBFEKXTJGGN3VFVGK"
+        },
+        {
+          "isbn": "9781950719143",
+          "format": "eBook",
+          "sourceId": "01DF3SEQK4AG7V7ICWBFEKXTJGGN3VFVGK"
+        },
+        {
+          "isbn": "9781950719150",
+          "format": "Hardcover",
+          "sourceId": "01DF3SEQK4AG7V7ICWBFEKXTJGGN3VFVGK"
+        }
+      ],
+      "coverUrl": "/backlist/catalog/establishing-glory-3-cover.jpg",
+      "longDescription": "The crazy thing about marriage is that most of us enter into this union by making a pledge that many of us do not understand and most of us have never really thought about. We know that the Marriage Vows are essential. But, we do not take the time to expound on them.\n\nEstablishing Glory 3: The Marriage Handbook takes a deep dive into the vows that we exchange with our spouse on our special day.\n\nAs a follow-up to the Praise and Worship Handbook and the Relationship Handbook, Best-Selling Author - Jackie Smith, Jr. takes an honest and unfiltered look into the challenges and achievements that marriage can present us.\n\nSo, whether you've been married for 90 years, or you're planning to get married one day, Establishing Glory 3: The Marriage Handbook is for YOU!",
+      "shortDescription": "The crazy thing about marriage is that most of us enter into this union by making a pledge that many of us do not understand and most of us have never really thought about. We know that the Marriage Vows are essential. But, we do not take the time to expound on them."
     },
     "9d8797ca-c27a-f111-ab0f-7c1e525b15c2": {
       "titleId": "9d8797ca-c27a-f111-ab0f-7c1e525b15c2",
@@ -1526,9 +1915,52 @@
         {
           "id": "01DF3SEQIHK5OTUDRVG5B3DDG5WHOMUB2W",
           "sha256": "2b4ac5443d075d25be246208062a0e62e673cd45c9786443ae043a94bf98c8c1"
+        },
+        {
+          "id": "01DF3SEQIBR2SMLFRWPVEJNJJ2PB6R6YN3",
+          "sha256": "68166096f84b3c5512f359ee2e68fe49ce61a85f203ce01ff70f7a986f95b72e"
+        },
+        {
+          "id": "01DF3SEQO63NFM6OGLHBDIGAFPJQA7SHJA",
+          "sha256": "6ebc650f0b201ef2755bef72dc914a866de01426e136ce48796c37de547d4fc5"
+        },
+        {
+          "id": "01DF3SEQOZD34DKQQDPVFY7EA76BEWMAIN",
+          "sha256": "e84da477ed6940afbb260746971006990c6d22a56f608b330a862c9b2f2e54d1"
+        },
+        {
+          "id": "01DF3SEQMYZWSDOHBCEZAZDD7XOXZY7YSA",
+          "sha256": "0e05b06e601704f066365af328d8c6bb8303c7373cf036a2bd4011fbb9c33ee2"
+        },
+        {
+          "id": "01DF3SEQKXNWBS3G5UEFB3OGZZ7D3HVOWL",
+          "sha256": "f803245ea40fc7ad0f53f9b2cb1a31f73dc123529a889d21d9cbb95f939ae655"
+        },
+        {
+          "id": "01DF3SEQLFEIV6WUBCJZBJGFP5K3QOF6OF",
+          "sha256": "74d78c8f5ce8d0d5a04626ca7e50a4b21eea4205cdf148cb3450c65601dd5d8f"
+        },
+        {
+          "id": "01DF3SEQKFCIV46KHD6NG2FRLHKIHODXKC",
+          "sha256": "6e216e6bfa219078b339625201bec42993f4659294564808f394b670f7f1fa9e"
+        },
+        {
+          "id": "01DF3SEQOGFW5C5367GNEZQ4WQS6UCWOT5",
+          "sha256": "d7f3c54ff901b1171ad30db7ee7058c786ddaa23ae2108e88a28b87aa61382d6"
+        },
+        {
+          "id": "01DF3SEQK2TGULSZKR6BEZFQZQU7ISSNTG",
+          "sha256": "ac8f37e1af3de06f66ea095ae5dc2aa3bb716df03a165bceb44fd41305231070"
+        },
+        {
+          "id": "01DF3SEQPDGKCQWU3Q2RE2AFK3RMQPUKHS",
+          "sha256": "54a864346372197d8445493a47cc73b7320aa99959d4ace4a75256a2b5869b82"
         }
       ],
-      "editionFormats": {},
+      "editionFormats": {
+        "9781954414938": "Paperback",
+        "9781954414945": "eBook"
+      },
       "coverUrl": "/backlist/catalog/hodge-podge-of-life-cover.jpg",
       "longDescription": "\u201cHodge Podge of Life\u201d by Mildred Beard is a heartfelt memoir recounting her life\u02bbs journey from her humble beginnings in Ethel, West Virginia, to her unwavering faith and community engagement. Inspired by conversations with classmates, Beard embarked on a spiritual quest, leading her to a profound connection with God. The book highlights pivotal moments in her life, including facing health challenges, experiencing spiritual awakening, and receiving miraculous healing through prayer . Her career in beauty culture allowed her to engage with her community, fostering lasting friendships. Beard\u02bbs narrative underscores the importance of faith, community, and service. Her active involvement in churches, dedication to youth ministries, and commitment to community activities showcase her passion for positively impacting others\u02bb lives. In essence, \u201cHodge Podge of Life\u201d is a testament to the enduring power of faith, community support, and the transformative impact of spirituality on one woman\u02bbs remarkable journey.",
       "shortDescription": "\u201cHodge Podge of Life\u201d by Mildred Beard is a heartfelt memoir recounting her life\u02bbs journey from her humble beginnings in Ethel, West Virginia, to her unwavering faith and community engagement. Inspired by conversations with classmates, Beard embarked on a spiritual quest, leading her to a profound connection with God. The book highlights pivotal moments in her life, including facing health challenges, experiencing spiritual awakening, and receiving miraculous healing through prayer . Her career in beauty culture allowed her to engage with her community, fostering lasting friendships. Beard\u02bbs narrative underscores the importance of faith, community, and service. Her active involvement in churches, dedication to youth ministries, and commitment to community activities showcase her passion for positively impacting others\u02bb lives. In essence, \u201cHodge Podge of Life\u201d is a testament to the enduring power of faith, community support, and the transformative impact of spirituality on one woman\u02bbs remarkable journey."
@@ -1545,10 +1977,23 @@
         {
           "id": "01DF3SEQP33FGM5QOBEJDYHZ3A72FI3FTS",
           "sha256": "ea4ee23aa008c511bb34165a55a56ea91af447fe8e1cd2051f5c48a8b089dae4"
+        },
+        {
+          "id": "01DF3SEQK66NH7L6SCSBGIB4NVGULKYQ4K",
+          "sha256": "09c2001b9543c32d11965823f360866044d628876b86f48ba60436cfee1db6b4"
+        },
+        {
+          "id": "01DF3SEQKJW4XPMO2QAJE2NXHAWVVBNFZE",
+          "sha256": "64a292c4bb8ce029b9f0d682a9937ee1000db487be772a2c2ccf3f0e30dd89c6"
         }
       ],
-      "editionFormats": {},
-      "coverUrl": "/backlist/catalog/mirror-of-refining-insight-cover.jpg"
+      "editionFormats": {
+        "9781954414365": "eBook",
+        "9781954414372": "Paperback"
+      },
+      "coverUrl": "/backlist/catalog/mirror-of-refining-insight-cover.jpg",
+      "longDescription": "For those not satisfied with who they are, or know they can do better... When we look in the mirror, we see a reflection. If we don't like what we see, we can either make cosmetic changes or, through surgery, get alterations implemented. Unfortunately, we can't do that if we've developed bad habits or traits, and often some of our bad habits, we don't even know about until someone exposes them. Even your best friend may not tell you about some of them. The observations via poems are to help expose some of those habits, traits, and character flaws like nobody taught you to have a filter on the things you say? We can't say everything that comes to mind, or a slap upside the head might be in our near future. Or when we talk, we may make gestures or faces that give away the truth when you tell a lady she's not really fat or a coworker that they're smart? Poems make you question, who am I, and do I act like that when you know you don't want to be disrespectful. Another means to improve your self-worth and character while distancing yourself from the negative characteristic flaws and undesirable habits.",
+      "shortDescription": "For those not satisfied with who they are, or know they can do better... When we look in the mirror, we see a reflection. If we don't like what we see, we can either make cosmetic changes or, through surgery, get alterations implemented. Unfortunately, we can't do that if we've developed bad habits or traits, and often some of our bad habits, we don't even know about until someone exposes them. Even your best friend may not tell you about some of them. The observations via poems are to help expose some of those habits, traits, and character flaws like nobody taught you to have a filter on the things you say? We can't say everything that comes to mind, or a slap upside the head might be in our near future. Or when we talk, we may make gestures or faces that give away the truth when you tell a lady she's not really fat or a coworker that they're smart? Poems make you question, who am I, and do I act like that when you know you don't want to be disrespectful. Another means to improve your self-worth and character while distancing yourself from the negative characteristic flaws and undesirable habits."
     },
     "5b4797d0-c27a-f111-ab0f-7c1e525b15c2": {
       "titleId": "5b4797d0-c27a-f111-ab0f-7c1e525b15c2",
@@ -1582,9 +2027,37 @@
         {
           "id": "01DF3SEQO3JALJRCKFRBALNTKJFIFYPBDK",
           "sha256": "5aecc1a237037e75f257e3168f6d6d2ed751a925899f3f7560f3913e76be3690"
+        },
+        {
+          "id": "01DF3SEQMYWKXLW2Y4O5D3756WAT2JYJCD",
+          "sha256": "0f3fb0e4571d84fe00bf112b1cd586448f05e5868726a1ab0bd12a2201dc7f17"
+        },
+        {
+          "id": "01DF3SEQM5DIGLCWHQGRFI522D2HNEAYTW",
+          "sha256": "361deaa987c85c063c22f36efdcd6d66605939beccad9c46500710ea0939ca0c"
+        },
+        {
+          "id": "01DF3SEQIY46PVT6A36JCIYPNTOZACFWSN",
+          "sha256": "a758c83a99fd96d9e1aa234cec9374a25899d2ea956fe27a7e6bd8eed7c93fe6"
+        },
+        {
+          "id": "01DF3SEQL6YLNP3MLV7FHJRQ5E6W54JWTG",
+          "sha256": "c6b1f6b8d524fba40735ba8ca50675974ca5eb281034337a99ad6335e3df6f93"
+        },
+        {
+          "id": "01DF3SEQM62DCC7PYQWZHK6JFOPKXJHWVZ",
+          "sha256": "644f59ef9804f4ef62854cb3d2b5c0036b902b31ec4d8fbf0cad00d780d99b4c"
+        },
+        {
+          "id": "01DF3SEQIVECWA52H6XZGZ5GUAA6DZLVJD",
+          "sha256": "a79434ff0e47f8355676933547dec270132bb23a54198ee1af3f3867c486d187"
         }
       ],
-      "editionFormats": {},
+      "editionFormats": {
+        "9781954414860": "Paperback",
+        "9781954414877": "Hardcover",
+        "9781954414884": "eBook"
+      },
       "coverUrl": "/backlist/catalog/ordinary-people-searching-for-greatness-cover.jpg",
       "longDescription": "Prepare to be captivated by the extraordinary life and teachings of Pastor Neal, a true West Virginian luminary. In her dynamic book, \"Ordinary People Searching for Greatness,\" she reveals her multifaceted journey as a teacher, dancer, radio personality, and more, all driven by her unwavering dedication to God and humanity. Brace yourself for a life-altering exploration that transcends the ordinary, as Pastor Neal ignites the spark within you to unleash your hidden greatness. This exhilarating book compels you to break free from the confines of your current existence and embark on an extraordinary journey of self-discovery.",
       "shortDescription": "Prepare to be captivated by the extraordinary life and teachings of Pastor Neal, a true West Virginian luminary. In her dynamic book, \"Ordinary People Searching for Greatness,\" she reveals her multifaceted journey as a teacher, dancer, radio personality, and more, all driven by her unwavering dedication to God and humanity. Brace yourself for a life-altering exploration that transcends the ordinary, as Pastor Neal ignites the spark within you to unleash your hidden greatness. This exhilarating book compels you to break free from the confines of your current existence and embark on an extraordinary journey of self-discovery."
@@ -1633,9 +2106,24 @@
         {
           "id": "01DF3SEQP7LCJROW7TXNFICNRXHCPQLPJS",
           "sha256": "49552076fb4d17695f7af5cd529cb83c20aae7bb652806fa1878a66daffc227a"
+        },
+        {
+          "id": "01DF3SEQLSTCBUEKW245HYYUPSDINQREIR",
+          "sha256": "6eccf15a546a41c2b9255542d7ca2958dc905993eba2b35c2820f6e6d92628bd"
+        },
+        {
+          "id": "01DF3SEQOU5AWUHPLH2VA24ERQCPYK2YAS",
+          "sha256": "13a8e96b6b49ea96a6f8e2476d3c3cecde45921953d00aecc2a80ceb74c1a55c"
+        },
+        {
+          "id": "01DF3SEQICR5S2WXZESBGZWTKOVTRC7AEQ",
+          "sha256": "ffc8a8dcb52e472e82a9a4f01cf95f20a4205b2e4a3745a5a92d480acab89156"
         }
       ],
-      "editionFormats": {},
+      "editionFormats": {
+        "9781954414556": "eBook",
+        "9781954414563": "Paperback"
+      },
       "coverUrl": "/backlist/catalog/words-of-a-troubled-soul-cover.jpg",
       "longDescription": "In \u201cWords of a Troubled Soul, \u201d David mirrors his feelings and takes on life through his work. This book starts like David\u2019s life: rough, dark, and hopeless. You\u2019ll notice some helpful sayings and quotes as you continue to read. As you reach the book\u2019s climax, you\u2019ll see his writings become brighter and more hopeful.",
       "shortDescription": "In \u201cWords of a Troubled Soul, \u201d David mirrors his feelings and takes on life through his work. This book starts like David\u2019s life: rough, dark, and hopeless. You\u2019ll notice some helpful sayings and quotes as you continue to read. As you reach the book\u2019s climax, you\u2019ll see his writings become brighter and more hopeful."
@@ -1714,9 +2202,15 @@
         {
           "id": "01DF3SEQINF3MVNT7QXZHJZQ66YSJ4PHSX",
           "sha256": "b336b21f62cf795758c28617aae1bf03cb0679b7d7024e49842f2035a779ee47"
+        },
+        {
+          "id": "01DF3SEQKPENOLCAM74NDZPVRMLGGWC4Z4",
+          "sha256": "678d8e39c98aaef50d79c3f681c2edc872aca27f7aad0551c9c2d843f85e7cb0"
         }
       ],
-      "editionFormats": {},
+      "editionFormats": {
+        "9781950719884": "Paperback"
+      },
       "longDescription": "Have you ever experienced God\u2019s Nudge? The Nudge of God is that non-verbal, internal thought or that still audible voice you hear to guide you in the direction that is pleasing to His will. Every now and then, one need\u2019s the Nudge of God to stay the course to stay led, directed, and guided by God. The Nudge illuminates the word that it will shine like a lamp unto your feet and a light unto your path. Why God\u2019s Nudge? God\u2019s Nudge was written during a worldwide pandemic (Covid-19). Anxiety , depression, sadness, fear, doubt, the spirit of \u201cquit,\u201d and so many other symptomology and emotions were present, which filled many hearts and minds. Because God is our refuge and strength, a present help in trouble, he offers His infallible word to bring comfort and guidance. In reading God\u2019s Nudge, there is fresh Rhema in each chapter providing support to the readers with reflective insight to search the scriptures to gain deeper understanding, knowledge, and life application. God\u2019s Nudge is thought-provoking and enlightening. It will ignite the branches of readers to \u201clevel up\u201d in your journey .",
       "shortDescription": "Have you ever experienced God\u2019s Nudge? The Nudge of God is that non-verbal, internal thought or that still audible voice you hear to guide you in the direction that is pleasing to His will. Every now and then, one need\u2019s the Nudge of God to stay the course to stay led, directed, and guided by God. The Nudge illuminates the word that it will shine like a lamp unto your feet and a light unto your path. Why God\u2019s Nudge? God\u2019s Nudge was written during a worldwide pandemic (Covid-19). Anxiety , depression, sadness, fear, doubt, the spirit of \u201cquit,\u201d and so many other symptomology and emotions were present, which filled many hearts and minds. Because God is our refuge and strength, a present help in trouble, he offers His infallible word to bring comfort and guidance. In reading God\u2019s Nudge, there is fresh Rhema in each chapter providing support to the readers with reflective insight to search the scriptures to gain deeper understanding, knowledge, and life application. God\u2019s Nudge is thought-provoking and enlightening. It will ignite the branches of readers to \u201clevel up\u201d in your journey ."
     },
@@ -1894,10 +2388,16 @@
         {
           "id": "01DF3SEQOYPKPEWC2NWZALU2BAHCPX372E",
           "sha256": "39e2cedea9188acbe3861788b6b8ae9fc732e231ef7a4589e03cc45635271b94"
+        },
+        {
+          "id": "01DF3SEQLZPCCMF46FSNE3I6C3PLGIF2VD",
+          "sha256": "02c6cc617dda5bc22f98611caa4fa2dc606bf6a76a780d6b2351c5a023328a09"
         }
       ],
       "editionFormats": {},
-      "coverUrl": "/backlist/catalog/pretty-wings-cover.jpg"
+      "coverUrl": "/backlist/catalog/pretty-wings-cover.jpg",
+      "longDescription": "Pretty Wings, is a captivating journey detailing the miraculous life-changing experiences of extraordinary women. These true testimonies of overcoming abuse, trauma, sickness, anger, and fear are inspiring to all women in the process of life's complications. Our journey can be dark like a cocoon, but God knows the end from the beginning.\n\nGod is the architect of our life and story. Orchestrated so He receives the glory from his hand in our lives. As a butterfly cast its shell it leaves behind its old form and way of operation. In its new form it develops Pretty Wings to reproduce beauty. Evolving into God's imagination of us.\n\nPretty Wings, signifies being able to make it through the experiences we think are destroying us. Yet molding us into the beauty of God's creation.",
+      "shortDescription": "Pretty Wings, is a captivating journey detailing the miraculous life-changing experiences of extraordinary women. These true testimonies of overcoming abuse, trauma, sickness, anger, and fear are inspiring to all women in the process of life's complications. Our journey can be dark like a cocoon, but God knows the end from the beginning."
     },
     "rhyming-it-up-with-church-stuff": {
       "titleId": "rhyming-it-up-with-church-stuff",
@@ -2108,8 +2608,13 @@
         {
           "id": "01DF3SEQNPS26WQVBCXFD27ZXOAGVEOJN4",
           "sha256": "a0b56739c6902f015b08b3a0cd602a5b012300dbaa207b9257f9eb2a16c5061d"
+        },
+        {
+          "id": "01DF3SEQKYTCZMHK4ZSFDINGYS6NDFPJT6",
+          "sha256": "011adc31461f04b95bea690d4a38699024bd3a6e22b92672a647b914718bd08b"
         }
-      ]
+      ],
+      "photoUrl": "/backlist/catalog/donjia-walls-portrait.jpg"
     },
     "ericka-johnson-settles": {
       "name": "Ericka Johnson-Settles",
@@ -2129,7 +2634,7 @@
       "titleIds": [
         "9a8797ca-c27a-f111-ab0f-7c1e525b15c2"
       ],
-      "biography": "I am a devoted wife to Isaiah Hezekiah Patterson. I married my husband on September 22, 2004. We have three daughters together, Elisabeth, Hannah, and Naomi. I also have a stepdaughter, Sarah Patterson.\n\nI enjoy inspiring women to believe in themselves, exercise their faith, and overcome adversity, by shifting their mindset. I am a firm believer in whatever the mind can perceive it can achieve. Reading motivational books inspires me to lead and mentor others to success. Stay afloat by quoting the promises of God.",
+      "biography": "I enjoy inspiring women to believe in themselves, exercise their faith, and overcome adversity, by shifting their mindset. I am a firm believer in whatever the mind can perceive it can achieve. Reading motivational books inspires me to lead and mentor others to success. Stay afloat by quoting the promises of God.",
       "sources": [
         {
           "id": "01DF3SEQMSNB4NAOLQKNE3YPVCDJQ2TV4W",
@@ -2138,6 +2643,10 @@
         {
           "id": "01DF3SEQM7VRVHZVWX4NBLPJWKNALKVJHZ",
           "sha256": "a5c793871b29c66bdb774df2991ef831d7368f72e8f7326966088e31dcb47df0"
+        },
+        {
+          "id": "01DF3SEQI2P4KXK2XL6VHY6UBIPZ4ZMSZ7",
+          "sha256": "405daaea14da426c2b89b35e8f8293cd7c9653e8704f64665038505c6fa150eb"
         }
       ],
       "photoUrl": "/backlist/catalog/gloria-patterson-portrait.jpg"
@@ -2363,9 +2872,19 @@
         {
           "id": "01DF3SEQLKFMZZBW35SNAK2UCE5ZPWDGQH",
           "sha256": "4bb9322e5862520b9066724720bb580f3b30bdd029ba89f75c9c00321dc3c763"
+        },
+        {
+          "id": "01DF3SEQKDK43PHUMV7VE3CGYL4B2DROJN",
+          "sha256": "2b487e160c47c6add4687de857d52df66de056f4e45e5e3e740fc269fd58ce3c"
+        },
+        {
+          "id": "01DF3SEQMMEY5ZCD5ASJEI24QHDMPXVNWI",
+          "sha256": "3e5f67f4806bddbac2decb81bf4cdeb78a2455edf2bd35200b582c3f0f3dbeaf"
         }
       ],
-      "photoUrl": "/backlist/catalog/leslie-banks-portrait.jpg"
+      "photoUrl": "/backlist/catalog/leslie-banks-portrait.jpg",
+      "biography": "Leslie Banks, MSA, LCDC II, is a counselor, motivational speaker, author and adjunct professor. As a chemical dependency/mental health counselor, she specializes in working with young, African-American males. She uses sincerity, humor and genuine approach to touch the hearts and motivate the hard to reach and sometimes forgotten youths. Leslie earned a BA in Business Administration, a degree in counseling, and a Master\u2019s degree in Health Services Administration and Human Resources. Leslie is the founder and CEO of L. Banks and Associates, LLC and the non-profit organization Mending Our Youth. Currently residing in Columbus, Ohio, she enjoys spending her time with her family, traveling, and being active in her church. She lives by the principal of 1 Thessalonians 5:11 \u201cSo encourage each other and build each other up, just as you are already doing.\u201d",
+      "portraitUrl": "/backlist/catalog/leslie-banks-portrait.jpg"
     },
     "dennis-brown": {
       "name": "Dennis Brown",
@@ -2518,9 +3037,15 @@
         {
           "id": "01DF3SEQL67X7SF4K2M5GZVP67ZTMRBAPU",
           "sha256": "5c9fa471aca7e0aed20d6beeb1170abd292fe8fdb9c2ee4d0f67ae8dcb4a4f58"
+        },
+        {
+          "id": "01DF3SEQMVU4UJVOX6BRGLNOSOFU3UGXNR",
+          "sha256": "f3caed422b334b606565ba0f1ea1b461d66c9a84748ec7ed0c80d922bf6eb18f"
         }
       ],
-      "photoUrl": "/backlist/catalog/pamela-smith-portrait.jpg"
+      "photoUrl": "/backlist/catalog/pamela-smith-portrait.jpg",
+      "biography": "Pamela Smith is an Evangelist, Wife, Mother, and Spiritual Counselor to many. Her desire in life is to serve God and share His Word with all those she encounter s.",
+      "portraitUrl": "/backlist/catalog/pamela-smith-portrait.jpg"
     },
     "ericka-thornton": {
       "name": "Ericka Thornton",
@@ -2548,6 +3073,51 @@
         }
       ],
       "biography": "Christina Has worked with children since she was a little girl herself! From directing The \u201cRosebud\u201dchoir at her childhood church, to working at daycares and coordinating her first Vacation Bible School! She has had a love for making children smile!\n\nChristina is thankful for so many mentors along the way! And those yet to come!"
+    },
+    "brandyn-mcelroy": {
+      "name": "Brandyn McElroy",
+      "titleIds": [
+        "15e01ad3-c27a-f111-ab0f-6045bdd69678"
+      ],
+      "sources": [
+        {
+          "id": "01DF3SEQJZR2I5GJVSLRGLH5RX5L4NRFIM",
+          "sha256": "b36f5a3b47215a4a2957af4e02b2dfc423b66c096608c487774c0734f3f71290"
+        }
+      ],
+      "photoUrl": "/backlist/catalog/brandyn-mcelroy-portrait.jpg",
+      "biography": "BRANDYN MCELROY is a corporate professional, community leader and minister, but most importantly, he\u2019s a husband and father. Dealing with infertility is a challenge that can be daughting to anyone and Brandyn has devoted himself to informing and encouraging men on how to navigate this difficult path. While each journey bring forth different obstacles, faith and the pursuit of knowledge will guide you to better future for you and your partner."
+    },
+    "shelley-mcintosh": {
+      "name": "Shelley McIntosh",
+      "titleIds": [
+        "d9f603d3-c27a-f111-ab0f-000d3a14673b",
+        "903274cd-c27a-f111-ab0f-6045bdd69435",
+        "841a04cd-c27a-f111-ab0f-000d3a14673b",
+        "1159fcc8-c37a-f111-ab0f-000d3a14673b"
+      ],
+      "sources": [
+        {
+          "id": "01DF3SEQI5ZEDBD6LI3FFLDMYWVNUHAKU3",
+          "sha256": "c11ea85a83cc2d440b1e5cbfcd5214f783b9283588304aa9651114f4bfc48f78"
+        }
+      ],
+      "biography": "Dr. Shelley McIntosh earned her doctoral degree in curriculum and instruction at the University of Houston. Her research and studies have focused on the social, spiritual, and academic development of Black children; the spiritual voices of preservice teachers and their responses to state certification tests; the diverse cultural and linguistic backgrounds of Black children; and biblical history. She has served as a bishop and cardinal, national youth director, professor of urban education, elementary school teacher, urban school principal, and English language arts coach.",
+      "portraitUrl": "/backlist/catalog/shelley-mcintosh-portrait.jpg"
+    },
+    "janet-stephens": {
+      "name": "Janet Stephens",
+      "titleIds": [
+        "a5084bcd-c27a-f111-ab0f-00224820105b"
+      ],
+      "sources": [
+        {
+          "id": "01DF3SEQI77B5GV4YW3ZDJIJWY43MYAOBB",
+          "sha256": "a9b3e13418e99821d93dd62ce23f68daf847284b35cfcc970265e99b52ae9afa"
+        }
+      ],
+      "biography": "Janet Stephens (Lady J) is a leader, writer, exhorter, wife and mother of a blended family of 6 beautiful children. She partnered with her husband to plant Truth and Wholeness Ministries now Manifestation Church in Columbus, Ohio where she currently lives. She has developed a love for teaching the word of God and is passionate about everyone learning about their purpose in life, establishing a vision for their life, and walking in destiny. Lady J has served in many areas of ministry administratively, teaching, preaching and in song.",
+      "portraitUrl": "/backlist/catalog/janet-stephens-portrait.jpg"
     }
   }
 }

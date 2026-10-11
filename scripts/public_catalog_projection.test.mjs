@@ -105,6 +105,37 @@ test('campaign readiness rejects empty and placeholder destinations without hidi
   assert.ok(projection.evaluateCampaignDestinationReadiness(title({formats:['Other'],isbnByFormat:[]})).missing.includes('UNVERIFIED_EDITION_FORMAT'))
 })
 
+test('confirmed duplicate pairs consolidate exact IDs and retain distinct editions', () => {
+  const canonical = title({id:'67137ed6-c27a-f111-ab0f-6045bdd69738',slug:'music-ministry-unplugged',formats:['Paperback'],isbnByFormat:[{format:'Paperback',isbn:'9781961475724',assetId:'print',assetStatus:'Live'}]})
+  const duplicate = title({id:'982156cd-c37a-f111-ab0f-00224820105b',slug:'music-ministry-unplugged-real-lessons-for-those-who-lead-and-serve-in-music-ministry',formats:['eBook'],isbnByFormat:[{format:'eBook',isbn:'9781961475731',assetId:'digital',assetStatus:'Live'}]})
+  const distinct = title({id:'other-edition',slug:'music-ministry-unplugged-large-print',title:'Music Ministry Unplugged: Large Print'})
+  const result = projection.consolidateConfirmedPublicTitles([canonical, duplicate, distinct])
+  assert.equal(result.length, 2)
+  assert.equal(result[0].subtitle, 'Real Lessons for Those who Lead and Serve in Music Ministry')
+  assert.deepEqual(result[0].formats,['Paperback','eBook'])
+  assert.equal(result[0].isbnByFormat.length,2)
+  assert.equal(result[1],distinct)
+  assert.deepEqual(projection.consolidateConfirmedPublicTitles(result),result)
+  assert.equal(projection.canonicalPublicTitleSlug(duplicate.slug),canonical.slug)
+  assert.equal(projection.canonicalPublicTitleSlug(duplicate.id),canonical.slug)
+  assert.equal(projection.canonicalPublicTitleSlug(distinct.slug),distinct.slug)
+  assert.deepEqual(projection.consolidateConfirmedPublicTitles([duplicate]),[duplicate])
+})
+
+test('all explicit duplicate rules expose stable canonical aliases without changing source records', () => {
+  const rules = JSON.parse(readFileSync(new URL('../data/public-title-consolidations.json', import.meta.url), 'utf8'))
+  for (const rule of rules) {
+    const retained = title({id:rule.canonicalId,slug:rule.canonicalSlug})
+    const aliases = projection.publicTitleAliases([retained])
+    for (const id of rule.duplicateIds) {
+      assert.equal(projection.canonicalPublicTitleSlug(id),rule.canonicalSlug)
+      assert.ok(aliases.some(alias => alias.id === id && alias.canonicalId === rule.canonicalId))
+    }
+    for (const slug of rule.retiredSlugs) assert.equal(projection.canonicalPublicTitleSlug(slug),rule.canonicalSlug)
+    assert.equal(retained.id,rule.canonicalId)
+  }
+})
+
 test('title cannot verify live without a JMP-controlled title page', () => {
   const result = projection.evaluateTitleLiveAndVerifiedPublicGate({
     title: title(),
@@ -199,14 +230,14 @@ test('duplicate title and author slugs are surfaced as public projection holds',
 
 test('public title projection disambiguates duplicate slugs with stable title identity', () => {
   const titles = projection.projectPublicCatalogTitles([
-    title({ id: 'fec27b7a-cc7a-f111-ab0f-6045bdd69435', slug: 'warrior-s-breed', title: "Warrior's Breed" }),
-    title({ id: '935f72d0-c27a-f111-ab0f-6045bdd69738', slug: 'warrior-s-breed', title: "Warrior's Breed" }),
+    title({ id: 'fec27b7b-cc7a-f111-ab0f-6045bdd69435', slug: 'distinct-editions', title: 'Distinct Editions' }),
+    title({ id: '935f72d1-c27a-f111-ab0f-6045bdd69738', slug: 'distinct-editions', title: 'Distinct Editions' }),
   ])
   assert.deepEqual(
     titles.map((item) => [item.id, item.slug]),
     [
-      ['935f72d0-c27a-f111-ab0f-6045bdd69738', 'warrior-s-breed'],
-      ['fec27b7a-cc7a-f111-ab0f-6045bdd69435', 'warrior-s-breed-fec27b7a'],
+      ['935f72d1-c27a-f111-ab0f-6045bdd69738', 'distinct-editions'],
+      ['fec27b7b-cc7a-f111-ab0f-6045bdd69435', 'distinct-editions-fec27b7b'],
     ],
   )
 })

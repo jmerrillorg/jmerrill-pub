@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { buildPublicCatalogProjectionSummary, evaluatePublicCatalogReadiness, evaluateCampaignDestinationReadiness } from '@/lib/catalog/public-projection'
+import { buildPublicCatalogProjectionSummary, evaluatePublicCatalogReadiness, evaluateCampaignDestinationReadiness, publicTitleAliases } from '@/lib/catalog/public-projection'
 import { listPublicAuthors, listPublicCatalogTitles } from '@/lib/server/dataverse/catalog'
 
 export const dynamic = 'force-dynamic'
@@ -32,6 +32,7 @@ export async function GET() {
       retailerBoundary: 'Retailer and Amazon data are verification evidence only.',
     },
     summary,
+    titleAliases: publicTitleAliases(titlesResult.data),
     titles: titlesResult.data.map((title) => ({
       id: title.id,
       slug: title.slug,

@@ -9,6 +9,7 @@ type TitlePresentation = {
   shortDescription?: string
   longDescription?: string
   editionFormats?: Record<string, string>
+  sourceBoundEditions?: { isbn: string; format: 'Paperback' | 'Hardcover' | 'eBook'; sourceId: string }[]
 }
 type AuthorPresentation = {
   name: string
@@ -34,7 +35,9 @@ export function getPublicBacklistContent(title: Pick<CatalogTitleSummary, 'id' |
 export function applyPublicBacklistAuthor(author: CatalogAuthorSummary, titles: CatalogTitleSummary[]): CatalogAuthorSummary {
   const entry = content.authors[author.slug]
   if (!entry || entry.name !== author.name) return author
-  const bound = titles.some(title => entry.titleIds.includes(getPublicBacklistContent(title)?.titleId || title.id) && title.authors.some(link => link.slug === author.slug && link.name === author.name))
+  const displayKey = (name: string) => name.toLowerCase().replace(/[.,]/g, '').replace(/\s+/g, ' ').trim()
+  // Presentation punctuation does not change an already exact-slug/title binding.
+  const bound = titles.some(title => entry.titleIds.includes(getPublicBacklistContent(title)?.titleId || title.id) && title.authors.some(link => link.slug === author.slug && displayKey(link.name) === displayKey(author.name)))
   if (!bound) return author
   return { ...author, shortBio: entry.biography || author.shortBio, photoUrl: entry.photoUrl || author.photoUrl }
 }
