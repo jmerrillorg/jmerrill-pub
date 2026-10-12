@@ -25,7 +25,7 @@ function fixture() {
   const deps={env:{JM1_TITLE_COMMISSIONING_REVIEW_ENABLED:"false",JM1_PUBLISHING_STAGE_RUNTIME_ENABLED:"false",JM1_PUBLISHING_WAIT_RUNTIME_ENABLED:"false",
     JM1_NEW_SUBMISSION_STAGE03_ENABLED:"true",JM1_NEW_SUBMISSION_STAGE03_APPROVAL_SHA256:b.sha(approvedBytes)},containerClient,
     native:async d=>d,prepare:async()=>({p:{titleId,fingerprint:"f".repeat(64)},components:[component]}),
-    readDeployment:async()=>({}),countRequest:async prompt=>({inputTokens:1000,verifiedAt:new Date().toISOString(),
+    wait:async()=>{},readDeployment:async()=>({}),countRequest:async prompt=>({inputTokens:1000,verifiedAt:new Date().toISOString(),
       requestSha256:b.sha(JSON.stringify(require("../src/model/providers/microsoftFoundryClaudeProvider").buildRequestBody(prompt,require("../src/lifecycle/gloryReviewRecoveryReaders").route)))}),
     callModel:async({promptBody})=>{paid++;const source=JSON.parse(promptBody).source;return{ok:true,provider:"microsoft-foundry-claude",tokenCounts:{input:1000,output:500},
       output:{intakeSummary:{title:source.title,sourceVersion:source.version,wordCount:source.wordCount,
@@ -65,6 +65,30 @@ test("missing approval and changed approval pin deny before model",async()=>{
   const x=fixture();x.deps.env.JM1_NEW_SUBMISSION_STAGE03_APPROVAL_SHA256="0".repeat(64);
   assert.equal((await stage.handler({titleId:x.titleId,mode:"SUBMISSION_03_EXECUTE"},x.deps)).jsonBody.code,"STAGE03_SPEND_APPROVAL_DENIED");
   assert.equal(x.paid(),0);
+});
+test("explicit rate rejection uses the sole retry, retains failed candidate and respects backoff",async()=>{
+  const x=fixture(), body={titleId:x.titleId,mode:"SUBMISSION_03_EXECUTE"};
+  const original=x.deps.callModel;let calls=0,waits=0;
+  x.deps.wait=async ms=>{assert(ms>0&&ms<=65000);waits++;};
+  x.deps.callModel=async request=>{calls++;if(calls===1)return{provider:"microsoft-foundry-claude",ok:false,httpStatus:429,
+    output:null,tokenCounts:{input:0,output:0,total:0},error:"MICROSOFT_FOUNDRY_HTTP_429: Rate limit exceeded"};return original(request);};
+  assert.equal((await stage.handler(body,x.deps)).jsonBody.code,"STAGE03_PROVIDER_RATE_LIMIT_REJECTED");
+  assert.equal((await stage.handler(body,x.deps)).status,202);
+  const ledger=JSON.parse(x.records.get(`${b.PREFIX}/budget.json`).bytes);
+  assert.equal(ledger.calls.length,2);assert.equal(ledger.calls[0].actualMicroUsd,0);
+  assert.equal(ledger.calls[0].status,"REJECTED_RATE_LIMIT");assert.equal(ledger.calls[1].retry,true);
+  assert.equal(waits,1);assert.equal([...x.records.keys()].filter(k=>k.includes("candidates/")).length,2);
+});
+test("only preserved matching explicit 429 may reconcile an ambiguous legacy result",async()=>{
+  const x=fixture();const model={provider:"microsoft-foundry-claude",ok:false,httpStatus:429,output:null,
+    tokenCounts:{input:0,output:0,total:0},error:"MICROSOFT_FOUNDRY_HTTP_429: Rate limit exceeded"};
+  const call={id:"a:0",bindingHash:"a",index:0,status:"AMBIGUOUS",safeCode:"STAGE03_ACTUAL_USAGE_UNVERIFIED",requestSha256:"hash"};
+  await b.immutable(x.deps.containerClient,`${b.PREFIX}/candidates/a/0.json`,{bindingHash:"a",requestSha256:"hash",model,receivedAt:new Date().toISOString()});
+  const ledger={calls:[call]};assert.equal(await stage.reconcileRateRejections(ledger,x.deps.containerClient,"approved"),true);
+  assert.equal(call.status,"REJECTED_RATE_LIMIT");assert.equal(await stage.reconcileRateRejections(ledger,x.deps.containerClient,"approved"),false);
+  assert([...x.records.keys()].some(k=>k.includes("recoveries/")));
+  for(const changed of [{httpStatus:500},{httpStatus:null},{failureCode:"MODEL_REQUEST_TIMEOUT"},{output:{}},{tokenCounts:{input:1,output:0,total:1}}])
+    assert.equal(stage.rateRejected({...model,...changed}),false);
 });
 test("complete assessment has canonical output and durable receipt; restart replay calls no model",async()=>{
   const x=fixture();const text="One two three four";
