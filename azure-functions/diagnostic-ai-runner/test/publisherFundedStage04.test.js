@@ -76,6 +76,39 @@ function reply(x, value = "ACCEPT", id = "reply") {
     toRecipients: [{ emailAddress: { address: mail.MAILBOX } }], uniqueBody: { content: value },
     internetMessageHeaders: [{ name: "In-Reply-To", value: x.delivered.internetMessageId }, { name: "Authentication-Results", value: "mx; dmarc=pass; spf=pass; dkim=pass" }] };
 }
+test("readable attachments preserve exact terms, title binding and deterministic replay", async () => {
+  const x = fixture(), bundle = await stage.load(x.titleId, x.deps);
+  const review = { webUrl: "https://internal.example/offer.md" };
+  const email = await mail.payload(bundle, review, bundle.baseBytes, bundle.approvedOn);
+  assert.match(email.body, /Please review the attached offer and publishing agreement, then reply to this email with your decision\./);
+  assert.ok(!email.body.includes(review.webUrl));
+  assert.deepEqual(email.cc, [mail.MAILBOX]);
+  assert.match(email.body, /ACCEPT, DECLINE, or HOLD/);
+  assert.equal(email.attachments[0].contentType, "application/pdf");
+  assert.equal(Buffer.from(email.attachments[0].contentInBase64, "base64").subarray(0, 5).toString(), "%PDF-");
+  const Zip = require("jszip");
+  const original = await Zip.loadAsync(bundle.baseBytes);
+  const copy = await Zip.loadAsync(Buffer.from(email.attachments[1].contentInBase64, "base64"));
+  const xml = await copy.file("word/document.xml").async("string");
+  const { DOMParser } = require("@xmldom/xmldom");
+  const ns = "http://schemas.openxmlformats.org/wordprocessingml/2006/main";
+  const body = value => new DOMParser().parseFromString(value, "application/xml").getElementsByTagNameNS(ns, "body")[0];
+  assert.ok(body(xml).textContent.includes(bundle.title));
+  assert.ok(body(xml).textContent.includes(bundle.offer.fundedTerms.clause));
+  assert.ok(body(xml).textContent.endsWith(body(await original.file("word/document.xml").async("string")).textContent));
+  for (const name of Object.keys(original.files).filter(name => !original.files[name].dir && name !== "word/document.xml")) {
+    assert.deepEqual(await copy.file(name).async("nodebuffer"), await original.file(name).async("nodebuffer"));
+  }
+  assert.deepEqual(await mail.payload(bundle, review, bundle.baseBytes, bundle.approvedOn), email);
+  const legacy = await mail.payload(bundle, review, bundle.baseBytes, bundle.approvedOn, 1);
+  assert.equal(legacy.attachments[0].contentType, "text/markdown");
+  x.put(`${bundle.prefix}/send.json`, { providerMessageId: "already-sent" });
+  const prepared = await stage.prepare(bundle, x.deps);
+  x.put(`${bundle.prefix}/package.json`, { ...prepared, presentationVersion: 1,
+    email: await mail.payload(bundle, prepared.review, bundle.baseBytes, bundle.approvedOn, 1) });
+  assert.equal((await stage.executeSend({ titleId: x.titleId, bindingHash: bundle.offer.offerSha256 }, x.deps)).receipt.providerMessageId, "already-sent");
+  assert.equal(x.counts.sends, 0);
+});
 test("five offers preserve sources, send once, wait for author and capture exact reply durably", async () => {
   const x = fixture(); const original = Buffer.from(x.blobs.get("publisher-acceptance"));
   for (const titleId of x.manifest.titleIds) {

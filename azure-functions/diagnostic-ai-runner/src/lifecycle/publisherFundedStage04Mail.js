@@ -36,7 +36,7 @@ function render(title, offer) {
     `Offer SHA-256: ${offer.offerSha256}`, `Policy SHA-256: ${offer.policySha256}`, `Selection SHA-256: ${offer.selectionSha256}`, ""];
   return { reference, subject: `Your author decision: ${title} [${reference}]`, review: lines.join("\n"), special };
 }
-function payload(bundle, packageOutput, baseBytes, approvedOn) {
+function legacyPayload(bundle, packageOutput, baseBytes, approvedOn) {
   const { title, offer, intakeReference } = bundle, copy = render(title, offer);
   const attachment = (name, bytes, contentType, role) => ({ name, contentType, contentInBase64: bytes.toString("base64"),
     sha256: sha(bytes), role, version: offer.version, artifactId: `${offer.offerSha256}:${role}` });
@@ -50,6 +50,26 @@ function payload(bundle, packageOutput, baseBytes, approvedOn) {
     attachments: [attachment(`${copy.reference}.md`, Buffer.from(copy.review), "text/markdown", "EXACT_VERSION_FUNDED_OFFER"),
       attachment("JMP-Publishing-Agreement-v1.3.1.docx", baseBytes, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "BASE_AGREEMENT_FOR_REVIEW")]
   };
+}
+async function payload(bundle, packageOutput, baseBytes, approvedOn, presentationVersion = 2) {
+  const value = legacyPayload(bundle, packageOutput, baseBytes, approvedOn);
+  if (presentationVersion === 1) return value;
+  if (presentationVersion !== 2) deny("STAGE04_PRESENTATION_VERSION_INVALID");
+  const copy = render(bundle.title, bundle.offer);
+  const documents = require("./publisherFundedStage04Attachments");
+  // Custody URLs remain in the internal review, not in author-facing instructions.
+  const pdf = await documents.offerPdf(copy.review.replace(/^Assessment: .*$/gm, "Assessment retained with the exact-version Publishing record."));
+  const agreement = await documents.agreementCopy(baseBytes, bundle, copy.reference);
+  value.body = value.body.replace(`Review the exact offer and assessment links: ${packageOutput.webUrl}`,
+    "Please review the attached offer and publishing agreement, then reply to this email with your decision.")
+    .replace("The offer and existing base agreement are also attached.", "The attachments identify your title and exact offer version.");
+  value.templateVersion = "1.1.0";
+  value.attachments = value.attachments.map((attachment, index) => ({ ...attachment,
+    name: index === 0 ? `${copy.reference}.pdf` : `${copy.reference}-Publishing-Agreement.docx`,
+    contentType: index === 0 ? "application/pdf" : attachment.contentType,
+    contentInBase64: (index === 0 ? pdf : agreement).toString("base64"),
+    sha256: sha(index === 0 ? pdf : agreement) }));
+  return value;
 }
 async function nativeGraph(path, deps) {
   const allowed = [AUTHOR, MAILBOX].some(mailbox => path.startsWith(`users/${encodeURIComponent(mailbox)}/messages`));
