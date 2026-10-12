@@ -178,3 +178,15 @@ test("mail pagination remains within the authorized mailbox and recipient proof 
   assert.equal(await mail.delivery({ providerMessageId: id, mailboxMessageId: "cc" }, bundle,
     { mailGraph: async p => p.includes("/messages/cc?") ? message : { value: [] } }), null);
 });
+test("mail read failures retain sanitized provider status and scope", async () => {
+  const x = fixture();
+  x.deps.verifyDelivery = async () => { throw Object.assign(Error("private provider detail"), {
+    safeCode: "STAGE04_MAIL_READ_FAILED", statusCode: 404, providerCode: "ErrorItemNotFound", mailReadScope: "PUBLISHING" }); };
+  const result = await stage.handler({ titleId: x.titleId, mode: "SUBMISSION_04_SEND" }, x.deps);
+  assert.equal(result.jsonBody.providerStatus, 404);
+  const key = [...x.blobs.keys()].find(k => k.endsWith("/monitor.json"));
+  const evidence = JSON.parse(x.blobs.get(key));
+  assert.equal(evidence.providerCode, "ErrorItemNotFound");
+  assert.equal(evidence.mailReadScope, "PUBLISHING");
+  assert.equal(JSON.stringify(evidence).includes("private provider detail"), false);
+});
