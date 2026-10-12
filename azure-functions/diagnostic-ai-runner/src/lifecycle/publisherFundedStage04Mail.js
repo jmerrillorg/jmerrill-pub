@@ -59,7 +59,12 @@ async function nativeGraph(path, deps) {
   const response = await (deps.fetchImpl || fetch)(`https://graph.microsoft.com/v1.0/${path}`, {
     headers: { Authorization: `Bearer ${token.token}`, Prefer: 'IdType="ImmutableId", outlook.body-content-type="text"' },
     redirect: "error", signal: AbortSignal.timeout(30000) });
-  if (!response.ok) throw Object.assign(new Error("STAGE04_MAIL_READ_FAILED"), { safeCode: "STAGE04_MAIL_READ_FAILED", statusCode: response.status });
+  if (!response.ok) {
+    const detail = await response.json().catch(() => ({}));
+    throw Object.assign(new Error("STAGE04_MAIL_READ_FAILED"), { safeCode: "STAGE04_MAIL_READ_FAILED", statusCode: response.status,
+      providerCode: /^[A-Za-z0-9_]+$/.test(detail.error?.code || "") ? detail.error.code : null,
+      mailReadScope: path.startsWith(`users/${encodeURIComponent(AUTHOR)}/`) ? "AUTHOR" : "PUBLISHING" });
+  }
   return response.json();
 }
 async function pages(mailbox, query, deps) {

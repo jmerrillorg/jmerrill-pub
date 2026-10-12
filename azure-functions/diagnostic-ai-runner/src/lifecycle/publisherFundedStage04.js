@@ -175,9 +175,10 @@ async function reconcile(bundle, deps) {
     const failures = (prior?.failures || 0) + 1;
     const code = /^STAGE04_[A-Z0-9_]+$/.test(error.safeCode || "") ? error.safeCode : "STAGE04_MONITOR_DEPENDENCY_FAILED";
     await save("monitor", { status: failures >= 5 ? "HELD" : "RETRY_PENDING", failures, code,
+      providerStatus: error.statusCode || null, providerCode: error.providerCode || null, mailReadScope: error.mailReadScope || null,
       checkedAt: new Date().toISOString(), nextAttemptAt: new Date(Date.now() + Math.min(3600000, 60000 * 2 ** failures)).toISOString(),
       titleId: bundle.offer.titleId, offerSha256: bundle.offer.offerSha256 });
-    throw Object.assign(new Error(code), { safeCode: code });
+    throw Object.assign(new Error(code), { safeCode: code, statusCode: error.statusCode });
   } finally { clearInterval(renewal); await lease.releaseLease().catch(() => {}); }
 }
 async function handler(body, deps = {}) {
