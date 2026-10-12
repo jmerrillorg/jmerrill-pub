@@ -976,7 +976,7 @@ function normalizeRepositoryAuthorName(value: string) {
 }
 
 function normalizeRepositoryImprint(value: string, genre: string) {
-  if (value === 'J Merrill Publishing' || value === 'JM Little' || value === 'JM Verse' || value === 'JM Signature' || value === 'JM Works') {
+  if (value === 'J Merrill Publishing' || value === 'JM Little' || value === 'JM Verse' || value === 'JM Signature' || value === 'JM Works' || value === 'JM Prestige') {
     return value
   }
   if (value === 'J Merrill Kids' || genre === "Children's") return 'JM Little'

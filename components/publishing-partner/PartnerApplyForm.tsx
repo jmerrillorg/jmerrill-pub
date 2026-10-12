@@ -76,8 +76,8 @@ const PUBLISH_TIMELINES = [
 ]
 
 const PARTNER_TIERS = [
-  'JM Prestige Standard — $750/month or $8,000/year',
-  'JM Prestige Premium — $1,250/month or $13,500/year',
+  'JM Prestige Standard — $750/month or $8,000 paid annually',
+  'JM Prestige Premium — $1,250/month or $13,500 paid annually',
   'Not sure yet — I want guidance',
 ]
 

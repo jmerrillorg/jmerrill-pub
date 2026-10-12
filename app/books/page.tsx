@@ -61,7 +61,7 @@ export default async function BooksPage() {
             {[
               `${publishedPortfolioCountPublic} published titles`,
               ...(catalogResult.ok ? [`${books.length} catalog titles`] : []),
-              imprints.length ? `${imprints.length} official imprints` : 'Official imprints',
+              imprints.length ? `${imprints.length} imprints represented in this catalog` : 'Catalog imprints',
               'Real authors and visible book pages',
             ].map((item) => (
               <div
