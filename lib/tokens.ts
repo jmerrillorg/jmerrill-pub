@@ -292,9 +292,9 @@ export const imprints = [
   {
     id:          'signature',
     name:        'JM Signature',
-    tagline:     'Marquee and prestige publishing.',
-    description: 'A selective imprint for signature releases and prestige-positioned books in the J Merrill Publishing system.',
-    genres:      ['Prestige titles', 'Marquee releases', 'Selective placement'],
+    tagline:     'Publisher-designated signature releases.',
+    description: 'A separate Publisher-designated imprint for signature releases. JM Signature is not purchasable and is not a JM Prestige partnership tier.',
+    genres:      ['Signature titles', 'Marquee releases', 'Selective placement'],
     color:       '#A3C4DC',
     textColor:   'white',
     bg:          '#0F2431',
@@ -312,6 +312,18 @@ export const imprints = [
     bg:          '#0A1E1E',
     titleCount:  'Select titles',
     href:        '/books?imprint=works',
+  },
+  {
+    id:          'prestige',
+    name:        'JM Prestige',
+    tagline:     'Selective publishing partnership.',
+    description: 'A commercial imprint with Standard and Premium partnership tiers. Application and Publisher review are required; JM Signature remains separate and is not purchasable.',
+    genres:      ['Publishing partnership'],
+    color:       pub.primary,
+    textColor:   'white',
+    bg:          pub.darkBg,
+    titleCount:  'Partnership',
+    href:        '/imprints/jm-prestige',
   },
 ] as const
 

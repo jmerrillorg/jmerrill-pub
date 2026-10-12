@@ -3,18 +3,18 @@ import { notFound } from 'next/navigation'
 import { ImprintDetailTemplate } from '@/components/imprints/ImprintDetailTemplate'
 import { catalogTitleToBookCardRecord } from '@/lib/catalog/display'
 import { listTitlesByCertifiedImprint } from '@/lib/server/dataverse/catalog'
-import { getImprintStrategyBySlug, imprintStrategies } from '@/data/imprints'
+import { getImprintStrategyBySlug } from '@/data/imprints'
 
 export const dynamic = 'force-dynamic'
 
 type Props = {
-  params: {
+  params: Promise<{
     slug: string
-  }
+  }>
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const imprint = getImprintStrategyBySlug(params.slug)
+  const imprint = getImprintStrategyBySlug((await params).slug)
 
   if (!imprint) {
     return { title: 'Imprint Not Found' }
@@ -27,7 +27,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function ImprintPage({ params }: Props) {
-  const imprint = getImprintStrategyBySlug(params.slug)
+  const imprint = getImprintStrategyBySlug((await params).slug)
   if (!imprint) notFound()
 
   const titleResult = await listTitlesByCertifiedImprint(imprint.label)

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { hasConfirmedCanonicalFormCapture, hasConfirmedNotificationDelivery, notificationNotConfiguredMessage, submitWebsiteForm, type Jm1PubInternalClassification } from '@/lib/server/form-integrations'
 import { cleanString, missingFields, requiredFieldsResponse } from '@/lib/server/form-validation'
 
-type JoinImprint = 'J Merrill Publishing' | 'JM Little' | 'JM Verse' | 'JM Works' | 'JM Signature'
+type JoinImprint = 'J Merrill Publishing' | 'JM Little' | 'JM Verse' | 'JM Works' | 'JM Signature' | 'JM Prestige'
 
 const OFFICIAL_JOIN_IMPRINTS: JoinImprint[] = [
   'J Merrill Publishing',
@@ -10,6 +10,7 @@ const OFFICIAL_JOIN_IMPRINTS: JoinImprint[] = [
   'JM Verse',
   'JM Works',
   'JM Signature',
+  'JM Prestige',
 ]
 
 // ─────────────────────────────────────────────────────────────

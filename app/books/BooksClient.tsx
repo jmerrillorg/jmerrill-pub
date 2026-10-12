@@ -6,6 +6,7 @@ import { useSearchParams } from 'next/navigation'
 import { BookCard } from '@/components/content/BookCard'
 import { catalogTitleToBookCardRecord, catalogAuthorDisplayName } from '@/lib/catalog/display'
 import type { CatalogTitleSummary } from '@/lib/catalog/types'
+import { imprintStrategies } from '@/data/imprints'
 
 const FORMAT_OPTIONS = ['All Formats', 'Paperback', 'Hardcover', 'eBook', 'Audiobook']
 
@@ -19,6 +20,7 @@ const LEGACY_IMPRINT_ALIASES: Record<string, string> = {
   little: 'JM Little',
   verse: 'JM Verse',
   signature: 'JM Signature',
+  prestige: 'JM Prestige',
 }
 
 function slugify(value: string) {
@@ -28,7 +30,8 @@ function slugify(value: string) {
 function buildImprintOptions(imprints: string[]) {
   return [
     { id: 'all', label: 'All Imprints', name: '' },
-    ...imprints.map((imprint) => ({ id: slugify(imprint), label: imprint, name: imprint })),
+    ...Array.from(new Set([...imprintStrategies.map((imprint) => imprint.label), ...imprints]))
+      .map((imprint) => ({ id: slugify(imprint), label: imprint, name: imprint })),
   ]
 }
 

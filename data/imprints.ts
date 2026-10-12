@@ -4,6 +4,9 @@ export type ImprintSlug =
   | 'jm-little'
   | 'j-merrill-publishing'
   | 'jm-signature'
+  | 'jm-prestige'
+
+export const IMPRINT_CANON_VERSION = 'JMP-IMPRINT-PRESTIGE-20261012-v1'
 
 export type ImprintStrategy = {
   label: string
@@ -90,7 +93,21 @@ export const imprintStrategies: ImprintStrategy[] = [
     primaryPlatforms: ['Website', 'Email', 'LinkedIn'],
     secondaryPlatforms: ['Instagram'],
     recommendedCtaEmphasis: 'premium / exclusive releases',
-    assignmentRule: 'Publisher-designated only. Prestige-level work without designation should be flagged for publisher confirmation.',
+    assignmentRule: 'Publisher-designated only and not purchasable. Exceptional work without designation requires Publisher confirmation; JM Prestige partnership tiers do not confer Signature status.',
+  },
+  {
+    label: 'JM Prestige',
+    slug: 'jm-prestige',
+    pageHref: '/imprints/jm-prestige',
+    booksHref: '/books?imprint=prestige',
+    readerPathLabel: 'Selective Publishing Partnership',
+    readerPathSummary: 'The commercial imprint for the JM Prestige publishing partnership.',
+    positioningStatement: 'JM Prestige is a selective commercial imprint with Standard and Premium publishing partnership tiers. It is separate from the non-purchasable JM Signature imprint.',
+    audienceSummary: 'Readers exploring titles accepted into the JM Prestige publishing partnership.',
+    primaryPlatforms: ['Website'],
+    secondaryPlatforms: [],
+    recommendedCtaEmphasis: 'the publishing partnership and verified title availability',
+    assignmentRule: 'Application and Publisher review are required. Manuscript quality alone does not establish eligibility or author acceptance of a paid partnership. Existing title assignments remain unchanged.',
   },
 ]
 
@@ -105,6 +122,7 @@ const imprintAliases: Record<string, ImprintSlug> = imprintStrategies.reduce<Rec
   verse: 'jm-verse',
   little: 'jm-little',
   signature: 'jm-signature',
+  prestige: 'jm-prestige',
 })
 
 export function normalizeImprintSlug(value: string | null | undefined) {

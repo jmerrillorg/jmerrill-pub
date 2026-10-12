@@ -74,7 +74,7 @@ const pricingCards = [
     title: 'JM Prestige Standard',
     price: '$750',
     cadence: '/ month',
-    annual: 'or $8,000/year — save $1,000',
+    annual: 'or $8,000 paid annually; twelve monthly payments total $9,000',
     features: [
       'A selective publishing relationship under JM Prestige',
       'Professional editorial, design, and production care for serious work',
@@ -90,7 +90,7 @@ const pricingCards = [
     title: 'JM Prestige Premium',
     price: '$1,250',
     cadence: '/ month',
-    annual: 'or $13,500/year — save $1,500',
+    annual: 'or $13,500 paid annually; twelve monthly payments total $15,000',
     features: [
       'A deeper publishing partnership for high-commitment authors',
       'Expanded editorial, production, and release attention for elevated work',
@@ -206,7 +206,7 @@ export default function PublishingPartnerPage() {
           <div className="max-w-[860px] mb-10">
             <SectionLabel>What Makes JM Prestige Different</SectionLabel>
             <p className="text-[15px] font-light leading-[1.8] text-white/60">
-              JM Prestige is not a standard publishing offering. It is a selective publishing imprint and a higher-touch publishing relationship. When you publish under JM Prestige, you are not a client purchasing services. You are an author publishing under a house that believes in your work.
+              JM Prestige is a selective commercial imprint with Standard and Premium publishing partnership tiers. Application and Publisher review are required. JM Signature is a separate Publisher-designated imprint and is not purchasable. Applying does not establish acceptance into a paid partnership or change an existing title assignment.
             </p>
           </div>
 

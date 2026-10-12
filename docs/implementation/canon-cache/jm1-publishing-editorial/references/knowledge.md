@@ -2,6 +2,8 @@
 **J Merrill Publishing, Inc. — Editorial Review GPT Knowledge Document**
 Status: CANON | Version: 1.0 | April 2026
 
+Current membership amendment: [JMP-IMPRINT-PRESTIGE-20261012-v1](../../../../governance/publisher-amendments/JMP-IMPRINT-PRESTIGE-20261012-v1.md) recognizes JM Prestige as the sixth commercial imprint. The five-imprint enumeration below is retained as historical v1.0 text, not the current complete register. Prestige Standard/Premium are partnership tiers; Signature is separate and not purchasable. Content assessment alone cannot establish Prestige partnership acceptance or authorize reassignment. Existing title commitments remain unchanged.
+
 This document is attached to the Editorial Review GPT as a reference knowledge file.
 It contains imprint definitions, scoring weight guidance, style guide matrix, and compliance detail.
 The GPT instructions reference this file directly. Do not modify without Publisher authorization.
