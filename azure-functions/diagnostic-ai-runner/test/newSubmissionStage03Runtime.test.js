@@ -53,15 +53,52 @@ test("ambiguous timeout blocks replay and further batch calls without duplicate 
   const again=await stage.handler(body,x.deps);assert.equal(again.status,409);assert.equal(calls,1);
   assert.equal(again.jsonBody.code,"STAGE03_AMBIGUOUS_PROVIDER_EFFECT_HELD");
 });
-test("invalid output retains candidate and prevents same request from being paid twice",async()=>{
+test("invalid output retains candidate; only one bounded known-result retry is allowed",async()=>{
   const x=fixture();let calls=0;x.deps.callModel=async()=>{calls++;return{ok:true,provider:"microsoft-foundry-claude",output:{},tokenCounts:{input:1000,output:500}};};
   const body={titleId:x.titleId,mode:"SUBMISSION_03_EXECUTE"};
   assert.equal((await stage.handler(body,x.deps)).jsonBody.code,"REVIEW_SECTIONS_INVALID");
-  assert.equal((await stage.handler(body,x.deps)).jsonBody.code,"STAGE03_PAID_REQUEST_ALREADY_ATTEMPTED");
-  assert.equal(calls,1);assert([...x.records.keys()].some(k=>k.includes("candidates/")));
+  assert.equal((await stage.handler(body,x.deps)).jsonBody.code,"REVIEW_SECTIONS_INVALID");
+  assert.equal((await stage.handler(body,x.deps)).jsonBody.code,"STAGE03_BATCH_BUDGET_EXCEEDED");
+  assert.equal(calls,2);assert([...x.records.keys()].filter(k=>k.includes("candidates/")).length===2);
 });
 test("missing approval and changed approval pin deny before model",async()=>{
   const x=fixture();x.deps.env.JM1_NEW_SUBMISSION_STAGE03_APPROVAL_SHA256="0".repeat(64);
   assert.equal((await stage.handler({titleId:x.titleId,mode:"SUBMISSION_03_EXECUTE"},x.deps)).jsonBody.code,"STAGE03_SPEND_APPROVAL_DENIED");
   assert.equal(x.paid(),0);
+});
+test("complete assessment has canonical output and durable receipt; restart replay calls no model",async()=>{
+  const x=fixture();const text="One two three four";
+  x.component.chunks=stage.sections(text);x.component.source.provenance.words=4;
+  x.component.source.provenance.path="/01_Pipeline_A-Z/02 - Intake/Fixture/source.md";
+  x.component.binding.coverage=x.component.chunks.map(({text,...p})=>p);
+  const p={titleId:x.titleId,intakeId:"intake",fingerprint:"f".repeat(64)},items=new Map(),bytes=new Map();let uploads=0;
+  x.deps.prepare=async()=>({p,prior:{outputs:[{itemId:"working"}]},components:[x.component]});
+  const drive=require("../src/lifecycle/freshTitleIntake").driveId;
+  const parentPath="/01_Pipeline_A-Z/02 - Intake/Fixture";
+  x.deps.graph=async(path,options={})=>{
+    if(path.endsWith("/working"))return{parentReference:{id:"working-folder"}};
+    if(path.endsWith("/working-folder"))return{parentReference:{id:"manuscripts",driveId:drive,path:"/drives/root:"+parentPath}};
+    if(options.method==="POST"){
+      const name=JSON.parse(options.body).name;
+      const item={id:"assessment-folder",name,folder:{},parentReference:{id:"manuscripts",driveId:drive}};
+      items.set(`manuscripts:/${name}`,item);return item;
+    }
+    const key=path.split("/items/")[1];
+    if(options.method==="PUT"){
+      const name=decodeURIComponent(key.split(":/")[1].split(":/content")[0]);
+      const id="output"+ ++uploads;
+      const item={id,name,eTag:'"1"',file:{},size:options.body.length,parentReference:{id:"assessment-folder",driveId:drive}};
+      bytes.set(id,Buffer.from(options.body));items.set(key.split(":/content")[0],item);return item;
+    }
+    if(!items.has(key))throw Object.assign(Error("missing"),{statusCode:404});return items.get(key);
+  };
+  x.deps.sourceBytes=async({itemId})=>bytes.get(itemId);
+  const body={titleId:x.titleId,mode:"SUBMISSION_03_EXECUTE"};
+  const first=await stage.handler(body,x.deps);assert.equal(first.status,200,JSON.stringify(first));
+  assert.equal(first.jsonBody.receipt.status,"COMPLETED_ASSESSMENT");
+  assert.equal(first.jsonBody.receipt.assessments.length,1);
+  assert(first.jsonBody.receipt.assessments[0].sharePointOutput.path.startsWith("/01_Pipeline_A-Z/"));
+  const replay=await stage.handler(body,x.deps);assert.equal(replay.status,200,JSON.stringify(replay));
+  assert.equal(replay.jsonBody.replay,true);assert.equal(x.paid(),1);assert.equal(uploads,1);
+  assert.equal(replay.jsonBody.receipt.stage04,"NOT_STARTED");
 });

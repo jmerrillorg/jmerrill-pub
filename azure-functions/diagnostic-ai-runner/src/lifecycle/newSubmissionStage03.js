@@ -173,6 +173,7 @@ async function handler(body, deps = {}) {
     acquired = true;
     const ledger = (await b.read(container, ledgerPath)).value;
     if (ledger.approvalSha256 !== env.JM1_NEW_SUBMISSION_STAGE03_APPROVAL_SHA256) b.deny("STAGE03_LEDGER_APPROVAL_CONFLICT");
+    if (ledger.calls.some(c => ["IN_FLIGHT", "AMBIGUOUS"].includes(c.status))) b.deny("STAGE03_AMBIGUOUS_PROVIDER_EFFECT_HELD");
     const writeLedger = () => journal.uploadData(Buffer.from(JSON.stringify(ledger)), {
       conditions: { leaseId: lease.leaseId }, blobHTTPHeaders: { blobContentType: "application/json" } });
     let job;
@@ -192,18 +193,27 @@ async function handler(body, deps = {}) {
       if (job) break;
     }
     if (!job) b.deny("STAGE03_COMPLETION_RECONCILIATION_REQUIRED");
-    const { prompt, source } = requestPrompt(job.c, job.chunk, job.reports);
+    const logicalCallId = `${job.c.key}:${job.index}`;
+    const earlier = ledger.calls.find(c => c.id === logicalCallId);
+    const retry = Boolean(earlier && earlier.status === "HELD_VALIDATION" && earlier.actualMicroUsd &&
+      /^REVIEW_/.test(earlier.safeCode || ""));
+    if (earlier && !retry) b.deny("STAGE03_PAID_REQUEST_ALREADY_ATTEMPTED");
+    const request = requestPrompt(job.c, job.chunk, job.reports);
+    const prompt = retry ? JSON.stringify({ ...JSON.parse(request.prompt),
+      previousValidationFailure: earlier.safeCode,
+      retryInstruction: "Return the complete strict assessment contract and exact bound source values; never invent approval or change manuscript content." }) : request.prompt;
+    const source = request.source;
     await b.immutable(container, `${b.PREFIX}/bindings/${job.c.key}.json`, { binding: job.c.binding,
       authorityContent: job.c.authority.sources.map(({ verifiedAt, ...source }) => source) });
     phase = "NATIVE_TOKEN_COUNT";
     await (context.readDeployment || recovery.readDeployment)(context);
     const count = await (context.countRequest || recovery.countRequest)(prompt, context);
     if (count.requestSha256 !== b.sha(JSON.stringify(provider.buildRequestBody(prompt, recovery.route)))) b.deny("STAGE03_REQUEST_HASH_CHANGED");
-    const held = b.reservation(count, ledger);
-    const callId = `${job.c.key}:${job.index}`;
+    const held = b.reservation(count, ledger, retry);
+    const callId = retry ? `${logicalCallId}:retry1` : logicalCallId;
     if (ledger.calls.some(c => c.id === callId)) b.deny("STAGE03_PAID_REQUEST_ALREADY_ATTEMPTED");
     call = { id: callId, titleId: body.titleId, bindingHash: job.c.key, index: job.index,
-      status: "IN_FLIGHT", retry: false, ...held, requestSha256: count.requestSha256, startedAt: new Date().toISOString() };
+      status: "IN_FLIGHT", retry, ...held, requestSha256: count.requestSha256, startedAt: new Date().toISOString() };
     ledger.calls.push(call); await writeLedger();
     phase = "PAID_MODEL_REQUEST";
     const model = await (context.callModel || provider.call)({ promptBody: prompt, diagnosticId: callId, route: recovery.route });
@@ -213,7 +223,7 @@ async function handler(body, deps = {}) {
     const candidate = { bindingHash: job.c.key, promptSha256: b.sha(prompt), requestSha256: count.requestSha256,
       source, coverage: job.chunk ? (({ text, ...p }) => p)(job.chunk) : job.c.binding.coverage,
       model, receivedAt: new Date().toISOString() };
-    await b.immutable(container, `${b.PREFIX}/candidates/${job.c.key}/${job.index}.json`, candidate);
+    await b.immutable(container, `${b.PREFIX}/candidates/${job.c.key}/${job.index}${retry ? "-retry1" : ""}.json`, candidate);
     try {
       call.actualMicroUsd = b.actualCost(model, held);
       if (!model.ok || model.provider !== "microsoft-foundry-claude") b.deny("STAGE03_PROVIDER_FAILURE_HELD");
