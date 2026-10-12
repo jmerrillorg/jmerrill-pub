@@ -106,6 +106,14 @@ async function completion(prepared, deps) {
   for (const c of prepared.components) {
     const result = await savedResult(c, c.chunks.length === 1 ? 0 : "synthesis", deps);
     if (!result || result.value.status !== "VALIDATED_ASSESSMENT") return null;
+    for (const [index, chunk] of c.chunks.entries()) {
+      const section = await savedResult(c, index, deps);
+      if (!section || section.value.status !== "VALIDATED_ASSESSMENT" || section.value.bindingHash !== c.key ||
+        section.value.reportSha256 !== b.sha(JSON.stringify(section.value.report)) ||
+        JSON.stringify(section.value.coverage) !== JSON.stringify((({ text, ...p }) => p)(chunk))) b.deny("STAGE03_FINAL_COVERAGE_UNVERIFIED");
+      validateReport({ output: section.value.report }, { title: c.authority.titleName,
+        version: c.source.provenance.eTag, wordCount: chunk.words });
+    }
     const expected = { title: c.authority.titleName, version: c.source.provenance.eTag, wordCount: c.source.provenance.words };
     validateReport({ output: result.value.report }, expected);
     if (result.value.bindingHash !== c.key || b.sha(JSON.stringify(result.value.report)) !== result.value.reportSha256) b.deny("STAGE03_SAVED_REPORT_CONFLICT");
