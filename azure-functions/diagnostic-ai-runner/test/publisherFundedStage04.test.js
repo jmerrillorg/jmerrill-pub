@@ -89,6 +89,7 @@ test("readable attachments preserve exact terms, title binding and deterministic
   const Zip = require("jszip");
   const original = await Zip.loadAsync(bundle.baseBytes);
   const copy = await Zip.loadAsync(Buffer.from(email.attachments[1].contentInBase64, "base64"));
+  assert.deepEqual(Object.keys(copy.files).sort(), Object.keys(original.files).sort(), "no wall-clock parent entries are synthesized");
   const xml = await copy.file("word/document.xml").async("string");
   const { DOMParser } = require("@xmldom/xmldom");
   const ns = "http://schemas.openxmlformats.org/wordprocessingml/2006/main";
