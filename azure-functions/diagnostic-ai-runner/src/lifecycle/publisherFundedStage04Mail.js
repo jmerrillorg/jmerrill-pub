@@ -107,10 +107,21 @@ async function pages(mailbox, query, deps) {
 }
 const SELECT = "id,internetMessageId,conversationId,receivedDateTime,subject,from,sender,toRecipients,ccRecipients,internetMessageHeaders";
 async function delivery(sent, bundle, deps) {
-  if (!sent.providerMessageId || !sent.mailboxMessageId) return null;
+  if (!sent.providerMessageId) return null;
   const graph = deps.mailGraph || (p => nativeGraph(p, deps));
-  const cc = await graph(`users/${encodeURIComponent(MAILBOX)}/messages/${encodeURIComponent(sent.mailboxMessageId)}?$select=${SELECT}`);
   const providerId = require("../generated/communications/publishing-communication-acceptance").providerIdFromInternetMessageId;
+  let cc;
+  if (sent.mailboxMessageId) {
+    cc = await graph(`users/${encodeURIComponent(MAILBOX)}/messages/${encodeURIComponent(sent.mailboxMessageId)}?$select=${SELECT}`);
+  } else {
+    if (!Number.isFinite(Date.parse(sent.sentAt))) deny("STAGE04_OUTBOUND_IDENTITY_CONFLICT");
+    const copies = await pages(MAILBOX, { $filter: `receivedDateTime ge ${sent.sentAt} and from/emailAddress/address eq '${FROM}'`,
+      $select: SELECT, $top: "100" }, deps);
+    const matches = copies.filter(m => providerId(m.internetMessageId || "") === sent.providerMessageId.replaceAll("-", "").toLowerCase());
+    if (matches.length > 1) deny("STAGE04_OUTBOUND_IDENTITY_CONFLICT");
+    if (!matches.length) return null;
+    cc = matches[0];
+  }
   if (!cc.internetMessageId || providerId(cc.internetMessageId) !== sent.providerMessageId.replaceAll("-", "").toLowerCase() ||
       cc.subject !== render(bundle.title, bundle.offer).subject || cc.from?.emailAddress?.address?.toLowerCase() !== FROM ||
       !cc.toRecipients?.some(r => r.emailAddress?.address?.toLowerCase() === AUTHOR) ||

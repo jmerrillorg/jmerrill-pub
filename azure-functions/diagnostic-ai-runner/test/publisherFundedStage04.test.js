@@ -301,6 +301,7 @@ test("exact authenticated Publishing reply proves receipt without author mailbox
     if (p.includes("/messages/cc?")) return cc;
     if (p.startsWith(`users/${encodeURIComponent(mail.AUTHOR)}/`)) throw denied;
     assert.ok(p.startsWith(`users/${encodeURIComponent(mail.MAILBOX)}/`));
+    if (decodeURIComponent(p).includes(mail.FROM)) return { value: [cc] };
     return { value: responses };
   } };
   const sent = { providerMessageId, mailboxMessageId: "cc", sentAt: x.delivered.deliveredAt };
@@ -309,6 +310,7 @@ test("exact authenticated Publishing reply proves receipt without author mailbox
   assert.equal(proof.authentication.dmarc, "UNVERIFIED");
   assert.equal(mail.classify(responses[0], bundle.offer, proof).decision, "ACCEPT");
   assert.deepEqual(await mail.delivery(sent, bundle, deps), proof);
+  assert.deepEqual(await mail.delivery({ ...sent, mailboxMessageId: null }, bundle, deps), proof);
   responses = [reply(x, "I have a question")];
   assert.equal((await mail.delivery(sent, bundle, deps)).delivered, true);
   assert.equal(mail.classify(responses[0], bundle.offer, proof).decision, null);

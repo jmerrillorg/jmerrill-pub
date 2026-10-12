@@ -144,13 +144,7 @@ async function reconcile(bundle, deps) {
     } else if (prior?.nextAttemptAt && Date.parse(prior.nextAttemptAt) > Date.now()) return readback(bundle, deps);
     let delivered = (await b.optional(container, `${bundle.prefix}/delivery.json`))?.value;
     if (!delivered) {
-      let evidence = sent;
-      if (!sent.mailboxMessageId) {
-        const prepared = (await b.read(container, `${bundle.prefix}/package.json`)).value;
-        evidence = await (deps.sendOffer || mail.send)(prepared.email, deps);
-        if (evidence.providerMessageId !== sent.providerMessageId || evidence.communicationRecordId !== sent.communicationRecordId) deny("STAGE04_RELAY_REPLAY_CONFLICT");
-      }
-      delivered = await (deps.verifyDelivery || mail.delivery)(evidence, bundle, deps);
+      delivered = await (deps.verifyDelivery || mail.delivery)(sent, bundle, deps);
       if (!delivered) throw Object.assign(new Error("STAGE04_DELIVERY_PENDING"), { safeCode: "STAGE04_DELIVERY_PENDING", statusCode: 503 });
       assertClaim();
       await b.immutable(container, `${bundle.prefix}/delivery.json`, delivered);
