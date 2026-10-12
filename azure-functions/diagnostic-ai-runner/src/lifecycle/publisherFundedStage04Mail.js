@@ -1,5 +1,6 @@
 "use strict";
 const { createHash } = require("node:crypto");
+const internalMail = require("./publisherFundedInternalMail");
 const sha = value => createHash("sha256").update(value).digest("hex");
 const AUTHOR = "jackie@jmerrill.one", MAILBOX = "publishing@jmerrill.one", FROM = "publishing@email.jmerrill.one";
 function deny(code) { throw Object.assign(new Error(code), { safeCode: code }); }
@@ -7,6 +8,8 @@ function headers(message, name) {
   return (message.internetMessageHeaders || []).filter(h => h.name.toLowerCase() === name).map(h => h.value).join("\n");
 }
 function authentication(message) {
+  const internal = internalMail.authenticate(message);
+  if (internal) return internal;
   const values = headers(message, "authentication-results");
   return { dmarc: values.match(/\bdmarc=(pass|fail|none|bestguesspass|temperror|permerror)\b/i)?.[1]?.toLowerCase() || "UNVERIFIED",
     spf: values.match(/\bspf=(pass|fail|softfail|neutral|none|temperror|permerror)\b/i)?.[1]?.toLowerCase() || "UNVERIFIED",
@@ -95,19 +98,30 @@ async function pages(mailbox, query, deps) {
     seen.add(path);
     const data = await (deps.mailGraph || (p => nativeGraph(p, deps)))(path);
     if (!Array.isArray(data.value)) deny("STAGE04_MAIL_READ_INVALID");
-    rows.push(...data.value);
+    rows.push(...data.value.map(message => internalMail.bindCustody(message, mailbox)));
     const next = data["@odata.nextLink"];
     if (next && !next.startsWith(`https://graph.microsoft.com/v1.0/users/${encodeURIComponent(mailbox)}/messages?`)) deny("STAGE04_MAIL_PAGINATION_DENIED");
     path = next ? next.slice("https://graph.microsoft.com/v1.0/".length) : null;
   }
   return rows;
 }
-const SELECT = "id,internetMessageId,conversationId,receivedDateTime,subject,from,toRecipients,ccRecipients,internetMessageHeaders";
+const SELECT = "id,internetMessageId,conversationId,receivedDateTime,subject,from,sender,toRecipients,ccRecipients,internetMessageHeaders";
 async function delivery(sent, bundle, deps) {
-  if (!sent.providerMessageId || !sent.mailboxMessageId) return null;
+  if (!sent.providerMessageId) return null;
   const graph = deps.mailGraph || (p => nativeGraph(p, deps));
-  const cc = await graph(`users/${encodeURIComponent(MAILBOX)}/messages/${encodeURIComponent(sent.mailboxMessageId)}?$select=${SELECT}`);
   const providerId = require("../generated/communications/publishing-communication-acceptance").providerIdFromInternetMessageId;
+  let cc;
+  if (sent.mailboxMessageId) {
+    cc = await graph(`users/${encodeURIComponent(MAILBOX)}/messages/${encodeURIComponent(sent.mailboxMessageId)}?$select=${SELECT}`);
+  } else {
+    if (!Number.isFinite(Date.parse(sent.sentAt))) deny("STAGE04_OUTBOUND_IDENTITY_CONFLICT");
+    const copies = await pages(MAILBOX, { $filter: `receivedDateTime ge ${sent.sentAt} and from/emailAddress/address eq '${FROM}'`,
+      $select: SELECT, $top: "100" }, deps);
+    const matches = copies.filter(m => providerId(m.internetMessageId || "") === sent.providerMessageId.replaceAll("-", "").toLowerCase());
+    if (matches.length > 1) deny("STAGE04_OUTBOUND_IDENTITY_CONFLICT");
+    if (!matches.length) return null;
+    cc = matches[0];
+  }
   if (!cc.internetMessageId || providerId(cc.internetMessageId) !== sent.providerMessageId.replaceAll("-", "").toLowerCase() ||
       cc.subject !== render(bundle.title, bundle.offer).subject || cc.from?.emailAddress?.address?.toLowerCase() !== FROM ||
       !cc.toRecipients?.some(r => r.emailAddress?.address?.toLowerCase() === AUTHOR) ||
@@ -153,7 +167,8 @@ function classify(message, offer, delivered) {
   const replyIds = headers(message, "in-reply-to").match(/<[^>]+>/g) || [];
   if (sender !== AUTHOR || !message.toRecipients?.some(r => r.emailAddress?.address?.toLowerCase() === MAILBOX) ||
       !message.id || !message.internetMessageId || message.internetMessageId === delivered.internetMessageId ||
-      !replyIds.includes(delivered.internetMessageId) || !Number.isFinite(Date.parse(message.receivedDateTime)) ||
+      replyIds.length !== 1 || replyIds[0] !== delivered.internetMessageId || /^(?:fw|fwd):/i.test(message.subject || "") ||
+      (message.internetMessageHeaders || []).some(h => /^resent-/i.test(h.name)) || !Number.isFinite(Date.parse(message.receivedDateTime)) ||
       Date.parse(message.receivedDateTime) < Date.parse(delivered.deliveredAt)) return { decision: null, reason: "IDENTITY_OR_EXACT_OFFER_THREAD_MISMATCH" };
   const text = (message.uniqueBody?.content || "").trim();
   const authenticationProof = authentication(message);
@@ -161,8 +176,11 @@ function classify(message, offer, delivered) {
   const lines = text.split(/\r?\n/).map(x => x.trim()).filter(Boolean);
   const decision = /^(ACCEPT|DECLINE|HOLD)[.!]?$/i.exec(lines[0] || "")?.[1]?.toUpperCase();
   const extra = lines.slice(1).join(" ");
-  if (authenticationProof.dmarc !== "pass") return { decision: null, reason: "AUTHOR_MESSAGE_AUTHENTICATION_REVIEW_REQUIRED" };
-  if (!decision || (extra && !/^(?:Jackie(?: Smith,? Jr\.?)?|Sent from my (?:iPhone|iPad))\.?$/i.test(extra)))
+  if (authenticationProof.dmarc !== "pass" && authenticationProof.method !== "TENANT_VERIFIED_INTERNAL_MAILBOX")
+    return { decision: null, reason: "AUTHOR_MESSAGE_AUTHENTICATION_REVIEW_REQUIRED" };
+  const signature = extra.replace(/https:\/\/jmerrill\.one\/?/g, "").replace(/[<>\[\]]/g, "").replace(/\s+/g, " ").trim();
+  const knownSignature = sha(signature) === "9ae3e7ac995e04b6fc0475856b80fc664c3c5ddad6da7032331c0ca99d9ad45d";
+  if (!decision || (extra && !knownSignature && !/^(?:Jackie(?: Smith,? Jr\.?)?|Sent from my (?:iPhone|iPad))\.?$/i.test(extra)))
     return { decision: null, reason: "AUTHOR_TEXT_REQUIRES_REVIEW" };
   return { decision, offerSha256: offer.offerSha256, offerVersion: offer.version, titleId: offer.titleId,
     authorContactId: offer.authorContactId, authorEmail: sender, sourceMailbox: MAILBOX,

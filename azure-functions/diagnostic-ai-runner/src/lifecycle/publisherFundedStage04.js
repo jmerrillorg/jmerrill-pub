@@ -120,16 +120,31 @@ async function reconcile(bundle, deps) {
   };
   try {
     const prior = (await b.optional(container, `${bundle.prefix}/monitor.json`))?.value;
-    if ((prior?.nextAttemptAt && Date.parse(prior.nextAttemptAt) > Date.now()) || prior?.status === "HELD") return readback(bundle, deps);
+    const internalPolicy = require("./publisherFundedInternalMail").POLICY;
+    if (Date.now() >= Date.parse(internalPolicy.expiresAt)) {
+      const priorResponse = (await b.optional(container, `${bundle.prefix}/response.json`))?.value;
+      const source = priorResponse?.sourceReference && (await b.optional(container, priorResponse.sourceReference))?.value;
+      if (source?.authentication?.method === "TENANT_VERIFIED_INTERNAL_MAILBOX") {
+        return { ...(await readback(bundle, deps)), authenticationReviewRequired: "INTERNAL_MAIL_POLICY_EXPIRED" };
+      }
+    }
+    if (prior?.status === "HELD") {
+      const policy = require("./publisherFundedInternalMail").POLICY;
+      const recoveryReference = `${bundle.prefix}/recoveries/${policy.version}.json`;
+      if (prior.code !== "STAGE04_MAIL_READ_FAILED" || prior.providerStatus !== 403 ||
+          prior.providerCode !== "ErrorAccessDenied" || prior.mailReadScope !== "AUTHOR" ||
+          Date.now() >= Date.parse(policy.expiresAt)) return readback(bundle, deps);
+      const proof = await (deps.verifyDelivery || mail.delivery)(sent, bundle, deps);
+      if (proof?.replyAuthentication?.method !== "TENANT_VERIFIED_INTERNAL_MAILBOX") return readback(bundle, deps);
+      assertClaim();
+      await b.immutable(container, recoveryReference, { prior, policyVersion: policy.version,
+        titleId: bundle.offer.titleId, offerSha256: bundle.offer.offerSha256,
+        proofMessageId: proof.replyInternetMessageId, sendRepeated: false });
+      await b.immutable(container, `${bundle.prefix}/delivery.json`, proof);
+    } else if (prior?.nextAttemptAt && Date.parse(prior.nextAttemptAt) > Date.now()) return readback(bundle, deps);
     let delivered = (await b.optional(container, `${bundle.prefix}/delivery.json`))?.value;
     if (!delivered) {
-      let evidence = sent;
-      if (!sent.mailboxMessageId) {
-        const prepared = (await b.read(container, `${bundle.prefix}/package.json`)).value;
-        evidence = await (deps.sendOffer || mail.send)(prepared.email, deps);
-        if (evidence.providerMessageId !== sent.providerMessageId || evidence.communicationRecordId !== sent.communicationRecordId) deny("STAGE04_RELAY_REPLAY_CONFLICT");
-      }
-      delivered = await (deps.verifyDelivery || mail.delivery)(evidence, bundle, deps);
+      delivered = await (deps.verifyDelivery || mail.delivery)(sent, bundle, deps);
       if (!delivered) throw Object.assign(new Error("STAGE04_DELIVERY_PENDING"), { safeCode: "STAGE04_DELIVERY_PENDING", statusCode: 503 });
       assertClaim();
       await b.immutable(container, `${bundle.prefix}/delivery.json`, delivered);
