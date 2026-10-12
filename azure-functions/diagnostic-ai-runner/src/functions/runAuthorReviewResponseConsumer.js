@@ -12,6 +12,11 @@ const { runAuthorReviewResponseConsumer } = require("../orchestration/authorRevi
 app.timer("run-author-review-response-consumer", {
   schedule: "0 */5 * * * *",
   handler: async (_timer, context) => {
+    const funded = await require("../lifecycle/publisherFundedStage04").monitor();
+    for (const result of funded) {
+      if (result.status !== 200) context.error(`Stage04 funded response monitor: title=${result.titleId}; code=${result.code}`);
+      else context.info(`Stage04 funded response monitor: title=${result.titleId}; status=${result.stage04}`);
+    }
     const result = await runAuthorReviewResponseConsumer({
       triggerSource: "SCHEDULED_WORKER",
       maxGates: Number(process.env.JM1_AUTHOR_RESPONSE_CONSUMER_MAX_GATES || 10)

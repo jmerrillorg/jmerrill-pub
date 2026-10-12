@@ -68,3 +68,33 @@ Publisher policy approval cannot satisfy those gates.
 
 No new paid inference, provider commitment or final publication is authorized
 by this policy. Stage 03's completed assessment budget is not next-work authority.
+
+## Bounded Stage 04 sender and response consumer
+
+The existing source-registration endpoint accepts `SUBMISSION_04_PREFLIGHT`,
+`SUBMISSION_04_SEND`, `SUBMISSION_04_READBACK`, and `SUBMISSION_04_RECONCILE`.
+Only the five selected title IDs are accepted. A private content-addressed
+manifest binds the retained policy, selection, accepted assessments, offer hashes,
+and unchanged registered base-agreement bytes. Broad commissioning workers remain
+disabled. Set `JM1_NEW_SUBMISSION_STAGE04_MANIFEST` and its `_SHA256`, then the
+five-ID `JM1_NEW_SUBMISSION_STAGE04_TITLE_IDS` allowlist. Enable only
+`JM1_NEW_SUBMISSION_STAGE04_ENABLED` after release and authority preflight.
+
+The sender persists an exact review package and uses the existing approved-author
+relay, canonical author recipient and Publishing CC. Provider acceptance and an
+exact provider message found in the author's mailbox are separate receipts.
+The existing author-response timer resumes only previously initiated sends,
+using bounded claim/backoff recovery; it never starts an unrequested offer.
+Disable the Stage 04 flag to stop its sender and scheduled consumer without
+deleting receipts or changing any other commissioning state.
+
+Responses must come from the authorized author, authenticate successfully, and
+reply to the exact delivered message. Quoted instructions, conditional language,
+stale threads, changed observations and conflicting elections cannot authorize
+advancement. Metadata and content hashes retain provenance without retaining
+full response bodies. Stage 05 remains gated on actual agreement execution and
+approved next-work budget; an author acceptance alone is not either proof.
+
+Local and CI tests establish source behavior only. Record the reviewed release,
+actual recipient delivery, authentication and scheduled recovery separately
+before describing Stage 04 as operational.
