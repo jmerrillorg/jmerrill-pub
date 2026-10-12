@@ -125,4 +125,15 @@ test("complete assessment has canonical output and durable receipt; restart repl
   const replay=await stage.handler(body,x.deps);assert.equal(replay.status,200,JSON.stringify(replay));
   assert.equal(replay.jsonBody.replay,true);assert.equal(x.paid(),1);assert.equal(uploads,1);
   assert.equal(replay.jsonBody.receipt.stage04,"NOT_STARTED");
+  const canon=require("../config/commissioning-editorial-review-canon.json");
+  x.component.binding.authority=[{role:"EDITORIAL_REVIEW_CANON",sha256:canon.sha256,version:canon.version}];
+  const accepted=await stage.handler({...body,mode:"SUBMISSION_03_ACCEPT"},x.deps);
+  assert.equal(accepted.status,200,JSON.stringify(accepted));
+  assert.equal(accepted.jsonBody.acceptanceReceipt.status,"VALIDATED_ASSESSMENT_PACKAGE");
+  assert.equal(accepted.jsonBody.acceptanceReceipt.modelCalls,0);
+  const again=await stage.handler({...body,mode:"SUBMISSION_03_ACCEPT"},x.deps);
+  assert.equal(again.status,200,JSON.stringify(again));
+  assert.deepEqual(again.jsonBody.acceptanceReceipt,accepted.jsonBody.acceptanceReceipt);
+  assert.equal(x.paid(),1);assert.equal(uploads,2);
+  assert.deepEqual(accepted.jsonBody.receipt,first.jsonBody.receipt);
 });
