@@ -65,7 +65,8 @@ async function agreementCopy(baseBytes, bundle, reference) {
   }
   const p = doc.createElementNS(NS, "w:p"), r = doc.createElementNS(NS, "w:r"), br = doc.createElementNS(NS, "w:br");
   br.setAttributeNS(NS, "w:type", "page"); r.appendChild(br); p.appendChild(r); body.insertBefore(p, first);
-  zip.file("word/document.xml", new XMLSerializer().serializeToString(doc), { date: EPOCH });
+  // Do not synthesize parent directories with wall-clock timestamps on replay.
+  zip.file("word/document.xml", new XMLSerializer().serializeToString(doc), { date: EPOCH, createFolders: false });
   return zip.generateAsync({ type: "nodebuffer", compression: "DEFLATE" });
 }
 module.exports = { offerPdf, agreementCopy };

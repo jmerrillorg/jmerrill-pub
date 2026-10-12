@@ -112,7 +112,30 @@ async function delivery(sent, bundle, deps) {
       cc.subject !== render(bundle.title, bundle.offer).subject || cc.from?.emailAddress?.address?.toLowerCase() !== FROM ||
       !cc.toRecipients?.some(r => r.emailAddress?.address?.toLowerCase() === AUTHOR) ||
       !cc.ccRecipients?.some(r => r.emailAddress?.address?.toLowerCase() === MAILBOX)) deny("STAGE04_OUTBOUND_IDENTITY_CONFLICT");
-  const found = await pages(AUTHOR, { $filter: `internetMessageId eq '${cc.internetMessageId.replace(/'/g, "''")}'`, $select: SELECT, $top: "10" }, deps);
+  let found;
+  try {
+    found = await pages(AUTHOR, { $filter: `internetMessageId eq '${cc.internetMessageId.replace(/'/g, "''")}'`, $select: SELECT, $top: "10" }, deps);
+  } catch (error) {
+    if (error.safeCode !== "STAGE04_MAIL_READ_FAILED" || error.statusCode !== 403 ||
+        error.providerCode !== "ErrorAccessDenied" || error.mailReadScope !== "AUTHOR") throw error;
+    // An authenticated exact-thread reply proves receipt, not the outbound authentication result.
+    if (!Number.isFinite(Date.parse(sent.sentAt))) throw error;
+    const anchor = { internetMessageId: cc.internetMessageId, deliveredAt: sent.sentAt };
+    const candidates = await replies(anchor, deps);
+    const valid = candidates.filter(message => {
+      const result = classify(message, bundle.offer, anchor);
+      return result.decision || result.reason === "AUTHOR_TEXT_REQUIRES_REVIEW";
+    }).sort((a, c) => Date.parse(a.receivedDateTime) - Date.parse(c.receivedDateTime) || a.id.localeCompare(c.id));
+    if (!valid.length) throw error;
+    const reply = valid[0];
+    return { generated: true, sent: true, delivered: true, recipient: AUTHOR, cc: [MAILBOX],
+      providerMessageId: sent.providerMessageId, communicationRecordId: sent.communicationRecordId,
+      internetMessageId: cc.internetMessageId, publishingMessageId: cc.id,
+      deliveredAt: sent.sentAt, deliveredAtMeaning: "LOWER_BOUND_SEND_TIME_NOT_EXACT_RECIPIENT_RECEIPT",
+      receiptProvenBy: reply.receivedDateTime, replyMessageId: reply.id, replyInternetMessageId: reply.internetMessageId,
+      authentication: { dmarc: "UNVERIFIED", spf: "UNVERIFIED", dkim: "UNVERIFIED" },
+      replyAuthentication: authentication(reply), proof: "AUTHENTICATED_EXACT_AUTHOR_REPLY_IN_PUBLISHING_MAILBOX" };
+  }
   if (found.length > 1) deny("STAGE04_RECIPIENT_MESSAGE_CONFLICT");
   if (!found.length) return null;
   const m = found[0];
