@@ -35,6 +35,28 @@ function validateReport(model, source) {
   if (report.intakeSummary.title !== source.title || report.intakeSummary.sourceVersion !== source.version ||
     report.intakeSummary.wordCount !== source.wordCount || report.imprintAlignment.authority !== "SUGGESTED_ONLY") b.deny("STAGE03_REPORT_SOURCE_CONTEXT_MISMATCH");
 }
+function rateRejected(model) {
+  return model?.provider === "microsoft-foundry-claude" && model.ok === false && model.httpStatus === 429 &&
+    model.output === null && !model.failureCode && /^MICROSOFT_FOUNDRY_HTTP_429:/.test(model.error || "") &&
+    model.tokenCounts?.input === 0 && model.tokenCounts.output === 0 && model.tokenCounts.total === 0;
+}
+async function reconcileRateRejections(ledger, container, approvalSha256) {
+  let changed = false;
+  for (const call of ledger.calls) {
+    if (call.status !== "AMBIGUOUS" || call.safeCode !== "STAGE03_ACTUAL_USAGE_UNVERIFIED") continue;
+    const path = `${b.PREFIX}/candidates/${call.bindingHash}/${call.index}${call.retry ? "-retry1" : ""}.json`;
+    const candidate = await b.optional(container, path);
+    if (!candidate || candidate.value.bindingHash !== call.bindingHash || candidate.value.requestSha256 !== call.requestSha256 ||
+        !rateRejected(candidate.value.model)) continue;
+    const receipt = { callId: call.id, candidateReference: path, candidateSha256: b.sha(candidate.bytes),
+      approvalSha256, priorStatus: call.status, disposition: "EXPLICIT_PROVIDER_429_REJECTION", actualMicroUsd: 0 };
+    await b.immutable(container, `${b.PREFIX}/recoveries/${b.sha(call.id)}.json`, receipt);
+    call.status = "REJECTED_RATE_LIMIT"; call.actualMicroUsd = 0;
+    call.safeCode = "STAGE03_PROVIDER_RATE_LIMIT_REJECTED"; call.completedAt = candidate.value.receivedAt;
+    changed = true;
+  }
+  return changed;
+}
 async function prepare(titleId, deps, approval) {
   const current = await fresh.readSource(titleId, deps);
   const p = stage02.plan(current);
@@ -183,9 +205,10 @@ async function handler(body, deps = {}) {
     acquired = true;
     const ledger = (await b.read(container, ledgerPath)).value;
     if (ledger.approvalSha256 !== env.JM1_NEW_SUBMISSION_STAGE03_APPROVAL_SHA256) b.deny("STAGE03_LEDGER_APPROVAL_CONFLICT");
-    if (ledger.calls.some(c => ["IN_FLIGHT", "AMBIGUOUS"].includes(c.status))) b.deny("STAGE03_AMBIGUOUS_PROVIDER_EFFECT_HELD");
     const writeLedger = () => journal.uploadData(Buffer.from(JSON.stringify(ledger)), {
       conditions: { leaseId: lease.leaseId }, blobHTTPHeaders: { blobContentType: "application/json" } });
+    if (await reconcileRateRejections(ledger, container, ledger.approvalSha256)) await writeLedger();
+    if (ledger.calls.some(c => ["IN_FLIGHT", "AMBIGUOUS"].includes(c.status))) b.deny("STAGE03_AMBIGUOUS_PROVIDER_EFFECT_HELD");
     let job;
     for (const c of prepared.components) {
       const reports = [];
@@ -205,8 +228,8 @@ async function handler(body, deps = {}) {
     if (!job) b.deny("STAGE03_COMPLETION_RECONCILIATION_REQUIRED");
     const logicalCallId = `${job.c.key}:${job.index}`;
     const earlier = ledger.calls.find(c => c.id === logicalCallId);
-    const retry = Boolean(earlier && earlier.status === "HELD_VALIDATION" && earlier.actualMicroUsd &&
-      /^REVIEW_/.test(earlier.safeCode || ""));
+    const retry = Boolean(earlier && ((earlier.status === "HELD_VALIDATION" && earlier.actualMicroUsd &&
+      /^REVIEW_/.test(earlier.safeCode || "")) || (earlier.status === "REJECTED_RATE_LIMIT" && earlier.actualMicroUsd === 0)));
     if (earlier && !retry) b.deny("STAGE03_PAID_REQUEST_ALREADY_ATTEMPTED");
     const request = requestPrompt(job.c, job.chunk, job.reports);
     const prompt = retry ? JSON.stringify({ ...JSON.parse(request.prompt),
@@ -215,6 +238,11 @@ async function handler(body, deps = {}) {
     const source = request.source;
     await b.immutable(container, `${b.PREFIX}/bindings/${job.c.key}.json`, { binding: job.c.binding,
       authorityContent: job.c.authority.sources.map(({ verifiedAt, ...source }) => source) });
+    // The existing deployment has a shared input-token minute limit; allow it to replenish between batch requests.
+    const lastCompleted = ledger.calls.at(-1)?.completedAt;
+    const delay = lastCompleted ? Math.max(0, Date.parse(lastCompleted) + 65000 - Date.now()) : 0;
+    if (delay > 65000 || !Number.isFinite(delay)) b.deny("STAGE03_PROVIDER_BACKOFF_INVALID");
+    if (delay) await (context.wait || (ms => new Promise(resolve => setTimeout(resolve, ms))))(delay);
     phase = "NATIVE_TOKEN_COUNT";
     await (context.readDeployment || recovery.readDeployment)(context);
     const count = await (context.countRequest || recovery.countRequest)(prompt, context);
@@ -235,6 +263,7 @@ async function handler(body, deps = {}) {
       model, receivedAt: new Date().toISOString() };
     await b.immutable(container, `${b.PREFIX}/candidates/${job.c.key}/${job.index}${retry ? "-retry1" : ""}.json`, candidate);
     try {
+      if (rateRejected(model)) { call.actualMicroUsd = 0; b.deny("STAGE03_PROVIDER_RATE_LIMIT_REJECTED"); }
       call.actualMicroUsd = b.actualCost(model, held);
       if (!model.ok || model.provider !== "microsoft-foundry-claude") b.deny("STAGE03_PROVIDER_FAILURE_HELD");
       validateReport(model, source);
@@ -247,8 +276,9 @@ async function handler(body, deps = {}) {
         tokenCounts: model.tokenCounts, actualMicroUsd: call.actualMicroUsd, callId, source };
       await b.immutable(container, resultPath, result);
       call.status = "COMPLETED";
-    } catch (e) { call.status = call.actualMicroUsd ? "HELD_VALIDATION" : "AMBIGUOUS"; call.safeCode = e.safeCode || "STAGE03_RESULT_VALIDATION_FAILED"; throw e; }
-    finally { await writeLedger(); }
+    } catch (e) { call.status = rateRejected(model) ? "REJECTED_RATE_LIMIT" : call.actualMicroUsd ? "HELD_VALIDATION" : "AMBIGUOUS";
+      call.safeCode = e.safeCode || "STAGE03_RESULT_VALIDATION_FAILED"; throw e; }
+    finally { call.completedAt = new Date().toISOString(); await writeLedger(); }
     const receipt = await completion(prepared, context);
     return { status: receipt ? 200 : 202, jsonBody: { receipt, titleId: body.titleId, completedRequest: callId,
       actualBatchMicroUsd: ledger.calls.reduce((n, c) => n + (c.actualMicroUsd || 0), 0), modelCalls: 1,
@@ -259,4 +289,4 @@ async function handler(body, deps = {}) {
       recovery: call ? "PRESERVE_CANDIDATE_AND_BUDGET_NO_AUTOMATIC_REPLAY" : "NO_PAID_REQUEST_ATTEMPTED" } };
   } finally { if (acquired) await lease.releaseLease(); }
 }
-module.exports = { MODES, sections, requestPrompt, validateReport, prepare, handler };
+module.exports = { MODES, sections, requestPrompt, validateReport, rateRejected, reconcileRateRejections, prepare, handler };
