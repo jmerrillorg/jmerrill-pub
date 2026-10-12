@@ -223,3 +223,41 @@ test("mail read failures retain sanitized provider status and scope", async () =
   assert.equal(evidence.mailReadScope, "PUBLISHING");
   assert.equal(JSON.stringify(evidence).includes("private provider detail"), false);
 });
+test("exact authenticated Publishing reply proves receipt without author mailbox access or a send", async () => {
+  const x = fixture(), bundle = await stage.load(x.titleId, x.deps);
+  const providerMessageId = "a".repeat(32);
+  const cc = { id: "cc", internetMessageId: `<261012120000.${providerMessageId}-abc@microsoft.com>`,
+    subject: mail.render(bundle.title, bundle.offer).subject, from: { emailAddress: { address: mail.FROM } },
+    toRecipients: [{ emailAddress: { address: mail.AUTHOR } }], ccRecipients: [{ emailAddress: { address: mail.MAILBOX } }] };
+  const denied = Object.assign(Error("denied"), { safeCode: "STAGE04_MAIL_READ_FAILED", statusCode: 403,
+    providerCode: "ErrorAccessDenied", mailReadScope: "AUTHOR" });
+  x.delivered.internetMessageId = cc.internetMessageId;
+  let responses = [reply(x)];
+  const deps = { mailGraph: async p => {
+    if (p.includes("/messages/cc?")) return cc;
+    if (p.startsWith(`users/${encodeURIComponent(mail.AUTHOR)}/`)) throw denied;
+    assert.ok(p.startsWith(`users/${encodeURIComponent(mail.MAILBOX)}/`));
+    return { value: responses };
+  } };
+  const sent = { providerMessageId, mailboxMessageId: "cc", sentAt: x.delivered.deliveredAt };
+  const proof = await mail.delivery(sent, bundle, deps);
+  assert.equal(proof.proof, "AUTHENTICATED_EXACT_AUTHOR_REPLY_IN_PUBLISHING_MAILBOX");
+  assert.equal(proof.authentication.dmarc, "UNVERIFIED");
+  assert.equal(mail.classify(responses[0], bundle.offer, proof).decision, "ACCEPT");
+  assert.deepEqual(await mail.delivery(sent, bundle, deps), proof);
+  responses = [reply(x, "I have a question")];
+  assert.equal((await mail.delivery(sent, bundle, deps)).delivered, true);
+  assert.equal(mail.classify(responses[0], bundle.offer, proof).decision, null);
+  for (const invalid of [
+    { ...reply(x), from: { emailAddress: { address: "other@example.com" } } },
+    { ...reply(x), receivedDateTime: "2020-01-01T00:00:00Z" },
+    { ...reply(x), internetMessageHeaders: [{ name: "In-Reply-To", value: "<stale@example.com>" }, { name: "Authentication-Results", value: "dmarc=pass" }] },
+    { ...reply(x), internetMessageHeaders: [{ name: "In-Reply-To", value: cc.internetMessageId }, { name: "Authentication-Results", value: "dmarc=fail" }] }
+  ]) {
+    responses = [invalid];
+    await assert.rejects(mail.delivery(sent, bundle, deps), /denied/);
+  }
+  responses = [];
+  await assert.rejects(mail.delivery(sent, bundle, deps), /denied/);
+  assert.equal(x.counts.sends, 0);
+});
