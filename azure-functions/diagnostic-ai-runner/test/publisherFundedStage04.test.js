@@ -131,6 +131,10 @@ test("resolved exact-author access hold recovers once with durable proof and no 
   assert.equal(result.response.decision, "ACCEPT");
   assert.equal(x.counts.sends, sends);
   assert.ok(x.blobs.has(`${bundle.prefix}/recoveries/${trust.POLICY.version}.json`));
+  const recovery = JSON.parse(x.blobs.get(`${bundle.prefix}/recoveries/${trust.POLICY.version}.json`));
+  x.put(`${bundle.prefix}/monitor.json`, recovery.prior);
+  x.blobs.delete(`${bundle.prefix}/delivery.json`);
+  assert.equal((await stage.reconcile(bundle, x.deps)).response.decision, "ACCEPT");
   assert.equal((await stage.reconcile(bundle, x.deps)).response.decision, "ACCEPT");
   assert.equal(x.counts.sends, sends);
   t.mock.timers.setTime(Date.parse(trust.POLICY.expiresAt));

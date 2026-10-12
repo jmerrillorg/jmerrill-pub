@@ -133,7 +133,7 @@ async function reconcile(bundle, deps) {
       const recoveryReference = `${bundle.prefix}/recoveries/${policy.version}.json`;
       if (prior.code !== "STAGE04_MAIL_READ_FAILED" || prior.providerStatus !== 403 ||
           prior.providerCode !== "ErrorAccessDenied" || prior.mailReadScope !== "AUTHOR" ||
-          Date.now() >= Date.parse(policy.expiresAt) || await b.optional(container, recoveryReference)) return readback(bundle, deps);
+          Date.now() >= Date.parse(policy.expiresAt)) return readback(bundle, deps);
       const proof = await (deps.verifyDelivery || mail.delivery)(sent, bundle, deps);
       if (proof?.replyAuthentication?.method !== "TENANT_VERIFIED_INTERNAL_MAILBOX") return readback(bundle, deps);
       assertClaim();
