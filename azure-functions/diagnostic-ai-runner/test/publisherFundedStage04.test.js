@@ -76,6 +76,69 @@ function reply(x, value = "ACCEPT", id = "reply") {
     toRecipients: [{ emailAddress: { address: mail.MAILBOX } }], uniqueBody: { content: value },
     internetMessageHeaders: [{ name: "In-Reply-To", value: x.delivered.internetMessageId }, { name: "Authentication-Results", value: "mx; dmarc=pass; spf=pass; dkim=pass" }] };
 }
+function internalReply(x) {
+  const m = reply(x);
+  m.sender = m.from;
+  m.internetMessageHeaders = [
+    { name: "In-Reply-To", value: x.delivered.internetMessageId },
+    { name: "X-MS-Exchange-Organization-AuthAs", value: "Internal" },
+    { name: "X-MS-Exchange-Organization-AuthMechanism", value: "04" },
+    { name: "X-MS-Exchange-Organization-AuthSource", value: "CH3PR15MB6500.namprd15.prod.outlook.com" },
+    { name: "X-MS-Exchange-Organization-Network-Message-Id", value: "11111111-2222-4333-8444-555555555555" },
+    { name: "Received", value: "from SN7PR15MB5732.namprd15.prod.outlook.com by DS0PR15MB7055.namprd15.prod.outlook.com with HTTPS" },
+    { name: "Received", value: "from CH3PR15MB6500.namprd15.prod.outlook.com by CH3PR15MB6500.namprd15.prod.outlook.com with mapi id 1" }
+  ];
+  return m;
+}
+test("internal path requires native custody, bounded tenant policy and intact mailbox-origin chain", async t => {
+  const trust = require("../src/lifecycle/publisherFundedInternalMail");
+  t.mock.timers.enable({ apis: ["Date"], now: Date.parse(trust.POLICY.checkedAt) + 1000 });
+  const x = fixture(), bundle = await stage.load(x.titleId, x.deps), m = internalReply(x);
+  assert.equal(mail.classify(m, bundle.offer, x.delivered).decision, null);
+  const read = async row => (await mail.replies(x.delivered, { mailGraph: async () => ({ value: [row] }) }))[0];
+  assert.equal(mail.classify(await read(m), bundle.offer, x.delivered).decision, "ACCEPT");
+  assert.equal(mail.authentication(m).dmarc, "NOT_APPLICABLE_INTERNAL");
+  for (const mutate of [
+    row => { row.sender = { emailAddress: { address: "spoof@example.com" } }; },
+    row => { row.subject = "Fwd: offer"; },
+    row => { row.receivedDateTime = "2020-01-01T00:00:00Z"; },
+    row => { row.internetMessageHeaders[0].value = "<old@offer>"; },
+    row => { row.internetMessageHeaders.push({ name: "In-Reply-To", value: x.delivered.internetMessageId }); },
+    row => { row.internetMessageHeaders.push({ name: "X-MS-Exchange-Organization-AuthAs", value: "Internal" }); },
+    row => { row.internetMessageHeaders[3].value = "attacker.example.com"; },
+    row => { row.internetMessageHeaders[6].value = "from attacker.example.com by mailbox.example.com with mapi"; },
+    row => { row.uniqueBody.content = "ACCEPT\nOnly if you change the rights clause."; }
+  ]) {
+    const bad = internalReply(x); mutate(bad);
+    assert.equal(mail.classify(await read(bad), bundle.offer, x.delivered).decision, null);
+  }
+  t.mock.timers.setTime(Date.parse(trust.POLICY.expiresAt));
+  assert.equal(mail.classify(m, bundle.offer, x.delivered).decision, null);
+});
+test("resolved exact-author access hold recovers once with durable proof and no resend", async t => {
+  const trust = require("../src/lifecycle/publisherFundedInternalMail");
+  t.mock.timers.enable({ apis: ["Date"], now: Date.parse(trust.POLICY.checkedAt) + 1000 });
+  const x = fixture();
+  await stage.handler({ titleId: x.titleId, mode: "SUBMISSION_04_SEND" }, x.deps);
+  const bundle = await stage.load(x.titleId, x.deps);
+  x.blobs.delete(`${bundle.prefix}/delivery.json`);
+  x.put(`${bundle.prefix}/monitor.json`, { status: "HELD", failures: 5, code: "STAGE04_MAIL_READ_FAILED",
+    providerStatus: 403, providerCode: "ErrorAccessDenied", mailReadScope: "AUTHOR" });
+  x.deps.verifyDelivery = async () => ({ ...x.delivered, replyAuthentication: { method: "TENANT_VERIFIED_INTERNAL_MAILBOX" }, replyInternetMessageId: "<reply@jmerrill.one>" });
+  x.deps.readReplies = async () => mail.replies(x.delivered, { mailGraph: async () => ({ value: [internalReply(x)] }) });
+  const sends = x.counts.sends;
+  const result = await stage.reconcile(bundle, x.deps);
+  assert.equal(result.response.decision, "ACCEPT");
+  assert.equal(x.counts.sends, sends);
+  assert.ok(x.blobs.has(`${bundle.prefix}/recoveries/${trust.POLICY.version}.json`));
+  assert.equal((await stage.reconcile(bundle, x.deps)).response.decision, "ACCEPT");
+  assert.equal(x.counts.sends, sends);
+  t.mock.timers.setTime(Date.parse(trust.POLICY.expiresAt));
+  const replay = await stage.reconcile(bundle, x.deps);
+  assert.equal(replay.response.decision, "ACCEPT");
+  assert.equal(replay.authenticationReviewRequired, "INTERNAL_MAIL_POLICY_EXPIRED");
+  assert.equal(x.counts.sends, sends);
+});
 test("readable attachments preserve exact terms, title binding and deterministic replay", async () => {
   const x = fixture(), bundle = await stage.load(x.titleId, x.deps);
   const review = { webUrl: "https://internal.example/offer.md" };
