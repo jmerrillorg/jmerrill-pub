@@ -57,7 +57,8 @@ async function payload(bundle, packageOutput, baseBytes, approvedOn, presentatio
   if (presentationVersion !== 2) deny("STAGE04_PRESENTATION_VERSION_INVALID");
   const copy = render(bundle.title, bundle.offer);
   const documents = require("./publisherFundedStage04Attachments");
-  const pdf = await documents.offerPdf(copy.review);
+  // Custody URLs remain in the internal review, not in author-facing instructions.
+  const pdf = await documents.offerPdf(copy.review.replace(/^Assessment: .*$/gm, "Assessment retained with the exact-version Publishing record."));
   const agreement = await documents.agreementCopy(baseBytes, bundle, copy.reference);
   value.body = value.body.replace(`Review the exact offer and assessment links: ${packageOutput.webUrl}`,
     "Please review the attached offer and publishing agreement, then reply to this email with your decision.")
