@@ -60,7 +60,7 @@ async function prepare(bundle, deps) {
   if (existing) {
     await stage02.verifyOutput(existing.value.review, deps);
     if (existing.value.offerSha256 !== bundle.offer.offerSha256 ||
-        JSON.stringify(existing.value.email) !== JSON.stringify(mail.payload(bundle, existing.value.review, bundle.baseBytes, bundle.approvedOn))) deny("STAGE04_PREPARED_PACKAGE_CHANGED");
+        JSON.stringify(existing.value.email) !== JSON.stringify(await mail.payload(bundle, existing.value.review, bundle.baseBytes, bundle.approvedOn, existing.value.presentationVersion || 1))) deny("STAGE04_PREPARED_PACKAGE_CHANGED");
     return existing.value;
   }
   for (const component of bundle.offer.components) await stage02.verifyOutput(component.assessment, deps);
@@ -71,7 +71,8 @@ async function prepare(bundle, deps) {
   const copy = mail.render(bundle.title, bundle.offer);
   const review = await stage02.persistFile(folder, `${copy.reference}-Stage04-Offer.md`, Buffer.from(copy.review), "text/markdown; charset=utf-8", deps);
   const value = { titleId: bundle.offer.titleId, offerSha256: bundle.offer.offerSha256, review,
-    offerVersion: bundle.offer.version, email: mail.payload(bundle, review, bundle.baseBytes, bundle.approvedOn) };
+    offerVersion: bundle.offer.version, presentationVersion: 2,
+    email: await mail.payload(bundle, review, bundle.baseBytes, bundle.approvedOn) };
   return (await b.immutable(deps.containerClient, path, value)).value;
 }
 async function executeSend(input, deps) {
