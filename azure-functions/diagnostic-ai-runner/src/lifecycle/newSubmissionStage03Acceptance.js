@@ -39,6 +39,8 @@ ${saved.value.report.recommendation.rationale}`;
     const header = ["# Stage 03 Validated Assessment Package", "",
       `Original receipt: ${receipt.reference}`, `Original report SHA-256: ${assessment.reportSha256}`,
       `Canon version: ${canon.version}`, `Canon SHA-256: ${canon.sha256}`, "",
+      `Verified author: Jackie Smith, Jr.; canonical Contact ${require("../author/jackieTitleSystemCommissioningPolicy").JACKIE_CANONICAL_AUTHOR_CONTACT_ID}.`,
+      "This is already a source-bound Jackie submission. Model suggestions to establish founder-adjacent identity or third-party routing are inapplicable; no author identity or prior-book gate is reopened.",
       "QA uses the existing canonical score rules, not another model call. Original reports and receipts remain unchanged.",
       "Numeric eligibility does not clear qualitative major-flag or exceptional-originality requirements; the Publisher must review those judgments.",
       "Completeness observations concern the manuscript text, not the accepted intake records. Do not repeat intake or request already-captured information from these suggestions.",

@@ -27,7 +27,10 @@ function fixture() {
     native:async d=>d,prepare:async()=>({p:{titleId,fingerprint:"f".repeat(64)},components:[component]}),
     wait:async()=>{},readDeployment:async()=>({}),countRequest:async prompt=>({inputTokens:1000,verifiedAt:new Date().toISOString(),
       requestSha256:b.sha(JSON.stringify(require("../src/model/providers/microsoftFoundryClaudeProvider").buildRequestBody(prompt,require("../src/lifecycle/gloryReviewRecoveryReaders").route)))}),
-    callModel:async({promptBody})=>{paid++;const source=JSON.parse(promptBody).source;return{ok:true,provider:"microsoft-foundry-claude",tokenCounts:{input:1000,output:500},
+    callModel:async({promptBody})=>{paid++;const prompt=JSON.parse(promptBody),source=prompt.source;
+      assert.equal(prompt.verifiedIntakeContext.author,"Jackie Smith, Jr.");
+      assert.equal(prompt.verifiedIntakeContext.stage02,"ACCEPTED");assert.equal(prompt.verifiedIntakeContext.authorConsentInferred,false);
+      return{ok:true,provider:"microsoft-foundry-claude",tokenCounts:{input:1000,output:500},
       output:{intakeSummary:{title:source.title,sourceVersion:source.version,wordCount:source.wordCount,
         genre:"UNKNOWN",audience:"UNKNOWN",draftStage:"UNKNOWN",seriesPotential:"UNKNOWN",comparables:"UNKNOWN",authorIntent:"UNKNOWN",submissionCompleteness:"Section"},
         imprintAlignment:{imprint:"JM Works",authority:"SUGGESTED_ONLY",rationale:"Advisory",publisherApprovalRequired:false},

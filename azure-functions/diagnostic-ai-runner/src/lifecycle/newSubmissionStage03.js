@@ -87,6 +87,11 @@ function requestPrompt(component, chunk, reports) {
     sourceSha256: component.source.provenance.sourceSha256, sourceVersion: component.source.provenance.eTag,
     manuscript: data, authority: component.authority });
   const prompt = JSON.parse(assembled.prompt);
+  prompt.verifiedIntakeContext = { author: "Jackie Smith, Jr.",
+    authorContactId: require("../author/jackieTitleSystemCommissioningPolicy").JACKIE_CANONICAL_AUTHOR_CONTACT_ID,
+    stage01: "ACCEPTED", stage02: "ACCEPTED", authorConsentInferred: false,
+    scope: "FRESH_SOURCE_BOUND_SUBMISSION_NOT_HISTORICAL_COMPLETION",
+    instruction: "Do not reopen the verified author identity or contact/intake stages from manuscript byline resemblance or absent contact details in manuscript text. Assess content; no author approval is inferred." };
   if (synthesis) {
     prompt.task = "SYNTHESIZE_FULL_COMPONENT_EDITORIAL_ASSESSMENT_ONLY";
     prompt.source.wordCount = component.source.provenance.words;
