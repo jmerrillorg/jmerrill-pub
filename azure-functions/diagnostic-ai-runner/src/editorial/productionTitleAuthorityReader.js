@@ -118,4 +118,4 @@ async function readExistingGlobalStyleGuide(deps = {}) {
   };
 }
 
-module.exports = { graphBytes, readExistingTitleAuthorities, readExistingGlobalStyleGuide };
+module.exports = { graphBytes, readExistingTitleAuthorities, readExistingGlobalStyleGuide, roleFor };
