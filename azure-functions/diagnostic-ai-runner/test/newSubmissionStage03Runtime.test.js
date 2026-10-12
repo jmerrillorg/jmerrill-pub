@@ -27,7 +27,10 @@ function fixture() {
     native:async d=>d,prepare:async()=>({p:{titleId,fingerprint:"f".repeat(64)},components:[component]}),
     wait:async()=>{},readDeployment:async()=>({}),countRequest:async prompt=>({inputTokens:1000,verifiedAt:new Date().toISOString(),
       requestSha256:b.sha(JSON.stringify(require("../src/model/providers/microsoftFoundryClaudeProvider").buildRequestBody(prompt,require("../src/lifecycle/gloryReviewRecoveryReaders").route)))}),
-    callModel:async({promptBody})=>{paid++;const source=JSON.parse(promptBody).source;return{ok:true,provider:"microsoft-foundry-claude",tokenCounts:{input:1000,output:500},
+    callModel:async({promptBody})=>{paid++;const prompt=JSON.parse(promptBody),source=prompt.source;
+      assert.equal(prompt.verifiedIntakeContext.author,"Jackie Smith, Jr.");
+      assert.equal(prompt.verifiedIntakeContext.stage02,"ACCEPTED");assert.equal(prompt.verifiedIntakeContext.authorConsentInferred,false);
+      return{ok:true,provider:"microsoft-foundry-claude",tokenCounts:{input:1000,output:500},
       output:{intakeSummary:{title:source.title,sourceVersion:source.version,wordCount:source.wordCount,
         genre:"UNKNOWN",audience:"UNKNOWN",draftStage:"UNKNOWN",seriesPotential:"UNKNOWN",comparables:"UNKNOWN",authorIntent:"UNKNOWN",submissionCompleteness:"Section"},
         imprintAlignment:{imprint:"JM Works",authority:"SUGGESTED_ONLY",rationale:"Advisory",publisherApprovalRequired:false},
@@ -125,4 +128,15 @@ test("complete assessment has canonical output and durable receipt; restart repl
   const replay=await stage.handler(body,x.deps);assert.equal(replay.status,200,JSON.stringify(replay));
   assert.equal(replay.jsonBody.replay,true);assert.equal(x.paid(),1);assert.equal(uploads,1);
   assert.equal(replay.jsonBody.receipt.stage04,"NOT_STARTED");
+  const canon=require("../config/commissioning-editorial-review-canon.json");
+  x.component.binding.authority=[{role:"EDITORIAL_REVIEW_CANON",sha256:canon.sha256,version:canon.version}];
+  const accepted=await stage.handler({...body,mode:"SUBMISSION_03_ACCEPT"},x.deps);
+  assert.equal(accepted.status,200,JSON.stringify(accepted));
+  assert.equal(accepted.jsonBody.acceptanceReceipt.status,"VALIDATED_ASSESSMENT_PACKAGE");
+  assert.equal(accepted.jsonBody.acceptanceReceipt.modelCalls,0);
+  const again=await stage.handler({...body,mode:"SUBMISSION_03_ACCEPT"},x.deps);
+  assert.equal(again.status,200,JSON.stringify(again));
+  assert.deepEqual(again.jsonBody.acceptanceReceipt,accepted.jsonBody.acceptanceReceipt);
+  assert.equal(x.paid(),1);assert.equal(uploads,2);
+  assert.deepEqual(accepted.jsonBody.receipt,first.jsonBody.receipt);
 });

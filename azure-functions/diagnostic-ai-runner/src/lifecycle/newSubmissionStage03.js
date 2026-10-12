@@ -6,7 +6,7 @@ const stage02 = require("./newSubmissionStage02");
 const contract = require("../editorial/commissioningEditorialReviewContract");
 const provider = require("../model/providers/microsoftFoundryClaudeProvider");
 const recovery = require("./gloryReviewRecoveryReaders");
-const MODES = ["SUBMISSION_03_PLAN", "SUBMISSION_03_EXECUTE", "SUBMISSION_03_READBACK"];
+const MODES = ["SUBMISSION_03_PLAN", "SUBMISSION_03_EXECUTE", "SUBMISSION_03_READBACK", "SUBMISSION_03_ACCEPT"];
 const BROAD = ["JM1_TITLE_COMMISSIONING_REVIEW_ENABLED", "JM1_PUBLISHING_STAGE_RUNTIME_ENABLED", "JM1_PUBLISHING_WAIT_RUNTIME_ENABLED"];
 function sections(text) {
   const matches = [...text.matchAll(/\S+/gu)];
@@ -87,6 +87,11 @@ function requestPrompt(component, chunk, reports) {
     sourceSha256: component.source.provenance.sourceSha256, sourceVersion: component.source.provenance.eTag,
     manuscript: data, authority: component.authority });
   const prompt = JSON.parse(assembled.prompt);
+  prompt.verifiedIntakeContext = { author: "Jackie Smith, Jr.",
+    authorContactId: require("../author/jackieTitleSystemCommissioningPolicy").JACKIE_CANONICAL_AUTHOR_CONTACT_ID,
+    stage01: "ACCEPTED", stage02: "ACCEPTED", authorConsentInferred: false,
+    scope: "FRESH_SOURCE_BOUND_SUBMISSION_NOT_HISTORICAL_COMPLETION",
+    instruction: "Do not reopen the verified author identity or contact/intake stages from manuscript byline resemblance or absent contact details in manuscript text. Assess content; no author approval is inferred." };
   if (synthesis) {
     prompt.task = "SYNTHESIZE_FULL_COMPONENT_EDITORIAL_ASSESSMENT_ONLY";
     prompt.source.wordCount = component.source.provenance.words;
@@ -190,7 +195,12 @@ async function handler(body, deps = {}) {
     const prepareSource = context.prepare || prepare;
     const prepared = await prepareSource(body.titleId, context, approval);
     const done = await completion(prepared, context);
-    if (done) return { status: 200, jsonBody: { receipt: done, replay: true, modelCalls: 0, stage04: "NOT_STARTED" } };
+    if (done) {
+      const acceptanceReceipt = body.mode === "SUBMISSION_03_ACCEPT" ?
+        await require("./newSubmissionStage03Acceptance").accept(done, prepared, await outputFolder(prepared, context), context) :
+        (await b.optional(container, `${b.PREFIX}/acceptance/${done.titleId}/${done.sourceFingerprint}.json`))?.value || null;
+      return { status: 200, jsonBody: { receipt: done, acceptanceReceipt, replay: true, modelCalls: 0, stage04: "NOT_STARTED" } };
+    }
     if (body.mode !== "SUBMISSION_03_EXECUTE") return { status: 200, jsonBody: { titleId: body.titleId,
       status: "ASSESSMENT_PENDING", components: prepared.components.map(c => ({ key: c.key, provenance: c.source.provenance,
         sections: c.chunks.length, synthesis: c.chunks.length > 1 })), stage04: "NOT_STARTED", modelCalls: 0 } };
