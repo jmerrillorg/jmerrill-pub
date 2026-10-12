@@ -17,6 +17,16 @@ test("character ceiling applies independently from words", () => {
   assert.equal(chunks.length,3);
   assert(chunks.every(c => c.text.length <= 400000));
 });
+test("long approved sources balance sections without adding paid calls", () => {
+  for (const [words, expected] of [[163206,5],[132751,4],[145689,4]]) {
+    const source = "word ".repeat(words);
+    const chunks = stage.sections(source);
+    assert.equal(chunks.length, expected);
+    assert(chunks.every(c => c.words <= Math.ceil(words / expected)));
+    assert.equal(chunks.map(c => c.text).join(""), source);
+  }
+  assert.deepEqual(stage.sections("word ".repeat(52853)).map(c => c.words),[40000,12853]);
+});
 test("oversized indivisible word fails instead of being truncated", () => {
   assert.throws(() => stage.sections("a".repeat(400001)), /SECTION_TOO_LARGE/);
 });

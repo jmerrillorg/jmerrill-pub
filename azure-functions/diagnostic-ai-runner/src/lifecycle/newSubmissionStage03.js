@@ -11,9 +11,11 @@ const BROAD = ["JM1_TITLE_COMMISSIONING_REVIEW_ENABLED", "JM1_PUBLISHING_STAGE_R
 function sections(text) {
   const matches = [...text.matchAll(/\S+/gu)];
   if (!matches.length) b.deny("STAGE03_EMPTY_SOURCE");
+  // Balance long sources without increasing their planned section count or changing completed short-source bindings.
+  const wordLimit = matches.length > 80000 ? Math.ceil(matches.length / Math.ceil(matches.length / 40000)) : 40000;
   const parts = []; let start = 0, first = 0;
   while (first < matches.length) {
-    let last = Math.min(first + 40000, matches.length);
+    let last = Math.min(first + wordLimit, matches.length);
     let end = last === matches.length ? text.length : matches[last].index;
     while (end - start > 400000 && last > first + 1) { last--; end = matches[last].index; }
     if (end - start > 400000) b.deny("STAGE03_SOURCE_SECTION_TOO_LARGE");
