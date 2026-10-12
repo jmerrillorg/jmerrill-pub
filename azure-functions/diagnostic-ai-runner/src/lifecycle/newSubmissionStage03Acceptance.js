@@ -42,6 +42,7 @@ ${saved.value.report.recommendation.rationale}`;
       "QA uses the existing canonical score rules, not another model call. Original reports and receipts remain unchanged.",
       "Numeric eligibility does not clear qualitative major-flag or exceptional-originality requirements; the Publisher must review those judgments.",
       "Completeness observations concern the manuscript text, not the accepted intake records. Do not repeat intake or request already-captured information from these suggestions.",
+      "Section boundaries are artificial. A sentence cut at a section edge is not itself evidence of source-file truncation; check adjacent sections before any cleanup or author query.",
       "Imprint, style, rights, factual claims and editorial recommendations remain advisory and require the appropriate human review. No author consent or clearance is inferred. Stage 04 is unstarted.", ""].join("\n");
     const bytes = Buffer.from(header + require("../editorial/commissioningEditorialReviewRenderer").renderCommissioningEditorialReview(report, {
       titleId: receipt.titleId, source: { version: assessment.component.eTag, sha256: assessment.component.sourceSha256 }
