@@ -9,6 +9,9 @@ async function sourceRegistrationHandler(request, deps = {}) {
   }
   let body;
   try { body = await request.json(); } catch { return { status: 400, jsonBody: { code: "INVALID_JSON", effects: 0 } }; }
+  if (require("./newSubmissionStage03").MODES.includes(body?.mode)) {
+    return require("./newSubmissionStage03").handler(body, deps);
+  }
   if (body?.mode === require("./newSubmissionStage03Preflight").MODE) {
     return require("./newSubmissionStage03Preflight").handler(body, deps);
   }

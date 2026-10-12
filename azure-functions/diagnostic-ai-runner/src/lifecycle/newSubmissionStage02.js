@@ -228,4 +228,4 @@ async function handler(body, deps = {}) {
   } catch (e) { return { status: 409, jsonBody: { code: /^COMMISSIONING_[A-Z0-9_]+$/.test(e.safeCode || "") ? e.safeCode : "COMMISSIONING_STAGE02_DEPENDENCY_FAILED",
     mutationAttempted: attempted, providerStatus: e.statusCode || null, recovery: "SAME_SOURCE_CLAIM_AND_EXACT_OUTPUT_READBACK", communications: 0, stage03: "NOT_STARTED" } }; }
 }
-module.exports = { MODES, CONTRACT, plan, qa, receipt, handler, execute, verifyOutput, verifyTransport, packWorkingSource, verifyWorkingPackage };
+module.exports = { MODES, CONTRACT, plan, qa, receipt, handler, execute, verifyOutput, verifyTransport, packWorkingSource, verifyWorkingPackage, persistFile };
