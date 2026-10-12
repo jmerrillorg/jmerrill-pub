@@ -1,4 +1,4 @@
-# Publisher-funded route v1.0.0
+# Publisher-funded route v1.1.0
 
 Authority: current explicit Publisher instruction, 2026-10-12.
 Status: policy and five-title selections persisted; execution integration NOT
@@ -42,7 +42,25 @@ Approved author-funded agreement clauses requiring first payment and annual
 author fees need a properly versioned funded addendum before use in a funded
 offer. Existing royalty and rights terms are reused only from the applicable
 governed agreement; no automatic recoupment or ownership inference is permitted.
-Exit/reimbursement treatment is explicitly pending Publisher decision.
+## Five-title cost ruling (2026-10-12)
+
+The five exact selected fresh titles have a separately bound cost-treatment
+authority. On voluntary withdrawal, Publisher absorbs ordinary documented
+production costs. No automatic cost reimbursement debt or royalty recoupment
+is created. Existing author warranties and manuscript/disclosure obligations
+are preserved; failure to satisfy them does not automatically create a debt.
+Different financial treatment requires approval of the exact clause and financial
+consequence before issuing an offer containing it. This is not new spend authority.
+
+The same versioned clause and policy/selection/cost-treatment hashes must bind
+both Stage 04 offers and Stage 05 agreements. Supersede only contradictory
+author-fee and automatic production-cost reimbursement requirements for that
+Work, including relevant provisions of base sections 2.4, 4.2 and 10.2. Preserve
+unrelated warranties, rights and royalty terms; never alter the base agreement
+silently. Prior policy versions and approval evidence remain historical.
+
+The cost ruling is limited to the five selected titles; future publisher-funded
+selections do not inherit a new contingent-cost treatment without authority.
 
 Existing relay routing and idempotency must be reused. Delivery, author decision,
 execution and budget approval require their own evidence; a send request or

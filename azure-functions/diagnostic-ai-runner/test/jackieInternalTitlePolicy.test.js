@@ -41,6 +41,30 @@ test("five exact internal submissions preserve six scopes, no retail fees or dow
   assert.deepEqual(p.validatePolicy(policy, a), policy);
   assert.equal(p.sha(JSON.stringify(policy)), p.sha(JSON.stringify(p.createPolicy(a))));
 });
+test("five-title cost ruling binds identical offer and agreement terms without new debt or spend", () => {
+  const f = require("../src/lifecycle/publisherFundedPolicy"), a = acceptance();
+  const selection = f.authorizeFreshTitles(a);
+  assert.equal(f.POLICY.version, "1.1.0");
+  assert.equal(selection.costTreatment.titleIds.length, 5);
+  assert.equal(selection.costTreatment.voluntaryWithdrawalOrdinaryDocumentedProductionCosts, "PUBLISHER_ABSORBS");
+  for (const key of ["automaticRoyaltyRecoupment", "automaticWithdrawalReimbursementDebt",
+    "manuscriptOrDisclosureFailureAutomaticallyCreatesDebt", "rightsChanged", "royaltyTermsChanged", "additionalSpendAuthorized"]) {
+    assert.equal(selection.costTreatment[key], false);
+  }
+  for (const t of a.titles) {
+    const terms = f.fundedAgreementTerms(f.POLICY, selection, t.titleId, a);
+    assert.equal(terms.authorFeeCents, 0);
+    assert.deepEqual(f.validateFundedAgreementTerms(terms, f.POLICY, selection, t.titleId, a), terms);
+    for (const bad of [{ ...terms, authorFeeCents: 50000 }, { ...terms, clause: "Author reimburses all costs" },
+      { ...terms, costTreatment: { ...terms.costTreatment, automaticRoyaltyRecoupment: true } }]) {
+      assert.throws(() => f.validateFundedAgreementTerms(bad, f.POLICY, selection, t.titleId, a));
+    }
+  }
+  assert.throws(() => f.fundedAgreementTerms(f.POLICY, selection, "future-title", a));
+  const bad = structuredClone(selection);
+  bad.costTreatment.manuscriptOrDisclosureFailureAutomaticallyCreatesDebt = true;
+  assert.throws(() => f.validateFunding(f.POLICY, bad, a.titles[0].titleId, a));
+});
 test("policy cannot extend to another author, title, source, or publisher scope", () => {
   for (const alter of [a => a.actorContactId = "other", a => a.titles[0].titleId = "other",
     a => a.titles[0].components[0].sourceSha256 = "c".repeat(64),
