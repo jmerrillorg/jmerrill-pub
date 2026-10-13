@@ -10,6 +10,7 @@ test('funded onboarding retains author choice without retail package or new edit
   assert.match(page, /\['editingLevelAcknowledgment', 'payment_acknowledgment'\]\.includes\(field.name\)/)
   assert.match(page, /No portal account is required/)
   assert.doesNotMatch(page, /Starter includes/)
+  assert.match(page, /min-h-screen bg-\[#070710\] pt-28 text-white/)
 })
 test('onboarding capability binds purpose, exact title, contact, version and expiry', t => {
   const before = process.env.INTAKE_CONTINUATION_TOKEN_SECRET
