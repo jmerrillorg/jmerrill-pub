@@ -98,3 +98,18 @@ approved next-work budget; an author acceptance alone is not either proof.
 Local and CI tests establish source behavior only. Record the reviewed release,
 actual recipient delivery, authentication and scheduled recovery separately
 before describing Stage 04 as operational.
+
+## Publisher effective-date amendment 2026-10-13
+
+Authority: Jackie first supplied October 13, 2026 for the five replacement
+agreements, then instructed: "always use the current date as the effective".
+Policy version: `JMP-AGREEMENT-EFFECTIVE-DATE-20261013-v1`.
+
+New agreements use the current calendar date at preparation in
+`America/New_York`. Record that explicit policy-derived date in the issued
+document and its manifest. Do not infer it from a later signature. The date
+remains fixed for that issued version: retries, download, signing and ingestion
+must not re-date it. Existing documents are not amended retrospectively.
+Substantive replacement versions still require the existing supersession and
+signature controls. This date rule changes no fees, rights, royalties, funding,
+scope or spending authority.

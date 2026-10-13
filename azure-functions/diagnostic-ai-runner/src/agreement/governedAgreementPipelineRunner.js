@@ -183,10 +183,20 @@ async function generateGovernedAgreement(input = {}, deps = {}) {
     return blocked("DEPS_MISSING_READ_OR_WRITE");
   }
 
+  let effectiveDateAuthority;
+  try {
+    effectiveDateAuthority = require("./agreementEffectiveDate").effectiveDateAtPreparation(
+      typeof deps.now === "function" ? deps.now() : new Date());
+  } catch (error) {
+    return blocked(error.safeCode || "AGREEMENT_PREPARATION_CLOCK_INVALID");
+  }
+  if (normalizeString(input.effectiveDate) && normalizeString(input.effectiveDate) !== effectiveDateAuthority.value) {
+    return blocked("AGREEMENT_CURRENT_EFFECTIVE_DATE_REQUIRED");
+  }
   const normalizedInput = {
     ...input,
     correlationId: normalizeString(input.correlationId || randomUUID()),
-    effectiveDate: normalizeString(input.effectiveDate),
+    effectiveDate: effectiveDateAuthority.value,
     territory: normalizeString(input.territory || "World")
   };
   const errors = validateGenerationInput(normalizedInput);
@@ -224,6 +234,8 @@ async function generateGovernedAgreement(input = {}, deps = {}) {
       templateGovernedPath: selectedTemplate.governedPath,
       templateSha256,
       generationTimestamp: generatedAt,
+      effectiveDate: effectiveDateAuthority.value,
+      effectiveDateAuthority,
       title: { id: normalizedInput.titleId, name: normalizedInput.bookTitle },
       author: { id: normalizedInput.authorId, legalName: normalizedInput.authorLegalName },
       publishingTrack: normalizedInput.publishingTrack,

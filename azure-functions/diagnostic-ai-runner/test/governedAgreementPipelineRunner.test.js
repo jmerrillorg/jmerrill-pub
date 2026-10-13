@@ -68,6 +68,7 @@ function validationInput(overrides = {}) {
 
 function memoryDeps({ writes = new Map(), convertDocxToPdf } = {}) {
   return {
+    now: () => new Date("2026-08-05T16:00:00Z"),
     readTemplate: async (template) => fs.readFile(path.join(repoRoot, template.governedPath)),
     outputExists: async (name) => writes.has(name),
     writeOutput: async (name, buffer) => {
@@ -99,6 +100,32 @@ describe("selectAgreementTemplateForTrack", () => {
 });
 
 describe("generateGovernedAgreement", () => {
+  test("defaults to the current Eastern date with Publisher policy provenance", async () => {
+    const result = await generateGovernedAgreement(validationInput({ effectiveDate: undefined }), memoryDeps());
+    assert.equal(result.ok, true);
+    assert.equal(result.manifest.effectiveDate, "2026-08-05");
+    assert.equal(result.manifest.effectiveDateAuthority.reference, "JMP-AGREEMENT-EFFECTIVE-DATE-20261013-v1");
+  });
+
+  test("rejects a stale requested date without output", async () => {
+    const writes = new Map();
+    const result = await generateGovernedAgreement(validationInput({ effectiveDate: "2026-08-04" }), memoryDeps({ writes }));
+    assert.equal(result.reason, "AGREEMENT_CURRENT_EFFECTIVE_DATE_REQUIRED");
+    assert.equal(writes.size, 0);
+  });
+
+  test("a retry on the next day cannot re-date existing artifacts", async () => {
+    const writes = new Map();
+    const deps = memoryDeps({ writes });
+    const first = await generateGovernedAgreement(validationInput({ effectiveDate: undefined }), deps);
+    const original = [...writes].map(([name, bytes]) => [name, Buffer.from(bytes)]);
+    deps.now = () => new Date("2026-08-06T16:00:00Z");
+    const replay = await generateGovernedAgreement(validationInput({ effectiveDate: undefined }), deps);
+    assert.equal(first.manifest.effectiveDate, "2026-08-05");
+    assert.equal(replay.reason, "GENERATED_AGREEMENT_ALREADY_EXISTS");
+    assert.deepEqual([...writes], original);
+  });
+
   test("requires the governed gate", async () => {
     delete process.env[GATE_NAME];
     const result = await generateGovernedAgreement(validationInput(), memoryDeps());
