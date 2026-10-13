@@ -41,3 +41,22 @@ test("legacy later-stage engagement cannot move a fresh submission", async t => 
     : { titleId, offerSha256: "offer", authorElectionReference: "actual", authorPaymentDisposition: "NOT_APPLICABLE_PUBLISHER_FUNDED", authorDueCents: 0, paymentCreated: false } }));
   await assert.rejects(runtime.readAuthority(titleId, { projectionEvent: { stageCode: "16_ARCHIVE" }, authorityClient: { list: async () => [{ jmpv2_currentstage: "16_ARCHIVE", jmpv2_correlationid: "old" }] } }), /FRESH_ENGAGEMENT_BINDING_UNPROVEN/);
 });
+test("reference repair changes only an exact moved artifact path and retains its preimage", async t => {
+  const titleId = Object.keys(projection.FOLDERS)[0], saved = new Map(); let writes = 0;
+  const row = { jm1pub_editorialartifactid: "artifact", _jm1pub_titleid_value: titleId,
+    jm1pub_repositorydriveid: require("../src/lifecycle/freshTitleIntake").driveId,
+    jm1pub_repositoryitemid: "file", jm1pub_repositorypath: "old-path", "@odata.etag": "version1" };
+  t.mock.method(b, "optional", async (_c, path) => saved.has(path) ? { value: saved.get(path) } : null);
+  t.mock.method(b, "immutable", async (_c, path, value) => { saved.set(path, value); });
+  const client = { list: async () => [row], first: async () => row,
+    patchIfMatch: async (set, id, fields, etag) => {
+      assert.equal(set, "jm1pub_editorialartifacts"); assert.equal(id, "artifact"); assert.equal(etag, "version1");
+      assert.deepEqual(Object.keys(fields), ["jm1pub_repositorypath"]); Object.assign(row, fields); writes++;
+    } };
+  const receipt = { intentReference: "moves/key/intent.json", items: [{ id: "file", webUrl: "new-path" }] };
+  await runtime.reconcileReferences(titleId, receipt, { authorityClient: client });
+  await runtime.reconcileReferences(titleId, receipt, { authorityClient: client });
+  assert.equal(writes, 1); assert.equal([...saved.values()][0].before, "old-path");
+  row.jm1pub_repositorypath = "concurrent-change";
+  await assert.rejects(runtime.reconcileReferences(titleId, receipt, { authorityClient: client }), /REFERENCE_CONCURRENT_CHANGE/);
+});
