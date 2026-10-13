@@ -2,7 +2,7 @@
 const { timingSafeEqual, createHash } = require("node:crypto");
 const DRIVE = "b!mA37NWi8UEKdDYwH1o5AJNWKIBAoAPBIn_pxeBKSSDVm9PH59uWnQpr1oD4m79se";
 const GRAPH = "https://graph.microsoft.com/v1.0/";
-const ENTITIES = ["jm1pub_royaltylines", "jm1_royaltytransactions", "jmpv2_royaltystatements", "jmpv2_royaltypaymentevidences", "jm1_executionlogs?$filter=contains(jm1_actiontype,'ROYALTY')"];
+const ENTITIES = ["jm1pub_royaltylines", "jm1pub_royaltystatements", "jm1_royaltytransactions", "jmpv2_royaltystatements", "jmpv2_royaltypaymentevidences", "jm1_executionlogs?$filter=contains(jm1_actiontype,'ROYALTY')"];
 function fail(code, response) { throw Object.assign(Error(code), { requestId: response?.headers.get("request-id") || response?.headers.get("x-ms-service-request-id") || null }); }
 async function read(body, deps = {}) {
   const env = deps.env || process.env, request = deps.fetch || fetch;

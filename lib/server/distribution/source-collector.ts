@@ -32,13 +32,14 @@ async function ownerRead(body:{mode:string;month:string;itemId?:string}) {
 export async function priorLedgerReader(month=new Date().toISOString().slice(0,7)) {
   const result=await ownerRead({mode:'PRIOR_LEDGER',month})
   const rows=result.rows as Record<string,Row[]>
-  const lines=rows.jm1pub_royaltylines,transactions=rows.jm1_royaltytransactions,
+  const lines=rows.jm1pub_royaltylines,statements=rows.jm1pub_royaltystatements,transactions=rows.jm1_royaltytransactions,
     v2Statements=rows.jmpv2_royaltystatements,v2Payments=rows.jmpv2_royaltypaymentevidences,logs=rows.jm1_executionlogs
-  if(![lines,transactions,v2Statements,v2Payments,logs].every(Array.isArray))throw Error('PRIOR_LEDGER_READ_INVALID')
+  if(![lines,statements,transactions,v2Statements,v2Payments,logs].every(Array.isArray))throw Error('PRIOR_LEDGER_READ_INVALID')
   const at=result.checkedAt
   return async(s:SourceStatement):Promise<PriorEvidence>=>{
     // A period collision is held even if legacy data has no distributor or ISBN.
     const references=[...v2Statements.map(r=>String(r.jmpv2_royaltystatementid)),
+      ...statements.filter(r=>!legacyStatementPeriod(r.jm1pub_statementperiod)||legacyStatementPeriod(r.jm1pub_statementperiod)===s.salesPeriod).map(r=>String(r.jm1pub_royaltystatementid)),
       ...v2Payments.map(r=>String(r.jmpv2_royaltypaymentevidenceid)),
       ...lines.filter(r=>!r.jm1_statementmonth||String(r.jm1_statementmonth).startsWith(s.salesPeriod)).map(r=>String(r.jm1pub_royaltylineid)),
       ...transactions.filter(r=>!r.jm1_periodstart||String(r.jm1_periodstart).startsWith(s.salesPeriod)).map(r=>String(r.jm1_royaltytransactionid)),
@@ -46,6 +47,15 @@ export async function priorLedgerReader(month=new Date().toISOString().slice(0,7
         (/IMPORT/.test(String(r.jm1_actiontype))&&JSON.stringify(r).includes(s.salesPeriod))).map(r=>String(r.jm1_executionlogid))]
     return {checkedAt:at,references,status:references.length?'PRESENT_OR_AMBIGUOUS':'ABSENT'}
   }
+}
+export function legacyStatementPeriod(value:unknown):string|null {
+  if(typeof value!=='string')return null
+  if(/^20\d{2}-(0[1-9]|1[0-2])$/.test(value))return value
+  // The legacy statement-period field also contains labeled draft periods.
+  const matches=[...value.matchAll(/\b(January|February|March|April|May|June|July|August|September|October|November|December) (20\d{2})\b/g)]
+  if(matches.length!==1)return null
+  const months=['January','February','March','April','May','June','July','August','September','October','November','December']
+  return `${matches[0][2]}-${String(months.indexOf(matches[0][1])+1).padStart(2,'0')}`
 }
 export async function collectMonth(month:string) {
   if(!/^20\d{2}-(0[1-9]|1[0-2])$/.test(month))throw Error('RECEIPT_MONTH_INVALID')
