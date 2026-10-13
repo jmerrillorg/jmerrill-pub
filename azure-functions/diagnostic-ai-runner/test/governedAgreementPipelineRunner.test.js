@@ -52,6 +52,7 @@ function validationInput(overrides = {}) {
     stateOfIncorporation: "Ohio",
     publisherBusinessAddress: "J Merrill Publishing business address on file",
     authorAddress: "Author address on file",
+    authorCityStatePostal: "Columbus, OH 43207",
     finalTitleAndSubtitle: "Internal Validation Title",
     authorNameForSchedule: "Validation Author",
     manuscriptDeliveryRequirements: "Manuscript delivery requirements on file",
@@ -67,6 +68,7 @@ function validationInput(overrides = {}) {
 
 function memoryDeps({ writes = new Map(), convertDocxToPdf } = {}) {
   return {
+    now: () => new Date("2026-08-05T16:00:00Z"),
     readTemplate: async (template) => fs.readFile(path.join(repoRoot, template.governedPath)),
     outputExists: async (name) => writes.has(name),
     writeOutput: async (name, buffer) => {
@@ -98,6 +100,32 @@ describe("selectAgreementTemplateForTrack", () => {
 });
 
 describe("generateGovernedAgreement", () => {
+  test("defaults to the current Eastern date with Publisher policy provenance", async () => {
+    const result = await generateGovernedAgreement(validationInput({ effectiveDate: undefined }), memoryDeps());
+    assert.equal(result.ok, true);
+    assert.equal(result.manifest.effectiveDate, "2026-08-05");
+    assert.equal(result.manifest.effectiveDateAuthority.reference, "JMP-AGREEMENT-EFFECTIVE-DATE-20261013-v1");
+  });
+
+  test("rejects a stale requested date without output", async () => {
+    const writes = new Map();
+    const result = await generateGovernedAgreement(validationInput({ effectiveDate: "2026-08-04" }), memoryDeps({ writes }));
+    assert.equal(result.reason, "AGREEMENT_CURRENT_EFFECTIVE_DATE_REQUIRED");
+    assert.equal(writes.size, 0);
+  });
+
+  test("a retry on the next day cannot re-date existing artifacts", async () => {
+    const writes = new Map();
+    const deps = memoryDeps({ writes });
+    const first = await generateGovernedAgreement(validationInput({ effectiveDate: undefined }), deps);
+    const original = [...writes].map(([name, bytes]) => [name, Buffer.from(bytes)]);
+    deps.now = () => new Date("2026-08-06T16:00:00Z");
+    const replay = await generateGovernedAgreement(validationInput({ effectiveDate: undefined }), deps);
+    assert.equal(first.manifest.effectiveDate, "2026-08-05");
+    assert.equal(replay.reason, "GENERATED_AGREEMENT_ALREADY_EXISTS");
+    assert.deepEqual([...writes], original);
+  });
+
   test("requires the governed gate", async () => {
     delete process.env[GATE_NAME];
     const result = await generateGovernedAgreement(validationInput(), memoryDeps());
@@ -147,7 +175,7 @@ describe("generateGovernedAgreement", () => {
     assert.equal(result.manifest.authorFacingOutputSent, false);
   });
 
-  test("fills existing bracket placeholders without requiring redesign of unresolved blanks", async () => {
+  test("fills author address and existing bracket placeholders before output", async () => {
     const writes = new Map();
     const result = await generateGovernedAgreement(validationInput(), memoryDeps({ writes }));
     assert.equal(result.ok, true);
@@ -160,6 +188,19 @@ describe("generateGovernedAgreement", () => {
     assert.ok(!xml.includes("[Author Legal Name]"));
     assert.ok(!xml.includes("[Book Title]"));
     assert.ok(!xml.includes("[Effective Date]"));
+    assert.ok(!xml.includes("[Address]"));
+    assert.ok(!xml.includes("[City, State ZIP]"));
+  });
+
+  test("missing author address fields fail before writing or converting artifacts", async () => {
+    const writes = new Map();
+    let converted = false;
+    const result = await generateGovernedAgreement(validationInput({ authorCityStatePostal: undefined }),
+      memoryDeps({ writes, convertDocxToPdf: async () => { converted = true; return Buffer.from("pdf"); } }));
+    assert.equal(result.ok, false);
+    assert.equal(result.reason, "AGREEMENT_UNRESOLVED_PLACEHOLDER");
+    assert.equal(writes.size, 0);
+    assert.equal(converted, false);
   });
 
   test("refuses duplicate generated artifacts for the same correlation", async () => {

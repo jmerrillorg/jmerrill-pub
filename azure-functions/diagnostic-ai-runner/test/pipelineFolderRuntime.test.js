@@ -41,6 +41,19 @@ test("legacy later-stage engagement cannot move a fresh submission", async t => 
     : { titleId, offerSha256: "offer", authorElectionReference: "actual", authorPaymentDisposition: "NOT_APPLICABLE_PUBLISHER_FUNDED", authorDueCents: 0, paymentCreated: false } }));
   await assert.rejects(runtime.readAuthority(titleId, { projectionEvent: { stageCode: "16_ARCHIVE" }, authorityClient: { list: async () => [{ jmpv2_currentstage: "16_ARCHIVE", jmpv2_correlationid: "old" }] } }), /FRESH_ENGAGEMENT_BINDING_UNPROVEN/);
 });
+test("only exact replacement execution can project the fresh title into onboarding", async t => {
+  const titleId = Object.keys(projection.FOLDERS)[0];
+  const response = { titleId, offerSha256: "offer", decision: "ACCEPT", status: "AUTHOR_ELECTION_CAPTURED", sourceReference: "reply" };
+  const request = { titleId, offerSha256: "offer", authorElectionReference: "reply", authorPaymentDisposition: "NOT_APPLICABLE_PUBLISHER_FUNDED", authorDueCents: 0, paymentCreated: false };
+  const execution = { ...request, agreementSha256: "replacement", status: "REPLACEMENT_EXECUTION_VERIFIED", stage05Complete: true,
+    proof: { seal: { fullDocumentIntegrity: true }, requiredPartyEvents: 2 } };
+  t.mock.method(stage04, "load", async () => ({ prefix: "stage04", offer: { titleId, offerSha256: "offer" } }));
+  t.mock.method(b, "optional", async (_c, ref) => ref.endsWith("execution.json") ? { value: execution } : null);
+  t.mock.method(b, "read", async (_c, ref) => ({ value: ref === "stage04/response.json" ? response : ref.endsWith("prepared.json") ? { agreementSha256: "replacement" } : request }));
+  assert.equal((await runtime.readAuthority(titleId, {})).stageCode, "06_ONBOARDING");
+  execution.agreementSha256 = "defective-v1";
+  await assert.rejects(runtime.readAuthority(titleId, {}), /OWNER_AUTHORITY_CONFLICT/);
+});
 test("reference repair changes only an exact moved artifact path and retains its preimage", async t => {
   const titleId = Object.keys(projection.FOLDERS)[0], saved = new Map(); let writes = 0;
   const row = { jm1pub_editorialartifactid: "artifact", _jm1pub_titleid_value: titleId,

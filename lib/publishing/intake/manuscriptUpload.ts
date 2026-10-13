@@ -193,6 +193,7 @@ export async function storeOriginalManuscriptArtifact(input: {
   candidate: ManuscriptUploadCandidate
   provenance: ManuscriptArtifactProvenance
   validation?: ManuscriptUploadValidation & { ok: true }
+  preserveExisting?: boolean
 }): Promise<StoredManuscriptArtifact> {
   const validation = input.validation || validateManuscriptUploadCandidate(input.candidate)
   if (!validation.ok) throw new Error(validation.code)
@@ -216,6 +217,7 @@ export async function storeOriginalManuscriptArtifact(input: {
     `${context.workspacePath}/${ORIGINAL_MANUSCRIPT_FOLDER}/${uploadFileName}.source.bin`,
     validation.value.bytes,
     'application/octet-stream',
+    input.preserveExisting ? 'exact' : undefined,
   )
   const uploaded = await uploadSmallFile(
     context.token,
@@ -223,6 +225,7 @@ export async function storeOriginalManuscriptArtifact(input: {
     `${context.workspacePath}/${ORIGINAL_MANUSCRIPT_FOLDER}/${uploadFileName}`,
     validation.value.bytes,
     validation.value.contentType,
+    input.preserveExisting ? 'preserve-readable' : undefined,
   )
   const artifact: StoredManuscriptArtifact = {
     manuscriptUrl: uploaded.webUrl,
@@ -251,6 +254,7 @@ export async function storeOriginalManuscriptArtifact(input: {
     `${context.workspacePath}/${ORIGINAL_MANUSCRIPT_FOLDER}/${manifestName}`,
     sourceManifestBytes,
     'application/json',
+    input.preserveExisting ? 'preserve-readable' : undefined,
   )
 
   return artifact
@@ -505,22 +509,51 @@ async function uploadSmallFile(
   itemPath: string,
   bytes: ArrayBuffer,
   contentType: string,
+  preservation?: 'exact' | 'preserve-readable',
 ): Promise<GraphDriveItem> {
+  // The inert companion is authoritative. Office copies may acquire SharePoint
+  // metadata; recovery preserves those copies and their version history.
+  const existing = preservation ? await getDriveItemByPath(token, driveId, itemPath) : null
+  if (existing) {
+    if (preservation === 'exact') await verifyExactStoredBytes(token, driveId, existing.id, bytes)
+    return existing
+  }
   const response = await fetch(
-    `${GRAPH_BASE_URL}/drives/${encodeURIComponent(driveId)}/root:/${encodeGraphPath(itemPath)}:/content`,
+    `${GRAPH_BASE_URL}/drives/${encodeURIComponent(driveId)}/root:/${encodeGraphPath(itemPath)}:/content${preservation ? '?@microsoft.graph.conflictBehavior=fail' : ''}`,
     {
       method: 'PUT',
       signal: AbortSignal.timeout(15000),
       headers: {
         ...graphHeaders(token),
         'Content-Type': contentType || 'application/octet-stream',
+        ...(preservation ? { 'If-None-Match': '*' } : {}),
       },
       body: bytes,
     },
   )
 
-  if (!response.ok) throw new Error(`graph_upload_failed:${response.status}`)
-  return parseDriveItem(await response.json())
+  if (!response.ok) {
+    if (preservation && [409, 412].includes(response.status)) {
+      const recovered = await getDriveItemByPath(token, driveId, itemPath)
+      if (recovered) {
+        if (preservation === 'exact') await verifyExactStoredBytes(token, driveId, recovered.id, bytes)
+        return recovered
+      }
+    }
+    throw new Error(`graph_upload_failed:${response.status}`)
+  }
+  const item = parseDriveItem(await response.json())
+  if (preservation === 'exact') await verifyExactStoredBytes(token, driveId, item.id, bytes)
+  return item
+}
+
+async function verifyExactStoredBytes(token: string, driveId: string, itemId: string, bytes: ArrayBuffer) {
+  const response = await fetch(`${GRAPH_BASE_URL}/drives/${encodeURIComponent(driveId)}/items/${encodeURIComponent(itemId)}/content`, {
+    headers: graphHeaders(token), signal: AbortSignal.timeout(15000),
+  })
+  if (!response.ok || computeSha256(await response.arrayBuffer()) !== computeSha256(bytes)) {
+    throw new Error('CONTINUATION_SOURCE_CUSTODY_CONFLICT')
+  }
 }
 
 async function graphFetch(token: string, path: string): Promise<unknown> {

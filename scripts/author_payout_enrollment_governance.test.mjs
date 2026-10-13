@@ -637,16 +637,16 @@ test('Connect Account Links use signed refresh and return contexts', async () =>
   assert.doesNotMatch(linkRequest.body.get('refresh_url'), /contact=/)
 })
 
-test('legacy Connect financial setup links bypass the generic activation-code gate', () => {
+test('unsigned legacy Contact links require a fresh secure link without exposing financial setup', () => {
   const pageSource = readFileSync('app/author/financial-setup/page.tsx', 'utf8')
   const refreshSource = readFileSync('app/api/author/stripe/connect/refresh/route.ts', 'utf8')
 
   assert.match(pageSource, /isValidLegacyConnectContact/)
-  assert.ok(pageSource.includes('redirect(`/api/author/stripe/connect/refresh?contact='))
+  assert.ok(pageSource.includes("redirect('/author/financial-setup?connect=support')"))
   assert.match(pageSource, /ConnectReturnExperience/)
-  assert.match(refreshSource, /createFreshConnectAccountLinkFromLegacyContact/)
-  assert.match(refreshSource, /legacy_connect_account_missing/)
-  assert.match(refreshSource, /The author was not sent to an activation-code gate/)
+  assert.doesNotMatch(refreshSource, /createFreshConnectAccountLinkFromLegacyContact|resolveGovernedAuthorConnectIdentity/)
+  assert.match(refreshSource, /if \(!token\)/)
+  assert.match(refreshSource, /'Referrer-Policy': 'no-referrer'/)
   assert.match(refreshSource, /P0_CONNECT_JOURNEY_REGRESSION/)
 })
 
@@ -683,11 +683,9 @@ test('commissioning matrix captures the governed Connect journey and negative pr
     connect_return_requires_JMP_activation_code: pageSource.indexOf('if (token)') >= 0 && pageSource.indexOf('if (token)') < pageSource.indexOf('<AuthorGate scope="portal">') ? 0 : 1,
     connect_refresh_requires_JMP_activation_code: !/requireAuthorAccess|validateAuthorPortalAccessCode/.test(refreshSource) ? 0 : 1,
     expired_link_creates_new_Connect_account: !/resolveRecipientAccountId/.test(refreshSource) ? 0 : 1,
-    arbitrary_contactId_query_grants_access: /nextUrl\.searchParams\.get\(['"]contact/.test(combined) &&
-      /resolveGovernedAuthorConnectIdentity/.test(refreshSource) &&
-      /legacy_connect_account_missing/.test(refreshSource) &&
-      /assertConnectedAccountMatchesIdentity/.test(refreshSource) &&
-      /persistConnectAccountLinkage/.test(refreshSource)
+    arbitrary_contactId_query_grants_access: !/nextUrl\.searchParams\.get\(['"]contact/.test(refreshSource) &&
+      /if \(!token\)/.test(refreshSource) &&
+      /createFreshConnectAccountLinkFromToken\(token\)/.test(refreshSource)
       ? 0
       : 1,
     bank_data_stored_in_JMP: !/bankAccountNumber|routingNumber|taxIdentifier|socialSecurity|taxId/i.test(combined) ? 0 : 1,

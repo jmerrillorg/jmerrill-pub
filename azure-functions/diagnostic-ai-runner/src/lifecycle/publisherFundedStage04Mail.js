@@ -209,4 +209,4 @@ async function send(message, deps) {
     mailboxMessageId: data.mailboxMessageId || null, communicationComplete: data.communicationComplete === true,
     sentAt: data.sentAt, semanticIdempotencyKey: data.semanticIdempotencyKey, replay: data.deliveryStatus === "ALREADY_DELIVERED" };
 }
-module.exports = { AUTHOR, MAILBOX, FROM, render, payload, delivery, replies, classify, authentication, send, pages };
+module.exports = { AUTHOR, MAILBOX, FROM, render, payload, delivery, replies, classify, authentication, send, pages, nativeGraph };
