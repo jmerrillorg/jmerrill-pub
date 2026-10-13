@@ -9,7 +9,7 @@ async function read(body, deps = {}) {
   if (!body || Object.keys(body).some(k => !["mode", "month", "itemId"].includes(k)) ||
       !/^20\d{2}-(0[1-9]|1[0-2])$/.test(body.month || "") ||
       !["ARCHIVE_LIST", "SOURCE_READ", "PRIOR_LEDGER"].includes(body.mode) ||
-      (body.mode === "SOURCE_READ" ? !/^[A-Z0-9]{32}$/.test(body.itemId || "") : body.itemId !== undefined)) fail("DISTRIBUTOR_READ_SCOPE_DENIED");
+      (body.mode === "SOURCE_READ" ? !/^[A-Za-z0-9_-]{16,128}$/.test(body.itemId || "") : body.itemId !== undefined)) fail("DISTRIBUTOR_READ_SCOPE_DENIED");
   if (env.JM1_DISTRIBUTOR_COLLECTION_MONTH && body.month !== env.JM1_DISTRIBUTOR_COLLECTION_MONTH) fail("DISTRIBUTOR_MONTH_OUT_OF_SCOPE");
   const credential = deps.credential || new (require("@azure/identity").ManagedIdentityCredential)();
   async function response(url, token) {
