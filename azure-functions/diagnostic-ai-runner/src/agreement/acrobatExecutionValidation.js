@@ -7,6 +7,20 @@ const ROOT = "458e0e219698b18d2d4093d6336a12547953a54c05dd967c3a5a268b772d1b22";
 const sha = bytes => createHash("sha256").update(bytes).digest("hex");
 const normalize = value => value.normalize("NFKC").replace(/\s|\u00ad/g, "");
 function deny(code) { throw Object.assign(new Error(code), { safeCode: code }); }
+function requiredParties(audit) {
+  const events = Array.from(audit.matchAll(/Document e-signed by\s+(.+?)\s*\(([^)]+)\)\s*Signature Date:/g));
+  const author = events.filter(e => e[2].trim().toLowerCase() === "jackie@jmerrill.one" && /^Jackie Smith,? Jr\.?$/.test(e[1].trim()));
+  const publisher = events.filter(e => e[2].trim().toLowerCase() === "publishing@jmerrill.one" && /^Jackie Smith(?:,? Jr\.?)?$/.test(e[1].trim()));
+  if (events.length !== 2 || author.length !== 1 || publisher.length !== 1) deny("STAGE05_REQUIRED_PARTIES_UNPROVEN");
+  return { author: "jackie@jmerrill.one", publisher: "publishing@jmerrill.one" };
+}
+function withoutIssuedFurniture(pages, furniture) {
+  return pages.map(page => {
+    let value = normalize(page);
+    for (const text of furniture) value = value.replace(normalize(text), "");
+    return value;
+  }).join("");
+}
 
 async function verifySeal(bytes) {
   if (!Buffer.isBuffer(bytes) || bytes.length > 25 * 1024 * 1024 || bytes.subarray(0, 5).toString() !== "%PDF-") deny("STAGE05_PDF_INVALID");
@@ -78,6 +92,12 @@ async function validateExecution({ signedBytes, auditBytes, issuedBytes, prepare
   const ns = "http://schemas.openxmlformats.org/wordprocessingml/2006/main";
   const paragraphs = Array.from(doc.getElementsByTagNameNS(ns, "p")).map(p =>
     Array.from(p.getElementsByTagNameNS(ns, "t")).map(t => t.textContent).join(""));
+  const furniture = [];
+  for (const name of Object.keys(zip.files).filter(name => /^word\/(?:header|footer)[0-9]+\.xml$/.test(name))) {
+    const part = new (require("@xmldom/xmldom").DOMParser)().parseFromString(await zip.file(name).async("string"), "application/xml");
+    const text = Array.from(part.getElementsByTagNameNS(ns, "t")).map(t => t.textContent).join("");
+    if (text.trim()) furniture.push(text);
+  }
   const full = normalize(pages.join("\n"));
   // Signature blanks may be overlaid, but no commercial or source clause may disappear.
   const required = paragraphs.filter(p => p.trim() && !/^\s*(?:Author|Publisher) signature:/.test(p));
@@ -87,7 +107,9 @@ async function validateExecution({ signedBytes, auditBytes, issuedBytes, prepare
   const auditText = signedBytes.equals(auditBytes) ? pages.join("\n") : (await readText(auditBytes)).join("\n");
   const embeddedAudit = pages.findLast(p => /Final Audit Report/.test(p));
   const audit = embeddedAudit || auditText;
-  let residual = normalize(pages.filter(p => p !== embeddedAudit).join("\n"));
+  // Remove only exact issued header/footer text, once per page, before body
+  // subtraction so repeated publisher/address text cannot be partially consumed.
+  let residual = withoutIssuedFurniture(pages.filter(p => p !== embeddedAudit), furniture);
   for (const paragraph of [...paragraphs].sort((a, b) => b.length - a.length)) {
     residual = residual.replace(normalize(paragraph), "");
   }
@@ -97,9 +119,8 @@ async function validateExecution({ signedBytes, auditBytes, issuedBytes, prepare
   if (residual) deny("STAGE05_UNISSUED_TEXT_REQUIRES_REVIEW");
   if (!audit || !/Status:\s*Signed/.test(audit) || !/Agreement completed\./.test(audit)) deny("STAGE05_COMPLETION_AUDIT_REQUIRED");
   const transaction = /Transaction ID:\s*([A-Za-z0-9_-]+)/.exec(audit)?.[1];
-  const events = Array.from(audit.matchAll(/Document e-signed by\s+(.+?)\s*\(([^)]+)\)\s*Signature Date:/g));
-  if (!transaction || events.length !== 2 || events.some(e => e[2].trim().toLowerCase() !== "jackie@jmerrill.one" ||
-      !/^Jackie Smith,? Jr\.?$/.test(e[1].trim()))) deny("STAGE05_REQUIRED_PARTIES_UNPROVEN");
+  if (!transaction) deny("STAGE05_REQUIRED_PARTIES_UNPROVEN");
+  const parties = requiredParties(audit);
   const signaturePages = [0, embeddedAudit ? pages.findIndex(p => p === embeddedAudit) - 1 : pages.length - 1];
   if (signaturePages[1] < 1 || !pages[signaturePages[1]].includes("IN WITNESS WHEREOF")) deny("STAGE05_SIGNATURE_PLACEMENT_UNPROVEN");
   const signatureLocations = signaturePages.map(index => annotations[index].filter(a => {
@@ -113,8 +134,8 @@ async function validateExecution({ signedBytes, auditBytes, issuedBytes, prepare
   if (signatureLocations.some(items => items.length !== 2)) deny("STAGE05_SIGNATURE_PLACEMENT_UNPROVEN");
   if (!normalize(auditText).includes(normalize(audit))) deny("STAGE05_AUDIT_TRANSACTION_CONFLICT");
   return { agreementSha256: prepared.agreementSha256, executedSha256: sha(signedBytes), auditSha256: sha(auditBytes),
-    transactionId: transaction, issuedParagraphsVerified: required.length, requiredPartyEvents: 2,
+    transactionId: transaction, issuedParagraphsVerified: required.length, requiredPartyEvents: 2, parties,
     seal, auditSeal, signatureFieldPlacement: "FOUR_ADOBE_TRANSACTION_LINKED_SIGNATURE_APPEARANCES",
     signaturePages: signaturePages.map(n => n + 1) };
 }
-module.exports = { verifySeal, readText, validateExecution, normalize };
+module.exports = { verifySeal, readText, validateExecution, normalize, requiredParties, withoutIssuedFurniture };
