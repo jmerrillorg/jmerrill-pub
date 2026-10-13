@@ -31,3 +31,22 @@ Acceptance requires exact source hashes/counts/currency totals, live private led
 ## Recovery and rollback
 
 Disable the collection feature on both hosts before rollback. Preserve originals, statement versions, failed receipts, monitor claims, and existing signature/stage settings. Never delete a real receipt or restore a historical oversized ledger to simulate recovery. A source-only rollback uses the last verified canonical artifacts through the protected path. Corrected-statement promotion and exhausted-retry reset require an exact reviewed owner operation; this release deliberately supplies no blind promote/reset endpoint.
+# Existing owner source access
+
+Distributor source reads run in the existing Publishing Function managed identity,
+not a fallback credential in the website. The authenticated reader is disabled by
+default (`JM1_DISTRIBUTOR_SOURCE_READER_ENABLED`). It accepts only a bounded archive
+month, fixed Publishing drive, file membership and five existing ledger reads.
+It cannot accept arbitrary URLs, OData, mutations or mailbox operations. The
+website uses its established Function-owner authentication. No grant is added.
+`JM1_DISTRIBUTOR_COLLECTION_MONTH` bounds both caller and owner during acceptance.
+Disabling the reader and collector retains all source receipts and originals.
+
+## Publisher source precedence, October 13, 2026
+
+Jackie's direct ruling in the OPS owner conversation establishes that KDP online
+wins when it conflicts with an archived workbook. For August 2026 the independently
+observed online USD 6.69 supersedes the archived USD 13.38 as value authority.
+Preserve both observations and unchanged workbook bytes. This does not establish
+account binding, royalty entitlement, payment or accounting authority. Archived
+KDP totals remain nonauthoritative until reconciled with current online evidence.
