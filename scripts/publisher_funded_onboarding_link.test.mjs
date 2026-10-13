@@ -2,7 +2,25 @@ import test from 'node:test'
 import assert from 'node:assert/strict'
 import createJiti from 'jiti'
 import { readFileSync } from 'node:fs'
-const { signOnboardingClaims, verifyOnboardingToken } = createJiti(import.meta.url)('../lib/server/publisher-funded-onboarding.ts')
+const { signOnboardingClaims, verifyOnboardingToken, validateOnboardingRecordBinding } = createJiti(import.meta.url)('../lib/server/publisher-funded-onboarding.ts')
+test('executed offer authority supports a missing legacy lookup, never a conflict', () => {
+  const titleId = '11111111-1111-4111-8111-111111111111', contactId = '22222222-2222-4222-8222-222222222222', hash = 'a'.repeat(64)
+  const prepared = { titleId, offerSha256: hash, authorElectionReference: `publisher-funded/stage04/${titleId}/${hash}/responses/exact.json`,
+    completeness: { complete: true, authorSourceReference: `contacts(${contactId})/W/"123"` } }
+  const body = { authorContactId: contactId, replacement: prepared, execution: { ...prepared } }
+  const contact = { contactid: contactId }, title = { jm1pub_titleid: titleId, _jm1_primaryauthor_value: null }
+  assert.doesNotThrow(() => validateOnboardingRecordBinding(titleId, body, contact, title))
+  assert.doesNotThrow(() => validateOnboardingRecordBinding(titleId, body, contact, { ...title, _jm1_primaryauthor_value: contactId }))
+  for (const [b, c, t] of [
+    [body, contact, { ...title, _jm1_primaryauthor_value: 'different-author' }],
+    [body, contact, { ...title, jm1pub_titleid: 'different-title' }],
+    [body, { contactid: 'different-author' }, title],
+    [{ ...body, execution: { ...prepared, offerSha256: 'b'.repeat(64) } }, contact, title],
+    [{ ...body, execution: { ...prepared, authorElectionReference: 'stale-response' } }, contact, title],
+    [{ ...body, replacement: { ...prepared, completeness: { complete: false } } }, contact, title],
+    [{ ...body, replacement: { ...prepared, completeness: { complete: true, authorSourceReference: 'unbound' } } }, contact, title],
+  ]) assert.throws(() => validateOnboardingRecordBinding(titleId, b, c, t), /IDENTITY_CONFLICT/)
+})
 test('funded onboarding retains author choice without retail package or new editorial election', () => {
   const page = readFileSync(new URL('../app/onboarding/page.tsx', import.meta.url), 'utf8')
   assert.match(page, /fundedNotes\[field.name\]/)
