@@ -3,7 +3,7 @@ const test = require("node:test"), assert = require("node:assert/strict");
 const { read, handler } = require("../src/distribution/sourceReader");
 const env = { JM1_DIAGNOSTIC_RUNNER_KEY: "secret", JM1_DISTRIBUTOR_SOURCE_READER_ENABLED: "true", JM1_DISTRIBUTOR_COLLECTION_MONTH: "2026-10" };
 function fixture() {
-  const file = { id: "A".repeat(32), name: "LSI POD Wholesale Comp Report 2026.xls", size: 3, eTag: "v1", createdDateTime: "2026-10-01T00:00:00Z" };
+  const file = { id: "01DF3SEQI6F5CKZOIK6RDL6KCCD4RBECLL", name: "LSI POD Wholesale Comp Report 2026.xls", size: 3, eTag: "v1", createdDateTime: "2026-10-01T00:00:00Z" };
   const calls = [], deps = { env, credential: { getToken: async () => ({ token: "token" }) }, fetch: async (url, options) => {
     calls.push({ url: String(url), options });
     if (String(url).endsWith("/children")) return Response.json({ value: [file] });
@@ -21,6 +21,7 @@ test("reader rejects arbitrary URLs, mutations, months and nonmember items", asy
   const f = fixture();
   for (const body of [{ mode: "DELETE", month: "2026-10" }, { mode: "ARCHIVE_LIST", month: "2026-10", url: "https://evil.test" }, { mode: "ARCHIVE_LIST", month: "2026-09" }]) await assert.rejects(read(body, f.deps));
   assert.equal(f.calls.length, 0);
+  await assert.rejects(read({ mode: "SOURCE_READ", month: "2026-10", itemId: "../items/other/content" }, f.deps), /SCOPE_DENIED/);
   await assert.rejects(read({ mode: "SOURCE_READ", month: "2026-10", itemId: "B".repeat(32) }, f.deps), /NOT_IN_ARCHIVE/);
 });
 test("reader verifies source membership and ETags without sending Graph token to download", async () => {
