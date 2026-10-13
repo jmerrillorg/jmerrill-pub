@@ -6,12 +6,13 @@ import {
 } from '@/lib/server/stripe/author-workspace-stripe'
 
 export const runtime = 'nodejs'
+const SUPPORT_URL = 'https://jmerrill.pub/author/financial-setup?connect=support'
 
 export async function GET(req: NextRequest) {
   const token = req.nextUrl.searchParams.get('token') || ''
   // A record identifier is not authorization to enter its financial setup.
   if (!token) {
-    return NextResponse.redirect(new URL('/author/financial-setup?connect=support', req.nextUrl.origin), {
+    return NextResponse.redirect(SUPPORT_URL, {
       headers: { 'Cache-Control': 'no-store', 'Referrer-Policy': 'no-referrer' },
     })
   }
@@ -42,8 +43,7 @@ export async function GET(req: NextRequest) {
         'Stripe Connect setup refresh could not produce a fresh Stripe-hosted link and was redirected to support. ' +
         'This watchdog protects against Connect-context traffic reaching an activation-code dead end.',
     }).catch(() => ({ created: false, id: null, detail: 'execution_log_write_failed' }))
-    const url = new URL('/author/financial-setup?connect=support', req.nextUrl.origin)
-    return NextResponse.redirect(url, {
+    return NextResponse.redirect(SUPPORT_URL, {
       headers: { 'Cache-Control': 'no-store', 'Referrer-Policy': 'no-referrer' },
     })
   }
