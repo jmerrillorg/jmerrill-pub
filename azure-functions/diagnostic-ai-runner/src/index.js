@@ -65,6 +65,7 @@ require("./functions/runCommercialEligibilityA2");
 require("./functions/runStripeConnectReminderMonitor");
 require("./functions/runPublishingPaymentTimer");
 require("./functions/runAuthorFollowupCadence");
+require("./functions/runDistributorCollection");
 if ((process.env.JM1_ENVIRONMENT || "").trim().toUpperCase() === "UAT") {
   require("./functions/runPhase6OnboardingCertification");
 }
