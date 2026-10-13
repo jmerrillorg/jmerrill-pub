@@ -99,6 +99,9 @@ async function prepare(bundle, contact, effectiveDateAuthority, prior, election)
   const p = doc.createElementNS(W, "w:p"), r = doc.createElementNS(W, "w:r"), br = doc.createElementNS(W, "w:br");
   br.setAttributeNS(W, "w:type", "page"); r.appendChild(br); p.appendChild(r); body.insertBefore(p, first);
   zip.file("word/document.xml", new XMLSerializer().serializeToString(doc), { date: new Date("2000-01-01T00:00:00Z"), createFolders: false });
+  // Template filling may create directory entries with wall-clock timestamps.
+  // Normalize the entire envelope so recovery produces the same issued bytes.
+  for (const entry of Object.values(zip.files)) entry.date = new Date("2000-01-01T00:00:00Z");
   const bytes = await zip.generateAsync({ type: "nodebuffer", compression: "DEFLATE" });
   const completeness = await validateCompleteAgreement(bytes, expected);
   return { bytes, manifest: { schemaVersion: 1, titleId: offer.titleId, title: bundle.title,

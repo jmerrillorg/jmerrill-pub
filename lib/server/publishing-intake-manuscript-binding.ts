@@ -14,6 +14,7 @@ import {
   type StoredManuscriptArtifact,
 } from '@/lib/publishing/intake/manuscriptUpload'
 import { getGraphSharePointRuntimeAccessToken } from './publisher-runtime-auth'
+import { createHash } from 'node:crypto'
 
 const EXECUTION_STATUS_SUCCESS = 835500001
 const BAND_LEVEL_1 = 835500000
@@ -113,6 +114,16 @@ export async function bindContinuationManuscriptToIntake(input: {
   const validation = validateManuscriptUploadCandidate(input.candidate)
   if (!validation.ok) throw new Error(validation.code)
 
+  const sourceSha256 = createHash('sha256').update(Buffer.from(validation.value.bytes)).digest('hex')
+  const existingUrl = stringValue(intake.jm1_manuscripturl || intake.jm1_submissionurl)
+  if (existingUrl || intake.jm1_manuscriptreceived === true) {
+    if (existingUrl && continuationMatchesExistingSource(stringValue(intake.jm1_additionalnotes), sourceSha256)) {
+      return { status: 'idempotent', intakeId: input.intakeId, reference,
+        manuscriptUrl: existingUrl, sha256: sourceSha256, fileType: validation.extension, reviewFlag: validation.reviewFlag }
+    }
+    throw new Error('continuation_existing_source_requires_review')
+  }
+
   const artifact = await storeOriginalManuscriptArtifact({
     intake: intakeContext(intake),
     candidate: input.candidate,
@@ -135,6 +146,11 @@ export async function bindContinuationManuscriptToIntake(input: {
     fileType: artifact.fileType,
     reviewFlag: artifact.reviewFlag,
   }
+}
+
+export function continuationMatchesExistingSource(notes: string, sha256: string) {
+  return /^[a-f0-9]{64}$/.test(sha256) && notes.split('\n').some(line =>
+    /^CONTINUATION_MANUSCRIPT_UPLOADED sha256=([a-f0-9]{64}); format=[a-z0-9]+$/.exec(line.trim())?.[1] === sha256)
 }
 
 export async function getContinuationIntakeStatus(input: { intakeId: string; reference: string }) {

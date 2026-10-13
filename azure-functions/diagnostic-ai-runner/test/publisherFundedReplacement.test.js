@@ -18,7 +18,8 @@ function input(titleId) {
     { titleId, agreementVersion: "1.0.0", agreementSha256: "c".repeat(64), offerSha256: offer.offerSha256 },
     { decision: "ACCEPT", offerSha256: offer.offerSha256, sourceReference: "fixture:actual-election" }];
 }
-test("all five replacements preserve base terms and exact source components", async () => {
+test("all five replacements preserve base terms and exact source components", async t => {
+  t.mock.timers.enable({ apis: ["Date"], now: Date.parse("2026-10-13T12:00:00Z") });
   for (const titleId of Object.keys(TITLES)) {
     const args = input(titleId), result = await generator.prepare(...args);
     const zip = await Zip.loadAsync(result.bytes), original = await Zip.loadAsync(baseBytes);
@@ -33,7 +34,8 @@ test("all five replacements preserve base terms and exact source components", as
     assert.equal(result.manifest.stage05Complete, false);
     assert.equal(result.manifest.paymentCreated, false);
     assert.equal(result.manifest.administrationRecipient, "publishing@jmerrill.one");
-    assert.deepEqual((await generator.prepare(...args)).bytes, result.bytes);
+    t.mock.timers.tick(60000);
+    assert.equal((await generator.prepare(...args)).bytes.equals(result.bytes), true, "restart must preserve exact bytes across clock changes");
   }
 });
 test("missing address, wrong election, source or previous agreement blocks generation", async () => {
@@ -51,4 +53,17 @@ test("replacement endpoint rejects extra fields and unauthorized titles before d
     { titleId: Object.keys(TITLES)[0], mode: "SUBMISSION_05_PREPARE_REPLACEMENT", authorAddress: "untrusted" }]) {
     assert.equal((await handler(body)).status, 400);
   }
+});
+test("Stage 05 is independently disabled and requires all broad workers off", async () => {
+  const { handler, enabled } = require("../src/lifecycle/publisherFundedStage05");
+  const titleId = Object.keys(TITLES)[0];
+  const env = { JM1_NEW_SUBMISSION_STAGE05_ENABLED: "true", JM1_NEW_SUBMISSION_STAGE05_TITLE_IDS: titleId,
+    JM1_TITLE_COMMISSIONING_REVIEW_ENABLED: "false", JM1_PUBLISHING_STAGE_RUNTIME_ENABLED: "false", JM1_PUBLISHING_WAIT_RUNTIME_ENABLED: "false" };
+  assert.equal(enabled(env, titleId), true);
+  assert.equal(enabled(env, "constructor"), false);
+  for (const key of Object.keys(env)) {
+    const changed = { ...env }; delete changed[key];
+    assert.equal(enabled(changed, titleId), false);
+  }
+  assert.equal((await handler({ titleId, mode: "SUBMISSION_05_SEND_ADMIN" }, { env: {} })).status, 403);
 });

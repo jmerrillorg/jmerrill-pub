@@ -4,7 +4,12 @@ const internal = require("./jackieInternalTitlePolicy");
 const documents = require("../agreement/publisherFundedReplacement");
 const dates = require("../agreement/agreementEffectiveDate");
 const MODES = ["SUBMISSION_05_PREPARE_REPLACEMENT", "SUBMISSION_05_REPLACEMENT_READBACK", "SUBMISSION_05_SEND_ADMIN", "SUBMISSION_05_ADMIN_DELIVERY"];
+const BROAD = ["JM1_TITLE_COMMISSIONING_REVIEW_ENABLED", "JM1_PUBLISHING_STAGE_RUNTIME_ENABLED", "JM1_PUBLISHING_WAIT_RUNTIME_ENABLED"];
 function deny(code) { throw Object.assign(new Error(code), { safeCode: code }); }
+function enabled(env, titleId) {
+  return Object.hasOwn(internal.TITLES, titleId || "") && env.JM1_NEW_SUBMISSION_STAGE05_ENABLED === "true" &&
+    (env.JM1_NEW_SUBMISSION_STAGE05_TITLE_IDS || "").split(",").includes(titleId) && BROAD.every(key => env[key] === "false");
+}
 
 async function readPrepared(prefix, deps) {
   const saved = await b.optional(deps.containerClient, `${prefix}/prepared.json`);
@@ -77,7 +82,7 @@ async function sendAdmin(body, deps) {
   await b.immutable(deps.containerClient, `${prefix}/page-review.json`, review);
   const step = require("./titleCommissioningIntakeWorker").processTitleCommissioningStep;
   const execution = await step({ titleId: body.titleId, bindingHash: prepared.agreementSha256 }, {
-    ...deps, readScope: async titleId => ({ titleId, enabled: Boolean(internal.TITLES[titleId]), revoked: false, mode: "JACKIE_TITLE_INTERNAL_COMMISSIONING" }),
+    ...deps, readScope: async titleId => ({ titleId, enabled: enabled(deps.env || process.env, titleId), revoked: false, mode: "JACKIE_TITLE_INTERNAL_COMMISSIONING" }),
   }, {
     namespace: "publisher-funded/stage05/admin-send-executions", executionSuffix: "",
     plan: input => ({ ...input, executionId: `stage05-admin:${input.bindingHash}` }),
@@ -148,8 +153,11 @@ async function delivery(titleId, deps) {
 }
 
 async function handler(body, supplied = {}) {
-  if (!internal.TITLES[body?.titleId] || !MODES.includes(body.mode) ||
+  if (!Object.hasOwn(internal.TITLES, body?.titleId || "") || !MODES.includes(body.mode) ||
       Object.keys(body).some(k => !(body.mode === "SUBMISSION_05_SEND_ADMIN" ? ["titleId", "mode", "agreementSha256", "pageReviewSha256"] : ["titleId", "mode"]).includes(k))) return { status: 400, jsonBody: { code: "STAGE05_SCOPE_DENIED", effects: 0 } };
+  if (body.mode !== "SUBMISSION_05_REPLACEMENT_READBACK" && !enabled(supplied.env || process.env, body.titleId)) {
+    return { status: 403, jsonBody: { code: "STAGE05_DISABLED", effects: 0 } };
+  }
   try {
     const deps = await require("./newSubmissionStage01").native(supplied);
     if ((await deps.containerClient.getProperties()).blobPublicAccess) deny("STAGE05_PRIVATE_STORAGE_REQUIRED");
@@ -167,4 +175,4 @@ async function handler(body, supplied = {}) {
       payments: 0, stage05Complete: false, stage06: "NOT_STARTED" } };
   }
 }
-module.exports = { MODES, handler, prepare, readPrepared, sendAdmin, delivery, agreementFolder };
+module.exports = { MODES, handler, prepare, readPrepared, sendAdmin, delivery, agreementFolder, enabled };
