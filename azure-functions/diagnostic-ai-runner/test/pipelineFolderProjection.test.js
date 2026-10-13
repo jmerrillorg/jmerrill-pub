@@ -101,3 +101,37 @@ test("source relocation needs stable title folder plus durable verified custody,
 test("pagination rejects cross-drive continuation instead of claiming complete census", async () => {
   await assert.rejects(p.pages(async () => ({ value: [], "@odata.nextLink": "https://example.org/secret" }), p.path("root")), /PAGINATION_SCOPE_DENIED/);
 });
+test("transient Graph credentials and absent false IRM flags are not custody differences", async () => {
+  const x = fixture(), before = await p.inventory(x.folderId, x.deps.graph), after = structuredClone(before);
+  after.find(r => r.id === x.folderId).parentId = "agreement";
+  const file = after.find(r => r.id === "original");
+  file.file.irmEnabled = false; file.file.irmEffectivelyEnabled = false;
+  file.versions[0]["@microsoft.graph.downloadUrl"] = "temporary-secret";
+  assert.equal(p.custodyEqual(before, after, x.folderId, "agreement"), true);
+  assert.ok(!JSON.stringify(p.sanitize(after)).includes("temporary-secret"));
+  file.file.irmEnabled = true;
+  assert.equal(p.custodyEqual(before, after, x.folderId, "agreement"), false);
+  const permission = [{ id: "link", roles: ["read"], link: { type: "view", scope: "users", webUrl: "secret" } }];
+  assert.equal(p.acl(permission), p.acl([{ ...permission[0], link: { type: "view", scope: "users" } }]));
+  assert.notEqual(p.acl(permission), p.acl([{ ...permission[0], roles: ["write"] }]));
+});
+test("only metadata-only held moves recover; recovery rereads custody without another move", async () => {
+  const x = fixture(), before = await p.inventory(x.folderId, x.deps.graph);
+  const authority = await x.deps.readPlacementAuthority(x.titleId), prefix = `${p.PREFIX}/${x.titleId}`;
+  const move = `${prefix}/moves/${b.sha(JSON.stringify(authority))}`;
+  x.items.get(x.folderId).parentReference.id = "agreement";
+  const after = await p.inventory(x.folderId, x.deps.graph);
+  x.put(`${move}/intent.json`, { folderId: x.folderId, targetId: "agreement", sourceId: "intake", before, authority });
+  x.put(`${move}/after.json`, { pending: [], items: after });
+  x.put(`${prefix}/state.json`, { status: "HELD", code: "PIPELINE_CUSTODY_MISMATCH" });
+  const changed = structuredClone(after); changed.find(r => r.id === "original").size++;
+  x.put(`${move}/after.json`, { pending: [], items: changed });
+  assert.equal((await p.reconcile(x.titleId, x.deps)).status, "HELD");
+  x.put(`${move}/after.json`, { pending: [], items: after });
+  assert.equal((await p.reconcile(x.titleId, x.deps)).status, "ALIGNED");
+  assert.equal(x.patches(), 0);
+  assert.ok(x.blobs.has(`${move}/metadata-recovery-v2.json`));
+  assert.ok(x.blobs.has(`${move}/after-v2.json`));
+  assert.equal((await p.reconcile(x.titleId, x.deps)).status, "ALIGNED");
+  assert.equal(x.patches(), 0);
+});
