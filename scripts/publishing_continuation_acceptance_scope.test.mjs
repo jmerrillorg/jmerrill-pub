@@ -11,3 +11,9 @@ test('continuation acceptance fixture remains inside existing expiring worker sc
   assert.match(source, /verified\.fingerprint !== fingerprint/)
   assert.doesNotMatch(source, /createTitle|sendMail|createInvoice|chargeCard/)
 })
+test('standalone Connect return and recovery do not show portal-code instructions', () => {
+  const page = readFileSync('app/author/financial-setup/page.tsx', 'utf8')
+  assert.equal((page.match(/portalGuidance=\{false\}/g) || []).length, 2)
+  const shell = readFileSync('app/author/_components/AuthorPortalShell.tsx', 'utf8')
+  assert.match(shell, /portalGuidance \? \[/)
+})
