@@ -25,7 +25,8 @@ export default function OnboardingPage() {
   const defaults: Record<string, string> = context ? { authorName: context.authorName, legalName: context.authorName,
     email: context.email, phone: context.phone, mailingAddress: context.mailingAddress, bookTitle: context.title,
     packageConfirmation: 'PUBLISHER_FUNDED' } : {}
-  return <main className="mx-auto max-w-3xl px-6 py-12">
+  return <div className="min-h-screen bg-[#070710] pt-28 text-white">
+    <main className="mx-auto max-w-3xl px-6 py-12">
     <h1 className="mb-6 text-3xl font-semibold">Author onboarding</h1>
     {error ? <p role="alert">{error}</p> : !context ? <p>Loading your request...</p> : <>
       <h2 className="mb-6 text-xl">{context.title}</h2>
@@ -37,5 +38,6 @@ export default function OnboardingPage() {
         successMessage="Publishing will review your title-bound submission. No portal account is required."
         failureMessage="Receipt could not be confirmed. Keep this request and contact Publishing before starting another submission." />
     </>}
-  </main>
+    </main>
+  </div>
 }
