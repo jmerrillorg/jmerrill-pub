@@ -39,6 +39,7 @@ async function processStageEvent(event, deps = {}) {
 
   const recorded = await (deps.persistEvent || persistStageEvent)(event, deps);
   if (!action) return { ...recorded, action: "JOURNAL_ONLY" };
+  if (action === "dispatchStage") await require("./pipelineFolderRuntime").beforeDispatch(event, deps);
 
   // A replay must invoke the same idempotent adapter: the first attempt may have
   // recorded the event but failed before its action was durably accepted.

@@ -87,7 +87,10 @@ async function readComponent(p, deps) {
   const metadata = await deps.sourceMetadata(p);
   const parent = decodeURIComponent(metadata.parentReference?.path || "").split("root:");
   if (metadata.id !== p.itemId || metadata.name !== p.name || metadata.size !== p.bytes || metadata.eTag !== p.eTag ||
-      metadata.parentReference?.driveId !== driveId || parent.length !== 2 || parent[1] !== p.parent || !metadata.file) {
+      metadata.parentReference?.driveId !== driveId || parent.length !== 2 || !metadata.file) {
+    deny("COMMISSIONING_FRESH_ORIGINAL_CUSTODY_CHANGED");
+  }
+  if (parent[1] !== p.parent && !await require("./pipelineFolderProjection").acceptsSourceLocation(p, metadata, deps)) {
     deny("COMMISSIONING_FRESH_ORIGINAL_CUSTODY_CHANGED");
   }
   const bytes = await deps.sourceBytes(p);
