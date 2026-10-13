@@ -12,6 +12,7 @@ const { runAuthorReviewResponseConsumer } = require("../orchestration/authorRevi
 app.timer("run-author-review-response-consumer", {
   schedule: "0 */5 * * * *",
   handler: async (_timer, context) => {
+    try {
     const funded = await require("../lifecycle/publisherFundedStage04").monitor();
     for (const result of funded) {
       if (result.status !== 200) context.error(`Stage04 funded response monitor: title=${result.titleId}; code=${result.code}`);
@@ -24,6 +25,13 @@ app.timer("run-author-review-response-consumer", {
     context.info(
       `Author review response consumer completed; processed=${result.processed}; idempotent=${result.idempotent}; checked=${result.results.length}`
     );
+    } finally {
+    const placements = await require("../lifecycle/pipelineFolderRuntime").monitor();
+    for (const placement of placements) {
+      if (["FAILED", "HELD", "RETRY_PENDING"].includes(placement.status)) context.error(`Pipeline folder projection: title=${placement.titleId}; status=${placement.status}; code=${placement.code || placement.reason}`);
+      else context.info(`Pipeline folder projection: title=${placement.titleId}; status=${placement.status}`);
+    }
+    }
   }
 });
 

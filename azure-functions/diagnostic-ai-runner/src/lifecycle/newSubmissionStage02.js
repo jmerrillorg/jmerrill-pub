@@ -39,7 +39,9 @@ async function ensureFolder(part, p, deps) {
   const parentPath = part.policy.parent.replace(/\/[^/]+$/, "");
   const originalParentPath = decodeURIComponent(originalFolder.parentReference?.path || "").split("root:")[1];
   if (!originalFolder.folder || !originalFolder.parentReference?.id || originalFolder.parentReference.driveId !== fresh.driveId ||
-      originalParentPath !== parentPath || !parentPath.startsWith("/01_Pipeline_A-Z/")) deny("COMMISSIONING_STAGE02_WORKSPACE_UNBOUND");
+      !parentPath.startsWith("/01_Pipeline_A-Z/")) deny("COMMISSIONING_STAGE02_WORKSPACE_UNBOUND");
+  if (originalParentPath !== parentPath && !await require("./pipelineFolderProjection").acceptsSourceLocation(
+    part.policy, await deps.sourceMetadata(part.policy), deps)) deny("COMMISSIONING_STAGE02_WORKSPACE_UNBOUND");
   const parent = root + encodeURIComponent(originalFolder.parentReference.id);
   const name = `_WORKING_STAGE02_${p.fingerprint.slice(0,16)}`;
   let folder = await readOptional(deps, `${parent}:/${name}`);
@@ -51,7 +53,7 @@ async function ensureFolder(part, p, deps) {
   }
   if (!folder.folder || folder.name !== name || folder.parentReference?.id !== originalFolder.parentReference.id ||
       folder.parentReference.driveId !== fresh.driveId) deny("COMMISSIONING_STAGE02_FOLDER_CONFLICT");
-  return { id: folder.id, path: `${parentPath}/${name}` };
+  return { id: folder.id, path: `${originalParentPath}/${name}` };
 }
 async function persistFile(folder, name, bytes, contentType, deps) {
   const target = `drives/${encodeURIComponent(fresh.driveId)}/items/${encodeURIComponent(folder.id)}:/${encodeURIComponent(name)}`;
@@ -131,8 +133,11 @@ async function transportReadback(current, p, deps) {
 async function verifyOutput(output, deps) {
   const item = await deps.graph(`drives/${encodeURIComponent(fresh.driveId)}/items/${encodeURIComponent(output.itemId)}`);
   const path = decodeURIComponent(item.parentReference?.path || "").split("root:")[1];
-  if (!item.file || item.eTag !== output.eTag || item.size !== output.bytes || item.parentReference?.driveId !== output.driveId ||
-      `${path}/${item.name}` !== output.path) deny("COMMISSIONING_STAGE02_OUTPUT_CUSTODY_CHANGED");
+  if (!item.file || item.eTag !== output.eTag || item.size !== output.bytes || item.parentReference?.driveId !== output.driveId) deny("COMMISSIONING_STAGE02_OUTPUT_CUSTODY_CHANGED");
+  if (`${path}/${item.name}` !== output.path && !await require("./pipelineFolderProjection").acceptsSourceLocation({
+    parent: output.path.slice(0, output.path.lastIndexOf("/")), name: output.path.slice(output.path.lastIndexOf("/") + 1),
+    bytes: output.bytes
+  }, item, deps)) deny("COMMISSIONING_STAGE02_OUTPUT_CUSTODY_CHANGED");
   const bytes = await deps.sourceBytes({ itemId: output.itemId });
   if (bytes.length !== output.bytes || hash(bytes) !== output.sha256) deny("COMMISSIONING_STAGE02_OUTPUT_BYTES_CHANGED");
   if (output.packaging === "ZIP_SINGLE_SOURCE_V1") await verifyWorkingPackage(bytes, output);
