@@ -13,9 +13,25 @@ async function readAuthority(titleId, deps) {
       request.offerSha256 !== bundle.offer.offerSha256 || request.authorElectionReference !== response.sourceReference ||
       request.authorPaymentDisposition !== "NOT_APPLICABLE_PUBLISHER_FUNDED" || request.authorDueCents !== 0 ||
       request.paymentCreated !== false) deny("PIPELINE_OWNER_AUTHORITY_CONFLICT");
+  const replacementPrefix = `publisher-funded/stage05/${titleId}/${bundle.offer.offerSha256}/replacement-v2`;
+  const placement = (await b.optional(deps.containerClient, `${projection.PREFIX}/${titleId}/state.json`))?.value;
+  const execution = (await b.optional(deps.containerClient, `${replacementPrefix}/execution.json`))?.value;
+  if (execution) {
+    const prepared = (await b.read(deps.containerClient, `${replacementPrefix}/prepared.json`)).value;
+    if (execution.titleId !== titleId || execution.offerSha256 !== bundle.offer.offerSha256 ||
+        execution.agreementSha256 !== prepared.agreementSha256 || execution.authorElectionReference !== response.sourceReference ||
+        execution.status !== "REPLACEMENT_EXECUTION_VERIFIED" || execution.stage05Complete !== true ||
+        execution.authorDueCents !== 0 || execution.authorPaymentDisposition !== "NOT_APPLICABLE_PUBLISHER_FUNDED" ||
+        execution.paymentCreated !== false || !execution.proof?.seal?.fullDocumentIntegrity ||
+        execution.proof.requiredPartyEvents !== 2) deny("PIPELINE_OWNER_AUTHORITY_CONFLICT");
+    // This bounded fresh-submission owner enters onboarding only. Later canonical
+    // lifecycle progression remains owned by the established V2 runtime.
+    if (Number((deps.projectionEvent?.stageCode || placement?.stageCode || "05").slice(0, 2)) <= 6) {
+      return { current: true, titleId, stageCode: "06_ONBOARDING", reference: `${replacementPrefix}/execution.json` };
+    }
+  }
   // Canonical lifecycle authority, when present, owns later progression. A
   // signature request is only authority for waiting in Stage 05, never Stage 06.
-  const placement = (await b.optional(deps.containerClient, `${projection.PREFIX}/${titleId}/state.json`))?.value;
   const later = Number((deps.projectionEvent?.stageCode || placement?.stageCode || "05").slice(0, 2)) > 5;
   const engagements = later ? await deps.authorityClient.list("jmpv2_publishingengagements", {
     $filter: `jmpv2_canonicaltitleid eq '${titleId}'`, $top: "2" }) : [];

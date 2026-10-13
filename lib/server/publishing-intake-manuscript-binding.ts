@@ -15,6 +15,7 @@ import {
 } from '@/lib/publishing/intake/manuscriptUpload'
 import { getGraphSharePointRuntimeAccessToken } from './publisher-runtime-auth'
 import { createHash } from 'node:crypto'
+import { recoverContinuation } from '../publishing/intake/continuationRecovery'
 
 const EXECUTION_STATUS_SUCCESS = 835500001
 const BAND_LEVEL_1 = 835500000
@@ -117,25 +118,41 @@ export async function bindContinuationManuscriptToIntake(input: {
   const sourceSha256 = createHash('sha256').update(Buffer.from(validation.value.bytes)).digest('hex')
   const existingUrl = stringValue(intake.jm1_manuscripturl || intake.jm1_submissionurl)
   if (existingUrl || intake.jm1_manuscriptreceived === true) {
-    if (existingUrl && continuationMatchesExistingSource(stringValue(intake.jm1_additionalnotes), sourceSha256)) {
-      return { status: 'idempotent', intakeId: input.intakeId, reference,
-        manuscriptUrl: existingUrl, sha256: sourceSha256, fileType: validation.extension, reviewFlag: validation.reviewFlag }
+    if (!existingUrl || !continuationMatchesExistingSource(stringValue(intake.jm1_additionalnotes), sourceSha256)) {
+      throw new Error('continuation_existing_source_requires_review')
     }
-    throw new Error('continuation_existing_source_requires_review')
   }
 
-  const artifact = await storeOriginalManuscriptArtifact({
+  return recoverContinuation(input, async (state, checkpoint) => {
+  const current = await getBindingIntake(config, input.intakeId)
+  if (stringValue(current.jm1_intakereferencecode) !== reference) throw new Error('continuation_reference_mismatch')
+  const currentUrl = stringValue(current.jm1_manuscripturl || current.jm1_submissionurl)
+  if (currentUrl) {
+    if (state.artifact?.manuscriptUrl !== currentUrl || !continuationMatchesExistingSource(stringValue(current.jm1_additionalnotes), sourceSha256)) {
+      throw new Error('continuation_existing_source_requires_review')
+    }
+    return { status: 'idempotent', intakeId: input.intakeId, reference, manuscriptUrl: currentUrl,
+      sha256: sourceSha256, fileType: state.artifact.fileType, reviewFlag: state.artifact.reviewFlag }
+  }
+  const artifact = state.artifact || await storeOriginalManuscriptArtifact({
     intake: intakeContext(intake),
     candidate: input.candidate,
     validation,
+    preserveExisting: true,
     provenance: {
       source: 'CONTINUATION_UPLOAD',
       route: '/api/publishing/intake/continue',
     },
   })
-  await patchIntakeWithArtifact(config, input.intakeId, intake, artifact, [
+  if (!state.artifact) await checkpoint(artifact)
+  if (!current['@odata.etag']) throw new Error('continuation_concurrency_authority_missing')
+  await patchIntakeWithArtifact(config, input.intakeId, current, artifact, [
     `CONTINUATION_MANUSCRIPT_UPLOADED sha256=${artifact.sha256}; format=${artifact.fileType}`,
-  ])
+  ], { ifMatch: stringValue(current['@odata.etag']) })
+  const verified = await getBindingIntake(config, input.intakeId)
+  if (verified.jm1_manuscripturl !== artifact.manuscriptUrl || verified.jm1_manuscriptreceived !== true) {
+    throw new Error('continuation_receipt_readback_failed')
+  }
 
   return {
     status: 'bound',
@@ -146,6 +163,7 @@ export async function bindContinuationManuscriptToIntake(input: {
     fileType: artifact.fileType,
     reviewFlag: artifact.reviewFlag,
   }
+  })
 }
 
 export function continuationMatchesExistingSource(notes: string, sha256: string) {
@@ -193,6 +211,7 @@ async function patchIntakeWithArtifact(
   intake: DataverseRow,
   artifact: StoredManuscriptArtifact,
   notes: string[],
+  options: { ifMatch?: string } = {},
 ) {
   const existingNotes = stringValue(intake.jm1_additionalnotes)
   const nextNotes = [...notes, existingNotes].filter(Boolean).join('\n').slice(0, 950)
@@ -203,7 +222,7 @@ async function patchIntakeWithArtifact(
     jm1_sharepointworkspacefolderid: artifact.workspaceFolderId,
     jm1_workspacestatus: WORKSPACE_STATUS_CREATED,
     jm1_additionalnotes: nextNotes,
-  })
+  }, options)
 }
 
 async function fetchMailboxAttachment(input: {

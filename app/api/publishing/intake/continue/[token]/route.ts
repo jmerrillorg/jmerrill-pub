@@ -29,9 +29,9 @@ export async function GET(_req: Request, context: RouteContext) {
       reference: token.claims.reference,
     })
     return NextResponse.json({ status: 'ready', intake: status }, { headers: { 'Cache-Control': 'no-store' } })
-  } catch (error) {
+  } catch {
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Unable to load continuation status.' },
+      { error: 'Unable to verify this submission. Please contact publishing@jmerrill.one.', code: 'CONTINUATION_READBACK_UNAVAILABLE' },
       { status: 400, headers: { 'Cache-Control': 'no-store' } },
     )
   }
@@ -49,6 +49,7 @@ export async function POST(req: Request, context: RouteContext) {
   if (!value || typeof value === 'string' || !isFileLike(value) || value.size <= 0) {
     return NextResponse.json({ error: 'A manuscript file is required.' }, { status: 400 })
   }
+  if (value.size > 25 * 1024 * 1024) return NextResponse.json({ error: 'Upload a manuscript smaller than 25 MB.' }, { status: 413 })
 
   const candidate: ManuscriptUploadCandidate = {
     fileName: value.name,
@@ -65,9 +66,15 @@ export async function POST(req: Request, context: RouteContext) {
     })
     return NextResponse.json({ status: 'received', result }, { headers: { 'Cache-Control': 'no-store' } })
   } catch (error) {
+    const message = error instanceof Error ? error.message : ''
+    const conflict = ['continuation_existing_source_requires_review', 'CONTINUATION_SOURCE_CHANGED', 'CONTINUATION_CUSTODY_CONFLICT',
+      'CONTINUATION_SOURCE_CUSTODY_CONFLICT'].includes(message)
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Unable to bind manuscript.' },
-      { status: 400, headers: { 'Cache-Control': 'no-store' } },
+      { error: conflict
+        ? 'An existing manuscript requires Publishing review. No replacement was accepted. Please contact publishing@jmerrill.one.'
+        : 'Receipt is not yet complete. Please retain your file and use this same link to check again; do not start a new inquiry.',
+        code: conflict ? 'CONTINUATION_SOURCE_REVIEW_REQUIRED' : 'CONTINUATION_RECOVERY_PENDING' },
+      { status: conflict ? 409 : 503, headers: { 'Cache-Control': 'no-store', 'Referrer-Policy': 'no-referrer' } },
     )
   }
 }

@@ -129,7 +129,8 @@ async function delivery(titleId, deps) {
   const existing = await b.optional(deps.containerClient, `${prefix}/admin-delivery.json`);
   if (existing) return existing.value;
   const mail = require("./publisherFundedStage04Mail");
-  const messages = await mail.pages(mail.MAILBOX, { $filter: `receivedDateTime ge ${sent.sent.sentAt} and from/emailAddress/address eq '${mail.FROM}'`,
+  const searchStart = new Date(Date.parse(sent.sent.sentAt) - 5 * 60_000).toISOString();
+  const messages = await mail.pages(mail.MAILBOX, { $filter: `receivedDateTime ge ${searchStart} and from/emailAddress/address eq '${mail.FROM}'`,
     $select: "id,internetMessageId,receivedDateTime,subject,from,toRecipients,ccRecipients,hasAttachments", $top: "100" }, deps);
   const providerId = require("../generated/communications/publishing-communication-acceptance").providerIdFromInternetMessageId;
   const matches = messages.filter(m => providerId(m.internetMessageId || "") === sent.sent.providerMessageId.replaceAll("-", "").toLowerCase());
@@ -165,7 +166,10 @@ async function handler(body, supplied = {}) {
     if (body.mode === "SUBMISSION_05_ADMIN_DELIVERY") return { status: 200, jsonBody: await delivery(body.titleId, deps) };
     if (body.mode === "SUBMISSION_05_REPLACEMENT_READBACK") {
       const bundle = await require("./publisherFundedStage04").load(body.titleId, deps);
-      return { status: 200, jsonBody: { replacement: await readPrepared(`publisher-funded/stage05/${body.titleId}/${bundle.offer.offerSha256}/replacement-v2`, deps), effects: 0 } };
+      const prefix = `publisher-funded/stage05/${body.titleId}/${bundle.offer.offerSha256}/replacement-v2`;
+      return { status: 200, jsonBody: { replacement: await readPrepared(prefix, deps),
+        execution: (await b.optional(deps.containerClient, `${prefix}/execution.json`))?.value || null,
+        authorContactId: bundle.offer.authorContactId, title: bundle.title, effects: 0 } };
     }
     return { status: 200, jsonBody: { replacement: await prepare(body.titleId, deps), communications: 0,
       payments: 0, stage05Complete: false, stage06: "NOT_STARTED" } };

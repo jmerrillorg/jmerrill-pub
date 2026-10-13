@@ -13,6 +13,7 @@ import { enqueuePublishingIntakeRecovery } from '@/lib/publishing/intake/deadLet
 import { receiptRecoveryEnabled, reserveReceiptRecovery, recordReceiptCustody, recordReceiptFailure,
   readReceiptRecovery, readReceiptMonitor, releaseAcceptanceHold, sweepReceiptRecovery } from '@/lib/publishing/intake/receiptRecovery'
 import { generateIntakeReference } from '@/lib/publishing/intake/reference'
+import { sweepContinuationRecovery } from '@/lib/publishing/intake/continuationRecovery'
 
 export const dynamic = 'force-dynamic'
 
@@ -28,7 +29,11 @@ export async function POST(request: NextRequest) {
     if (!body || Object.keys(body).some(key => !['operation', 'recordId'].includes(key))) {
       return NextResponse.json({ code: 'UNEXPECTED_RECOVERY_FIELD' }, { status: 400 })
     }
-    if (body.operation === 'sweep') return NextResponse.json(await sweepReceiptRecovery())
+    if (body.operation === 'sweep') {
+      const receipts = await sweepReceiptRecovery()
+      const continuations = await sweepContinuationRecovery()
+      return NextResponse.json({ ...receipts, continuations })
+    }
     if (body.operation === 'monitor') return NextResponse.json(await readReceiptMonitor())
     if (body.operation === 'read' && typeof body.recordId === 'string') return NextResponse.json(await readReceiptRecovery(body.recordId))
     const key = process.env.JM1_INTAKE_RECEIPT_ACCEPTANCE_KEY || ''

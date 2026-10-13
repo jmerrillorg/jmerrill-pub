@@ -55,6 +55,7 @@ export function AuthorSetupForm({
   successLink,
   failureMessage,
   fields,
+  requestHeaders,
 }: {
   endpoint: string
   submitLabel: string
@@ -67,6 +68,7 @@ export function AuthorSetupForm({
   }
   failureMessage?: string
   fields: Field[]
+  requestHeaders?: Record<string, string>
 }) {
   const [values, setValues] = useState<Record<string, string>>(() =>
     Object.fromEntries(
@@ -138,6 +140,7 @@ export function AuthorSetupForm({
       const response = await fetch(endpoint, {
         method: 'POST',
         headers: {
+          ...requestHeaders,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(values),
