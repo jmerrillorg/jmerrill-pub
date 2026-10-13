@@ -112,6 +112,7 @@ async function reconcile(titleId, deps) {
     let intent = (await b.optional(container, intentPath))?.value;
     const completed = await b.optional(container, `${prefix}/moves/${key}/receipt.json`);
     if (completed && folder.parentReference.id !== target.id) deny("PIPELINE_VERIFIED_LOCATION_DRIFT");
+    if (!intent && folder.parentReference.id === target.id) deny("PIPELINE_UNRECORDED_PLACEMENT");
     if (folder.parentReference.id === target.id && (!intent || completed)) {
       if (completed && deps.reconcileReferences) await deps.reconcileReferences(titleId, completed.value);
       await save("state", { status: "ALIGNED", stageCode: authority.stageCode,
