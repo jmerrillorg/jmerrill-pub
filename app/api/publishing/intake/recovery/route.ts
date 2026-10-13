@@ -7,7 +7,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { strToU8, zipSync } from 'fflate'
 import { intakeFingerprint, intakeRecordId } from '@/lib/publishing/intake/receipt'
 import { createNormalizedPublishingIntake, validatePublishingIntakeBody } from '@/lib/publishing/intake/schema'
-import { findPublishingIntakeByIdempotencyKey, writePublishingIntakeWithRetry } from '@/lib/publishing/intake/dataverse'
+import { findPublishingIntakeByIdempotencyKey, writePublishingIntakeWithRetry, finalizePublishingIntakeReceipt } from '@/lib/publishing/intake/dataverse'
+import { createIntakeContinuationToken } from '@/lib/publishing/intake/continuation'
 import { uploadManuscriptToInquiryWorkspace } from '@/lib/publishing/intake/manuscriptUpload'
 import { enqueuePublishingIntakeRecovery } from '@/lib/publishing/intake/deadLetter'
 import { receiptRecoveryEnabled, reserveReceiptRecovery, recordReceiptCustody, recordReceiptFailure,
@@ -45,6 +46,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ code: 'ACCEPTANCE_SCOPE_DENIED' }, { status: 403 })
     }
     if (body.operation === 'restore') return NextResponse.json(await releaseAcceptanceHold(id))
+    if (body.operation === 'seed-continuation') return await seedAcceptance(key, id, true)
     if (body.operation !== 'seed') return NextResponse.json({ code: 'OPERATION_INVALID' }, { status: 400 })
     return await seedAcceptance(key, id)
   } catch (error) {
@@ -54,10 +56,16 @@ export async function POST(request: NextRequest) {
   }
 }
 
-async function seedAcceptance(key: string, recordId: string) {
+async function seedAcceptance(key: string, recordId: string, continuationOnly = false) {
   const existing = await findPublishingIntakeByIdempotencyKey(key)
   if (existing.status === 'found') {
     if (existing.recordId !== recordId) throw new Error('ACCEPTANCE_RECEIPT_IDENTITY_MISMATCH')
+    if (continuationOnly) {
+      if (!existing.accepted) throw new Error('ACCEPTANCE_RESERVATION_REVIEW_REQUIRED')
+      return NextResponse.json({ recordId, reference: existing.reference,
+        continuationToken: createIntakeContinuationToken({ intakeId: recordId, reference: existing.reference, ttlSeconds: 3600 }),
+        synthetic: true, replay: true, notifications: 0 })
+    }
     const receipt = await readReceiptRecovery(recordId)
     if (receipt.reference !== existing.reference) throw new Error('ACCEPTANCE_RECEIPT_IDENTITY_MISMATCH')
     return NextResponse.json(receipt, { status: 202 })
@@ -68,7 +76,7 @@ async function seedAcceptance(key: string, recordId: string) {
     firstName: 'Synthetic', lastName: 'RecoveryAcceptance', email: 'jm1-admin@jmerrill.one',
     streetAddress: '1 Internal Test Street', city: 'Test', stateProvince: 'VA', postalCode: '20000', country: 'United States',
     bookTitle: `SYNTHETIC INTERNAL RECEIPT RECOVERY ${key.slice(0, 8)}`, genre: 'Test', wordCount: 1000,
-    workType: 'Full-length Book', manuscriptStatus: 'Complete', manuscriptSubmissionChoice: 'now',
+    workType: 'Full-length Book', manuscriptStatus: 'Complete', manuscriptSubmissionChoice: continuationOnly ? 'later' : 'now',
     publishedBefore: 'First book', bookDescription: 'Harmless internal fixture for verifying durable intake failure monitoring and manual recovery only.',
     consent: true, rightsAttestation: true, serviceCommunicationConsent: true, marketingConsent: false,
     turnstileToken: '', idempotencyKey: key,
@@ -82,10 +90,20 @@ async function seedAcceptance(key: string, recordId: string) {
   }, { level: 0 })
   const candidate = { fileName: 'InternalReceiptRecovery.docx', contentType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
     size: bytes.length, bytes: bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.length) as ArrayBuffer }
-  const fingerprint = intakeFingerprint(validation.data, candidate.bytes)
+  const fingerprint = intakeFingerprint(validation.data, continuationOnly ? undefined : candidate.bytes)
   const intake = createNormalizedPublishingIntake(validation.data, generateIntakeReference())
   const reserved = await writePublishingIntakeWithRetry({ ...intake, manuscriptUrl: undefined, manuscriptReceived: false }, fingerprint)
   if (reserved.status !== 'success' || reserved.recordId !== recordId) throw new Error('ACCEPTANCE_RESERVATION_FAILED')
+  if (continuationOnly) {
+    if (reserved.existing) throw new Error('ACCEPTANCE_RESERVATION_REVIEW_REQUIRED')
+    const finalized = await finalizePublishingIntakeReceipt(recordId, intake, fingerprint)
+    if (finalized.status !== 'success') throw new Error('ACCEPTANCE_FINALIZATION_FAILED')
+    const verified = await findPublishingIntakeByIdempotencyKey(key)
+    if (verified.status !== 'found' || !verified.accepted || verified.recordId !== recordId || verified.fingerprint !== fingerprint) throw new Error('ACCEPTANCE_READBACK_FAILED')
+    return NextResponse.json({ recordId, reference: intake.reference,
+      continuationToken: createIntakeContinuationToken({ intakeId: recordId, reference: intake.reference, ttlSeconds: 3600 }),
+      synthetic: true, notifications: 0 })
+  }
   if (reserved.existing) return NextResponse.json(await readReceiptRecovery(recordId), { status: 202 })
   await reserveReceiptRecovery(recordId, intake, fingerprint, candidate, true)
   const upload = await uploadManuscriptToInquiryWorkspace(intake, candidate)
