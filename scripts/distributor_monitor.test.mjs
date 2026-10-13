@@ -5,7 +5,7 @@ import {Readable} from 'node:stream'
 const jiti=createJiti(import.meta.url)
 const {monitoredCollection}=jiti('../lib/server/distribution/collection-monitor.ts')
 const {excelMinor}=jiti('../lib/server/distribution/kdp-source.ts')
-const {readSourceList}=jiti('../lib/server/distribution/source-collector.ts')
+const {readSourceList,legacyStatementPeriod}=jiti('../lib/server/distribution/source-collector.ts')
 function fixture(){
   const values=new Map();let sequence=0,calls=0,fail=false
   const store={container:{getBlockBlobClient:path=>({
@@ -41,4 +41,11 @@ test('pagination cannot send credentials outside the source origin',async()=>{
   let calls=0
   await assert.rejects(readSourceList('https://graph.microsoft.com/v1.0/','fixed','secret',async()=>{calls++;return new Response(JSON.stringify({value:[], '@odata.nextLink':'https://other.invalid/read'}))}),/PAGINATION_INVALID/)
   assert.equal(calls,1)
+})
+test('legacy statement periods include labeled drafts, while ambiguous periods stay held',()=>{
+  assert.equal(legacyStatementPeriod('2026-09'),'2026-09')
+  assert.equal(legacyStatementPeriod('WAVE1 Author - April 2026 Draft Statement'),'2026-04')
+  assert.equal(legacyStatementPeriod('April 2026 and May 2026'),null)
+  assert.equal(legacyStatementPeriod(null),null)
+  assert.equal(legacyStatementPeriod('unknown'),null)
 })

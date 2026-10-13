@@ -36,7 +36,7 @@ Disable the collection feature on both hosts before rollback. Preserve originals
 Distributor source reads run in the existing Publishing Function managed identity,
 not a fallback credential in the website. The authenticated reader is disabled by
 default (`JM1_DISTRIBUTOR_SOURCE_READER_ENABLED`). It accepts only a bounded archive
-month, fixed Publishing drive, file membership and five existing ledger reads.
+month, fixed Publishing drive, file membership and six existing ledger reads.
 It cannot accept arbitrary URLs, OData, mutations or mailbox operations. The
 website uses its established Function-owner authentication. No grant is added.
 `JM1_DISTRIBUTOR_COLLECTION_MONTH` bounds both caller and owner during acceptance.
