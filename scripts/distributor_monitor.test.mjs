@@ -5,6 +5,7 @@ import {Readable} from 'node:stream'
 const jiti=createJiti(import.meta.url)
 const {monitoredCollection}=jiti('../lib/server/distribution/collection-monitor.ts')
 const {excelMinor}=jiti('../lib/server/distribution/kdp-source.ts')
+const {readSourceList}=jiti('../lib/server/distribution/source-collector.ts')
 function fixture(){
   const values=new Map();let sequence=0,calls=0,fail=false
   const store={container:{getBlockBlobClient:path=>({
@@ -32,4 +33,12 @@ test('expired claim is recovered and counted, without a permanent lock',async()=
 })
 test('Excel serialization noise is not a new sub-cent amount',()=>{
   assert.equal(excelMinor('9.7899999999999991'),979);assert.equal(excelMinor('13.38'),1338);assert.throws(()=>excelMinor('6.695'));assert.throws(()=>excelMinor(''))
+})
+test('read denial identifies exact boundary without exposing content or token',async()=>{
+  await assert.rejects(readSourceList('https://graph.microsoft.com/v1.0/','drives/fixed/root:/archive:/children','secret',async()=>new Response('{}',{status:403,headers:{'request-id':'request-1'}})),e=>e.message==='SOURCE_SHAREPOINT_ARCHIVE_HTTP_403'&&e.requestId==='request-1')
+})
+test('pagination cannot send credentials outside the source origin',async()=>{
+  let calls=0
+  await assert.rejects(readSourceList('https://graph.microsoft.com/v1.0/','fixed','secret',async()=>{calls++;return new Response(JSON.stringify({value:[], '@odata.nextLink':'https://other.invalid/read'}))}),/PAGINATION_INVALID/)
+  assert.equal(calls,1)
 })

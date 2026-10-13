@@ -2,6 +2,8 @@ import { timingSafeEqual } from 'node:crypto'
 import { NextResponse } from 'next/server'
 import { collectMonth } from '@/lib/server/distribution/source-collector'
 import { monitoredCollection } from '@/lib/server/distribution/collection-monitor'
+import { sourceStore } from '@/lib/server/distribution/source-ledger'
+import { randomUUID } from 'node:crypto'
 export const runtime='nodejs'
 export const dynamic='force-dynamic'
 export async function POST(request:Request) {
@@ -21,6 +23,10 @@ export async function POST(request:Request) {
     if(process.env.JM1_DISTRIBUTOR_COLLECTION_MONTH && month!==process.env.JM1_DISTRIBUTOR_COLLECTION_MONTH)throw Error('COLLECTION_MONTH_OUT_OF_SCOPE')
     return NextResponse.json(await collectMonth(month),{headers:{'Cache-Control':'no-store'}})
   }catch(e){const code=e instanceof Error&&/^[A-Z_0-9]+$/.test(e.message)?e.message:'COLLECTION_DEPENDENCY_FAILED'
-    console.error('Publishing distributor collection held',{code})
-    return NextResponse.json({code},{status:503})}
+    const reference=randomUUID(),requestId=(e as {requestId?:string})?.requestId||null
+    try {const store=await sourceStore();await store.container.getBlockBlobClient(`failures/${reference}.json`).uploadData(
+      Buffer.from(JSON.stringify({at:new Date().toISOString(),code,requestId,reference,status:'HELD_RECONCILE_DURABLE_SOURCE_RECEIPTS'})),{conditions:{ifNoneMatch:'*'}})}
+    catch {console.error('DISTRIBUTOR_FAILURE_RECEIPT_UNAVAILABLE',{reference})}
+    console.error('Publishing distributor collection held',{code,reference,requestId})
+    return NextResponse.json({code,reference,requestId},{status:503})}
 }
