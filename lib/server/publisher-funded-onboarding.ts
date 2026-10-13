@@ -22,6 +22,21 @@ export function verifyOnboardingToken(token: string): Claims {
       claims.exp > Date.now() / 1000 + 14 * 86400 + 60) throw new Error('ONBOARDING_LINK_INVALID')
   return claims
 }
+export function validateOnboardingRecordBinding(titleId: string, body: any, contact: any, title: any) {
+  const prepared = body.replacement, execution = body.execution
+  // The owner validates the exact intake/offer chain. A missing legacy lookup
+  // is not a different author, but any populated conflicting lookup is a hold.
+  if (contact?.contactid !== body.authorContactId || title?.jm1pub_titleid !== titleId ||
+      (title._jm1_primaryauthor_value != null && title._jm1_primaryauthor_value !== body.authorContactId) ||
+      prepared?.titleId !== titleId || execution?.titleId !== titleId ||
+      !/^[a-f0-9]{64}$/.test(prepared?.offerSha256 || '') || execution.offerSha256 !== prepared.offerSha256 ||
+      !prepared.authorElectionReference?.startsWith(`publisher-funded/stage04/${titleId}/${prepared.offerSha256}/responses/`) ||
+      execution.authorElectionReference !== prepared.authorElectionReference ||
+      prepared.completeness?.complete !== true ||
+      !prepared.completeness.authorSourceReference?.startsWith(`contacts(${body.authorContactId})/W/`)) {
+    throw new Error('ONBOARDING_IDENTITY_CONFLICT')
+  }
+}
 export async function onboardingAuthority(titleId: string) {
   if (!/^[a-f0-9-]{36}$/.test(titleId)) throw new Error('ONBOARDING_TITLE_INVALID')
   const base = process.env.JM1_DIAGNOSTIC_RUNNER_URL, key = process.env.JM1_DIAGNOSTIC_RUNNER_KEY
@@ -43,7 +58,7 @@ export async function onboardingAuthority(titleId: string) {
   const contact = await dataverseFirst(config, 'contacts', { $filter: `contactid eq ${body.authorContactId}`,
     $select: 'contactid,fullname,emailaddress1,telephone1,address1_line1,address1_line2,address1_city,address1_stateorprovince,address1_postalcode' })
   const title = await dataverseFirst(config, 'jm1pub_titles', { $filter: `jm1pub_titleid eq ${titleId}`, $select: 'jm1pub_titleid,_jm1_primaryauthor_value' })
-  if (contact?.contactid !== body.authorContactId || title?._jm1_primaryauthor_value !== body.authorContactId) throw new Error('ONBOARDING_IDENTITY_CONFLICT')
+  validateOnboardingRecordBinding(titleId, body, contact, title)
   return { titleId, contactId: body.authorContactId as string, agreementSha256: body.replacement.agreementSha256 as string,
     title: body.title as string, authorName: stringValue(contact.fullname), email: stringValue(contact.emailaddress1), phone: stringValue(contact.telephone1),
     mailingAddress: ['address1_line1', 'address1_line2', 'address1_city', 'address1_stateorprovince', 'address1_postalcode'].map(k => stringValue(contact[k])).filter(Boolean).join(', ') }
