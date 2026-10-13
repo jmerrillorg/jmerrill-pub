@@ -70,24 +70,46 @@ export async function recoverContinuation<T>(input: { intakeId: string; referenc
   } finally { clearInterval(timer); await lease.releaseLease().catch(() => {}) }
 }
 
-export async function sweepContinuationRecovery() {
+export async function sweepContinuationRecovery(storage = container(), resume = async (state: State) => {
+  const bytes = Buffer.from(state.source.base64, 'base64')
+  return (await import('../../server/publishing-intake-manuscript-binding')).bindContinuationManuscriptToIntake({
+    intakeId: state.intakeId, reference: state.reference,
+    candidate: { ...state.source, bytes: bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.length) as ArrayBuffer },
+  })
+}) {
   const results: { intakeId: string; status: string }[] = []
-  const client = container()
+  const client = storage
   if ((await client.getProperties()).blobPublicAccess) throw new Error('CONTINUATION_PRIVATE_CUSTODY_REQUIRED')
+  const cursor = client.getBlockBlobClient('continuation-monitor/v1/cursor.json')
+  try { await cursor.uploadData(Buffer.from('{}'), { conditions: { ifNoneMatch: '*' } }) }
+  catch (error) { if (![409, 412].includes((error as { statusCode: number }).statusCode)) throw error }
+  const lease = cursor.getBlobLeaseClient()
+  try { await lease.acquireLease(60) } catch { return { results, inspected: 0, bounded: true, busy: true } }
+  const renewal = setInterval(() => { void lease.renewLease().catch(() => {}) }, 20_000)
+  renewal.unref()
   let inspected = 0
-  for await (const item of client.listBlobsFlat({ prefix: PREFIX })) {
-    if (++inspected > 500 || results.length >= 5) break
-    const state = validateContinuationState(JSON.parse((await client.getBlockBlobClient(item.name).downloadToBuffer()).toString('utf8')))
-    if (state.completed || Date.parse(state.nextAttemptAt || '') > Date.now()) continue
-    if (state.attempts >= 5) { results.push({ intakeId: state.intakeId, status: 'MANUAL_RECOVERY_REQUIRED' }); continue }
-    const bytes = Buffer.from(state.source.base64, 'base64')
-    try {
-      await (await import('../../server/publishing-intake-manuscript-binding')).bindContinuationManuscriptToIntake({
-        intakeId: state.intakeId, reference: state.reference,
-        candidate: { ...state.source, bytes: bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.length) as ArrayBuffer },
-      })
-      results.push({ intakeId: state.intakeId, status: 'COMPLETED' })
-    } catch { results.push({ intakeId: state.intakeId, status: 'RECOVERY_PENDING' }) }
+  try {
+    const saved = JSON.parse((await cursor.downloadToBuffer()).toString('utf8'))
+    // One five-item page per tick bounds work without starving records behind completed or held receipts.
+    const pages = client.listBlobsFlat({ prefix: PREFIX }).byPage({ continuationToken: saved.continuationToken, maxPageSize: 5 })
+    const page = (await pages.next()).value
+    for (const item of page?.segment.blobItems || []) {
+      inspected++
+      try {
+        const state = validateContinuationState(JSON.parse((await client.getBlockBlobClient(item.name).downloadToBuffer()).toString('utf8')))
+        if (state.completed || Date.parse(state.nextAttemptAt || '') > Date.now()) continue
+        if (state.attempts >= 5) { results.push({ intakeId: state.intakeId, status: 'MANUAL_RECOVERY_REQUIRED' }); continue }
+        try { await resume(state); results.push({ intakeId: state.intakeId, status: 'COMPLETED' }) }
+        catch { results.push({ intakeId: state.intakeId, status: 'RECOVERY_PENDING' }) }
+      } catch {
+        results.push({ intakeId: item.name.slice(PREFIX.length).replace(/\.json$/, ''), status: 'CUSTODY_VALIDATION_FAILED' })
+      }
+    }
+    await cursor.uploadData(Buffer.from(JSON.stringify({ continuationToken: page?.continuationToken || undefined,
+      checkedAt: new Date().toISOString(), inspected, results })), { conditions: { leaseId: lease.leaseId } })
+    return { results, inspected, bounded: Boolean(page?.continuationToken) }
+  } finally {
+    clearInterval(renewal)
+    await lease.releaseLease().catch(() => {})
   }
-  return { results, inspected, bounded: inspected > 500 || results.length >= 5 }
 }

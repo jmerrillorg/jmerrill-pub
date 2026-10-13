@@ -1,10 +1,13 @@
 'use client'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { AuthorSetupForm, onboardingFields } from '../author/_components/AuthorSetupForm'
 type Context = { title: string; authorName: string; email: string; phone: string; mailingAddress: string }
 export default function OnboardingPage() {
   const [token, setToken] = useState(''), [context, setContext] = useState<Context | null>(null), [error, setError] = useState('')
+  const initialized = useRef(false)
   useEffect(() => {
+    if (initialized.current) return
+    initialized.current = true
     const value = window.location.hash.slice(1)
     window.history.replaceState(null, '', window.location.pathname)
     setToken(value)

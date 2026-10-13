@@ -2,7 +2,7 @@ import test from 'node:test'
 import assert from 'node:assert/strict'
 import { createHash } from 'node:crypto'
 import createJiti from 'jiti'
-const { recoverContinuation, validateContinuationState } = createJiti(import.meta.url)('../lib/publishing/intake/continuationRecovery.ts')
+const { recoverContinuation, validateContinuationState, sweepContinuationRecovery } = createJiti(import.meta.url)('../lib/publishing/intake/continuationRecovery.ts')
 const input = { intakeId: '11111111-1111-4111-8111-111111111111', reference: 'JMP-TEST',
   candidate: { fileName: 'fixture.docx', contentType: 'application/octet-stream', size: 3, bytes: Uint8Array.from([1,2,3]).buffer } }
 const sha = createHash('sha256').update(Buffer.from(input.candidate.bytes)).digest('hex')
@@ -43,4 +43,23 @@ test('concurrent claimant cannot execute and corrupt bytes fail validation', asy
   await assert.rejects(recoverContinuation(input, async () => assert.fail('duplicate execution'), storage), /BUSY/)
   unblock(); await pending
   assert.throws(() => validateContinuationState({ ...storage.value(), sha256: 'b'.repeat(64) }), /CONFLICT/)
+})
+test('durable pagination reaches pending receipts beyond completed and exhausted records', async () => {
+  const cursor = store(), resumed = []
+  const state = { schema: 'CONTINUATION_CUSTODY_V1', intakeId: input.intakeId, reference: input.reference,
+    sha256: sha, source: { ...input.candidate, base64: 'AQID' }, attempts: 0 }
+  const storage = { async getProperties() { return {} }, getBlockBlobClient(name) {
+    if (name.startsWith('continuation-monitor/')) return cursor.getBlockBlobClient()
+    return { async downloadToBuffer() { return Buffer.from(JSON.stringify({ ...state,
+      ...(name.endsWith('held.json') ? { attempts: 5 } : name.endsWith('completed.json') ? { completed: true } : {}) })) } }
+  }, listBlobsFlat() { return { byPage({ continuationToken, maxPageSize }) {
+    assert.equal(maxPageSize, 5)
+    return { async next() { return { value: continuationToken ? { segment: { blobItems: [{ name: 'continuations/v1/pending.json' }] } } :
+      { continuationToken: 'next', segment: { blobItems: [{ name: 'continuations/v1/completed.json' }, { name: 'continuations/v1/held.json' }] } } } } }
+  } } } }
+  assert.equal((await sweepContinuationRecovery(storage, async s => resumed.push(s.intakeId))).bounded, true)
+  assert.equal(cursor.value().continuationToken, 'next')
+  assert.equal((await sweepContinuationRecovery(storage, async s => resumed.push(s.intakeId))).bounded, false)
+  assert.deepEqual(resumed, [input.intakeId])
+  assert.equal(cursor.value().continuationToken, undefined)
 })
