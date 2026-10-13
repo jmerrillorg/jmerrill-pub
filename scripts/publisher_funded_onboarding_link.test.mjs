@@ -7,7 +7,7 @@ test('funded onboarding retains author choice without retail package or new edit
   const page = readFileSync(new URL('../app/onboarding/page.tsx', import.meta.url), 'utf8')
   assert.match(page, /fundedNotes\[field.name\]/)
   assert.match(page, /Preferences do not authorize new spending/)
-  assert.match(page, /field.name !== 'editingLevelAcknowledgment'/)
+  assert.match(page, /\['editingLevelAcknowledgment', 'payment_acknowledgment'\]\.includes\(field.name\)/)
   assert.match(page, /No portal account is required/)
   assert.doesNotMatch(page, /Starter includes/)
 })

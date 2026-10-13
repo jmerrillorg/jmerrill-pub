@@ -30,7 +30,7 @@ export default function OnboardingPage() {
     {error ? <p role="alert">{error}</p> : !context ? <p>Loading your request...</p> : <>
       <h2 className="mb-6 text-xl">{context.title}</h2>
       <AuthorSetupForm endpoint="/api/publishing/onboarding" requestHeaders={{ Authorization: `Bearer ${token}` }}
-        fields={onboardingFields.filter(field => field.name !== 'editingLevelAcknowledgment').map(field => ({ ...field, defaultValue: defaults[field.name] ?? field.defaultValue,
+        fields={onboardingFields.filter(field => !['editingLevelAcknowledgment', 'payment_acknowledgment'].includes(field.name)).map(field => ({ ...field, defaultValue: defaults[field.name] ?? field.defaultValue,
           ...(fundedNotes[field.name] ? { note: fundedNotes[field.name] } : {}),
           ...(field.name === 'packageConfirmation' ? { type: 'text' as const, label: 'Funding route' } : {}) }))}
         submitLabel="Submit onboarding" successTitle="Your answers have been received."
