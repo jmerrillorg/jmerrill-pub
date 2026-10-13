@@ -27,7 +27,7 @@ export default async function AuthorFinancialSetupPage({
   const params = await searchParams
   const contact = first(params?.contact)
   if (isValidLegacyConnectContact(contact)) {
-    redirect(`/api/author/stripe/connect/refresh?contact=${encodeURIComponent(contact)}`)
+    redirect('/author/financial-setup?connect=support')
   }
 
   const connectMode = first(params?.connect)

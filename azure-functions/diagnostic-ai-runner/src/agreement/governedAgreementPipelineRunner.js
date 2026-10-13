@@ -51,9 +51,12 @@ function agreementMergeValues(input) {
     "[Book Title]": input.bookTitle,
     "[Working Title]": input.bookTitle,
     "[Territory]": input.territory,
+    "[World / United States and Canada / Other — specify]": input.territory,
     "[State of Incorporation]": input.stateOfIncorporation,
     "[JM1 Business Address]": input.publisherBusinessAddress,
     "[Author Address]": input.authorAddress,
+    "[Address]": input.authorAddress,
+    "[City, State ZIP]": input.authorCityStatePostal,
     "[Final Title and Subtitle]": input.finalTitleAndSubtitle,
     "[Author's Legal and Professional/Pen Name]": input.authorNameForSchedule,
     "[Manuscript Delivery Requirements (format, word-processing program, method of delivery)]": input.manuscriptDeliveryRequirements,
@@ -200,6 +203,7 @@ async function generateGovernedAgreement(input = {}, deps = {}) {
     const templateBuffer = await deps.readTemplate(selectedTemplate);
     const templateSha256 = computeSha256(templateBuffer);
     const filled = await fillDocxTemplate(templateBuffer, agreementMergeValues(normalizedInput));
+    await require("./agreementCompleteness").assertNoUnresolvedFields(filled.buffer);
     const outputBase = [
       "JM1",
       safeSlug(selectedTemplate.agreementType),

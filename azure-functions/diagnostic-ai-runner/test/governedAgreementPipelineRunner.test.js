@@ -52,6 +52,7 @@ function validationInput(overrides = {}) {
     stateOfIncorporation: "Ohio",
     publisherBusinessAddress: "J Merrill Publishing business address on file",
     authorAddress: "Author address on file",
+    authorCityStatePostal: "Columbus, OH 43207",
     finalTitleAndSubtitle: "Internal Validation Title",
     authorNameForSchedule: "Validation Author",
     manuscriptDeliveryRequirements: "Manuscript delivery requirements on file",
@@ -147,7 +148,7 @@ describe("generateGovernedAgreement", () => {
     assert.equal(result.manifest.authorFacingOutputSent, false);
   });
 
-  test("fills existing bracket placeholders without requiring redesign of unresolved blanks", async () => {
+  test("fills author address and existing bracket placeholders before output", async () => {
     const writes = new Map();
     const result = await generateGovernedAgreement(validationInput(), memoryDeps({ writes }));
     assert.equal(result.ok, true);
@@ -160,6 +161,19 @@ describe("generateGovernedAgreement", () => {
     assert.ok(!xml.includes("[Author Legal Name]"));
     assert.ok(!xml.includes("[Book Title]"));
     assert.ok(!xml.includes("[Effective Date]"));
+    assert.ok(!xml.includes("[Address]"));
+    assert.ok(!xml.includes("[City, State ZIP]"));
+  });
+
+  test("missing author address fields fail before writing or converting artifacts", async () => {
+    const writes = new Map();
+    let converted = false;
+    const result = await generateGovernedAgreement(validationInput({ authorCityStatePostal: undefined }),
+      memoryDeps({ writes, convertDocxToPdf: async () => { converted = true; return Buffer.from("pdf"); } }));
+    assert.equal(result.ok, false);
+    assert.equal(result.reason, "AGREEMENT_UNRESOLVED_PLACEHOLDER");
+    assert.equal(writes.size, 0);
+    assert.equal(converted, false);
   });
 
   test("refuses duplicate generated artifacts for the same correlation", async () => {
