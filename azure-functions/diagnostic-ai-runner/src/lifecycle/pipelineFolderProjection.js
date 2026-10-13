@@ -1,6 +1,7 @@
 "use strict";
 
 const b = require("./newSubmissionStage03Budget");
+const { isDeepStrictEqual } = require("node:util");
 const PREFIX = "pipeline-folder-projection";
 const PIPELINE = "01DF3SEQLV6K2H3E6TPJH2UOTR5DUBSJT5";
 const FOLDERS = Object.freeze({
@@ -33,11 +34,15 @@ function acl(rows) {
   if (!Array.isArray(rows) || !rows.length || rows.some(x => !x.id || !Array.isArray(x.roles) || !x.roles.length)) deny("PIPELINE_PERMISSION_READBACK_INCOMPLETE");
   return JSON.stringify(rows.map(x => ({ id: x.id, roles: [...x.roles].sort(),
     grantedToV2: x.grantedToV2, grantedToIdentitiesV2: x.grantedToIdentitiesV2,
-    link: x.link, invitation: x.invitation, expirationDateTime: x.expirationDateTime }))
+    link: x.link && Object.fromEntries(Object.entries(x.link).filter(([key]) => key !== "webUrl")), invitation: x.invitation, expirationDateTime: x.expirationDateTime }))
     .sort((a, c) => a.id.localeCompare(c.id)));
 }
+// Graph download URLs are transient credentials, not version/custody identity.
+function sanitize(value) {
+  return JSON.parse(JSON.stringify(value, (key, item) => key === "@microsoft.graph.downloadUrl" ? undefined : item));
+}
 async function inventory(id, graph, progress) {
-  const state = progress ? await progress.read() || { pending: [id], items: [] } : { pending: [id], items: [] };
+  const state = sanitize(progress ? await progress.read() || { pending: [id], items: [] } : { pending: [id], items: [] });
   while (state.pending.length) {
     if (progress && Date.now() >= progress.deadline) return null;
     const itemId = state.pending[0];
@@ -47,7 +52,7 @@ async function inventory(id, graph, progress) {
       parentId: x.parentReference?.id, webUrl: x.webUrl,
       permissions: acl(await pages(graph, `${path(itemId)}/permissions`)) };
     if (x.file) {
-      row.versions = await pages(graph, `${path(itemId)}/versions`);
+      row.versions = sanitize(await pages(graph, `${path(itemId)}/versions`));
       if (!row.versions.length) deny("PIPELINE_VERSION_READBACK_INCOMPLETE");
     }
     const children = x.folder ? await pages(graph, `${path(itemId)}/children?$top=200`) : [];
@@ -56,12 +61,16 @@ async function inventory(id, graph, progress) {
     state.pending.push(...children.map(child => child.id));
     if (progress) await progress.save(state);
   }
-  return state.items.sort((a, c) => a.id.localeCompare(c.id));
+  return sanitize(state.items).sort((a, c) => a.id.localeCompare(c.id));
 }
 function custodyEqual(before, after, rootId, targetId) {
-  const normalize = (rows, moved) => rows.map(({ webUrl, ...x }) => ({ ...x,
-    parentId: x.id === rootId && moved ? targetId : x.parentId }));
-  return JSON.stringify(normalize(before, true)) === JSON.stringify(normalize(after, false));
+  const normalize = (rows, moved) => sanitize(rows).map(({ webUrl, ...x }) => ({ ...x,
+    file: x.file && Object.fromEntries(Object.entries(x.file).filter(([key, value]) =>
+      !(["irmEnabled", "irmEffectivelyEnabled"].includes(key) && value === false))),
+    permissions: acl(JSON.parse(x.permissions)),
+    parentId: x.id === rootId && moved ? targetId : x.parentId })).sort((a, c) => a.id.localeCompare(c.id));
+  try { return isDeepStrictEqual(normalize(before, true), normalize(after, false)); }
+  catch { return false; }
 }
 async function reconcile(titleId, deps) {
   const folderId = FOLDERS[titleId];
@@ -92,8 +101,9 @@ async function reconcile(titleId, deps) {
         !/^(0[1-9]|1[0-6])_[A-Z_]+$/.test(authority.stageCode)) deny("PIPELINE_STAGE_AUTHORITY_UNPROVEN");
     if (authority.hold === true) return { titleId, status: "HELD", reason: "MOVEMENT_HOLD", effects: 0 };
     const prior = (await b.optional(container, `${prefix}/state.json`))?.value;
-    if (prior?.status === "HELD") return { titleId, ...prior };
-    if (prior?.nextAttemptAt && Date.parse(prior.nextAttemptAt) > Date.now()) return { titleId, ...prior };
+    const metadataRecovery = prior?.status === "HELD" && prior.code === "PIPELINE_CUSTODY_MISMATCH";
+    if (prior?.status === "HELD" && !metadataRecovery) return { titleId, ...prior };
+    if (!metadataRecovery && prior?.nextAttemptAt && Date.parse(prior.nextAttemptAt) > Date.now()) return { titleId, ...prior };
     const folder = await graph(path(folderId));
     const source = await graph(path(folder.parentReference.id));
     if (!folder.folder || source.parentReference?.id !== PIPELINE || !source.folder) deny("PIPELINE_ANCESTRY_UNPROVEN");
@@ -110,6 +120,18 @@ async function reconcile(titleId, deps) {
     });
     const intentPath = `${prefix}/moves/${key}/intent.json`;
     let intent = (await b.optional(container, intentPath))?.value;
+    if (metadataRecovery) {
+      const previousAfter = (await b.optional(container, `${prefix}/moves/${key}/after.json`))?.value;
+      const freshAfter = (await b.optional(container, `${prefix}/moves/${key}/after-v2.json`))?.value;
+      if (!intent || folder.parentReference.id !== target.id || intent.targetId !== target.id ||
+          intent.folderId !== folderId || previousAfter?.pending?.length !== 0 ||
+          !custodyEqual(intent.before, previousAfter.items, folderId, target.id) ||
+          freshAfter?.pending?.length === 0 && !custodyEqual(intent.before, freshAfter.items, folderId, target.id)) return { titleId, ...prior };
+      const recoveryPath = `${prefix}/moves/${key}/metadata-recovery-v2.json`;
+      if (!(await b.optional(container, recoveryPath))) await b.immutable(container, recoveryPath, {
+        prior, intentReference: intentPath, reason: "GRAPH_TRANSIENT_METADATA_ONLY", schemaVersion: 2
+      });
+    }
     const completed = await b.optional(container, `${prefix}/moves/${key}/receipt.json`);
     if (completed && folder.parentReference.id !== target.id) deny("PIPELINE_VERIFIED_LOCATION_DRIFT");
     if (!intent && folder.parentReference.id === target.id) deny("PIPELINE_UNRECORDED_PLACEMENT");
@@ -142,7 +164,7 @@ async function reconcile(titleId, deps) {
       await graph(path(folderId), { method: "PATCH", headers: { "Content-Type": "application/json", "If-Match": latest.eTag },
         body: JSON.stringify({ parentReference: { id: target.id } }) });
     }
-    const after = await snapshot("after");
+    const after = await snapshot("after-v2");
     if (!after) return { titleId, status: "CUSTODY_READBACK_PENDING" };
     if (!custodyEqual(intent.before, after, folderId, target.id)) deny("PIPELINE_CUSTODY_MISMATCH");
     const receiptPath = `${prefix}/moves/${key}/receipt.json`;
@@ -189,4 +211,4 @@ async function acceptsSourceLocation(policy, metadata, deps) {
     receipt.targetId === stage.id && stage.parentReference.id === PIPELINE && stage.name === actual[2] &&
     receipt.items.some(x => x.id === metadata.id && x.name === policy.name && x.size === policy.bytes);
 }
-module.exports = { PREFIX, PIPELINE, FOLDERS, path, pages, acl, inventory, custodyEqual, reconcile, acceptsSourceLocation };
+module.exports = { PREFIX, PIPELINE, FOLDERS, path, pages, acl, sanitize, inventory, custodyEqual, reconcile, acceptsSourceLocation };

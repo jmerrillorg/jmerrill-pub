@@ -62,3 +62,20 @@ the reviewed/deployed SHA, five live parent-ID readbacks, complete post-move
 custody comparison, replay results, source/output read verification, reference
 reconciliation, and a natural scheduled drift check. No Stage 05 completion or
 Stage 06 start can be inferred from these receipts.
+# Graph metadata recovery v2
+
+The first production comparison held three moves because Graph version responses
+included transient download URLs and application responses added false IRM fields.
+One permissions response omitted sharing URLs; a fresh read with the original
+delegated identity reproduced the complete original ACL unchanged.
+
+Graph documents that permission `webUrl` secrets depend on caller authority:
+https://learn.microsoft.com/en-us/graph/api/driveitem-list-permissions
+
+Do not persist transient version download URLs. Compare substantive metadata,
+including permission IDs, roles, principals, scope, version IDs, sizes and hashes.
+Missing versus false IRM flags normalize; true IRM changes still fail closed.
+Metadata-only held moves may recover only with a matching immutable intent,
+the exact destination, and passing substantive before/after comparison. Recovery
+records the original hold and performs a fresh resumable after-v2 inventory.
+No second move is issued. Other holds and substantive custody differences remain held.
