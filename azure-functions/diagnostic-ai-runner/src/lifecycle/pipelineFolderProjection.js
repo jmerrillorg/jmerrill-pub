@@ -152,6 +152,8 @@ async function reconcile(titleId, deps) {
       items: after, status: "CUSTODY_VERIFIED", stageCompleted: false, signatureInferred: false };
     claim();
     await b.immutable(container, receiptPath, receipt);
+    await save("state", { status: "CUSTODY_VERIFIED_REFERENCES_PENDING", stageCode: authority.stageCode,
+      receiptReference: receiptPath, checkedAt: new Date().toISOString(), failures: prior?.failures || 0 });
     if (deps.reconcileReferences) await deps.reconcileReferences(titleId, receipt);
     await save("state", { status: "ALIGNED", stageCode: authority.stageCode, receiptReference: receiptPath,
       checkedAt: new Date().toISOString(), failures: 0 });
