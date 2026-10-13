@@ -84,6 +84,7 @@ async function ConnectReturnExperience({ token }: { token: string }) {
     const copy = humanStatusCopy(status.humanStatus)
     return (
       <AuthorPortalShell
+        portalGuidance={false}
         eyebrow="Direct Deposit"
         title="Set up direct deposit."
         description="Stripe has sent you back to J Merrill Publishing. We checked your Stripe setup status directly and listed the next step below."
@@ -124,6 +125,7 @@ async function ConnectReturnExperience({ token }: { token: string }) {
 function ConnectSupportExperience() {
   return (
     <AuthorPortalShell
+      portalGuidance={false}
       eyebrow="Direct Deposit"
       title="Set up direct deposit."
       description="We could not confirm this setup link. The Publishing Team can send a fresh Stripe setup link without asking you for banking or tax information by email."
