@@ -1,7 +1,16 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import createJiti from 'jiti'
+import { readFileSync } from 'node:fs'
 const { signOnboardingClaims, verifyOnboardingToken } = createJiti(import.meta.url)('../lib/server/publisher-funded-onboarding.ts')
+test('funded onboarding retains author choice without retail package or new editorial election', () => {
+  const page = readFileSync(new URL('../app/onboarding/page.tsx', import.meta.url), 'utf8')
+  assert.match(page, /fundedNotes\[field.name\]/)
+  assert.match(page, /Preferences do not authorize new spending/)
+  assert.match(page, /\['editingLevelAcknowledgment', 'payment_acknowledgment'\]\.includes\(field.name\)/)
+  assert.match(page, /No portal account is required/)
+  assert.doesNotMatch(page, /Starter includes/)
+})
 test('onboarding capability binds purpose, exact title, contact, version and expiry', t => {
   const before = process.env.INTAKE_CONTINUATION_TOKEN_SECRET
   process.env.INTAKE_CONTINUATION_TOKEN_SECRET = 'synthetic-test-only-not-a-production-key'
