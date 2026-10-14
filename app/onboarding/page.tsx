@@ -33,6 +33,8 @@ export default function OnboardingPage() {
       <AuthorSetupForm endpoint="/api/publishing/onboarding" requestHeaders={{ Authorization: `Bearer ${token}` }}
         fields={onboardingFields.filter(field => !['editingLevelAcknowledgment', 'payment_acknowledgment'].includes(field.name)).map(field => ({ ...field, defaultValue: defaults[field.name] ?? field.defaultValue,
           ...(fundedNotes[field.name] ? { note: fundedNotes[field.name] } : {}),
+          ...(field.name === 'governedFormatSelection' ? { options: [...(field.options || []),
+            { key: 'paperback_ebook_hardcover', label: 'Paperback + eBook + hardcover' }] } : {}),
           ...(field.name === 'packageConfirmation' ? { type: 'text' as const, label: 'Funding route' } : {}) }))}
         submitLabel="Submit onboarding" successTitle="Your answers have been received."
         successMessage="Publishing will review your title-bound submission. No portal account is required."
