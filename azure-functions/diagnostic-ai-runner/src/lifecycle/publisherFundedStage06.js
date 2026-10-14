@@ -8,7 +8,7 @@ const required = ["legalName", "phone", "mailingAddress", "genre", "targetAudien
 function deny(code) { throw Object.assign(new Error(code), { safeCode: code }); }
 function validateSubmission(row, bundle, execution) {
   let payload;
-  try { payload = JSON.parse(row?.jm1pub_rawpayload); } catch { deny("STAGE06_SUBMISSION_INVALID"); }
+  try { payload = require("./onboardingPayloadCodec").decode(row?.jm1pub_rawpayload); } catch { deny("STAGE06_SUBMISSION_INVALID"); }
   const a = payload.governedAuthority, answers = payload.rawFormData;
   if (!row["@odata.etag"] || !row.jm1pub_submissionid || row.jm1pub_formtype !== "author-onboarding-attempt" ||
       row._jm1pub_linkedcontact_value !== policy.CONTACT || a?.contactId !== policy.CONTACT ||

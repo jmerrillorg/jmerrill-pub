@@ -2,6 +2,7 @@
 // Reusable? Y
 // Stage-specific exception? N
 import { cookies } from 'next/headers'
+import { decode as decodeOnboardingPayload } from '../../azure-functions/diagnostic-ai-runner/src/lifecycle/onboardingPayloadCodec'
 import { readAuthorEditorialStage } from './author-editorial-stage-readback'
 import { type NextRequest, NextResponse } from 'next/server'
 
@@ -1434,7 +1435,7 @@ async function hasCompletedOnboardingSubmission(
     const rawPayload = stringValue(submission.jm1pub_rawpayload)
     if (!rawPayload) return false
     try {
-      const parsed = JSON.parse(rawPayload) as { governedAuthority?: { titleId?: string } }
+      const parsed = decodeOnboardingPayload(rawPayload) as { governedAuthority?: { titleId?: string } }
       return parsed.governedAuthority?.titleId?.toLowerCase() === titleId.toLowerCase()
     } catch {
       return false
