@@ -26,6 +26,8 @@ export async function POST(request: Request) {
         policyVersion: 'PUBLISHER_FUNDED_ONBOARDING_V1', agreementSha256: authority.agreementSha256 },
     }, 'Author-bound login-free onboarding receipt; editorial review and stage completion remain separate.', true)
     if (result.status !== 'success' || !result.submissionId) throw Error('receipt unavailable')
-    return NextResponse.json({ success: true, receipt: result.submissionId, stage06Complete: false }, { headers })
+    return NextResponse.json({ success: true, receipt: result.submissionId, stage06Complete: false,
+      processingStatus: result.processorAccess?.status === 'READY' ? 'READY_FOR_REVIEW' : 'AWAITING_PROCESSOR_ACCESS',
+    }, { status: result.processorAccess?.status === 'READY' ? 200 : 202, headers })
   } catch { return NextResponse.json({ error: 'Receipt could not be confirmed. Keep this link and contact Publishing before starting another submission.' }, { status: 503, headers }) }
 }
