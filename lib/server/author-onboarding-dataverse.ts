@@ -1,4 +1,5 @@
 import { createHash } from 'node:crypto'
+import { encode as encodeOnboardingPayload } from '../../azure-functions/diagnostic-ai-runner/src/lifecycle/onboardingPayloadCodec'
 
 import { getDataverseRuntimeAccessToken, getPublisherRuntimeAuthMode } from './publisher-runtime-auth'
 
@@ -139,7 +140,7 @@ export function buildSubmissionPayload(payload: Record<string, any>, submittedAt
     jm1pub_timezone: stringValue(payload.timezone || payload.author?.timezone),
     jm1pub_wordcount: stringValue(payload.estimatedWords || payload.book?.estimatedWords),
     jm1pub_workflowstage: WORKFLOW_STAGE_AUTHOR_ONBOARDING,
-    jm1pub_rawpayload: JSON.stringify(payload),
+    jm1pub_rawpayload: encodeOnboardingPayload(payload),
     ...(authority.contactId
       ? { 'jm1pub_LinkedContact@odata.bind': `/contacts(${authority.contactId})` }
       : {}),
@@ -153,6 +154,7 @@ export function buildSubmissionIdentity(payload: Record<string, any>) {
     authority.contactId || payload.email || '',
     authority.titleId || payload.bookTitle || '',
     authority.engagementId || '',
+    ...(authority.agreementSha256 ? [authority.agreementSha256] : []),
     // Keep distinct answer sets; exact replay remains idempotent.
     createHash('sha256').update(JSON.stringify(canonicalAnswers(payload.rawFormData || payload))).digest('hex'),
   ].join(':').toLowerCase()

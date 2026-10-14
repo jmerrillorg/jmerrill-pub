@@ -24,8 +24,18 @@ async function readAuthority(titleId, deps) {
         execution.authorDueCents !== 0 || execution.authorPaymentDisposition !== "NOT_APPLICABLE_PUBLISHER_FUNDED" ||
         execution.paymentCreated !== false || !execution.proof?.seal?.fullDocumentIntegrity ||
         execution.proof.requiredPartyEvents !== 2) deny("PIPELINE_OWNER_AUTHORITY_CONFLICT");
-    // This bounded fresh-submission owner enters onboarding only. Later canonical
-    // lifecycle progression remains owned by the established V2 runtime.
+    const onboardingRef = `publisher-funded/stage06/${titleId}/${execution.agreementSha256}/receipt.json`;
+    const onboarding = (await b.optional(deps.containerClient, onboardingRef))?.value;
+    if (onboarding && Number((deps.projectionEvent?.stageCode || placement?.stageCode || "06").slice(0, 2)) <= 7) {
+      if (onboarding.titleId !== titleId || onboarding.offerSha256 !== bundle.offer.offerSha256 ||
+          onboarding.agreementSha256 !== execution.agreementSha256 || onboarding.sourceFingerprint !== bundle.sourceFingerprint ||
+          onboarding.stageCode !== "06_ONBOARDING" || onboarding.status !== "COMPLETED" || onboarding.stage06Complete !== true ||
+          onboarding.nextStage !== "07_DEVELOPMENTAL_EDITING" || onboarding.authorDueCents !== 0 ||
+          onboarding.authorPaymentDisposition !== "NOT_APPLICABLE_PUBLISHER_FUNDED" || onboarding.reference !== onboardingRef ||
+          !onboarding.submission?.submissionId || !onboarding.workingSources?.length) deny("PIPELINE_OWNER_AUTHORITY_CONFLICT");
+      return { current: true, titleId, stageCode: "07_DEVELOPMENTAL_EDITING", reference: onboardingRef };
+    }
+    // Placement does not dispatch editorial work or authorize its budget.
     if (Number((deps.projectionEvent?.stageCode || placement?.stageCode || "05").slice(0, 2)) <= 6) {
       return { current: true, titleId, stageCode: "06_ONBOARDING", reference: `${replacementPrefix}/execution.json` };
     }

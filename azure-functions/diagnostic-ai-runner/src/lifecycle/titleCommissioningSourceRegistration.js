@@ -9,6 +9,9 @@ async function sourceRegistrationHandler(request, deps = {}) {
   }
   let body;
   try { body = await request.json(); } catch { return { status: 400, jsonBody: { code: "INVALID_JSON", effects: 0 } }; }
+  if (require("./publisherFundedStage06").MODES.includes(body?.mode)) {
+    return require("./publisherFundedStage06").handler(body, deps);
+  }
   if (require("./publisherFundedStage05").MODES.includes(body?.mode)) {
     return require("./publisherFundedStage05").handler(body, deps);
   }
