@@ -2,6 +2,7 @@ import { createHash } from 'node:crypto'
 import { encode as encodeOnboardingPayload } from '../../azure-functions/diagnostic-ai-runner/src/lifecycle/onboardingPayloadCodec'
 
 import { getDataverseRuntimeAccessToken, getPublisherRuntimeAuthMode } from './publisher-runtime-auth'
+import { ensureOnboardingProcessorRead } from './onboarding-record-sharing'
 
 const EXECUTION_STATUS = {
   SUCCESS: 835500001,
@@ -18,6 +19,7 @@ type AuthorOnboardingDataverseResult =
       submissionId: string | null
       executionLogId: string | null
       detail: string
+      processorAccess?: { status: 'READY' | 'HELD'; code: string; granted: boolean }
     }
   | {
       status: 'failed' | 'skipped'
@@ -66,6 +68,7 @@ export async function writeAuthorOnboardingDataverseFallback(
     }
   }
 
+  let durableSubmissionId: string | null = null
   try {
     const token = await getDataverseToken(config)
     const submittedAt = new Date().toISOString()
@@ -75,6 +78,7 @@ export async function writeAuthorOnboardingDataverseFallback(
     const executionLogId = deterministicGuid(`execution:${submissionId}`)
     const submissionPayload = buildSubmissionPayload(payload, submittedAt, receiptOnly)
     const submission = await upsertDataverseRecord(config, token, 'jm1pub_submissions', submissionId, submissionPayload)
+    durableSubmissionId = submission.id
     const executionLog = await upsertDataverseRecord(config, token, 'jm1_executionlogs', executionLogId, {
       jm1_name: `AUTHOR-ONBOARDING-${submissionId}`,
       jm1_actiondescription: receiptOnly
@@ -91,10 +95,37 @@ export async function writeAuthorOnboardingDataverseFallback(
       jm1_errordetail: safeDetail(failureDetail),
     })
 
+    const processorAccess = receiptOnly && payload.governedAuthority?.policyVersion === 'PUBLISHER_FUNDED_ONBOARDING_V1'
+      ? await ensureOnboardingProcessorRead({ submissionId, payload,
+          enabled: process.env.JM1_ONBOARDING_PROCESSOR_READ_SHARING_ENABLED === 'true',
+          request: async (path, method = 'GET', body) => {
+            const response = await fetch(`${config.apiBase}/${path}`, { method,
+              headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+              ...(body ? { body: JSON.stringify(body) } : {}), signal: AbortSignal.timeout(30000) })
+            if (!response.ok) throw Error('onboarding_processor_access_dependency')
+            const text = await response.text()
+            return text ? JSON.parse(text) : null
+          },
+        }) : undefined
+    if (processorAccess) {
+      // A stable receipt survives a routing failure. State-specific evidence is duplicate-safe.
+      await upsertDataverseRecord(config, token, 'jm1_executionlogs',
+        deterministicGuid(`onboarding-routing:${submissionId}:${processorAccess.status}:${processorAccess.code}`), {
+          jm1_name: `AUTHOR-ONBOARDING-ROUTING-${submissionId}`,
+          jm1_actiondescription: `Receipt=${submissionId}; processorAccess=${processorAccess.status}; code=${processorAccess.code}. No author decision or stage completion inferred.`,
+          jm1_actiontype: `AUTHOR_ONBOARDING_ROUTING_${processorAccess.status}`,
+          jm1_agentname: 'jmerrill.pub', jm1_bandlevel: BAND_LEVEL.BAND_1,
+          jm1_executionstatus: processorAccess.status === 'READY' ? EXECUTION_STATUS.SUCCESS : EXECUTION_STATUS.FAILED,
+          jm1_startedon: submittedAt, jm1_completedon: new Date().toISOString(),
+          jm1_sourceentity: 'jm1pub_submission', jm1_sourcerecordid: submissionId,
+        })
+    }
+
     return {
       status: 'success',
       submissionId: submission.id,
       executionLogId: executionLog.id,
+      ...(processorAccess ? { processorAccess } : {}),
       detail: submission.replay
         ? 'The existing governed author onboarding submission was returned without creating a duplicate.'
         : 'Author onboarding was written directly to Dataverse after route-specific Power Automate ingestion was unavailable.',
@@ -102,6 +133,12 @@ export async function writeAuthorOnboardingDataverseFallback(
   } catch (error) {
     const dependency = (error as { dependency?: Record<string, unknown> })?.dependency
     if (dependency) console.error('AUTHOR_ONBOARDING_RECEIPT_DEPENDENCY_FAILED', JSON.stringify(dependency))
+    if (durableSubmissionId && receiptOnly && payload.governedAuthority?.policyVersion === 'PUBLISHER_FUNDED_ONBOARDING_V1') {
+      console.error('AUTHOR_ONBOARDING_ROUTING_HELD', JSON.stringify({ receipt: durableSubmissionId, code: 'PROCESSOR_ROUTING_EVIDENCE_PENDING' }))
+      return { status: 'success', submissionId: durableSubmissionId, executionLogId: null,
+        detail: 'Answers are preserved; processing evidence awaits recovery.',
+        processorAccess: { status: 'HELD', code: 'PROCESSOR_ROUTING_EVIDENCE_PENDING', granted: false } }
+    }
     return {
       status: 'failed',
       submissionId: null,

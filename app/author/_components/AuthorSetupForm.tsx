@@ -78,6 +78,7 @@ export function AuthorSetupForm({
     ),
   )
   const [status, setStatus] = useState<Status>('idle')
+  const [receiptNotice, setReceiptNotice] = useState('')
   const [error, setError] = useState('')
 
   const fieldClass =
@@ -147,6 +148,8 @@ export function AuthorSetupForm({
       })
       const data = await safeReadJson(response)
       if (!response.ok) throw new Error(data.error || 'Submission failed.')
+      setReceiptNotice(data.processingStatus === 'AWAITING_PROCESSOR_ACCESS' && /^[a-f0-9-]{36}$/.test(data.receipt || '')
+        ? `Your answers are saved under reference ${data.receipt}. Publishing is resolving processing access. Do not submit another form.` : '')
       setStatus('success')
     } catch (err: any) {
       setStatus('error')
@@ -169,7 +172,7 @@ export function AuthorSetupForm({
         >
           {successTitle}
         </h2>
-        <p className="mx-auto mt-3 max-w-[560px] text-[14px] font-light leading-[1.8] text-white/45">{successMessage}</p>
+        <p className="mx-auto mt-3 max-w-[560px] text-[14px] font-light leading-[1.8] text-white/45">{receiptNotice || successMessage}</p>
         {successDetails?.map((detail) => (
           <p key={detail} className="mx-auto mt-3 max-w-[560px] text-[14px] font-light leading-[1.8] text-white/55">
             {detail}
@@ -297,7 +300,7 @@ async function safeReadJson(response: Response) {
   if (!text) return {}
 
   try {
-    return JSON.parse(text) as { error?: string; success?: boolean }
+    return JSON.parse(text) as { error?: string; success?: boolean; processingStatus?: string; receipt?: string }
   } catch {
     return {}
   }
