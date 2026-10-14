@@ -47,6 +47,11 @@ existing `JMP Author Onboarding Submission Capture` role
 Append, administrator, Local or Global permission is proposed. Verify that the
 role is not shared with unintended principals before any authorized change.
 
+October 14 12:09 UTC readback found this role assigned only to the website user,
+with no team assignments. Exact Share privilege ID:
+`426898a2-d694-4364-b251-ab64acb6f2e9`. Recheck immediately before any future
+authorized grant; this snapshot is not permission to apply it.
+
 This is an additional delegation capability, not the five record shares already
 approved. At the platform level Basic Share is not restricted to a particular
 recipient or to Read-only grants: application guards restrict this implementation
