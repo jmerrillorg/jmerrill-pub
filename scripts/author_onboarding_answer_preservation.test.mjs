@@ -29,3 +29,9 @@ test('an incomplete attempt preserves answers without claiming onboarding comple
   assert.equal('jm1pub_onboardingcompletedat' in receipt, false)
   assert.deepEqual(JSON.parse(receipt.jm1pub_rawpayload).rawFormData, input.rawFormData)
 })
+
+test('funded agreement versions cannot reuse another issued-version receipt', () => {
+  const input = { governedAuthority: { ...authority, agreementSha256: 'a'.repeat(64) }, rawFormData: { notes: 'Same answers' } }
+  assert.notEqual(buildSubmissionIdentity(input), buildSubmissionIdentity({ ...input,
+    governedAuthority: { ...input.governedAuthority, agreementSha256: 'b'.repeat(64) } }))
+})

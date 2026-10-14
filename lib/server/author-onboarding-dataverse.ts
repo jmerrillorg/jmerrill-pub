@@ -154,6 +154,7 @@ export function buildSubmissionIdentity(payload: Record<string, any>) {
     authority.contactId || payload.email || '',
     authority.titleId || payload.bookTitle || '',
     authority.engagementId || '',
+    ...(authority.agreementSha256 ? [authority.agreementSha256] : []),
     // Keep distinct answer sets; exact replay remains idempotent.
     createHash('sha256').update(JSON.stringify(canonicalAnswers(payload.rawFormData || payload))).digest('hex'),
   ].join(':').toLowerCase()
