@@ -21,7 +21,7 @@ export async function POST(request: Request) {
     if (body.bookTitle !== authority.title || body.email !== authority.email || body.packageConfirmation !== 'PUBLISHER_FUNDED') return NextResponse.json({ error: 'The title, author email or funding route differs from this issued request. Contact Publishing for review.' }, { status: 409, headers })
     const result = await writeAuthorOnboardingDataverseFallback({ ...body, authorName: authority.authorName,
       email: authority.email, bookTitle: authority.title, packageConfirmation: 'PUBLISHER_FUNDED',
-      rightsHolderConfirmed: true, rawFormData: body,
+      rightsHolderConfirmed: true, genreKey: body.genre, rawFormData: body,
       governedAuthority: { titleId: authority.titleId, contactId: authority.contactId,
         policyVersion: 'PUBLISHER_FUNDED_ONBOARDING_V1', agreementSha256: authority.agreementSha256 },
     }, 'Author-bound login-free onboarding receipt; editorial review and stage completion remain separate.', true)
