@@ -99,6 +99,8 @@ export async function writeAuthorOnboardingDataverseFallback(
         : 'Author onboarding was written directly to Dataverse after route-specific Power Automate ingestion was unavailable.',
     }
   } catch (error) {
+    const dependency = (error as { dependency?: Record<string, unknown> })?.dependency
+    if (dependency) console.error('AUTHOR_ONBOARDING_RECEIPT_DEPENDENCY_FAILED', JSON.stringify(dependency))
     return {
       status: 'failed',
       submissionId: null,
@@ -223,7 +225,11 @@ async function upsertDataverseRecord(
   const body = await response.json().catch(() => ({}))
   if (!response.ok) {
     const message = body?.error?.message || `dataverse_write_failed:${response.status}`
-    throw new Error(message)
+    throw Object.assign(new Error(message), { dependency: {
+      entitySet, recordId: id, httpStatus: response.status,
+      providerCode: /^0x[0-9a-f]+$/i.test(body?.error?.code || '') ? body.error.code : 'UNCLASSIFIED',
+      requestId: response.headers.get('x-ms-service-request-id'),
+    } })
   }
   return {
     id: body.jm1pub_submissionid || body.jm1_executionlogid || id,
