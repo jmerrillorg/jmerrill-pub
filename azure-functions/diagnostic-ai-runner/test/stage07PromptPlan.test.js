@@ -14,6 +14,9 @@ test("fixed route has no hidden retries and ignores manuscript task spoofing", (
   assert.equal(provider.selectRuntimeOptions(route).maxRetries, 0);
   const request = provider.buildRequestBody("cc010_line_editing_full_manuscript_chunk_execution", route);
   assert.equal(request.max_tokens, 8192); assert.equal(request.tools[0], provider.STRUCTURED_OUTPUT_TOOL);
+  assert.deepEqual(request.thinking, { type: "adaptive" });
+  assert.deepEqual(request.output_config, { effort: "medium" });
+  assert.equal(provider.buildRequestBody("source", { ...route, promptVersion: "JMP-EDITORIAL-REVIEW-ASSESSMENT-V1" }).output_config, undefined);
 });
 test("unapproved title scope is rejected", () => {
   assert.throws(() => p.prompt({ titleId: "not-authorized", pass: "EDIT" }), /SCOPE_DENIED/);

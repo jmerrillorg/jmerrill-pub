@@ -63,6 +63,17 @@ source content cannot switch tool selection by embedding another task marker.
 Output truncation, malformed structured output, missing coverage and unchanged
 fallback text are not successful editorial completion.
 
+Sonnet5 adaptive thinking is enabled by default and shares the output ceiling.
+Stage07 explicitly uses adaptive thinking at medium effort; it does not disable
+reasoning or substitute a model. All thinking tokens count in provider output
+usage and the existing reservation. Planning ledgers group source-anchored
+findings within 500 words instead of emitting a paragraph inventory. Complete
+source sections and independent consistency review remain intact. The first
+live planning attempt exhausted 2048 output tokens, was rejected, and its
+USD0.045414 charge stays in the same batch ledger. A corrected attempt is an
+additional attempt, not a new normal task or a reset budget.
+Authority for model behavior: https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-sonnet-5
+
 Consistency sections target 3,000 words and include the complete corresponding
 original and proposed text. Groups of at most eight complete child ledgers form
 the explicit planning and consistency hierarchy. All 987 current normal task

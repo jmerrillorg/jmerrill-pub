@@ -395,6 +395,9 @@ function extractStructuredToolInput(responseBody) {
 function buildRequestBody(promptBody, route) {
   const tool = selectStructuredOutputTool(promptBody, route);
   return { model: route.deploymentName, messages: [{ role: "user", content: promptBody }],
+    // Sonnet5 defaults to high adaptive thinking, which shares max_tokens with
+    // the response. Make cost-sensitive Stage07 effort explicit, not implicit.
+    ...(route.promptVersion === "JMP-STAGE07-BUDGETED-V1" ? { thinking: { type: "adaptive" }, output_config: { effort: "medium" } } : {}),
     max_tokens: selectMaxOutputTokens(promptBody, route), tools: [tool],
     tool_choice: { type: "tool", name: tool.name }, stream: false };
 }
