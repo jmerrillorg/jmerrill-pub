@@ -80,6 +80,28 @@ afterEach(() => {
 });
 
 describe("microsoftFoundryClaudeProvider", () => {
+  for (const variant of ["truncated", "text-fallback"]) {
+    test(`Stage07 rejects ${variant} and retains billable usage`, async () => {
+      const { loaded, restore } = loadProviderWithStubs({ fetchImpl: async () => ({ ok: true, status: 200,
+        headers: new Headers(), json: async () => ({
+          stop_reason: variant === "truncated" ? "max_tokens" : "end_turn",
+          usage: { input_tokens: 10, output_tokens: 8192 },
+          content: variant === "truncated"
+            ? [{ type: "tool_use", name: "submit_jm1_structured_output", input: { partial: true } }]
+            : [{ type: "text", text: '{"editedManuscript":"fallback"}' }]
+        }) }) });
+      try {
+        await withEnv({ AZURE_FOUNDRY_ENDPOINT: "https://ais-jm1-foundry.services.ai.azure.com/" }, async () => {
+          const result = await loaded.call({ promptBody: "bounded editing", diagnosticId: "fixture",
+            route: { deploymentName: "jm1-editorial-devline-primary", promptVersion: "JMP-STAGE07-BUDGETED-V1" } });
+          assert.equal(result.ok, false); assert.equal(result.output, null);
+          assert.equal(result.failureCode, variant === "truncated" ? "MODEL_OUTPUT_TRUNCATED" : "MODEL_STRICT_TOOL_OUTPUT_MISSING");
+          assert.deepEqual(result.tokenCounts, { input: 10, output: 8192, total: 8202 });
+          assert.equal(loaded.selectRuntimeOptions({ promptVersion: "JMP-STAGE07-BUDGETED-V1" }).maxRetries, 0);
+        });
+      } finally { restore(); }
+    });
+  }
   test("assessment cannot substitute text JSON for the forced strict tool", async () => {
     const { loaded, restore } = loadProviderWithStubs({ fetchImpl: async (_url, options) => {
       assert.equal(JSON.parse(options.body).tools[0].strict, true);
