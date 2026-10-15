@@ -15,12 +15,14 @@ function validate(state) {
   }
   const ids = new Set();
   for (const a of state.attempts) {
-    if (ids.has(a.id) || !a.id || !a.taskId || !/^[a-f0-9]{64}$/.test(a.requestSha256 || "") ||
+    if (ids.has(a.id) || !a.id || !state.taskIds.includes(a.taskId) || !/^[a-f0-9]{64}$/.test(a.requestSha256 || "") ||
         !integer(a.reservedMicroUsd) || a.reservedMicroUsd < 1 ||
         !["RESERVED", "UNKNOWN", "SETTLED"].includes(a.status) ||
-        (a.status === "SETTLED" && (!integer(a.actualMicroUsd) || !a.receiptReference))) deny("STAGE07_BUDGET_STATE_INVALID");
+        (a.status === "SETTLED" && (!integer(a.actualMicroUsd) || !a.receiptReference ||
+          !["SUCCESS", "FAILED"].includes(a.outcome)))) deny("STAGE07_BUDGET_STATE_INVALID");
     ids.add(a.id);
   }
+  if (state.attempts.length - new Set(state.attempts.map(a => a.taskId)).size > RETRIES) deny("STAGE07_BUDGET_STATE_INVALID");
   return state;
 }
 function exposure(state) {

@@ -204,7 +204,8 @@ async function call({ promptBody, diagnosticId, telemetry = null, route }) {
     }
 
     const usage = responseBody?.usage || {};
-    if (route.promptVersion === "JMP-EDITORIAL-REVIEW-ASSESSMENT-V1" && responseBody.stop_reason === "max_tokens") {
+    const guardedEditorialRoute = ["JMP-EDITORIAL-REVIEW-ASSESSMENT-V1", "JMP-STAGE07-BUDGETED-V1"].includes(route.promptVersion);
+    if (guardedEditorialRoute && responseBody.stop_reason === "max_tokens") {
       return { ok: false, provider: "microsoft-foundry-claude", output: null,
         tokenCounts: { input: usage.input_tokens || 0, output: usage.output_tokens || 0,
           total: (usage.input_tokens || 0) + (usage.output_tokens || 0) },
@@ -212,7 +213,7 @@ async function call({ promptBody, diagnosticId, telemetry = null, route }) {
         request: { deployment, maxOutputTokens: requestBody.max_tokens, responseContract: "anthropic-messages-tool", stopReason: "max_tokens" } };
     }
     const toolInput = extractStructuredToolInput(responseBody);
-    if (route.promptVersion === "JMP-EDITORIAL-REVIEW-ASSESSMENT-V1" && !toolInput) {
+    if (guardedEditorialRoute && !toolInput) {
       return { ok: false, provider: "microsoft-foundry-claude", output: null,
         tokenCounts: { input: usage.input_tokens || 0, output: usage.output_tokens || 0,
           total: (usage.input_tokens || 0) + (usage.output_tokens || 0) },

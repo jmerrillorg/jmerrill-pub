@@ -25,6 +25,13 @@ maximum billed output enforcement, response receipt persistence, and complete
 source/owner checks. No local evidence directory may be an operational runtime
 dependency. No provider retry or fallback may occur outside this shared ledger.
 
+`stage07BudgetedAttempt` implements the single-attempt reserve/receipt/settle
+contract with injected owner dependencies. It rejects changed model/version,
+unverified tariff/source, hidden retries and fallback. It persists the response
+before settlement; a missing receipt or usage report keeps the full reservation.
+Its tests prove recovery without a second dispatch. Binding those dependencies
+to the live owner is still required; this module does not expose a paid endpoint.
+
 ## Complete source and hierarchical review
 
 The deterministic coverage plan owns every non-whitespace source span exactly
