@@ -3,6 +3,7 @@ import { encode as encodeOnboardingPayload } from '../../azure-functions/diagnos
 
 import { getDataverseRuntimeAccessToken, getPublisherRuntimeAuthMode } from './publisher-runtime-auth'
 import { ensureOnboardingProcessorRead } from './onboarding-record-sharing'
+import { validatePayload as validAccessFixture, POLICY as ACCESS_FIXTURE_POLICY } from '../../azure-functions/diagnostic-ai-runner/src/lifecycle/onboardingAccessFixture'
 
 const EXECUTION_STATUS = {
   SUCCESS: 835500001,
@@ -58,6 +59,9 @@ export async function writeAuthorOnboardingDataverseFallback(
   failureDetail: string,
   receiptOnly = false,
 ): Promise<AuthorOnboardingDataverseResult> {
+  if (payload.governedAuthority?.policyVersion === ACCESS_FIXTURE_POLICY && (!receiptOnly || !validAccessFixture(payload))) {
+    return { status: 'failed', submissionId: null, executionLogId: null, detail: 'Synthetic access fixture is outside its bounded acceptance window.' }
+  }
   const config = getDataverseConfig()
   if (!config) {
     return {
@@ -69,6 +73,7 @@ export async function writeAuthorOnboardingDataverseFallback(
   }
 
   let durableSubmissionId: string | null = null
+  const synthetic = payload.governedAuthority?.policyVersion === ACCESS_FIXTURE_POLICY
   try {
     const token = await getDataverseToken(config)
     const submittedAt = new Date().toISOString()
@@ -81,10 +86,10 @@ export async function writeAuthorOnboardingDataverseFallback(
     durableSubmissionId = submission.id
     const executionLog = await upsertDataverseRecord(config, token, 'jm1_executionlogs', executionLogId, {
       jm1_name: `AUTHOR-ONBOARDING-${submissionId}`,
-      jm1_actiondescription: receiptOnly
+      jm1_actiondescription: synthetic ? 'Internal synthetic access-boundary receipt. No author attestation, title or lifecycle change.' : receiptOnly
         ? 'Authenticated onboarding answers preserved as an attempt receipt. No onboarding completion or lifecycle transition was asserted.'
         : 'Author onboarding submitted through website Dataverse fallback after Power Automate onboarding ingestion failed. No payment, contract, royalty, production, distribution, or workspace movement action was performed.',
-      jm1_actiontype: receiptOnly ? 'AUTHOR_ONBOARDING_ATTEMPT_CAPTURED' : 'AUTHOR_ONBOARDING_SUBMITTED',
+      jm1_actiontype: synthetic ? 'ONBOARDING_ACCESS_SYNTHETIC_CAPTURED' : receiptOnly ? 'AUTHOR_ONBOARDING_ATTEMPT_CAPTURED' : 'AUTHOR_ONBOARDING_SUBMITTED',
       jm1_agentname: 'jmerrill.pub',
       jm1_bandlevel: BAND_LEVEL.BAND_1,
       jm1_executionstatus: EXECUTION_STATUS.SUCCESS,
@@ -95,7 +100,7 @@ export async function writeAuthorOnboardingDataverseFallback(
       jm1_errordetail: safeDetail(failureDetail),
     })
 
-    const processorAccess = receiptOnly && payload.governedAuthority?.policyVersion === 'PUBLISHER_FUNDED_ONBOARDING_V1'
+    const processorAccess = receiptOnly && ['PUBLISHER_FUNDED_ONBOARDING_V1', ACCESS_FIXTURE_POLICY].includes(payload.governedAuthority?.policyVersion)
       ? await ensureOnboardingProcessorRead({ submissionId, payload,
           enabled: process.env.JM1_ONBOARDING_PROCESSOR_READ_SHARING_ENABLED === 'true',
           request: async (path, method = 'GET', body) => {
@@ -113,7 +118,7 @@ export async function writeAuthorOnboardingDataverseFallback(
         deterministicGuid(`onboarding-routing:${submissionId}:${processorAccess.status}:${processorAccess.code}`), {
           jm1_name: `AUTHOR-ONBOARDING-ROUTING-${submissionId}`,
           jm1_actiondescription: `Receipt=${submissionId}; processorAccess=${processorAccess.status}; code=${processorAccess.code}. No author decision or stage completion inferred.`,
-          jm1_actiontype: `AUTHOR_ONBOARDING_ROUTING_${processorAccess.status}`,
+          jm1_actiontype: `${synthetic ? 'ONBOARDING_ACCESS_SYNTHETIC' : 'AUTHOR_ONBOARDING'}_ROUTING_${processorAccess.status}`,
           jm1_agentname: 'jmerrill.pub', jm1_bandlevel: BAND_LEVEL.BAND_1,
           jm1_executionstatus: processorAccess.status === 'READY' ? EXECUTION_STATUS.SUCCESS : EXECUTION_STATUS.FAILED,
           jm1_startedon: submittedAt, jm1_completedon: new Date().toISOString(),
@@ -133,7 +138,7 @@ export async function writeAuthorOnboardingDataverseFallback(
   } catch (error) {
     const dependency = (error as { dependency?: Record<string, unknown> })?.dependency
     if (dependency) console.error('AUTHOR_ONBOARDING_RECEIPT_DEPENDENCY_FAILED', JSON.stringify(dependency))
-    if (durableSubmissionId && receiptOnly && payload.governedAuthority?.policyVersion === 'PUBLISHER_FUNDED_ONBOARDING_V1') {
+    if (durableSubmissionId && receiptOnly && ['PUBLISHER_FUNDED_ONBOARDING_V1', ACCESS_FIXTURE_POLICY].includes(payload.governedAuthority?.policyVersion)) {
       console.error('AUTHOR_ONBOARDING_ROUTING_HELD', JSON.stringify({ receipt: durableSubmissionId, code: 'PROCESSOR_ROUTING_EVIDENCE_PENDING' }))
       return { status: 'success', submissionId: durableSubmissionId, executionLogId: null,
         detail: 'Answers are preserved; processing evidence awaits recovery.',
@@ -161,7 +166,7 @@ export function buildSubmissionPayload(payload: Record<string, any>, submittedAt
     jm1pub_booktitle: stringValue(payload.bookTitle || payload.book?.title),
     jm1pub_genre: genreValue,
     jm1pub_formsource: 'private-author-onboarding',
-    jm1pub_formtype: receiptOnly ? 'author-onboarding-attempt' : 'author-onboarding',
+    jm1pub_formtype: authority.policyVersion === ACCESS_FIXTURE_POLICY ? 'onboarding-access-synthetic' : receiptOnly ? 'author-onboarding-attempt' : 'author-onboarding',
     jm1pub_internalclassification: stringValue(payload.internalClassification?.label || 'Other'),
     jm1pub_legalname: stringValue(payload.legalName),
     jm1pub_mailingaddress: stringValue(payload.mailingAddress),
@@ -176,7 +181,7 @@ export function buildSubmissionPayload(payload: Record<string, any>, submittedAt
     jm1pub_targetaudience: stringValue(payload.targetAudience),
     jm1pub_timezone: stringValue(payload.timezone || payload.author?.timezone),
     jm1pub_wordcount: stringValue(payload.estimatedWords || payload.book?.estimatedWords),
-    jm1pub_workflowstage: WORKFLOW_STAGE_AUTHOR_ONBOARDING,
+    jm1pub_workflowstage: authority.policyVersion === ACCESS_FIXTURE_POLICY ? undefined : WORKFLOW_STAGE_AUTHOR_ONBOARDING,
     jm1pub_rawpayload: encodeOnboardingPayload(payload),
     ...(authority.contactId
       ? { 'jm1pub_LinkedContact@odata.bind': `/contacts(${authority.contactId})` }

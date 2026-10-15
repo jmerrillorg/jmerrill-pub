@@ -1,6 +1,7 @@
 import { createHash } from 'node:crypto'
 import { decode } from '../../azure-functions/diagnostic-ai-runner/src/lifecycle/onboardingPayloadCodec'
 import { CONTACT, TITLES } from '../../azure-functions/diagnostic-ai-runner/src/lifecycle/jackieInternalTitlePolicy'
+import { validatePayload as validFixture, POLICY as FIXTURE_POLICY, submissionId as fixtureId } from '../../azure-functions/diagnostic-ai-runner/src/lifecycle/onboardingAccessFixture'
 
 export const ONBOARDING_PROCESSOR_USER = 'cb6e97e5-1d6a-f111-a826-000d3a9eacee'
 export const ONBOARDING_PROCESSOR_PRINCIPAL = 'e8c51a80-bdb0-46fa-b398-9109719d6427'
@@ -25,8 +26,9 @@ export async function ensureOnboardingProcessorRead(input: {
   let granted = false
   try {
     const { submissionId: id, payload, request } = input, a = payload.governedAuthority
-    if (!/^[a-f0-9-]{36}$/.test(id) || a?.contactId !== CONTACT || !Object.hasOwn(TITLES, a?.titleId || '') ||
-      a.policyVersion !== 'PUBLISHER_FUNDED_ONBOARDING_V1' || !/^[a-f0-9]{64}$/.test(a.agreementSha256 || '')) deny('PROCESSOR_SHARING_SCOPE_DENIED')
+    const fixture = a?.policyVersion === FIXTURE_POLICY && validFixture(payload) && id === fixtureId(a.fixtureKey)
+    if (!/^[a-f0-9-]{36}$/.test(id) || (!fixture && (a?.contactId !== CONTACT || !Object.hasOwn(TITLES, a?.titleId || '') ||
+      a.policyVersion !== 'PUBLISHER_FUNDED_ONBOARDING_V1' || !/^[a-f0-9]{64}$/.test(a.agreementSha256 || '')))) deny('PROCESSOR_SHARING_SCOPE_DENIED')
     const who = await request('WhoAmI()')
     if (who.UserId !== ONBOARDING_WEBSITE_USER || who.OrganizationId !== ORGANIZATION) deny('PROCESSOR_SHARING_OWNER_IDENTITY_CONFLICT')
     const recipient = await request(`systemusers(${ONBOARDING_PROCESSOR_USER})?$select=systemuserid,azureactivedirectoryobjectid,isdisabled`)
@@ -34,14 +36,15 @@ export async function ensureOnboardingProcessorRead(input: {
     const path = `jm1pub_submissions(${id})?$select=jm1pub_submissionid,_ownerid_value,_createdby_value,_jm1pub_linkedcontact_value,jm1pub_formtype,jm1pub_rawpayload`
     const row = await request(path)
     if (row.jm1pub_submissionid !== id || row._ownerid_value !== ONBOARDING_WEBSITE_USER ||
-      row._createdby_value !== ONBOARDING_WEBSITE_USER || row._jm1pub_linkedcontact_value !== CONTACT ||
-      row.jm1pub_formtype !== 'author-onboarding-attempt' || !row['@odata.etag'] ||
+      row._createdby_value !== ONBOARDING_WEBSITE_USER || (fixture ? Boolean(row._jm1pub_linkedcontact_value) : row._jm1pub_linkedcontact_value !== CONTACT) ||
+      row.jm1pub_formtype !== (fixture ? 'onboarding-access-synthetic' : 'author-onboarding-attempt') || !row['@odata.etag'] ||
       JSON.stringify(canonical(decode(row.jm1pub_rawpayload))) !== JSON.stringify(canonical(payload))) deny('PROCESSOR_SHARING_RECORD_CONFLICT')
     const accessPath = `systemusers(${ONBOARDING_PROCESSOR_USER})/Microsoft.Dynamics.CRM.RetrievePrincipalAccess(Target=@p1)?` +
       new URLSearchParams({ '@p1': JSON.stringify({ '@odata.id': `jm1pub_submissions(${id})` }) })
     const access = await request(accessPath)
     if (!['None', 'ReadAccess'].includes(access.AccessRights)) deny('PROCESSOR_SHARING_EXCESS_ACCESS')
     if (access.AccessRights === 'None') {
+      if (fixture && process.env.JM1_ONBOARDING_ACCESS_ACCEPTANCE_HOLD === 'true') deny('PROCESSOR_SHARING_SYNTHETIC_DEPENDENCY_HOLD')
       const privileges = await request(`systemusers(${ONBOARDING_WEBSITE_USER})/Microsoft.Dynamics.CRM.RetrieveUserPrivilegeByPrivilegeName(PrivilegeName='prvSharejm1pub_Submission',ExcludeTeamBasic=false)`)
       if (!privileges.RolePrivileges?.length) deny('PROCESSOR_SHARING_BASIC_SHARE_REQUIRED')
       if (privileges.RolePrivileges.some((p: any) => p.Depth !== 'Basic')) deny('PROCESSOR_SHARING_PRIVILEGE_SCOPE_CONFLICT')
