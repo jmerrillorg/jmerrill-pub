@@ -336,7 +336,12 @@ function selectRuntimeOptions(route = {}) {
 }
 
 function selectStructuredOutputTool(promptBody, route = {}) {
-  if (route.promptVersion === "JMP-STAGE07-BUDGETED-V1") return STRUCTURED_OUTPUT_TOOL;
+  if (route.promptVersion === "JMP-STAGE07-BUDGETED-V1") return {
+    name: STRUCTURED_OUTPUT_TOOL.name,
+    description: "Submit the completed editorial result directly in these fields, never a prompt or outputContract wrapper.",
+    strict: true,
+    input_schema: require("../../editorial/stage07OutputSchema").schema(JSON.parse(promptBody).pass)
+  };
   // Bound assessment authority outranks markers inside untrusted manuscript data.
   if (route.promptVersion === "JMP-EDITORIAL-REVIEW-ASSESSMENT-V1") return {
     name: STRUCTURED_OUTPUT_TOOL.name,

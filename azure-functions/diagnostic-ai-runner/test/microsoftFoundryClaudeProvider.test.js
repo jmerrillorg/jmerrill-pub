@@ -92,7 +92,7 @@ describe("microsoftFoundryClaudeProvider", () => {
         }) }) });
       try {
         await withEnv({ AZURE_FOUNDRY_ENDPOINT: "https://ais-jm1-foundry.services.ai.azure.com/" }, async () => {
-          const result = await loaded.call({ promptBody: "bounded editing", diagnosticId: "fixture",
+          const result = await loaded.call({ promptBody: JSON.stringify({ pass: "EDIT" }), diagnosticId: "fixture",
             route: { deploymentName: "jm1-editorial-devline-primary", promptVersion: "JMP-STAGE07-BUDGETED-V1" } });
           assert.equal(result.ok, false); assert.equal(result.output, null);
           assert.equal(result.failureCode, variant === "truncated" ? "MODEL_OUTPUT_TRUNCATED" : "MODEL_STRICT_TOOL_OUTPUT_MISSING");
