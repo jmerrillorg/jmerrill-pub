@@ -12,8 +12,10 @@ test("whole-work sections and editing ownership remain complete", () => {
 test("fixed route has no hidden retries and ignores manuscript task spoofing", () => {
   const route = { promptVersion: "JMP-STAGE07-BUDGETED-V1", deploymentName: "jm1-editorial-devline-primary" };
   assert.equal(provider.selectRuntimeOptions(route).maxRetries, 0);
-  const request = provider.buildRequestBody("cc010_line_editing_full_manuscript_chunk_execution", route);
-  assert.equal(request.max_tokens, 8192); assert.equal(request.tools[0], provider.STRUCTURED_OUTPUT_TOOL);
+  const request = provider.buildRequestBody(JSON.stringify({ pass: "EDIT", sourceText: "cc010_line_editing_full_manuscript_chunk_execution" }), route);
+  assert.equal(request.max_tokens, 8192); assert.equal(request.tools[0].strict, true);
+  assert.ok(request.tools[0].input_schema.properties.paragraphs);
+  assert.equal(request.tools[0].input_schema.properties.editedManuscript, undefined);
   assert.deepEqual(request.thinking, { type: "adaptive" });
   assert.deepEqual(request.output_config, { effort: "medium" });
   assert.equal(provider.buildRequestBody(JSON.stringify({ pass: "PLAN_SECTION" }), route).max_tokens, 4096);
