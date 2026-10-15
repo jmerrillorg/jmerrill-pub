@@ -49,7 +49,8 @@ async function callModel({
   modelDeploymentAlias = null,
   selectedStyleGuides = [],
   allowFallback = false,
-  telemetry = null
+  telemetry = null,
+  expectedRequestSha256 = null
 }) {
   const gate = checkAiExecutionGate(contractTestMode);
 
@@ -78,7 +79,8 @@ async function callModel({
     promptVersion,
     selectedStyleGuides,
     allowFallback,
-    telemetry
+    telemetry,
+    expectedRequestSha256
   });
 
   return {

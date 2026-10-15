@@ -3,14 +3,17 @@ const test = require("node:test"), assert = require("node:assert/strict"), { cre
 const { executeAttempt } = require("../src/editorial/stage07BudgetedAttempt");
 const budget = require("../src/editorial/stage07BatchBudget");
 function fixture() {
-  const input = { attemptId: "one", taskId: "edit-one", planSha256: "a".repeat(64), request: { source: "synthetic" } };
+  const input = { attemptId: "one", taskId: "edit-one", planSha256: "a".repeat(64),
+    request: require("../src/model/providers/microsoftFoundryClaudeProvider").buildRequestBody(JSON.stringify({pass:"EDIT",source:"synthetic"}),
+      {deploymentName:"jm1-editorial-devline-primary",promptVersion:"JMP-STAGE07-BUDGETED-V1"}) };
   let state = budget.createState({ approvalReference: "synthetic-test", planSha256: input.planSha256, taskIds: [input.taskId] });
   let version = 0, calls = 0;
   const receipts = new Map();
   const authority = { planSha256: input.planSha256, requestSha256: createHash("sha256").update(JSON.stringify(input.request)).digest("hex"),
     model: "claude-sonnet-5", modelVersion: "2", deploymentName: "jm1-editorial-devline-primary",
     maxProviderRetries: 0, allowFallback: false, sourceAndStageVerified: true, tariffVerified: true, current: true,
-    inputTokenBound: 1000, maxOutputTokens: 8192, inputMicroUsdPerToken: 2, outputMicroUsdPerToken: 10 };
+    estimatedInputTokens: 1000, sku: "GlobalStandard", contextTokens: 1000000,
+    maxOutputTokens: 8192, inputMicroUsdPerToken: 2, outputMicroUsdPerToken: 10 };
   const result = { ok: true, model: authority.model, modelVersion: authority.modelVersion,
     providerRequestId: "synthetic-request", usageVerified: true, inputTokens: 100, outputTokens: 200, output: { complete: true } };
   const deps = { verifyAuthority: async () => authority, readReceipt: async id => receipts.get(id),
@@ -40,7 +43,7 @@ test("unknown timeout and restart retain reservation without retry", async () =>
   const f = fixture(); f.deps.callOnce = async () => { throw Error("timeout"); };
   assert.equal((await executeAttempt(f.input, f.deps)).reservationRetained, true);
   assert.equal((await executeAttempt(f.input, f.deps)).dispatch, false);
-  assert.equal(budget.exposure(f.state()), 83920);
+  assert.equal(budget.exposure(f.state()), 2081920);
 });
 test("failed receipt persistence cannot authorize another provider call", async () => {
   const f = fixture(); f.deps.writeReceipt = async () => { throw Error("storage unavailable"); };
@@ -56,7 +59,7 @@ test("billable rejected output settles spending but not editorial success", asyn
 test("missing usage keeps the full reservation", async () => {
   const f = fixture(); f.result.usageVerified = false;
   assert.equal((await executeAttempt(f.input, f.deps)).status, "USAGE_RECONCILIATION_REQUIRED");
-  assert.equal(budget.exposure(f.state()), 83920);
+  assert.equal(budget.exposure(f.state()), 2081920);
 });
 test("model or tariff uncertainty prevents any reservation or inference", async () => {
   const f = fixture(); f.authority.modelVersion = "3";

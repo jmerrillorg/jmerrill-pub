@@ -17,17 +17,18 @@ async function executeAttempt(input, deps) {
       authority.deploymentName !== "jm1-editorial-devline-primary" || authority.maxProviderRetries !== 0 ||
       authority.allowFallback !== false || authority.sourceAndStageVerified !== true ||
       authority.tariffVerified !== true || authority.current !== true ||
-      !natural(authority.inputTokenBound) || authority.inputTokenBound < 1 || authority.inputTokenBound > 32000 ||
+      !natural(authority.estimatedInputTokens) || authority.estimatedInputTokens < 1 || authority.estimatedInputTokens > 32000 ||
       !natural(authority.maxOutputTokens) || authority.maxOutputTokens < 1 || authority.maxOutputTokens > 8192 ||
       !natural(authority.inputMicroUsdPerToken) || authority.inputMicroUsdPerToken < 1 ||
       !natural(authority.outputMicroUsdPerToken) || authority.outputMicroUsdPerToken < 1) fail("STAGE07_PREFLIGHT_HOLD");
-  const maximum = authority.inputTokenBound * authority.inputMicroUsdPerToken +
-    authority.maxOutputTokens * authority.outputMicroUsdPerToken;
+  const bound = require("./stage07CostBound").quote(input.request, authority);
+  if (bound.maxOutputTokens !== authority.maxOutputTokens) fail("STAGE07_PREFLIGHT_HOLD");
+  const maximum = bound.maximumMicroUsd;
   if (!Number.isSafeInteger(maximum)) fail("STAGE07_COST_BOUND_INVALID");
   const requestSha256 = authority.requestSha256;
   const reservation = await budget.reserve(deps.store, { id: input.attemptId, taskId: input.taskId,
     planSha256: input.planSha256, requestSha256, maxMicroUsd: maximum,
-    capacityTokens: authority.inputTokenBound + authority.maxOutputTokens });
+    capacityTokens: authority.estimatedInputTokens + authority.maxOutputTokens, bound, requireVerifiedBounds: true });
   let receipt;
   if (!reservation.dispatch) {
     receipt = await deps.readReceipt(input.attemptId);

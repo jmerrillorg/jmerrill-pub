@@ -128,6 +128,14 @@ function buildPrompt(prepared, task, results) {
   return prompts.prompt({ text: working.text, titleId: source.titleId, componentId: source.sourceSha256,
     title: source.title, span, pass: task.pass, brief, evidence });
 }
+function nextEligibleTask(prepared, remaining, results, ledger) {
+  for (const task of remaining) {
+    if (ledger.attempts.some(a => a.taskId === task.id && a.status !== "SETTLED")) continue;
+    try { buildPrompt(prepared, task, results); return task; }
+    catch (error) { if (error.safeCode !== "STAGE07_DEPENDENT_RESULT_REQUIRED") throw error; }
+  }
+  return null;
+}
 async function count(prompt, deps) {
   const request = provider.buildRequestBody(prompt, route);
   const { max_tokens, stream, ...body } = request;
@@ -137,8 +145,8 @@ async function count(prompt, deps) {
     body: JSON.stringify(body), signal: AbortSignal.timeout(60000) });
   const result = await response.json();
   if (!response.ok || !Number.isSafeInteger(result.input_tokens) || result.input_tokens < 1) b.deny("STAGE07_TOKEN_COUNT_UNAVAILABLE");
-  if (Math.ceil(result.input_tokens * 1.05) > 32000) b.deny("STAGE07_REQUEST_CAPACITY_HOLD");
-  return { request, inputTokenBound: Math.ceil(result.input_tokens * 1.05), maxOutputTokens: max_tokens };
+  if (result.input_tokens > 32000) b.deny("STAGE07_REQUEST_CAPACITY_HOLD");
+  return { request, estimatedInputTokens: result.input_tokens, maxOutputTokens: max_tokens };
 }
 async function handler(body, supplied = {}) {
   const source = policy.sources.find(s => s.sourceSha256 === body.componentSha256 && s.titleId === body.titleId);
@@ -188,10 +196,14 @@ async function handler(body, supplied = {}) {
     if (b.sha(approval.bytes) !== env.JM1_NEW_SUBMISSION_STAGE07_APPROVAL_SHA256 || JSON.stringify(approval.value) !== JSON.stringify(policy)) b.deny("STAGE07_APPROVAL_BINDING_REQUIRED");
     const ledgerBlob = deps.containerClient.getBlockBlobClient(`${PREFIX}/budget.json`);
     await budget.initialize(ledgerBlob, budget.createState({ approvalReference: `${PREFIX}/approval.json`, planSha256: planSha, taskIds }));
-    const task = remaining[0];
     const store = budget.blobStore(ledgerBlob), before = await store.read();
+    const task = nextEligibleTask(prepared, remaining, results, before.value);
+    if (!task) return { status: 409, jsonBody: { code: "STAGE07_DEPENDENT_RESULT_REQUIRED", dispatch: false,
+      reservationRetained: true, stage08: "NOT_STARTED" } };
     const previous = before.value.attempts.filter(a => a.taskId === task.id);
     const prior = previous.at(-1);
+    if (prior && prior.status !== "SETTLED") return { status: 409, jsonBody: {
+      code: "STAGE07_UNRESOLVED_ATTEMPT_HOLD", taskId: task.id, dispatch: false, reservationRetained: true, stage08: "NOT_STARTED" } };
     if (prior?.status === "SETTLED" && prior.outcome === "FAILED") {
       const originalReceiptPath = `${PREFIX}/attempts/${prior.id}.json`;
       const originalReceipt = (await b.read(deps.containerClient, originalReceiptPath)).value;
@@ -214,8 +226,9 @@ async function handler(body, supplied = {}) {
     const call = await require("../editorial/stage07BudgetedAttempt").executeAttempt({ attemptId, taskId: task.id,
       planSha256: planSha, request: measured.request }, { store,
       verifyAuthority: async () => {
-        await require("./gloryReviewRecoveryReaders").readDeployment(deps);
+        const deployment = await require("./gloryReviewRecoveryReaders").readDeployment(deps);
         return { ...measured, planSha256: planSha, requestSha256: b.sha(JSON.stringify(measured.request)),
+          sku: deployment.sku, contextTokens: require("../editorial/stage07CostBound").CONTEXT_TOKENS,
           model: policy.model, modelVersion: policy.modelVersion, deploymentName: policy.deploymentName,
           inputMicroUsdPerToken: policy.inputMicroUsdPerToken, outputMicroUsdPerToken: policy.outputMicroUsdPerToken,
           maxProviderRetries: 0, allowFallback: false, sourceAndStageVerified: true, tariffVerified: true, current: true };
@@ -227,7 +240,8 @@ async function handler(body, supplied = {}) {
       callOnce: async () => {
         const model = await require("../model/modelCaller").callModel({ contractTestMode: false, promptBody: prompt,
           diagnosticId: attemptId, executionType: "REAL_MANUSCRIPT_PILOT", editorialTransaction: "GPAT-001",
-          modelDeploymentAlias: policy.deploymentName, promptKey: "jm1-prompt-pub-stage07-budgeted", promptVersion: route.promptVersion, allowFallback: false });
+          modelDeploymentAlias: policy.deploymentName, promptKey: "jm1-prompt-pub-stage07-budgeted", promptVersion: route.promptVersion,
+          expectedRequestSha256: b.sha(JSON.stringify(measured.request)), allowFallback: false });
         return { ok: model.ok, output: model.output, stopReason: model.request?.stopReason,
           usageVerified: model.request?.usageVerified === true && model.provider === "microsoft-foundry-claude" &&
             [policy.model, policy.deploymentName].includes(model.request?.responseModel),
@@ -246,4 +260,4 @@ async function handler(body, supplied = {}) {
   } catch (error) { return { status: 409, jsonBody: { code: /^(STAGE07|REVIEW_RECOVERY)_[A-Z_]+$/.test(error.safeCode || "") ? error.safeCode : "STAGE07_DEPENDENCY_FAILED",
     providerStatus: error.statusCode || null, stage08: "NOT_STARTED", communications: 0, payments: 0 } }; }
 }
-module.exports = { MODES, tasks, prepare, validateOutput, recoverSourceWhitespace, buildPrompt, handler, PREFIX, planSha, policy };
+module.exports = { MODES, tasks, prepare, validateOutput, recoverSourceWhitespace, buildPrompt, nextEligibleTask, handler, PREFIX, planSha, policy };

@@ -79,7 +79,8 @@ async function routeToProvider({
   promptVersion = null,
   selectedStyleGuides = [],
   allowFallback = false,
-  telemetry = null
+  telemetry = null,
+  expectedRequestSha256 = null
 }) {
   const resolution = resolveProvider({
     executionType,
@@ -118,7 +119,7 @@ async function routeToProvider({
     }
     case PROVIDERS.MICROSOFT_FOUNDRY_CLAUDE: {
       const { call } = require("./providers/microsoftFoundryClaudeProvider");
-      const result = await call({ promptBody, diagnosticId, telemetry, route: resolution.route });
+      const result = await call({ promptBody, diagnosticId, telemetry, route: resolution.route, expectedRequestSha256 });
       return { ...result, route: resolution.route };
     }
     default:
