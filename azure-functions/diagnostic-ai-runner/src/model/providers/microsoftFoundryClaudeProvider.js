@@ -366,7 +366,7 @@ function selectMaxOutputTokens(promptBody, route = {}) {
   if (route.promptVersion === "JMP-STAGE07-BUDGETED-V1") {
     let pass;
     try { pass = JSON.parse(promptBody).pass; } catch { return 8192; }
-    return ["PLAN_SECTION", "CONSISTENCY_SECTION", "PLAN_SYNTHESIS", "FINAL_SYNTHESIS"].includes(pass) ? 2048 : 8192;
+    return ["PLAN_SECTION", "CONSISTENCY_SECTION", "PLAN_SYNTHESIS", "FINAL_SYNTHESIS"].includes(pass) ? 4096 : 8192;
   }
   if (route.promptVersion === "JMP-EDITORIAL-REVIEW-ASSESSMENT-V1") return 8192;
   if (isLineEditingChunkPrompt(promptBody)) {
@@ -395,6 +395,9 @@ function extractStructuredToolInput(responseBody) {
 function buildRequestBody(promptBody, route) {
   const tool = selectStructuredOutputTool(promptBody, route);
   return { model: route.deploymentName, messages: [{ role: "user", content: promptBody }],
+    // Sonnet5 defaults to high adaptive thinking, which shares max_tokens with
+    // the response. Make cost-sensitive Stage07 effort explicit, not implicit.
+    ...(route.promptVersion === "JMP-STAGE07-BUDGETED-V1" ? { thinking: { type: "adaptive" }, output_config: { effort: "medium" } } : {}),
     max_tokens: selectMaxOutputTokens(promptBody, route), tools: [tool],
     tool_choice: { type: "tool", name: tool.name }, stream: false };
 }
