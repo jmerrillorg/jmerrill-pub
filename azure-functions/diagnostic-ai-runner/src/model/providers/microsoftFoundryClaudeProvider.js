@@ -111,7 +111,7 @@ function checkConfig(route = {}) {
   return missing.length === 0 ? null : missing;
 }
 
-async function call({ promptBody, diagnosticId, telemetry = null, route }) {
+async function call({ promptBody, diagnosticId, telemetry = null, route, expectedRequestSha256 = null }) {
   const missingConfig = checkConfig(route);
   if (missingConfig) {
     return {
@@ -130,6 +130,16 @@ async function call({ promptBody, diagnosticId, telemetry = null, route }) {
   const deployment = route.deploymentName;
   const url = `${endpoint}/anthropic/v1/messages`;
   const requestBody = buildRequestBody(promptBody, route);
+  const serializedRequest = JSON.stringify(requestBody);
+  if (route.promptVersion === "JMP-STAGE07-BUDGETED-V1") {
+    const sha = require("node:crypto").createHash("sha256").update(serializedRequest).digest("hex");
+    if (expectedRequestSha256 !== sha || endpoint !== "https://ais-jm1-foundry.services.ai.azure.com" ||
+        anthropicVersion !== DEFAULT_ANTHROPIC_VERSION) {
+      return { ok: false, provider: "microsoft-foundry-claude", output: null,
+        failureCode: "STAGE07_RESERVED_REQUEST_DRIFT", httpStatus: null,
+        tokenCounts: { input: 0, output: 0, total: 0 }, error: "STAGE07_RESERVED_REQUEST_DRIFT" };
+    }
+  }
 
   let httpStatus = null;
 
@@ -170,7 +180,7 @@ async function call({ promptBody, diagnosticId, telemetry = null, route }) {
             "anthropic-version": anthropicVersion,
             Authorization: `Bearer ${tokenResult.token}`
           },
-          body: JSON.stringify(requestBody),
+          body: serializedRequest,
           signal
         })
       })
@@ -194,7 +204,11 @@ async function call({ promptBody, diagnosticId, telemetry = null, route }) {
         request: {
           deployment,
           maxOutputTokens: requestBody.max_tokens,
-          responseContract: "anthropic-messages"
+          responseContract: "anthropic-messages",
+          ...(route.promptVersion === "JMP-STAGE07-BUDGETED-V1" ? {
+            providerRequestId: response.headers.get("request-id") || response.headers.get("x-request-id") || null,
+            usageVerified: false, requestSha256: expectedRequestSha256
+          } : {})
         },
         rateLimit,
         error: providerMessage

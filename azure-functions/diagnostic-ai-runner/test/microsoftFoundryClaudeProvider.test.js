@@ -92,8 +92,10 @@ describe("microsoftFoundryClaudeProvider", () => {
         }) }) });
       try {
         await withEnv({ AZURE_FOUNDRY_ENDPOINT: "https://ais-jm1-foundry.services.ai.azure.com/" }, async () => {
+          const route = { deploymentName: "jm1-editorial-devline-primary", promptVersion: "JMP-STAGE07-BUDGETED-V1" };
+          const expectedRequestSha256 = require("node:crypto").createHash("sha256").update(JSON.stringify(loaded.buildRequestBody(JSON.stringify({ pass: "EDIT" }), route))).digest("hex");
           const result = await loaded.call({ promptBody: JSON.stringify({ pass: "EDIT" }), diagnosticId: "fixture",
-            route: { deploymentName: "jm1-editorial-devline-primary", promptVersion: "JMP-STAGE07-BUDGETED-V1" } });
+            route, expectedRequestSha256 });
           assert.equal(result.ok, false); assert.equal(result.output, null);
           assert.equal(result.failureCode, variant === "truncated" ? "MODEL_OUTPUT_TRUNCATED" : "MODEL_STRICT_TOOL_OUTPUT_MISSING");
           assert.deepEqual(result.tokenCounts, { input: 10, output: 8192, total: 8202 });
@@ -102,6 +104,34 @@ describe("microsoftFoundryClaudeProvider", () => {
       } finally { restore(); }
     });
   }
+  test("Stage07 refuses unreserved or mismatched serialized requests before transport", async () => {
+    let calls = 0;
+    const { loaded, restore } = loadProviderWithStubs({ fetchImpl: async () => { calls++; throw Error("must not dispatch"); } });
+    try {
+      for (const expectedRequestSha256 of [null, "f".repeat(64)]) {
+        await withEnv({ AZURE_FOUNDRY_ENDPOINT: "https://ais-jm1-foundry.services.ai.azure.com/" }, async () => {
+          const result = await loaded.call({promptBody:JSON.stringify({pass:"EDIT"}),diagnosticId:"fixture",
+            route:{deploymentName:"jm1-editorial-devline-primary",promptVersion:"JMP-STAGE07-BUDGETED-V1"},expectedRequestSha256});
+          assert.equal(result.failureCode,"STAGE07_RESERVED_REQUEST_DRIFT");
+        });
+      }
+      assert.equal(calls,0);
+    } finally { restore(); }
+  });
+  test("Stage07 HTTP failure preserves provider identity but never claims zero billing", async () => {
+    let calls = 0;
+    const { loaded, restore } = loadProviderWithStubs({ fetchImpl: async () => { calls++; return {
+      ok:false,status:500,headers:new Headers({"request-id":"synthetic-provider-id"}),json:async()=>({})}; } });
+    try {
+      await withEnv({ AZURE_FOUNDRY_ENDPOINT: "https://ais-jm1-foundry.services.ai.azure.com/" }, async () => {
+        const route={deploymentName:"jm1-editorial-devline-primary",promptVersion:"JMP-STAGE07-BUDGETED-V1"},promptBody=JSON.stringify({pass:"EDIT"});
+        const expectedRequestSha256=require("node:crypto").createHash("sha256").update(JSON.stringify(loaded.buildRequestBody(promptBody,route))).digest("hex");
+        const result=await loaded.call({promptBody,route,expectedRequestSha256,diagnosticId:"fixture"});
+        assert.equal(calls,1);assert.equal(result.request.providerRequestId,"synthetic-provider-id");
+        assert.equal(result.request.usageVerified,false);assert.equal(result.httpStatus,500);
+      });
+    } finally { restore(); }
+  });
   test("assessment cannot substitute text JSON for the forced strict tool", async () => {
     const { loaded, restore } = loadProviderWithStubs({ fetchImpl: async (_url, options) => {
       assert.equal(JSON.parse(options.body).tools[0].strict, true);
