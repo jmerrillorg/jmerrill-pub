@@ -22,6 +22,29 @@ function fixture(options = {}) {
   }
   return { calls, input: { submissionId: id, payload, enabled: true, request } }
 }
+test('isolated fixture uses the same writer identity and share path without binding a real author', async () => {
+  const { default: f } = await import('../azure-functions/diagnostic-ai-runner/src/lifecycle/onboardingAccessFixture.js')
+  const { buildSubmissionIdentity, buildSubmissionPayload } = await jiti.import('../lib/server/author-onboarding-dataverse.ts')
+  const { createHash } = await import('node:crypto')
+  const saved={...process.env}, key='1234567890abcdef1234567890abcdef'
+  try {
+    process.env.JM1_ONBOARDING_ACCESS_ACCEPTANCE_KEY=key
+    process.env.JM1_ONBOARDING_ACCESS_ACCEPTANCE_EXPIRES_AT=new Date(Date.now()+3600000).toISOString()
+    const payload=f.payloadFor(key), id=f.submissionId(key), row=buildSubmissionPayload(payload,new Date().toISOString(),true)
+    const h=createHash('sha256').update(`attempt:${buildSubmissionIdentity(payload)}`).digest('hex').slice(0,32).split('');h[12]='5';h[16]=((parseInt(h[16],16)&3)|8).toString(16)
+    assert.equal(id.replaceAll('-',''),h.join(''));assert.equal(row['jm1pub_LinkedContact@odata.bind'],undefined)
+    const a=fixture({row:{...row,jm1pub_submissionid:id,_jm1pub_linkedcontact_value:null}}), input={...a.input,submissionId:id,payload}
+    process.env.JM1_ONBOARDING_ACCESS_ACCEPTANCE_HOLD='true'
+    assert.equal((await share(input)).code,'PROCESSOR_SHARING_SYNTHETIC_DEPENDENCY_HOLD')
+    assert.ok(a.calls.every(x=>x.method==='GET'))
+    process.env.JM1_ONBOARDING_ACCESS_ACCEPTANCE_HOLD='false'
+    assert.equal((await share(input)).status,'READY');assert.equal((await share(input)).status,'READY')
+    assert.equal(a.calls.filter(x=>x.method==='POST').length,1)
+    assert.equal((await share({...input,submissionId:'00000000-0000-5000-8000-000000000000'})).code,'PROCESSOR_SHARING_SCOPE_DENIED')
+    delete process.env.JM1_ONBOARDING_ACCESS_ACCEPTANCE_KEY
+    assert.equal((await share(input)).code,'PROCESSOR_SHARING_SCOPE_DENIED')
+  } finally {for(const k of Object.keys(process.env))if(!(k in saved))delete process.env[k];Object.assign(process.env,saved)}
+})
 test('shares only exact record ReadAccess with pinned recipient; replay makes no second write', async () => {
   const f = fixture(); assert.equal((await share(f.input)).status, 'READY'); assert.equal((await share(f.input)).status, 'READY')
   const writes = f.calls.filter(c => c.method !== 'GET'); assert.equal(writes.length, 1)

@@ -79,3 +79,36 @@ runtime receipts and custody evidence remain there, not in public source logs.
 Microsoft authority:
 [Sharing and assigning](https://learn.microsoft.com/en-us/power-apps/developer/data-platform/security-sharing-assigning)
 and [Data operations and access rights](https://learn.microsoft.com/en-us/power-apps/developer/data-platform/security-access-rights).
+
+## October 15 authorization and isolated acceptance
+
+The Publisher approved Basic Share on the existing capture role, explicitly
+acknowledging the platform/application restriction distinction. Native readback
+confirmed Basic and unchanged unrelated privileges. This supersedes the pending
+permission decision above, not the preserved historical evidence.
+
+The five real receipts must not be replaced or resubmitted for this test. The
+internal `/api/publishing/onboarding/acceptance` route uses the existing worker
+key and only an empty JSON object. It generates one fixed synthetic payload from
+`JM1_ONBOARDING_ACCESS_ACCEPTANCE_KEY` (32 lowercase hex characters) and a bounded
+`JM1_ONBOARDING_ACCESS_ACCEPTANCE_EXPIRES_AT` (maximum four hours). No caller may
+choose content, recipient, title, contact or record ID. The fixture has no author
+attestation, title/contact linkage or workflow stage, and uses separate synthetic
+capture/routing action types. The ordinary author endpoint cannot select this
+policy. Both paths use the same deterministic receipt writer and sharing guard.
+
+Set `JM1_ONBOARDING_ACCESS_ACCEPTANCE_HOLD=true` only for the fixture to fail
+before sharing. Confirm a durable HTTP202 receipt and denied Function read. Set
+the hold false and retry the same fixed fixture: require identical record bytes,
+ID, owner and ETag, one exact Read share, and no additional receipt. The existing
+Function source-registration endpoint accepts `ONBOARDING_ACCESS_ACCEPT` only
+within the same fixed window. It reads that exact record under its own identity,
+checks ReadAccess only, and writes an immutable private acceptance receipt under
+`onboarding-access-acceptance/<key>/receipt.json`. It never completes Stage06 or
+advances a real title. Repeated/restarted calls must retain the same receipt.
+
+After acceptance remove the fixture key/expiry/hold settings from both runtimes;
+verify the test paths fail closed. Keep ordinary automatic sharing enabled and
+preserve synthetic evidence, real title receipts and their Stage07 folders.
+No new scheduler, identity, table privilege, author communication or paid model
+operation is introduced by the acceptance facility.
