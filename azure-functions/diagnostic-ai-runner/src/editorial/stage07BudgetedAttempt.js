@@ -36,12 +36,16 @@ async function executeAttempt(input, deps) {
     let result;
     try { result = await deps.callOnce(input.request); }
     catch (_) { return { status: "UNRESOLVED_PROVIDER_ATTEMPT", dispatch: true, reservationRetained: true }; }
-    let accepted = false;
+    let accepted = false, sourceRestoration = null;
     if (result?.ok && result.stopReason !== "max_tokens") {
-      try { accepted = await deps.validateOutput(result.output, input) === true; } catch (_) { accepted = false; }
+      try {
+        sourceRestoration = deps.restoreSource ? await deps.restoreSource(result.output) : null;
+        accepted = await deps.validateOutput(sourceRestoration?.output || result.output, input) === true;
+      } catch (_) { accepted = false; }
     }
     receipt = { schemaVersion: 1, attemptId: input.attemptId, taskId: input.taskId,
-      planSha256: input.planSha256, requestSha256, result, accepted };
+      planSha256: input.planSha256, requestSha256, result, accepted,
+      ...(sourceRestoration ? { sourceRestoration } : {}) };
     // Persist the provider result before releasing any reservation. If this
     // fails, restart holds the unknown attempt instead of calling the model.
     await deps.writeReceipt(input.attemptId, receipt);

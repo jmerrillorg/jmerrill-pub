@@ -49,6 +49,22 @@ function validateOutput(output, task, plan, text) {
   }
   return true;
 }
+function recoverSourceWhitespace(prior, receipt, prepared, task) {
+  if (prior?.status !== "SETTLED" || prior.outcome !== "FAILED" || receipt.accepted !== false ||
+      receipt.attemptId !== prior.id || prior.taskId !== task.id || receipt.taskId !== task.id || receipt.planSha256 !== planSha ||
+      prior.receiptReference !== `stage07-attempt:${prior.id}:${b.sha(JSON.stringify(receipt))}` ||
+      receipt.requestSha256 !== prior.requestSha256 || receipt.result?.ok !== true ||
+      receipt.result.stopReason !== "tool_use" || receipt.result.usageVerified !== true ||
+      !receipt.result.providerRequestId || receipt.result.model !== policy.model || receipt.result.modelVersion !== policy.modelVersion ||
+      receipt.result.inputTokens * policy.inputMicroUsdPerToken + receipt.result.outputTokens * policy.outputMicroUsdPerToken !== prior.actualMicroUsd) return null;
+  const restoration = require("../editorial/stage07SourceRestoration").restore(receipt.result.output, task, prepared.plan, prepared.working.text);
+  if (!restoration) return null;
+  try { validateOutput(restoration.output, task, prepared.plan, prepared.working.text); }
+  catch { return null; }
+  return { taskId: task.id, planSha256: planSha, sourceSha256: prepared.source.sourceSha256,
+    originalAttemptId: prior.id, originalReceiptSha256: b.sha(JSON.stringify(receipt)),
+    originalPaidMicroUsd: prior.actualMicroUsd, newPaidAttempts: 0, sourceRestoration: restoration };
+}
 async function prepare(source, deps) {
   const current = await require("./pipelineFolderRuntime").readAuthority(source.titleId, deps);
   const placement = (await b.read(deps.containerClient, `${require("./pipelineFolderProjection").PREFIX}/${source.titleId}/state.json`)).value;
@@ -172,10 +188,26 @@ async function handler(body, supplied = {}) {
     if (b.sha(approval.bytes) !== env.JM1_NEW_SUBMISSION_STAGE07_APPROVAL_SHA256 || JSON.stringify(approval.value) !== JSON.stringify(policy)) b.deny("STAGE07_APPROVAL_BINDING_REQUIRED");
     const ledgerBlob = deps.containerClient.getBlockBlobClient(`${PREFIX}/budget.json`);
     await budget.initialize(ledgerBlob, budget.createState({ approvalReference: `${PREFIX}/approval.json`, planSha256: planSha, taskIds }));
-    const task = remaining[0], prompt = buildPrompt(prepared, task, results);
-    const measured = await count(prompt, deps);
+    const task = remaining[0];
     const store = budget.blobStore(ledgerBlob), before = await store.read();
     const previous = before.value.attempts.filter(a => a.taskId === task.id);
+    const prior = previous.at(-1);
+    if (prior?.status === "SETTLED" && prior.outcome === "FAILED") {
+      const originalReceiptPath = `${PREFIX}/attempts/${prior.id}.json`;
+      const originalReceipt = (await b.read(deps.containerClient, originalReceiptPath)).value;
+      const recovered = recoverSourceWhitespace(prior, originalReceipt, prepared, task);
+      if (recovered) {
+        const receiptPath = `${PREFIX}/recoveries/${prior.id}-source-whitespace-v1.json`, output = recovered.sourceRestoration.output;
+        await b.immutable(deps.containerClient, receiptPath, { ...recovered, originalReceiptPath });
+        await b.immutable(deps.containerClient, `${PREFIX}/results/${b.sha(task.id)}.json`, {
+          taskId: task.id, planSha256: planSha, sourceSha256: source.sourceSha256, receiptPath,
+          output, outputSha256: b.sha(JSON.stringify(output)) });
+        return { status: 200, jsonBody: { status: "OUTPUT_VALIDATED", recovered: true, dispatch: false, replay: true,
+          taskId: task.id, receiptPath, actualMicroUsd: 0, originalPaidMicroUsd: prior.actualMicroUsd,
+          exposureMicroUsd: budget.exposure(before.value), stage08: "NOT_STARTED", communications: 0, payments: 0 } };
+      }
+    }
+    const prompt = buildPrompt(prepared, task, results), measured = await count(prompt, deps);
     const attemptNumber = previous.length && previous.at(-1).status === "SETTLED" && previous.at(-1).outcome === "FAILED"
       ? previous.length : Math.max(0, previous.length - 1);
     const attemptId = b.sha(`${task.id}:${attemptNumber}`), receiptPath = `${PREFIX}/attempts/${attemptId}.json`;
@@ -190,6 +222,7 @@ async function handler(body, supplied = {}) {
       },
       readReceipt: async () => (await b.optional(deps.containerClient, receiptPath))?.value,
       writeReceipt: async (_, value) => b.immutable(deps.containerClient, receiptPath, value),
+      restoreSource: output => require("../editorial/stage07SourceRestoration").restore(output, task, prepared.plan, prepared.working.text),
       validateOutput: output => validateOutput(output, task, prepared.plan, prepared.working.text),
       callOnce: async () => {
         const model = await require("../model/modelCaller").callModel({ contractTestMode: false, promptBody: prompt,
@@ -203,13 +236,14 @@ async function handler(body, supplied = {}) {
       } });
     if (call.status === "OUTPUT_VALIDATED") {
       const receipt = (await b.read(deps.containerClient, receiptPath)).value;
+      const output = receipt.sourceRestoration?.output || receipt.result.output;
       await b.immutable(deps.containerClient, `${PREFIX}/results/${b.sha(task.id)}.json`, {
         taskId: task.id, planSha256: planSha, sourceSha256: source.sourceSha256, receiptPath,
-        output: receipt.result.output, outputSha256: b.sha(JSON.stringify(receipt.result.output)) });
+        output, outputSha256: b.sha(JSON.stringify(output)) });
     }
     return { status: 200, jsonBody: { ...call, taskId: task.id, receiptPath,
       exposureMicroUsd: budget.exposure((await store.read()).value), stage08: "NOT_STARTED", communications: 0, payments: 0 } };
   } catch (error) { return { status: 409, jsonBody: { code: /^(STAGE07|REVIEW_RECOVERY)_[A-Z_]+$/.test(error.safeCode || "") ? error.safeCode : "STAGE07_DEPENDENCY_FAILED",
     providerStatus: error.statusCode || null, stage08: "NOT_STARTED", communications: 0, payments: 0 } }; }
 }
-module.exports = { MODES, tasks, prepare, validateOutput, buildPrompt, handler, PREFIX, planSha, policy };
+module.exports = { MODES, tasks, prepare, validateOutput, recoverSourceWhitespace, buildPrompt, handler, PREFIX, planSha, policy };
