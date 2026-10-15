@@ -322,11 +322,12 @@ function extractTextContent(responseBody) {
 function selectRuntimeOptions(route = {}) {
   const options = getProviderRuntimeOptions("AZURE_FOUNDRY");
   // Full-manuscript assessment needs one longer request, not repeated short calls.
-  return route.promptVersion === "JMP-EDITORIAL-REVIEW-ASSESSMENT-V1"
+  return ["JMP-EDITORIAL-REVIEW-ASSESSMENT-V1", "JMP-STAGE07-BUDGETED-V1"].includes(route.promptVersion)
     ? { ...options, timeoutMs: 240000, maxRetries: 0 } : options;
 }
 
 function selectStructuredOutputTool(promptBody, route = {}) {
+  if (route.promptVersion === "JMP-STAGE07-BUDGETED-V1") return STRUCTURED_OUTPUT_TOOL;
   // Bound assessment authority outranks markers inside untrusted manuscript data.
   if (route.promptVersion === "JMP-EDITORIAL-REVIEW-ASSESSMENT-V1") return {
     name: STRUCTURED_OUTPUT_TOOL.name,
@@ -353,6 +354,7 @@ function parsePositiveInteger(value, fallback) {
 }
 
 function selectMaxOutputTokens(promptBody, route = {}) {
+  if (route.promptVersion === "JMP-STAGE07-BUDGETED-V1") return 8192;
   if (route.promptVersion === "JMP-EDITORIAL-REVIEW-ASSESSMENT-V1") return 8192;
   if (isLineEditingChunkPrompt(promptBody)) {
     return parsePositiveInteger(process.env.AZURE_FOUNDRY_LINE_CHUNK_MAX_OUTPUT_TOKENS, DEFAULT_LINE_CHUNK_MAX_OUTPUT_TOKENS);
