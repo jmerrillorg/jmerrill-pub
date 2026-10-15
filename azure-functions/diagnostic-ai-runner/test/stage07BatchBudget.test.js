@@ -3,6 +3,33 @@ const { test } = require("node:test");
 const assert = require("node:assert/strict");
 const b = require("../src/editorial/stage07BatchBudget");
 const hash = "a".repeat(64);
+test("concurrent initialization cannot reset a live ledger and readback uses one snapshot", async () => {
+  const initial = b.createState({ approvalReference: "approval", planSha256: hash, taskIds: ["one"] });
+  let value, version = 0, downloads = 0;
+  const blob = {
+    async exists() { return false; },
+    async getProperties() { throw Error("split metadata/body read is forbidden"); },
+    async uploadData(bytes, options) {
+      assert.equal(options.conditions.ifNoneMatch, "*");
+      if (value) throw Object.assign(Error("already created"), { statusCode: 412 });
+      value = JSON.parse(bytes); version++;
+      value.attempts.push({ id: "one", taskId: "one", requestSha256: hash, reservedMicroUsd: 100, status: "UNKNOWN" });
+    },
+    async download() {
+      downloads++;
+      const snapshot = JSON.stringify(value), etag = String(version);
+      return { etag, readableStreamBody: require("node:stream").Readable.from([snapshot]) };
+    }
+  };
+  await Promise.all(Array.from({ length: 6 }, () => b.initialize(blob, initial)));
+  const result = await b.readIfPresent(blob);
+  assert.equal(result.attempts.length, 1);
+  assert.equal(b.exposure(result), 100);
+  assert.equal(downloads, 1);
+  assert.equal(version, 1);
+  assert.equal(await b.readIfPresent({ download: async () => { throw Object.assign(Error("missing"), { statusCode: 404 }); } }), null);
+  await assert.rejects(b.readIfPresent({ download: async () => { throw Object.assign(Error("denied"), { statusCode: 403 }); } }), /denied/);
+});
 function store() {
   let value = b.createState({ approvalReference: "founder-stage07-50", planSha256: hash,
     taskIds: ["one", "two", "task", ...Array.from({ length: 10 }, (_, i) => String(i))] }), version = 0;

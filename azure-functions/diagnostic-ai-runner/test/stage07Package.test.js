@@ -28,3 +28,13 @@ test("missing tasks, consistency defects and all-unchanged output cannot become 
   input = fixture(); input.results.get("edit").output.paragraphs[0].text = input.working.text;
   await assert.rejects(assemble(input), /UNCHANGED_COMPONENT/);
 });
+test("planning history is preserved while section and final consistency defects still hold", async () => {
+  const input = fixture();
+  input.tasks.unshift({ id: "plan", pass: "PLAN_SECTION" });
+  input.results.set("plan", { output: { blockingFindings: ["Planning concern subsequently checked"], questions: [] } });
+  const result = await assemble(input);
+  assert.equal(JSON.parse(result.files["editorial-memo.json"]).planningFindings[0].findings[0], "Planning concern subsequently checked");
+  input.tasks.push({ id: "section", pass: "CONSISTENCY_SECTION" });
+  input.results.set("section", { output: { blockingFindings: ["Unresolved source omission"], questions: [] } });
+  await assert.rejects(assemble(input), /CONSISTENCY_HOLD/);
+});

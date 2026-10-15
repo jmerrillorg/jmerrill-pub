@@ -91,6 +91,20 @@ async function settle(store, input) {
     return { settled: true, hold: Boolean(state.tariffOrUsageViolation) };
   });
 }
+async function initialize(blob, initial) {
+  if (await blob.exists()) return;
+  try {
+    await blob.uploadData(Buffer.from(JSON.stringify(validate(initial))), {
+      conditions: { ifNoneMatch: "*" }, blobHTTPHeaders: { blobContentType: "application/json" }
+    });
+  } catch (error) {
+    if (![409, 412].includes(error.statusCode)) throw error;
+  }
+}
+async function readIfPresent(blob) {
+  try { return (await blobStore(blob).read()).value; }
+  catch (error) { if (error.statusCode === 404) return null; throw error; }
+}
 function blobStore(blob) {
   return {
     async read() {
@@ -108,4 +122,4 @@ function blobStore(blob) {
     }
   };
 }
-module.exports = { LIMIT, RETRIES, createState, exposure, reserve, settle, blobStore };
+module.exports = { LIMIT, RETRIES, createState, exposure, reserve, settle, blobStore, initialize, readIfPresent };
