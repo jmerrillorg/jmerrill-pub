@@ -159,10 +159,13 @@ async function handler(body, supplied = {}) {
       await b.immutable(deps.containerClient, `${base}/manifest.json`, manifest);
       return { status: 200, jsonBody: manifest };
     }
+    const ledger = !execute || !remaining.length ? (await b.optional(deps.containerClient, `${PREFIX}/budget.json`))?.value : null;
     if (!execute || !remaining.length) return { status: 200, jsonBody: { titleId: source.titleId, componentSha256: source.sourceSha256,
       planSha256: planSha, totalTasks: allTasks.length, completedTasks: results.size, remainingTasks: remaining.length,
       status: remaining.length ? "PLANNED_NOT_COMPLETE" : "MODEL_OUTPUTS_PENDING_PACKAGE_QA", stage08: "NOT_STARTED",
-      coverage: body.mode === "SUBMISSION_07_PLAN" ? prepared.plan : undefined, paidCalls: 0 } };
+      coverage: body.mode === "SUBMISSION_07_PLAN" ? prepared.plan : undefined,
+      batchAttemptCount: ledger?.attempts.length || 0, batchExposureMicroUsd: ledger ? budget.exposure(ledger) : 0,
+      batchSettledMicroUsd: ledger?.attempts.filter(a => a.status === "SETTLED").reduce((n, a) => n + a.actualMicroUsd, 0) || 0 } };
     if (Date.now() >= Date.parse(policy.tariffEffectiveUntil)) b.deny("STAGE07_TARIFF_EXPIRED");
     const approval = await b.read(deps.containerClient, `${PREFIX}/approval.json`);
     if (b.sha(approval.bytes) !== env.JM1_NEW_SUBMISSION_STAGE07_APPROVAL_SHA256 || JSON.stringify(approval.value) !== JSON.stringify(policy)) b.deny("STAGE07_APPROVAL_BINDING_REQUIRED");
