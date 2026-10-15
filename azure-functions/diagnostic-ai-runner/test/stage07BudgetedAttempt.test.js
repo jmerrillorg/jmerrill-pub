@@ -26,6 +26,16 @@ test("durable result replay settles once and never dispatches twice", async () =
   assert.equal((await executeAttempt(f.input, f.deps)).replay, true);
   assert.equal(f.calls(), 1); assert.equal(budget.exposure(f.state()), 2200);
 });
+test("source restoration preserves raw response and is replayed without another billable attempt", async () => {
+  const f = fixture();
+  f.deps.restoreSource = () => ({ method: "EXACT_SOURCE_WHITESPACE_RESTORATION_V1", output: { restored: true }, restored: [{ index: 0 }] });
+  f.deps.validateOutput = output => output.restored === true;
+  assert.equal((await executeAttempt(f.input, f.deps)).status, "OUTPUT_VALIDATED");
+  assert.deepEqual(f.receipts.get("one").result.output, { complete: true });
+  assert.equal(f.receipts.get("one").sourceRestoration.output.restored, true);
+  assert.equal((await executeAttempt(f.input, f.deps)).replay, true);
+  assert.equal(f.calls(), 1);
+});
 test("unknown timeout and restart retain reservation without retry", async () => {
   const f = fixture(); f.deps.callOnce = async () => { throw Error("timeout"); };
   assert.equal((await executeAttempt(f.input, f.deps)).reservationRetained, true);

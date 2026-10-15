@@ -27,6 +27,8 @@ test("missing tasks, consistency defects and all-unchanged output cannot become 
   await assert.rejects(assemble(input), /CONSISTENCY_HOLD/);
   input = fixture(); input.results.get("edit").output.paragraphs[0].text = input.working.text;
   await assert.rejects(assemble(input), /UNCHANGED_COMPONENT/);
+  input = fixture(); input.results.get("edit").output.paragraphs[0].text = "Original  paragraph.";
+  await assert.rejects(assemble(input), /UNCHANGED_COMPONENT/);
 });
 test("planning history is preserved while section and final consistency defects still hold", async () => {
   const input = fixture();

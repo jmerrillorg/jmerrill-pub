@@ -11,7 +11,8 @@ async function assemble({ source, working, plan, tasks, results, original, planS
   const proposed = edits.flatMap(e => e.output.paragraphs);
   if (proposed.length !== originalParagraphs.length || proposed.some((p, i) => p.index !== i)) throw Error("STAGE07_PACKAGE_COVERAGE_HOLD");
   const changes = proposed.filter((p, i) => p.text !== originalParagraphs[i]);
-  if (!changes.length) throw Error("STAGE07_UNCHANGED_COMPONENT_REVIEW_REQUIRED");
+  const { whitespace } = require("./stage07SourceRestoration");
+  if (!changes.some(p => whitespace(p.text) !== whitespace(originalParagraphs[p.index]))) throw Error("STAGE07_UNCHANGED_COMPONENT_REVIEW_REQUIRED");
   if (sha(original) !== source.sourceSha256) throw Error("STAGE07_PACKAGE_SOURCE_HASH_MISMATCH");
   const documents = await require("./stage07Documents").buildDocuments(original, working.provenance.name, originalParagraphs, proposed.map(p => p.text));
   const coverage = { sourceSha256: source.sourceSha256, sourceTextSha256: source.sourceTextSha256, planSha256,
