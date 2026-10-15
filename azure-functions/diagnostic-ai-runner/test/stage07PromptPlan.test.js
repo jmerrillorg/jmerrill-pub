@@ -19,10 +19,23 @@ test("fixed route has no hidden retries and ignores manuscript task spoofing", (
   assert.deepEqual(request.thinking, { type: "adaptive" });
   assert.deepEqual(request.output_config, { effort: "medium" });
   assert.equal(provider.buildRequestBody(JSON.stringify({ pass: "PLAN_SECTION" }), route).max_tokens, 4096);
+  for (const pass of ["PLAN_SYNTHESIS", "FINAL_SYNTHESIS"]) {
+    const synthesis = provider.buildRequestBody(JSON.stringify({ pass }), route);
+    assert.equal(synthesis.max_tokens, 8192);
+    assert.deepEqual(synthesis.output_config, { effort: "medium" });
+  }
   assert.equal(provider.buildRequestBody("source", { ...route, promptVersion: "JMP-EDITORIAL-REVIEW-ASSESSMENT-V1" }).output_config, undefined);
 });
 test("unapproved title scope is rejected", () => {
   assert.throws(() => p.prompt({ titleId: "not-authorized", pass: "EDIT" }), /SCOPE_DENIED/);
+});
+test("edit contract requires complete text even for explicitly unchanged paragraphs", () => {
+  const text = "First source paragraph.\n\nSecond source paragraph.";
+  const span = p.componentPlan(text).editing.chunks[0];
+  const value = JSON.parse(p.prompt({ text, titleId: "f79006b7-f595-f111-8076-00224820105b", componentId: "synthetic", title: "Synthetic", span, pass: "EDIT" }));
+  assert.equal(value.sourceParagraphs.length, 2);
+  assert.match(value.task, /paragraphs must never be empty/);
+  assert.match(value.task, /not a substitute for manuscript text/);
 });
 test("bounded planning detail retains the entire source and exact range", () => {
   const text = "First source paragraph.\n\nSecond source paragraph.";
