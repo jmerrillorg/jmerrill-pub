@@ -366,7 +366,7 @@ function selectMaxOutputTokens(promptBody, route = {}) {
   if (route.promptVersion === "JMP-STAGE07-BUDGETED-V1") {
     let pass;
     try { pass = JSON.parse(promptBody).pass; } catch { return 8192; }
-    return ["PLAN_SECTION", "CONSISTENCY_SECTION", "PLAN_SYNTHESIS", "FINAL_SYNTHESIS"].includes(pass) ? 2048 : 8192;
+    return ["PLAN_SECTION", "CONSISTENCY_SECTION", "PLAN_SYNTHESIS", "FINAL_SYNTHESIS"].includes(pass) ? 4096 : 8192;
   }
   if (route.promptVersion === "JMP-EDITORIAL-REVIEW-ASSESSMENT-V1") return 8192;
   if (isLineEditingChunkPrompt(promptBody)) {

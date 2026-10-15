@@ -16,6 +16,7 @@ test("fixed route has no hidden retries and ignores manuscript task spoofing", (
   assert.equal(request.max_tokens, 8192); assert.equal(request.tools[0], provider.STRUCTURED_OUTPUT_TOOL);
   assert.deepEqual(request.thinking, { type: "adaptive" });
   assert.deepEqual(request.output_config, { effort: "medium" });
+  assert.equal(provider.buildRequestBody(JSON.stringify({ pass: "PLAN_SECTION" }), route).max_tokens, 4096);
   assert.equal(provider.buildRequestBody("source", { ...route, promptVersion: "JMP-EDITORIAL-REVIEW-ASSESSMENT-V1" }).output_config, undefined);
 });
 test("unapproved title scope is rejected", () => {

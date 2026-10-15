@@ -57,7 +57,7 @@ The 100,000-token/minute live deployment quota is distinct from model context
 capacity; pacing must include input plus output reservations across consumers.
 
 The `JMP-STAGE07-BUDGETED-V1` provider route uses 8,192 maximum editing output tokens,
-2,048 maximum planning/review output tokens and
+4,096 maximum planning/review output tokens and
 zero hidden retries. It must remain on the approved deployment/model/version;
 source content cannot switch tool selection by embedding another task marker.
 Output truncation, malformed structured output, missing coverage and unchanged
@@ -65,7 +65,9 @@ fallback text are not successful editorial completion.
 
 Sonnet5 adaptive thinking is enabled by default and shares the output ceiling.
 Stage07 explicitly uses adaptive thinking at medium effort; it does not disable
-reasoning or substitute a model. All thinking tokens count in provider output
+reasoning or substitute a model. The 4,096 planning/review ceiling reserves
+headroom for both reasoning and the concise structured response, inside the
+existing 8,192 absolute per-attempt bound. All thinking tokens count in provider output
 usage and the existing reservation. Planning ledgers group source-anchored
 findings within 500 words instead of emitting a paragraph inventory. Complete
 source sections and independent consistency review remain intact. The first
