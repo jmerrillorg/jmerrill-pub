@@ -26,7 +26,8 @@ async function executeAttempt(input, deps) {
   if (!Number.isSafeInteger(maximum)) fail("STAGE07_COST_BOUND_INVALID");
   const requestSha256 = authority.requestSha256;
   const reservation = await budget.reserve(deps.store, { id: input.attemptId, taskId: input.taskId,
-    planSha256: input.planSha256, requestSha256, maxMicroUsd: maximum });
+    planSha256: input.planSha256, requestSha256, maxMicroUsd: maximum,
+    capacityTokens: authority.inputTokenBound + authority.maxOutputTokens });
   let receipt;
   if (!reservation.dispatch) {
     receipt = await deps.readReceipt(input.attemptId);

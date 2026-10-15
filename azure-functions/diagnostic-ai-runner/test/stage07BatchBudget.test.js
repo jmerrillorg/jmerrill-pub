@@ -10,6 +10,14 @@ function store() {
     async compareAndSwap(etag, next) { if (etag !== String(version)) return false; value = structuredClone(next); version++; return true; } };
 }
 const request = (id, taskId = id, maxMicroUsd = 10_000_000) => ({ id, taskId, maxMicroUsd, planSha256: hash, requestSha256: hash });
+test("capacity reservations serialize concurrent dispatch without spending on rate-limit retries", async () => {
+  const s = store();
+  const attempts = await Promise.allSettled(Array.from({ length: 4 }, (_, i) => b.reserve(s,
+    { ...request(String(i), String(i), 100), capacityTokens: 40000 })));
+  assert.equal(attempts.filter(r => r.status === "fulfilled").length, 2);
+  assert.equal((await s.read()).value.attempts.length, 2);
+  assert.equal(b.exposure((await s.read()).value), 200);
+});
 test("concurrent reservations cannot exceed shared fifty dollar cap", async () => {
   const s = store(); const results = await Promise.allSettled(Array.from({ length: 10 }, (_, i) => b.reserve(s, request(String(i)))));
   assert.equal(results.filter(r => r.status === "fulfilled").length, 5);

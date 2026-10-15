@@ -55,6 +55,12 @@ async function reserve(store, input) {
           existing.reservedMicroUsd !== input.maxMicroUsd) deny("STAGE07_ATTEMPT_ID_CONFLICT");
       return { noWrite: true, dispatch: false, replay: true, attempt: existing };
     }
+    if (input.capacityTokens !== undefined) {
+      if (!integer(input.capacityTokens) || input.capacityTokens < 1 || input.capacityTokens > 40192) deny("STAGE07_CAPACITY_BOUND_INVALID");
+      const used = state.attempts.filter(a => a.reservedAtMs > Date.now() - 60000)
+        .reduce((n, a) => n + (a.capacityTokens || 0), 0);
+      if (used + input.capacityTokens > 80000) deny("STAGE07_CAPACITY_WAIT");
+    }
     const prior = state.attempts.filter(a => a.taskId === input.taskId);
     if (prior.some(a => a.status !== "SETTLED")) deny("STAGE07_UNRESOLVED_ATTEMPT_HOLD");
     if (prior.some(a => a.outcome === "SUCCESS")) deny("STAGE07_COMPLETED_TASK_REPLAY_REQUIRED");
@@ -62,7 +68,8 @@ async function reserve(store, input) {
     if (prior.length && retries >= RETRIES) deny("STAGE07_RETRY_LIMIT");
     if (exposure(state) + input.maxMicroUsd > LIMIT) deny("STAGE07_SPEND_LIMIT");
     const attempt = { id: input.id, taskId: input.taskId, requestSha256: input.requestSha256,
-      reservedMicroUsd: input.maxMicroUsd, status: "RESERVED" };
+      reservedMicroUsd: input.maxMicroUsd, status: "RESERVED",
+      ...(input.capacityTokens !== undefined ? { capacityTokens: input.capacityTokens, reservedAtMs: Date.now() } : {}) };
     state.attempts.push(attempt);
     return { dispatch: true, attempt };
   });

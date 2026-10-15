@@ -1,0 +1,78 @@
+{
+  "schemaVersion": 1,
+  "batchId": "jackie-stage07-20261015",
+  "approvalReference": "Publisher direct authorization in PUB chat on 2026-10-15: USD50 total, six components, twelve additional attempts maximum",
+  "contactId": "d38aa56a-882a-f111-88b4-6045bdd69678",
+  "maximumMicroUsd": 50000000,
+  "maxAdditionalAttempts": 12,
+  "model": "claude-sonnet-5",
+  "modelVersion": "2",
+  "deploymentName": "jm1-editorial-devline-primary",
+  "inputMicroUsdPerToken": 2,
+  "outputMicroUsdPerToken": 10,
+  "tariffEffectiveUntil": "2026-11-01T00:00:00.000Z",
+  "tariffEvidenceSha256": "151cb40376e43d9ceea23a4b623eec0e9403af995650898e988906b6e464e694",
+  "stage08": "NOT_AUTHORIZED",
+  "sources": [
+    {
+      "title": "Til Death Do Us Part",
+      "titleId": "f79006b7-f595-f111-8076-00224820105b",
+      "sourceSha256": "b030075bbda336c8dea8f7c12aaf210665fb0bbdc52da690144d7cfd3dd8bcd7",
+      "sourceTextSha256": "b030075bbda336c8dea8f7c12aaf210665fb0bbdc52da690144d7cfd3dd8bcd7",
+      "sourceWords": 23413,
+      "editingCalls": 28,
+      "planningCalls": 4,
+      "consistencyCalls": 8
+    },
+    {
+      "title": "Establishing Glory: The Library",
+      "titleId": "f1908dc9-5775-f111-ab0f-6045bdd69435",
+      "sourceSha256": "b6dd239da025e58d9d0dc4e375a00e76391f9455fb856d63664031931387b5e2",
+      "sourceTextSha256": "521c079ec041a2686c910b6516f83d5f4224d29160dfabbac1a56aba23e1ac39",
+      "sourceWords": 52853,
+      "editingCalls": 61,
+      "planningCalls": 9,
+      "consistencyCalls": 18
+    },
+    {
+      "title": "The Intentional Leader",
+      "titleId": "e797232b-da7a-f111-ab0f-00224820105b",
+      "sourceSha256": "701c16b72ff107603f0c09acd264434e97146b93b80ba4f175fb7bdbe3515d06",
+      "sourceTextSha256": "480456cb54797719976746d35a7fad8163d874ccf2ff9cdb76da4eee5977f1cb",
+      "sourceWords": 163206,
+      "editingCalls": 184,
+      "planningCalls": 28,
+      "consistencyCalls": 55
+    },
+    {
+      "title": "The Intentional Leader",
+      "titleId": "e797232b-da7a-f111-ab0f-00224820105b",
+      "sourceSha256": "94b46204db5e0e81d739f507c26905f693888949a494d2c4d64463ebe2a90312",
+      "sourceTextSha256": "1fc5a4ed2eb6f83b74bcba27618d994acd3c72ec518fa7ee542da0e8bcff9f95",
+      "sourceWords": 132751,
+      "editingCalls": 150,
+      "planningCalls": 23,
+      "consistencyCalls": 45
+    },
+    {
+      "title": "The Long Watch",
+      "titleId": "a69b9dfa-bb7b-f111-ab0f-7c1e525b15c2",
+      "sourceSha256": "d4fdcd2515c60d592ff2df0bf116c967777bef4d2eb1d3897fbe88004d42cf1a",
+      "sourceTextSha256": "6357e53374051848b967b9dee507a0ee656cf77de0cd047d27aed5bb922ad0e6",
+      "sourceWords": 145689,
+      "editingCalls": 164,
+      "planningCalls": 25,
+      "consistencyCalls": 49
+    },
+    {
+      "title": "Chad and Me v003",
+      "titleId": "0e127af9-fcb3-5671-a0fa-e4af63c307d1",
+      "sourceSha256": "e03b0a2b6da9b6318352b9724e024713aaf7ffba24f1fd426f9def2fb8540175",
+      "sourceTextSha256": "750a344cf1c516f07018c3a0295b81758d7305542aa6c1931ca74005455a0725",
+      "sourceWords": 48749,
+      "editingCalls": 57,
+      "planningCalls": 9,
+      "consistencyCalls": 17
+    }
+  ]
+}

@@ -204,13 +204,20 @@ async function call({ promptBody, diagnosticId, telemetry = null, route }) {
     }
 
     const usage = responseBody?.usage || {};
+    const editorialUsage = route.promptVersion === "JMP-STAGE07-BUDGETED-V1" ? {
+      providerRequestId: response.headers.get("request-id") || responseBody.id || null,
+      responseModel: responseBody.model || null, stopReason: responseBody.stop_reason || null,
+      usageVerified: Number.isSafeInteger(usage.input_tokens) && usage.input_tokens > 0 &&
+        Number.isSafeInteger(usage.output_tokens) && usage.output_tokens >= 0 &&
+        !(usage.cache_creation_input_tokens || usage.cache_read_input_tokens)
+    } : {};
     const guardedEditorialRoute = ["JMP-EDITORIAL-REVIEW-ASSESSMENT-V1", "JMP-STAGE07-BUDGETED-V1"].includes(route.promptVersion);
     if (guardedEditorialRoute && responseBody.stop_reason === "max_tokens") {
       return { ok: false, provider: "microsoft-foundry-claude", output: null,
         tokenCounts: { input: usage.input_tokens || 0, output: usage.output_tokens || 0,
           total: (usage.input_tokens || 0) + (usage.output_tokens || 0) },
         httpStatus, failureCode: "MODEL_OUTPUT_TRUNCATED", error: "MODEL_OUTPUT_TRUNCATED",
-        request: { deployment, maxOutputTokens: requestBody.max_tokens, responseContract: "anthropic-messages-tool", stopReason: "max_tokens" } };
+        request: { deployment, maxOutputTokens: requestBody.max_tokens, responseContract: "anthropic-messages-tool", stopReason: "max_tokens", ...editorialUsage } };
     }
     const toolInput = extractStructuredToolInput(responseBody);
     if (guardedEditorialRoute && !toolInput) {
@@ -218,7 +225,7 @@ async function call({ promptBody, diagnosticId, telemetry = null, route }) {
         tokenCounts: { input: usage.input_tokens || 0, output: usage.output_tokens || 0,
           total: (usage.input_tokens || 0) + (usage.output_tokens || 0) },
         httpStatus, failureCode: "MODEL_STRICT_TOOL_OUTPUT_MISSING", error: "MODEL_STRICT_TOOL_OUTPUT_MISSING",
-        request: { deployment, maxOutputTokens: requestBody.max_tokens, responseContract: "anthropic-messages-tool", strictTool: true } };
+        request: { deployment, maxOutputTokens: requestBody.max_tokens, responseContract: "anthropic-messages-tool", strictTool: true, ...editorialUsage } };
     }
     if (toolInput) {
       return {
@@ -236,6 +243,7 @@ async function call({ promptBody, diagnosticId, telemetry = null, route }) {
           deployment,
           maxOutputTokens: requestBody.max_tokens,
           responseContract: "anthropic-messages-tool",
+          ...editorialUsage,
           ...(route.promptVersion === "JMP-EDITORIAL-REVIEW-ASSESSMENT-V1" ? { strictTool: true } : {})
         },
         rateLimit,
@@ -355,7 +363,11 @@ function parsePositiveInteger(value, fallback) {
 }
 
 function selectMaxOutputTokens(promptBody, route = {}) {
-  if (route.promptVersion === "JMP-STAGE07-BUDGETED-V1") return 8192;
+  if (route.promptVersion === "JMP-STAGE07-BUDGETED-V1") {
+    let pass;
+    try { pass = JSON.parse(promptBody).pass; } catch { return 8192; }
+    return ["PLAN_SECTION", "CONSISTENCY_SECTION", "PLAN_SYNTHESIS", "FINAL_SYNTHESIS"].includes(pass) ? 2048 : 8192;
+  }
   if (route.promptVersion === "JMP-EDITORIAL-REVIEW-ASSESSMENT-V1") return 8192;
   if (isLineEditingChunkPrompt(promptBody)) {
     return parsePositiveInteger(process.env.AZURE_FOUNDRY_LINE_CHUNK_MAX_OUTPUT_TOKENS, DEFAULT_LINE_CHUNK_MAX_OUTPUT_TOKENS);
