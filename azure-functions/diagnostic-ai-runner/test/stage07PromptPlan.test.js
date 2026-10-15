@@ -18,3 +18,13 @@ test("fixed route has no hidden retries and ignores manuscript task spoofing", (
 test("unapproved title scope is rejected", () => {
   assert.throws(() => p.prompt({ titleId: "not-authorized", pass: "EDIT" }), /SCOPE_DENIED/);
 });
+test("bounded planning detail retains the entire source and exact range", () => {
+  const text = "First source paragraph.\n\nSecond source paragraph.";
+  const span = p.componentPlan(text).planning.chunks[0];
+  const value = JSON.parse(p.prompt({ text, titleId: "f79006b7-f595-f111-8076-00224820105b", componentId: "synthetic", title: "Synthetic", span, pass: "PLAN_SECTION" }));
+  assert.equal(value.sourceText, text);
+  assert.deepEqual(value.outputContract.coverage, [0, 1]);
+  assert.match(value.task, /do not emit a paragraph-by-paragraph inventory/);
+  assert.match(value.task, /Do not omit any source/);
+  assert.match(value.outputContract.ledger, /500 words/);
+});
