@@ -4,13 +4,23 @@
 // Reservations never expire: an uncertain provider attempt remains fully charged
 // against available funds until independent usage reconciliation settles it.
 const LIMIT = 50_000_000;
+const AMENDMENT = Object.freeze({
+  reference: "codex://threads/01a10bb0-3832-7e03-b3a7-2cc488694143/turns/01a14203-8fee-7102-894b-0dd296707beb",
+  planSha256: "3e10ccdf20a07108e6169d23fb667c70afae9cda2204ca49c76fc3a29bfe0b0e",
+  fromMicroUsd: LIMIT, toMicroUsd: 55_000_000
+});
 const RETRIES = 12;
 const { valid: validBound } = require("./stage07CostBound");
 const maximum = a => Math.max(a.reservedMicroUsd, a.conservativeMaximumMicroUsd || 0);
 function deny(code) { throw Object.assign(new Error(code), { safeCode: code }); }
 function integer(n) { return Number.isSafeInteger(n) && n >= 0; }
 function validate(state) {
-  if (![1, 2].includes(state.version) || state.limitMicroUsd !== LIMIT || state.maxAdditionalAttempts !== RETRIES ||
+  const amended = state.version === 3;
+  if (amended && (!state.budgetAmendment || state.budgetAmendment.reference !== AMENDMENT.reference ||
+      state.planSha256 !== AMENDMENT.planSha256 || state.budgetAmendment.fromMicroUsd !== LIMIT ||
+      state.budgetAmendment.toMicroUsd !== AMENDMENT.toMicroUsd ||
+      !/^[a-f0-9]{64}$/.test(state.budgetAmendment.preimageSha256 || ""))) deny("STAGE07_BUDGET_AMENDMENT_INVALID");
+  if (![1, 2, 3].includes(state.version) || state.limitMicroUsd !== (amended ? AMENDMENT.toMicroUsd : LIMIT) || state.maxAdditionalAttempts !== RETRIES ||
       !state.approvalReference || !/^[a-f0-9]{64}$/.test(state.planSha256 || "") || !Array.isArray(state.attempts) ||
       !Array.isArray(state.taskIds) || !state.taskIds.length || new Set(state.taskIds).size !== state.taskIds.length) {
     deny("STAGE07_BUDGET_STATE_INVALID");
@@ -52,7 +62,7 @@ async function transact(store, change) {
 async function reserve(store, input) {
   return transact(store, state => {
     if (state.tariffOrUsageViolation) deny("STAGE07_TARIFF_OR_USAGE_HOLD");
-    if (input.requireVerifiedBounds && (state.version !== 2 || !validBound(input.bound,input.requestSha256) || input.bound.maximumMicroUsd !== input.maxMicroUsd ||
+    if (input.requireVerifiedBounds && (![2, 3].includes(state.version) || !validBound(input.bound,input.requestSha256) || input.bound.maximumMicroUsd !== input.maxMicroUsd ||
         state.attempts.some(a => a.status !== "SETTLED" && !validBound(a.bound,a.requestSha256)))) deny("STAGE07_LEGACY_BOUND_RECONCILIATION_REQUIRED");
     if (input.planSha256 !== state.planSha256 || !input.id || !state.taskIds.includes(input.taskId) ||
         !/^[a-f0-9]{64}$/.test(input.requestSha256 || "") ||
@@ -74,7 +84,7 @@ async function reserve(store, input) {
     if (prior.some(a => a.outcome === "SUCCESS")) deny("STAGE07_COMPLETED_TASK_REPLAY_REQUIRED");
     const retries = state.attempts.length - new Set(state.attempts.map(a => a.taskId)).size;
     if (prior.length && retries >= RETRIES) deny("STAGE07_RETRY_LIMIT");
-    if (exposure(state) + input.maxMicroUsd > LIMIT) deny("STAGE07_SPEND_LIMIT");
+    if (exposure(state) + input.maxMicroUsd > state.limitMicroUsd) deny("STAGE07_SPEND_LIMIT");
     const attempt = { id: input.id, taskId: input.taskId, requestSha256: input.requestSha256,
       reservedMicroUsd: input.maxMicroUsd, status: "RESERVED",
       ...(input.bound ? { bound: input.bound } : {}),
@@ -110,7 +120,7 @@ async function reconcileBound(store, { id, request, authority }) {
       return { noWrite: true, replay: true, dispatch: false };
     }
     const conservativeMaximumMicroUsd = Math.max(a.reservedMicroUsd, bound.maximumMicroUsd);
-    if (exposure(state) - maximum(a) + conservativeMaximumMicroUsd > LIMIT) deny("STAGE07_SPEND_LIMIT");
+    if (exposure(state) - maximum(a) + conservativeMaximumMicroUsd > state.limitMicroUsd) deny("STAGE07_SPEND_LIMIT");
     // Add an audited supplement; original reservation and unresolved state survive.
     if (state.version === 1) {
       state.reservationMigration = { fromVersion: 1, toVersion: 2, method: bound.method,
@@ -130,6 +140,20 @@ async function initialize(blob, initial) {
   } catch (error) {
     if (![409, 412].includes(error.statusCode)) throw error;
   }
+}
+async function applyApprovedAmendment(store, reference) {
+  if (reference !== AMENDMENT.reference) deny("STAGE07_BUDGET_AMENDMENT_INVALID");
+  return transact(store, state => {
+    if (state.planSha256 !== AMENDMENT.planSha256) deny("STAGE07_BUDGET_AMENDMENT_INVALID");
+    if (state.version === 3) return { noWrite: true, replay: true, dispatch: false };
+    if (state.version !== 2) deny("STAGE07_BUDGET_AMENDMENT_INVALID");
+    const preimageSha256 = require("node:crypto").createHash("sha256").update(JSON.stringify(state)).digest("hex");
+    state.budgetAmendment = { ...AMENDMENT, preimageSha256 };
+    state.version = 3;
+    state.limitMicroUsd = AMENDMENT.toMicroUsd;
+    validate(state);
+    return { amended: true, dispatch: false, preimageSha256, limitMicroUsd: state.limitMicroUsd };
+  });
 }
 async function readIfPresent(blob) {
   try { return (await blobStore(blob).read()).value; }
@@ -152,4 +176,4 @@ function blobStore(blob) {
     }
   };
 }
-module.exports = { LIMIT, RETRIES, createState, exposure, reserve, settle, reconcileBound, blobStore, initialize, readIfPresent };
+module.exports = { LIMIT, RETRIES, AMENDMENT, applyApprovedAmendment, createState, exposure, reserve, settle, reconcileBound, blobStore, initialize, readIfPresent };

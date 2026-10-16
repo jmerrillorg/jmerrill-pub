@@ -37,6 +37,38 @@ function store() {
     async compareAndSwap(etag, next) { if (etag !== String(version)) return false; value = structuredClone(next); version++; return true; } };
 }
 const request = (id, taskId = id, maxMicroUsd = 10_000_000) => ({ id, taskId, maxMicroUsd, planSha256: hash, requestSha256: hash });
+test("exact founder amendment preserves history, is replay-safe and caps concurrent exposure at 55", async () => {
+  const s = store(), before = await s.read();
+  before.value.planSha256 = b.AMENDMENT.planSha256;
+  await s.compareAndSwap(before.etag, before.value);
+  const req = id => ({ ...request(id, id, 5_000_000), planSha256: b.AMENDMENT.planSha256 });
+  await b.reserve(s, req("one"));
+  const pre = await s.read();
+  const results = await Promise.all(Array.from({length: 4}, () => b.applyApprovedAmendment(s, b.AMENDMENT.reference)));
+  assert.equal(results.filter(r => r.amended).length, 1);
+  const amended = await s.read();
+  assert.deepEqual(amended.value.attempts, pre.value.attempts);
+  assert.equal(amended.value.maxAdditionalAttempts, 12);
+  assert.equal(amended.value.limitMicroUsd, 55_000_000);
+  const reserves = await Promise.allSettled(Array.from({length: 10}, (_, i) => b.reserve(s, req(String(i)))));
+  assert.equal(reserves.filter(r => r.status === "fulfilled").length, 10);
+  assert.equal(b.exposure((await s.read()).value), 55_000_000);
+  await assert.rejects(b.reserve(s, req("two")), /SPEND_LIMIT/);
+  await assert.rejects(b.reserve(s, {...req("task"), taskId:"one"}), /UNRESOLVED/);
+});
+test("amendment rejects another plan, arbitrary authority, tampered limits and missing provenance", async () => {
+  const s = store();
+  await assert.rejects(b.applyApprovedAmendment(s, b.AMENDMENT.reference), /AMENDMENT_INVALID/);
+  await assert.rejects(b.applyApprovedAmendment(s, "invented"), /AMENDMENT_INVALID/);
+  const snapshot = await s.read();
+  snapshot.value.planSha256 = b.AMENDMENT.planSha256;
+  await s.compareAndSwap(snapshot.etag, snapshot.value);
+  await b.applyApprovedAmendment(s, b.AMENDMENT.reference);
+  const state = (await s.read()).value;
+  assert.throws(() => b.exposure({...state, limitMicroUsd:56_000_000}), /STATE_INVALID/);
+  assert.throws(() => b.exposure({...state, budgetAmendment:undefined}), /AMENDMENT_INVALID/);
+  assert.throws(() => b.exposure({...state, maxAdditionalAttempts:13}), /STATE_INVALID/);
+});
 test("capacity reservations serialize concurrent dispatch without spending on rate-limit retries", async () => {
   const s = store();
   const attempts = await Promise.allSettled(Array.from({ length: 4 }, (_, i) => b.reserve(s,

@@ -4,6 +4,7 @@ const sha = bytes => createHash("sha256").update(bytes).digest("hex");
 async function assemble({ source, working, plan, tasks, results, original, planSha256 }) {
   const edits = tasks.filter(t => t.pass === "EDIT").map(t => results.get(t.id));
   if (tasks.some(t => !results.has(t.id))) throw Error("STAGE07_PACKAGE_INCOMPLETE");
+  const memoEntries = edits.map(e => ({ taskId: e.taskId, ...require("./stage07MemoRecovery").recover(e.output) }));
   const blocking = tasks.filter(t => t.pass === "CONSISTENCY_SECTION" || t.pass === "FINAL_SYNTHESIS")
     .flatMap(t => results.get(t.id).output.blockingFindings || []);
   if (blocking.length) throw Error("STAGE07_EDITORIAL_CONSISTENCY_HOLD");
@@ -25,13 +26,13 @@ async function assemble({ source, working, plan, tasks, results, original, planS
   const memoParagraphs = [source.title, working.provenance.name, "Stage 07 editorial review - proposed changes, not author approval",
     "Planning observations (preserved history; final consistency review determines unresolved defects)",
     ...planningFindings.flatMap(p => p.findings.map(f => `${p.taskId}: ${f}`)),
-    ...ledgers.flatMap(l => [l.taskId, l.ledger]), ...edits.flatMap(e => [e.taskId, e.output.memo])].filter(Boolean);
+    ...ledgers.flatMap(l => [l.taskId, l.ledger]), ...memoEntries.flatMap(e => [e.taskId, e.memo])].filter(Boolean);
   const questionParagraphs = [source.title, working.provenance.name, "Author questions", ...(questions.length ? questions : ["No additional questions recorded by this review."])];
   const memoDocument = await require("./stage07Documents").buildDocuments(Buffer.from(memoParagraphs.join("\n\n")), "memo.md", memoParagraphs, memoParagraphs);
   const questionsDocument = await require("./stage07Documents").buildDocuments(Buffer.from(questionParagraphs.join("\n\n")), "questions.md", questionParagraphs, questionParagraphs);
   const files = { "proposed-edited.docx": documents.edited, "author-review.docx": documents.review,
     "editorial-memo.docx": memoDocument.edited, "author-questions.docx": questionsDocument.edited,
-    "editorial-memo.json": Buffer.from(JSON.stringify({ title: source.title, componentName: working.provenance.name, planningFindings, ledgers, edits: edits.map(e => ({ taskId: e.taskId, memo: e.output.memo })) }, null, 2)),
+    "editorial-memo.json": Buffer.from(JSON.stringify({ title: source.title, componentName: working.provenance.name, planningFindings, ledgers, edits: memoEntries }, null, 2)),
     "author-questions.json": Buffer.from(JSON.stringify({ title: source.title, questions }, null, 2)),
     "source-coverage.json": Buffer.from(JSON.stringify(coverage, null, 2)) };
   return { files, manifest: { titleId: source.titleId, componentSha256: source.sourceSha256, planSha256,
