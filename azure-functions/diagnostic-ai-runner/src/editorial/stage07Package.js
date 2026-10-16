@@ -1,20 +1,22 @@
 "use strict";
 const { createHash } = require("node:crypto");
 const sha = bytes => createHash("sha256").update(bytes).digest("hex");
+const hold = code => { const error = new Error(code); error.safeCode = code; throw error; };
 async function assemble({ source, working, plan, tasks, results, original, planSha256 }) {
   const edits = tasks.filter(t => t.pass === "EDIT").map(t => results.get(t.id));
-  if (tasks.some(t => !results.has(t.id))) throw Error("STAGE07_PACKAGE_INCOMPLETE");
+  if (tasks.some(t => !results.has(t.id))) hold("STAGE07_PACKAGE_INCOMPLETE");
   const memoEntries = edits.map(e => ({ taskId: e.taskId, ...require("./stage07MemoRecovery").recover(e.output) }));
   const blocking = tasks.filter(t => t.pass === "CONSISTENCY_SECTION" || t.pass === "FINAL_SYNTHESIS")
     .flatMap(t => results.get(t.id).output.blockingFindings || []);
-  if (blocking.length) throw Error("STAGE07_EDITORIAL_CONSISTENCY_HOLD");
+  if (blocking.length) hold("STAGE07_EDITORIAL_CONSISTENCY_HOLD");
   const originalParagraphs = plan.editing.paragraphs.map(p => working.text.slice(p.start, p.end));
   const proposed = edits.flatMap(e => e.output.paragraphs);
-  if (proposed.length !== originalParagraphs.length || proposed.some((p, i) => p.index !== i)) throw Error("STAGE07_PACKAGE_COVERAGE_HOLD");
+  if (proposed.length !== originalParagraphs.length || proposed.some((p, i) => p.index !== i)) hold("STAGE07_PACKAGE_COVERAGE_HOLD");
   const changes = proposed.filter((p, i) => p.text !== originalParagraphs[i]);
-  const { whitespace } = require("./stage07SourceRestoration");
-  if (!changes.some(p => whitespace(p.text) !== whitespace(originalParagraphs[p.index]))) throw Error("STAGE07_UNCHANGED_COMPONENT_REVIEW_REQUIRED");
-  if (sha(original) !== source.sourceSha256) throw Error("STAGE07_PACKAGE_SOURCE_HASH_MISMATCH");
+  const { typographicQuotes } = require("./stage07SourceRestoration");
+  // Typography alone does not demonstrate completed substantive editorial work.
+  if (!changes.some(p => typographicQuotes(p.text) !== typographicQuotes(originalParagraphs[p.index]))) hold("STAGE07_UNCHANGED_COMPONENT_REVIEW_REQUIRED");
+  if (sha(original) !== source.sourceSha256) hold("STAGE07_PACKAGE_SOURCE_HASH_MISMATCH");
   const documents = await require("./stage07Documents").buildDocuments(original, working.provenance.name, originalParagraphs, proposed.map(p => p.text));
   const coverage = { sourceSha256: source.sourceSha256, sourceTextSha256: source.sourceTextSha256, planSha256,
     paragraphs: plan.editing.paragraphs.map((p, i) => ({ ...p, proposedSha256: sha(proposed[i].text), changed: proposed[i].text !== originalParagraphs[i] })),

@@ -40,3 +40,15 @@ test("planning history is preserved while section and final consistency defects 
   input.results.set("section", { output: { blockingFindings: ["Unresolved source omission"], questions: [] } });
   await assert.rejects(assemble(input), /CONSISTENCY_HOLD/);
 });
+test("quote-only differences cannot masquerade as substantive editing or alter saved proposals", async () => {
+  const input=fixture(),text="The author's words: \u2018Don\u2019t invent.\u2019";
+  input.original=Buffer.from(text);input.working.text=text;
+  input.source.sourceSha256=hash(text);input.source.sourceTextSha256=hash(text);
+  input.plan.editing.paragraphs=[{index:0,start:0,end:text.length}];
+  input.results.get("edit").output.paragraphs[0].text="The author\u2019s words: 'Don't invent.'";
+  const before=structuredClone(input.results.get("edit"));
+  await assert.rejects(assemble(input),{message:"STAGE07_UNCHANGED_COMPONENT_REVIEW_REQUIRED",safeCode:"STAGE07_UNCHANGED_COMPONENT_REVIEW_REQUIRED"});
+  assert.deepEqual(input.results.get("edit"),before);
+  input.results.get("edit").output.paragraphs[0].text="The author's words: 'Never invent.'";
+  const result=await assemble(input);assert.equal(result.manifest.stage07Complete,false);
+});
