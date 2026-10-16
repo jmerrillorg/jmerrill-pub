@@ -26,6 +26,11 @@ app.timer("run-author-review-response-consumer", {
         `Author review response consumer completed; processed=${result.processed}; idempotent=${result.idempotent}; checked=${result.results.length}`
       );
     } finally {
+      const consultations = await require("../lifecycle/stage07AuthorCorrespondence").monitor();
+      for (const result of consultations) {
+        if (result.status !== 200) context.error(`Stage07 consultation: title=${result.jsonBody.titleId}; code=${result.jsonBody.code}`);
+        else context.info(`Stage07 consultation: title=${result.jsonBody.titleId}; status=${result.jsonBody.status}`);
+      }
       const agreements = await require("../lifecycle/publisherFundedSignedFolder").monitor();
       for (const agreement of agreements) {
         if (["HELD", "EXECUTION_REVIEW_REQUIRED"].includes(agreement.status)) context.error(`Stage05 execution review: title=${agreement.titleId}; status=${agreement.status}; code=${agreement.code || "SIGNED_EVIDENCE_REVIEW_REQUIRED"}`);

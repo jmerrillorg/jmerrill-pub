@@ -9,6 +9,7 @@ async function sourceRegistrationHandler(request, deps = {}) {
   }
   let body;
   try { body = await request.json(); } catch { return { status: 400, jsonBody: { code: "INVALID_JSON", effects: 0 } }; }
+  if (require("./stage07AuthorCorrespondence").MODES.includes(body?.mode)) return require("./stage07AuthorCorrespondence").handler(body,deps);
   if (require("./newSubmissionStage07").MODES.includes(body?.mode)) return require("./newSubmissionStage07").handler(body, deps);
   if (body?.mode === "ONBOARDING_ACCESS_ACCEPT") return require("./onboardingAccessAcceptance").handler(body, deps);
   if (require("./publisherFundedStage06").MODES.includes(body?.mode)) {
