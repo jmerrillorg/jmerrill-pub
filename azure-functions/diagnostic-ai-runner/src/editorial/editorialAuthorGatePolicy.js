@@ -108,6 +108,8 @@ function gateIsSuperseded(gate) {
 
 function gateHasFullAuthorApprovalForArtifact(gate, artifact) {
   if (!gate || !artifact || gateIsSuperseded(gate)) return false;
+  // An editorial direction is not approval of a completed stage deliverable.
+  if (isConsultationGate(gate)) return false;
   const status = Number(gate.jm1pub_gatestatus || gate.gateStatus || 0);
   const decidedOn = normalizeString(gate.jm1pub_authordecisionon || gate.authorDecisionOn);
   const nextStageAuthorized = gate.jm1pub_nextstageauthorized === true || gate.nextStageAuthorized === true;
@@ -120,6 +122,11 @@ function gateHasFullAuthorApprovalForArtifact(gate, artifact) {
     artifactMatches &&
     normalizeString(artifact.jm1pub_sha256 || artifact.sha256)
   );
+}
+
+function isConsultationGate(gate) {
+  return gate?.reviewPurpose === "EDITORIAL_CONSULTATION" ||
+    /^EDITORIAL_CONSULTATION:/.test(normalizeString(gate?.jm1pub_editorialapprovalgatename || gate?.name));
 }
 
 function gateBlocksCurrentStageRuntime(gate) {
@@ -233,6 +240,7 @@ function classifyAuthorDecisionForStage({ decision, summary = "", gate = null, a
 }
 
 module.exports = {
+  isConsultationGate,
   AUTHOR_DECISION,
   GATE_STATUS,
   STAGE_SEQUENCE,
