@@ -19,4 +19,4 @@ function restore(output, task, plan, text) {
   }
   return restored.length ? { method: quoteRestored ? "EXACT_SOURCE_QUOTE_RESTORATION_V1" : "EXACT_SOURCE_WHITESPACE_RESTORATION_V1", output: value, restored } : null;
 }
-module.exports = { restore, whitespace };
+module.exports = { restore, whitespace, typographicQuotes };
