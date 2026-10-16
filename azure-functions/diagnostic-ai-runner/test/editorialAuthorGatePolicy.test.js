@@ -1,5 +1,12 @@
 "use strict";
 
+require("node:test")("consultation approval cannot fall through to generic stage approval", () => {
+  const result = require("../src/editorial/editorialAuthorGatePolicy").classifyAuthorDecisionForStage({
+    decision:"APPROVE",gate:{reviewPurpose:"EDITORIAL_CONSULTATION"}
+  });
+  require("node:assert/strict").deepEqual(result,{stageDisposition:"EDITORIAL_DIRECTION_ONLY",nextStageAuthorized:false});
+});
+
 const assert = require("node:assert/strict");
 const test = require("node:test");
 

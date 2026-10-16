@@ -224,6 +224,9 @@ function createAuthorReviewGatePlan({ stageCode, titleId, stageId, artifact, exi
 }
 
 function classifyAuthorDecisionForStage({ decision, summary = "", gate = null, artifact = null } = {}) {
+  if (isConsultationGate(gate)) {
+    return { stageDisposition: "EDITORIAL_DIRECTION_ONLY", nextStageAuthorized: false };
+  }
   if (gate && artifact && gateHasFullAuthorApprovalForArtifact(gate, artifact)) {
     return { stageDisposition: "APPROVED", nextStageAuthorized: true };
   }
