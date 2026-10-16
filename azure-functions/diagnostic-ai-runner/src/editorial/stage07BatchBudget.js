@@ -10,17 +10,28 @@ const AMENDMENT = Object.freeze({
   fromMicroUsd: LIMIT, toMicroUsd: 55_000_000
 });
 const RETRIES = 12;
+const AMENDMENT_60 = Object.freeze({
+  reference: "codex://threads/01a10bb0-3832-7e03-b3a7-2cc488694143/turns/01a143ef-5ecd-7a70-b5c6-44f7f040c282",
+  planSha256: AMENDMENT.planSha256,
+  fromMicroUsd: AMENDMENT.toMicroUsd, toMicroUsd: 60_000_000
+});
 const { valid: validBound } = require("./stage07CostBound");
 const maximum = a => Math.max(a.reservedMicroUsd, a.conservativeMaximumMicroUsd || 0);
 function deny(code) { throw Object.assign(new Error(code), { safeCode: code }); }
 function integer(n) { return Number.isSafeInteger(n) && n >= 0; }
 function validate(state) {
-  const amended = state.version === 3;
+  const amended = [3, 4].includes(state.version);
   if (amended && (!state.budgetAmendment || state.budgetAmendment.reference !== AMENDMENT.reference ||
       state.planSha256 !== AMENDMENT.planSha256 || state.budgetAmendment.fromMicroUsd !== LIMIT ||
       state.budgetAmendment.toMicroUsd !== AMENDMENT.toMicroUsd ||
       !/^[a-f0-9]{64}$/.test(state.budgetAmendment.preimageSha256 || ""))) deny("STAGE07_BUDGET_AMENDMENT_INVALID");
-  if (![1, 2, 3].includes(state.version) || state.limitMicroUsd !== (amended ? AMENDMENT.toMicroUsd : LIMIT) || state.maxAdditionalAttempts !== RETRIES ||
+  if (state.version === 4 && (!state.budgetAmendment60 ||
+      state.budgetAmendment60.reference !== AMENDMENT_60.reference ||
+      state.budgetAmendment60.planSha256 !== AMENDMENT_60.planSha256 ||
+      state.budgetAmendment60.fromMicroUsd !== AMENDMENT_60.fromMicroUsd ||
+      state.budgetAmendment60.toMicroUsd !== AMENDMENT_60.toMicroUsd ||
+      !/^[a-f0-9]{64}$/.test(state.budgetAmendment60.preimageSha256 || ""))) deny("STAGE07_BUDGET_AMENDMENT_INVALID");
+  if (![1, 2, 3, 4].includes(state.version) || state.limitMicroUsd !== (state.version === 4 ? AMENDMENT_60.toMicroUsd : amended ? AMENDMENT.toMicroUsd : LIMIT) || state.maxAdditionalAttempts !== RETRIES ||
       !state.approvalReference || !/^[a-f0-9]{64}$/.test(state.planSha256 || "") || !Array.isArray(state.attempts) ||
       !Array.isArray(state.taskIds) || !state.taskIds.length || new Set(state.taskIds).size !== state.taskIds.length) {
     deny("STAGE07_BUDGET_STATE_INVALID");
@@ -62,7 +73,7 @@ async function transact(store, change) {
 async function reserve(store, input) {
   return transact(store, state => {
     if (state.tariffOrUsageViolation) deny("STAGE07_TARIFF_OR_USAGE_HOLD");
-    if (input.requireVerifiedBounds && (![2, 3].includes(state.version) || !validBound(input.bound,input.requestSha256) || input.bound.maximumMicroUsd !== input.maxMicroUsd ||
+    if (input.requireVerifiedBounds && (![2, 3, 4].includes(state.version) || !validBound(input.bound,input.requestSha256) || input.bound.maximumMicroUsd !== input.maxMicroUsd ||
         state.attempts.some(a => a.status !== "SETTLED" && !validBound(a.bound,a.requestSha256)))) deny("STAGE07_LEGACY_BOUND_RECONCILIATION_REQUIRED");
     if (input.planSha256 !== state.planSha256 || !input.id || !state.taskIds.includes(input.taskId) ||
         !/^[a-f0-9]{64}$/.test(input.requestSha256 || "") ||
@@ -145,7 +156,7 @@ async function applyApprovedAmendment(store, reference) {
   if (reference !== AMENDMENT.reference) deny("STAGE07_BUDGET_AMENDMENT_INVALID");
   return transact(store, state => {
     if (state.planSha256 !== AMENDMENT.planSha256) deny("STAGE07_BUDGET_AMENDMENT_INVALID");
-    if (state.version === 3) return { noWrite: true, replay: true, dispatch: false };
+    if ([3, 4].includes(state.version)) return { noWrite: true, replay: true, dispatch: false };
     if (state.version !== 2) deny("STAGE07_BUDGET_AMENDMENT_INVALID");
     const preimageSha256 = require("node:crypto").createHash("sha256").update(JSON.stringify(state)).digest("hex");
     state.budgetAmendment = { ...AMENDMENT, preimageSha256 };
@@ -158,6 +169,20 @@ async function applyApprovedAmendment(store, reference) {
 async function readIfPresent(blob) {
   try { return (await blobStore(blob).read()).value; }
   catch (error) { if (error.statusCode === 404) return null; throw error; }
+}
+async function applyApproved60Amendment(store, reference) {
+  if (reference !== AMENDMENT_60.reference) deny("STAGE07_BUDGET_AMENDMENT_INVALID");
+  return transact(store, state => {
+    if (state.planSha256 !== AMENDMENT_60.planSha256) deny("STAGE07_BUDGET_AMENDMENT_INVALID");
+    if (state.version === 4) return { noWrite: true, replay: true, dispatch: false };
+    if (state.version !== 3) deny("STAGE07_BUDGET_AMENDMENT_INVALID");
+    const preimageSha256 = require("node:crypto").createHash("sha256").update(JSON.stringify(state)).digest("hex");
+    state.budgetAmendment60 = { ...AMENDMENT_60, preimageSha256 };
+    state.version = 4;
+    state.limitMicroUsd = AMENDMENT_60.toMicroUsd;
+    validate(state);
+    return { amended: true, dispatch: false, preimageSha256, limitMicroUsd: state.limitMicroUsd };
+  });
 }
 function blobStore(blob) {
   return {
@@ -176,4 +201,4 @@ function blobStore(blob) {
     }
   };
 }
-module.exports = { LIMIT, RETRIES, AMENDMENT, applyApprovedAmendment, createState, exposure, reserve, settle, reconcileBound, blobStore, initialize, readIfPresent };
+module.exports = { LIMIT, RETRIES, AMENDMENT, AMENDMENT_60, applyApprovedAmendment, applyApproved60Amendment, createState, exposure, reserve, settle, reconcileBound, blobStore, initialize, readIfPresent };

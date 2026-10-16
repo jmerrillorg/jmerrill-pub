@@ -37,6 +37,36 @@ function store() {
     async compareAndSwap(etag, next) { if (etag !== String(version)) return false; value = structuredClone(next); version++; return true; } };
 }
 const request = (id, taskId = id, maxMicroUsd = 10_000_000) => ({ id, taskId, maxMicroUsd, planSha256: hash, requestSha256: hash });
+test("sixty-dollar amendment preserves prior authority and unresolved attempts with concurrent hard stop", async () => {
+  const s = store(), start = await s.read();
+  start.value.planSha256 = b.AMENDMENT.planSha256;
+  await s.compareAndSwap(start.etag, start.value);
+  await assert.rejects(b.applyApproved60Amendment(s, b.AMENDMENT_60.reference), /AMENDMENT_INVALID/);
+  await b.applyApprovedAmendment(s, b.AMENDMENT.reference);
+  const req = id => ({...request(id, id, 10_000_000), planSha256:b.AMENDMENT.planSha256});
+  await b.reserve(s, req("one"));
+  const before = await s.read();
+  await assert.rejects(b.applyApproved60Amendment(s, "unapproved"), /AMENDMENT_INVALID/);
+  const results = await Promise.all(Array.from({length:4}, () => b.applyApproved60Amendment(s,b.AMENDMENT_60.reference)));
+  assert.equal(results.filter(r=>r.amended).length,1);
+  const after = await s.read();
+  assert.deepEqual(after.value.attempts,before.value.attempts);
+  assert.deepEqual(after.value.budgetAmendment,before.value.budgetAmendment);
+  assert.equal(after.value.maxAdditionalAttempts,12);
+  assert.equal(after.value.version,4);
+  assert.equal(after.value.limitMicroUsd,60_000_000);
+  await b.applyApprovedAmendment(s,b.AMENDMENT.reference);
+  await b.applyApproved60Amendment(s,b.AMENDMENT_60.reference);
+  assert.equal((await s.read()).etag,after.etag);
+  const reservations=await Promise.allSettled(Array.from({length:10},(_,i)=>b.reserve(s,req(String(i)))));
+  assert.equal(reservations.filter(r=>r.status==="fulfilled").length,5);
+  assert.equal(b.exposure((await s.read()).value),60_000_000);
+  await assert.rejects(b.reserve(s,req("two")),/SPEND_LIMIT/);
+  await assert.rejects(b.reserve(s,{...req("task"),taskId:"one"}),/UNRESOLVED/);
+  assert.throws(()=>b.exposure({...after.value,limitMicroUsd:65_000_000}),/STATE_INVALID/);
+  assert.throws(()=>b.exposure({...after.value,budgetAmendment60:undefined}),/AMENDMENT_INVALID/);
+  assert.throws(()=>b.exposure({...after.value,maxAdditionalAttempts:13}),/STATE_INVALID/);
+});
 test("exact founder amendment preserves history, is replay-safe and caps concurrent exposure at 55", async () => {
   const s = store(), before = await s.read();
   before.value.planSha256 = b.AMENDMENT.planSha256;
