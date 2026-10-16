@@ -41,6 +41,10 @@ async function buildDocuments(original, name, paragraphs, proposed) {
     let revision = 0;
     for (const [index, node] of nodes.entries()) {
       if (proposed[index] === paragraphs[index]) continue;
+      if (proposed[index] === "" && !review) {
+        if (["fldChar","fldSimple","drawing","sectPr"].some(tag=>node.getElementsByTagNameNS(W,tag).length)) throw Error("STAGE07_DOCUMENT_COMPLEX_PARAGRAPH_REVIEW_REQUIRED");
+        node.parentNode.removeChild(node); continue;
+      }
       // Never flatten live fields or silently lose an existing citation link.
       if (["fldChar", "fldSimple"].some(tag => node.getElementsByTagNameNS(W, tag).length)) {
         throw Error("STAGE07_DOCUMENT_COMPLEX_PARAGRAPH_REVIEW_REQUIRED");
