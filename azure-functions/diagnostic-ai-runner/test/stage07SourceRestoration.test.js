@@ -9,6 +9,19 @@ function fixture() {
     reviewedNoChange: [0, 1], noChangeReason: "Source wording is deliberately retained after review.", memo: "Retain these source paragraphs.", questions: [] };
   return { text, plan, task, output };
 }
+test("explicitly unchanged curly double quotes restore source, never words or attribution", () => {
+  const text = 'He said \u201cKeep these exact words.\u201d', plan = componentPlan(text), task = {id:"component/EDIT/0",pass:"EDIT",index:0};
+  const output = {paragraphs:[{index:0,text:'He said "Keep these exact words."'}],reviewedNoChange:[0],noChangeReason:"Retained after review.",memo:"Preserve the exact quotation.",questions:[]};
+  const before = structuredClone(output), result = restore(output,task,plan,text);
+  assert.equal(result.method,"EXACT_SOURCE_QUOTE_RESTORATION_V1");
+  assert.equal(result.output.paragraphs[0].text,text);
+  assert.equal(runtime.validateOutput(result.output,task,plan,text),true);
+  assert.deepEqual(output,before);
+  for(const changed of ['She said "Keep these exact words."','He said "Change these exact words."','He said Keep these exact words.']) {
+    assert.equal(restore({...output,paragraphs:[{index:0,text:changed}]},task,plan,text),null);
+  }
+  assert.equal(restore({...output,reviewedNoChange:[]},task,plan,text),null);
+});
 test("only explicitly unchanged whitespace equivalents restore exact source bytes", () => {
   const f = fixture(), raw = structuredClone(f.output), result = restore(f.output, f.task, f.plan, f.text);
   assert.deepEqual(f.output, raw);

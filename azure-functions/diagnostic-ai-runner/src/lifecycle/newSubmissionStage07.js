@@ -209,7 +209,8 @@ async function handler(body, supplied = {}) {
       const originalReceipt = (await b.read(deps.containerClient, originalReceiptPath)).value;
       const recovered = recoverSourceWhitespace(prior, originalReceipt, prepared, task);
       if (recovered) {
-        const receiptPath = `${PREFIX}/recoveries/${prior.id}-source-whitespace-v1.json`, output = recovered.sourceRestoration.output;
+        const suffix = recovered.sourceRestoration.method === "EXACT_SOURCE_QUOTE_RESTORATION_V1" ? "source-quotes-v1" : "source-whitespace-v1";
+        const receiptPath = `${PREFIX}/recoveries/${prior.id}-${suffix}.json`, output = recovered.sourceRestoration.output;
         await b.immutable(deps.containerClient, receiptPath, { ...recovered, originalReceiptPath });
         await b.immutable(deps.containerClient, `${PREFIX}/results/${b.sha(task.id)}.json`, {
           taskId: task.id, planSha256: planSha, sourceSha256: source.sourceSha256, receiptPath,
