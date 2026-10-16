@@ -1,0 +1,177 @@
+"use strict";
+const b = require("./newSubmissionStage03Budget");
+const mail = require("./publisherFundedStage04Mail");
+const policy = require("../editorial/editorialConsultationPolicy");
+const replies = require("../editorial/editorialConsultationReply");
+const folders = require("./pipelineFolderProjection");
+const sources = require("../../config/jackie-stage07-batch.json");
+const PREFIX = "editorial-consultations/stage07";
+const MODES = ["CONSULTATION_07_SEND", "CONSULTATION_07_RECONCILE", "CONSULTATION_07_READBACK"];
+const version = "EDITORIAL-CONSULTATION-20261016-V5";
+const contact = require("../author/jackieTitleSystemCommissioningPolicy").JACKIE_CANONICAL_AUTHOR_CONTACT_ID;
+const selected = () => require("../../config/stage07-consultation-manifest.json");
+function prefix(titleId) { return `${PREFIX}/${titleId}/${version}`; }
+function validate(review) {
+  const hash = policy.validate(review);
+  const expected = sources.sources.filter(s => s.titleId === review.titleId).map(s => s.sourceSha256).sort();
+  if (!expected.length || review.version !== version || review.stageId !== "07_DEVELOPMENTAL_EDITING" ||
+      review.authorContactId !== contact || review.authorEmail !== mail.AUTHOR ||
+      JSON.stringify([...review.sourceHashes].sort()) !== JSON.stringify(expected) ||
+      review.stageCompletionRequested !== false || review.authority?.method !== "DIRECT_AUTHOR_INSTRUCTION" ||
+      !review.authority.chatReference || !review.subject?.includes(`[JMP-DEV-${review.titleId.slice(0,8)}-V5]`) ||
+      !review.body || review.attachments.some(a => !a.blobPath?.startsWith(`${prefix(review.titleId)}/attachments/`) ||
+        !["application/pdf", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"].includes(a.contentType) ||
+        !a.name || /[\r\n/\\]/.test(a.name))) b.deny("CONSULTATION_SCOPE_DENIED");
+  return hash;
+}
+async function load(titleId, deps) {
+  const pin = selected().find(x => x.titleId === titleId);
+  if (!pin) b.deny("CONSULTATION_TITLE_NOT_SELECTED");
+  const record = await b.read(deps.containerClient, `${prefix(titleId)}/review.json`);
+  if (b.sha(record.bytes) !== pin.sha256 || record.value.titleId !== titleId) b.deny("CONSULTATION_MANIFEST_DRIFT");
+  validate(record.value);
+  return record.value;
+}
+async function archive(review, kind, value, deps) {
+  const bytes = Buffer.from(JSON.stringify(value)), hash = b.sha(bytes);
+  const saved = await b.optional(deps.containerClient, `${prefix(review.titleId)}/folder-${kind}-${hash}.json`);
+  if (saved) return saved.value;
+  const id = folders.FOLDERS[review.titleId];
+  const folder = await deps.graph(folders.path(id));
+  if (folder.id !== id || folder.parentReference?.name !== "07 - Developmental Editing") b.deny("CONSULTATION_FOLDER_DRIFT");
+  const name = `Stage07-${kind}-${hash.slice(0,16)}.json`;
+  const target = `${folders.path(id)}:/${encodeURIComponent(name)}`;
+  let item;
+  try { item = await deps.graph(target); } catch(e) { if(e.statusCode!==404)throw e; }
+  if(!item){
+    try { item = await deps.graph(`${target}:/content`, {method:"PUT",headers:{"Content-Type":"application/json","If-None-Match":"*"},body:bytes}); }
+    catch(e){if(![409,412].includes(e.statusCode))throw e;item=await deps.graph(target);}
+  }
+  if (!item.id || item.parentReference?.id !== id) b.deny("CONSULTATION_CUSTODY_FAILED");
+  if(b.sha(await deps.sourceBytes({itemId:item.id}))!==hash)b.deny("CONSULTATION_CUSTODY_CONTENT_CONFLICT");
+  return (await b.immutable(deps.containerClient, `${prefix(review.titleId)}/folder-${kind}-${hash}.json`,
+    { itemId:item.id, webUrl:item.webUrl, sha256:hash, titleId:review.titleId, version:review.version })).value;
+}
+async function payload(review, deps) {
+  const attachments = [];
+  for (const a of review.attachments) {
+    const blob = deps.containerClient.getBlockBlobClient(a.blobPath), props = await blob.getProperties();
+    const bytes = await blob.downloadToBuffer(0, undefined, {conditions:{ifMatch:props.etag}});
+    if (b.sha(bytes) !== a.sha256) b.deny("CONSULTATION_ATTACHMENT_DRIFT");
+    attachments.push({name:a.name,contentType:a.contentType,contentInBase64:bytes.toString("base64"),
+      sha256:a.sha256,role:a.role,version:a.version,artifactId:`${review.titleId}:${a.sha256}`});
+  }
+  if (Buffer.byteLength(JSON.stringify(attachments)) > 9 * 1024 * 1024)
+    b.deny("CONSULTATION_MESSAGE_SIZE_LIMIT");
+  return {messageType:"APPROVED_AUTHOR_RESPONSE",diagnosticId:review.titleId,intakeReferenceCode:review.intakeReference,
+    authorEmail:mail.AUTHOR,authorName:"Jackie Smith, Jr.",projectTitle:review.title,subject:review.subject,body:review.body,
+    templateName:"STAGE07_EDITORIAL_CONSULTATION_V5",templateVersion:review.version,
+    approvedBy:review.authority.chatReference,approvedOn:review.authority.recordedAt,
+    futureSendRequiresInternalCopy:true,futureSendRequiresDataverseLog:true,
+    internalVisibilityMailbox:mail.MAILBOX,cc:[mail.MAILBOX],bcc:[],replyTo:mail.MAILBOX,attachments};
+}
+async function send(review, deps) {
+  const path = `${prefix(review.titleId)}/send.json`, prior = await b.optional(deps.containerClient,path);
+  if(prior) return prior.value;
+  const message = await payload(review,deps);
+  // A relay timeout remains an unresolved intent. The identical relay key/body owns recovery.
+  await b.immutable(deps.containerClient,`${prefix(review.titleId)}/send-intent.json`,
+    {titleId:review.titleId,reviewHash:validate(review),payloadSha256:b.sha(JSON.stringify(message)),version:review.version});
+  const result = await (deps.sendConsultation || mail.send)(message,deps);
+  if(!result.providerMessageId || !result.communicationRecordId || !Number.isFinite(Date.parse(result.sentAt)))
+    b.deny("CONSULTATION_SEND_RECEIPT_INCOMPLETE");
+  return (await b.immutable(deps.containerClient,path,{...result,titleId:review.titleId,version:review.version,
+    reviewHash:validate(review),generated:true,sent:true,delivered:false,stageCompletionApproved:false,nextStageAuthorized:false})).value;
+}
+const SELECT="id,internetMessageId,conversationId,receivedDateTime,subject,from,sender,toRecipients,ccRecipients,internetMessageHeaders";
+async function delivery(review,sent,deps) {
+  const providerId=require("../generated/communications/publishing-communication-acceptance").providerIdFromInternetMessageId;
+  const copies=await mail.pages(mail.MAILBOX,{$filter:`receivedDateTime ge ${sent.sentAt} and from/emailAddress/address eq '${mail.FROM}'`,$select:SELECT,$top:"100"},deps);
+  const candidates=copies.filter(x=>providerId(x.internetMessageId||"")===sent.providerMessageId.replaceAll("-","").toLowerCase());
+  if(candidates.length>1)b.deny("CONSULTATION_DELIVERY_CONFLICT");
+  if(!candidates.length)return null;
+  const cc=candidates[0];
+  if(cc.subject!==review.subject || !cc.toRecipients?.some(x=>x.emailAddress.address.toLowerCase()===mail.AUTHOR) ||
+    !cc.ccRecipients?.some(x=>x.emailAddress.address.toLowerCase()===mail.MAILBOX))b.deny("CONSULTATION_RECIPIENT_CONFLICT");
+  let author=[];let authorReadError=null;
+  try {author=await mail.pages(mail.AUTHOR,{$filter:`internetMessageId eq '${cc.internetMessageId.replace(/'/g,"''")}'`,$select:SELECT,$top:"10"},deps);}
+  catch(e){if(e.statusCode!==403)throw e;authorReadError={status:403,code:e.providerCode||e.safeCode};}
+  if(author.length>1)b.deny("CONSULTATION_DELIVERY_CONFLICT");
+  const found=author[0];
+  if(found&&(found.subject!==review.subject || found.internetMessageId!==cc.internetMessageId ||
+    found.from?.emailAddress?.address?.toLowerCase()!==mail.FROM ||
+    !found.toRecipients?.some(x=>x.emailAddress?.address?.toLowerCase()===mail.AUTHOR) ||
+    !Number.isFinite(Date.parse(found.receivedDateTime))))b.deny("CONSULTATION_RECIPIENT_CONFLICT");
+  return {titleId:review.titleId,version:review.version,reviewHash:validate(review),internetMessageId:cc.internetMessageId,
+    publishingMessageId:cc.id,authorMessageId:found?.id||null,conversationId:cc.conversationId,sentAt:sent.sentAt,
+    deliveredAt:found?.receivedDateTime||null,publishingCopyReceivedAt:cc.receivedDateTime,
+    delivered:!!found,authorReadError,authentication:found?mail.authentication(found):{dmarc:"UNVERIFIED"},
+    stageCompletionApproved:false,nextStageAuthorized:false};
+}
+async function reconcile(review,deps) {
+  const base=prefix(review.titleId),sent=(await b.optional(deps.containerClient,`${base}/send.json`))?.value;
+  if(!sent)return {titleId:review.titleId,status:"NOT_SENT",stageCompletionApproved:false,nextStageAuthorized:false};
+  const custodyErrors=[];
+  const preserve=async(kind,value)=>{try{await archive(review,kind,value,deps);}catch(e){custodyErrors.push({kind,code:e.safeCode||"CONSULTATION_FOLDER_UNAVAILABLE",status:e.statusCode||null});}};
+  await preserve("consultation",review);await preserve("send",sent);
+  const prior=await b.optional(deps.containerClient,`${base}/delivery.json`);
+  const delivered=prior?.value||await delivery(review,sent,deps);
+  if(delivered){
+    await b.immutable(deps.containerClient,`${base}/delivery-observations/${b.sha(JSON.stringify(delivered))}.json`,delivered);
+    if(delivered.delivered)await b.immutable(deps.containerClient,`${base}/delivery.json`,delivered);
+    await preserve("delivery",delivered);
+  }
+  const results=[];
+  if(delivered?.internetMessageId){
+    for(const message of await mail.replies({deliveredAt:sent.sentAt},deps)){
+      const headers=message.internetMessageHeaders||[];
+      if(!headers.some(h=>h.name.toLowerCase()==="in-reply-to"&&h.value.includes(delivered.internetMessageId)))continue;
+      const key=b.sha(message.internetMessageId||message.id),path=`${base}/replies/${key}.json`;
+      const saved=await b.optional(deps.containerClient,path);
+      const result=replies.classify(message,review,delivered);
+      const record={titleId:review.titleId,version:review.version,reviewHash:validate(review),messageId:message.id,
+        internetMessageId:message.internetMessageId,receivedAt:message.receivedDateTime,authoredText:message.uniqueBody?.content||"",
+        stageCompletionApproved:false,nextStageAuthorized:false};
+      if(saved&&JSON.stringify(saved.value)!==JSON.stringify(record))b.deny("CONSULTATION_REPLY_CONTENT_CONFLICT");
+      await b.immutable(deps.containerClient,path,record);await preserve("reply",record);
+      const evaluation={replyReference:path,reviewHash:validate(review),result};
+      await b.immutable(deps.containerClient,`${base}/evaluations/${key}-${b.sha(JSON.stringify(result))}.json`,evaluation);
+      await preserve("decision",evaluation);
+      results.push({reference:path,status:result.status,replay:!!saved});
+    }
+  }
+  return {titleId:review.titleId,version:review.version,generated:true,sent:true,delivery:delivered,
+    replies:results,custodyErrors,status:delivered?.delivered?"DELIVERED_AWAITING_EDITORIAL_RESPONSE":"SENT_DELIVERY_READBACK_PENDING",
+    stageCompletionApproved:false,nextStageAuthorized:false};
+}
+async function handler(body,supplied={}) {
+  if(!MODES.includes(body?.mode)||!selected().some(x=>x.titleId===body.titleId)||Object.keys(body).some(k=>!["mode","titleId"].includes(k)))
+    return {status:400,jsonBody:{code:"CONSULTATION_SCOPE_DENIED"}};
+  try{
+    const deps=await require("./newSubmissionStage01").native(supplied);
+    if((await deps.containerClient.getProperties()).blobPublicAccess)b.deny("CONSULTATION_PRIVATE_STORAGE_REQUIRED");
+    const review=await load(body.titleId,deps);
+    if(body.mode==="CONSULTATION_07_SEND"){
+      const stage=await require("./pipelineFolderRuntime").readAuthority(body.titleId,deps);
+      if(!stage.current||stage.stageCode!==review.stageId)b.deny("CONSULTATION_STAGE_CHANGED");
+      const hash=validate(review);
+      const execution=await require("./titleCommissioningIntakeWorker").processTitleCommissioningStep({titleId:body.titleId,bindingHash:hash},
+        {...deps,readScope:async titleId=>({titleId,enabled:true,revoked:false,mode:"JACKIE_TITLE_INTERNAL_COMMISSIONING"})},
+        {namespace:`${PREFIX}/send-executions`,executionSuffix:"",plan:x=>({...x,executionId:`consultation:${x.bindingHash}`}),
+          execute:()=>send(review,deps),validate:x=>x.sent===true,reference:()=>`${prefix(body.titleId)}/send.json`,
+          completionEffects:()=>({stageCompletionApproved:false,nextStageAuthorized:false})});
+      if(execution.status!=="COMPLETED")return {status:202,jsonBody:{titleId:body.titleId,execution,stageCompletionApproved:false,nextStageAuthorized:false}};
+    }
+    if(body.mode==="CONSULTATION_07_READBACK")return {status:200,jsonBody:{titleId:body.titleId,reviewHash:validate(review),
+      sent:(await b.optional(deps.containerClient,`${prefix(body.titleId)}/send.json`))?.value||null,
+      delivered:(await b.optional(deps.containerClient,`${prefix(body.titleId)}/delivery.json`))?.value||null,
+      stageCompletionApproved:false,nextStageAuthorized:false}};
+    return {status:200,jsonBody:await reconcile(review,deps)};
+  }catch(e){return {status:409,jsonBody:{titleId:body.titleId,code:e.safeCode||"CONSULTATION_DEPENDENCY_FAILED",providerStatus:e.statusCode||null,stageCompletionApproved:false,nextStageAuthorized:false}};}
+}
+async function monitor(deps={}) {
+  const results=[];
+  for(const row of selected())results.push(await handler({titleId:row.titleId,mode:"CONSULTATION_07_RECONCILE"},deps));
+  return results;
+}
+module.exports={PREFIX,MODES,version,prefix,validate,load,payload,send,delivery,reconcile,handler,monitor};

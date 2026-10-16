@@ -41,6 +41,15 @@ function artifact(overrides = {}) {
   };
 }
 
+test("an approved consultation never authorizes next-stage execution", () => {
+  for (const scope of [{reviewPurpose:"EDITORIAL_CONSULTATION"},
+    {jm1pub_editorialapprovalgatename:"EDITORIAL_CONSULTATION: annual structure"}]) {
+    const gate=approvedGate(scope);
+    assert.equal(gateHasFullAuthorApprovalForArtifact(gate,artifact()),false);
+    assert.equal(evaluateNextStageEligibility({stageCode:"LINE_EDITING",upstreamArtifacts:[artifact()],upstreamGates:[gate]}).ok,false);
+  }
+});
+
 test("canonical editorial stage sequence requires author approval between all stage transitions", () => {
   assert.deepEqual(STAGE_SEQUENCE, [
     "EDITORIAL_REVIEW",

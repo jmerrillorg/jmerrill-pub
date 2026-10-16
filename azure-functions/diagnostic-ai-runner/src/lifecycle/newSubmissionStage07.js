@@ -4,8 +4,9 @@ const b = require("./newSubmissionStage03Budget");
 const budget = require("../editorial/stage07BatchBudget");
 const prompts = require("../editorial/stage07PromptPlan");
 const provider = require("../model/providers/microsoftFoundryClaudeProvider");
+const closure = require("../editorial/stage07ClosureAuthority");
 const PREFIX = `new-submission-stage07/${policy.batchId}`;
-const MODES = ["SUBMISSION_07_PLAN", "SUBMISSION_07_EXECUTE", "SUBMISSION_07_READBACK", "SUBMISSION_07_PACKAGE"];
+const MODES = ["SUBMISSION_07_PLAN", "SUBMISSION_07_EXECUTE", "SUBMISSION_07_READBACK", "SUBMISSION_07_PACKAGE", "SUBMISSION_07_CLOSURE_ADOPT"];
 const route = { deploymentName: policy.deploymentName, model: policy.model, promptVersion: "JMP-STAGE07-BUDGETED-V1" };
 const planSha = b.sha(JSON.stringify({ policy, promptVersion: "PARAGRAPH_EDIT_HIERARCHY8_V2" }));
 function tasks(source) {
@@ -89,6 +90,17 @@ function recoverIdenticalReviews(entries, prepared, task) {
     originalPaidMicroUsd: entries.reduce((n,e) => n+e.prior.actualMicroUsd,0), newPaidAttempts:0,
     sourceRestoration: {method:"IDENTICAL_PAID_REVIEW_RECONCILIATION_V1",output} };
 }
+function recoverApprovedMetadata(prior, receipt, prepared, task) {
+  if (task.id !== `${closure.primary}/EDIT/106` || !verifiedFailedReceipt(prior,receipt,task) ||
+      b.sha(JSON.stringify(receipt.result.output)) !== "45dbefd494e882ffb19e2ef3a8adfdfef6753ca18de173b36dd7294873410875") return null;
+  const output = structuredClone(receipt.result.output);
+  if (!output.memo.includes("The run-together list formatting in paragraphs 9445 and 9485 (no line breaks between clauses) is preserved verbatim as it appears")) return null;
+  output.reviewedNoChange.push(9485); output.reviewedNoChange.sort((a,b)=>a-b);
+  validateOutput(output,task,prepared.plan,prepared.working.text);
+  return {taskId:task.id,planSha256:planSha,sourceSha256:prepared.source.sourceSha256,
+    originalAttemptId:prior.id,originalReceiptSha256:b.sha(JSON.stringify(receipt)),originalPaidMicroUsd:prior.actualMicroUsd,
+    authority:closure.reference,newPaidAttempts:0,sourceRestoration:{method:"EXACT_MEMO_INDEX_REPAIR_V1",output}};
+}
 async function prepare(source, deps) {
   const current = await require("./pipelineFolderRuntime").readAuthority(source.titleId, deps);
   const placement = (await b.read(deps.containerClient, `${require("./pipelineFolderProjection").PREFIX}/${source.titleId}/state.json`)).value;
@@ -149,8 +161,14 @@ function buildPrompt(prepared, task, results) {
         .map(({ index, text }) => ({ index, text })) });
     }
   }
-  return prompts.prompt({ text: working.text, titleId: source.titleId, componentId: source.sourceSha256,
+  const prompt = prompts.prompt({ text: working.text, titleId: source.titleId, componentId: source.sourceSha256,
     title: source.title, span, pass: task.pass, brief, evidence });
+  if (task.id !== closure.correctiveTask) return prompt;
+  const request = JSON.parse(prompt);
+  request.correctiveAuthority = closure.reference;
+  request.correctiveTask = task.id;
+  request.compactReview = "Review every supplied paragraph. Report concise grouped findings with exact paragraph anchors; do not repeat manuscript text. Include exact coverage, questions and blockingFindings fields. Never omit a material finding to shorten output.";
+  return JSON.stringify(request);
 }
 function nextEligibleTask(prepared, remaining, results, ledger) {
   const retries = ledger.attempts.length - new Set(ledger.attempts.map(a => a.taskId)).size;
@@ -190,16 +208,38 @@ async function handler(body, supplied = {}) {
     if ((await deps.containerClient.getProperties()).blobPublicAccess) b.deny("STAGE07_PRIVATE_STORAGE_REQUIRED");
     const prepared = await prepare(source, deps), results = await readResults(source, deps), allTasks = tasks(source);
     const remaining = allTasks.filter(task => !results.has(task.id));
+    if (body.mode === "SUBMISSION_07_CLOSURE_ADOPT") {
+      if (env.JM1_STAGE07_CLOSURE_AUTHORITY !== closure.reference) b.deny("STAGE07_CLOSURE_AUTHORITY_REQUIRED");
+      if (source.sourceSha256 !== closure.primary) b.deny("STAGE07_CLOSURE_SCOPE_DENIED");
+      const task = allTasks.find(t=>t.id===`${closure.primary}/EDIT/106`);
+      if (results.has(task.id)) return {status:200,jsonBody:{status:"OUTPUT_VALIDATED",taskId:task.id,replay:true,dispatch:false,stage08:"NOT_STARTED"}};
+      const ledger = await budget.readIfPresent(deps.containerClient.getBlockBlobClient(`${PREFIX}/budget.json`));
+      const prior = ledger.attempts.filter(a=>a.taskId===task.id).at(-1);
+      const originalReceiptPath = `${PREFIX}/attempts/${prior.id}.json`;
+      const recovered = recoverApprovedMetadata(prior,(await b.read(deps.containerClient,originalReceiptPath)).value,prepared,task);
+      if (!recovered) b.deny("STAGE07_CLOSURE_EVIDENCE_INVALID");
+      const receiptPath=`${PREFIX}/recoveries/${prior.id}-memo-index-v1.json`,output=recovered.sourceRestoration.output;
+      await b.immutable(deps.containerClient,receiptPath,{...recovered,originalReceiptPath});
+      await b.immutable(deps.containerClient,`${PREFIX}/results/${b.sha(task.id)}.json`,{taskId:task.id,planSha256:planSha,
+        sourceSha256:source.sourceSha256,receiptPath,output,outputSha256:b.sha(JSON.stringify(output))});
+      return {status:200,jsonBody:{status:"OUTPUT_VALIDATED",taskId:task.id,receiptPath,dispatch:false,newPaidAttempts:0,stage08:"NOT_STARTED"}};
+    }
     if (body.mode === "SUBMISSION_07_PACKAGE") {
       if (remaining.length) b.deny("STAGE07_PACKAGE_INCOMPLETE");
-      const base = `${PREFIX}/packages/${source.sourceSha256}`;
+      const approvedClosure = env.JM1_STAGE07_CLOSURE_AUTHORITY === closure.reference;
+      const base = `${PREFIX}/packages/${source.sourceSha256}${approvedClosure ? "/closure-v1" : ""}`;
       const existing = await b.optional(deps.containerClient, `${base}/manifest.json`);
-      if (existing) return { status: 200, jsonBody: { ...existing.value, replay: true } };
+      if (existing) {
+        if(approvedClosure){const delivery=await require("../editorial/stage07TitleDelivery").publish(source,existing.value,deps);
+          await b.immutable(deps.containerClient,`${base}/delivery.json`,delivery);
+          return {status:200,jsonBody:{...existing.value,delivery,replay:true}};}
+        return { status: 200, jsonBody: { ...existing.value, replay: true } };
+      }
       let original = await deps.sourceBytes({ itemId: prepared.workingOutput.itemId });
       if (prepared.workingOutput.packaging === "ZIP_SINGLE_SOURCE_V1") {
         original = await (await require("jszip").loadAsync(original, { checkCRC32: true })).file(prepared.workingOutput.entryName).async("nodebuffer");
       }
-      const assembled = await require("../editorial/stage07Package").assemble({ ...prepared, tasks: allTasks, results, original, planSha256: planSha });
+      const assembled = await require("../editorial/stage07Package").assemble({ ...prepared, tasks: allTasks, results, original, planSha256: planSha, approvedClosure });
       for (const [name, bytes] of Object.entries(assembled.files)) {
         const blob = deps.containerClient.getBlockBlobClient(`${base}/${name}`);
         try { await blob.uploadData(bytes, { conditions: { ifNoneMatch: "*" } }); }
@@ -211,6 +251,9 @@ async function handler(body, supplied = {}) {
       }
       const manifest = { ...assembled.manifest, storagePrefix: base };
       await b.immutable(deps.containerClient, `${base}/manifest.json`, manifest);
+      if(approvedClosure){const delivery=await require("../editorial/stage07TitleDelivery").publish(source,manifest,deps);
+        await b.immutable(deps.containerClient,`${base}/delivery.json`,delivery);
+        return {status:200,jsonBody:{...manifest,delivery}};}
       return { status: 200, jsonBody: manifest };
     }
     const ledger = !execute || !remaining.length ? await budget.readIfPresent(deps.containerClient.getBlockBlobClient(`${PREFIX}/budget.json`)) : null;
@@ -226,7 +269,8 @@ async function handler(body, supplied = {}) {
     const ledgerBlob = deps.containerClient.getBlockBlobClient(`${PREFIX}/budget.json`);
     await budget.initialize(ledgerBlob, budget.createState({ approvalReference: `${PREFIX}/approval.json`, planSha256: planSha, taskIds }));
     const store = budget.blobStore(ledgerBlob), before = await store.read();
-    const task = nextEligibleTask(prepared, remaining, results, before.value);
+    if (env.JM1_STAGE07_CLOSURE_AUTHORITY !== closure.reference || before.value.version !== 5) b.deny("STAGE07_CLOSURE_AUTHORITY_REQUIRED");
+    const task = nextEligibleTask(prepared, remaining.filter(t=>closure.paidTasks.includes(t.id)), results, before.value);
     if (!task) return { status: 409, jsonBody: { code: "STAGE07_DEPENDENT_RESULT_REQUIRED", dispatch: false,
       reservationRetained: true, stage08: "NOT_STARTED" } };
     const previous = before.value.attempts.filter(a => a.taskId === task.id);
@@ -295,4 +339,4 @@ async function handler(body, supplied = {}) {
   } catch (error) { return { status: 409, jsonBody: { code: /^(STAGE07|REVIEW_RECOVERY)_[A-Z_]+$/.test(error.safeCode || "") ? error.safeCode : "STAGE07_DEPENDENCY_FAILED",
     providerStatus: error.statusCode || null, stage08: "NOT_STARTED", communications: 0, payments: 0 } }; }
 }
-module.exports = { MODES, tasks, prepare, validateOutput, recoverSourceWhitespace, recoverIdenticalReviews, buildPrompt, nextEligibleTask, handler, PREFIX, planSha, policy };
+module.exports = { MODES, tasks, prepare, validateOutput, recoverSourceWhitespace, recoverIdenticalReviews, recoverApprovedMetadata, buildPrompt, nextEligibleTask, handler, PREFIX, planSha, policy };

@@ -37,6 +37,38 @@ function store() {
     async compareAndSwap(etag, next) { if (etag !== String(version)) return false; value = structuredClone(next); version++; return true; } };
 }
 const request = (id, taskId = id, maxMicroUsd = 10_000_000) => ({ id, taskId, maxMicroUsd, planSha256: hash, requestSha256: hash });
+test("closure grants one exact corrective retry, preserves uncertain exposure and permits later evidence settlement", async () => {
+  const c=require("../src/editorial/stage07ClosureAuthority"), s=store(), initial=await s.read();
+  initial.value.planSha256=b.AMENDMENT.planSha256;
+  initial.value.taskIds.push(...c.paidTasks);
+  await s.compareAndSwap(initial.etag,initial.value);
+  await b.applyApprovedAmendment(s,b.AMENDMENT.reference);
+  await b.applyApproved60Amendment(s,b.AMENDMENT_60.reference);
+  const req=(id,taskId)=>({...request(id,taskId,100),planSha256:b.AMENDMENT.planSha256});
+  for(let i=0;i<13;i++){
+    await b.reserve(s,req(`prior-${i}`,c.correctiveTask));
+    await b.settle(s,{id:`prior-${i}`,actualMicroUsd:50,receiptReference:`receipt-${i}`,outcome:"FAILED"});
+  }
+  await b.reserve(s,req("uncertain","one"));
+  const before=await s.read();
+  const amended=await Promise.all(Array.from({length:3},()=>b.applyClosureAmendment(s,c.reference)));
+  assert.equal(amended.filter(x=>x.amended).length,1);
+  assert.deepEqual((await s.read()).value.attempts,before.value.attempts);
+  await assert.rejects(b.reserve(s,req("wrong","two")),/CLOSURE_SCOPE_DENIED/);
+  await assert.rejects(b.reserve(s,{...req("too-large",c.correctiveTask),maxMicroUsd:c.maximumMicroUsd+1}),/CLOSURE_SCOPE_DENIED/);
+  const attempts=await Promise.allSettled([b.reserve(s,req("retry-a",c.correctiveTask)),b.reserve(s,req("retry-b",c.correctiveTask))]);
+  assert.equal(attempts.filter(x=>x.status==="fulfilled").length,1);
+  const id=attempts[0].status==="fulfilled"?"retry-a":"retry-b";
+  assert.equal((await b.reserve(s,req(id,c.correctiveTask))).dispatch,false);
+  await b.settle(s,{id,actualMicroUsd:50,receiptReference:"corrective-receipt",outcome:"FAILED"});
+  await assert.rejects(b.reserve(s,req("retry-again",c.correctiveTask)),/CLOSURE_SCOPE_DENIED/);
+  await b.reserve(s,req("original-dependent",c.paidTasks[1]));
+  await b.settle(s,{id:"uncertain",actualMicroUsd:80,receiptReference:"authoritative-later-receipt",outcome:"FAILED"});
+  assert.equal(b.exposure((await s.read()).value),880);
+  const tampered=(await s.read()).value;
+  tampered.attempts[0].reservedMicroUsd=1;
+  assert.throws(()=>b.exposure(tampered),/CLOSURE_AUTHORITY_INVALID/);
+});
 test("sixty-dollar amendment preserves prior authority and unresolved attempts with concurrent hard stop", async () => {
   const s = store(), start = await s.read();
   start.value.planSha256 = b.AMENDMENT.planSha256;

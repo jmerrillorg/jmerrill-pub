@@ -8,6 +8,14 @@ function textOf(node) {
   if (node.namespaceURI === W && ["tab", "br", "cr"].includes(node.localName)) return " ";
   return Array.from(node.childNodes || []).map(textOf).join("");
 }
+// Match the accepted Mammoth raw-text source: tabs survive, inline breaks do not.
+// This is extractor parity, not permission to normalize away differing words.
+function sourceTextOf(node) {
+  if (node.namespaceURI === W && node.localName === "t") return node.textContent;
+  if (node.namespaceURI === W && node.localName === "tab") return "\t";
+  if (node.namespaceURI === W && ["br", "cr"].includes(node.localName)) return "";
+  return Array.from(node.childNodes || []).map(sourceTextOf).join("");
+}
 function wordElement(document, tag, text) {
   const element = document.createElementNS(W, `w:${tag}`);
   if (text !== undefined) {
@@ -36,11 +44,15 @@ async function buildDocuments(original, name, paragraphs, proposed) {
     }
     const xml = await zip.file("word/document.xml").async("string");
     const document = new DOMParser().parseFromString(xml, "application/xml");
-    const nodes = Array.from(document.getElementsByTagNameNS(W, "p")).filter(p => textOf(p).trim());
-    if (nodes.length !== paragraphs.length || nodes.some((p, i) => norm(textOf(p)) !== norm(paragraphs[i]))) throw Error("STAGE07_DOCUMENT_SOURCE_PARITY_FAILED");
+    const nodes = Array.from(document.getElementsByTagNameNS(W, "p")).filter(p => sourceTextOf(p).trim());
+    if (nodes.length !== paragraphs.length || nodes.some((p, i) => norm(sourceTextOf(p)) !== norm(paragraphs[i]))) throw Error("STAGE07_DOCUMENT_SOURCE_PARITY_FAILED");
     let revision = 0;
     for (const [index, node] of nodes.entries()) {
       if (proposed[index] === paragraphs[index]) continue;
+      if (proposed[index] === "" && !review) {
+        if (["fldChar","fldSimple","drawing","sectPr"].some(tag=>node.getElementsByTagNameNS(W,tag).length)) throw Error("STAGE07_DOCUMENT_COMPLEX_PARAGRAPH_REVIEW_REQUIRED");
+        node.parentNode.removeChild(node); continue;
+      }
       // Never flatten live fields or silently lose an existing citation link.
       if (["fldChar", "fldSimple"].some(tag => node.getElementsByTagNameNS(W, tag).length)) {
         throw Error("STAGE07_DOCUMENT_COMPLEX_PARAGRAPH_REVIEW_REQUIRED");
