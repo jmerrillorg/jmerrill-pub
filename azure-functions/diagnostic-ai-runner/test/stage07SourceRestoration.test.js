@@ -31,6 +31,20 @@ function fixture() {
     reviewedNoChange: [0, 1], noChangeReason: "Source wording is deliberately retained after review.", memo: "Retain these source paragraphs.", questions: [] };
   return { text, plan, task, output };
 }
+test("explicit unchanged apostrophes restore exact source without accepting word or punctuation changes", () => {
+  const text = "The author's words: \u2018Don\u2019t invent.\u2019", plan = componentPlan(text), task = {id:"component/EDIT/0",pass:"EDIT",index:0};
+  const output = {paragraphs:[{index:0,text:"The author\u2019s words: 'Don't invent.'"}],reviewedNoChange:[0],noChangeReason:"Retain source.",memo:"Explicit source review.",questions:[]};
+  const before=structuredClone(output),result=restore(output,task,plan,text);
+  assert.equal(result.method,"EXACT_SOURCE_QUOTE_RESTORATION_V1");
+  assert.equal(result.output.paragraphs[0].text,text);
+  assert.equal(runtime.validateOutput(result.output,task,plan,text),true);
+  assert.deepEqual(output,before);
+  assert.deepEqual(result,restore(output,task,plan,text));
+  for(const changed of ["The authors words: 'Don't invent.'","The author's words: 'Do invent.'","The author's words: 'Don't invent!'","The author's words: Don't invent."]){
+    assert.equal(restore({...output,paragraphs:[{index:0,text:changed}]},task,plan,text),null);
+  }
+  assert.equal(restore({...output,reviewedNoChange:[]},task,plan,text),null);
+});
 test("explicitly unchanged curly double quotes restore source, never words or attribution", () => {
   const text = 'He said \u201cKeep these exact words.\u201d', plan = componentPlan(text), task = {id:"component/EDIT/0",pass:"EDIT",index:0};
   const output = {paragraphs:[{index:0,text:'He said "Keep these exact words."'}],reviewedNoChange:[0],noChangeReason:"Retained after review.",memo:"Preserve the exact quotation.",questions:[]};
