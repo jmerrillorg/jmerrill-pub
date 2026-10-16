@@ -49,14 +49,18 @@ function validateOutput(output, task, plan, text) {
   }
   return true;
 }
-function recoverSourceWhitespace(prior, receipt, prepared, task) {
+function verifiedFailedReceipt(prior, receipt, task) {
   if (prior?.status !== "SETTLED" || prior.outcome !== "FAILED" || receipt.accepted !== false ||
       receipt.attemptId !== prior.id || prior.taskId !== task.id || receipt.taskId !== task.id || receipt.planSha256 !== planSha ||
       prior.receiptReference !== `stage07-attempt:${prior.id}:${b.sha(JSON.stringify(receipt))}` ||
       receipt.requestSha256 !== prior.requestSha256 || receipt.result?.ok !== true ||
       receipt.result.stopReason !== "tool_use" || receipt.result.usageVerified !== true ||
       !receipt.result.providerRequestId || receipt.result.model !== policy.model || receipt.result.modelVersion !== policy.modelVersion ||
-      receipt.result.inputTokens * policy.inputMicroUsdPerToken + receipt.result.outputTokens * policy.outputMicroUsdPerToken !== prior.actualMicroUsd) return null;
+      receipt.result.inputTokens * policy.inputMicroUsdPerToken + receipt.result.outputTokens * policy.outputMicroUsdPerToken !== prior.actualMicroUsd) return false;
+  return true;
+}
+function recoverSourceWhitespace(prior, receipt, prepared, task) {
+  if (!verifiedFailedReceipt(prior, receipt, task)) return null;
   const restoration = require("../editorial/stage07SourceRestoration").restore(receipt.result.output, task, prepared.plan, prepared.working.text);
   if (!restoration) return null;
   try { validateOutput(restoration.output, task, prepared.plan, prepared.working.text); }
@@ -64,6 +68,26 @@ function recoverSourceWhitespace(prior, receipt, prepared, task) {
   return { taskId: task.id, planSha256: planSha, sourceSha256: prepared.source.sourceSha256,
     originalAttemptId: prior.id, originalReceiptSha256: b.sha(JSON.stringify(receipt)),
     originalPaidMicroUsd: prior.actualMicroUsd, newPaidAttempts: 0, sourceRestoration: restoration };
+}
+function recoverIdenticalReviews(entries, prepared, task) {
+  if (task.pass !== "EDIT" || entries.length !== 2 || entries[0].prior.id === entries[1].prior.id ||
+      entries.some(e => !verifiedFailedReceipt(e.prior, e.receipt, task)) ||
+      entries[0].prior.requestSha256 !== entries[1].prior.requestSha256) return null;
+  const outputs = entries.map(e => e.receipt.result.output);
+  if (!outputs.every(o => Array.isArray(o?.paragraphs) && Array.isArray(o.reviewedNoChange) &&
+      typeof o.noChangeReason === "string" && o.noChangeReason.trim() && typeof o.memo === "string" &&
+      Array.isArray(o.questions)) || JSON.stringify(outputs[0].paragraphs) !== JSON.stringify(outputs[1].paragraphs)) return null;
+  // Retain both paid opinions; only complementary explicit no-change indices are united.
+  const output = { ...structuredClone(outputs[0]),
+    reviewedNoChange: [...new Set(outputs.flatMap(o => o.reviewedNoChange))].sort((a,b) => a-b),
+    noChangeReason: outputs.map((o,i) => `Preserved review ${i+1}: ${o.noChangeReason}`).join("\n\n"),
+    memo: outputs.map((o,i) => `Preserved review ${i+1}: ${o.memo}`).join("\n\n"),
+    questions: [...new Set(outputs.flatMap(o => o.questions))] };
+  try { validateOutput(output, task, prepared.plan, prepared.working.text); } catch { return null; }
+  return { taskId: task.id, planSha256: planSha, sourceSha256: prepared.source.sourceSha256,
+    originalAttempts: entries.map(e => ({ id:e.prior.id, receiptSha256:b.sha(JSON.stringify(e.receipt)), paidMicroUsd:e.prior.actualMicroUsd })),
+    originalPaidMicroUsd: entries.reduce((n,e) => n+e.prior.actualMicroUsd,0), newPaidAttempts:0,
+    sourceRestoration: {method:"IDENTICAL_PAID_REVIEW_RECONCILIATION_V1",output} };
 }
 async function prepare(source, deps) {
   const current = await require("./pipelineFolderRuntime").readAuthority(source.titleId, deps);
@@ -207,16 +231,21 @@ async function handler(body, supplied = {}) {
     if (prior?.status === "SETTLED" && prior.outcome === "FAILED") {
       const originalReceiptPath = `${PREFIX}/attempts/${prior.id}.json`;
       const originalReceipt = (await b.read(deps.containerClient, originalReceiptPath)).value;
-      const recovered = recoverSourceWhitespace(prior, originalReceipt, prepared, task);
+      let recovered = recoverSourceWhitespace(prior, originalReceipt, prepared, task);
+      if (!recovered && previous.length >= 2) {
+        const earlier = previous.at(-2);
+        const earlierReceipt = (await b.read(deps.containerClient, `${PREFIX}/attempts/${earlier.id}.json`)).value;
+        recovered = recoverIdenticalReviews([{prior:earlier,receipt:earlierReceipt},{prior,receipt:originalReceipt}],prepared,task);
+      }
       if (recovered) {
-        const suffix = recovered.sourceRestoration.method === "EXACT_SOURCE_QUOTE_RESTORATION_V1" ? "source-quotes-v1" : "source-whitespace-v1";
+        const suffix = recovered.sourceRestoration.method === "IDENTICAL_PAID_REVIEW_RECONCILIATION_V1" ? "identical-reviews-v1" : recovered.sourceRestoration.method === "EXACT_SOURCE_QUOTE_RESTORATION_V1" ? "source-quotes-v1" : "source-whitespace-v1";
         const receiptPath = `${PREFIX}/recoveries/${prior.id}-${suffix}.json`, output = recovered.sourceRestoration.output;
         await b.immutable(deps.containerClient, receiptPath, { ...recovered, originalReceiptPath });
         await b.immutable(deps.containerClient, `${PREFIX}/results/${b.sha(task.id)}.json`, {
           taskId: task.id, planSha256: planSha, sourceSha256: source.sourceSha256, receiptPath,
           output, outputSha256: b.sha(JSON.stringify(output)) });
         return { status: 200, jsonBody: { status: "OUTPUT_VALIDATED", recovered: true, dispatch: false, replay: true,
-          taskId: task.id, receiptPath, actualMicroUsd: 0, originalPaidMicroUsd: prior.actualMicroUsd,
+          taskId: task.id, receiptPath, actualMicroUsd: 0, originalPaidMicroUsd: recovered.originalPaidMicroUsd,
           exposureMicroUsd: budget.exposure(before.value), stage08: "NOT_STARTED", communications: 0, payments: 0 } };
       }
     }
@@ -261,4 +290,4 @@ async function handler(body, supplied = {}) {
   } catch (error) { return { status: 409, jsonBody: { code: /^(STAGE07|REVIEW_RECOVERY)_[A-Z_]+$/.test(error.safeCode || "") ? error.safeCode : "STAGE07_DEPENDENCY_FAILED",
     providerStatus: error.statusCode || null, stage08: "NOT_STARTED", communications: 0, payments: 0 } }; }
 }
-module.exports = { MODES, tasks, prepare, validateOutput, recoverSourceWhitespace, buildPrompt, nextEligibleTask, handler, PREFIX, planSha, policy };
+module.exports = { MODES, tasks, prepare, validateOutput, recoverSourceWhitespace, recoverIdenticalReviews, buildPrompt, nextEligibleTask, handler, PREFIX, planSha, policy };

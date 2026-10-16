@@ -3,6 +3,28 @@ const test = require("node:test"), assert = require("node:assert/strict"), { cre
 const { restore } = require("../src/editorial/stage07SourceRestoration"), runtime = require("../src/lifecycle/newSubmissionStage07");
 const { componentPlan } = require("../src/editorial/stage07PromptPlan");
 const hash = value => createHash("sha256").update(JSON.stringify(value)).digest("hex");
+test("identical paid outputs reconcile complementary review evidence, never infer missing review", () => {
+  const text="Exact first paragraph.\n\nExact second paragraph.",plan=componentPlan(text),task={id:"component/EDIT/0",pass:"EDIT",index:0};
+  const prepared={source:{sourceSha256:"component"},working:{text},plan};
+  const make=(id,indices)=>{
+    const receipt={accepted:false,attemptId:id,taskId:task.id,planSha256:runtime.planSha,requestSha256:"request",result:{ok:true,stopReason:"tool_use",usageVerified:true,providerRequestId:id,model:runtime.policy.model,modelVersion:runtime.policy.modelVersion,inputTokens:100,outputTokens:100,output:{paragraphs:[{index:0,text:"Exact first paragraph."},{index:1,text:"Exact second paragraph."}],reviewedNoChange:indices,noChangeReason:"Explicitly reviewed retention.",memo:"Preserved opinion "+id,questions:["Question "+id]}}};
+    return {receipt,prior:{id,taskId:task.id,status:"SETTLED",outcome:"FAILED",requestSha256:"request",actualMicroUsd:1200,receiptReference:`stage07-attempt:${id}:${hash(receipt)}`}};
+  };
+  const entries=[make("a",[0]),make("b",[1])],before=structuredClone(entries);
+  const recovered=runtime.recoverIdenticalReviews(entries,prepared,task);
+  assert.equal(recovered.newPaidAttempts,0);assert.equal(recovered.originalPaidMicroUsd,2400);
+  assert.equal(runtime.validateOutput(recovered.sourceRestoration.output,task,plan,text),true);
+  assert.deepEqual(recovered.sourceRestoration.output.questions,["Question a","Question b"]);
+  assert.deepEqual(entries,before);
+  assert.deepEqual(recovered,runtime.recoverIdenticalReviews(entries,prepared,task));
+  assert.equal(runtime.recoverIdenticalReviews([make("a",[0]),make("b",[0])],prepared,task),null);
+  assert.equal(runtime.recoverIdenticalReviews([entries[0],entries[0]],prepared,task),null);
+  for(const mutate of [e=>e.prior.status="UNKNOWN",e=>e.prior.actualMicroUsd=0,e=>e.receipt.planSha256="wrong",e=>e.receipt.result.usageVerified=false,e=>e.prior.requestSha256="different",e=>e.receipt.result.output.paragraphs[0].text="Invented paragraph."]) {
+    const changed=structuredClone(entries);mutate(changed[1]);assert.equal(runtime.recoverIdenticalReviews(changed,prepared,task),null);
+  }
+  const different=make("b",[1]);different.receipt.result.output.paragraphs[0].text="A different proposal.";different.prior.receiptReference=`stage07-attempt:b:${hash(different.receipt)}`;
+  assert.equal(runtime.recoverIdenticalReviews([entries[0],different],prepared,task),null);
+});
 function fixture() {
   const text = "Original\u00a0source  words.\n\nPreserved second paragraph.", plan = componentPlan(text), task = { id: "component/EDIT/0", pass: "EDIT", index: 0 };
   const output = { paragraphs: [{ index: 0, text: "Original source words." }, { index: 1, text: "Preserved second paragraph." }],
