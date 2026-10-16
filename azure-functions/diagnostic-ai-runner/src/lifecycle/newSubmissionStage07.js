@@ -153,7 +153,12 @@ function buildPrompt(prepared, task, results) {
     title: source.title, span, pass: task.pass, brief, evidence });
 }
 function nextEligibleTask(prepared, remaining, results, ledger) {
-  for (const task of remaining) {
+  const retries = ledger.attempts.length - new Set(ledger.attempts.map(a => a.taskId)).size;
+  const exhausted = Number.isInteger(ledger.maxAdditionalAttempts) && retries >= ledger.maxAdditionalAttempts;
+  const failed = new Set(ledger.attempts.filter(a => a.status === "SETTLED" && a.outcome === "FAILED").map(a => a.taskId));
+  // Preserve failed receipts for unpaid recovery, without starving independent first attempts.
+  const ordered = exhausted ? [...remaining.filter(t => !failed.has(t.id)), ...remaining.filter(t => failed.has(t.id))] : remaining;
+  for (const task of ordered) {
     if (ledger.attempts.some(a => a.taskId === task.id && a.status !== "SETTLED")) continue;
     try { buildPrompt(prepared, task, results); return task; }
     catch (error) { if (error.safeCode !== "STAGE07_DEPENDENT_RESULT_REQUIRED") throw error; }

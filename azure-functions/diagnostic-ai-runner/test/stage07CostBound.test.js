@@ -70,6 +70,13 @@ test("eight spent additional attempts survive restart with exactly four left",as
   }
   await assert.rejects(budget.reserve(f.store,{id:"thirteenth-extra",taskId:"1",planSha256:hash,requestSha256:f.quote.requestSha256,
     maxMicroUsd:f.quote.maximumMicroUsd,bound:f.quote,requireVerifiedBounds:true}),/RETRY_LIMIT/);
+  const independent={id:"independent-first",taskId:"2",planSha256:hash,requestSha256:f.quote.requestSha256,
+    maxMicroUsd:f.quote.maximumMicroUsd,bound:f.quote,requireVerifiedBounds:true};
+  assert.equal((await budget.reserve(f.store,independent)).dispatch,true);
+  assert.equal((await budget.reserve(f.store,independent)).dispatch,false);
+  const after=(await f.store.read()).value;
+  assert.equal(after.attempts.length-new Set(after.attempts.map(a=>a.taskId)).size,12);
+  assert.equal(after.attempts.find(a=>a.id==="old").status,"RESERVED");
 });
 test("lossless consistency encoding preserves all originals and exact proposed differences",()=>{
   const p=require("../src/editorial/stage07PromptPlan"),text="First paragraph.\n\nSecond paragraph.",span=p.componentPlan(text).consistency.chunks[0];
@@ -96,4 +103,21 @@ test("an unresolved edit blocks only itself and dependent reviews, not the next 
   const review=all.find(t=>t.pass==="CONSISTENCY_SECTION");
   assert.equal(rt.nextEligibleTask(prepared,[review],results,ledger),null);
   assert.equal(rt.nextEligibleTask(prepared,edits,new Map(),ledger),null);
+});
+test("exhausted retries preserve recovery but do not starve independent first attempts",()=>{
+  const rt=require("../src/lifecycle/newSubmissionStage07"),p=require("../src/editorial/stage07PromptPlan");
+  const source=rt.policy.sources[1],text=Array.from({length:5},(_,i)=>Array(600).fill(`paragraph${i}`).join(" ")).join("\n\n");
+  const prepared={source,working:{text},plan:p.componentPlan(text)},all=rt.tasks(source);
+  const root=`${source.sourceSha256}/PLAN_SYNTHESIS/${p.hierarchy(source.planningCalls).length-1}-0`;
+  const results=new Map([[root,{output:{ledger:"Existing brief",questions:[],blockingFindings:[]}}]]);
+  const edits=all.filter(t=>t.pass==="EDIT").slice(0,2),review=all.find(t=>t.pass==="CONSISTENCY_SECTION");
+  const ledger={maxAdditionalAttempts:12,attempts:Array.from({length:13},(_,i)=>({id:`attempt-${i}`,taskId:edits[0].id,status:"SETTLED",outcome:"FAILED"}))};
+  const before=JSON.stringify(ledger),remaining=[edits[0],review,edits[1]];
+  assert.equal(rt.nextEligibleTask(prepared,remaining,results,ledger).id,edits[1].id);
+  assert.equal(rt.nextEligibleTask(prepared,[review,edits[0]],results,ledger).id,edits[0].id);
+  assert.equal(rt.nextEligibleTask(prepared,[review],results,ledger),null);
+  assert.equal(rt.nextEligibleTask(prepared,remaining,new Map(),ledger),null);
+  assert.equal(JSON.stringify(ledger),before);
+  assert.deepEqual(remaining,[edits[0],review,edits[1]]);
+  assert.equal(rt.nextEligibleTask(prepared,remaining,results,{...ledger,attempts:ledger.attempts.slice(1)}).id,edits[0].id);
 });
