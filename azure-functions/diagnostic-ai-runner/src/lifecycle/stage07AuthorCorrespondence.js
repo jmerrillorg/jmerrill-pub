@@ -27,7 +27,11 @@ function validate(review) {
 async function load(titleId, deps) {
   const pin = selected().find(x => x.titleId === titleId);
   if (!pin) b.deny("CONSULTATION_TITLE_NOT_SELECTED");
+<<<<<<< HEAD
   const record = await b.read(deps.containerClient, `${prefix(titleId)}/review-authority-v2.json`);
+=======
+  const record = await b.read(deps.containerClient, `${prefix(titleId)}/review.json`);
+>>>>>>> origin/main
   if (b.sha(record.bytes) !== pin.sha256 || record.value.titleId !== titleId) b.deny("CONSULTATION_MANIFEST_DRIFT");
   validate(record.value);
   return record.value;
