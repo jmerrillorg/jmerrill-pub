@@ -8,13 +8,25 @@
   {
     "titleId": "0e127af9-fcb3-5671-a0fa-e4af63c307d1",
     "replyKey": "6a457ae131365e9f88384fe447396a3a60fa2182b298366465113c61f552e8a1",
-    "actionVersion": "CHAD-INDEPENDENT-20261019-V1",
-    "sha256": "9bee93b859fcc33c996e39c19ab0f635c1e7ba4e083be3391e79f5998b4bd17b"
+    "actionVersion": "CHAD-INDEPENDENT-20261019-V2",
+    "sha256": "930751f336ad011c3dfb0e3dc7f72df913a05bd46170e54254f8560690089d5e"
   },
   {
     "titleId": "e797232b-da7a-f111-ab0f-00224820105b",
     "replyKey": "a35271a2a751e2922f95db0314567e0425e3e99e4f654d4d21391004fc61941a",
-    "actionVersion": "INTENTIONAL-INDEPENDENT-20261019-V1",
-    "sha256": "7a79c37d5da5af139fc687926574fa90d4459429b4155649e9928bbaa080406a"
+    "actionVersion": "INTENTIONAL-INDEPENDENT-20261019-V2",
+    "sha256": "06a8322d28c98cdcc5720a7717c4e5650ac44f039f85747c44b7021fa9b9e5a0"
+  },
+  {
+    "titleId": "f79006b7-f595-f111-8076-00224820105b",
+    "replyKey": "538c03dcc25f54a0b2573bf9ee0f3a58af7428d93643ba56d61889d701dda549",
+    "actionVersion": "TIL-SELECTIVE-PROPOSALS-20261019-V1",
+    "sha256": "1a512957e73972764bcfe22827ecad5b49260edf0f2a6a3d9161008fbc026fef"
+  },
+  {
+    "titleId": "f1908dc9-5775-f111-ab0f-6045bdd69435",
+    "replyKey": "085d6c89ac63eae9f07492ecf5f24c100a09c534feb9050b7414263e9c14cb4a",
+    "actionVersion": "GLORY-RELATIONSHIP-BRIDGES-20261019-V1",
+    "sha256": "dbfa1fae381b690680254aab5263f6c25f4136e97d5a664f59458f4fa2939e42"
   }
 ]

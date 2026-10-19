@@ -30,6 +30,7 @@ app.timer("run-author-review-response-consumer", {
       for (const result of consultations) {
         if (result.status !== 200) context.error(`Stage07 consultation: title=${result.jsonBody.titleId}; code=${result.jsonBody.code}`);
         else context.info(`Stage07 consultation: title=${result.jsonBody.titleId}; status=${result.jsonBody.status}`);
+        for (const failure of result.jsonBody.custodyErrors || []) context.error(`Stage07 custody failure: title=${result.jsonBody.titleId}; kind=${failure.kind}; code=${failure.code}; providerStatus=${failure.status || "none"}; dependencyCode=${failure.dependencyCode || "none"}`);
         for (const reply of result.jsonBody.replies || []) {
           if (reply.editorial) context.info(`Stage07 editorial action: title=${result.jsonBody.titleId}; status=${reply.editorial.status}; execution=${reply.editorial.execution?.executionId || "none"}; delivered=${reply.editorial.correspondence?.delivery?.delivered === true}`);
         }
