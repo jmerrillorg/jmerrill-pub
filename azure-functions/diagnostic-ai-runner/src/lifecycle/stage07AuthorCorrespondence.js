@@ -216,7 +216,8 @@ async function recordedFollowupBindings(review,deps){
   const root=`${prefix(review.titleId)}/followup-deliveries/`,result=[];
   for await(const item of deps.containerClient.listBlobsFlat({prefix:root})){
     if(!item.name.startsWith(root)||!item.name.endsWith('.json')||result.length>=1000)b.deny('CONSULTATION_FOLLOWUP_INVENTORY_INVALID');
-    const {value}=await b.read(deps.containerClient,item.name);
+    let {value}=await b.read(deps.containerClient,item.name);
+    if(value.editorialActionVersion)value=await editorialBinding(review,value,deps);
     if(value.titleId!==review.titleId||value.version!==review.version||value.reviewHash!==validate(review)||
       !value.internetMessageId||!value.publishingMessageId||!Number.isFinite(Date.parse(value.publishingCopyReceivedAt))||
       value.stageCompletionApproved!==false||value.nextStageAuthorized!==false)b.deny('CONSULTATION_FOLLOWUP_BINDING_INVALID');
@@ -235,4 +236,25 @@ async function recordedFollowupBindings(review,deps){
   }
   return result;
 }
-module.exports={PREFIX,MODES,version,prefix,validate,load,payload,send,delivery,reconcile,handler,monitor,recordedFollowupBindings};
+async function editorialBinding(review,value,deps){
+  const pin=require("../../config/stage07-editorial-actions.json").find(x=>x.titleId===review.titleId&&x.actionVersion===value.editorialActionVersion);
+  if(!pin||pin.sha256!==value.editorialPlanSha256)b.deny("CONSULTATION_EDITORIAL_BINDING_CONFLICT");
+  const root=`editorial-actions/stage07/${review.titleId}/${pin.actionVersion}`;
+  const plan=await b.read(deps.containerClient,`${root}/plan.json`),sent=(await b.read(deps.containerClient,`${root}/send.json`)).value;
+  const canonical=validate(review),legacy=validate({...review,subject:`Re: ${review.subject}`});
+  const providerId=require("../generated/communications/publishing-communication-acceptance").providerIdFromInternetMessageId;
+  if(b.sha(plan.bytes)!==pin.sha256||plan.value.reviewHash!==canonical||plan.value.titleId!==review.titleId||
+    plan.value.version!==review.version||value.titleId!==review.titleId||value.version!==review.version||
+    ![canonical,legacy].includes(value.reviewHash)||sent.providerMessageId!==value.providerMessageId||
+    sent.communicationRecordId!==value.communicationRecordId||sent.sentAt!==value.sentAt||
+    providerId(value.internetMessageId||"")!==sent.providerMessageId.replaceAll("-","").toLowerCase())
+    b.deny("CONSULTATION_EDITORIAL_BINDING_CONFLICT");
+  // Preserve the original observation; only its proven subject-derived hash is normalized.
+  if(value.reviewHash!==canonical){
+    await b.immutable(deps.containerClient,`${root}/binding-recovery.json`,{titleId:review.titleId,actionVersion:pin.actionVersion,
+      originalReviewHash:value.reviewHash,reviewHash:canonical,planSha256:pin.sha256,providerMessageId:sent.providerMessageId,
+      communicationRecordId:sent.communicationRecordId,stageCompletionApproved:false,nextStageAuthorized:false});
+  }
+  return {...value,reviewHash:canonical};
+}
+module.exports={PREFIX,MODES,version,prefix,validate,load,payload,send,delivery,reconcile,handler,monitor,recordedFollowupBindings,editorialBinding};

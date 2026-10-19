@@ -30,6 +30,25 @@ test('source-update correspondence binds only verified same-title version delive
  }
 });
 test("attachment drift stops before sending",async()=>{const x=fixture();x.put(x.review.attachments[0].blobPath,Buffer.from("changed"));await assert.rejects(()=>stage.send(x.review,x.deps),/ATTACHMENT_DRIFT/);assert.equal(x.counts.send,0);});
+test("editorial followup recovers only the exact subject-hash defect without changing original evidence",async()=>{
+ const x=fixture(),pins=require("../config/stage07-editorial-actions.json"),actionVersion="TEST-BINDING-RECOVERY";
+ const plan={titleId:x.review.titleId,version:x.review.version,reviewHash:stage.validate(x.review)},bytes=Buffer.from(JSON.stringify(plan));
+ const pin={titleId:x.review.titleId,actionVersion,sha256:b.sha(bytes)},root=`editorial-actions/stage07/${x.review.titleId}/${actionVersion}`;
+ const provider="12345678-9012-3456-7890-123456789012",sent={providerMessageId:provider,communicationRecordId:"record",sentAt:"2026-10-19T12:30:31.089Z"};
+ const binding={titleId:x.review.titleId,version:x.review.version,reviewHash:stage.validate({...x.review,subject:`Re: ${x.review.subject}`}),
+  editorialActionVersion:actionVersion,editorialPlanSha256:pin.sha256,...sent,internetMessageId:`<202610191230.${provider.replaceAll("-","")}-fixture@microsoft.com>`,
+  publishingMessageId:"immutable",publishingCopyReceivedAt:"2026-10-19T12:30:55Z",stageCompletionApproved:false,nextStageAuthorized:false};
+ const path=stage.prefix(x.review.titleId)+"/followup-deliveries/editorial-test.json";
+ pins.push(pin);x.put(root+"/plan.json",bytes);x.put(root+"/send.json",sent);x.put(path,binding);
+ try{
+  const result=await stage.recordedFollowupBindings(x.review,x.deps);assert.equal(result[0].reviewHash,stage.validate(x.review));
+  assert.equal(JSON.parse(x.blobs.get(path)).reviewHash,binding.reviewHash);const count=x.blobs.size;
+  await stage.recordedFollowupBindings(x.review,x.deps);assert.equal(x.blobs.size,count);
+  for(const patch of [{reviewHash:"unrelated"},{providerMessageId:"other"},{communicationRecordId:"other"},{titleId:"other"},{version:"old"},{sentAt:"2026-10-20T00:00:00Z"},{editorialPlanSha256:"wrong"},{internetMessageId:"<wrong>"}]){
+   x.put(path,{...binding,...patch});await assert.rejects(()=>stage.recordedFollowupBindings(x.review,x.deps),/EDITORIAL_BINDING_CONFLICT/);
+  }
+ }finally{pins.splice(pins.indexOf(pin),1);}
+});
 test("source-update reply binding recovers original send time only from the exact receipt",async()=>{
  const x=fixture(),root=stage.prefix(x.review.titleId),hash='a'.repeat(64);
  const binding={titleId:x.review.titleId,version:x.review.version,reviewHash:stage.validate(x.review),sourceUpdateVersion:'UPDATE-V5',sourceUpdateSha256:hash,
