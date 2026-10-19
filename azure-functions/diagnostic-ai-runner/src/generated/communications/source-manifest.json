@@ -6,8 +6,8 @@
       "runtimeSha256": "31d8b8b694424f111db30c1e2cd23fa3c47e08a5bbad7e5ad2f07c80f563534b"
     },
     "jm1-enterprise-communication-renderer": {
-      "sourceSha256": "db16bdfbe47ebaa2e317731eaf6090e73ec3f9fd4e9e3cdd2ce2577c78646b28",
-      "runtimeSha256": "82818a2a53514cb597fcda59e5941e6b7991a672b54073d2be8e8b8385d50b6e"
+      "sourceSha256": "77c6ba4d8dca63be1f3e7b7440199df77329198f271137e4a0b2b177cbdd4880",
+      "runtimeSha256": "21b6bc1bbb30d8a05bd44b8a558b5136b985690a0700ad98487d51778958b3d9"
     },
     "publishing-communication-acceptance": {
       "sourceSha256": "21da53bc4fd9fd689364fcd62de828c4ff02755735ef671de372540e68cf7b80",

@@ -417,7 +417,9 @@ function renderCorrespondenceText(input: Jm1EnterpriseCommunicationInput) {
     input.reviewPrompt || '',
     input.actionInstruction,
     responseWindow,
-    ...(input.replyOnly ? [] : [input.correspondenceParagraphs ? `${input.actionLabel || 'View your materials'}: ${input.actionUrl}` : `You may also view the materials in your Author Operating Center: ${input.actionUrl}`]),
+    ...(input.replyOnly ? [] : [input.correspondenceParagraphs
+      ? `${input.templateName === 'PUBLISHING_EDITORIAL_PROPOSAL_V1' ? input.actionLabel : 'Use the secure link'}: ${input.actionUrl}`
+      : `You may also view the materials in your Author Operating Center: ${input.actionUrl}`]),
     next,
     input.supportNote || '',
     input.operationalNote || '',
