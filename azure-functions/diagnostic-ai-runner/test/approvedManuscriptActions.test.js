@@ -24,3 +24,13 @@ test("no invented paragraph or broad deletion is accepted",async()=>{
  await assert.rejects(()=>m.applyLongWatch(bytes,[{kind:"REMOVE_EXACT_ANNOTATION",before:"source two",count:2}]),/SCOPE_DENIED/);
 });
 test("partial annual coverage cannot pass",()=>assert.throws(()=>m.annualQa([{qa:{after:[]}}]),/ANNUAL_COVERAGE/));
+test("Intentional samples preserve Soul Dive and reflection text with deterministic replay",async()=>{
+ const zip=new JSZip(),lines=["JANUARY 1","Executive Reflection","Protected reflection","SOUL DIVE - JANUARY 1","Protected depth","Covenant Charge","Protected closing","JANUARY 2"];
+ zip.file("word/document.xml",`<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:body>${lines.map(x=>`<w:p><w:r><w:t>${x}</w:t></w:r></w:p>`).join("")}<w:sectPr/></w:body></w:document>`);
+ const bytes=await zip.generateAsync({type:"nodebuffer"}),inputs=[{bytes,date:"JANUARY 1",nextDate:"JANUARY 2"}];
+ const a=await m.intentionalSamples(inputs),b=await m.intentionalSamples(inputs);
+ assert.equal(a.outputs.length,2);assert.equal(a.qa.soulDivesPreserved,true);assert.equal(a.qa.globalRestructuring,false);
+ assert.deepEqual(a.outputs.map(x=>x.bytes),b.outputs.map(x=>x.bytes));
+ for(const output of a.outputs){const opened=await m.open(output.bytes);assert.ok(m.text(opened.body).includes("Protected depth"));}
+ await assert.rejects(()=>m.intentionalSamples([{bytes,date:"JANUARY 1",nextDate:"MISSING"}]),/BOUNDARY_MISSING/);
+});

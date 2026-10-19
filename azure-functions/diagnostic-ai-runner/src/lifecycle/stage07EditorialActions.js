@@ -17,9 +17,17 @@ function validate(plan,pin,review,message,classification){
   if(plan.titleId!==review.titleId||plan.version!==review.version||plan.replyKey!==b.sha(message.internetMessageId)||
     plan.authoredTextSha256!==b.sha(message.uniqueBody?.content||"")||plan.reviewHash!==require("./stage07AuthorCorrespondence").validate(review)||
     plan.actionVersion!==pin.actionVersion||plan.nextStageAuthorized!==false||plan.stageCompletionApproved!==false||
-    plan.paidCalls!==0||!plan.authorityReference||!Array.isArray(plan.inputs)||plan.inputs.length!==4||
-    plan.operation!=="LONG_WATCH_APPROVED_PLACEMENTS"||plan.titleId!=="a69b9dfa-bb7b-f111-ab0f-7c1e525b15c2"||
+    plan.paidCalls!==0||!plan.authorityReference||!Array.isArray(plan.inputs)||
     plan.inputs.some(x=>!x.itemId||! /^[a-f0-9]{64}$/.test(x.sha256)||! /^[A-Za-z0-9 -]+\.docx$/.test(x.outputName)))b.deny("EDITORIAL_ACTION_AUTHORITY_CONFLICT");
+  if(plan.operation==="LONG_WATCH_APPROVED_PLACEMENTS"){
+    if(plan.titleId!=="a69b9dfa-bb7b-f111-ab0f-7c1e525b15c2"||plan.inputs.length!==4)b.deny("EDITORIAL_ACTION_AUTHORITY_CONFLICT");
+  }else if(plan.operation==="CHAD_REVIEWED_UNCHANGED_PACKAGE"){
+    if(plan.titleId!=="0e127af9-fcb3-5671-a0fa-e4af63c307d1"||plan.componentSha256!=="e03b0a2b6da9b6318352b9724e024713aaf7ffba24f1fd426f9def2fb8540175"||plan.inputs.length)b.deny("EDITORIAL_ACTION_AUTHORITY_CONFLICT");
+  }else if(plan.operation==="INTENTIONAL_LAYOUT_SAMPLES"){
+    if(plan.titleId!=="e797232b-da7a-f111-ab0f-00224820105b"||plan.inputs.length!==2||
+      plan.inputs[0].sha256!=="701c16b72ff107603f0c09acd264434e97146b93b80ba4f175fb7bdbe3515d06"||
+      plan.inputs[1].sha256!=="94b46204db5e0e81d739f507c26905f693888949a494d2c4d64463ebe2a90312")b.deny("EDITORIAL_ACTION_AUTHORITY_CONFLICT");
+  }else b.deny("EDITORIAL_ACTION_AUTHORITY_CONFLICT");
 }
 async function publish(plan,name,bytes,deps){
   const id=folders.FOLDERS[plan.titleId],path=`${folders.path(id)}:/${encodeURIComponent(`${plan.actionVersion} ${name}`)}`;
@@ -37,6 +45,19 @@ async function execute(plan,review,deps){
   const stage=await require("./pipelineFolderRuntime").readAuthority(plan.titleId,deps);
   const folder=await deps.graph(folders.path(folders.FOLDERS[plan.titleId]));
   if(!stage.current||stage.stageCode!=="07_DEVELOPMENTAL_EDITING"||folder.parentReference?.name!=="07 - Developmental Editing")b.deny("EDITORIAL_STAGE_OR_FOLDER_CHANGED");
+  if(plan.operation==="INTENTIONAL_LAYOUT_SAMPLES"){
+    const inputs=[];for(const input of plan.inputs)inputs.push({...input,bytes:await source(input,deps)});
+    const sample=await documents.intentionalSamples(inputs),artifacts=[];
+    for(const output of sample.outputs)artifacts.push(await publish(plan,output.name,output.bytes,deps));
+    const result={titleId:plan.titleId,version:plan.version,actionVersion:plan.actionVersion,replyKey:plan.replyKey,status:"LAYOUT_SAMPLES_AVAILABLE_VISUAL_REVIEW_OPEN",artifacts,qa:sample.qa,paidCalls:0,stageCompletionApproved:false,nextStageAuthorized:false};
+    return (await b.immutable(deps.containerClient,`${base}/result.json`,result)).value;
+  }
+  if(plan.operation==="CHAD_REVIEWED_UNCHANGED_PACKAGE"){
+    const packaged=await require("./newSubmissionStage07").handler({mode:"SUBMISSION_07_PACKAGE",titleId:plan.titleId,componentSha256:plan.componentSha256},deps);
+    if(packaged.status!==200||packaged.jsonBody.stage07Complete!==false||packaged.jsonBody.reviewedUnchanged!==true||!packaged.jsonBody.delivery?.files?.length)b.deny("EDITORIAL_REVIEWED_PACKAGE_NOT_READY");
+    const result={titleId:plan.titleId,version:plan.version,actionVersion:plan.actionVersion,replyKey:plan.replyKey,status:"REVIEWED_UNCHANGED_PACKAGE_AVAILABLE_RENDERING_REVIEW_OPEN",artifacts:packaged.jsonBody.delivery.files,package:packaged.jsonBody,paidCalls:0,stageCompletionApproved:false,nextStageAuthorized:false};
+    return (await b.immutable(deps.containerClient,`${base}/result.json`,result)).value;
+  }
   const results=[];
   for(const input of plan.inputs){
     const bytes=await source(input,deps),edited=await documents.applyLongWatch(bytes,input.actions);
@@ -62,7 +83,10 @@ async function run(review,message,classification,deps){
   const state=await require("./titleCommissioningIntakeWorker").processTitleCommissioningStep({titleId:plan.titleId,bindingHash:pin.sha256},
     {...deps,readScope:async()=>({titleId:plan.titleId,enabled:true,revoked:false,mode:"JACKIE_TITLE_INTERNAL_COMMISSIONING"})},
     {namespace:ROOT+"/executions",executionSuffix:"",plan:x=>({...x,executionId:`editorial-action:${x.bindingHash}`}),
-      execute:()=>execute(plan,review,deps),validate:x=>x.status==="APPROVED_PLACEMENTS_APPLIED_EDITORIAL_REVIEW_OPEN"&&x.annual.uniqueDates===365,
+      execute:()=>execute(plan,review,deps),validate:x=>x.stageCompletionApproved===false&&x.nextStageAuthorized===false&&
+        ((x.status==="APPROVED_PLACEMENTS_APPLIED_EDITORIAL_REVIEW_OPEN"&&x.annual.uniqueDates===365)||
+         (x.status==="REVIEWED_UNCHANGED_PACKAGE_AVAILABLE_RENDERING_REVIEW_OPEN"&&x.package.reviewedUnchanged===true)||
+         (x.status==="LAYOUT_SAMPLES_AVAILABLE_VISUAL_REVIEW_OPEN"&&x.qa.soulDivesPreserved===true)),
       reference:()=>`${ROOT}/${plan.titleId}/${plan.actionVersion}/result.json`,
       completionEffects:()=>({stageCompletionApproved:false,nextStageAuthorized:false,paidCalls:0})});
   let correspondence=null;
@@ -71,8 +95,12 @@ async function run(review,message,classification,deps){
 }
 async function followup(plan,review,deps){
  const base=`${ROOT}/${plan.titleId}/${plan.actionVersion}`,result=(await b.read(deps.containerClient,`${base}/result.json`)).value;
- if(result.titleId!==plan.titleId||result.replyKey!==plan.replyKey||result.annual.uniqueDates!==365||result.stageCompletionApproved!==false)b.deny("EDITORIAL_RESULT_CONFLICT");
- const subject=`Re: ${review.subject}`,body=`Jackie, your February A-D decisions have now been applied to Formation. The three swaps preserve each entry once; February 5, 7 and 9 are retained, The Quiet No remains on February 12, and What Quiet Reveals remains on February 18.\n\nAll four quarterly working copies contain 365 unique dated entries with the five daily sections. Originals and the separate Soul Dive archive remain preserved.\n\nThese are updated working manuscripts. Complete developmental and visual review remain open; this message does not claim Stage 07 completion or request advancement. Finished deliverables will return for your explicit approval.\n\n${result.artifacts.map(x=>`${x.name}: ${x.webUrl}`).join("\n")}`;
+ if(result.titleId!==plan.titleId||result.replyKey!==plan.replyKey||result.stageCompletionApproved!==false)b.deny("EDITORIAL_RESULT_CONFLICT");
+ const summary=plan.operation==="INTENTIONAL_LAYOUT_SAMPLES"?
+ "Jackie, The Intentional Leader now has two reading-flow samples using the same complete January 1 and August 12 readings at 6 by 9 inches and 7 by 10 inches. Secondary labels are quieter, while every Executive Reflection and Soul Dive passage in these samples remains intact. The wider sample provides more room per line; actual page counts and visual assessment remain to be confirmed. These samples are for comparison before manuscript-wide restructuring. Quarterly print volumes and one annual eBook remain settled. No global restructuring or Stage 08 advancement has occurred.":plan.operation==="CHAD_REVIEWED_UNCHANGED_PACKAGE"?
+ "Jackie, Chad and Me's reviewed-unchanged package is available in its own Stage 07 folder. The documentary-reflective approach and original experiences remain intact. The editorial memo, questions and source coverage preserve the disclosed factual limitations; this is not factual publication clearance. No scenes, quotations or chronology have been invented. Final visual acceptance remains open, and the finished stage will return for your explicit approval.":
+ "Jackie, your February A-D decisions have now been applied to Formation. The three swaps preserve each entry once; February 5, 7 and 9 are retained, The Quiet No remains on February 12, and What Quiet Reveals remains on February 18.\n\nAll four quarterly working copies contain 365 unique dated entries with the five daily sections. Originals and the separate Soul Dive archive remain preserved.\n\nThese are updated working manuscripts. Complete developmental and visual review remain open; this message does not claim Stage 07 completion or request advancement. Finished deliverables will return for your explicit approval.";
+ const subject=`Re: ${review.subject}`,body=`${summary}\n\n${result.artifacts.filter(x=>/\.docx$|\.html$/.test(x.name)).map(x=>`${x.name}: ${x.webUrl}`).join("\n")}`;
  const payload={messageType:"APPROVED_AUTHOR_RESPONSE",diagnosticId:review.titleId,intakeReferenceCode:review.intakeReference,authorEmail:mail.AUTHOR,authorName:"Jackie Smith, Jr.",projectTitle:review.title,subject,body,
  templateName:"STAGE07_APPROVED_ACTION_RESULT_V1",templateVersion:plan.actionVersion,approvedBy:plan.authorityReference,approvedOn:plan.authorityRecordedAt,
  futureSendRequiresInternalCopy:true,futureSendRequiresDataverseLog:true,internalVisibilityMailbox:mail.MAILBOX,cc:[mail.MAILBOX],bcc:[],replyTo:mail.MAILBOX,attachments:[]};
@@ -85,6 +113,12 @@ async function followup(plan,review,deps){
  }
  const stage=require("./stage07AuthorCorrespondence"),delivery=(await b.optional(deps.containerClient,`${base}/delivery.json`))?.value||await stage.delivery({...review,subject},sent,deps);
  if(delivery?.delivered)await b.immutable(deps.containerClient,`${base}/delivery.json`,delivery);
+ if(delivery?.internetMessageId){
+  await b.immutable(deps.containerClient,`${stage.prefix(plan.titleId)}/followup-deliveries/editorial-${plan.actionVersion}.json`,{
+   ...delivery,editorialActionVersion:plan.actionVersion,editorialPlanSha256:b.sha(JSON.stringify(plan)),
+   providerMessageId:sent.providerMessageId,communicationRecordId:sent.communicationRecordId
+  });
+ }
  return {sent,delivery,stageCompletionApproved:false,nextStageAuthorized:false};
 }
 module.exports={run,validate,source,publish,execute,followup,ROOT};
