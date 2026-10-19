@@ -30,6 +30,18 @@ test('source-update correspondence binds only verified same-title version delive
  }
 });
 test("attachment drift stops before sending",async()=>{const x=fixture();x.put(x.review.attachments[0].blobPath,Buffer.from("changed"));await assert.rejects(()=>stage.send(x.review,x.deps),/ATTACHMENT_DRIFT/);assert.equal(x.counts.send,0);});
+test("source-update reply binding recovers original send time only from the exact receipt",async()=>{
+ const x=fixture(),root=stage.prefix(x.review.titleId),hash='a'.repeat(64);
+ const binding={titleId:x.review.titleId,version:x.review.version,reviewHash:stage.validate(x.review),sourceUpdateVersion:'UPDATE-V5',sourceUpdateSha256:hash,
+ internetMessageId:'<update>',publishingMessageId:'immutable',publishingCopyReceivedAt:'2026-10-19T11:34:17Z',providerMessageId:'provider',communicationRecordId:'record',stageCompletionApproved:false,nextStageAuthorized:false};
+ const receipt={titleId:x.review.titleId,reviewVersion:x.review.version,version:'UPDATE-V5',reviewHash:binding.reviewHash,sourceUpdateSha256:hash,providerMessageId:'provider',communicationRecordId:'record',sentAt:'2026-10-19T11:33:26.736Z'};
+ x.put(root+'/followup-deliveries/update.json',binding);x.put(root+'/source-updates/UPDATE-V5/send.json',receipt);
+ assert.equal((await stage.recordedFollowupBindings(x.review,x.deps))[0].sentAt,receipt.sentAt);
+ assert.equal(JSON.parse(x.blobs.get(root+'/followup-deliveries/update.json')).sentAt,undefined);
+ for(const change of [{titleId:'other'},{providerMessageId:'other'},{sentAt:'2026-10-20T00:00:00Z'},{sourceUpdateSha256:'b'.repeat(64)}]){
+ x.put(root+'/source-updates/UPDATE-V5/send.json',{...receipt,...change});await assert.rejects(()=>stage.recordedFollowupBindings(x.review,x.deps),/RECEIPT_CONFLICT/);
+ }
+});
 test("cross-title source and attachment paths are rejected",()=>{const x=fixture();stage.validate(x.review);assert.throws(()=>stage.validate({...x.review,titleId:policy.sources.find(s=>s.titleId!==x.review.titleId).titleId}),/SCOPE_DENIED/);assert.throws(()=>stage.validate({...x.review,attachments:[{...x.review.attachments[0],blobPath:"other-title/attachments/file"}]}),/SCOPE_DENIED/);});
 test("consultation never requests completed-stage approval",()=>{const x=fixture();assert.throws(()=>stage.validate({...x.review,stageCompletionRequested:true}),/SCOPE_DENIED/);});
 test("timeout preserves the exact intent and no false send receipt",async()=>{const x=fixture();x.deps.sendConsultation=async()=>{throw Error("timeout");};await assert.rejects(()=>stage.send(x.review,x.deps),/timeout/);assert.ok(x.blobs.has(stage.prefix(x.review.titleId)+"/send-intent.json"));assert.ok(!x.blobs.has(stage.prefix(x.review.titleId)+"/send.json"));});

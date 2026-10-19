@@ -98,7 +98,7 @@ async function processTitleCommissioningStep(input, deps, contract) {
     const canRetry = retryable(error) && claimed.attempts < MAX_ATTEMPTS;
     result = { ...claimed, status: canRetry ? "RETRY_PENDING" : "HELD",
       failureCode: retryable(error) ? "COMMISSIONING_DEPENDENCY_UNAVAILABLE" : "COMMISSIONING_AUTHORITY_OR_RESULT_REQUIRES_REVIEW",
-      ...(/^(?:REVIEW|COMMISSIONING|STAGE04|STAGE05)_[A-Z0-9_]{1,100}$/.test(error?.safeCode || "") ? { causeCode: error.safeCode } : {}),
+      ...(/^(?:REVIEW|COMMISSIONING|STAGE04|STAGE05|EDITORIAL)_[A-Z0-9_]{1,100}$/.test(error?.safeCode || "") ? { causeCode: error.safeCode } : {}),
       ...(typeof error.quarantineReference === "string" &&
         error.quarantineReference.startsWith(`commissioning-review-quarantine/${plan.titleId}/${plan.bindingHash}/`) &&
         /^[a-f0-9]{64}\.json$/.test(error.quarantineReference.split("/").pop())
