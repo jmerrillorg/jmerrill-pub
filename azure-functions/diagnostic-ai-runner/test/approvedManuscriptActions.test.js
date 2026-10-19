@@ -34,3 +34,21 @@ test("Intentional samples preserve Soul Dive and reflection text with determinis
  for(const output of a.outputs){const opened=await m.open(output.bytes);assert.ok(m.text(opened.body).includes("Protected depth"));assert.ok(m.readingText(opened.body).includes("Protected reflection\nSeparate sentence."));}
  await assert.rejects(()=>m.intentionalSamples([{bytes,date:"JANUARY 1",nextDate:"MISSING"}]),/BOUNDARY_MISSING/);
 });
+test("formatting tab stops are not manuscript text",async()=>{
+ const z=new JSZip();z.file("word/document.xml",'<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:body><w:p><w:pPr><w:tabs><w:tab w:pos="720"/></w:tabs></w:pPr><w:r><w:t>First</w:t><w:tab/><w:t>Second</w:t></w:r></w:p></w:body></w:document>');
+ const x=await m.open(await z.generateAsync({type:"nodebuffer"}));assert.equal(m.readingText(x.body),"First\tSecond");
+});
+test("relationship bridges preserve all original XML and order and reject changed anchors",async()=>{
+ const bytes=await fixture(),copy=Buffer.from(bytes),plan={bridges:[{paragraphIndex:0,before:"February 6",heading:"Introduction",paragraphs:["Relationship connects the course."]},{paragraphIndex:1,before:"Theme: First",heading:"Transition one",paragraphs:["First bridge."]},{paragraphIndex:2,before:"The Standing Stone",heading:"Transition two",paragraphs:["Second bridge."]}]};
+ const a=await m.relationshipBridges(bytes,plan),replay=await m.relationshipBridges(bytes,plan);
+ assert.deepEqual(bytes,copy);assert.deepEqual(a.bytes,replay.bytes);assert.equal(a.qa.unsplit,true);assert.equal(a.qa.sourceOrderingPreserved,true);assert.equal(a.qa.addedParagraphs,6);
+ await assert.rejects(()=>m.relationshipBridges(bytes,{bridges:plan.bridges.map(x=>({...x,before:"different"}))}),/ANCHOR_CHANGED/);
+});
+test("passage proposals verify PDF excerpts and exact manuscript anchors without insertion",async()=>{
+ const pdf=await require("pdf-lib").PDFDocument.create();pdf.addPage().drawText("Source evidence for a proposal.");const companion=Buffer.from(await pdf.save());
+ const manuscript=await fixture(),copy=Buffer.from(manuscript),plan={proposals:["Theme: First","Theme: Second","February 6"].map((anchor,i)=>({anchor,heading:`Proposal ${i+1}`,pdfPage:1,printedPage:"1",excerpt:"Source evidence",reason:"Reader benefit",draft:"Proposed wording only.",decision:"Approve or decline."}))};
+ const a=await m.passageProposals(manuscript,companion,plan),replay=await m.passageProposals(manuscript,companion,plan);
+ assert.deepEqual(manuscript,copy);assert.deepEqual(a.bytes,replay.bytes);assert.equal(a.qa.manuscriptModified,false);assert.equal(a.qa.checks.length,3);
+ await assert.rejects(()=>m.passageProposals(manuscript,companion,{proposals:plan.proposals.map(x=>({...x,excerpt:"Absent quotation"}))}),/EXCERPT_NOT_FOUND/);
+ await assert.rejects(()=>m.passageProposals(manuscript,companion,{proposals:plan.proposals.map(x=>({...x,anchor:"Absent heading"}))}),/ANCHOR_CHANGED/);
+});
