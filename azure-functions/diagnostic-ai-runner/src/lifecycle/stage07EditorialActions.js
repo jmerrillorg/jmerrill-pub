@@ -38,8 +38,12 @@ async function publish(plan,name,bytes,deps){
   let item;
   try{item=await deps.graph(path);}catch(e){if(e.statusCode!==404)throw e;}
   if(!item){try{item=await deps.graph(`${path}:/content`,{method:"PUT",headers:{"Content-Type":name.endsWith(".docx")?"application/vnd.openxmlformats-officedocument.wordprocessingml.document":"text/html","If-None-Match":"*"},body:bytes});}catch(e){if(![409,412].includes(e.statusCode))throw e;item=await deps.graph(path);}}
-  if(item.parentReference?.id!==id||b.sha(await deps.sourceBytes({itemId:item.id}))!==b.sha(bytes))b.deny("EDITORIAL_OUTPUT_CUSTODY_CONFLICT");
-  return {name,itemId:item.id,webUrl:item.webUrl,sha256:b.sha(bytes),bytes:bytes.length};
+  if(item.parentReference?.id!==id)b.deny("EDITORIAL_OUTPUT_CUSTODY_CONFLICT");
+  const stored=await deps.sourceBytes({itemId:item.id});
+  const custody=name.endsWith(".docx")?await require("../editorial/sharePointDocumentCustody").verify(bytes,stored):{method:"EXACT_BYTES",generatedSha256:b.sha(bytes),storedSha256:b.sha(stored)};
+  if(!name.endsWith(".docx")&&custody.generatedSha256!==custody.storedSha256)b.deny("EDITORIAL_OUTPUT_CUSTODY_CONFLICT");
+  await b.immutable(deps.containerClient,`${ROOT}/${plan.titleId}/${plan.actionVersion}/custody/${b.sha(name)}.json`,{itemId:item.id,eTag:item.eTag,...custody});
+  return {name,itemId:item.id,webUrl:item.webUrl,sha256:b.sha(stored),generatedSha256:b.sha(bytes),bytes:stored.length,custody};
 }
 const escape=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 async function execute(plan,review,deps){
@@ -67,13 +71,31 @@ async function execute(plan,review,deps){
     const inputs=[];for(const input of plan.inputs)inputs.push({...input,bytes:await source(input,deps)});
     const sample=await documents.intentionalSamples(inputs),artifacts=[];
     for(const output of sample.outputs)artifacts.push(await publish(plan,output.name,output.bytes,deps));
+    const comparison=Buffer.from(`<!doctype html><html lang="en"><meta charset="utf-8"><title>The Intentional Leader: flow and trim comparison</title><body><h1>Option A reading flow and Option C trim comparison</h1><p>Both samples contain the same complete January 1 and August 12 readings, including Executive Reflection and Soul Dive. They test quieter secondary labels and continuous reading without deleting devotional content. No manuscript-wide restructuring has occurred.</p><table><thead><tr><th>Option</th><th>Reader benefit</th><th>Tradeoff</th></tr></thead><tbody><tr><td>6 x 9 inches</td><td>Compact, familiar book size; preserves the current baseline.</td><td>Narrower lines and more page turns for the complete daily material.</td></tr><tr><td>7 x 10 inches</td><td>More room for the same words and reflection material.</td><td>Larger physical book and longer lines; production cost and provider limits are not yet quoted.</td></tr></tbody></table><p>Both use Georgia 11-point type and 0.625-inch sample margins. The text areas are 4.75 x 7.75 and 5.75 x 8.75 inches respectively. The larger sample has approximately 37% more text area, but that does not establish a final page-count reduction. These two readings are a comparison, not a full-volume pagination proof.</p><h2>Recommendation</h2><p>Review the quieter-label flow first, then compare the larger trim for comfortable quarterly reading. Preserve all Executive Reflection and Soul Dive content. Do not compress type or remove content to force a target page count. Final gutter, page count, binding and provider cost require a complete quarterly layout before production.</p><h2>Your remaining choice</h2><p>Tell us whether this reading flow is comfortable and which sample size you prefer for the next layout study. Quarterly print volumes and one annual eBook are already settled and are not being asked again. This choice guides development; it does not approve unfinished Stage 07 work or Stage 08 advancement.</p></body></html>`);
+    artifacts.push(await publish(plan,"Intentional Leader Option A and Option C comparison.html",comparison,deps));
     const result={titleId:plan.titleId,version:plan.version,actionVersion:plan.actionVersion,replyKey:plan.replyKey,status:"LAYOUT_SAMPLES_AVAILABLE_VISUAL_REVIEW_OPEN",artifacts,qa:sample.qa,paidCalls:0,stageCompletionApproved:false,nextStageAuthorized:false};
     return (await b.immutable(deps.containerClient,`${base}/result.json`,result)).value;
   }
   if(plan.operation==="CHAD_REVIEWED_UNCHANGED_PACKAGE"){
-    const packaged=await require("./newSubmissionStage07").handler({mode:"SUBMISSION_07_PACKAGE",titleId:plan.titleId,componentSha256:plan.componentSha256},deps);
+    // This reviewed action applies the existing unchanged-text approval only to
+    // Chad's unpaid package operation, never to model execution or other titles.
+    const packaged=await require("./newSubmissionStage07").handler({mode:"SUBMISSION_07_PACKAGE",titleId:plan.titleId,componentSha256:plan.componentSha256},
+      {...deps,env:{...(deps.env||process.env),JM1_STAGE07_CLOSURE_AUTHORITY:require("../editorial/stage07ClosureAuthority").reference}});
+    if(packaged.status!==200)b.deny(packaged.jsonBody.code||"EDITORIAL_REVIEWED_PACKAGE_NOT_READY");
     if(packaged.status!==200||packaged.jsonBody.stage07Complete!==false||packaged.jsonBody.reviewedUnchanged!==true||!packaged.jsonBody.delivery?.files?.length)b.deny("EDITORIAL_REVIEWED_PACKAGE_NOT_READY");
-    const result={titleId:plan.titleId,version:plan.version,actionVersion:plan.actionVersion,replyKey:plan.replyKey,status:"REVIEWED_UNCHANGED_PACKAGE_AVAILABLE_RENDERING_REVIEW_OPEN",artifacts:packaged.jsonBody.delivery.files,package:packaged.jsonBody,paidCalls:0,stageCompletionApproved:false,nextStageAuthorized:false};
+    const exceptionRows=[
+      ["First prompt and Chad naming exchange","21-22, 44, 115, 632-633","Unrecovered source remains explicitly disclosed. Do not reconstruct or invent it; no repeat author request is implied."],
+      ["Dates and financial recollections","69, 153, 168, 235, 283-284, 322","Approximate or unverified claims remain qualified. Documentary corroboration is not established by this editorial package."],
+      ["Architecture and operator-load records","202, 209-210, 244, 385-403, 441, 507-523, 614","Exact document and version cross-references remain a source-verification task; editorial consistency does not independently certify them."],
+      ["Publishing pipeline counts","414, 451","Preserve the disclosed sixteen-stage versus ten-stage discrepancy until the dated source records explain it."],
+      ["September 2 review meeting","372, 407","No reconstructed scene, dialogue or approval. The underlying meeting account remains unavailable."],
+      ["October 10 reconstruction versus historical exchange date","457, 481-487, 643-644, 691-698, 706","Keep reconstruction and unrecovered historical dates distinct; do not infer the latter."],
+      ["Blockchain research and technical claims","540-588, 649, 711","Research intention is not a launched product or guaranteed royalty enforcement. Publication fact-checking remains separate."],
+      ["Citations and personal disclosures","682, 684, 699-711","Check exact citation targets and authorized personal details before publication. Do not add names, roles or contributions without source authority."]
+    ];
+    const register=Buffer.from(`<!doctype html><html lang="en"><meta charset="utf-8"><title>Chad and Me source-verification register</title><body><h1>Chad and Me: factual and source-verification exceptions</h1><p>The documentary-reflective, reviewed-unchanged disposition is accepted. These are preserved source limitations and verification tasks, not a request to repeat that decision and not factual publication clearance. Paragraph references use original v003 numbering, 0-711.</p><table><thead><tr><th>Issue</th><th>Source paragraphs</th><th>Disposition</th></tr></thead><tbody>${exceptionRows.map(row=>`<tr>${row.map(cell=>`<td>${escape(cell)}</td>`).join("")}</tr>`).join("")}</tbody></table><p>The original manuscript, editorial memo and detailed source questions remain in the review package. No invented scenes, quotations, chronology or factual resolutions have been introduced. Completed-stage author approval remains required.</p></body></html>`);
+    const exceptionArtifact=await publish(plan,"Chad and Me factual and source verification register.html",register,deps);
+    const result={titleId:plan.titleId,version:plan.version,actionVersion:plan.actionVersion,replyKey:plan.replyKey,status:"REVIEWED_UNCHANGED_PACKAGE_AVAILABLE_RENDERING_REVIEW_OPEN",artifacts:[...packaged.jsonBody.delivery.files,exceptionArtifact],package:packaged.jsonBody,paidCalls:0,stageCompletionApproved:false,nextStageAuthorized:false};
     return (await b.immutable(deps.containerClient,`${base}/result.json`,result)).value;
   }
   const results=[];
