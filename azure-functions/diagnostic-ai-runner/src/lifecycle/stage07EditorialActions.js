@@ -155,10 +155,13 @@ async function followup(plan,review,deps){
   if(!receipt.providerMessageId||!receipt.communicationRecordId||!receipt.sentAt)b.deny("EDITORIAL_SEND_RECEIPT_MISSING");
   sent=(await b.immutable(deps.containerClient,`${base}/send.json`,receipt)).value;
  }
- const stage=require("./stage07AuthorCorrespondence"),delivery=(await b.optional(deps.containerClient,`${base}/delivery.json`))?.value||await stage.delivery({...review,subject},sent,deps);
+ const stage=require("./stage07AuthorCorrespondence"),observed=(await b.optional(deps.containerClient,`${base}/delivery.json`))?.value||await stage.delivery({...review,subject},sent,deps);
+ const delivery=observed?{...observed,reviewHash:stage.validate(review)}:null;
+ if(delivery)await b.immutable(deps.containerClient,`${base}/delivery-observations/${b.sha(JSON.stringify(delivery))}.json`,delivery);
  if(delivery?.delivered)await b.immutable(deps.containerClient,`${base}/delivery.json`,delivery);
  if(delivery?.internetMessageId){
-  await b.immutable(deps.containerClient,`${stage.prefix(plan.titleId)}/followup-deliveries/editorial-${plan.actionVersion}.json`,{
+  const bindingPath=`${stage.prefix(plan.titleId)}/followup-deliveries/editorial-${plan.actionVersion}.json`;
+  if(!(await b.optional(deps.containerClient,bindingPath)))await b.immutable(deps.containerClient,bindingPath,{
    ...delivery,editorialActionVersion:plan.actionVersion,editorialPlanSha256:b.sha(JSON.stringify(plan)),
    providerMessageId:sent.providerMessageId,communicationRecordId:sent.communicationRecordId
   });
