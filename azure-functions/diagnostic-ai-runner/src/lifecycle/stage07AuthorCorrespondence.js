@@ -169,7 +169,12 @@ async function reconcile(review,deps) {
           if(completion.direction)await preserve("author-direction",completion.direction);
           if(completion.send)await preserve("followup",completion.send);
         }
-      }catch(e){custodyErrors.push({kind:"reply-completion",code:e.safeCode||"CONSULTATION_REPLY_COMPLETION_FAILED",status:e.statusCode||null});completion={status:"REPLY_COMPLETION_RETRY_REQUIRED"};}
+      }catch(e){
+        const failure={kind:"reply-completion",replyReference:path,code:e.safeCode||"CONSULTATION_REPLY_COMPLETION_FAILED",status:e.statusCode||null,
+          dependencyCode:/^[A-Z_0-9]+$/.test(e.code||"")?e.code:null,stageCompletionApproved:false,nextStageAuthorized:false};
+        await b.immutable(deps.containerClient,`${base}/completion-failures/${key}-${b.sha(JSON.stringify(failure))}.json`,failure);
+        custodyErrors.push(failure);completion={status:"REPLY_COMPLETION_RETRY_REQUIRED"};
+      }
       results.push({reference:path,status:completion.status,replay:!!saved,followup:completion.send||null,editorial:completion.editorial||null});
     }
   }

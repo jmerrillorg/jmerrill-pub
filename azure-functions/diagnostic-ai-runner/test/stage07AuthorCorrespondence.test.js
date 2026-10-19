@@ -73,5 +73,8 @@ test("missing folder custody does not prevent durable exact-version reply captur
   mail.replies=async()=>[{id:"immutable",internetMessageId:"<reply>",receivedDateTime:"2026-10-16T21:10:00Z",from:{emailAddress:{address:mail.AUTHOR}},toRecipients:[{emailAddress:{address:mail.MAILBOX}}],subject:"Re: consultation",uniqueBody:{content:"Please preserve the voice."},internetMessageHeaders:[{name:"In-Reply-To",value:"<original>"}]}];
   const first=await stage.reconcile(x.review,x.deps),count=x.blobs.size,second=await stage.reconcile(x.review,x.deps);
   assert.equal(first.replies[0].status,"REPLY_COMPLETION_RETRY_REQUIRED");assert.equal(second.replies[0].replay,true);assert.equal(x.blobs.size,count);assert.ok(first.custodyErrors.length);assert.equal(first.stageCompletionApproved,false);
+  const failures=[...x.blobs].filter(([path])=>path.includes("/completion-failures/"));
+  assert.equal(failures.length,1);assert.equal(JSON.parse(failures[0][1]).status,503);
+  assert.ok(!failures[0][1].toString().includes("Please preserve the voice"));
  }finally{mail.replies=old;}
 });
