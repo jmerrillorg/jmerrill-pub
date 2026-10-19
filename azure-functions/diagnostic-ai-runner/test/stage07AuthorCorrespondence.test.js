@@ -48,9 +48,10 @@ test("missing folder custody does not prevent durable exact-version reply captur
  x.put(base+"/send.json",{sentAt:"2026-10-16T21:00:00Z",providerMessageId:"provider",sent:true});
  x.put(base+"/delivery.json",{delivered:true,internetMessageId:"<original>",reviewHash:stage.validate(x.review),sentAt:"2026-10-16T21:00:00Z"});
  x.deps.graph=async()=>{throw Object.assign(Error("unavailable"),{statusCode:503});};
+ x.deps.mailGraph=async()=>({value:[]});
  try{
   mail.replies=async()=>[{id:"immutable",internetMessageId:"<reply>",receivedDateTime:"2026-10-16T21:10:00Z",from:{emailAddress:{address:mail.AUTHOR}},toRecipients:[{emailAddress:{address:mail.MAILBOX}}],subject:"Re: consultation",uniqueBody:{content:"Please preserve the voice."},internetMessageHeaders:[{name:"In-Reply-To",value:"<original>"}]}];
   const first=await stage.reconcile(x.review,x.deps),count=x.blobs.size,second=await stage.reconcile(x.review,x.deps);
-  assert.equal(first.replies[0].status,"AUTHENTICATION_REVIEW_REQUIRED");assert.equal(second.replies[0].replay,true);assert.equal(x.blobs.size,count);assert.ok(first.custodyErrors.length);assert.equal(first.stageCompletionApproved,false);
+  assert.equal(first.replies[0].status,"REPLY_COMPLETION_RETRY_REQUIRED");assert.equal(second.replies[0].replay,true);assert.equal(x.blobs.size,count);assert.ok(first.custodyErrors.length);assert.equal(first.stageCompletionApproved,false);
  }finally{mail.replies=old;}
 });

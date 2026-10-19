@@ -123,12 +123,26 @@ async function reconcile(review,deps) {
   }
   const results=[];
   if(delivered?.internetMessageId){
+    const bindings=[delivered];
+    // Replies to a verified follow-up remain bound to this same reviewed title/version.
+    for(const pin of require("../../config/stage07-reviewed-replies.json").filter(x=>x.titleId===review.titleId)){
+      const followup=(await b.optional(deps.containerClient,`${base}/followups/${pin.replyKey}.json`))?.value;
+      if(!followup)continue;
+      const bound=(await b.optional(deps.containerClient,`${base}/followup-deliveries/${pin.replyKey}.json`))?.value;
+      const observed=bound||await delivery({...review,subject:`Re: ${review.subject}`},followup,deps);
+      if(observed?.internetMessageId){
+        const binding={...observed,reviewHash:validate(review)};
+        await b.immutable(deps.containerClient,`${base}/followup-deliveries/${pin.replyKey}.json`,binding);
+        await preserve("followup-delivery",binding);bindings.push(binding);
+      }
+    }
     for(const message of await mail.replies({deliveredAt:sent.sentAt},deps)){
       const headers=message.internetMessageHeaders||[];
-      if(!headers.some(h=>h.name.toLowerCase()==="in-reply-to"&&h.value.includes(delivered.internetMessageId)))continue;
+      const matched=bindings.filter(binding=>headers.some(h=>h.name.toLowerCase()==="in-reply-to"&&h.value.trim()===binding.internetMessageId));
+      if(matched.length!==1)continue;
       const key=b.sha(message.internetMessageId||message.id),path=`${base}/replies/${key}.json`;
       const saved=await b.optional(deps.containerClient,path);
-      const result=replies.classify(message,review,delivered);
+      const result=replies.classify(message,review,matched[0]);
       const record={titleId:review.titleId,version:review.version,reviewHash:validate(review),messageId:message.id,
         internetMessageId:message.internetMessageId,receivedAt:message.receivedDateTime,authoredText:message.uniqueBody?.content||"",
         stageCompletionApproved:false,nextStageAuthorized:false};
@@ -137,11 +151,22 @@ async function reconcile(review,deps) {
       const evaluation={replyReference:path,reviewHash:validate(review),result};
       await b.immutable(deps.containerClient,`${base}/evaluations/${key}-${b.sha(JSON.stringify(result))}.json`,evaluation);
       await preserve("decision",evaluation);
-      results.push({reference:path,status:result.status,replay:!!saved});
+      let completion={status:result.status};
+      try{
+        if(result.status!=="IDENTITY_OR_REVIEW_THREAD_MISMATCH"){
+          const owner=require("./stage07ReplyCompletion");
+          const custody=await owner.attachments(review,message,base,deps);
+          await preserve("reply-attachments",custody);
+          completion=await owner.complete(review,message,result,custody,base,deps);
+          if(completion.direction)await preserve("author-direction",completion.direction);
+          if(completion.send)await preserve("followup",completion.send);
+        }
+      }catch(e){custodyErrors.push({kind:"reply-completion",code:e.safeCode||"CONSULTATION_REPLY_COMPLETION_FAILED",status:e.statusCode||null});completion={status:"REPLY_COMPLETION_RETRY_REQUIRED"};}
+      results.push({reference:path,status:completion.status,replay:!!saved,followup:completion.send||null});
     }
   }
   return {titleId:review.titleId,version:review.version,generated:true,sent:true,delivery:delivered,
-    replies:results,custodyErrors,status:delivered?.delivered?"DELIVERED_AWAITING_EDITORIAL_RESPONSE":"SENT_DELIVERY_READBACK_PENDING",
+    replies:results,custodyErrors,status:results.length?"EDITORIAL_RESPONSE_CAPTURED_STAGE_HELD":delivered?.delivered?"DELIVERED_AWAITING_EDITORIAL_RESPONSE":"SENT_DELIVERY_READBACK_PENDING",
     stageCompletionApproved:false,nextStageAuthorized:false};
 }
 async function handler(body,supplied={}) {
