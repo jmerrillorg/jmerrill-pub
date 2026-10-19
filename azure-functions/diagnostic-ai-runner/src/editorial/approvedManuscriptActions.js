@@ -4,6 +4,14 @@ const JSZip = require("jszip");
 const { sha, deny } = require("../lifecycle/newSubmissionStage03Budget");
 const W = "http://schemas.openxmlformats.org/wordprocessingml/2006/main";
 const text = node => Array.from(node.getElementsByTagNameNS(W, "t")).map(x => x.textContent).join("");
+function readingText(node) {
+  if(node.namespaceURI===W){
+    if(node.localName==="t")return node.textContent;
+    if(node.localName==="br"||node.localName==="cr")return "\n";
+    if(node.localName==="tab")return "\t";
+  }
+  return Array.from(node.childNodes||[]).map(readingText).join("");
+}
 const MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
 function dateOf(value) {
   const m = /^(January|February|March|April|May|June|July|August|September|October|November|December)\s+(\d{1,2})$/.exec(value.trim());
@@ -80,7 +88,7 @@ function annualQa(quarters){
 async function intentionalSamples(inputs){
   const {Document,Paragraph,TextRun,Packer}=require("docx"),samples=[];
   for(const input of inputs){
-    const opened=await open(input.bytes),paragraphs=Array.from(opened.body.getElementsByTagNameNS(W,"p")).map(text);
+    const opened=await open(input.bytes),paragraphs=Array.from(opened.body.getElementsByTagNameNS(W,"p")).map(readingText);
     const heading=t=>t.replace(/^[^A-Za-z]+/u,"").trim().toUpperCase();
     const starts=paragraphs.map((t,i)=>heading(t)===input.date?i:-1).filter(i=>i>=0);
     if(starts.length!==1)deny("EDITORIAL_SAMPLE_DATE_NOT_UNIQUE");
@@ -95,17 +103,17 @@ async function intentionalSamples(inputs){
     const children=[new Paragraph({text:"The Intentional Leader reading flow samples",heading:"Title"}),new Paragraph("Option A preserves the complete daily reflection and Soul Dive while giving secondary labels a quieter visual treatment. Compare the same readings at two trim sizes before manuscript-wide changes. Quarterly print and one annual eBook remain the approved format. These samples do not approve Stage 07 completion.")];
     for(const sample of samples){
       children.push(new Paragraph({text:sample.date,heading:"Heading1",pageBreakBefore:true}));
-      for(const line of sample.lines.slice(1))children.push(new Paragraph({spacing:{after:80},children:[new TextRun({text:line,bold:/^(Executive Reflection|Mindful Cue|Soul Prompt|Final Charge|SOUL DIVE|Subtheme:|Guiding Truth:|Extended Inner Reflection|Journaling Prompt|Embodied Practice|Closing Prayer|Covenant Charge)/i.test(line)})]}));
+      for(const line of sample.lines.slice(1))children.push(new Paragraph({spacing:{after:80},children:line.split("\n").map((part,index)=>new TextRun({text:part,break:index?1:0,bold:/^(Executive Reflection|Mindful Cue|Soul Prompt|Final Charge|SOUL DIVE|Subtheme:|Guiding Truth:|Extended Inner Reflection|Journaling Prompt|Embodied Practice|Closing Prayer|Covenant Charge)/i.test(line)}))}));
     }
     const document=new Document({creator:"J Merrill Publishing",styles:{default:{document:{run:{font:"Georgia",size:22},paragraph:{spacing:{line:276}}}}},sections:[{properties:{page:{size:{width:width*1440,height:height*1440},margin:{top:900,bottom:900,left:900,right:900}}},children}]});
     const zip=await JSZip.loadAsync(await Packer.toBuffer(document));
     for(const entry of Object.values(zip.files))entry.date=new Date("2000-01-01T00:00:00Z");
     const core=await zip.file("docProps/core.xml").async("string");zip.file("docProps/core.xml",core.replace(/(<dcterms:(?:created|modified)[^>]*>)[^<]+/g,"$12000-01-01T00:00:00Z"),{date:new Date("2000-01-01T00:00:00Z")});
     const bytes=await zip.generateAsync({type:"nodebuffer",compression:"DEFLATE"});
-    const check=await open(bytes),all=Array.from(check.body.getElementsByTagNameNS(W,"p")).map(text);
+    const check=await open(bytes),all=Array.from(check.body.getElementsByTagNameNS(W,"p")).map(readingText);
     for(const sample of samples)for(const line of sample.lines.slice(1))if(!all.includes(line))deny("EDITORIAL_SAMPLE_TEXT_LOSS");
     outputs.push({name:`Intentional Leader Option A ${width}x${height} sample.docx`,bytes});
   }
   return {outputs,qa:{status:"SAMPLE_CONTENT_PARITY_PASS_VISUAL_REVIEW_OPEN",samples:samples.map(x=>({date:x.date,sourceSha256:x.sourceSha256,paragraphs:x.lines.length})),executiveReflectionPreserved:true,soulDivesPreserved:true,globalRestructuring:false,stageCompletionApproved:false,nextStageAuthorized:false}};
 }
-module.exports={applyLongWatch,annualQa,intentionalSamples,open,inventory,entries,text};
+module.exports={applyLongWatch,annualQa,intentionalSamples,open,inventory,entries,text,readingText};
