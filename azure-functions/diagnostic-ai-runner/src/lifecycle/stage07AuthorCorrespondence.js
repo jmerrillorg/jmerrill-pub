@@ -136,6 +136,11 @@ async function reconcile(review,deps) {
         await preserve("followup-delivery",binding);bindings.push(binding);
       }
     }
+    // Reviewed source updates may originate in chat rather than an inbound email.
+    // Their verified delivery records still bind subsequent author replies here.
+    for(const binding of await recordedFollowupBindings(review,deps)){
+      if(!bindings.some(x=>x.internetMessageId===binding.internetMessageId))bindings.push(binding);
+    }
     for(const message of await mail.replies({deliveredAt:sent.sentAt},deps)){
       const headers=message.internetMessageHeaders||[];
       const matched=bindings.filter(binding=>headers.some(h=>h.name.toLowerCase()==="in-reply-to"&&h.value.trim()===binding.internetMessageId));
@@ -145,6 +150,7 @@ async function reconcile(review,deps) {
       const result=replies.classify(message,review,matched[0]);
       const record={titleId:review.titleId,version:review.version,reviewHash:validate(review),messageId:message.id,
         internetMessageId:message.internetMessageId,receivedAt:message.receivedDateTime,authoredText:message.uniqueBody?.content||"",
+        ...(matched[0].sourceUpdateVersion?{sourceUpdateVersion:matched[0].sourceUpdateVersion,sourceUpdateSha256:matched[0].sourceUpdateSha256,correspondenceReference:matched[0].internetMessageId}:{}),
         stageCompletionApproved:false,nextStageAuthorized:false};
       if(saved&&JSON.stringify(saved.value)!==JSON.stringify(record))b.deny("CONSULTATION_REPLY_CONTENT_CONFLICT");
       await b.immutable(deps.containerClient,path,record);await preserve("reply",record);
@@ -199,4 +205,17 @@ async function monitor(deps={}) {
   for(const row of selected())results.push(await handler({titleId:row.titleId,mode:"CONSULTATION_07_RECONCILE"},deps));
   return results;
 }
-module.exports={PREFIX,MODES,version,prefix,validate,load,payload,send,delivery,reconcile,handler,monitor};
+async function recordedFollowupBindings(review,deps){
+  const root=`${prefix(review.titleId)}/followup-deliveries/`,result=[];
+  for await(const item of deps.containerClient.listBlobsFlat({prefix:root})){
+    if(!item.name.startsWith(root)||!item.name.endsWith('.json')||result.length>=1000)b.deny('CONSULTATION_FOLLOWUP_INVENTORY_INVALID');
+    const {value}=await b.read(deps.containerClient,item.name);
+    if(value.titleId!==review.titleId||value.version!==review.version||value.reviewHash!==validate(review)||
+      !value.internetMessageId||!value.publishingMessageId||!Number.isFinite(Date.parse(value.publishingCopyReceivedAt))||
+      value.stageCompletionApproved!==false||value.nextStageAuthorized!==false)b.deny('CONSULTATION_FOLLOWUP_BINDING_INVALID');
+    if(value.sourceUpdateVersion&&(!/^[A-Z0-9-]+$/i.test(value.sourceUpdateVersion)||!/^[a-f0-9]{64}$/.test(value.sourceUpdateSha256||'')))b.deny('CONSULTATION_FOLLOWUP_BINDING_INVALID');
+    result.push(value);
+  }
+  return result;
+}
+module.exports={PREFIX,MODES,version,prefix,validate,load,payload,send,delivery,reconcile,handler,monitor,recordedFollowupBindings};

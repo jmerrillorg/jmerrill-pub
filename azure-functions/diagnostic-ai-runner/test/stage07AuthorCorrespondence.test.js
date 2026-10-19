@@ -13,13 +13,21 @@ function fixture(){
   attachments:[{itemId:"exact",version:"1",sha256:b.sha(file),blobPath:base+"/attachments/fixture.docx",name:"Review.docx",contentType:"application/vnd.openxmlformats-officedocument.wordprocessingml.document",role:"WORK_IN_PROGRESS"}],questions:[{id:"POSITIONING",options:["SELF_CONTAINED","COMPANION"]}]};
  const put=(p,v)=>{blobs.set(p,Buffer.isBuffer(v)?v:Buffer.from(JSON.stringify(v)));versions.set(p,String(Number(versions.get(p)||0)+1));};put(review.attachments[0].blobPath,file);
  const deps={env:{},sendConsultation:async message=>{counts.send++;assert.equal(message.authorEmail,mail.AUTHOR);assert.deepEqual(message.cc,[mail.MAILBOX]);return {providerMessageId:"abc",communicationRecordId:"crm",sentAt:"2026-10-16T21:00:00Z"};},
- containerClient:{getProperties:async()=>({}),getBlockBlobClient:p=>({getProperties:async()=>{if(!blobs.has(p))throw Object.assign(Error("missing"),{statusCode:404});return {etag:versions.get(p)};},downloadToBuffer:async()=>blobs.get(p),uploadData:async(bytes,o)=>{if(o?.conditions?.ifNoneMatch&&blobs.has(p))throw Object.assign(Error("exists"),{statusCode:412});put(p,bytes);return {etag:versions.get(p)};}})}};
+ containerClient:{listBlobsFlat:async function*({prefix}){for(const name of blobs.keys())if(name.startsWith(prefix))yield {name};},getProperties:async()=>({}),getBlockBlobClient:p=>({getProperties:async()=>{if(!blobs.has(p))throw Object.assign(Error("missing"),{statusCode:404});return {etag:versions.get(p)};},downloadToBuffer:async()=>blobs.get(p),uploadData:async(bytes,o)=>{if(o?.conditions?.ifNoneMatch&&blobs.has(p))throw Object.assign(Error("exists"),{statusCode:412});put(p,bytes);return {etag:versions.get(p)};}})}};
  return {review,deps,counts,blobs,put};
 }
 test("outbound is independent of expired inbound trust and preserves title-only attachments",async()=>{
  const x=fixture();const first=await stage.send(x.review,x.deps),second=await stage.send(x.review,x.deps);
  assert.equal(x.counts.send,1);assert.deepEqual(first,second);assert.equal(first.delivered,false);assert.equal(first.stageCompletionApproved,false);
  assert.ok(x.blobs.has(stage.prefix(x.review.titleId)+"/send-intent.json"));
+});
+test('source-update correspondence binds only verified same-title version deliveries',async()=>{
+ const x=fixture(),path=stage.prefix(x.review.titleId)+'/followup-deliveries/chat-source-update.json';
+ const good={titleId:x.review.titleId,version:x.review.version,reviewHash:stage.validate(x.review),internetMessageId:'<source-update>',publishingMessageId:'immutable-cc',publishingCopyReceivedAt:'2026-10-19T10:00:00Z',stageCompletionApproved:false,nextStageAuthorized:false};
+ x.put(path,good);assert.deepEqual(await stage.recordedFollowupBindings(x.review,x.deps),[good]);
+ for(const patch of [{titleId:'other'},{version:'stale'},{reviewHash:'wrong'},{publishingMessageId:null},{stageCompletionApproved:true}]){
+  x.put(path,{...good,...patch});await assert.rejects(()=>stage.recordedFollowupBindings(x.review,x.deps),/FOLLOWUP_BINDING_INVALID/);
+ }
 });
 test("attachment drift stops before sending",async()=>{const x=fixture();x.put(x.review.attachments[0].blobPath,Buffer.from("changed"));await assert.rejects(()=>stage.send(x.review,x.deps),/ATTACHMENT_DRIFT/);assert.equal(x.counts.send,0);});
 test("cross-title source and attachment paths are rejected",()=>{const x=fixture();stage.validate(x.review);assert.throws(()=>stage.validate({...x.review,titleId:policy.sources.find(s=>s.titleId!==x.review.titleId).titleId}),/SCOPE_DENIED/);assert.throws(()=>stage.validate({...x.review,attachments:[{...x.review.attachments[0],blobPath:"other-title/attachments/file"}]}),/SCOPE_DENIED/);});
