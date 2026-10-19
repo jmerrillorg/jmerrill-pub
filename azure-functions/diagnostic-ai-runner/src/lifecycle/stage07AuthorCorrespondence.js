@@ -137,11 +137,22 @@ async function reconcile(review,deps) {
       const evaluation={replyReference:path,reviewHash:validate(review),result};
       await b.immutable(deps.containerClient,`${base}/evaluations/${key}-${b.sha(JSON.stringify(result))}.json`,evaluation);
       await preserve("decision",evaluation);
-      results.push({reference:path,status:result.status,replay:!!saved});
+      let completion={status:result.status};
+      try{
+        if(result.status!=="IDENTITY_OR_REVIEW_THREAD_MISMATCH"){
+          const owner=require("./stage07ReplyCompletion");
+          const custody=await owner.attachments(review,message,base,deps);
+          await preserve("reply-attachments",custody);
+          completion=await owner.complete(review,message,result,custody,base,deps);
+          if(completion.direction)await preserve("author-direction",completion.direction);
+          if(completion.send)await preserve("followup",completion.send);
+        }
+      }catch(e){custodyErrors.push({kind:"reply-completion",code:e.safeCode||"CONSULTATION_REPLY_COMPLETION_FAILED",status:e.statusCode||null});completion={status:"REPLY_COMPLETION_RETRY_REQUIRED"};}
+      results.push({reference:path,status:completion.status,replay:!!saved,followup:completion.send||null});
     }
   }
   return {titleId:review.titleId,version:review.version,generated:true,sent:true,delivery:delivered,
-    replies:results,custodyErrors,status:delivered?.delivered?"DELIVERED_AWAITING_EDITORIAL_RESPONSE":"SENT_DELIVERY_READBACK_PENDING",
+    replies:results,custodyErrors,status:results.length?"EDITORIAL_RESPONSE_CAPTURED_STAGE_HELD":delivered?.delivered?"DELIVERED_AWAITING_EDITORIAL_RESPONSE":"SENT_DELIVERY_READBACK_PENDING",
     stageCompletionApproved:false,nextStageAuthorized:false};
 }
 async function handler(body,supplied={}) {

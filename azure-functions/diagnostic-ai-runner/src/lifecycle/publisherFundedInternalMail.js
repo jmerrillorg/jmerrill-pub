@@ -1,7 +1,7 @@
 "use strict";
 const { createHash } = require("node:crypto");
 const custody = new WeakMap();
-const POLICY = Object.freeze({
+const HISTORICAL_POLICY = Object.freeze({
   version: "JMP-STAGE04-INTERNAL-MAIL-20261012-v1",
   tenantId: "352d075e-8e17-4169-9f8e-22e6946ce66d",
   applicationId: "dc8d1429-8c1b-473b-83ca-f9545fad8074",
@@ -11,6 +11,13 @@ const POLICY = Object.freeze({
   authorMailboxId: "9586f34b-b5f3-437b-bc64-3e44d2518427",
   checkedAt: "2026-10-12T21:06:09.790Z",
   expiresAt: "2026-10-13T21:05:01.804Z"
+});
+// Fresh administrator readbacks, not an extension of the expired attestation.
+const POLICY = Object.freeze({ ...HISTORICAL_POLICY,
+  version: "JMP-INTERNAL-MAIL-20261019-v2",
+  checkedAt: "2026-10-19T01:27:01.445Z",
+  expiresAt: "2026-10-20T01:26:30.942Z",
+  evidence: ["stage04-exchange-scope-2026-10-19T01-26-30-942Z.json", "stage04-exchange-scope-2026-10-19T01-27-01-445Z.json"]
 });
 const digest = value => createHash("sha256").update(value).digest("hex");
 function one(message, name) {
@@ -46,4 +53,4 @@ function authenticate(message, now = Date.now()) {
     networkMessageId: networkId, headerSha256: digest(JSON.stringify(received)),
     dmarc: "NOT_APPLICABLE_INTERNAL", spf: "NOT_APPLICABLE_INTERNAL", dkim: "NOT_APPLICABLE_INTERNAL" };
 }
-module.exports = { POLICY, bindCustody, authenticate };
+module.exports = { POLICY, HISTORICAL_POLICY, bindCustody, authenticate };
