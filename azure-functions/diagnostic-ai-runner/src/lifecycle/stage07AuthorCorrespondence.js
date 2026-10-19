@@ -164,11 +164,13 @@ async function reconcile(review,deps) {
           const custody=await owner.attachments(review,message,base,deps);
           await preserve("reply-attachments",custody);
           completion=await owner.complete(review,message,result,custody,base,deps);
+          const editorial=await require("./stage07EditorialActions").run(review,message,result,deps);
+          if(editorial.status!=="NO_REVIEWED_EXECUTABLE_ACTION")completion={...completion,editorial};
           if(completion.direction)await preserve("author-direction",completion.direction);
           if(completion.send)await preserve("followup",completion.send);
         }
       }catch(e){custodyErrors.push({kind:"reply-completion",code:e.safeCode||"CONSULTATION_REPLY_COMPLETION_FAILED",status:e.statusCode||null});completion={status:"REPLY_COMPLETION_RETRY_REQUIRED"};}
-      results.push({reference:path,status:completion.status,replay:!!saved,followup:completion.send||null});
+      results.push({reference:path,status:completion.status,replay:!!saved,followup:completion.send||null,editorial:completion.editorial||null});
     }
   }
   return {titleId:review.titleId,version:review.version,generated:true,sent:true,delivery:delivered,
@@ -214,6 +216,16 @@ async function recordedFollowupBindings(review,deps){
       !value.internetMessageId||!value.publishingMessageId||!Number.isFinite(Date.parse(value.publishingCopyReceivedAt))||
       value.stageCompletionApproved!==false||value.nextStageAuthorized!==false)b.deny('CONSULTATION_FOLLOWUP_BINDING_INVALID');
     if(value.sourceUpdateVersion&&(!/^[A-Z0-9-]+$/i.test(value.sourceUpdateVersion)||!/^[a-f0-9]{64}$/.test(value.sourceUpdateSha256||'')))b.deny('CONSULTATION_FOLLOWUP_BINDING_INVALID');
+    if(value.sourceUpdateVersion){
+      const receipt=(await b.read(deps.containerClient,`${prefix(review.titleId)}/source-updates/${value.sourceUpdateVersion}/send.json`)).value;
+      if(receipt.titleId!==value.titleId||receipt.reviewVersion!==value.version||receipt.version!==value.sourceUpdateVersion||
+        receipt.reviewHash!==value.reviewHash||receipt.sourceUpdateSha256!==value.sourceUpdateSha256||
+        receipt.providerMessageId!==value.providerMessageId||receipt.communicationRecordId!==value.communicationRecordId||
+        !Number.isFinite(Date.parse(receipt.sentAt))||Date.parse(receipt.sentAt)>Date.parse(value.publishingCopyReceivedAt)||
+        (value.sentAt&&value.sentAt!==receipt.sentAt))b.deny('CONSULTATION_FOLLOWUP_RECEIPT_CONFLICT');
+      // Recover omitted metadata from its original exact-version receipt, never from clock time.
+      value.sentAt=receipt.sentAt;
+    }
     result.push(value);
   }
   return result;

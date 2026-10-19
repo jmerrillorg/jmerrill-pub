@@ -1,0 +1,20 @@
+[
+  {
+    "titleId": "a69b9dfa-bb7b-f111-ab0f-7c1e525b15c2",
+    "replyKey": "cf968db8a8c4502e1517608e17eae9138cb2a22a9d56dc7092ddc2f272fe9713",
+    "actionVersion": "LW-APPROVED-FEBRUARY-20261019-V6",
+    "sha256": "3d481500e7bfbe6889809b29c0de1f850e27c39f07f82bcf06b37eed4b8e36e6"
+  },
+  {
+    "titleId": "0e127af9-fcb3-5671-a0fa-e4af63c307d1",
+    "replyKey": "6a457ae131365e9f88384fe447396a3a60fa2182b298366465113c61f552e8a1",
+    "actionVersion": "CHAD-INDEPENDENT-20261019-V1",
+    "sha256": "9bee93b859fcc33c996e39c19ab0f635c1e7ba4e083be3391e79f5998b4bd17b"
+  },
+  {
+    "titleId": "e797232b-da7a-f111-ab0f-00224820105b",
+    "replyKey": "a35271a2a751e2922f95db0314567e0425e3e99e4f654d4d21391004fc61941a",
+    "actionVersion": "INTENTIONAL-INDEPENDENT-20261019-V1",
+    "sha256": "7a79c37d5da5af139fc687926574fa90d4459429b4155649e9928bbaa080406a"
+  }
+]

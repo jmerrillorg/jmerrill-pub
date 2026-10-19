@@ -9,6 +9,7 @@ exports.renderJm1EnterpriseCommunication = renderJm1EnterpriseCommunication;
 exports.signatureForBrand = signatureForBrand;
 exports.renderPublishingServiceCorrespondence = renderPublishingServiceCorrespondence;
 exports.messageTitleFromSubject = messageTitleFromSubject;
+exports.renderPublishingEditorialProposal = renderPublishingEditorialProposal;
 exports.validateJm1EnterpriseCommunication = validateJm1EnterpriseCommunication;
 const node_crypto_1 = require("node:crypto");
 const jm1_enterprise_design_tokens_1 = require("./jm1-enterprise-design-tokens");
@@ -110,6 +111,48 @@ function messageTitleFromSubject(subject, subtitle) {
     if (!title)
         return subject.trim();
     return subject.replace(new RegExp(`\\s+[—-]\\s+${escapeRegExp(title)}\\s*$`, 'i'), '').trim();
+}
+// Editorial proposals are presentation only. The owning correspondence runtime
+// retains title/version custody, authentication, decisions and advancement gates.
+function renderPublishingEditorialProposal(input) {
+    const title = required(input.title, 'title');
+    if (!required(input.subject, 'subject').includes(title))
+        throw new Error('EDITORIAL_TITLE_MISMATCH');
+    if (!input.decisions?.length)
+        throw new Error('EDITORIAL_DECISIONS_REQUIRED');
+    const labels = new Set();
+    const paragraphs = input.decisions.map((decision) => {
+        const label = required(decision.label, 'decision label');
+        if (labels.has(label))
+            throw new Error('EDITORIAL_DUPLICATE_DECISION');
+        labels.add(label);
+        return [label, `Current: ${required(decision.current, 'current')}`,
+            `I recommend: ${required(decision.recommendation, 'recommendation')}`,
+            `For the reader: ${required(decision.readerBenefit, 'reader benefit')}`,
+            `Other entry: ${required(decision.displacedTreatment, 'displaced treatment')}`,
+            `Your choice: ${required(decision.authorChoice, 'author choice')}`].join('\n');
+    });
+    const content = [input.opening, input.settledDecisions, ...paragraphs, input.replyInstruction].join('\n');
+    if (/\b(crosswalk|checksum|sha-?256|model calls?|spending|runtime|ledger)\b/i.test(content)) {
+        throw new Error('EDITORIAL_INTERNAL_DETAILS_NOT_AUTHOR_COPY');
+    }
+    const rendered = renderJm1EnterpriseCommunication({
+        brand: 'publishing',
+        executionAuthority: { authoritySource: 'JM1 Governed Bootstrap', renderAllowed: true, communicationAllowed: true },
+        templateName: 'PUBLISHING_EDITORIAL_PROPOSAL_V1', templateVersion: required(input.templateVersion, 'template version'),
+        subject: input.subject, recipientName: required(input.authorName, 'author name').split(/\s+/)[0],
+        title: `${title}: editorial choices`, preheader: required(input.opening, 'opening'),
+        reason: input.opening, presentationStyle: 'CORRESPONDENCE',
+        correspondenceParagraphs: [required(input.settledDecisions, 'settled decisions'), ...paragraphs,
+            required(input.replyInstruction, 'reply instruction'),
+            `Reviewing: ${required(input.reviewedVersion, 'reviewed version')}. These choices guide the edit. The finished manuscript will return to you for approval; this reply does not approve completion or advancement.`],
+        actionInstruction: PUBLISHING_CANONICAL_CLOSE, replyOnly: false,
+        actionUrl: validateUrl(required(input.materialsUrl, 'materials URL')),
+        actionLabel: required(input.materialsLabel, 'materials label'), operationalNote: '',
+    });
+    if (rendered.text.length > 6000)
+        throw new Error('EDITORIAL_PROPOSAL_EXCEEDS_RELAY_TEXT_LIMIT');
+    return rendered;
 }
 function validateJm1EnterpriseCommunication(input) {
     const html = input.html?.trim() || '';
@@ -321,7 +364,9 @@ function renderCorrespondenceText(input) {
         input.reviewPrompt || '',
         input.actionInstruction,
         responseWindow,
-        ...(input.replyOnly ? [] : [input.correspondenceParagraphs ? `Use the secure link: ${input.actionUrl}` : `You may also view the materials in your Author Operating Center: ${input.actionUrl}`]),
+        ...(input.replyOnly ? [] : [input.correspondenceParagraphs
+                ? `${input.templateName === 'PUBLISHING_EDITORIAL_PROPOSAL_V1' ? input.actionLabel : 'Use the secure link'}: ${input.actionUrl}`
+                : `You may also view the materials in your Author Operating Center: ${input.actionUrl}`]),
         next,
         input.supportNote || '',
         input.operationalNote || '',
