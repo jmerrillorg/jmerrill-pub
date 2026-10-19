@@ -136,6 +136,11 @@ async function reconcile(review,deps) {
         await preserve("followup-delivery",binding);bindings.push(binding);
       }
     }
+    // Reviewed source updates may originate in chat rather than an inbound email.
+    // Their verified delivery records still bind subsequent author replies here.
+    for(const binding of await recordedFollowupBindings(review,deps)){
+      if(!bindings.some(x=>x.internetMessageId===binding.internetMessageId))bindings.push(binding);
+    }
     for(const message of await mail.replies({deliveredAt:sent.sentAt},deps)){
       const headers=message.internetMessageHeaders||[];
       const matched=bindings.filter(binding=>headers.some(h=>h.name.toLowerCase()==="in-reply-to"&&h.value.trim()===binding.internetMessageId));
@@ -199,4 +204,16 @@ async function monitor(deps={}) {
   for(const row of selected())results.push(await handler({titleId:row.titleId,mode:"CONSULTATION_07_RECONCILE"},deps));
   return results;
 }
-module.exports={PREFIX,MODES,version,prefix,validate,load,payload,send,delivery,reconcile,handler,monitor};
+async function recordedFollowupBindings(review,deps){
+  const root=`${prefix(review.titleId)}/followup-deliveries/`,result=[];
+  for await(const item of deps.containerClient.listBlobsFlat({prefix:root})){
+    if(!item.name.startsWith(root)||!item.name.endsWith('.json')||result.length>=1000)b.deny('CONSULTATION_FOLLOWUP_INVENTORY_INVALID');
+    const {value}=await b.read(deps.containerClient,item.name);
+    if(value.titleId!==review.titleId||value.version!==review.version||value.reviewHash!==validate(review)||
+      !value.internetMessageId||!value.publishingMessageId||!Number.isFinite(Date.parse(value.publishingCopyReceivedAt))||
+      value.stageCompletionApproved!==false||value.nextStageAuthorized!==false)b.deny('CONSULTATION_FOLLOWUP_BINDING_INVALID');
+    result.push(value);
+  }
+  return result;
+}
+module.exports={PREFIX,MODES,version,prefix,validate,load,payload,send,delivery,reconcile,handler,monitor,recordedFollowupBindings};
