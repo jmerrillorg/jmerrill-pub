@@ -103,7 +103,10 @@ async function intentionalSamples(inputs){
     const children=[new Paragraph({text:"The Intentional Leader reading flow samples",heading:"Title"}),new Paragraph("Option A preserves the complete daily reflection and Soul Dive while giving secondary labels a quieter visual treatment. Compare the same readings at two trim sizes before manuscript-wide changes. Quarterly print and one annual eBook remain the approved format. These samples do not approve Stage 07 completion.")];
     for(const sample of samples){
       children.push(new Paragraph({text:sample.date,heading:"Heading1",pageBreakBefore:true}));
-      for(const line of sample.lines.slice(1))children.push(new Paragraph({spacing:{after:80},children:line.split("\n").map((part,index)=>new TextRun({text:part,break:index?1:0,bold:/^(Executive Reflection|Mindful Cue|Soul Prompt|Final Charge|SOUL DIVE|Subtheme:|Guiding Truth:|Extended Inner Reflection|Journaling Prompt|Embodied Practice|Closing Prayer|Covenant Charge)/i.test(line)}))}));
+      for(const line of sample.lines.slice(1)){
+        const label=/^(Executive Reflection|Mindful Cue|Soul Prompt|Final Charge|SOUL DIVE|Subtheme:|Guiding Truth:|Extended Inner Reflection|Journaling Prompt|Embodied Practice|Closing Prayer|Covenant Charge)/i.test(line);
+        children.push(new Paragraph({spacing:{after:80},keepNext:label&&!line.includes("\n"),children:line.split("\n").map((part,index)=>new TextRun({text:part,break:index?1:0,bold:label}))}));
+      }
     }
     const document=new Document({creator:"J Merrill Publishing",styles:{default:{document:{run:{font:"Georgia",size:22},paragraph:{spacing:{line:276}}}}},sections:[{properties:{page:{size:{width:width*1440,height:height*1440},margin:{top:900,bottom:900,left:900,right:900}}},children}]});
     const zip=await JSZip.loadAsync(await Packer.toBuffer(document));
