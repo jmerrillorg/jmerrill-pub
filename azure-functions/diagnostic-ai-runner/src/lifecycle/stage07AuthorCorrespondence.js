@@ -123,12 +123,26 @@ async function reconcile(review,deps) {
   }
   const results=[];
   if(delivered?.internetMessageId){
+    const bindings=[delivered];
+    // Replies to a verified follow-up remain bound to this same reviewed title/version.
+    for(const pin of require("../../config/stage07-reviewed-replies.json").filter(x=>x.titleId===review.titleId)){
+      const followup=(await b.optional(deps.containerClient,`${base}/followups/${pin.replyKey}.json`))?.value;
+      if(!followup)continue;
+      const bound=(await b.optional(deps.containerClient,`${base}/followup-deliveries/${pin.replyKey}.json`))?.value;
+      const observed=bound||await delivery({...review,subject:`Re: ${review.subject}`},followup,deps);
+      if(observed?.internetMessageId){
+        const binding={...observed,reviewHash:validate(review)};
+        await b.immutable(deps.containerClient,`${base}/followup-deliveries/${pin.replyKey}.json`,binding);
+        await preserve("followup-delivery",binding);bindings.push(binding);
+      }
+    }
     for(const message of await mail.replies({deliveredAt:sent.sentAt},deps)){
       const headers=message.internetMessageHeaders||[];
-      if(!headers.some(h=>h.name.toLowerCase()==="in-reply-to"&&h.value.includes(delivered.internetMessageId)))continue;
+      const matched=bindings.filter(binding=>headers.some(h=>h.name.toLowerCase()==="in-reply-to"&&h.value.trim()===binding.internetMessageId));
+      if(matched.length!==1)continue;
       const key=b.sha(message.internetMessageId||message.id),path=`${base}/replies/${key}.json`;
       const saved=await b.optional(deps.containerClient,path);
-      const result=replies.classify(message,review,delivered);
+      const result=replies.classify(message,review,matched[0]);
       const record={titleId:review.titleId,version:review.version,reviewHash:validate(review),messageId:message.id,
         internetMessageId:message.internetMessageId,receivedAt:message.receivedDateTime,authoredText:message.uniqueBody?.content||"",
         stageCompletionApproved:false,nextStageAuthorized:false};
