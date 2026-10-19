@@ -1,5 +1,13 @@
 "use strict";
 const b=require("../lifecycle/newSubmissionStage03Budget"),projection=require("../lifecycle/pipelineFolderProjection");
+async function documentFile(folder,name,bytes,deps){
+ const target=`${projection.path(folder.id)}:/${encodeURIComponent(name)}`;
+ let item;try{item=await deps.graph(target);}catch(e){if(e.statusCode!==404)throw e;}
+ if(!item){try{item=await deps.graph(target+":/content",{method:"PUT",headers:{"Content-Type":"application/vnd.openxmlformats-officedocument.wordprocessingml.document","If-None-Match":"*"},body:bytes});}catch(e){if(![409,412].includes(e.statusCode))throw e;item=await deps.graph(target);}}
+ if(!item.file||item.parentReference?.id!==folder.id||!item.eTag)b.deny("STAGE07_PACKAGE_CUSTODY_CONFLICT");
+ const stored=await deps.sourceBytes({itemId:item.id}),transport=await require("./sharePointDocumentCustody").verify(bytes,stored);
+ return {driveId:item.parentReference.driveId,itemId:item.id,eTag:item.eTag,sha256:b.sha(stored),bytes:stored.length,sourceSha256:b.sha(bytes),sourceBytes:bytes.length,transport,path:`${folder.path}/${name}`,webUrl:item.webUrl};
+}
 async function publish(source,manifest,deps){
   const parent=await deps.graph(projection.path(projection.FOLDERS[source.titleId]));
   const stage=await deps.graph(projection.path(parent.parentReference.id));
@@ -20,8 +28,8 @@ async function publish(source,manifest,deps){
     if(b.sha(bytes)!==f.sha256)b.deny("STAGE07_PACKAGE_CUSTODY_CONFLICT");
     const label=f.name.replaceAll("-"," ");
     const filename=`${safeTitle} - ${component} - ${manifest.workingCopy?"WORK IN PROGRESS":"Closure v1"} - ${label}`;
-    files.push({name:filename,...await require("../lifecycle/newSubmissionStage02").persistFile({id:folder.id,path:decodeURIComponent(folder.parentReference.path).split("root:")[1]+"/"+folder.name},filename,bytes,
-      f.name.endsWith("docx")?"application/vnd.openxmlformats-officedocument.wordprocessingml.document":"application/json",deps)});
+    const destination={id:folder.id,path:decodeURIComponent(folder.parentReference.path).split("root:")[1]+"/"+folder.name};
+    files.push({name:filename,...(f.name.endsWith("docx")?await documentFile(destination,filename,bytes,deps):await require("../lifecycle/newSubmissionStage02").persistFile(destination,filename,bytes,"application/json",deps))});
   }
   const summary=[source.title,`${component} Stage 07 review`,manifest.workingCopy?"WORK IN PROGRESS. Missing reviews are explicitly identified. This is not a completed edited manuscript.":"Editorial package assembled. Rendering acceptance is recorded separately. No Stage 08 advancement.",
     `Status: ${manifest.status}`,`Original paragraphs: ${manifest.paragraphCount}`,"Current files",...files.map(f=>`${f.name}\n${f.webUrl}`),"Originals and paid receipts are preserved. No author communication has been sent."].join("\n\n");
