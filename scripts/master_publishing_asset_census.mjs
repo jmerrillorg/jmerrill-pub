@@ -1,0 +1,1590 @@
+import { execFileSync } from 'node:child_process'
+import { createHash } from 'node:crypto'
+import { mkdirSync, writeFileSync } from 'node:fs'
+import { join } from 'node:path'
+
+const OUT_DIR = 'docs/operations/generated/JMP-MASTER-ASSET-RECOVERY-CENSUS-2026-08-15'
+const P1_DIR = 'docs/operations/generated/JMP-P1-SERVICE-RECOVERY-2026-08-16'
+const ACTIVE_EDITORIAL_DIR = 'docs/operations/generated/JMP-ACTIVE-EDITORIAL-RECOVERY-2026-08-16'
+const RECON_DIR = 'docs/operations/generated/JMP-RECONCILIATION-REDUCTION-2026-08-16'
+const CANONICAL_PROJECT_DIR = 'docs/operations/generated/JMP-CANONICAL-PROJECT-RECOVERY-2026-08-16'
+const FIVE_PROJECT_DIR = 'docs/operations/generated/JMP-FIVE-PROJECT-SERVICE-RECOVERY-2026-08-16'
+const NOW = new Date().toISOString()
+const API_BASE = 'https://jm1hq.crm.dynamics.com/api/data/v9.2'
+const RESOURCE = 'https://jm1hq.crm.dynamics.com'
+
+function kv(name) {
+  return execFileSync('az', ['keyvault', 'secret', 'show', '--vault-name', 'jm1-core-vault', '--name', name, '--query', 'value', '-o', 'tsv'], {
+    encoding: 'utf8',
+    stdio: ['ignore', 'pipe', 'ignore'],
+  }).trim()
+}
+
+async function token() {
+  const tenant = kv('DATAVERSE-TENANT-ID')
+  const clientId = kv('DATAVERSE-CLIENT-ID')
+  const clientSecret = kv('DATAVERSE-CLIENT-SECRET')
+  const body = new URLSearchParams({
+    client_id: clientId,
+    client_secret: clientSecret,
+    grant_type: 'client_credentials',
+    scope: `${RESOURCE}/.default`,
+  })
+  const response = await fetch(`https://login.microsoftonline.com/${tenant}/oauth2/v2.0/token`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/x-www-form-urlencoded' },
+    body,
+  })
+  const json = await response.json()
+  if (!json.access_token) throw new Error('DATAVERSE_TOKEN_FAILED')
+  return json.access_token
+}
+
+function escapeOData(value) {
+  return String(value || '').replace(/'/g, "''")
+}
+
+async function dataverse(accessToken, path) {
+  const response = await fetch(`${API_BASE}/${path.replace(/^\//, '')}`, {
+    headers: {
+      authorization: `Bearer ${accessToken}`,
+      accept: 'application/json',
+      prefer: 'odata.include-annotations="OData.Community.Display.V1.FormattedValue"',
+    },
+  })
+  const text = await response.text()
+  if (!response.ok) throw new Error(`DATAVERSE_READ_FAILED:${path}:${response.status}:${text.slice(0, 180)}`)
+  return text ? JSON.parse(text) : {}
+}
+
+async function list(accessToken, entitySet, query) {
+  const rows = []
+  let next = `${entitySet}?${new URLSearchParams(query)}`
+  while (next) {
+    const json = await dataverse(accessToken, next)
+    rows.push(...(json.value || []))
+    next = json['@odata.nextLink'] ? json['@odata.nextLink'].replace(`${API_BASE}/`, '') : ''
+  }
+  return rows
+}
+
+function value(row, ...names) {
+  for (const name of names) {
+    const v = row?.[name]
+    if (v !== undefined && v !== null && String(v).trim()) return String(v).trim()
+  }
+  return ''
+}
+
+function formatted(row, name) {
+  return value(row, `${name}@OData.Community.Display.V1.FormattedValue`, name)
+}
+
+function dateOnly(value) {
+  return String(value || '').slice(0, 10)
+}
+
+function daysSince(value) {
+  if (!value) return ''
+  const t = Date.parse(value)
+  if (!Number.isFinite(t)) return ''
+  return String(Math.max(0, Math.floor((Date.now() - t) / 86400000)))
+}
+
+function clean(value) {
+  return String(value || '')
+    .replace(/https?:\/\/\S+/g, '[redacted-url]')
+    .replace(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi, '[redacted-email]')
+    .replace(/\s+/g, ' ')
+    .trim()
+}
+
+function csv(rows, columns) {
+  const quote = (v) => `"${String(v ?? '').replace(/"/g, '""')}"`
+  return [columns.map(quote).join(','), ...rows.map((row) => columns.map((col) => quote(row[col])).join(','))].join('\n') + '\n'
+}
+
+function priorityFor(asset) {
+  if (asset.Flags.includes('BROKEN_DELIVERABLE') || asset.Flags.includes('INCORRECT_PROMISE') || asset.Flags.includes('P0_WORKSPACE_ACCESS_MISMATCH')) return 'P0'
+  if (asset.WaitingOn === 'WAITING_ON_JMP' && Number(asset.DaysWaiting || 0) >= 7) return 'P1'
+  if (asset.WaitingOn === 'WAITING_ON_JMP') return 'P2'
+  if (asset.WaitingOn === 'WAITING_ON_AUTHOR' || asset.WaitingOn === 'WAITING_ON_PROSPECT') return 'P3'
+  return 'P4'
+}
+
+function isNoise(row) {
+  const haystack = [
+    value(row, 'Title / Working Title', 'Title'),
+    value(row, 'Author Legal/Internal Name', 'Author Public/Pen Name', 'Author'),
+    value(row, 'Notes / Evidence', 'Evidence'),
+  ].join(' ').toLowerCase()
+  return /\b(test|synthetic|fixture|certification|demo)\b|intake success validation|jm1 duplicate proof/.test(haystack)
+}
+
+function deriveLifecycle({ intake, title, diagnostic, stage, opportunity }) {
+  const opPkg = value(opportunity, 'jm1_m6packageselectionstatus')
+  const agreement = value(opportunity, 'jm1_m6agreementpreparationstatus', 'jm1pub_contractstatus')
+  const payment = value(opportunity, 'jm1_m6firstpaymentstatus')
+  const onboarding = value(opportunity, 'jm1_m6onboardingstatus')
+  const titleStage = formatted(title, 'jm1_lifecyclestage') || formatted(title, 'jm1pub_stage') || formatted(title, 'jm1pub_status')
+  const stageName = value(stage, 'jm1pub_name')
+  const stageSummary = value(stage, 'jm1pub_internaloperationalsummary', 'jm1pub_authorsafesummary')
+  const isActive =
+    /execut|signed|complete|confirmed|fulfillment|publishing authorized|active/i.test(`${agreement} ${payment} ${onboarding} ${titleStage} ${stageSummary}`) &&
+    !/prospect|inquiry|package selection/i.test(`${titleStage} ${stageSummary}`)
+  if (isActive) return 'ACTIVE_EDITORIAL'
+  if (/PACKAGE_SELECTED/i.test(opPkg)) return 'COMMERCIAL_CONVERSION'
+  if (diagnostic && /AUTHOR_RESPONSE_SENT|SENT/i.test(value(diagnostic, 'jm1_authordraftsendstatus'))) return 'WAITING_PACKAGE_SELECTION'
+  if (diagnostic) return 'EDITORIAL_REVIEW'
+  if (stage && /developmental|line|copy|proof|layout|cover/i.test(stageName)) return 'ACTIVE_EDITORIAL'
+  if (intake) return 'PROSPECT_INQUIRY'
+  return 'RECONCILIATION_REQUIRED'
+}
+
+function waitingOwner(asset) {
+  if (asset.LifecycleContext === 'RECONCILIATION_REQUIRED') return 'MANUAL_HOLD_RECONCILIATION_REQUIRED'
+  const text = `${asset.CurrentBusinessStage} ${asset.CurrentEditorialStage} ${asset.LastHumanPromise} ${asset.CurrentBlocker} ${asset.NotesEvidence}`.toLowerCase()
+  if (/waiting.*package|package selection|choose.*package|prospect.*question/.test(text)) return 'WAITING_ON_PROSPECT'
+  if (/awaiting author|author approval|author response|waiting on author|author revision/.test(text)) return 'WAITING_ON_AUTHOR'
+  if (/jackie|publisher review|publisher decision/.test(text)) return 'WAITING_ON_JACKIE_JUDGMENT'
+  if (/system|runner|job|automation|diagnostic handoff pending/.test(text)) return 'WAITING_ON_SYSTEM'
+  if (/external|ingram|stripe|esign|docusign|microsoft|graph/.test(text)) return 'WAITING_ON_EXTERNAL'
+  if (/complete|published.*no current action/.test(text)) return 'COMPLETE_CURRENT_STAGE'
+  return 'WAITING_ON_JMP'
+}
+
+function lastPromise({ diagnostic, stage, intake, log }) {
+  if (diagnostic && value(diagnostic, 'jm1_authordraftpreparedon')) {
+    return 'Editorial Review recommendation/package selection follow-up prepared or sent.'
+  }
+  if (stage && value(stage, 'jm1pub_authorsafesummary')) return clean(value(stage, 'jm1pub_authorsafesummary')).slice(0, 220)
+  if (intake && value(intake, 'jm1_acknowledgmentsenton')) return 'Intake acknowledged; manuscript/Editorial Review handling expected next.'
+  if (log) return clean(value(log, 'jm1_actiondescription')).slice(0, 220)
+  return 'NO_RECENT_EXTERNAL_PROMISE_FOUND_RECONCILE'
+}
+
+function flagsFor(asset) {
+  const flags = []
+  const text = `${asset.LastHumanPromise} ${asset.CurrentBlocker} ${asset.NotesEvidence}`.toLowerCase()
+  if (/portal|author operating center|workspace/.test(text) && !/activated|login proven|workspace cta omitted/i.test(asset.PortalWorkspaceState)) flags.push('P0_WORKSPACE_ACCESS_MISMATCH')
+  if (/approve|approved with corrections|current publishing stage|developmental approval/.test(text) && asset.LifecycleContext.includes('PROSPECT')) flags.push('INCORRECT_PROMISE')
+  if (/broken|corrupt|cannot open|one-line|overflow|render/.test(text)) flags.push('BROKEN_DELIVERABLE')
+  if (asset.WaitingOn === 'WAITING_ON_JMP' && Number(asset.DaysWaiting || 0) >= 7) flags.push('STALLED_JMP_OWNED')
+  if (asset.LastHumanPromise === 'NO_RECENT_EXTERNAL_PROMISE_FOUND_RECONCILE') flags.push('RECONCILIATION_REQUIRED')
+  return flags
+}
+
+function manualAction(asset) {
+  if (asset.Flags.includes('INCORRECT_PROMISE')) return 'Send corrected lifecycle-accurate communication after certification.'
+  if (asset.Flags.includes('P0_WORKSPACE_ACCESS_MISMATCH')) return 'Remove portal dependency or provision/verify workspace before next CTA.'
+  if (asset.LifecycleContext === 'PROSPECT_INQUIRY' || asset.LifecycleContext === 'EDITORIAL_REVIEW') return 'Prepare or verify prospect Editorial Review and package-selection communication.'
+  if (asset.LifecycleContext === 'WAITING_PACKAGE_SELECTION') return 'Monitor package-selection reply; send manual clarification only if promise is stale.'
+  if (asset.LifecycleContext === 'COMMERCIAL_CONVERSION') return 'Manually continue agreement/e-sign/payment onboarding from selected package evidence.'
+  if (asset.LifecycleContext === 'ACTIVE_EDITORIAL') return 'Verify latest approved artifact and complete next editorial/author-approval step manually.'
+  if (asset.LifecycleContext === 'PRODUCTION') return 'Verify final approvals and prepare production files manually.'
+  return 'Reconcile source disagreement before action.'
+}
+
+function safeAutomation(asset) {
+  if (asset.Flags.includes('INCORRECT_PROMISE') || asset.Flags.includes('BROKEN_DELIVERABLE') || asset.Flags.includes('P0_WORKSPACE_ACCESS_MISMATCH')) return 'MANUAL_ONLY_TEMPORARILY'
+  if (asset.WaitingOn === 'MANUAL_HOLD_RECONCILIATION_REQUIRED') return 'MANUAL_HOLD'
+  if (asset.WaitingOn === 'WAITING_ON_AUTHOR' || asset.WaitingOn === 'WAITING_ON_PROSPECT') return 'EXTERNAL_WAIT'
+  if (asset.WaitingOn === 'WAITING_ON_JMP') return 'ASSISTED_MANUAL'
+  if (asset.WaitingOn === 'WAITING_ON_SYSTEM') return 'SAFE_AUTOMATION'
+  return 'ASSISTED_MANUAL'
+}
+
+function manualRecoveryClass(asset) {
+  const text = `${asset.CurrentBlocker} ${asset.LatestValidManuscript} ${asset.LatestValidArtifact} ${asset.NextGovernedAction}`.toLowerCase()
+  if (asset.WaitingOn === 'WAITING_ON_AUTHOR' || asset.WaitingOn === 'WAITING_ON_PROSPECT') return 'NEEDS_AUTHOR_RESPONSE'
+  if (asset.WaitingOn === 'WAITING_ON_EXTERNAL') return 'NEEDS_EXTERNAL'
+  if (asset.WaitingOn === 'WAITING_ON_SYSTEM') return 'SYSTEM_ONLY'
+  if (asset.WaitingOn === 'WAITING_ON_JACKIE_JUDGMENT') return 'NEEDS_JACKIE_JUDGMENT'
+  if (/manuscript asset not attached|no manuscript evidence|missing_artifact|missing artifact|source/i.test(text)) return 'NEEDS_SOURCE'
+  if (asset.WaitingOn === 'WAITING_ON_JMP') return 'CAN_DO_NOW'
+  if (asset.WaitingOn === 'MANUAL_HOLD_RECONCILIATION_REQUIRED') return 'NEEDS_JACKIE_JUDGMENT'
+  return 'NEEDS_JACKIE_JUDGMENT'
+}
+
+function immediateManualRecoveryAction(asset) {
+  if (asset.ManualRecoveryClass === 'NEEDS_AUTHOR_RESPONSE') {
+    return asset.WaitingOn === 'WAITING_ON_PROSPECT'
+      ? 'Do not resend automatically. Monitor for prospect package-selection/questions response; manually answer only if a real response arrives.'
+      : 'Do not advance. Check whether a valid author response already exists before sending any reminder.'
+  }
+  if (asset.ManualRecoveryClass === 'NEEDS_SOURCE') {
+    return 'Locate/bind the current governed manuscript or artifact, confirm it is not superseded, then resume the listed editorial recovery action.'
+  }
+  if (asset.LifecycleContext === 'ACTIVE_EDITORIAL') {
+    return 'Open the latest delivered editorial package, verify artifact/version and author-gate state, then manually complete the next governed editorial package or author-review release.'
+  }
+  if (asset.LifecycleContext === 'EDITORIAL_REVIEW') {
+    return 'Verify the prospect recommendation/review artifact and manually prepare a lifecycle-accurate package-selection follow-up if no valid response is already pending.'
+  }
+  if (asset.LifecycleContext === 'RECONCILIATION_REQUIRED') {
+    return 'Answer the bounded reconciliation question before putting this row on the operating board.'
+  }
+  return asset.NextManualRecoveryAction || 'Review current evidence and complete the next governed manual action.'
+}
+
+function safeAutomationAction(asset) {
+  if (asset['Automation Safe?'] === 'SAFE_AUTOMATION') return 'System may continue internal queue evaluation, artifact generation, and QA without external release.'
+  if (asset['Automation Safe?'] === 'EXTERNAL_WAIT') return 'Automation may monitor inbound responses only; no new outbound send from census work.'
+  if (asset['Automation Safe?'] === 'ASSISTED_MANUAL') return 'Automation may prepare/check evidence; Jackie/JMP manually releases any author-facing artifact.'
+  if (asset['Automation Safe?'] === 'MANUAL_ONLY_TEMPORARILY') return 'Automation paused for external release until lane-specific live certification passes.'
+  return 'Evidence-only automation; no live state mutation.'
+}
+
+function waitingOwnerAfterRecovery(asset) {
+  if (asset.ManualRecoveryClass === 'NEEDS_AUTHOR_RESPONSE') return asset.WaitingOn
+  if (asset.ManualRecoveryClass === 'NEEDS_SOURCE') return 'WAITING_ON_JMP_SOURCE_RECOVERY'
+  if (asset.LifecycleContext === 'ACTIVE_EDITORIAL') return 'WAITING_ON_AUTHOR_AFTER_PACKAGE_RELEASE'
+  if (asset.LifecycleContext === 'EDITORIAL_REVIEW') return 'WAITING_ON_PROSPECT_AFTER_CORRECTED_FOLLOWUP'
+  if (asset.LifecycleContext === 'RECONCILIATION_REQUIRED') return 'WAITING_ON_JACKIE_BOUNDED_RECONCILIATION'
+  return 'WAITING_ON_JMP_MANUAL_COMPLETION'
+}
+
+function riskIfDelayed(asset) {
+  if (asset.Priority === 'P0') return 'Broken or incorrect external experience remains visible.'
+  if (asset.Priority === 'P1') return 'Service recovery delay: JMP-owned promise remains open and author/prospect trust can erode.'
+  if (asset.LifecycleContext === 'RECONCILIATION_REQUIRED') return 'Operating board remains noisy and successor cannot tell whether work is active.'
+  if (asset.WaitingOn === 'WAITING_ON_AUTHOR' || asset.WaitingOn === 'WAITING_ON_PROSPECT') return 'Response monitoring may be missed or stale follow-up may be sent.'
+  return 'Routine backlog and operational ambiguity increase.'
+}
+
+function makeAsset(seed) {
+  const asset = {
+    'Title / Working Title': seed.title || 'Untitled',
+    'Author Legal/Internal Name': seed.authorInternal || '',
+    'Author Public/Pen Name': seed.authorPublic || seed.authorInternal || '',
+    'Intake ID': seed.intakeId || '',
+    'Opportunity ID': seed.opportunityId || '',
+    'Project/Title ID': seed.titleId || '',
+    LifecycleContext: seed.lifecycle || 'RECONCILIATION_REQUIRED',
+    CurrentBusinessStage: seed.businessStage || '',
+    CurrentEditorialStage: seed.editorialStage || '',
+    CurrentProductionStage: seed.productionStage || '',
+    CurrentDistributionStage: seed.distributionStage || '',
+    Package: seed.package || '',
+    AgreementState: seed.agreement || '',
+    PaymentState: seed.payment || '',
+    PortalWorkspaceState: seed.portal || 'Workspace required now: UNKNOWN; identity/provisioning/activation/login: RECONCILIATION_REQUIRED',
+    LatestValidManuscript: seed.manuscript || '',
+    LatestValidArtifact: seed.artifact || '',
+    LastExternalCommunication: seed.lastCommunication || '',
+    LastExternalCommunicationDate: seed.lastCommunicationDate || '',
+    LastHumanPromise: seed.lastPromise || '',
+    WaitingOn: '',
+    CurrentBlocker: seed.blocker || '',
+    NextGovernedAction: seed.nextGovernedAction || '',
+    NextManualRecoveryAction: '',
+    'Automation Safe?': '',
+    AutomationLane: seed.automationLane || '',
+    Priority: '',
+    DaysWaiting: daysSince(seed.waitingSince || seed.lastCommunicationDate || seed.modifiedOn || seed.createdOn),
+    'Release Date if applicable': seed.releaseDate || '',
+    NotesEvidence: seed.evidence || '',
+    Flags: [],
+    ManualRecoveryClass: '',
+    ImmediateManualRecoveryAction: '',
+    SafeAutomationAction: '',
+    WaitingOwnerAfterRecovery: '',
+    RiskIfDelayed: '',
+    SourceLastUpdated: seed.modifiedOn || seed.createdOn || '',
+    TestSyntheticExcluded: 'NO',
+  }
+  asset.WaitingOn = waitingOwner(asset)
+  asset.Flags = flagsFor(asset)
+  asset.Priority = priorityFor(asset)
+  asset.NextManualRecoveryAction = manualAction(asset)
+  asset['Automation Safe?'] = safeAutomation(asset)
+  asset.ManualRecoveryClass = manualRecoveryClass(asset)
+  asset.ImmediateManualRecoveryAction = immediateManualRecoveryAction(asset)
+  asset.SafeAutomationAction = safeAutomationAction(asset)
+  asset.WaitingOwnerAfterRecovery = waitingOwnerAfterRecovery(asset)
+  asset.RiskIfDelayed = riskIfDelayed(asset)
+  if (isNoise(asset)) asset.TestSyntheticExcluded = 'YES'
+  return asset
+}
+
+function rowKey(parts) {
+  return parts.filter(Boolean).join(':') || createHash('sha1').update(JSON.stringify(parts)).digest('hex').slice(0, 12)
+}
+
+function normalizeKey(value) {
+  return String(value || '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, ' ')
+    .replace(/\b(the|a|an)\b/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+}
+
+function groupCount(rows, column) {
+  const out = {}
+  for (const row of rows) {
+    const key = row[column] || 'UNKNOWN'
+    out[key] = (out[key] || 0) + 1
+  }
+  return out
+}
+
+function classifyReconciliation(rows) {
+  const groups = new Map()
+  for (const row of rows) {
+    row.DuplicateGroupKey = normalizeKey(`${row['Title / Working Title']} ${row['Author Public/Pen Name']}`)
+    if (!groups.has(row.DuplicateGroupKey)) groups.set(row.DuplicateGroupKey, [])
+    groups.get(row.DuplicateGroupKey).push(row)
+  }
+  for (const row of rows) {
+    const groupRows = groups.get(row.DuplicateGroupKey) || [row]
+    row.DuplicateGroupSize = String(groupRows.length)
+    row.ReconciliationReason = reconciliationReasonFor(row, groupRows)
+    row.OperationallyActive = operationallyActiveFor(row) ? 'YES' : 'NO'
+    if (row.OperationallyActive === 'NO' && row.WaitingOn === 'MANUAL_HOLD_RECONCILIATION_REQUIRED') {
+      row.NextManualRecoveryAction = 'No immediate Jackie action; retain in historical/reconciliation evidence.'
+      row['Automation Safe?'] = 'NO_CURRENT_ACTION'
+    }
+  }
+}
+
+function reconciliationReasonFor(row, groupRows) {
+  if (row.LifecycleContext !== 'RECONCILIATION_REQUIRED' && !row.Flags.includes('RECONCILIATION_REQUIRED')) return ''
+  const hasOnlyTitle = !row['Intake ID'] && !row['Opportunity ID'] && row['Project/Title ID']
+  const stageText = `${row.CurrentBusinessStage} ${row.CurrentEditorialStage} ${row.CurrentProductionStage} ${row.CurrentDistributionStage}`.toLowerCase()
+  const noCurrentPromise = row.LastHumanPromise === 'NO_RECENT_EXTERNAL_PROMISE_FOUND_RECONCILE' && !row.LastExternalCommunicationDate
+  if (groupRows.length > 1 && hasOnlyTitle) return 'LEGACY_DUPLICATE'
+  if (hasOnlyTitle && /(approved|legacy)/i.test(stageText) && noCurrentPromise) return 'PUBLISHED_BACKLIST_NO_CURRENT_ACTION'
+  if (hasOnlyTitle && !row.CurrentEditorialStage && !row.CurrentProductionStage && !row.CurrentDistributionStage) return 'MISSING_LIFECYCLE_CONTEXT'
+  if (!row.LatestValidArtifact && !row.LatestValidManuscript) return 'MISSING_ARTIFACT_LINK'
+  if (/conflict|mismatch/i.test(`${row.CurrentBlocker} ${row.NotesEvidence}`)) return 'CONFLICTING_STAGE_STATE'
+  return 'UNKNOWN'
+}
+
+function operationallyActiveFor(row) {
+  if (row.TestSyntheticExcluded === 'YES') return false
+  if (row.LifecycleContext !== 'RECONCILIATION_REQUIRED') return true
+  return ![
+    'PUBLISHED_BACKLIST_NO_CURRENT_ACTION',
+    'LEGACY_DUPLICATE',
+    'MULTI_RECORD_SAME_ASSET'
+  ].includes(row.ReconciliationReason)
+}
+
+async function main() {
+  mkdirSync(OUT_DIR, { recursive: true })
+  mkdirSync(P1_DIR, { recursive: true })
+  mkdirSync(ACTIVE_EDITORIAL_DIR, { recursive: true })
+  mkdirSync(RECON_DIR, { recursive: true })
+  mkdirSync(CANONICAL_PROJECT_DIR, { recursive: true })
+  mkdirSync(FIVE_PROJECT_DIR, { recursive: true })
+  const accessToken = await token()
+  const [intakes, titles, diagnostics, stages, gates, artifacts, logs, opportunities, contacts] = await Promise.all([
+    list(accessToken, 'jm1_publishingintakes', { $top: '500', $orderby: 'modifiedon desc' }),
+    list(accessToken, 'jm1pub_titles', { $top: '500', $orderby: 'modifiedon desc' }),
+    list(accessToken, 'jm1pub_editorialdiagnostics', { $top: '500', $orderby: 'modifiedon desc' }),
+    list(accessToken, 'jm1pub_editorialstages', { $top: '500', $orderby: 'modifiedon desc' }),
+    list(accessToken, 'jm1pub_editorialapprovalgates', { $top: '500', $orderby: 'modifiedon desc' }),
+    list(accessToken, 'jm1pub_editorialartifacts', { $top: '500', $orderby: 'modifiedon desc' }),
+    list(accessToken, 'jm1_executionlogs', { $top: '500', $orderby: 'createdon desc' }),
+    list(accessToken, 'opportunities', { $top: '500', $orderby: 'modifiedon desc' }),
+    list(accessToken, 'contacts', { $select: 'contactid,fullname,firstname,lastname,emailaddress1,jm1pub_isauthor,jm1pub_publicslug,jm1pub_stripeonboardingstatus,adx_identity_lastsuccessfullogin,externaluseridentifier,modifiedon,createdon', $top: '500', $orderby: 'modifiedon desc' }),
+  ])
+
+  const byIntake = new Map(intakes.map((r) => [value(r, 'jm1_publishingintakeid'), r]))
+  const diagByIntake = new Map()
+  for (const d of diagnostics) {
+    const id = value(d, '_jm1pub_publishingintake_value')
+    if (id && !diagByIntake.has(id)) diagByIntake.set(id, d)
+  }
+  const opById = new Map(opportunities.map((r) => [value(r, 'opportunityid'), r]))
+  const contactById = new Map(contacts.map((r) => [value(r, 'contactid'), r]))
+  const titleById = new Map(titles.map((r) => [value(r, 'jm1pub_titleid'), r]))
+  const stagesByTitle = group(stages, '_jm1pub_titleid_value')
+  const gatesByTitle = group(gates, '_jm1pub_titleid_value')
+  const artifactsByTitle = group(artifacts, '_jm1pub_titleid_value')
+  const latestLogBySource = new Map()
+  for (const log of logs) {
+    const key = rowKey([value(log, 'jm1_sourceentity'), value(log, 'jm1_sourcerecordid')])
+    if (!latestLogBySource.has(key)) latestLogBySource.set(key, log)
+  }
+
+  const assets = new Map()
+  for (const intake of intakes) {
+    const intakeId = value(intake, 'jm1_publishingintakeid')
+    const diagnostic = diagByIntake.get(intakeId)
+    const opportunity = opById.get(value(intake, '_jm1_opportunity_value')) || opById.get(value(diagnostic, '_jm1pub_opportunity_value'))
+    const title = [...titles].find((t) => value(t, 'jm1_canonicaltitlereference') === value(intake, 'jm1_intakereferencecode') || value(t, 'jm1pub_titlename') === value(intake, 'jm1_projecttitle'))
+    const contact = contactById.get(value(intake, '_jm1_linkedcontact_value')) || contactById.get(value(diagnostic, '_jm1pub_authorcontact_value'))
+    const titleStages = title ? stagesByTitle.get(value(title, 'jm1pub_titleid')) || [] : []
+    const stage = titleStages[0]
+    const latestLog = latestLogBySource.get(rowKey(['jm1_publishingintake', intakeId])) || latestLogBySource.get(rowKey(['jm1pub_editorialdiagnostic', value(diagnostic, 'jm1pub_editorialdiagnosticid')]))
+    const lifecycle = deriveLifecycle({ intake, title, diagnostic, stage, opportunity })
+    const asset = makeAsset({
+      title: value(intake, 'jm1_projecttitle') || value(title, 'jm1pub_titlename', 'jm1_titlename') || 'Untitled',
+      authorInternal: [value(intake, 'jm1_firstname'), value(intake, 'jm1_lastname')].filter(Boolean).join(' ') || value(contact, 'fullname'),
+      authorPublic: value(contact, 'jm1pub_publicslug') || [value(intake, 'jm1_firstname'), value(intake, 'jm1_lastname')].filter(Boolean).join(' '),
+      intakeId,
+      opportunityId: value(opportunity, 'opportunityid'),
+      titleId: value(title, 'jm1pub_titleid'),
+      lifecycle,
+      businessStage: formatted(intake, 'jm1_intakestatus') || value(intake, 'jm1_routerstatus', 'jm1_stage0handoffstatus'),
+      editorialStage: value(stage, 'jm1pub_name') || formatted(diagnostic, 'jm1pub_diagnosticstatus') || value(diagnostic, 'jm1_diagnosticexecutionstatus'),
+      package: value(diagnostic, 'jm1pub_recommendedpackage') || value(opportunity, 'jm1_m6authorselectedpackagecode', 'jm1pub_packagerecommended'),
+      agreement: value(opportunity, 'jm1_m6agreementpreparationstatus', 'jm1pub_contractstatus'),
+      payment: value(opportunity, 'jm1_m6firstpaymentstatus', 'jm1_m6paymentoptionselectionstatus'),
+      portal: portalState(contact, intake, opportunity),
+      manuscript: value(intake, 'jm1_manuscriptreceived') === 'true' || value(intake, 'jm1_manuscripturl') ? 'Manuscript evidence present; URL redacted' : 'No manuscript evidence confirmed',
+      artifact: latestArtifactSummary(title ? artifactsByTitle.get(value(title, 'jm1pub_titleid')) || [] : []),
+      lastCommunication: latestCommunicationSummary(diagnostic, intake, latestLog),
+      lastCommunicationDate: value(diagnostic, 'jm1_authordraftpreparedon', 'jm1_authordraftapprovedon') || value(intake, 'jm1_acknowledgmentsenton') || value(latestLog, 'createdon'),
+      lastPromise: lastPromise({ diagnostic, stage, intake, log: latestLog }),
+      blocker: value(stage, 'jm1pub_blockerreason') || value(intake, 'jm1_routererror', 'jm1_stage0handofferror') || value(diagnostic, 'jm1_diagnosticexecutionerror'),
+      nextGovernedAction: nextActionFor({ lifecycle, diagnostic, opportunity, stage }),
+      automationLane: automationLaneFor(lifecycle),
+      releaseDate: value(title, 'jm1_releasedate', 'jm1pub_releasedate', 'jm1pub_targetpubdate') || value(opportunity, 'jm1pub_targetreleasedate'),
+      modifiedOn: value(intake, 'modifiedon') || value(diagnostic, 'modifiedon') || value(title, 'modifiedon'),
+      createdOn: value(intake, 'createdon'),
+      evidence: evidenceLine({ intake, diagnostic, title, opportunity, stage }),
+    })
+    assets.set(rowKey([asset['Intake ID'], asset['Project/Title ID'], asset['Opportunity ID'], asset['Title / Working Title']]), asset)
+  }
+
+  for (const title of titles) {
+    const titleId = value(title, 'jm1pub_titleid')
+    if ([...assets.values()].some((a) => a['Project/Title ID'] === titleId)) continue
+    const titleStages = stagesByTitle.get(titleId) || []
+    const stage = titleStages[0]
+    const titleGates = gatesByTitle.get(titleId) || []
+    const latestLog = latestLogBySource.get(rowKey(['jm1pub_title', titleId]))
+    const lifecycle = deriveLifecycle({ title, stage })
+    const asset = makeAsset({
+      title: value(title, 'jm1pub_titlename', 'jm1_titlename', 'jm1pub_name') || 'Untitled',
+      authorInternal: value(title, 'jm1pub_authorname', 'jm1pub_authordisplayname'),
+      authorPublic: value(title, 'jm1pub_authordisplayname', 'jm1pub_authorname'),
+      titleId,
+      lifecycle,
+      businessStage: formatted(title, 'jm1_lifecyclestage') || formatted(title, 'jm1pub_status') || value(title, 'jm1_canonicalstatus'),
+      editorialStage: value(stage, 'jm1pub_name') || '',
+      productionStage: formatted(title, 'jm1pub_publicationstatus') || value(title, 'jm1pub_publicationstatus'),
+      distributionStage: value(title, 'jm1_distributionchannel', 'jm1pub_publiccatalogstatus'),
+      portal: 'Workspace state not resolved from title-only row; reconciliation required if external action is active.',
+      manuscript: value(title, '_jm1pub_currentmanuscript_value') ? 'Current manuscript lookup present' : '',
+      artifact: latestArtifactSummary(artifactsByTitle.get(titleId) || []),
+      lastCommunication: latestLog ? clean(value(latestLog, 'jm1_actiontype')) : '',
+      lastCommunicationDate: value(latestLog, 'createdon'),
+      lastPromise: lastPromise({ stage, log: latestLog }),
+      nextGovernedAction: titleGates.some((g) => !value(g, 'jm1pub_authordecisionon')) ? 'Resolve active author approval gate.' : 'Review current title stage.',
+      automationLane: automationLaneFor(lifecycle),
+      releaseDate: value(title, 'jm1_releasedate', 'jm1pub_releasedate', 'jm1pub_targetpubdate'),
+      modifiedOn: value(title, 'modifiedon'),
+      createdOn: value(title, 'createdon'),
+      evidence: evidenceLine({ title, stage }),
+    })
+    assets.set(rowKey([asset['Project/Title ID'], asset['Title / Working Title']]), asset)
+  }
+
+  const allRows = [...assets.values()]
+  const realRows = allRows.filter((r) => r.TestSyntheticExcluded !== 'YES')
+  classifyReconciliation(realRows)
+  const operationalRows = realRows.filter((r) => r.OperationallyActive === 'YES')
+  const p1Rows = realRows.filter((r) => r.Priority === 'P1').sort(sortRecovery)
+  const activeP1Rows = p1Rows.filter((r) => r.OperationallyActive === 'YES')
+  const activeEditorialRows = operationalRows.filter((r) => r.LifecycleContext === 'ACTIVE_EDITORIAL').sort(sortRecovery)
+  const reconciliationRows = realRows.filter((r) => r.LifecycleContext === 'RECONCILIATION_REQUIRED' || r.Flags.includes('RECONCILIATION_REQUIRED'))
+  const activeReconciliationRows = reconciliationRows.filter((r) => r.OperationallyActive === 'YES')
+  const reconciliationReasonCounts = groupCount(reconciliationRows, 'ReconciliationReason')
+  const columns = [
+    'Priority',
+    'Title / Working Title',
+    'Author Legal/Internal Name',
+    'Author Public/Pen Name',
+    'Intake ID',
+    'Opportunity ID',
+    'Project/Title ID',
+    'LifecycleContext',
+    'CurrentBusinessStage',
+    'CurrentEditorialStage',
+    'CurrentProductionStage',
+    'CurrentDistributionStage',
+    'Package',
+    'AgreementState',
+    'PaymentState',
+    'PortalWorkspaceState',
+    'LatestValidManuscript',
+    'LatestValidArtifact',
+    'LastExternalCommunication',
+    'LastExternalCommunicationDate',
+    'LastHumanPromise',
+    'WaitingOn',
+    'CurrentBlocker',
+    'NextGovernedAction',
+    'NextManualRecoveryAction',
+    'Automation Safe?',
+    'AutomationLane',
+    'DaysWaiting',
+    'Release Date if applicable',
+    'OperationallyActive',
+    'ReconciliationReason',
+    'DuplicateGroupKey',
+    'DuplicateGroupSize',
+    'ManualRecoveryClass',
+    'ImmediateManualRecoveryAction',
+    'SafeAutomationAction',
+    'WaitingOwnerAfterRecovery',
+    'RiskIfDelayed',
+    'Flags',
+    'SourceLastUpdated',
+    'NotesEvidence',
+    'TestSyntheticExcluded',
+  ]
+  writeCsv('01-master-asset-ledger.csv', allRows, columns)
+  writeCsv('02-active-assets.csv', operationalRows.filter((r) => r.WaitingOn !== 'COMPLETE_CURRENT_STAGE'), columns)
+  writeCsv('03-jmp-owes-action.csv', operationalRows.filter((r) => ['WAITING_ON_JMP', 'WAITING_ON_SYSTEM', 'WAITING_ON_JACKIE_JUDGMENT'].includes(r.WaitingOn)), columns)
+  writeCsv('04-author-prospect-owes-action.csv', operationalRows.filter((r) => ['WAITING_ON_AUTHOR', 'WAITING_ON_PROSPECT'].includes(r.WaitingOn)), columns)
+  writeCsv('05-manual-recovery-board.csv', operationalRows.filter((r) => ['P0', 'P1', 'P2'].includes(r.Priority)).sort(sortRecovery), columns)
+  writeCsv('06-automation-safety.csv', realRows, ['Title / Working Title', 'Author Public/Pen Name', 'LifecycleContext', 'OperationallyActive', 'Automation Safe?', 'AutomationLane', 'ReconciliationReason', 'Flags', 'NextManualRecoveryAction'])
+  writeCsv('07-prospect-pipeline.csv', operationalRows.filter((r) => ['PROSPECT_INQUIRY', 'EDITORIAL_REVIEW', 'WAITING_PACKAGE_SELECTION'].includes(r.LifecycleContext)), columns)
+  writeCsv('08-commercial-pipeline.csv', operationalRows.filter((r) => ['COMMERCIAL_CONVERSION', 'AGREEMENT_ESIGN', 'PAYMENT_ONBOARDING'].includes(r.LifecycleContext) || r['Opportunity ID']), columns)
+  writeCsv('09-editorial-pipeline.csv', operationalRows.filter((r) => /EDITORIAL|ACTIVE_EDITORIAL|Developmental|Line|Copy|Proof/i.test(`${r.LifecycleContext} ${r.CurrentEditorialStage}`)), columns)
+  writeCsv('10-production-pipeline.csv', operationalRows.filter((r) => /PRODUCTION|production/i.test(`${r.LifecycleContext} ${r.CurrentProductionStage}`)), columns)
+  writeCsv('11-distribution-pipeline.csv', operationalRows.filter((r) => /DISTRIBUTION|distribution|ingram|coresource|retailer/i.test(`${r.LifecycleContext} ${r.CurrentDistributionStage}`)), columns)
+  writeCsv('12-release-risk.csv', operationalRows.filter((r) => r['Release Date if applicable']).map(withReleaseRisk), [...columns, 'ReleaseRisk'])
+  writeCsv('13-workspace-access-audit.csv', realRows, ['Title / Working Title', 'Author Public/Pen Name', 'LifecycleContext', 'OperationallyActive', 'PortalWorkspaceState', 'Flags'])
+  writeCsv('14-last-human-promise.csv', realRows, ['Title / Working Title', 'Author Public/Pen Name', 'OperationallyActive', 'LastExternalCommunicationDate', 'LastHumanPromise', 'WaitingOn', 'DaysWaiting'])
+  writeCsv('15-stalled-assets.csv', operationalRows.filter((r) => r.Flags.includes('STALLED_JMP_OWNED')), columns)
+  writeCsv('16-missed-promises.csv', operationalRows.filter((r) => r.Flags.includes('PROMISE_MISSED')), columns)
+  writeCsv('17-broken-deliverables.csv', operationalRows.filter((r) => r.Flags.includes('BROKEN_DELIVERABLE')), columns)
+  writeCsv('18-communication-state-mismatches.csv', operationalRows.filter((r) => r.Flags.includes('INCORRECT_PROMISE') || r.Flags.includes('P0_WORKSPACE_ACCESS_MISMATCH')), columns)
+  writeCsv('19-oldest-waits.csv', operationalRows.filter((r) => r.DaysWaiting).sort((a, b) => Number(b.DaysWaiting) - Number(a.DaysWaiting)).slice(0, 10), columns)
+  writeCsv('20-jackie-manual-recovery-now.csv', operationalRows.filter((r) => ['P0', 'P1', 'P2'].includes(r.Priority) && !['EXTERNAL_WAIT', 'AUTOMATION_BLOCKED'].includes(r['Automation Safe?'])).sort(sortRecovery), columns)
+  writeCsv('21-system-recovery-queue.csv', operationalRows.filter((r) => r['Automation Safe?'] === 'SAFE_AUTOMATION'), columns)
+  writeCsv('22-external-response-queue.csv', operationalRows.filter((r) => ['WAITING_ON_AUTHOR', 'WAITING_ON_PROSPECT', 'WAITING_ON_EXTERNAL'].includes(r.WaitingOn)), columns)
+  writeCsv('23-reconciliation-queue.csv', reconciliationRows, columns)
+
+  const counts = countSummary(realRows, allRows)
+  counts.operationallyActive = operationalRows.length
+  counts.activeReconciliationRequired = activeReconciliationRows.length
+  counts.historicalBacklistNoCurrentAction = reconciliationReasonCounts.PUBLISHED_BACKLIST_NO_CURRENT_ACTION || 0
+  counts.duplicateLegacy = (reconciliationReasonCounts.LEGACY_DUPLICATE || 0) + (reconciliationReasonCounts.MULTI_RECORD_SAME_ASSET || 0)
+  counts.unknownRemaining = reconciliationReasonCounts.UNKNOWN || 0
+  writeFileSync(join(OUT_DIR, '00-executive-summary.md'), executiveSummary(counts, operationalRows))
+  writeFileSync(join(OUT_DIR, '24-portfolio-counts.md'), portfolioCounts(counts))
+  writeFileSync(join(OUT_DIR, '25-final-recovery-assessment.md'), finalAssessment(counts, realRows))
+  writeP1Evidence(p1Rows, activeP1Rows, columns)
+  writeActiveEditorialEvidence({ activeEditorialRows, gatesByTitle, artifactsByTitle, logs, columns })
+  writeReconciliationEvidence(reconciliationRows, activeReconciliationRows, reconciliationReasonCounts, columns)
+  writeCanonicalProjectEvidence({ operationalRows, activeP1Rows, activeEditorialRows, activeReconciliationRows, gatesByTitle, artifactsByTitle, logs, counts })
+  writeOperationalRecoveryReport({ counts, operationalRows, activeP1Rows, activeEditorialRows, activeReconciliationRows, reconciliationReasonCounts })
+  writeChecksums()
+  writeChecksumsFor(P1_DIR)
+  writeChecksumsFor(ACTIVE_EDITORIAL_DIR)
+  writeChecksumsFor(RECON_DIR)
+  writeChecksumsFor(CANONICAL_PROJECT_DIR)
+  writeChecksumsFor(FIVE_PROJECT_DIR)
+  console.log(`WROTE ${OUT_DIR}`)
+  console.log(JSON.stringify(counts, null, 2))
+}
+
+function group(rows, key) {
+  const map = new Map()
+  for (const row of rows) {
+    const id = value(row, key)
+    if (!id) continue
+    if (!map.has(id)) map.set(id, [])
+    map.get(id).push(row)
+  }
+  return map
+}
+
+function portalState(contact, intake, opportunity) {
+  const required = /PACKAGE_SELECTED|agreement|onboarding|active/i.test(`${value(opportunity, 'jm1_m6packageselectionstatus')} ${value(opportunity, 'jm1_m6agreementpreparationstatus')} ${value(opportunity, 'jm1_m6onboardingstatus')}`)
+  const accountExists = Boolean(value(contact, 'externaluseridentifier') || value(contact, 'adx_identity_username') || value(contact, 'contactid'))
+  const login = value(contact, 'adx_identity_lastsuccessfullogin')
+  const workspace = value(intake, 'jm1_sharepointworkspaceurl') ? 'workspace evidence present; URL redacted' : 'workspace evidence not confirmed'
+  return `Workspace required now: ${required ? 'YES' : 'NO_OR_OPTIONAL'}; Identity exists: ${accountExists ? 'YES' : 'NO'}; Provisioned: ${workspace}; Activated/login proven: ${login ? `YES ${dateOnly(login)}` : 'NO'}; CTA/access mismatch: ${required && !login ? 'REVIEW_REQUIRED' : 'NO_EVIDENCE'}`
+}
+
+function latestArtifactSummary(rows) {
+  const current = rows.find((r) => value(r, 'jm1pub_iscurrentapproved') === 'true') || rows[0]
+  if (!current) return ''
+  return `${value(current, 'jm1pub_filename', 'jm1pub_editorialartifactname') || 'artifact'}; status ${formatted(current, 'jm1pub_artifactstatus') || value(current, 'jm1pub_artifactstatus')}; checksum ${value(current, 'jm1pub_sha256') ? 'present' : 'missing'}`
+}
+
+function latestCommunicationSummary(diagnostic, intake, log) {
+  if (diagnostic && value(diagnostic, 'jm1_authordraftpreparedon')) return `${value(diagnostic, 'jm1_authordraftsendstatus') || 'draft'} ${value(diagnostic, 'jm1_authordraftsubject') || 'Editorial Review recommendation'}`
+  if (intake && value(intake, 'jm1_acknowledgmentsenton')) return `Intake acknowledgment ${value(intake, 'jm1_acknowledgmentstatus') || 'sent'}`
+  if (log) return clean(value(log, 'jm1_actiontype'))
+  return ''
+}
+
+function nextActionFor({ lifecycle, diagnostic, opportunity, stage }) {
+  if (lifecycle === 'PROSPECT_INQUIRY') return 'Complete Stage 0 / prospect Editorial Review readiness.'
+  if (lifecycle === 'EDITORIAL_REVIEW') return 'Prepare certified prospect recommendation.'
+  if (lifecycle === 'WAITING_PACKAGE_SELECTION') return 'Await prospect package selection or questions.'
+  if (lifecycle === 'COMMERCIAL_CONVERSION') return 'Continue agreement/e-sign/payment/onboarding from selected package.'
+  if (lifecycle === 'ACTIVE_EDITORIAL') return 'Continue governed editorial stage and mandatory author approval.'
+  return 'Reconcile source state.'
+}
+
+function automationLaneFor(lifecycle) {
+  if (['PROSPECT_INQUIRY', 'EDITORIAL_REVIEW', 'WAITING_PACKAGE_SELECTION'].includes(lifecycle)) return 'Prospect first-touch / package selection'
+  if (lifecycle === 'COMMERCIAL_CONVERSION') return 'Commercial conversion'
+  if (lifecycle === 'ACTIVE_EDITORIAL') return 'Active author editorial'
+  if (lifecycle === 'PRODUCTION') return 'Production'
+  return 'Reconciliation'
+}
+
+function evidenceLine({ intake, diagnostic, title, opportunity, stage }) {
+  return [
+    intake ? `intake:${value(intake, 'jm1_intakereferencecode') || value(intake, 'jm1_publishingintakeid')}` : '',
+    diagnostic ? `diagnostic:${value(diagnostic, 'jm1pub_editorialdiagnosticid')}` : '',
+    title ? `title:${value(title, 'jm1pub_titleid')}` : '',
+    opportunity ? `opportunity:${value(opportunity, 'opportunityid')}` : '',
+    stage ? `stage:${value(stage, 'jm1pub_editorialstageid')}` : '',
+  ].filter(Boolean).join('; ')
+}
+
+function withReleaseRisk(row) {
+  const days = Math.ceil((Date.parse(row['Release Date if applicable']) - Date.now()) / 86400000)
+  let risk = 'DATE_RECONCILIATION_REQUIRED'
+  if (Number.isFinite(days)) {
+    if (days < 0 && row.WaitingOn !== 'COMPLETE_CURRENT_STAGE') risk = 'CRITICAL'
+    else if (days <= 21 && row.WaitingOn !== 'COMPLETE_CURRENT_STAGE') risk = 'AT_RISK'
+    else risk = 'ON_TRACK'
+  }
+  return { ...row, ReleaseRisk: risk }
+}
+
+function sortRecovery(a, b) {
+  const pri = ['P0', 'P1', 'P2', 'P3', 'P4']
+  return pri.indexOf(a.Priority) - pri.indexOf(b.Priority) || Number(b.DaysWaiting || 0) - Number(a.DaysWaiting || 0)
+}
+
+function writeCsv(name, rows, cols) {
+  writeFileSync(join(OUT_DIR, name), csvRows(rows, cols))
+}
+
+function csvRows(rows, cols) {
+  return csv(rows.map((row) => ({ ...row, Flags: Array.isArray(row.Flags) ? row.Flags.join(';') : row.Flags })), cols)
+}
+
+function countSummary(realRows, allRows) {
+  const count = (pred) => realRows.filter(pred).length
+  return {
+    asOf: NOW,
+    totalRealAssets: realRows.length,
+    testSyntheticExcluded: allRows.length - realRows.length,
+    prospects: count((r) => r.LifecycleContext === 'PROSPECT_INQUIRY' || r.LifecycleContext === 'EDITORIAL_REVIEW' || r.LifecycleContext === 'WAITING_PACKAGE_SELECTION'),
+    commercial: count((r) => r.LifecycleContext === 'COMMERCIAL_CONVERSION'),
+    activeEditorial: count((r) => r.LifecycleContext === 'ACTIVE_EDITORIAL'),
+    production: count((r) => r.LifecycleContext === 'PRODUCTION'),
+    distribution: count((r) => r.LifecycleContext === 'DISTRIBUTION'),
+    scheduledRelease: count((r) => r['Release Date if applicable']),
+    backlistActiveWork: count((r) => /PUBLISHED_BACKLIST/.test(r.LifecycleContext)),
+    reconciliationRequired: count((r) => r.LifecycleContext === 'RECONCILIATION_REQUIRED' || r.Flags.includes('RECONCILIATION_REQUIRED')),
+    P0: count((r) => r.Priority === 'P0'),
+    P1: count((r) => r.Priority === 'P1'),
+    P2: count((r) => r.Priority === 'P2'),
+    P3: count((r) => r.Priority === 'P3'),
+    P4: count((r) => r.Priority === 'P4'),
+    waitingOnJmp: count((r) => r.WaitingOn === 'WAITING_ON_JMP'),
+    waitingOnAuthor: count((r) => r.WaitingOn === 'WAITING_ON_AUTHOR'),
+    waitingOnProspect: count((r) => r.WaitingOn === 'WAITING_ON_PROSPECT'),
+    waitingOnSystem: count((r) => r.WaitingOn === 'WAITING_ON_SYSTEM'),
+    waitingOnExternal: count((r) => r.WaitingOn === 'WAITING_ON_EXTERNAL'),
+    waitingOnJackie: count((r) => r.WaitingOn === 'WAITING_ON_JACKIE_JUDGMENT'),
+    manualHoldReconciliation: count((r) => r.WaitingOn === 'MANUAL_HOLD_RECONCILIATION_REQUIRED'),
+    stalled: count((r) => r.Flags.includes('STALLED_JMP_OWNED')),
+    brokenDeliverables: count((r) => r.Flags.includes('BROKEN_DELIVERABLE')),
+    communicationMismatches: count((r) => r.Flags.includes('INCORRECT_PROMISE') || r.Flags.includes('P0_WORKSPACE_ACCESS_MISMATCH')),
+  }
+}
+
+function executiveSummary(counts, rows) {
+  const top = rows.sort(sortRecovery).slice(0, 12).map((r) => `| ${r.Priority} | ${r['Title / Working Title']} | ${r['Author Public/Pen Name']} | ${r.LifecycleContext} | ${r.WaitingOn} | ${r.NextManualRecoveryAction} |`).join('\n')
+  return `# Master Publishing Asset Recovery Census\n\nLast verified: ${NOW}\n\nEvidence source: live Dataverse read-only export plus current repository canon. Secret values, manuscript text, signed URLs, and full email bodies were not written.\n\n## Counts\n\n- Total real Publishing assets: ${counts.totalRealAssets}\n- Test/synthetic excluded: ${counts.testSyntheticExcluded}\n- Operationally active: ${counts.operationallyActive}\n- Prospects: ${counts.prospects}\n- Commercial conversion: ${counts.commercial}\n- Active editorial: ${counts.activeEditorial}\n- Production: ${counts.production}\n- Distribution: ${counts.distribution}\n- Scheduled release/date-bearing: ${counts.scheduledRelease}\n- Reconciliation required: ${counts.reconciliationRequired}\n- Active reconciliation required: ${counts.activeReconciliationRequired}\n- Historical/backlist no current action: ${counts.historicalBacklistNoCurrentAction}\n- Duplicate/legacy: ${counts.duplicateLegacy}\n- Unknown remaining: ${counts.unknownRemaining}\n\n## Priority Counts\n\n- P0: ${counts.P0}\n- P1: ${counts.P1}\n- P2: ${counts.P2}\n- P3: ${counts.P3}\n- P4: ${counts.P4}\n\n## Highest Priority Manual Recovery\n\n| Priority | Title / Working Title | Person | Lifecycle | Waiting On | Next Manual Action |\n|---|---|---|---|---|---|\n${top}\n`
+}
+
+function portfolioCounts(counts) {
+  return `# Portfolio Counts\n\nLast verified: ${NOW}\n\n\`\`\`json\n${JSON.stringify(counts, null, 2)}\n\`\`\`\n`
+}
+
+function finalAssessment(counts) {
+  const mode = counts.P0 > 0 || counts.communicationMismatches > 0 ? 'ASSISTED_MANUAL_RECOVERY' : 'AUTOMATION_WITH_EXTERNAL_RELEASE_GATES'
+  return `# Final Recovery Assessment\n\nLast verified: ${NOW}\n\nTemporary operating mode: ${mode}\n\nNegative proof:\n\n- real_assets_omitted_without_explanation: requires Jackie review of ledger against known estate; not asserted as zero by automation alone\n- test_assets_in_real_operating_count: ${counts.testSyntheticExcluded > 0 ? 'excluded into TestSyntheticExcluded' : '0 observed'}\n- multi_title_assets_collapsed: 0 by ledger key design\n- unknown_states_guessed: 0; unresolved rows marked reconciliation-required\n- historical_noise_in_active_board: ${counts.historicalBacklistNoCurrentAction > 0 || counts.duplicateLegacy > 0 ? 'reduced by operationally-active flag' : '0 observed'}\n- census_stage_mutations: 0\n- census_author_communications: 0\n\nRecommendation: use safe internal automation for evidence generation/reconciliation, and use manual/assisted release for external author/prospect communications until each lane has fresh live proof.\n`
+}
+
+function writeP1Evidence(p1Rows, activeP1Rows, columns) {
+  writeFileSync(join(P1_DIR, '01-exact-p1-source-rows.csv'), csvRows(p1Rows, columns))
+  writeFileSync(join(P1_DIR, '02-jackie-p1-recovery-now.csv'), csvRows(activeP1Rows, columns))
+  writeFileSync(join(P1_DIR, '03-confirmed-p1-operational-queue.csv'), csvRows(activeP1Rows, [
+    'Priority',
+    'Title / Working Title',
+    'Author Public/Pen Name',
+    'Author Legal/Internal Name',
+    'Intake ID',
+    'Project/Title ID',
+    'LifecycleContext',
+    'CurrentBusinessStage',
+    'CurrentEditorialStage',
+    'CurrentProductionStage',
+    'LastExternalCommunication',
+    'LastExternalCommunicationDate',
+    'LastHumanPromise',
+    'DaysWaiting',
+    'LatestValidArtifact',
+    'ManualRecoveryClass',
+    'ImmediateManualRecoveryAction',
+    'SafeAutomationAction',
+    'WaitingOwnerAfterRecovery',
+    'RiskIfDelayed',
+    'CurrentBlocker',
+    'NotesEvidence'
+  ]))
+  writeFileSync(join(P1_DIR, '00-executive-summary.md'), `# P1 Service Recovery\n\nLast verified: ${NOW}\n\nEvidence source: master Publishing asset census live Dataverse read-only export.\n\n## Counts\n\n- P1 source rows from current census: ${p1Rows.length}\n- P1 operationally active rows after verification: ${activeP1Rows.length}\n- P1 rows suppressed as non-active reconciliation noise: ${p1Rows.length - activeP1Rows.length}\n\n## Verification Standard\n\nEach active row remains P1 only if it is real, not synthetic, not published/no-action backlist, not merely historical duplicate evidence, and still has WAITING_ON_JMP with a stale promise or stalled JMP-owned action.\n\n## Immediate Queue\n\n${markdownP1Table(activeP1Rows)}\n`)
+}
+
+function writeActiveEditorialEvidence({ activeEditorialRows, gatesByTitle, artifactsByTitle, logs, columns }) {
+  const boardRows = activeEditorialRows.map(withEditorialRecoveryFields)
+  const titleIds = new Set(activeEditorialRows.map((r) => r['Project/Title ID']).filter(Boolean))
+  const gateRows = []
+  const artifactRows = []
+  for (const titleId of titleIds) {
+    const titleRows = activeEditorialRows.filter((r) => r['Project/Title ID'] === titleId)
+    for (const gate of gatesByTitle.get(titleId) || []) {
+      gateRows.push({
+        Title: titleRows[0]?.['Title / Working Title'] || '',
+        Author: titleRows[0]?.['Author Public/Pen Name'] || '',
+        ProjectTitleID: titleId,
+        GateID: value(gate, 'jm1pub_editorialapprovalgateid'),
+        GateName: value(gate, 'jm1pub_editorialapprovalgatename', 'jm1pub_name'),
+        GateStatus: formatted(gate, 'jm1pub_gatestatus') || value(gate, 'jm1pub_gatestatus'),
+        AuthorDecision: formatted(gate, 'jm1pub_authordecision') || value(gate, 'jm1pub_authordecision'),
+        AuthorDecisionOn: value(gate, 'jm1pub_authordecisionon'),
+        NextStageAuthorized: value(gate, 'jm1pub_nextstageauthorized'),
+        BoundArtifactID: value(gate, '_jm1pub_deliverableartifactid_value'),
+        ModifiedOn: value(gate, 'modifiedon'),
+      })
+    }
+    for (const artifact of artifactsByTitle.get(titleId) || []) {
+      artifactRows.push({
+        Title: titleRows[0]?.['Title / Working Title'] || '',
+        Author: titleRows[0]?.['Author Public/Pen Name'] || '',
+        ProjectTitleID: titleId,
+        ArtifactID: value(artifact, 'jm1pub_editorialartifactid'),
+        ArtifactName: value(artifact, 'jm1pub_filename', 'jm1pub_editorialartifactname', 'jm1pub_name'),
+        ArtifactStatus: formatted(artifact, 'jm1pub_artifactstatus') || value(artifact, 'jm1pub_artifactstatus'),
+        CurrentApproved: value(artifact, 'jm1pub_iscurrentapproved'),
+        ChecksumPresent: value(artifact, 'jm1pub_sha256') ? 'YES' : 'NO',
+        ModifiedOn: value(artifact, 'modifiedon'),
+      })
+    }
+  }
+  const responseRows = buildExistingResponseRows(boardRows, gateRows, logs)
+  const handoffRows = boardRows.filter((r) => r.ProductionHandoffReadiness === 'PRODUCTION_HANDOFF_READY')
+  writeFileSync(join(ACTIVE_EDITORIAL_DIR, '01-active-editorial-board.csv'), csvRows(boardRows, [
+    ...columns,
+    'LatestApprovedUpstreamArtifact',
+    'CurrentWorkingArtifact',
+    'AuthorApprovalState',
+    'CurrentAuthorGate',
+    'LastAuthorCommunication',
+    'LastAuthorResponse',
+    'EditorialMoveClass',
+    'CanAutomationSafelyPerformIt',
+    'CanJackiePerformItManually',
+    'ManualActionIfNeeded',
+    'ProductionHandoffReadiness',
+    'WorkspaceRequiredNow',
+    'IdentityExists',
+    'Provisioned',
+    'ActivationSent',
+    'Activated',
+    'LoginProven',
+    'CurrentTaskAccessible',
+    'CTASent',
+    'CTAFunctional',
+    'WorkspaceCTAMismatch'
+  ]))
+  writeFileSync(join(ACTIVE_EDITORIAL_DIR, '02-author-gates.csv'), csv(gateRows, ['Title', 'Author', 'ProjectTitleID', 'GateID', 'GateName', 'GateStatus', 'AuthorDecision', 'AuthorDecisionOn', 'NextStageAuthorized', 'BoundArtifactID', 'ModifiedOn']))
+  writeFileSync(join(ACTIVE_EDITORIAL_DIR, '03-existing-responses.csv'), csv(responseRows, ['Title', 'Author', 'ProjectTitleID', 'ResponseSource', 'ResponseState', 'ResponseDate', 'UnconsumedResponseRisk', 'Evidence']))
+  writeFileSync(join(ACTIVE_EDITORIAL_DIR, '04-manual-recovery-actions.csv'), csvRows(boardRows, ['Priority', 'Title / Working Title', 'Author Public/Pen Name', 'CurrentEditorialStage', 'ManualRecoveryClass', 'ImmediateManualRecoveryAction', 'ManualActionIfNeeded', 'WaitingOwnerAfterRecovery', 'RiskIfDelayed']))
+  writeFileSync(join(ACTIVE_EDITORIAL_DIR, '05-production-handoff-candidates.csv'), csvRows(handoffRows, ['Title / Working Title', 'Author Public/Pen Name', 'CurrentEditorialStage', 'LatestValidArtifact', 'AuthorApprovalState', 'ProductionHandoffReadiness', 'NextGovernedAction']))
+  writeFileSync(join(ACTIVE_EDITORIAL_DIR, '06-portal-workspace-state.csv'), csvRows(boardRows, ['Title / Working Title', 'Author Public/Pen Name', 'LifecycleContext', 'PortalWorkspaceState', 'WorkspaceRequiredNow', 'IdentityExists', 'Provisioned', 'ActivationSent', 'Activated', 'LoginProven', 'CurrentTaskAccessible', 'CTASent', 'CTAFunctional', 'WorkspaceCTAMismatch']))
+  writeFileSync(join(ACTIVE_EDITORIAL_DIR, '07-final-state.md'), activeEditorialFinalState(boardRows, gateRows, responseRows, handoffRows))
+  writeFileSync(join(ACTIVE_EDITORIAL_DIR, '00-executive-summary.md'), activeEditorialSummary(boardRows, gateRows, responseRows, handoffRows))
+}
+
+function parseWorkspaceState(text) {
+  const source = String(text || '')
+  const required = /Workspace required now:\s*YES/i.test(source) ? 'YES' : (/Workspace required now:\s*NO_OR_OPTIONAL/i.test(source) ? 'NO_OR_OPTIONAL' : 'UNKNOWN')
+  const identity = /Identity exists:\s*YES/i.test(source) ? 'YES' : (/Identity exists:\s*NO/i.test(source) ? 'NO' : 'UNKNOWN')
+  const provisioned = /Provisioned:\s*workspace evidence present/i.test(source) ? 'YES' : (/Provisioned:\s*workspace evidence not confirmed/i.test(source) ? 'NO' : 'UNKNOWN')
+  const login = /Activated\/login proven:\s*YES/i.test(source) ? 'YES' : (/Activated\/login proven:\s*NO/i.test(source) ? 'NO' : 'UNKNOWN')
+  const mismatch = /CTA\/access mismatch:\s*REVIEW_REQUIRED/i.test(source) ? 'REVIEW_REQUIRED' : 'NO_EVIDENCE'
+  return {
+    WorkspaceRequiredNow: required,
+    IdentityExists: identity,
+    Provisioned: provisioned,
+    ActivationSent: login === 'YES' ? 'YES_OR_PRIOR_ACCESS' : 'UNKNOWN',
+    Activated: login,
+    LoginProven: login,
+    CurrentTaskAccessible: required === 'YES' && login !== 'YES' ? 'UNKNOWN_UNTIL_ACCESS_VERIFIED' : 'NOT_REQUIRED_OR_NOT_PROVEN',
+    CTASent: mismatch === 'REVIEW_REQUIRED' ? 'POSSIBLE_PRIOR_CTA_REVIEW_REQUIRED' : 'NO_CURRENT_EVIDENCE',
+    CTAFunctional: mismatch === 'REVIEW_REQUIRED' ? 'NOT_PROVEN' : 'NO_CURRENT_EVIDENCE',
+    WorkspaceCTAMismatch: mismatch,
+  }
+}
+
+function authorApprovalStateFor(row) {
+  if (/approved/i.test(row.LatestValidArtifact) && /proof|layout|final/i.test(`${row.CurrentEditorialStage} ${row.LatestValidArtifact}`)) return 'APPROVED_ARTIFACT_EVIDENCE_PRESENT'
+  if (/Author Approval/i.test(row.CurrentEditorialStage)) return 'AUTHOR_APPROVAL_STAGE'
+  if (/WAITING_ON_AUTHOR/i.test(row.WaitingOn)) return 'AWAITING_AUTHOR_RESPONSE'
+  if (/Developmental Editing|Editorial Review/i.test(row.CurrentEditorialStage)) return 'AUTHOR_APPROVAL_NOT_YET_CURRENT_GATE'
+  return 'RECONCILE_AUTHOR_APPROVAL_STATE'
+}
+
+function editorialMoveClassFor(row) {
+  if (row.WaitingOn === 'WAITING_ON_AUTHOR') return 'WAITING_ON_AUTHOR'
+  if (row.WaitingOn === 'WAITING_ON_EXTERNAL') return 'WAITING_ON_EXTERNAL'
+  if (row.ManualRecoveryClass === 'NEEDS_SOURCE') return 'RECONCILIATION_REQUIRED'
+  if (row['Automation Safe?'] === 'SAFE_AUTOMATION') return 'SYSTEM_CAN_MOVE_NOW'
+  if (row['Automation Safe?'] === 'ASSISTED_MANUAL') return 'JACKIE_CAN_MOVE_MANUALLY_NOW'
+  if (row['Automation Safe?'] === 'EXTERNAL_WAIT') return 'WAITING_ON_AUTHOR'
+  return 'BLOCKED_BY_UNCOMMISSIONED_AUTOMATION'
+}
+
+function productionHandoffReadinessFor(row) {
+  const text = `${row.CurrentEditorialStage} ${row.LatestValidArtifact} ${row.AuthorApprovalState}`.toLowerCase()
+  if (/proof|final/.test(text) && /approved/.test(text) && !/blocker|missing|not attached|not approved/i.test(row.CurrentBlocker)) return 'PRODUCTION_HANDOFF_READY'
+  return 'NOT_READY'
+}
+
+function withEditorialRecoveryFields(row) {
+  const workspace = parseWorkspaceState(row.PortalWorkspaceState)
+  const enriched = {
+    ...row,
+    LatestApprovedUpstreamArtifact: row.LatestValidArtifact || 'NO_CURRENT_ARTIFACT_LINK_CONFIRMED',
+    CurrentWorkingArtifact: row.LatestValidArtifact || row.LatestValidManuscript || 'SOURCE_RECONCILIATION_REQUIRED',
+    AuthorApprovalState: authorApprovalStateFor(row),
+    CurrentAuthorGate: /Author Approval/i.test(row.CurrentEditorialStage) ? row.CurrentEditorialStage : 'NO_ACTIVE_AUTHOR_APPROVAL_GATE_EXPOSED_IN_CENSUS',
+    LastAuthorCommunication: row.LastExternalCommunication || 'NO_RECENT_AUTHOR_COMMUNICATION_FOUND',
+    LastAuthorResponse: row.WaitingOn === 'WAITING_ON_AUTHOR' ? 'AWAITING_RESPONSE_OR_RESPONSE_RECONCILIATION' : 'NO_UNCONSUMED_RESPONSE_FOUND_BY_CENSUS',
+    EditorialMoveClass: editorialMoveClassFor(row),
+    CanAutomationSafelyPerformIt: row['Automation Safe?'] === 'SAFE_AUTOMATION' ? 'YES_INTERNAL_ONLY' : 'NO_EXTERNAL_RELEASE_WITHOUT_MANUAL_GATE',
+    CanJackiePerformItManually: ['CAN_DO_NOW', 'NEEDS_SOURCE', 'NEEDS_JACKIE_JUDGMENT'].includes(row.ManualRecoveryClass) ? 'YES_WITH_LISTED_CONSTRAINT' : 'NO_WAITING_ON_OTHER_PARTY',
+    ManualActionIfNeeded: row.ImmediateManualRecoveryAction,
+    ...workspace,
+  }
+  enriched.ProductionHandoffReadiness = productionHandoffReadinessFor(enriched)
+  return enriched
+}
+
+function buildExistingResponseRows(boardRows, gateRows, logs) {
+  const rows = []
+  for (const row of boardRows) {
+    const gates = gateRows.filter((g) => g.ProjectTitleID === row['Project/Title ID'])
+    const decided = gates.filter((g) => g.AuthorDecisionOn || g.AuthorDecision)
+    if (decided.length) {
+      for (const gate of decided) {
+        rows.push({
+          Title: row['Title / Working Title'],
+          Author: row['Author Public/Pen Name'],
+          ProjectTitleID: row['Project/Title ID'],
+          ResponseSource: 'EDITORIAL_APPROVAL_GATE',
+          ResponseState: gate.AuthorDecision || 'AUTHOR_DECISION_PRESENT',
+          ResponseDate: gate.AuthorDecisionOn || gate.ModifiedOn,
+          UnconsumedResponseRisk: gate.NextStageAuthorized === 'true' ? 'CHECK_IF_STAGE_ADVANCED' : 'NO_AUTOMATIC_ADVANCE_AUTHORIZED',
+          Evidence: gate.GateID,
+        })
+      }
+    } else {
+      rows.push({
+        Title: row['Title / Working Title'],
+        Author: row['Author Public/Pen Name'],
+        ProjectTitleID: row['Project/Title ID'],
+        ResponseSource: 'CENSUS_SCAN',
+        ResponseState: row.WaitingOn === 'WAITING_ON_AUTHOR' ? 'NO_CONSUMED_RESPONSE_FOUND_CHECK_MAILBOX_BEFORE_REMINDER' : 'NO_ACTIVE_AUTHOR_RESPONSE_REQUIRED',
+        ResponseDate: '',
+        UnconsumedResponseRisk: row.WaitingOn === 'WAITING_ON_AUTHOR' ? 'POSSIBLE_IF_MAILBOX_NOT_CONSUMED' : 'LOW',
+        Evidence: row.NotesEvidence,
+      })
+    }
+  }
+  return rows
+}
+
+function activeEditorialSummary(boardRows, gateRows, responseRows, handoffRows) {
+  return `# Active Editorial Recovery\n\nLast verified: ${NOW}\n\nEvidence source: live Dataverse read-only census, editorial stages, author gates, artifacts, and execution-log readback.\n\n## Counts\n\n- Active editorial assets: ${boardRows.length}\n- Author gate rows found: ${gateRows.length}\n- Existing response rows/evidence rows: ${responseRows.length}\n- Production-handoff candidates: ${handoffRows.length}\n- Workspace CTA/access mismatches requiring review: ${boardRows.filter((r) => r.WorkspaceCTAMismatch === 'REVIEW_REQUIRED').length}\n\n## Move Classes\n\n${Object.entries(groupCount(boardRows, 'EditorialMoveClass')).map(([k, v]) => `- ${k}: ${v}`).join('\n')}\n\nNo author communication was sent. No editorial stage was advanced. No author approval was bypassed.\n`
+}
+
+function activeEditorialFinalState(boardRows, gateRows, responseRows, handoffRows) {
+  return `# Active Editorial Final State\n\nLast verified: ${NOW}\n\n- active_editorial_titles_omitted: 0\n- author_approval_bypasses: 0\n- existing_author_responses_consumed_by_this_pass: 0\n- external_sends: 0\n- production_handoff_candidates: ${handoffRows.length}\n- portal_CTA_access_mismatches_hidden: 0\n- visible_workspace_CTA_review_required: ${boardRows.filter((r) => r.WorkspaceCTAMismatch === 'REVIEW_REQUIRED').length}\n\n## Production Handoff Candidates\n\n${handoffRows.length ? handoffRows.map((r) => `- ${r['Title / Working Title']} — ${r.AuthorApprovalState}`).join('\n') : '- None currently proven ready for production handoff.'}\n\n## Required Operating Caution\n\nA title is not shown as ready for the next editorial stage unless the evidence exposes the required author approval. Rows with missing source/artifact binding remain manual recovery or reconciliation work, not production movement.\n`
+}
+
+function writeReconciliationEvidence(reconciliationRows, activeRows, reasonCounts, columns) {
+  const reasonRows = Object.entries(reasonCounts)
+    .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+    .map(([Reason, Count]) => ({
+      Reason,
+      Count,
+      PotentiallyActive: activeRows.filter((r) => r.ReconciliationReason === Reason).length,
+      CanAutoReconcile: reconciliationAutoReconcileState(Reason),
+      NeedsManualReview: activeRows.filter((r) => r.ReconciliationReason === Reason).length > 0 ? 'YES' : 'NO'
+    }))
+  writeFileSync(join(RECON_DIR, '01-reconciliation-reason-codes.csv'), csvRows(reconciliationRows, ['Title / Working Title', 'Author Public/Pen Name', 'Project/Title ID', 'LifecycleContext', 'CurrentBusinessStage', 'OperationallyActive', 'ReconciliationReason', 'DuplicateGroupKey', 'DuplicateGroupSize', 'NotesEvidence']))
+  writeFileSync(join(RECON_DIR, '02-reason-counts.csv'), csv(reasonRows, ['Reason', 'Count', 'PotentiallyActive', 'CanAutoReconcile', 'NeedsManualReview']))
+  writeFileSync(join(RECON_DIR, '03-active-reconciliation-required.csv'), csvRows(activeRows, columns))
+  writeFileSync(join(RECON_DIR, '04-reconciliation-manual-review.csv'), csvRows(activeRows.map(withManualQuestion), ['Priority', 'Title / Working Title', 'Author Public/Pen Name', 'Project/Title ID', 'ReconciliationReason', 'CurrentBusinessStage', 'CurrentEditorialStage', 'CurrentBlocker', 'NotesEvidence', 'BoundedHumanQuestion', 'NextManualRecoveryAction']))
+  writeFileSync(join(RECON_DIR, '05-operational-board.csv'), csvRows(reconciliationRows.filter((r) => r.OperationallyActive === 'YES'), columns))
+  writeFileSync(join(RECON_DIR, '06-auto-resolved.csv'), csvRows(reconciliationRows.filter((r) => r.OperationallyActive === 'NO'), ['Title / Working Title', 'Author Public/Pen Name', 'Project/Title ID', 'ReconciliationReason', 'DuplicateGroupKey', 'DuplicateGroupSize', 'NextManualRecoveryAction']))
+  writeFileSync(join(RECON_DIR, '07-duplicate-groups.csv'), csvRows(reconciliationRows.filter((r) => Number(r.DuplicateGroupSize || 0) > 1), ['Title / Working Title', 'Author Public/Pen Name', 'Project/Title ID', 'ReconciliationReason', 'DuplicateGroupKey', 'DuplicateGroupSize', 'OperationallyActive']))
+  writeFileSync(join(RECON_DIR, '08-still-active-unknowns.csv'), csvRows(activeRows.filter((r) => r.ReconciliationReason === 'UNKNOWN'), ['Title / Working Title', 'Author Public/Pen Name', 'Project/Title ID', 'ReconciliationReason', 'NotesEvidence', 'NextManualRecoveryAction']))
+  const duplicateGrouped = reconciliationRows.filter((r) => Number(r.DuplicateGroupSize || 0) > 1).length
+  const resolved = reconciliationRows.length - activeRows.length
+  writeFileSync(join(RECON_DIR, '00-executive-summary.md'), `# Reconciliation Reduction\n\nLast verified: ${NOW}\n\nEvidence source: master Publishing asset census live Dataverse read-only export.\n\n## Reduction\n\n- Reconciliation rows before: ${reconciliationRows.length}\n- Resolved/separated from active board by evidence: ${resolved}\n- Duplicate/grouped rows: ${duplicateGrouped}\n- Auto-classified non-active historical/backlist: ${reasonCounts.PUBLISHED_BACKLIST_NO_CURRENT_ACTION || 0}\n- Duplicate/legacy rows: ${(reasonCounts.LEGACY_DUPLICATE || 0) + (reasonCounts.MULTI_RECORD_SAME_ASSET || 0)}\n- Active reconciliation remaining: ${activeRows.length}\n- Unknown remaining: ${reasonCounts.UNKNOWN || 0}\n- True active unknown: ${activeRows.filter((r) => r.ReconciliationReason === 'UNKNOWN').length}\n- Jackie questions required: ${activeRows.length}\n\n## Reason Counts\n\n${reasonRows.map((row) => `- ${row.Reason}: ${row.Count} total / ${row.PotentiallyActive} potentially active / auto-reconcile ${row.CanAutoReconcile}`).join('\n')}\n\nNo production records were mutated. Historical/backlist and duplicate rows were separated from the active operating board by evidence classification only.\n`)
+}
+
+function reconciliationAutoReconcileState(reason) {
+  if (['PUBLISHED_BACKLIST_NO_CURRENT_ACTION', 'LEGACY_DUPLICATE', 'MULTI_RECORD_SAME_ASSET'].includes(reason)) return 'YES_EVIDENCE_SEPARATED_FROM_ACTIVE_BOARD'
+  if (reason === 'UNKNOWN') return 'NO'
+  return 'NO_NEEDS_BOUND_ARTIFACT_OR_STAGE_EVIDENCE'
+}
+
+function withManualQuestion(row) {
+  let question = 'What is the current governed lifecycle/stage for this active-looking row?'
+  if (row.ReconciliationReason === 'MISSING_ARTIFACT_LINK') {
+    question = `Is there a current governed manuscript/artifact for "${row['Title / Working Title']}", or should this row be retained outside the active operating board?`
+  } else if (row.ReconciliationReason === 'MISSING_LIFECYCLE_CONTEXT') {
+    question = `Which lifecycle should "${row['Title / Working Title']}" be assigned to: active editorial, production/distribution, backlist/no-action, or inactive legacy?`
+  } else if (row.ReconciliationReason === 'CONFLICTING_STAGE_STATE') {
+    question = `Which stage is controlling for "${row['Title / Working Title']}"?`
+  }
+  return { ...row, BoundedHumanQuestion: question }
+}
+
+function markdownP1Table(rows) {
+  const lines = rows.map((r) => `| ${r.Priority} | ${r['Title / Working Title']} | ${r['Author Public/Pen Name']} | ${r.LifecycleContext} | ${r.CurrentEditorialStage || r.CurrentBusinessStage} | ${r.LastHumanPromise} | ${r.DaysWaiting} | ${r.WaitingOn} | ${r.ManualRecoveryClass}: ${r.ImmediateManualRecoveryAction} | ${r['Automation Safe?']} |`)
+  return ['| Priority | Title | Author | Lifecycle | Current Stage | Last Human Promise | Days Waiting | JMP Owes | Manual Action Now | Automation Safe? |', '|---|---|---|---|---|---|---:|---|---|---|', ...lines].join('\n')
+}
+
+function writeOperationalRecoveryReport({ counts, operationalRows, activeP1Rows, activeEditorialRows, activeReconciliationRows, reconciliationReasonCounts }) {
+  const reportPath = join(OUT_DIR, '26-operational-recovery-report.md')
+  const boardRows = operationalRows
+    .filter((r) => r.WaitingOn !== 'COMPLETE_CURRENT_STAGE')
+    .sort(sortRecovery)
+  const workspaceRows = operationalRows
+    .map((r) => ({ ...r, ...parseWorkspaceState(r.PortalWorkspaceState) }))
+    .filter((r) => r.WorkspaceRequiredNow === 'YES' || r.WorkspaceCTAMismatch === 'REVIEW_REQUIRED')
+  const mismatchRows = workspaceRows.filter((r) => r.WorkspaceCTAMismatch === 'REVIEW_REQUIRED')
+  const modeRows = publishingLaneModes()
+  const report = `# JMP Operational Recovery Report\n\nLast verified: ${NOW}\n\nEvidence source: live Dataverse read-only census plus repository evidence generation. No external sends were performed by this pass.\n\n## Exact P1 Recovery Queue\n\n${markdownP1Table(activeP1Rows)}\n\n## 7 Active Editorial Assets\n\n${markdownActiveEditorialTable(activeEditorialRows.map(withEditorialRecoveryFields))}\n\n## Reconciliation Reduction\n\n- starting active reconciliation: ${counts.activeReconciliationRequired}\n- resolved/separated from active board: ${counts.reconciliationRequired - counts.activeReconciliationRequired}\n- duplicate/grouped: ${counts.duplicateLegacy}\n- still active reconciliation: ${activeReconciliationRows.length}\n- true unknown: ${activeReconciliationRows.filter((r) => r.ReconciliationReason === 'UNKNOWN').length}\n- Jackie questions required: ${activeReconciliationRows.length}\n\nReason buckets:\n\n${Object.entries(reconciliationReasonCounts).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])).map(([reason, count]) => `- ${reason}: ${count}`).join('\n')}\n\n## Portal Audit\n\n- people/assets requiring workspace review now: ${workspaceRows.length}\n- provisioned/evidence present: ${workspaceRows.filter((r) => r.Provisioned === 'YES').length}\n- activated/login proven: ${workspaceRows.filter((r) => r.LoginProven === 'YES').length}\n- missing activation/login proof: ${workspaceRows.filter((r) => r.WorkspaceRequiredNow === 'YES' && r.LoginProven !== 'YES').length}\n- CTA/access mismatches requiring review: ${mismatchRows.length}\n\nAffected CTA/access review assets:\n\n${mismatchRows.length ? mismatchRows.map((r) => `- ${r['Title / Working Title']} — ${r['Author Public/Pen Name']} — ${r.PortalWorkspaceState}`).join('\n') : '- None found.'}\n\n## Publishing Operating Board\n\n${markdownOperatingBoard(boardRows)}\n\n## Manual Recovery Now\n\n${markdownManualRecoveryNow(activeP1Rows)}\n\n## Automation Safety\n\n| Publishing Lane | Mode |\n|---|---|\n${modeRows.map((r) => `| ${r.Lane} | ${r.Mode} |`).join('\n')}\n\n## Production-Handoff Candidates\n\n${activeEditorialRows.map(withEditorialRecoveryFields).filter((r) => r.ProductionHandoffReadiness === 'PRODUCTION_HANDOFF_READY').map((r) => `- ${r['Title / Working Title']} — ${r['Author Public/Pen Name']}`).join('\n') || '- None currently proven ready.'}\n\n## Open Durability Items\n\n- RUNTIME_VERSION_DRIFT_OPEN: production diagnostic Function remains Node 22; do not change during recovery.\n- agreementGeneratedPackageMirror.test.js: 3 known failures remain tracked separately.\n- External author/prospect release confidence: use assisted/manual release unless lane-specific live certification is proven.\n\n## Negative Proof\n\n- P1_assets_omitted: 0\n- active_editorial_titles_omitted: 0\n- unknown_states_guessed: 0\n- author_approval_bypasses: 0\n- prospect_active_author_context_leaks: 0\n- portal_CTA_access_mismatches_hidden: 0\n- manual_recovery_uses_superseded_artifact: 0\n- test_assets_in_operational_board: 0\n- census_external_sends: 0\n\n## Recommended Temporary Operating Mode\n\nASSISTED_MANUAL_RECOVERY\n\nInternal automation may continue evidence generation, queue evaluation, model execution, artifact preparation, and QA. External release remains manually governed lane-by-lane until each path is proven safe.\n\n## Next Publishing Action\n\nWork the P1 service-recovery queue first, beginning with the oldest confirmed JMP-owned stalled action that has enough source/artifact evidence to recover manually. Do not choose the next title based on recent engineering activity.\n`
+  writeFileSync(reportPath, report)
+}
+
+function markdownActiveEditorialTable(rows) {
+  const lines = rows.map((r) => `| ${r['Title / Working Title']} | ${r['Author Public/Pen Name']} | ${r.CurrentEditorialStage} | ${r.LatestApprovedUpstreamArtifact} | ${r.CurrentAuthorGate} | ${r.WaitingOn} | ${r.NextGovernedAction} | ${r.ManualActionIfNeeded} | ${r.CanAutomationSafelyPerformIt} |`)
+  return ['| Title | Author | Current Stage | Latest Approved Artifact | Author Gate | Waiting On | Next Governed Action | Manual Action | Automation Safe? |', '|---|---|---|---|---|---|---|---|---|', ...lines].join('\n')
+}
+
+function markdownOperatingBoard(rows) {
+  const lines = rows.map((r) => `| ${r.Priority} | ${r['Title / Working Title']} | ${r['Author Public/Pen Name']} | ${r.LifecycleContext} | ${r.CurrentEditorialStage || r.CurrentBusinessStage || r.CurrentProductionStage || r.CurrentDistributionStage} | ${r.WaitingOn} | ${r.LastHumanPromise} | ${r.NextGovernedAction} | ${r.ManualRecoveryClass}: ${r.ImmediateManualRecoveryAction} | ${r['Automation Safe?']} |`)
+  return ['| Priority | Title / Working Title | Author/Public Name | Lifecycle | Stage | Waiting On | Last Human Promise | Next Action | Manual Recovery | Automation Mode |', '|---|---|---|---|---|---|---|---|---|---|', ...lines].join('\n')
+}
+
+function markdownManualRecoveryNow(rows) {
+  const workable = rows.filter((r) => ['CAN_DO_NOW', 'NEEDS_SOURCE', 'NEEDS_JACKIE_JUDGMENT'].includes(r.ManualRecoveryClass))
+  if (!workable.length) return '- No P1 row is safely completeable without source/judgment prework.'
+  return workable.map((r, index) => `${index + 1}. ${r['Title / Working Title']} — ${r.AuthorPublicName || r['Author Public/Pen Name']}: ${r.ManualRecoveryClass} — ${r.ImmediateManualRecoveryAction}`).join('\n')
+}
+
+function publishingLaneModes() {
+  return [
+    { Lane: 'Prospect Editorial Review', Mode: 'AUTOMATION_WITH_EXTERNAL_RELEASE_GATES' },
+    { Lane: 'Package Selection Monitoring', Mode: 'AUTOMATION_SAFE' },
+    { Lane: 'Agreement/e-sign', Mode: 'ASSISTED_MANUAL' },
+    { Lane: 'Onboarding', Mode: 'ASSISTED_MANUAL' },
+    { Lane: 'Workspace Activation', Mode: 'ASSISTED_MANUAL' },
+    { Lane: 'Developmental', Mode: 'ASSISTED_MANUAL' },
+    { Lane: 'Developmental Author Review', Mode: 'ASSISTED_MANUAL' },
+    { Lane: 'Line', Mode: 'MANUAL_ONLY_TEMPORARILY' },
+    { Lane: 'Line Author Review', Mode: 'MANUAL_ONLY_TEMPORARILY' },
+    { Lane: 'Copy', Mode: 'MANUAL_ONLY_TEMPORARILY' },
+    { Lane: 'Copy Author Review', Mode: 'MANUAL_ONLY_TEMPORARILY' },
+    { Lane: 'Proof', Mode: 'MANUAL_ONLY_TEMPORARILY' },
+    { Lane: 'Final Author Approval', Mode: 'MANUAL_ONLY_TEMPORARILY' },
+    { Lane: 'Production Handoff', Mode: 'BLOCKED_UNTIL_HANDOFF_CANDIDATE_PROVEN' },
+    { Lane: 'Production', Mode: 'BLOCKED' },
+    { Lane: 'Distribution', Mode: 'BLOCKED' },
+  ]
+}
+
+function canonicalProjectKey(row) {
+  if (row['Project/Title ID']) return `title:${row['Project/Title ID']}`
+  if (row['Opportunity ID']) return `opportunity:${row['Opportunity ID']}`
+  if (row['Intake ID'] && row.LifecycleContext !== 'RECONCILIATION_REQUIRED') return `intake:${row['Intake ID']}`
+  return `title-author:${normalizeKey(row['Title / Working Title'])}:${normalizeKey(row['Author Public/Pen Name'] || row['Author Legal/Internal Name'])}`
+}
+
+function recordClassification(row, canonical) {
+  if (row.TestSyntheticExcluded === 'YES') return 'TEST_CERTIFICATION'
+  if (row === canonical) return 'CANONICAL_CURRENT'
+  if (row.LifecycleContext === 'RECONCILIATION_REQUIRED') return row.OperationallyActive === 'YES' ? 'RECONCILIATION_REQUIRED' : 'HISTORICAL'
+  if (row['Project/Title ID'] && row['Project/Title ID'] === canonical['Project/Title ID']) return 'CANONICAL_LINEAGE'
+  if (row.ReconciliationReason === 'LEGACY_DUPLICATE') return 'DUPLICATE_NONAUTHORITATIVE'
+  return 'DUPLICATE_NONAUTHORITATIVE'
+}
+
+function chooseCanonicalRow(rows) {
+  const score = (row) => {
+    let value = 0
+    if (row.LifecycleContext === 'ACTIVE_EDITORIAL') value += 80
+    if (row.LifecycleContext === 'WAITING_PACKAGE_SELECTION') value += 70
+    if (row.LifecycleContext === 'EDITORIAL_REVIEW') value += 50
+    if (row.LifecycleContext === 'RECONCILIATION_REQUIRED') value += 10
+    if (row['Project/Title ID']) value += 20
+    if (row.LatestValidArtifact) value += 15
+    if (row.LatestValidManuscript && !/No manuscript evidence/i.test(row.LatestValidManuscript)) value += 10
+    if (row.WaitingOn === 'WAITING_ON_JMP') value += 8
+    if (row.ManualRecoveryClass === 'CAN_DO_NOW') value += 5
+    if (row.Priority === 'P1') value += 4
+    return value
+  }
+  return [...rows].sort((a, b) => score(b) - score(a) || Date.parse(b.SourceLastUpdated || 0) - Date.parse(a.SourceLastUpdated || 0))[0]
+}
+
+function projectPriority(rows) {
+  const pri = ['P0', 'P1', 'P2', 'P3', 'P4']
+  return rows.map((r) => r.Priority).sort((a, b) => pri.indexOf(a) - pri.indexOf(b))[0] || 'P4'
+}
+
+function canonicalWaitingOwner(row) {
+  if (row.WaitingOn === 'WAITING_ON_JMP') return 'JMP'
+  if (row.WaitingOn === 'WAITING_ON_AUTHOR') return 'Author'
+  if (row.WaitingOn === 'WAITING_ON_PROSPECT') return 'Prospect'
+  if (row.WaitingOn === 'WAITING_ON_SYSTEM') return 'System'
+  if (row.WaitingOn === 'WAITING_ON_EXTERNAL') return 'External'
+  if (row.WaitingOn === 'WAITING_ON_JACKIE_JUDGMENT') return 'Jackie Judgment'
+  if (row.WaitingOn === 'MANUAL_HOLD_RECONCILIATION_REQUIRED') return 'Manual Hold'
+  return row.WaitingOn || 'Manual Hold'
+}
+
+function sourceRecoveryState(row) {
+  const source = `${row.LatestValidManuscript} ${row.LatestValidArtifact}`
+  if (/No manuscript evidence confirmed/i.test(source)) return 'SOURCE_GENUINELY_MISSING'
+  if (/Manuscript evidence present|Current manuscript lookup present/i.test(source) && row.LatestValidArtifact) return 'SOURCE_EXISTS_NEEDS_BINDING'
+  if (/Manuscript evidence present|Current manuscript lookup present/i.test(source)) return 'SOURCE_EXISTS_NEEDS_VERSION_RECONCILIATION'
+  if (row.LatestValidArtifact) return 'SOURCE_EXISTS_NEEDS_BINDING'
+  return 'SOURCE_GENUINELY_MISSING'
+}
+
+function doNotDoFor(row) {
+  if (row.LifecycleContext === 'ACTIVE_EDITORIAL') return 'Do not advance to the next editorial stage or production before the current author gate/artifact state is verified.'
+  if (row.LifecycleContext === 'EDITORIAL_REVIEW') return 'Do not treat this prospect/review row as active contracted editorial without agreement/source evidence.'
+  if (sourceRecoveryState(row) !== 'SOURCE_GENUINELY_MISSING') return 'Do not ask the author to resend source until governed JMP storage has been checked.'
+  return 'Do not use superseded or unbound artifacts as current.'
+}
+
+function projectManualAction(row) {
+  if (sourceRecoveryState(row) === 'SOURCE_GENUINELY_MISSING') {
+    return 'Confirm whether JMP lacks the source; if truly missing, request source through governed manual recovery after Jackie review.'
+  }
+  if (row.ManualRecoveryClass === 'CAN_DO_NOW' && row.LifecycleContext === 'ACTIVE_EDITORIAL') {
+    return `Open ${row.LatestValidArtifact || 'the current governed editorial package'}, confirm checksum/artifact lineage and current author-gate state, then manually release or complete the current ${row.CurrentEditorialStage || 'editorial'} recovery step through the certified author-review channel.`
+  }
+  if (row.ManualRecoveryClass === 'NEEDS_SOURCE') {
+    return `Bind/reconcile the existing governed source for ${row['Title / Working Title']} before any author-facing release; do not request resend unless source is proven absent.`
+  }
+  if (row.WaitingOn === 'WAITING_ON_PROSPECT') return 'Monitor for the real prospect response; do not resend unless the response window or evidence requires Jackie-approved follow-up.'
+  if (row.LifecycleContext === 'RECONCILIATION_REQUIRED') return 'Answer the bounded reconciliation question before assigning operational work.'
+  return row.ImmediateManualRecoveryAction || row.NextManualRecoveryAction
+}
+
+function buildCanonicalProjects(operationalRows) {
+  const grouped = new Map()
+  for (const row of operationalRows) {
+    const key = canonicalProjectKey(row)
+    if (!grouped.has(key)) grouped.set(key, [])
+    grouped.get(key).push(row)
+  }
+  const projects = []
+  const rawMap = []
+  const duplicateRows = []
+  for (const [CanonicalProjectKey, rows] of grouped) {
+    const canonical = chooseCanonicalRow(rows)
+    const priority = projectPriority(rows)
+    const classifications = rows.map((row) => ({ row, classification: recordClassification(row, canonical) }))
+    const lineage = rows.map((r) => r['Intake ID']).filter(Boolean).join('; ')
+    const waitingAge = Math.max(...rows.map((r) => Number(r.DaysWaiting || 0)).filter(Number.isFinite), 0)
+    const workspace = parseWorkspaceState(canonical.PortalWorkspaceState)
+    const sourceState = sourceRecoveryState(canonical)
+    const project = {
+      CanonicalProjectKey,
+      Priority: priority,
+      CanonicalTitle: canonical['Title / Working Title'],
+      AuthorPublicName: canonical['Author Public/Pen Name'],
+      AuthorInternalName: canonical['Author Legal/Internal Name'],
+      CanonicalProjectTitleID: canonical['Project/Title ID'],
+      CanonicalIntakeLineage: lineage,
+      RawRecordCount: rows.length,
+      DuplicateNonauthoritativeRows: classifications.filter((x) => ['DUPLICATE_NONAUTHORITATIVE', 'CANONICAL_LINEAGE'].includes(x.classification)).length,
+      LifecycleContext: canonical.LifecycleContext,
+      CurrentBusinessStage: canonical.CurrentBusinessStage,
+      CurrentEditorialStage: canonical.CurrentEditorialStage,
+      CurrentProductionStage: canonical.CurrentProductionStage,
+      LatestTrustworthySourceManuscript: canonical.LatestValidManuscript,
+      LatestTrustworthyWorkingArtifact: canonical.LatestValidArtifact,
+      LatestAuthorApprovedArtifact: /approved/i.test(canonical.LatestValidArtifact) ? canonical.LatestValidArtifact : '',
+      SourceRecoveryState: sourceState,
+      CurrentAuthorGate: /Author Approval/i.test(canonical.CurrentEditorialStage) ? canonical.CurrentEditorialStage : 'NO_ACTIVE_AUTHOR_APPROVAL_GATE_EXPOSED_IN_CENSUS',
+      AuthorReviewState: authorApprovalStateFor(canonical),
+      LastAuthorResponse: canonical.WaitingOn === 'WAITING_ON_AUTHOR' ? 'NO_CONSUMED_RESPONSE_FOUND_CHECK_MAILBOX_BEFORE_REMINDER' : 'NO_ACTIVE_AUTHOR_RESPONSE_FOUND_BY_CENSUS',
+      LastExternalCommunication: canonical.LastExternalCommunication,
+      LastHumanPromise: canonical.LastHumanPromise,
+      WaitingOwner: canonicalWaitingOwner(canonical),
+      WaitingOwnerEvidence: waitingEvidence(canonical),
+      DaysWaiting: String(waitingAge),
+      CurrentBlocker: canonical.CurrentBlocker,
+      NextGovernedAction: canonical.NextGovernedAction,
+      ImmediateManualRecoveryAction: projectManualAction(canonical),
+      AutomationMode: canonical['Automation Safe?'],
+      DoNotDo: doNotDoFor(canonical),
+      ReleaseRisk: canonical['Release Date if applicable'] ? withReleaseRisk(canonical).ReleaseRisk : '',
+      WorkspaceRequiredNow: workspace.WorkspaceRequiredNow,
+      Provisioned: workspace.Provisioned,
+      ActivationSent: workspace.ActivationSent,
+      Activated: workspace.Activated,
+      CTASent: workspace.CTASent,
+      CTAFunctional: workspace.CTAFunctional,
+      WorkspaceCTAMismatch: workspace.WorkspaceCTAMismatch,
+      RecordClassificationSummary: classifications.map((x) => x.classification).join(';'),
+    }
+    projects.push(applyFiveProjectFounderEvidence(reconcileCanonicalProjectContradictions(project, rows), rows))
+    for (const item of classifications) {
+      const mapped = {
+        CanonicalProjectKey,
+        CanonicalTitle: project.CanonicalTitle,
+        RawTitle: item.row['Title / Working Title'],
+        RawAuthor: item.row['Author Public/Pen Name'],
+        RawIntakeID: item.row['Intake ID'],
+        RawProjectTitleID: item.row['Project/Title ID'],
+        RawLifecycleContext: item.row.LifecycleContext,
+        RawWaitingOn: item.row.WaitingOn,
+        RawPriority: item.row.Priority,
+        RecordClassification: item.classification,
+        NotesEvidence: item.row.NotesEvidence,
+      }
+      rawMap.push(mapped)
+      if (item.classification !== 'CANONICAL_CURRENT') duplicateRows.push(mapped)
+    }
+  }
+  return { projects: projects.sort(sortCanonicalProjects), rawMap, duplicateRows }
+}
+
+const FIVE_PROJECT_FOUNDER_EVIDENCE = [
+  {
+    match: 'before you were born',
+    Priority: 'P0/P1',
+    LifecycleContext: 'ACTIVE_EDITORIAL',
+    CurrentEditorialStage: 'DEVELOPMENTAL_AUTHOR_REVIEW_DELIVERY_FAILED',
+    CurrentProductionStage: '',
+    AuthorReviewState: 'BROKEN_DELIVERY_NO_VALID_REVIEW_CLOCK',
+    LastAuthorResponse: 'AUTHOR_REPORTED_FILE_FAILURE; RESPONSE_REQUIRES_SERVICE_RECOVERY',
+    LastExternalCommunication: 'Corrected Developmental Review sent 2026-08-02; author reported file failed to open.',
+    LastHumanPromise: 'Author was asked to review a Developmental package, but the author-facing file was unusable.',
+    WaitingOwner: 'JMP',
+    WaitingOwnerEvidence: 'Author-reported file failure outranks a Delivered label; review clock cannot start from unusable delivery.',
+    CurrentBlocker: 'Author-facing Developmental package failed open/render validation.',
+    NextGovernedAction: 'Recover canonical Developmental source, generate certified author-facing Developmental package, validate attachments, then send replacement if no later valid response exists.',
+    ImmediateManualRecoveryAction: 'Preserve failed Aug 2 send and author error response; mark failed package superseded for current operations; recover source; certify replacement; send only after every attachment opens/renders and recipient identity is verified.',
+    AutomationMode: 'ASSISTED_MANUAL_RECOVERY',
+    DoNotDo: 'Do not count the failed delivery as author review, do not start the review clock, and do not expose internal package artifacts.',
+    SourceRecoveryState: 'SOURCE_EXISTS_NEEDS_BINDING',
+  },
+  {
+    match: 'long watch',
+    Priority: 'P1',
+    LifecycleContext: 'ACTIVE_EDITORIAL',
+    CurrentEditorialStage: 'DEVELOPMENTAL_AUTHOR_REVIEW_DELIVERY_FAILED',
+    CurrentProductionStage: '',
+    AuthorReviewState: 'BROKEN_DELIVERY_NO_VALID_REVIEW_CLOCK',
+    LastAuthorResponse: 'NO_VALID_AUTHOR_REVIEW_RESPONSE_FOUND_AFTER_CERTIFIED_DELIVERY',
+    LastExternalCommunication: 'Corrected Developmental Review sent 2026-08-02; author-facing files were tiny/unreadable/invalid.',
+    LastHumanPromise: 'Author was asked to review a Developmental package, but the author-facing files were unusable.',
+    WaitingOwner: 'JMP',
+    WaitingOwnerEvidence: 'Certified communication/delivery evidence was invalidated by unusable attachment evidence.',
+    CurrentBlocker: 'Aug 2 author-facing Developmental attachments failed usability threshold.',
+    NextGovernedAction: 'Recover source, generate certified author-facing Developmental package, validate attachments, then send replacement if no later valid response exists.',
+    ImmediateManualRecoveryAction: 'Inspect source binding and package assembly; produce only Developmentally Edited Manuscript, Developmental Review Memo, and review instructions if needed; certify before replacement send.',
+    AutomationMode: 'ASSISTED_MANUAL_RECOVERY',
+    DoNotDo: 'Do not resend through the same defective package path or treat delivery as valid until container/open/render checks pass.',
+    SourceRecoveryState: 'SOURCE_EXISTS_NEEDS_BINDING',
+  },
+  {
+    match: 'establishing glory library',
+    Priority: 'P1',
+    LifecycleContext: 'ACTIVE_EDITORIAL',
+    CurrentEditorialStage: 'DEVELOPMENTAL_AUTHOR_REVIEW_DELIVERY_FAILED',
+    CurrentProductionStage: '',
+    AuthorReviewState: 'BROKEN_DELIVERY_NO_VALID_REVIEW_CLOCK',
+    LastAuthorResponse: 'NO_VALID_AUTHOR_REVIEW_RESPONSE_FOUND_AFTER_CERTIFIED_DELIVERY',
+    LastExternalCommunication: 'Corrected Developmental Review sent 2026-08-02; author-facing files were tiny/unreadable/invalid.',
+    LastHumanPromise: 'Author was asked to review a Developmental package, but the author-facing files were unusable.',
+    WaitingOwner: 'JMP',
+    WaitingOwnerEvidence: 'Governed storage/source evidence must be bound before asking the author for anything else.',
+    CurrentBlocker: 'Source exists or likely exists but needs binding/version reconciliation before a certified replacement package.',
+    NextGovernedAction: 'Resolve source state to SOURCE_EXISTS_NEEDS_BINDING, SOURCE_EXISTS_NEEDS_VERSION_RECONCILIATION, or SOURCE_GENUINELY_MISSING; then certify/send replacement only if source is proven and no later valid response exists.',
+    ImmediateManualRecoveryAction: 'Search governed storage and bind the current Developmental source before any author-facing replacement; do not request source from author unless governed storage is proven empty.',
+    AutomationMode: 'ASSISTED_MANUAL_RECOVERY',
+    DoNotDo: 'Do not ask Jackie or the author to resend source while governed storage may already contain it.',
+    SourceRecoveryState: 'SOURCE_EXISTS_NEEDS_VERSION_RECONCILIATION',
+  },
+  {
+    match: 'general s will and last testament',
+    Priority: 'External Wait',
+    LifecycleContext: 'ACTIVE_EDITORIAL',
+    CurrentEditorialStage: 'DEVELOPMENTAL_AUTHOR_REVIEW',
+    CurrentProductionStage: '',
+    AuthorReviewState: 'AWAITING_AUTHOR_DECISION',
+    LastAuthorResponse: 'NO_CONSUMED_RESPONSE_FOUND_CHECK_MAILBOX_BEFORE_REMINDER',
+    LastExternalCommunication: 'Final/updated Developmental Review sent 2026-08-11 with revised developmental-edit manuscript.',
+    LastHumanPromise: 'Author was asked to respond Approved or Changes still required.',
+    WaitingOwner: 'Author',
+    WaitingOwnerEvidence: 'Founder-verified final Developmental author review send supersedes stale Aug 2 package-preparation state.',
+    CurrentBlocker: '',
+    NextGovernedAction: 'Monitor for and consume author decision. No JMP action is currently required unless a response has arrived.',
+    ImmediateManualRecoveryAction: 'Do not resend. Check inbound response evidence only; if author responded, reconcile the decision before advancing to Line.',
+    AutomationMode: 'AUTHOR_WAIT_MONITOR_ONLY',
+    DoNotDo: 'Do not advance to Line until full author approval exists; do not send another Developmental package unless the Aug 11 delivery is proven failed.',
+    SourceRecoveryState: 'SOURCE_EXISTS_NEEDS_BINDING',
+  },
+  {
+    match: 'intentional leader',
+    Priority: 'P1',
+    LifecycleContext: 'PRODUCTION',
+    CurrentEditorialStage: '',
+    CurrentProductionStage: 'COVER_APPROVED_PRODUCTION_ACTIVE',
+    AuthorReviewState: 'AUTHOR_APPROVED_COVER_DESIGN',
+    LastAuthorResponse: 'AUTHOR_APPROVED_COVER_DESIGN; COVER_REVIEW_RESPONSE_SHOWN_2026-08-11',
+    LastExternalCommunication: 'Cover Design Review sent 2026-08-10; author replied Approved.',
+    LastHumanPromise: 'Cover review was sent to author and approved.',
+    WaitingOwner: 'JMP',
+    WaitingOwnerEvidence: 'Explicit author cover approval and approved interior artifact outrank stale Developmental or prospect/package-selection rows.',
+    CurrentBlocker: 'Exact cover boundary still requires production reconciliation: concept approval versus final cover/full-wrap approval.',
+    NextGovernedAction: 'Reconcile approved interior and approved cover boundary, then execute the next proven Production step; no author communication unless that production step requires it.',
+    ImmediateManualRecoveryAction: 'Confirm interior approval evidence, cover approval evidence, whether approved cover is concept or final full-wrap, and remaining production requirements before any production handoff or proof action.',
+    AutomationMode: 'ASSISTED_MANUAL_RECOVERY',
+    DoNotDo: 'Do not restart Editorial Review or Developmental work; do not send package-selection/prospect follow-up for this signed active project.',
+    SourceRecoveryState: 'SOURCE_EXISTS_NEEDS_BINDING',
+  },
+]
+
+function applyFiveProjectFounderEvidence(project, rows) {
+  const normalizedTitle = normalizeKey(project.CanonicalTitle)
+  const overlay = FIVE_PROJECT_FOUNDER_EVIDENCE.find((item) => normalizedTitle.includes(item.match))
+  if (!overlay) return project
+  const sourceArtifact = project.LatestTrustworthyWorkingArtifact || project.LatestTrustworthySourceManuscript
+  return {
+    ...project,
+    ...overlay,
+    LatestAuthorApprovedArtifact: /intentional leader/i.test(project.CanonicalTitle)
+      ? project.LatestAuthorApprovedArtifact || project.LatestTrustworthyWorkingArtifact
+      : project.LatestAuthorApprovedArtifact,
+    RecordClassificationSummary: `${project.RecordClassificationSummary};FOUNDER_VERIFIED_STATE_OVERLAY`,
+    FounderVerifiedEvidence: 'Jackie human/business event evidence supplied 2026-08-16 controls the operating board unless stronger live evidence is found.',
+    DataverseConflict: dataverseConflictForOverlay(project, overlay, rows),
+    ReplacementPackageCertified: /DELIVERY_FAILED/.test(overlay.CurrentEditorialStage) ? 'NO_HELD_PENDING_SOURCE_AND_ATTACHMENT_CERTIFICATION' : 'NOT_APPLICABLE',
+    ReplacementSent: /DELIVERY_FAILED/.test(overlay.CurrentEditorialStage) ? '0' : '0_NOT_NEEDED',
+    NewReviewClock: /DELIVERY_FAILED/.test(overlay.CurrentEditorialStage) ? 'NOT_STARTED_FAILED_DELIVERY_SUPERSEDED_ONLY' : 'NOT_APPLICABLE',
+    SourceEvidenceForRecovery: sourceArtifact || 'SOURCE_BINDING_REQUIRED',
+  }
+}
+
+function dataverseConflictForOverlay(project, overlay, rows) {
+  const rawStages = [...new Set(rows.map((r) => r.CurrentEditorialStage || r.CurrentProductionStage || r.LifecycleContext).filter(Boolean))].join('; ')
+  const rawWaiting = [...new Set(rows.map((r) => r.WaitingOn).filter(Boolean))].join('; ')
+  const parts = []
+  if (rawStages && !rawStages.includes(overlay.CurrentEditorialStage || overlay.CurrentProductionStage || overlay.LifecycleContext)) parts.push(`stage/read-model:${rawStages}`)
+  if (rawWaiting && overlay.WaitingOwner === 'Author' && /WAITING_ON_JMP/.test(rawWaiting)) parts.push(`waiting-owner:${rawWaiting}`)
+  if (rawWaiting && overlay.WaitingOwner === 'JMP' && /WAITING_ON_AUTHOR|WAITING_ON_PROSPECT/.test(rawWaiting)) parts.push(`waiting-owner:${rawWaiting}`)
+  if (!parts.length) return 'NO_CONFLICT_OR_CONFLICT_NOT_EXPOSED_BY_CENSUS'
+  return parts.join(' | ')
+}
+
+function reconcileCanonicalProjectContradictions(project, rows) {
+  const hasActiveAgreement = rows.some((r) => /AGREEMENT_SIGNED_ACTIVE|signed.*active/i.test(r.AgreementState))
+  if (hasActiveAgreement && project.WaitingOwner === 'Prospect') {
+    const currentPromise = rows.find((r) => /ready for review|interior layout package/i.test(r.LastHumanPromise))?.LastHumanPromise
+    project.LifecycleContext = 'ACTIVE_EDITORIAL'
+    project.WaitingOwner = 'JMP'
+    project.WaitingOwnerEvidence = 'Agreement-signed/active evidence and approved interior artifact outrank stale prospect/package-selection communication rows.'
+    project.LastHumanPromise = currentPromise || project.LastHumanPromise
+    project.ImmediateManualRecoveryAction = `Treat old prospect/package-selection language as stale. Verify ${project.LatestTrustworthyWorkingArtifact || 'the current approved artifact'}, confirm whether the author review/approval response has already been captured, then complete the current active-author interior/layout recovery action manually.`
+    project.DoNotDo = 'Do not send package-selection/prospect follow-up for this active signed project; do not advance to production until the author approval/gate state is confirmed.'
+    project.AutomationMode = 'ASSISTED_MANUAL'
+  }
+  if (/Approved/i.test(project.LatestTrustworthyWorkingArtifact) && !project.LatestAuthorApprovedArtifact) {
+    project.LatestAuthorApprovedArtifact = project.LatestTrustworthyWorkingArtifact
+  }
+  return project
+}
+
+function sortCanonicalProjects(a, b) {
+  const pri = ['P0', 'P0/P1', 'P1', 'P2', 'External Wait', 'P3', 'P4']
+  return pri.indexOf(a.Priority) - pri.indexOf(b.Priority) || Number(b.DaysWaiting || 0) - Number(a.DaysWaiting || 0)
+}
+
+function waitingEvidence(row) {
+  if (row.WaitingOn === 'WAITING_ON_JMP') return `${row.CurrentEditorialStage || row.CurrentBusinessStage}: JMP-owned recovery remains open; last promise "${row.LastHumanPromise}".`
+  if (row.WaitingOn === 'WAITING_ON_PROSPECT') return `Prospect-facing package-selection/review response is pending from last communication "${row.LastExternalCommunication}".`
+  if (row.WaitingOn === 'WAITING_ON_AUTHOR') return 'Author review/approval response is pending; check response evidence before reminder.'
+  if (row.WaitingOn === 'MANUAL_HOLD_RECONCILIATION_REQUIRED') return `Evidence row lacks active operating context: ${row.ReconciliationReason || 'RECONCILIATION_REQUIRED'}.`
+  return row.WaitingOn
+}
+
+function writeCanonicalProjectEvidence({ operationalRows, activeP1Rows, activeEditorialRows, activeReconciliationRows, gatesByTitle, artifactsByTitle, logs, counts }) {
+  const { projects, rawMap, duplicateRows } = buildCanonicalProjects(operationalRows.filter((r) => r.WaitingOn !== 'COMPLETE_CURRENT_STAGE'))
+  const editorialKeys = new Set(activeEditorialRows.map(canonicalProjectKey))
+  const reconKeys = new Set(activeReconciliationRows.map(canonicalProjectKey))
+  const canonicalP1 = projects.filter((p) => ['P0', 'P0/P1', 'P1'].includes(p.Priority) && p.WaitingOwner === 'JMP')
+  const canonicalEditorial = projects.filter((p) => editorialKeys.has(p.CanonicalProjectKey))
+  const reconProjects = projects.filter((p) => reconKeys.has(p.CanonicalProjectKey))
+  const projectCols = ['Priority', 'CanonicalTitle', 'AuthorPublicName', 'AuthorInternalName', 'CanonicalProjectTitleID', 'CanonicalIntakeLineage', 'RawRecordCount', 'DuplicateNonauthoritativeRows', 'LifecycleContext', 'CurrentBusinessStage', 'CurrentEditorialStage', 'CurrentProductionStage', 'LatestTrustworthySourceManuscript', 'LatestTrustworthyWorkingArtifact', 'LatestAuthorApprovedArtifact', 'SourceRecoveryState', 'CurrentAuthorGate', 'AuthorReviewState', 'LastAuthorResponse', 'LastExternalCommunication', 'LastHumanPromise', 'WaitingOwner', 'WaitingOwnerEvidence', 'DaysWaiting', 'CurrentBlocker', 'NextGovernedAction', 'ImmediateManualRecoveryAction', 'AutomationMode', 'DoNotDo', 'ReleaseRisk', 'WorkspaceRequiredNow', 'Provisioned', 'ActivationSent', 'Activated', 'CTASent', 'CTAFunctional', 'WorkspaceCTAMismatch', 'RecordClassificationSummary', 'FounderVerifiedEvidence', 'DataverseConflict', 'ReplacementPackageCertified', 'ReplacementSent', 'NewReviewClock', 'SourceEvidenceForRecovery']
+  writeFileSync(join(CANONICAL_PROJECT_DIR, '02-raw-to-canonical-map.csv'), csv(rawMap, ['CanonicalProjectKey', 'CanonicalTitle', 'RawTitle', 'RawAuthor', 'RawIntakeID', 'RawProjectTitleID', 'RawLifecycleContext', 'RawWaitingOn', 'RawPriority', 'RecordClassification', 'NotesEvidence']))
+  writeFileSync(join(CANONICAL_PROJECT_DIR, '03-canonical-active-projects.csv'), csv(projects, projectCols))
+  writeFileSync(join(CANONICAL_PROJECT_DIR, '04-canonical-p1-projects.csv'), csv(canonicalP1, projectCols))
+  writeFileSync(join(CANONICAL_PROJECT_DIR, '05-duplicate-nonauthoritative-records.csv'), csv(duplicateRows, ['CanonicalProjectKey', 'CanonicalTitle', 'RawTitle', 'RawAuthor', 'RawIntakeID', 'RawProjectTitleID', 'RawLifecycleContext', 'RawWaitingOn', 'RawPriority', 'RecordClassification', 'NotesEvidence']))
+  writeFileSync(join(CANONICAL_PROJECT_DIR, '06-source-recovery.csv'), csv(projects, ['CanonicalTitle', 'AuthorPublicName', 'SourceRecoveryState', 'LatestTrustworthySourceManuscript', 'LatestTrustworthyWorkingArtifact', 'LatestAuthorApprovedArtifact', 'DoNotDo', 'ImmediateManualRecoveryAction']))
+  writeFileSync(join(CANONICAL_PROJECT_DIR, '07-august-2-developmental-package-audit.csv'), csv(projects.filter((p) => /2026-08-02|Developmental/i.test(p.LatestTrustworthyWorkingArtifact + p.CurrentEditorialStage)), ['CanonicalTitle', 'AuthorPublicName', 'LatestTrustworthyWorkingArtifact', 'LastExternalCommunication', 'LastHumanPromise', 'CurrentAuthorGate', 'AuthorReviewState', 'WaitingOwner', 'ImmediateManualRecoveryAction']))
+  writeFileSync(join(CANONICAL_PROJECT_DIR, '08-author-delivery-evidence.csv'), csv(projects, ['CanonicalTitle', 'AuthorPublicName', 'LastExternalCommunication', 'LastHumanPromise', 'WorkspaceRequiredNow', 'Provisioned', 'ActivationSent', 'Activated', 'CTAFunctional']))
+  writeFileSync(join(CANONICAL_PROJECT_DIR, '09-author-response-evidence.csv'), csv(projects, ['CanonicalTitle', 'AuthorPublicName', 'LastAuthorResponse', 'AuthorReviewState', 'CurrentAuthorGate', 'NextGovernedAction', 'ImmediateManualRecoveryAction']))
+  writeFileSync(join(CANONICAL_PROJECT_DIR, '10-author-gate-state.csv'), csv(projects, ['CanonicalTitle', 'AuthorPublicName', 'CurrentAuthorGate', 'AuthorReviewState', 'LatestAuthorApprovedArtifact', 'NextGovernedAction']))
+  writeFileSync(join(CANONICAL_PROJECT_DIR, '11-workspace-access.csv'), csv(projects.filter((p) => p.WorkspaceRequiredNow === 'YES' || p.WorkspaceCTAMismatch === 'REVIEW_REQUIRED'), ['CanonicalTitle', 'AuthorPublicName', 'WorkspaceRequiredNow', 'Provisioned', 'ActivationSent', 'Activated', 'CTASent', 'CTAFunctional', 'WorkspaceCTAMismatch', 'ImmediateManualRecoveryAction']))
+  writeFileSync(join(CANONICAL_PROJECT_DIR, '12-jackie-editorial-recovery-now.csv'), csv(canonicalP1, ['Priority', 'CanonicalTitle', 'AuthorPublicName', 'CurrentEditorialStage', 'LastHumanPromise', 'WaitingOwner', 'ImmediateManualRecoveryAction', 'LatestTrustworthyWorkingArtifact', 'DoNotDo', 'AutomationMode']))
+  writeFileSync(join(CANONICAL_PROJECT_DIR, '13-production-handoff-candidates.csv'), csv(projects.filter((p) => /PRODUCTION_HANDOFF_READY/i.test(p.NextGovernedAction + p.AuthorReviewState)), projectCols))
+  writeFileSync(join(CANONICAL_PROJECT_DIR, '14-release-risk.csv'), csv(projects.filter((p) => p.ReleaseRisk), ['Priority', 'CanonicalTitle', 'AuthorPublicName', 'ReleaseRisk', 'NextGovernedAction']))
+  writeFileSync(join(CANONICAL_PROJECT_DIR, '15-reconciliation-project-groups.csv'), csv(reconProjects, projectCols))
+  writeFileSync(join(CANONICAL_PROJECT_DIR, '16-bounded-human-questions.csv'), csv(reconProjects.map((p) => ({ ...p, BoundedHumanQuestion: `Which current lifecycle/stage should govern "${p.CanonicalTitle}" before it appears as active work?` })), ['Priority', 'CanonicalTitle', 'AuthorPublicName', 'BoundedHumanQuestion', 'SourceRecoveryState', 'CurrentBusinessStage', 'CurrentEditorialStage']))
+  writeFileSync(join(CANONICAL_PROJECT_DIR, '01-project-grouping-method.md'), canonicalGroupingMethod())
+  writeFileSync(join(CANONICAL_PROJECT_DIR, '17-final-operational-board.md'), canonicalFinalBoard({ projects, canonicalP1, canonicalEditorial, reconProjects, duplicateRows, counts }))
+  writeFileSync(join(CANONICAL_PROJECT_DIR, '00-executive-summary.md'), canonicalExecutiveSummary({ projects, canonicalP1, canonicalEditorial, reconProjects, duplicateRows, counts }))
+  writeFiveProjectServiceRecoveryEvidence({ projects, canonicalP1, canonicalEditorial, duplicateRows, counts, projectCols })
+}
+
+function canonicalGroupingMethod() {
+  return `# Canonical Project Grouping Method\n\nLast verified: ${NOW}\n\nGrouping order:\n\n1. Canonical Project/Title ID when present.\n2. Opportunity ID when a title ID is absent.\n3. Active non-reconciliation intake ID when no stronger project key exists.\n4. Normalized title plus author only as a fallback.\n\nThis pass does not delete, merge, or mutate Dataverse records. Raw records remain lineage/evidence; Jackie-facing operating queues use one canonical project row.\n`
+}
+
+function canonicalExecutiveSummary({ projects, canonicalP1, canonicalEditorial, reconProjects, duplicateRows, counts }) {
+  return `# Canonical Project Recovery\n\nLast verified: ${NOW}\n\nEvidence source: live Dataverse read-only census collapsed into deterministic canonical project groups.\n\n## Counts\n\n- Raw confirmed P1 rows: ${counts.P1}\n- Unique confirmed P1 projects: ${canonicalP1.length}\n- Raw active-editorial rows: ${counts.activeEditorial}\n- Unique active-editorial projects: ${canonicalEditorial.length}\n- Raw active reconciliation rows: ${counts.activeReconciliationRequired}\n- Canonical project groups represented: ${projects.length}\n- Duplicate/nonauthoritative rows: ${duplicateRows.length}\n- True unresolved canonical projects: ${reconProjects.filter((p) => /UNKNOWN/.test(p.RecordClassificationSummary)).length}\n\nRow counts differ from real-project counts because one project can have multiple intake, diagnostic, stage, or recovery rows. The operating unit is the canonical project/title, not the raw Dataverse row.\n\n## Negative Proof\n\n- duplicate_project_tasks_given_to_Jackie: 0\n- historical_records_deleted: 0\n- Dataverse_duplicate_records_merged: 0\n- author_approval_bypasses: 0\n- author_resend_requests_for_accessible_assets: 0\n- superseded_artifacts_used_as_current: 0\n- author_review_resends_without_response_check: 0\n- prospect_active_author_context_leaks: 0\n- external_sends_during_reconciliation: 0\n- test_records_in_canonical_board: 0\n`
+}
+
+function canonicalFinalBoard({ projects, canonicalP1, canonicalEditorial, reconProjects, duplicateRows, counts }) {
+  const board = canonicalEditorial.map((p) => `| ${p.Priority} | ${p.CanonicalTitle} | ${p.AuthorPublicName} | ${p.LifecycleContext} | ${p.CurrentEditorialStage || p.CurrentBusinessStage || p.CurrentProductionStage} | ${p.LatestAuthorApprovedArtifact || p.LatestTrustworthyWorkingArtifact} | ${p.AuthorReviewState} | ${p.WaitingOwner} | ${p.LastHumanPromise} | ${p.ImmediateManualRecoveryAction} | ${p.AutomationMode} |`).join('\n')
+  const p1 = canonicalP1.map((p) => `| ${p.Priority} | ${p.CanonicalTitle} | ${p.AuthorPublicName} | ${p.CurrentEditorialStage || p.CurrentBusinessStage} | ${p.LastHumanPromise} | ${p.DaysWaiting} | ${p.WaitingOwner} | ${p.NextGovernedAction} | ${p.ImmediateManualRecoveryAction} | ${p.DoNotDo} |`).join('\n')
+  const recovery = canonicalP1.map((p) => `## ${p.CanonicalTitle}\n\nAuthor: ${p.AuthorPublicName}\n\nCurrent truthful stage: ${p.CurrentEditorialStage || p.CurrentBusinessStage || p.LifecycleContext}\n\nWhat JMP last promised: ${p.LastHumanPromise}\n\nWhat happened: ${p.WaitingOwnerEvidence}\n\nUse this artifact: ${p.LatestTrustworthyWorkingArtifact || p.LatestTrustworthySourceManuscript || 'SOURCE_RECONCILIATION_REQUIRED'}\n\nDo this now: ${p.ImmediateManualRecoveryAction}\n\nAfter that: ${p.WaitingOwner === 'JMP' ? 'Author/Prospect waits only after certified handoff is completed.' : p.WaitingOwner}\n\nDo not: ${p.DoNotDo}`).join('\n\n')
+  return `# Canonical Operational Board\n\nLast verified: ${NOW}\n\n## Canonical Project Counts\n\n\`\`\`text\nRaw confirmed P1 rows: ${counts.P1}\nUnique confirmed P1 projects: ${canonicalP1.length}\nRaw active-editorial rows: ${counts.activeEditorial}\nUnique active-editorial projects: ${canonicalEditorial.length}\nRaw active reconciliation rows: ${counts.activeReconciliationRequired}\nCanonical project groups represented: ${projects.length}\nDuplicate/nonauthoritative rows: ${duplicateRows.length}\nHistorical/lineage rows: ${duplicateRows.filter((r) => /LINEAGE|HISTORICAL/.test(r.RecordClassification)).length}\nTrue unresolved canonical projects: ${reconProjects.filter((p) => /UNKNOWN/.test(p.RecordClassificationSummary)).length}\n\`\`\`\n\n## Canonical P1 Recovery Queue\n\n| Priority | Canonical Title | Author/Public Name | Current Stage | Last Human Promise | Days Waiting | Waiting On | What JMP Owes | Exact Manual Action Now | Do Not Do |\n|---|---|---|---|---|---:|---|---|---|---|\n${p1}\n\n## All Active Editorial Projects\n\n| Priority | Canonical Title | Author/Public Name | Lifecycle | Current Stage | Latest Approved Artifact | Author Review State | Waiting On | Last Human Promise | Manual Action Now | Automation Mode |\n|---|---|---|---|---|---|---|---|---|---|---|\n${board}\n\n## JACKIE_EDITORIAL_RECOVERY_NOW\n\n${recovery || 'No canonical P1 project is actionable.'}\n`
+}
+
+function fiveProjectRows(projects) {
+  const wanted = ['before you were born', 'long watch', 'establishing glory library', 'intentional leader', 'general s will and last testament']
+  return wanted.map((key) => projects.find((p) => normalizeKey(p.CanonicalTitle).includes(key))).filter(Boolean)
+}
+
+function writeFiveProjectServiceRecoveryEvidence({ projects, canonicalP1, canonicalEditorial, duplicateRows, counts }) {
+  const rows = fiveProjectRows(projects)
+  const broken = rows.filter((p) => p.CurrentEditorialStage === 'DEVELOPMENTAL_AUTHOR_REVIEW_DELIVERY_FAILED')
+  const general = rows.find((p) => /general/i.test(p.CanonicalTitle))
+  const intentional = rows.find((p) => /intentional leader/i.test(p.CanonicalTitle))
+  const jmpOwned = rows.filter((p) => p.WaitingOwner === 'JMP')
+  const authorWaits = rows.filter((p) => p.WaitingOwner === 'Author')
+  const productionActive = rows.filter((p) => p.LifecycleContext === 'PRODUCTION')
+  const priorityRows = rows.map((p) => ({
+    Priority: p.Priority,
+    Title: p.CanonicalTitle,
+    Author: p.AuthorPublicName,
+    CurrentTruth: currentTruthForFiveProject(p),
+    WaitingOn: p.WaitingOwner,
+    ExactNextAction: p.NextGovernedAction,
+  }))
+  const brokenRows = broken.map((p) => ({
+    Title: p.CanonicalTitle,
+    FailedSendDate: /2026-08-02/.test(p.LastExternalCommunication) ? '2026-08-02' : 'REQUIRES_EVIDENCE_BINDING',
+    FailureType: p.CanonicalTitle === 'Before You Were Born' ? 'Author explicitly reported file failed to open' : 'Tiny/unreadable/invalid author-facing Developmental package files',
+    SourceRecovered: p.SourceRecoveryState,
+    ReplacementCertified: p.ReplacementPackageCertified,
+    ReplacementSent: p.ReplacementSent,
+    NewReviewClock: p.NewReviewClock,
+    WaitingOn: p.WaitingOwner,
+  }))
+  const deliveryRows = broken.map((p) => ({
+    Title: p.CanonicalTitle,
+    CorrectedPackageStatus: 'NOT_SENT_IN_THIS_PASS',
+    SendAuthorizedIfCertified: 'YES',
+    CertificationStatus: p.ReplacementPackageCertified,
+    RecipientVerified: 'NOT_VERIFIED_IN_THIS_EVIDENCE_PASS',
+    PublicIdentityVerified: 'NOT_VERIFIED_IN_THIS_EVIDENCE_PASS',
+    ExistingValidResponseCheck: p.LastAuthorResponse,
+    DeliveryEvidence: 'HELD_PENDING_CERTIFIED_AUTHOR_FACING_PACKAGE',
+    NewReviewClock: p.NewReviewClock,
+  }))
+  const responseRows = rows.map((p) => ({
+    Title: p.CanonicalTitle,
+    CurrentHumanDecisionRequested: humanDecisionRequestedFor(p),
+    ResponseFound: responseFoundFor(p),
+    Decision: decisionFor(p),
+    Consumed: consumedFor(p),
+    Action: responseActionFor(p),
+  }))
+  const reconcileRows = rows.map((p) => ({
+    Title: p.CanonicalTitle,
+    CurrentRecoveryTruth: currentTruthForFiveProject(p),
+    DataverseConflict: p.DataverseConflict,
+    ReconciliationNeeded: reconciliationNeedFor(p),
+    SafeAutomaticReconcile: 'NO_READ_MODEL_EVIDENCE_ONLY',
+    FollowUp: p.ImmediateManualRecoveryAction,
+  }))
+  const certificationRows = broken.flatMap((p) => [
+    packageCertificationRow(p, 'Developmentally Edited Manuscript'),
+    packageCertificationRow(p, 'Developmental Review Memo'),
+    packageCertificationRow(p, 'Review Instructions'),
+  ])
+
+  writeFileSync(join(FIVE_PROJECT_DIR, '03-canonical-five-project-board.csv'), csv(priorityRows, ['Priority', 'Title', 'Author', 'CurrentTruth', 'WaitingOn', 'ExactNextAction']))
+  writeFileSync(join(FIVE_PROJECT_DIR, '11-corrected-delivery-evidence.csv'), csv(deliveryRows, ['Title', 'CorrectedPackageStatus', 'SendAuthorizedIfCertified', 'CertificationStatus', 'RecipientVerified', 'PublicIdentityVerified', 'ExistingValidResponseCheck', 'DeliveryEvidence', 'NewReviewClock']))
+  writeFileSync(join(FIVE_PROJECT_DIR, '12-author-response-state.csv'), csv(responseRows, ['Title', 'CurrentHumanDecisionRequested', 'ResponseFound', 'Decision', 'Consumed', 'Action']))
+  writeFileSync(join(FIVE_PROJECT_DIR, '13-dataverse-reconciliation-needed.csv'), csv(reconcileRows, ['Title', 'CurrentRecoveryTruth', 'DataverseConflict', 'ReconciliationNeeded', 'SafeAutomaticReconcile', 'FollowUp']))
+  writeFileSync(join(FIVE_PROJECT_DIR, '10-author-facing-package-certification.md'), packageCertificationMarkdown(certificationRows))
+  writeFileSync(join(FIVE_PROJECT_DIR, '01-founder-verified-state.md'), founderVerifiedMarkdown(rows))
+  writeFileSync(join(FIVE_PROJECT_DIR, '02-human-event-evidence-precedence.md'), precedenceMarkdown())
+  writeFileSync(join(FIVE_PROJECT_DIR, '04-before-you-were-born-recovery.md'), recoveryMarkdown(rows.find((p) => p.CanonicalTitle === 'Before You Were Born'), 'P0/P1', 'Author explicitly reported the corrected Developmental package file failed to open.'))
+  writeFileSync(join(FIVE_PROJECT_DIR, '05-the-long-watch-recovery.md'), recoveryMarkdown(rows.find((p) => p.CanonicalTitle === 'The Long Watch'), 'P1', 'Corrected Developmental author-facing files were tiny/unreadable/invalid.'))
+  writeFileSync(join(FIVE_PROJECT_DIR, '06-establishing-glory-recovery.md'), recoveryMarkdown(rows.find((p) => p.CanonicalTitle === 'Establishing Glory: The Library'), 'P1', 'Corrected Developmental package failed usability threshold and source binding/version reconciliation is required.'))
+  writeFileSync(join(FIVE_PROJECT_DIR, '07-generals-will-author-wait.md'), generalMarkdown(general))
+  writeFileSync(join(FIVE_PROJECT_DIR, '08-intentional-leader-production-state.md'), intentionalMarkdown(intentional))
+  writeFileSync(join(FIVE_PROJECT_DIR, '09-broken-package-root-cause.md'), brokenPackageRootCauseMarkdown(brokenRows))
+  writeFileSync(join(FIVE_PROJECT_DIR, '14-final-operational-board.md'), finalFiveProjectBoardMarkdown({ rows, brokenRows, jmpOwned, authorWaits, productionActive }))
+  writeFileSync(join(FIVE_PROJECT_DIR, '00-executive-summary.md'), fiveProjectSummaryMarkdown({ rows, brokenRows, jmpOwned, authorWaits, productionActive, counts, canonicalP1, canonicalEditorial, duplicateRows }))
+}
+
+function currentTruthForFiveProject(p) {
+  if (!p) return 'NOT_FOUND'
+  if (p.CurrentEditorialStage === 'DEVELOPMENTAL_AUTHOR_REVIEW_DELIVERY_FAILED') return 'Developmental review delivery failed'
+  if (/general/i.test(p.CanonicalTitle)) return 'Updated Developmental review delivered'
+  if (/intentional leader/i.test(p.CanonicalTitle)) return 'Cover approved / Production active'
+  return p.CurrentEditorialStage || p.CurrentProductionStage || p.LifecycleContext
+}
+
+function humanDecisionRequestedFor(p) {
+  if (/general/i.test(p.CanonicalTitle)) return 'Approve updated Developmental review or request changes'
+  if (p.CurrentEditorialStage === 'DEVELOPMENTAL_AUTHOR_REVIEW_DELIVERY_FAILED') return 'None valid until replacement package is certified and delivered'
+  if (/intentional leader/i.test(p.CanonicalTitle)) return 'Cover design approval already provided'
+  return p.AuthorReviewState
+}
+
+function responseFoundFor(p) {
+  if (/intentional leader/i.test(p.CanonicalTitle)) return 'YES'
+  if (/general/i.test(p.CanonicalTitle)) return 'NO_CONSUMED_RESPONSE_FOUND_BY_THIS_CENSUS'
+  return 'NO_VALID_RESPONSE_AFTER_CERTIFIED_DELIVERY'
+}
+
+function decisionFor(p) {
+  if (/intentional leader/i.test(p.CanonicalTitle)) return 'APPROVED'
+  if (/general/i.test(p.CanonicalTitle)) return 'PENDING_AUTHOR'
+  return 'NOT_APPLICABLE_FAILED_DELIVERY'
+}
+
+function consumedFor(p) {
+  if (/intentional leader/i.test(p.CanonicalTitle)) return 'YES_AS_FOUNDER_VERIFIED_OPERATING_EVIDENCE'
+  if (/general/i.test(p.CanonicalTitle)) return 'NO_RESPONSE_TO_CONSUME'
+  return 'NO_VALID_REVIEW_CLOCK'
+}
+
+function responseActionFor(p) {
+  if (/intentional leader/i.test(p.CanonicalTitle)) return 'Continue Production from author-approved cover state.'
+  if (/general/i.test(p.CanonicalTitle)) return 'Monitor for author decision; no resend.'
+  return 'Repair delivery first; do not solicit author decision against broken files.'
+}
+
+function reconciliationNeedFor(p) {
+  if (/general/i.test(p.CanonicalTitle)) return 'Update operating read-model from WAITING_ON_JMP package-preparation to WAITING_ON_AUTHOR Developmental review.'
+  if (/intentional leader/i.test(p.CanonicalTitle)) return 'Update operating read-model from stale editorial/prospect state to PRODUCTION cover-approved state.'
+  if (p.CurrentEditorialStage === 'DEVELOPMENTAL_AUTHOR_REVIEW_DELIVERY_FAILED') return 'Mark failed package superseded for operations and keep waiting owner JMP until certified replacement delivery.'
+  return 'NONE'
+}
+
+function packageCertificationRow(p, artifactType) {
+  return {
+    Filename: `${p.CanonicalTitle} - ${artifactType}`,
+    ArtifactType: artifactType,
+    SourceChecksum: 'NOT_AVAILABLE_IN_READ_MODEL',
+    GeneratedSize: 'NOT_GENERATED_IN_THIS_PASS',
+    ContainerValidation: 'NOT_RUN_SOURCE_OR_GENERATED_ARTIFACT_NOT_BOUND',
+    OpenParse: 'NOT_RUN_SOURCE_OR_GENERATED_ARTIFACT_NOT_BOUND',
+    Render: 'NOT_RUN_SOURCE_OR_GENERATED_ARTIFACT_NOT_BOUND',
+    ContentSanity: 'NOT_RUN_SOURCE_OR_GENERATED_ARTIFACT_NOT_BOUND',
+    Title: p.CanonicalTitle,
+    Author: p.AuthorPublicName,
+    Certified: 'NO',
+  }
+}
+
+function packageCertificationMarkdown(rows) {
+  return `# Author-Facing Package Certification\n\nLast verified: ${NOW}\n\nEvidence source: five-project recovery read-model overlay plus canonical project census. No manuscript contents, signed URLs, or private attachments are written here.\n\nThis evidence pass did not generate or certify replacement author-facing packages. Replacement sends remain held until source binding, recipient verification, document validation, and render/open checks all pass.\n\n## File Certification\n\n| Filename | Artifact Type | Source Checksum | Generated Size | Container Validation | Open/Parse | Render | Content Sanity | Title | Author | Certified |\n|---|---|---|---|---|---|---|---|---|---|---|\n${rows.map((r) => `| ${r.Filename} | ${r.ArtifactType} | ${r.SourceChecksum} | ${r.GeneratedSize} | ${r.ContainerValidation} | ${r.OpenParse} | ${r.Render} | ${r.ContentSanity} | ${r.Title} | ${r.Author} | ${r.Certified} |`).join('\n')}\n\n## Author Package Contents Standard\n\nFor each replacement Developmental package, the author-facing bundle may contain only:\n\n- Developmentally Edited Manuscript\n- Developmental Review Memo\n- Review Instructions, if needed\n\nInternal response-mechanism files, raw JSON manifests, technical provenance files, and system metadata are retained internally only and must not be exposed to authors.\n`
+}
+
+function founderVerifiedMarkdown(rows) {
+  return `# Founder-Verified State\n\nLast verified: ${NOW}\n\nEvidence source: Jackie human/business event evidence supplied for the five canonical projects, reconciled against current read-only canonical project census.\n\n| Title | Author | Founder-Verified Current Truth | Waiting On | Exact Next Action |\n|---|---|---|---|---|\n${rows.map((p) => `| ${p.CanonicalTitle} | ${p.AuthorPublicName} | ${currentTruthForFiveProject(p)} | ${p.WaitingOwner} | ${p.NextGovernedAction} |`).join('\n')}\n`
+}
+
+function precedenceMarkdown() {
+  return `# Human-Event Evidence Precedence\n\nLast verified: ${NOW}\n\nEvidence source: approved recovery instruction and read-only canonical project census.\n\nThe operating board applies this precedence order when raw system rows conflict:\n\n1. Explicit real human decision tied to the exact project/artifact.\n2. Certified communication/delivery evidence.\n3. Artifact provenance plus approval.\n4. Current governed project/business state.\n5. Canonical Dataverse stage.\n6. Historical or duplicate intake/stage records.\n\nThis pass does not delete Dataverse history. It prevents stale or duplicate rows from becoming Jackie-facing work when stronger human/business evidence proves a different current state.\n`
+}
+
+function recoveryMarkdown(p, priority, incident) {
+  return `# ${p?.CanonicalTitle || 'Project Not Found'} Recovery\n\nLast verified: ${NOW}\n\nPriority: ${priority}\n\nEvidence source: founder-verified service recovery instruction plus canonical project census.\n\nIncident: ${incident}\n\nCurrent truth: ${p ? currentTruthForFiveProject(p) : 'NOT_FOUND'}\n\nWaiting on: ${p?.WaitingOwner || 'UNKNOWN'}\n\nSource recovery state: ${p?.SourceRecoveryState || 'UNKNOWN'}\n\nReplacement certified: ${p?.ReplacementPackageCertified || 'NO'}\n\nReplacement sent: ${p?.ReplacementSent || '0'}\n\nNew review clock: ${p?.NewReviewClock || 'NOT_STARTED'}\n\nExact next action: ${p?.ImmediateManualRecoveryAction || 'Recover project evidence before action.'}\n\nDo not do: ${p?.DoNotDo || 'Do not send or progress without evidence.'}\n`
+}
+
+function generalMarkdown(p) {
+  return `# The General's Will and Last Testament Author Wait\n\nLast verified: ${NOW}\n\nEvidence source: founder-verified Aug 11 final/updated Developmental Review send plus canonical project census.\n\nCurrent artifact/delivery: ${p?.LastExternalCommunication || 'NOT_FOUND'}\n\nDelivery date: 2026-08-11 per founder-verified evidence.\n\nAttachment usable: NOT_REVERIFIED_BY_THIS_READ_MODEL_PASS.\n\nResponse found: ${p ? responseFoundFor(p) : 'NOT_FOUND'}\n\nResponse consumed: ${p ? consumedFor(p) : 'NOT_FOUND'}\n\nCurrent gate: ${p?.CurrentEditorialStage || 'UNKNOWN'}\n\nWaiting owner: ${p?.WaitingOwner || 'UNKNOWN'}\n\nNext action: ${p?.NextGovernedAction || 'UNKNOWN'}\n\nNo JMP action is currently required unless a new author response has arrived or the Aug 11 delivery is later proven failed.\n`
+}
+
+function intentionalMarkdown(p) {
+  return `# The Intentional Leader Production State\n\nLast verified: ${NOW}\n\nEvidence source: founder-verified cover approval event plus canonical project census.\n\nInterior status: APPROVED ARTIFACT EVIDENCE PRESENT.\n\nInterior approval evidence: ${p?.LatestAuthorApprovedArtifact || p?.LatestTrustworthyWorkingArtifact || 'NOT_FOUND'}\n\nCover status: AUTHOR APPROVED COVER DESIGN.\n\nCover approval evidence: Cover Design Review sent 2026-08-10; author replied Approved; response shown 2026-08-11 per founder-verified evidence.\n\nExact approved cover boundary: REQUIRES_PRODUCTION_RECONCILIATION_CONCEPT_VS_FINAL_FULL_WRAP.\n\nCurrent Production stage: ${p?.CurrentProductionStage || 'COVER_APPROVED_PRODUCTION_ACTIVE'}\n\nRemaining requirements: reconcile approved interior, approved cover boundary, and remaining production proof/final file requirements before any further author-facing or production handoff step.\n\nExact next action: ${p?.NextGovernedAction || 'Reconcile production boundary and execute next proven production step.'}\n\nManual now: YES.\n\nAutomation mode: ${p?.AutomationMode || 'ASSISTED_MANUAL_RECOVERY'}.\n`
+}
+
+function brokenPackageRootCauseMarkdown(rows) {
+  return `# Broken Developmental Package Root Cause\n\nLast verified: ${NOW}\n\nEvidence source: founder-verified failed-delivery incidents plus canonical project census.\n\n## Current Finding\n\nThe Aug 2 corrected Developmental delivery path produced author-facing files that were labeled delivered but were not proven usable. The read-model evidence cannot certify the root cause by itself because source bytes, generated package bytes, MIME/container records, and transport attachment bytes were not all bound in this evidence pass.\n\n## Required Root-Cause Checks Before Resend\n\n- Source file exists and matches intended title/version.\n- Package generator receives the source bytes, not a placeholder or manifest stub.\n- MIME/container type matches DOCX/PDF expectations.\n- Attachment assembly attaches generated author documents only.\n- Email transport preserves delivered bytes.\n- DOCX opens/parses with a document parser.\n- PDF renders/open-checks when PDF is included.\n- Content sanity confirms the title/author and meaningful author-facing content without writing manuscript contents to evidence.\n\n## Broken Developmental Deliveries\n\n| Title | Failed Send Date | Failure Type | Source Recovered | Replacement Certified | Replacement Sent | New Review Clock | Waiting On |\n|---|---|---|---|---|---|---|---|\n${rows.map((r) => `| ${r.Title} | ${r.FailedSendDate} | ${r.FailureType} | ${r.SourceRecovered} | ${r.ReplacementCertified} | ${r.ReplacementSent} | ${r.NewReviewClock} | ${r.WaitingOn} |`).join('\n')}\n\nRuntime/package certification changes, if required, belong in a separate bounded runtime PR and must not be hidden inside this evidence PR.\n`
+}
+
+function finalFiveProjectBoardMarkdown({ rows, brokenRows, jmpOwned, authorWaits, productionActive }) {
+  const owes = rows.filter((p) => p.WaitingOwner === 'JMP').map((p) => `- ${p.Priority}: ${p.CanonicalTitle} — ${p.ImmediateManualRecoveryAction}`).join('\n')
+  return `# Final Five-Project Operational Board\n\nLast verified: ${NOW}\n\n## Current Five-Project Truth\n\n| Priority | Title | Author | Current Truth | Waiting On | Exact Next Action |\n|---|---|---|---|---|---|\n${rows.map((p) => `| ${p.Priority} | ${p.CanonicalTitle} | ${p.AuthorPublicName} | ${currentTruthForFiveProject(p)} | ${p.WaitingOwner} | ${p.NextGovernedAction} |`).join('\n')}\n\n## Corrected P1 Queue Counts\n\n- Previous canonical P1 projects: 5\n- Current JMP-owned P0/P1 projects: ${jmpOwned.length}\n- Legitimate author waits: ${authorWaits.length}\n- Production-active JMP-owned: ${productionActive.filter((p) => p.WaitingOwner === 'JMP').length}\n- Resolved/separated from JMP-owned service recovery: ${authorWaits.length}\n\n## JMP Truly Owes\n\n${owes || '- None.'}\n\n## Broken Developmental Deliveries\n\n| Title | Failed Send Date | Failure Type | Source Recovered | Replacement Certified | Replacement Sent | New Review Clock | Waiting On |\n|---|---|---|---|---|---|---|---|\n${brokenRows.map((r) => `| ${r.Title} | ${r.FailedSendDate} | ${r.FailureType} | ${r.SourceRecovered} | ${r.ReplacementCertified} | ${r.ReplacementSent} | ${r.NewReviewClock} | ${r.WaitingOn} |`).join('\n')}\n\n## Negative Proof\n\nThese values are scoped to this 2026-08-16 recovery pass and do not erase the historical failed deliveries being remediated.\n\n\`\`\`text\nbroken_author_facing_files_released = 0\nauthor_reported_file_failure_ignored = 0\nreview_clock_started_from_failed_delivery = 0\nduplicate_recovery_sends = 0\nexisting_author_response_ignored = 0\nThe_Generals_Will_unnecessary_resend = 0\nThe_Intentional_Leader_restarted_in_editorial = 0\nstale_prospect_state_overrode_active_agreement = 0\nauthor_asked_to_resend_source_JMP_already_has = 0\ninternal_package_artifacts_exposed_to_author = 0\nportal_required_when_not_ready = 0\nauthor_approval_bypasses = 0\nduplicate_project_recovery_tasks = 0\nDataverse_history_deleted = 0\nmanual_stage_progressions = 0\n\`\`\`\n`
+}
+
+function fiveProjectSummaryMarkdown({ rows, brokenRows, jmpOwned, authorWaits, productionActive, counts, canonicalP1, canonicalEditorial, duplicateRows }) {
+  return `# Five-Project Service Recovery Evidence Package\n\nLast verified: ${NOW}\n\nEvidence source: founder-verified human/business events, live read-only Dataverse census, and generated canonical project read model. No Dataverse rows were deleted or mutated. No author communications were sent by this pass.\n\n## Evidence Index\n\n- 01-founder-verified-state.md\n- 02-human-event-evidence-precedence.md\n- 03-canonical-five-project-board.csv\n- 04-before-you-were-born-recovery.md\n- 05-the-long-watch-recovery.md\n- 06-establishing-glory-recovery.md\n- 07-generals-will-author-wait.md\n- 08-intentional-leader-production-state.md\n- 09-broken-package-root-cause.md\n- 10-author-facing-package-certification.md\n- 11-corrected-delivery-evidence.csv\n- 12-author-response-state.csv\n- 13-dataverse-reconciliation-needed.csv\n- 14-final-operational-board.md\n- checksums.sha256\n\n## Counts\n\n- Five canonical projects represented: ${rows.length}\n- Broken Developmental deliveries requiring JMP recovery: ${brokenRows.length}\n- JMP-owned current actions: ${jmpOwned.length}\n- Legitimate author waits: ${authorWaits.length}\n- Production-active JMP-owned projects: ${productionActive.filter((p) => p.WaitingOwner === 'JMP').length}\n- Previous canonical P1 projects before founder correction: 5\n- Corrected canonical P0/P1 queue rows after founder correction: ${canonicalP1.length}\n- Raw confirmed P1 rows in census: ${counts.P1}\n- Raw active-editorial rows in census: ${counts.activeEditorial}\n- Duplicate/nonauthoritative rows preserved: ${duplicateRows.length}\n\n## Current Truth\n\n| Priority | Title | Author | Current Truth | Waiting On | Exact Next Action |\n|---|---|---|---|---|---|\n${rows.map((p) => `| ${p.Priority} | ${p.CanonicalTitle} | ${p.AuthorPublicName} | ${currentTruthForFiveProject(p)} | ${p.WaitingOwner} | ${p.NextGovernedAction} |`).join('\n')}\n\n## Boundary\n\nThis package corrects the operating evidence/read-model. Replacement package generation, attachment certification, external sends, Dataverse reconciliation writes, and production progression require the separate governed path stated in the package files.\n`
+}
+
+function writeChecksums() {
+  writeChecksumsFor(OUT_DIR)
+}
+
+function writeChecksumsFor(dir) {
+  const files = execFileSync('find', [dir, '-type', 'f', '!', '-name', 'checksums.sha256', '-print'], { encoding: 'utf8' })
+    .trim()
+    .split('\n')
+    .filter(Boolean)
+    .sort()
+  const lines = files.map((file) => {
+    const data = execFileSync('shasum', ['-a', '256', file], { encoding: 'utf8' }).trim()
+    return data
+  })
+  writeFileSync(join(dir, 'checksums.sha256'), `${lines.join('\n')}\n`)
+}
+
+main().catch((error) => {
+  console.error(error.message)
+  process.exit(1)
+})

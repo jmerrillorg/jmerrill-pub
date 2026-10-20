@@ -1,0 +1,3 @@
+title,gateId,trueDeliveryTimestamp,recordedClockBeforeCorrection,correctedClock,clockChangedCount,authorResponseExists,classification
+Before You Were Born,e996abe7-2f8e-f111-8077-000d3a14673b,2026-08-19T03:06:54.452Z,2026-08-19T03:14:19Z (post-test-pollution),2026-08-19T03:06:54Z,4,false,REVIEW_CLOCK_RESET (corrected same session)
+Untitled (synthetic test title),eeffc5fb-5698-f111-8076-000d3a14673b,2026-08-15T20:34:03.870Z,2026-08-15T20:34:03Z,2026-08-15T20:34:03Z (unchanged),1,unknown (synthetic record, not audited further),NO_IMPACT
