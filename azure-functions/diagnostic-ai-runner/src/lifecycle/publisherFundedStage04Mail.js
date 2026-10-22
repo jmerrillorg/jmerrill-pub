@@ -91,6 +91,12 @@ async function nativeGraph(path, deps) {
   return response.json();
 }
 async function pages(mailbox, query, deps) {
+  // Read fresh private administrator evidence; failure never renews prior trust.
+  let attestation;
+  if(deps.containerClient){
+    try { attestation=await require("./internalMailAttestation").load(deps.containerClient); }
+    catch { attestation=null; }
+  }
   let path = `users/${encodeURIComponent(mailbox)}/messages?${new URLSearchParams(query)}`;
   const seen = new Set(), rows = [];
   while (path) {
@@ -98,7 +104,7 @@ async function pages(mailbox, query, deps) {
     seen.add(path);
     const data = await (deps.mailGraph || (p => nativeGraph(p, deps)))(path);
     if (!Array.isArray(data.value)) deny("STAGE04_MAIL_READ_INVALID");
-    rows.push(...data.value.map(message => internalMail.bindCustody(message, mailbox)));
+    rows.push(...data.value.map(message => internalMail.bindCustody(message, mailbox, attestation)));
     const next = data["@odata.nextLink"];
     if (next && !next.startsWith(`https://graph.microsoft.com/v1.0/users/${encodeURIComponent(mailbox)}/messages?`)) deny("STAGE04_MAIL_PAGINATION_DENIED");
     path = next ? next.slice("https://graph.microsoft.com/v1.0/".length) : null;

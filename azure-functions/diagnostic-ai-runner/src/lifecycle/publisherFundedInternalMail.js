@@ -24,12 +24,13 @@ function one(message, name) {
   const values = (message.internetMessageHeaders || []).filter(h => h.name.toLowerCase() === name);
   return values.length === 1 ? values[0].value.trim() : null;
 }
-function bindCustody(message, mailbox) {
-  if (mailbox === POLICY.mailbox) custody.set(message, mailbox);
+function bindCustody(message, mailbox, attestation = POLICY) {
+  if (mailbox === POLICY.mailbox) custody.set(message, { mailbox, policy:attestation });
   return message;
 }
 function authenticate(message, now = Date.now()) {
-  if (custody.get(message) !== POLICY.mailbox || now < Date.parse(POLICY.checkedAt) || now >= Date.parse(POLICY.expiresAt)) return null;
+  const bound=custody.get(message), policy=bound?.policy;
+  if (bound?.mailbox !== POLICY.mailbox || !policy || now < Date.parse(policy.checkedAt) || now >= Date.parse(policy.expiresAt)) return null;
   if (message.from?.emailAddress?.address?.toLowerCase() !== POLICY.author ||
       message.sender?.emailAddress?.address?.toLowerCase() !== POLICY.author ||
       one(message, "x-ms-exchange-organization-authas") !== "Internal" ||
@@ -48,7 +49,7 @@ function authenticate(message, now = Date.now()) {
       !/\bwith mapi\b/i.test(received.at(-1)) ||
       (message.internetMessageHeaders || []).some(h => /^(resent-|x-ms-exchange-crosspremises-)/i.test(h.name) ||
         h.name.toLowerCase() === "authentication-results" && /\b(?:dmarc|dkim|spf)=(?:fail|softfail|permerror|temperror)\b/i.test(h.value))) return null;
-  return { method: "TENANT_VERIFIED_INTERNAL_MAILBOX", policyVersion: POLICY.version,
+  return { method: "TENANT_VERIFIED_INTERNAL_MAILBOX", policyVersion: policy.version,
     mailboxId: POLICY.mailboxId, authorMailboxId: POLICY.authorMailboxId,
     networkMessageId: networkId, headerSha256: digest(JSON.stringify(received)),
     dmarc: "NOT_APPLICABLE_INTERNAL", spf: "NOT_APPLICABLE_INTERNAL", dkim: "NOT_APPLICABLE_INTERNAL" };
