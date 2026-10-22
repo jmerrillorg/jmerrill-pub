@@ -49,3 +49,16 @@ test("custody recovery is bounded to the proven held cause and never repeats its
 test("reconstruction cannot use changed source bytes",async()=>{
  await assert.rejects(()=>owner.reconstructReviewedDocuments({operation:"GLORY_RELATIONSHIP_BRIDGES",inputs:[{itemId:"source",sha256:b.sha("original")}]},{sourceBytes:async()=>Buffer.from("changed")}),/SOURCE_VERSION_CHANGED/);
 });
+test("reviewed Word-save exceptions require exact title, plan, item, name and both hashes",()=>{
+ const rows=require("../config/stage07-reviewed-custody-20261022.json").entries;
+ assert.equal(rows.length,4);
+ for(const row of rows){
+  const artifact={itemId:row.itemId,name:row.name,sha256:row.recordedSha256};
+  const context={titleId:row.titleId,actionVersion:row.actionVersion};
+  assert.equal(owner.reconciledCustody(artifact,row.currentSha256,context),row);
+  for(const patch of [{itemId:"other"},{name:"other.docx"},{sha256:"changed"}])assert.equal(owner.reconciledCustody({...artifact,...patch},row.currentSha256,context),undefined);
+  for(const patch of [{titleId:"other"},{actionVersion:"other"}])assert.equal(owner.reconciledCustody(artifact,row.currentSha256,{...context,...patch}),undefined);
+  assert.equal(owner.reconciledCustody(artifact,"unknown-new-version",context),undefined);
+  assert.equal(owner.reconciledCustody(artifact,row.currentSha256),undefined);
+ }
+});
