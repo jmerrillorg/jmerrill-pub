@@ -1,7 +1,7 @@
 "use strict";
 // Administrator-owned readback/renewal. No role, connector, rule or mailbox mutation.
 const cp=require("node:child_process"),fs=require("node:fs"),path=require("node:path"),{createHash}=require("node:crypto");
-const runtime=path.resolve(__dirname,"../azure-functions/diagnostic-ai-runner");
+const runtime=path.resolve(__dirname,"..");
 const policy=require(runtime+"/src/lifecycle/internalMailAttestation");
 const sha=x=>createHash("sha256").update(JSON.stringify(x)).digest("hex");
 async function main(){

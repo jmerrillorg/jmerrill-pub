@@ -15,7 +15,7 @@ External authentication and outbound receipt/delivery reads remain separate.
 An already-authorized Exchange administrator runs:
 
 ```sh
-node scripts/refresh-publishing-internal-mail-attestation.cjs --publish --evidence=<existing-governed-evidence-directory>/<unique-name>.json
+node azure-functions/diagnostic-ai-runner/scripts/refresh-publishing-internal-mail-attestation.cjs --publish --evidence=<existing-governed-evidence-directory>/<unique-name>.json
 ```
 
 The command uses the existing Azure administrator session and Exchange InvokeCommand
