@@ -2,7 +2,10 @@
 const b=require("./newSubmissionStage03Budget"),mail=require("./publisherFundedStage04Mail");
 const pins=require("../../config/stage07-october20-decisions.json"),actions=require("./stage07EditorialActions");
 const ROOT="editorial-actions/stage07/author-decisions";
-const REPAIR_VERSION="EXACT_REVIEWED_CONTENT_CUSTODY_V2";
+const REPAIR_VERSION="EXACT_REVIEWED_CONTENT_CUSTODY_V3";
+function reconciledCustody(artifact,currentSha256,context,rows=require("../../config/stage07-reviewed-custody-20261022.json").entries){
+ return rows.find(x=>x.titleId===context?.titleId&&x.actionVersion===context?.actionVersion&&x.itemId===artifact.itemId&&x.name===artifact.name&&x.recordedSha256===artifact.sha256&&x.currentSha256===currentSha256);
+}
 async function reconstructReviewedDocuments(plan,deps){
  const docs=require("../editorial/approvedManuscriptActions"),outputs=new Map();
  if(plan.operation==="LONG_WATCH_APPROVED_PLACEMENTS"){
@@ -19,15 +22,17 @@ async function reconstructReviewedDocuments(plan,deps){
  }
  return outputs;
 }
-async function verifyReviewedArtifact(artifact,bytes,reconstructed){
+async function verifyReviewedArtifact(artifact,bytes,reconstructed,context){
  if(b.sha(bytes)===artifact.sha256)return {method:"EXACT_RECORDED_BYTES",recordedSha256:artifact.sha256,currentSha256:b.sha(bytes)};
+ const reconciliation=reconciledCustody(artifact,b.sha(bytes),context);
+ if(reconciliation)return {method:"EXACT_VERSION_REVIEWED_WORD_SAVE",recordedSha256:artifact.sha256,currentSha256:b.sha(bytes),reconciliation};
  if(!artifact.name.endsWith(".docx")||!Buffer.isBuffer(reconstructed))b.deny("EDITORIAL_DECISION_ARTIFACT_CHANGED");
  // Reconstruction is pure and bound to the original pinned plan and exact source
  // hashes. Only the existing narrow SharePoint metadata variance is permitted.
  const custody=await require("../editorial/sharePointDocumentCustody").verify(reconstructed,bytes);
  return {...custody,recordedSha256:artifact.sha256,currentSha256:b.sha(bytes),reconstruction:"PINNED_PLAN_EXACT_SOURCE_BYTES"};
 }
-function recoverHeld(state){return state.causeCode==="EDITORIAL_DECISION_ARTIFACT_CHANGED"&&state.repairRecovery?.version!==REPAIR_VERSION;}
+function recoverHeld(state){return ["EDITORIAL_DECISION_ARTIFACT_CHANGED","EDITORIAL_OUTPUT_CUSTODY_CONFLICT"].includes(state.causeCode)&&state.repairRecovery?.version!==REPAIR_VERSION;}
 const escape=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 function validate(pin,review,message,classification,binding){
  const auth=mail.authentication(message);
@@ -59,7 +64,7 @@ async function execute(pin,review,message,deps){
   if(!artifact.itemId||!artifact.sha256)b.deny("EDITORIAL_DECISION_ARTIFACT_IDENTITY_MISSING");
   const bytes=await deps.sourceBytes({itemId:artifact.itemId});
   if(b.sha(bytes)!==artifact.sha256&&!reconstructed)reconstructed=await reconstructReviewedDocuments(plan.value,deps);
-  const custody=await verifyReviewedArtifact(artifact,bytes,reconstructed?.get(artifact.name));
+  const custody=await verifyReviewedArtifact(artifact,bytes,reconstructed?.get(artifact.name),{titleId:pin.titleId,actionVersion:pin.priorActionVersion});
   verified.push({itemId:artifact.itemId,sha256:b.sha(bytes),recordedSha256:artifact.sha256,name:artifact.name,webUrl:artifact.webUrl,custody});
  }
  const outputPlan={titleId:pin.titleId,actionVersion:`AUTHOR-DECISION-20261020-${pin.replyKey.slice(0,12)}`},artifacts=[];
@@ -103,4 +108,4 @@ async function run(review,message,classification,binding,deps){
    reference:()=>`${ROOT}/${pin.titleId}/${pin.replyKey}/result.json`,completionEffects:()=>({stageCompletionApproved:false,nextStageAuthorized:false,paidCalls:0})});
  return {status:state.status,execution:state,stageCompletionApproved:false,nextStageAuthorized:false};
 }
-module.exports={ROOT,validate,execute,run,reconstructReviewedDocuments,verifyReviewedArtifact,recoverHeld,REPAIR_VERSION};
+module.exports={ROOT,validate,execute,run,reconstructReviewedDocuments,verifyReviewedArtifact,reconciledCustody,recoverHeld,REPAIR_VERSION};
