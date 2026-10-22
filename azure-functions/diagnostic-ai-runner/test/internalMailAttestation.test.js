@@ -27,5 +27,5 @@ test("fresh policy is still insufficient without native custody and full interna
 });
 test("private store rejects public access and malformed or missing evidence",async()=>{
  await assert.rejects(()=>owner.load({getProperties:async()=>({blobPublicAccess:"blob"})}),/NOT_PRIVATE/);
- assert.equal(await owner.load({getProperties:async()=>({}),getBlockBlobClient:()=>({getProperties:async()=>{throw {statusCode:404};}})}),null);
+ assert.equal(await owner.load({getProperties:async()=>({}),getBlockBlobClient:()=>({getProperties:async()=>{throw {statusCode:404};}})},null),null);
 });

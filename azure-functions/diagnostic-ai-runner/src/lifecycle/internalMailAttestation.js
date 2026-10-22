@@ -43,7 +43,7 @@ function validate(record, now = Date.now()) {
   return Object.freeze({...identity, checkedAt:record.checkedAt, expiresAt:record.expiresAt,
     version:`JMP-INTERNAL-MAIL-${createHash("sha256").update(JSON.stringify(record)).digest("hex")}`});
 }
-async function load(containerClient) {
+async function load(containerClient, bootstrap=require("../../config/internal-mail-attestation-bootstrap.json")) {
   if (!containerClient) return null;
   if ((await containerClient.getProperties()).blobPublicAccess) throw Error("INTERNAL_MAIL_ATTESTATION_STORAGE_NOT_PRIVATE");
   const blob=containerClient.getBlockBlobClient(PATH);
@@ -51,6 +51,11 @@ async function load(containerClient) {
     const props=await blob.getProperties();
     if (props.contentLength > 65536) throw Error("INTERNAL_MAIL_ATTESTATION_SIZE_INVALID");
     return validate(JSON.parse((await blob.downloadToBuffer(0,undefined,{conditions:{ifMatch:props.etag}})).toString()));
-  } catch(e) { if(e.statusCode===404)return null; throw e; }
+  } catch(e) {
+    // A reviewed release can carry a bounded fresh readback. Never substitute it
+    // for a present-but-expired/conflicting feed or a permission/storage failure.
+    if(e.statusCode===404)return bootstrap ? validate(bootstrap) : null;
+    throw e;
+  }
 }
 module.exports={PATH,MAX_AGE_MS,identity,validate,load};

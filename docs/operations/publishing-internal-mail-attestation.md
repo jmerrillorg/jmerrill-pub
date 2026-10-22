@@ -37,6 +37,15 @@ renewal facility must be separately identified before unattended renewal can be
 called commissioned. Until then the expiry is a real operating limit, not a date
 to extend by editing configuration.
 
+The October 22 Azure administrator could perform Exchange reads, but its direct
+storage write returned AuthorizationPermissionMismatch (403). No credential swap
+or grant bypass was used. The protected source release carries that fresh readback
+as a bounded bootstrap, using the existing reviewed-release authority. It is used
+only when the feed is absent, never for a present invalid feed or storage denial.
+Its original 24-hour deadline is unchanged. This permits bounded recovery but does
+not commission unattended renewal. The unresolved feed-publisher access must be
+addressed explicitly before claiming continuing renewal.
+
 ## Recovery and Rollback
 
 Invalid, expired, unavailable or public evidence fails internal validation closed.
