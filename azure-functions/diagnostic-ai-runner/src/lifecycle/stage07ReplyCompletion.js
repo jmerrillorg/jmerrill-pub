@@ -41,7 +41,12 @@ async function complete(review,message,classification,custody,base,deps){
  const plan=await b.read(deps.containerClient,`${base}/reviewed-replies/${key}.json`);
  const p=plan.value;
  if(b.sha(plan.bytes)!==pin.sha256||p.titleId!==review.titleId||p.version!==review.version||p.internetMessageId!==message.internetMessageId||p.authoredTextSha256!==b.sha(message.uniqueBody?.content||"")||p.stageCompletionApproved!==false||p.nextStageAuthorized!==false||!p.authority||!p.followupBody||JSON.stringify(p.attachments.map(x=>x.sha256).sort())!==JSON.stringify(custody.attachments.map(x=>x.sha256).sort()))b.deny("CONSULTATION_REVIEWED_DIRECTION_CONFLICT");
- await b.immutable(deps.containerClient,`${base}/recorded-directions/${key}.json`,{...p,authentication:mail.authentication(message),attachmentReceipt:custody});
+ const directionPath=`${base}/recorded-directions/${key}.json`;
+ const existing=await b.optional(deps.containerClient,directionPath);
+ if(existing){
+  const {authentication,attachmentReceipt,...original}=existing.value;
+  if(JSON.stringify(original)!==JSON.stringify(p)||JSON.stringify(attachmentReceipt)!==JSON.stringify(custody))b.deny("CONSULTATION_RECORDED_DIRECTION_CONFLICT");
+ }else await b.immutable(deps.containerClient,directionPath,{...p,authentication:mail.authentication(message),attachmentReceipt:custody});
  const payload={messageType:"APPROVED_AUTHOR_RESPONSE",diagnosticId:review.titleId,intakeReferenceCode:review.intakeReference,
  authorEmail:mail.AUTHOR,authorName:"Jackie Smith, Jr.",projectTitle:review.title,subject:`Re: ${review.subject}`,
  body:p.followupBody,templateName:"STAGE07_AUTHOR_DIRECTION_RECEIPT_V1",templateVersion:key,

@@ -166,6 +166,8 @@ async function reconcile(review,deps) {
           completion=await owner.complete(review,message,result,custody,base,deps);
           const editorial=await require("./stage07EditorialActions").run(review,message,result,deps);
           if(editorial.status!=="NO_REVIEWED_EXECUTABLE_ACTION")completion={...completion,editorial};
+          const decision=await require("./stage07DecisionRecovery").run(review,message,result,matched[0],deps);
+          if(decision)completion={...completion,editorial:decision};
           if(completion.direction)await preserve("author-direction",completion.direction);
           if(completion.send)await preserve("followup",completion.send);
         }

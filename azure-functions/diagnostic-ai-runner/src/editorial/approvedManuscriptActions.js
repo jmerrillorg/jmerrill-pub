@@ -166,4 +166,20 @@ async function relationshipBridges(bytes,plan){
  zip.file("word/document.xml",serialize(doc),{date:new Date("2026-10-19T00:00:00Z")});
  return {bytes:await zip.generateAsync({type:"nodebuffer",compression:"DEFLATE"}),qa:{originalNodesPreserved:original.length,addedParagraphs:added.size,sourceOrderingPreserved:true,unsplit:true,unresolvedEditorialResultsPreserved:true,stageCompletionApproved:false,nextStageAuthorized:false}};
 }
-module.exports={applyLongWatch,annualQa,intentionalSamples,passageProposals,relationshipBridges,open,inventory,entries,text,readingText};
+async function approvedProposals(manuscript,companion,plan){
+ await passageProposals(manuscript,companion,plan);
+ const {zip,doc,body}=await open(manuscript),serialize=n=>new XMLSerializer().serializeToString(n);
+ const original=Array.from(body.childNodes),before=original.map(serialize),added=new Set();
+ for(const proposal of plan.proposals){
+  const anchors=original.filter(x=>x.nodeType===1&&x.localName==="p"&&readingText(x)===proposal.anchor);
+  if(anchors.length!==1)deny("EDITORIAL_APPROVED_INSERTION_ANCHOR_CHANGED");
+  const p=doc.createElementNS(W,"w:p"),r=doc.createElementNS(W,"w:r"),t=doc.createElementNS(W,"w:t");
+  t.setAttribute("xml:space","preserve");t.textContent=proposal.draft;r.appendChild(t);p.appendChild(r);
+  body.insertBefore(p,anchors[0].nextSibling);added.add(p);
+ }
+ if(JSON.stringify(Array.from(body.childNodes).filter(x=>!added.has(x)).map(serialize))!==JSON.stringify(before))deny("EDITORIAL_APPROVED_INSERTION_SOURCE_CHANGED");
+ zip.file("word/document.xml",serialize(doc),{date:new Date("2026-10-22T00:00:00Z")});
+ return {bytes:await zip.generateAsync({type:"nodebuffer",compression:"DEFLATE"}),qa:{originalNodesPreserved:original.length,
+  approvedParagraphsInserted:3,originalOrderPreserved:true,sourceExcerptsVerified:true,stageCompletionApproved:false,nextStageAuthorized:false}};
+}
+module.exports={applyLongWatch,annualQa,intentionalSamples,passageProposals,relationshipBridges,approvedProposals,open,inventory,entries,text,readingText};
