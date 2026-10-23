@@ -52,3 +52,7 @@ test("omitted attestation never binds embedded historical trust",()=>{
  const message={};mail.bindCustody(message,owner.identity.mailbox);
  assert.equal(mail.authenticate(message,Date.parse(mail.POLICY.checkedAt)),null);
 });
+test("native feed is pinned to approved account and private container with token credential",()=>{
+ const container=owner.nativeContainer({getToken:async()=>{throw Error("No network in test");}});
+ assert.equal(container.url,"https://stjm1diagrunner.blob.core.windows.net/jm1-publishing-stage-runtime");
+});

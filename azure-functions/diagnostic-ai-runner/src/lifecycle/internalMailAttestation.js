@@ -56,4 +56,8 @@ async function load(containerClient) {
     throw e;
   }
 }
-module.exports={PATH,MAX_AGE_MS,identity,validate,load};
+function nativeContainer(credential = new (require("@azure/identity").ManagedIdentityCredential)()) {
+  return new (require("@azure/storage-blob").BlobServiceClient)("https://stjm1diagrunner.blob.core.windows.net", credential)
+    .getContainerClient("jm1-publishing-stage-runtime");
+}
+module.exports={PATH,MAX_AGE_MS,identity,validate,load,nativeContainer};

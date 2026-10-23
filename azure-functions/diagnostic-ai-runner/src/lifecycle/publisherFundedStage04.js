@@ -123,11 +123,11 @@ async function reconcile(bundle, deps) {
     const priorResponse = (await b.optional(container, `${bundle.prefix}/response.json`))?.value;
     const priorSource = priorResponse?.sourceReference && (await b.optional(container, priorResponse.sourceReference))?.value;
     if (priorSource?.authentication?.method === "TENANT_VERIFIED_INTERNAL_MAILBOX") {
-      try { await require("./internalMailAttestation").load(container); }
+      try { await require("./internalMailAttestation").load(deps.attestationContainer || container); }
       catch { return { ...(await readback(bundle, deps)), authenticationReviewRequired: "ACTIVE_INTERNAL_MAIL_ATTESTATION_UNAVAILABLE" }; }
     }
     if (prior?.status === "HELD") {
-      const policy = await require("./internalMailAttestation").load(container);
+      const policy = await require("./internalMailAttestation").load(deps.attestationContainer || container);
       const recoveryReference = `${bundle.prefix}/recoveries/${policy.version}.json`;
       if (prior.code !== "STAGE04_MAIL_READ_FAILED" || prior.providerStatus !== 403 ||
           prior.providerCode !== "ErrorAccessDenied" || prior.mailReadScope !== "AUTHOR" ||
