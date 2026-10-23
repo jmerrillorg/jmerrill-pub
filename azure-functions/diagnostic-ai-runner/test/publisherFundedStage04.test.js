@@ -5,10 +5,14 @@ const stage = require("../src/lifecycle/publisherFundedStage04"), mail = require
 const policy = require("../src/lifecycle/publisherFundedPolicy"), offers = require("../src/lifecycle/publisherFundedOffer");
 const internal = require("../src/lifecycle/jackieInternalTitlePolicy"), b = require("../src/lifecycle/newSubmissionStage03Budget");
 const fresh = require("../src/lifecycle/freshTitleIntake");
+const attestation = require("../src/lifecycle/internalMailAttestation");
+const trustFixture = require("../config/internal-mail-attestation-bootstrap.json");
+const trustPolicy = attestation.validate(trustFixture, Date.parse(trustFixture.checkedAt));
 function fixture() {
   const blobs = new Map(), files = new Map(), versions = new Map(), leases = new Set();
   const baseBytes = fs.readFileSync(path.resolve(__dirname, "../../../Implementation HQ/01_GOVERNANCE/Agreement Templates/JMP_Publishing_Agreement_v1.3.1.docx"));
   const put = (ref, value) => { blobs.set(ref, Buffer.isBuffer(value) ? value : Buffer.from(JSON.stringify(value))); versions.set(ref, (versions.get(ref) || 0) + 1); };
+  put(attestation.PATH, trustFixture);
   const acceptance = { actorContactId: internal.CONTACT, actorCapacity: "PUBLISHER_ONLY", packetSha256: "dfccdea117f0c126f7c5e5008e1eafcb40e614e526f6726a3c2a0b787495c202",
     reference: "publisher-acceptance", authorElection: "NOT_CAPTURED", stage05: "NOT_STARTED", gloryScope: "FOCUSED_DEVELOPMENTAL",
     gloryPresentation: "UNRESOLVED_NO_SPLIT_AUTHORIZED", intentionalComponents: "SEPARATE", chadAndMe: "NO_INVENTION", titles: [] };
@@ -91,11 +95,11 @@ function internalReply(x) {
   return m;
 }
 test("internal path requires native custody, bounded tenant policy and intact mailbox-origin chain", async t => {
-  const trust = require("../src/lifecycle/publisherFundedInternalMail");
+  const trust = { POLICY: trustPolicy };
   t.mock.timers.enable({ apis: ["Date"], now: Date.parse(trust.POLICY.checkedAt) + 1000 });
   const x = fixture(), bundle = await stage.load(x.titleId, x.deps), m = internalReply(x);
   assert.equal(mail.classify(m, bundle.offer, x.delivered).decision, null);
-  const read = async row => (await mail.replies(x.delivered, { mailGraph: async () => ({ value: [row] }) }))[0];
+  const read = async row => (await mail.replies(x.delivered, { containerClient: x.deps.containerClient, mailGraph: async () => ({ value: [row] }) }))[0];
   assert.equal(mail.classify(await read(m), bundle.offer, x.delivered).decision, "ACCEPT");
   assert.equal(mail.authentication(m).dmarc, "NOT_APPLICABLE_INTERNAL");
   for (const mutate of [
@@ -116,7 +120,7 @@ test("internal path requires native custody, bounded tenant policy and intact ma
   assert.equal(mail.classify(m, bundle.offer, x.delivered).decision, null);
 });
 test("resolved exact-author access hold recovers once with durable proof and no resend", async t => {
-  const trust = require("../src/lifecycle/publisherFundedInternalMail");
+  const trust = { POLICY: trustPolicy };
   t.mock.timers.enable({ apis: ["Date"], now: Date.parse(trust.POLICY.checkedAt) + 1000 });
   const x = fixture();
   await stage.handler({ titleId: x.titleId, mode: "SUBMISSION_04_SEND" }, x.deps);
@@ -125,7 +129,7 @@ test("resolved exact-author access hold recovers once with durable proof and no 
   x.put(`${bundle.prefix}/monitor.json`, { status: "HELD", failures: 5, code: "STAGE04_MAIL_READ_FAILED",
     providerStatus: 403, providerCode: "ErrorAccessDenied", mailReadScope: "AUTHOR" });
   x.deps.verifyDelivery = async () => ({ ...x.delivered, replyAuthentication: { method: "TENANT_VERIFIED_INTERNAL_MAILBOX" }, replyInternetMessageId: "<reply@jmerrill.one>" });
-  x.deps.readReplies = async () => mail.replies(x.delivered, { mailGraph: async () => ({ value: [internalReply(x)] }) });
+  x.deps.readReplies = async () => mail.replies(x.delivered, { containerClient: x.deps.containerClient, mailGraph: async () => ({ value: [internalReply(x)] }) });
   const sends = x.counts.sends;
   const result = await stage.reconcile(bundle, x.deps);
   assert.equal(result.response.decision, "ACCEPT");
@@ -137,10 +141,16 @@ test("resolved exact-author access hold recovers once with durable proof and no 
   assert.equal((await stage.reconcile(bundle, x.deps)).response.decision, "ACCEPT");
   assert.equal((await stage.reconcile(bundle, x.deps)).response.decision, "ACCEPT");
   assert.equal(x.counts.sends, sends);
+  const captured = Buffer.from(x.blobs.get(`${bundle.prefix}/responses/${b.sha("<reply@jmerrill.one>")}.json`));
+  const renewed = structuredClone(trustFixture);
+  renewed.checkedAt = new Date(Date.parse(renewed.checkedAt) + 500).toISOString();
+  x.put(attestation.PATH, renewed);
+  assert.equal((await stage.reconcile(bundle, x.deps)).response.decision, "ACCEPT");
+  assert.deepEqual(x.blobs.get(`${bundle.prefix}/responses/${b.sha("<reply@jmerrill.one>")}.json`), captured);
   t.mock.timers.setTime(Date.parse(trust.POLICY.expiresAt));
   const replay = await stage.reconcile(bundle, x.deps);
   assert.equal(replay.response.decision, "ACCEPT");
-  assert.equal(replay.authenticationReviewRequired, "INTERNAL_MAIL_POLICY_EXPIRED");
+  assert.equal(replay.response.decision, "ACCEPT", "expiry never invalidates a captured decision");
   assert.equal(x.counts.sends, sends);
 });
 test("readable attachments preserve exact terms, title binding and deterministic replay", async () => {

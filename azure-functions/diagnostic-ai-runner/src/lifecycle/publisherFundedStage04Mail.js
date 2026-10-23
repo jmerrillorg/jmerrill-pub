@@ -92,7 +92,7 @@ async function nativeGraph(path, deps) {
 }
 async function pages(mailbox, query, deps) {
   // Read fresh private administrator evidence; failure never renews prior trust.
-  let attestation;
+  let attestation = null;
   if(deps.containerClient){
     try { attestation=await require("./internalMailAttestation").load(deps.containerClient); }
     catch { attestation=null; }
