@@ -12,6 +12,14 @@ External authentication and outbound receipt/delivery reads remain separate.
 
 ## Supported Renewal
 
+Future history records belong in the private
+`jm1-publishing-internal-mail-history` container at
+`attestations/YYYY-MM-DD/<sha256>.json`. The producer uses create-if-absent,
+verifies the stored bytes even on an identical replay, then compare-and-swaps
+the unchanged active feed at the path above. The active schema and consumer contract do not change. The
+container legal hold protects retained objects; this is not described as an
+immutable-retention policy. Existing history is not migrated.
+
 An already-authorized Exchange administrator runs:
 
 ```sh
@@ -23,19 +31,25 @@ read operations: Get-InboundConnector, Get-TransportRule, Get-Mailbox for the tw
 specified identities, Test-ApplicationAccessPolicy and
 Test-ServicePrincipalAuthorization for those mailboxes.
 It rejects incomplete results, identity drift, unexpected connectors/rules and
-scope drift. It writes immutable history before compare-and-swap replacement of
-the active feed, then independently reads it back. It never grants permissions,
-changes mailbox configuration, sends mail or invokes the worker. No credentials
-are stored in the feed or printed.
+scope drift. It writes create-only history before compare-and-swap replacement
+of the active feed, then independently reads it back. It refuses to replace an
+equal-or-newer active record and retries transient storage failures a bounded
+number of times. It never grants permissions, changes mailbox configuration,
+sends mail or invokes the worker. No credentials are stored in the feed or
+printed.
 
 The feed's scoped RBAC evidence is not a claim that separately assigned Entra
 permissions are absent or restricted. Mailbox permission expansion is prohibited.
 Renewal requires existing administrator and private storage access. The Function's
-Mail.Read grant alone is not Exchange configuration-reader authority. This change
-does not add Exchange.ManageAsApp or install a scheduler. An administrator-owned
-renewal facility must be separately identified before unattended renewal can be
-called commissioned. Until then the expiry is a real operating limit, not a date
-to extend by editing configuration.
+Mail.Read grant alone is not Exchange configuration-reader authority. The
+administrator identity currently has no effective role assignment on the new
+history container; the prepared publisher therefore fails closed at storage
+authorization until an approved publication path exists. Do not fall back to the
+old history location. The Automation identity owns the approved protected-history
+write grant. This change does not add Exchange.ManageAsApp or install a scheduler.
+Until the unattended producer and its Exchange authority pass natural acceptance,
+the expiry remains a real operating limit, not a date to extend by editing
+configuration.
 
 The October 22 Azure administrator could perform Exchange reads, but its direct
 storage write returned AuthorizationPermissionMismatch (403). No credential swap

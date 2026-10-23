@@ -3,6 +3,7 @@
 const cp=require("node:child_process"),fs=require("node:fs"),path=require("node:path"),{createHash}=require("node:crypto");
 const runtime=path.resolve(__dirname,"..");
 const policy=require(runtime+"/src/lifecycle/internalMailAttestation");
+const {HISTORY_CONTAINER,publishInternalMailAttestation}=require(runtime+"/src/lifecycle/publishInternalMailAttestation");
 const sha=x=>createHash("sha256").update(JSON.stringify(x)).digest("hex");
 async function main(){
  const args=process.argv.slice(2),publish=args.includes("--publish"),dest=args.find(x=>x.startsWith("--evidence="))?.slice(11);
@@ -43,15 +44,12 @@ async function main(){
  if(publish){
   const {BlobServiceClient}=require(runtime+"/node_modules/@azure/storage-blob");
   const {AzureCliCredential}=require(runtime+"/node_modules/@azure/identity");
-  const container=new BlobServiceClient("https://stjm1diagrunner.blob.core.windows.net",new AzureCliCredential()).getContainerClient("jm1-publishing-stage-runtime");
-  if((await container.getProperties()).blobPublicAccess)throw Error("PRIVATE_STORAGE_REQUIRED");
-  const bytes=Buffer.from(JSON.stringify(record)),archive=container.getBlockBlobClient(`security/internal-mail/history/${sha(record)}.json`);
-  try{await archive.uploadData(bytes,{conditions:{ifNoneMatch:"*"}});}catch(e){if(e.statusCode!==412)throw e;}
-  if(sha(JSON.parse((await archive.downloadToBuffer()).toString()))!==sha(record))throw Error("ATTESTATION_ARCHIVE_CONFLICT");
-  const active=container.getBlockBlobClient(policy.PATH);let etag;
-  try{etag=(await active.getProperties()).etag;}catch(e){if(e.statusCode!==404)throw e;}
-  await active.uploadData(bytes,{conditions:etag?{ifMatch:etag}:{ifNoneMatch:"*"}});
-  if((await policy.load(container)).version!==policy.validate(record).version)throw Error("ATTESTATION_READBACK_CONFLICT");
+  const service=new BlobServiceClient("https://stjm1diagrunner.blob.core.windows.net",new AzureCliCredential());
+  const activeContainer=service.getContainerClient("jm1-publishing-stage-runtime");
+  const historyContainer=service.getContainerClient(HISTORY_CONTAINER);
+  if((await activeContainer.getProperties()).blobPublicAccess||(await historyContainer.getProperties()).blobPublicAccess)throw Error("PRIVATE_STORAGE_REQUIRED");
+  const result=await publishInternalMailAttestation(record,{historyContainer,activeContainer});
+  if((await policy.load(activeContainer)).version!==result.policy.version)throw Error("ATTESTATION_READBACK_CONFLICT");
  }
  console.log(JSON.stringify({status:publish?"FRESH_ADMIN_ATTESTATION_PUBLISHED":"FRESH_ADMIN_ATTESTATION_VALIDATED",checkedAt,expiresAt:record.expiresAt,sha256:sha(record),evidence:dest||null,permissionsChanged:false}));
 }
