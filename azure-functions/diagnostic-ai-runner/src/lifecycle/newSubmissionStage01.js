@@ -73,7 +73,8 @@ async function native(deps) {
     if (!r.ok) throw Object.assign(new Error("COMMISSIONING_SUBMISSION_RECIPIENT_READBACK_FAILED"), { safeCode: "COMMISSIONING_SUBMISSION_RECIPIENT_READBACK_FAILED", statusCode: r.status });
     return r.json();
   };
-  return { ...context, request, recipientReadback };
+  return { ...context, request, recipientReadback,
+    attestationContainer: require("./internalMailAttestation").nativeContainer(credential) };
 }
 async function inventory(deps) {
   let path = `${TABLE}?$select=${COLUMNS}`;

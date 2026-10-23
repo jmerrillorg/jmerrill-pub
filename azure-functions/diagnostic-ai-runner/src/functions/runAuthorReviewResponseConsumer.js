@@ -15,9 +15,9 @@ app.timer("run-author-review-response-consumer", {
     // Validate the active private feed even when no new reply is available.
     // Failure holds this invocation, without substituting bundled evidence.
     try {
-      const deps = await require("../lifecycle/newSubmissionStage01").native({});
-      const policy = await require("../lifecycle/internalMailAttestation").load(deps.containerClient);
-      context.info(`Internal mail attestation consumed; result=VALID; version=${policy.version}; expiresAt=${policy.expiresAt}`);
+      const feed = require("../lifecycle/internalMailAttestation");
+      const policy = await feed.load(feed.nativeContainer());
+      context.info(`Internal mail attestation consumed; result=VALID; credential=FUNCTION_MANAGED_IDENTITY; version=${policy.version}; expiresAt=${policy.expiresAt}`);
     } catch (error) {
       const code = /^INTERNAL_MAIL_ATTESTATION_[A-Z_]+$/.test(error.message || "")
         ? error.message : "INTERNAL_MAIL_ATTESTATION_STORAGE_OR_FORMAT_UNAVAILABLE";

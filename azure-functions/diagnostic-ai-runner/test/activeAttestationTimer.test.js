@@ -7,7 +7,7 @@ test("scheduled consumer validates active feed before business owners and signal
  vm.runInNewContext(source,{module:{exports:{}},process:{env:{}},require:name=>{
   if(name==="@azure/functions")return {app:{timer:(_n,x)=>{timer=x.handler;},http:()=>{}}};
   if(name.endsWith("newSubmissionStage01"))return {native:async()=>({containerClient:{private:true}})};
-  if(name.endsWith("internalMailAttestation"))return {load:async c=>{assert.equal(c.private,true);loads++;if(failure)throw Error("INTERNAL_MAIL_ATTESTATION_EXPIRED_OR_INVALID");return {version:"JMP-INTERNAL-MAIL-fixture",expiresAt:"2026-10-24T02:43:10.821Z"};}};
+  if(name.endsWith("internalMailAttestation"))return {nativeContainer:()=>({private:true}),load:async c=>{assert.equal(c.private,true);loads++;if(failure)throw Error("INTERNAL_MAIL_ATTESTATION_EXPIRED_OR_INVALID");return {version:"JMP-INTERNAL-MAIL-fixture",expiresAt:"2026-10-24T02:43:10.821Z"};}};
   if(name.endsWith("authorReviewResponseConsumer"))return {runAuthorReviewResponseConsumer:async()=>{effects++;return {processed:0,idempotent:5,results:[]};}};
   return {monitor:async()=>{effects++;return [];}};
  }});
