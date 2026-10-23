@@ -24,7 +24,7 @@ function one(message, name) {
   const values = (message.internetMessageHeaders || []).filter(h => h.name.toLowerCase() === name);
   return values.length === 1 ? values[0].value.trim() : null;
 }
-function bindCustody(message, mailbox, attestation = POLICY) {
+function bindCustody(message, mailbox, attestation = null) {
   if (mailbox === POLICY.mailbox) custody.set(message, { mailbox, policy:attestation });
   return message;
 }

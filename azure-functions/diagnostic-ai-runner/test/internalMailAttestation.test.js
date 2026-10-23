@@ -27,5 +27,28 @@ test("fresh policy is still insufficient without native custody and full interna
 });
 test("private store rejects public access and malformed or missing evidence",async()=>{
  await assert.rejects(()=>owner.load({getProperties:async()=>({blobPublicAccess:"blob"})}),/NOT_PRIVATE/);
- assert.equal(await owner.load({getProperties:async()=>({}),getBlockBlobClient:()=>({getProperties:async()=>{throw {statusCode:404};}})},null),null);
+ await assert.rejects(()=>owner.load({getProperties:async()=>({}),getBlockBlobClient:()=>({getProperties:async()=>{throw {statusCode:404};}})}),/MISSING/);
+});
+test("active feed fails closed and recovers without bootstrap or cached trust",async()=>{
+ const originalNow=Date.now; Date.now=()=>now;
+ let value=fixture(), unavailable=false;
+ const container={getProperties:async()=>({}),getBlockBlobClient:path=>{
+  assert.equal(path,owner.PATH);
+  return {getProperties:async()=>{if(unavailable)throw Object.assign(Error("storage unavailable"),{statusCode:503});return {contentLength:4096,etag:"version"};},
+   downloadToBuffer:async(_start,_length,options)=>{assert.equal(options.conditions.ifMatch,"version");return Buffer.from(typeof value==="string"?value:JSON.stringify(value));}};
+ }};
+ try {
+  const first=await owner.load(container);assert.equal(first.expiresAt,fixture().expiresAt);
+  for(const corrupt of [x=>{x.expiresAt=new Date(now).toISOString();},x=>{x.tenantId="wrong";},x=>{x.schemaVersion=2;},x=>{delete x.evidence;}]){
+   value=fixture();corrupt(value);await assert.rejects(()=>owner.load(container));
+  }
+  value="{";await assert.rejects(()=>owner.load(container));
+  unavailable=true;await assert.rejects(()=>owner.load(container));
+  unavailable=false;value=fixture();assert.deepEqual(await owner.load(container),first);
+  await assert.rejects(()=>owner.load(null),/STORAGE_REQUIRED/);
+ } finally {Date.now=originalNow;}
+});
+test("omitted attestation never binds embedded historical trust",()=>{
+ const message={};mail.bindCustody(message,owner.identity.mailbox);
+ assert.equal(mail.authenticate(message,Date.parse(mail.POLICY.checkedAt)),null);
 });

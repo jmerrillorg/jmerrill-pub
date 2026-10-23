@@ -120,16 +120,14 @@ async function reconcile(bundle, deps) {
   };
   try {
     const prior = (await b.optional(container, `${bundle.prefix}/monitor.json`))?.value;
-    const internalPolicy = require("./publisherFundedInternalMail").POLICY;
-    if (Date.now() >= Date.parse(internalPolicy.expiresAt)) {
-      const priorResponse = (await b.optional(container, `${bundle.prefix}/response.json`))?.value;
-      const source = priorResponse?.sourceReference && (await b.optional(container, priorResponse.sourceReference))?.value;
-      if (source?.authentication?.method === "TENANT_VERIFIED_INTERNAL_MAILBOX") {
-        return { ...(await readback(bundle, deps)), authenticationReviewRequired: "INTERNAL_MAIL_POLICY_EXPIRED" };
-      }
+    const priorResponse = (await b.optional(container, `${bundle.prefix}/response.json`))?.value;
+    const priorSource = priorResponse?.sourceReference && (await b.optional(container, priorResponse.sourceReference))?.value;
+    if (priorSource?.authentication?.method === "TENANT_VERIFIED_INTERNAL_MAILBOX") {
+      try { await require("./internalMailAttestation").load(container); }
+      catch { return { ...(await readback(bundle, deps)), authenticationReviewRequired: "ACTIVE_INTERNAL_MAIL_ATTESTATION_UNAVAILABLE" }; }
     }
     if (prior?.status === "HELD") {
-      const policy = require("./publisherFundedInternalMail").POLICY;
+      const policy = await require("./internalMailAttestation").load(container);
       const recoveryReference = `${bundle.prefix}/recoveries/${policy.version}.json`;
       if (prior.code !== "STAGE04_MAIL_READ_FAILED" || prior.providerStatus !== 403 ||
           prior.providerCode !== "ErrorAccessDenied" || prior.mailReadScope !== "AUTHOR" ||
@@ -166,7 +164,14 @@ async function reconcile(bundle, deps) {
         receivedAt: message.receivedDateTime, titleId: bundle.offer.titleId, offerSha256: bundle.offer.offerSha256, reference };
       assertClaim();
       const old = await b.optional(container, reference);
-      if (old && JSON.stringify(old.value) !== JSON.stringify(observation)) deny("STAGE04_RESPONSE_REPLAY_CONFLICT");
+      // Renewal changes authentication evidence, not the original author decision.
+      const comparison = value => {
+        const copy = structuredClone(value);
+        if (copy.authentication?.method === "TENANT_VERIFIED_INTERNAL_MAILBOX") delete copy.authentication.policyVersion;
+        return JSON.stringify(copy);
+      };
+      if (old && comparison(old.value) !== comparison(observation)) deny("STAGE04_RESPONSE_REPLAY_CONFLICT");
+      if (old) { decisions.push(old.value); continue; }
       await b.immutable(container, reference, observation);
       decisions.push(observation);
     }
