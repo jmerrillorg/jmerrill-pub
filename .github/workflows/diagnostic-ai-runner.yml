@@ -18,6 +18,8 @@ on:
     paths:
       - "azure-functions/diagnostic-ai-runner/**"
       - "docs/implementation/canon-cache/jm1-publishing-editorial/**"
+      - ".github/scripts/diagnostic-manual-producer-deploy-classification.mjs"
+      - ".github/tests/diagnostic-manual-producer-deploy-classification.test.mjs"
       - ".github/workflows/diagnostic-ai-runner.yml"
       - ".github/scripts/diagnostic-source-only-release.mjs"
       - ".github/tests/diagnostic-source-only-release.test.mjs"
@@ -27,6 +29,8 @@ on:
     paths:
       - "azure-functions/diagnostic-ai-runner/**"
       - "docs/implementation/canon-cache/jm1-publishing-editorial/**"
+      - ".github/scripts/diagnostic-manual-producer-deploy-classification.mjs"
+      - ".github/tests/diagnostic-manual-producer-deploy-classification.test.mjs"
       - ".github/workflows/diagnostic-ai-runner.yml"
       - ".github/scripts/diagnostic-source-only-release.mjs"
       - ".github/tests/diagnostic-source-only-release.test.mjs"
@@ -43,6 +47,22 @@ env:
   DEPLOYMENT_EVIDENCE_PREFIX: deployment-evidence/diagnostic-ai-runner
 
 jobs:
+  classify-deployment:
+    name: Classify runtime changes
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      skip_production_deploy: ${{ steps.classify.outputs.skip_production_deploy }}
+    steps:
+      - name: Checkout full history for exact change comparison
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - name: Prove whether every changed file is non-runtime producer or guard code
+        id: classify
+        run: node .github/scripts/diagnostic-manual-producer-deploy-classification.mjs
+
   validate-and-package:
     name: Validate and package
     runs-on: ubuntu-latest
@@ -70,6 +90,9 @@ jobs:
 
       - name: Validate settings-preserving release guard
         run: node --test .github/tests/diagnostic-source-only-release.test.mjs
+
+      - name: Validate manual-producer deployment classification
+        run: node --test .github/tests/diagnostic-manual-producer-deploy-classification.test.mjs
 
       - name: Build deterministic deployment package
         id: package
@@ -152,11 +175,13 @@ jobs:
 
   deploy:
     name: Deploy production Function App
+    needs: [classify-deployment, validate-and-package]
     concurrency:
       group: func-jm1-diagnostic-ai-runner-production
       cancel-in-progress: false
-    if: (github.event_name == 'push' && github.ref == 'refs/heads/main') || github.event_name == 'workflow_dispatch'
-    needs: validate-and-package
+    if: >-
+      (github.event_name == 'push' && github.ref == 'refs/heads/main' && needs.classify-deployment.outputs.skip_production_deploy != 'true') ||
+      github.event_name == 'workflow_dispatch'
     env:
       RELEASE_MODE: ${{ github.event_name == 'workflow_dispatch' && inputs.release_mode || 'standard' }}
       EXPECTED_PREVIOUS_RELEASE: ${{ inputs.expected_previous_release }}
