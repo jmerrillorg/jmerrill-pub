@@ -9,8 +9,10 @@ const SAFE_NO_RUNTIME_CHANGE_FILES = new Set([
   "docs/operations/publishing-internal-mail-attestation.md",
   ".github/scripts/diagnostic-manual-producer-deploy-classification.mjs",
   ".github/tests/diagnostic-manual-producer-deploy-classification.test.mjs",
-  ".github/workflows/diagnostic-ai-runner.yml",
 ]);
+
+// Workflow edits can change production behavior even without runtime source edits.
+// Never classify them as producer-only by pathname.
 
 export function shouldSkipProductionDeployment(files, comparisonKnown = true) {
   if (!comparisonKnown || !Array.isArray(files) || files.length === 0) return false;

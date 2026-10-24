@@ -17,8 +17,22 @@ test("isolated deployment-classification guard files skip Function deployment", 
   assert.equal(shouldSkipProductionDeployment([
     ".github/scripts/diagnostic-manual-producer-deploy-classification.mjs",
     ".github/tests/diagnostic-manual-producer-deploy-classification.test.mjs",
-    ".github/workflows/diagnostic-ai-runner.yml",
   ]), true);
+});
+
+test("workflow-only changes require the normal protected deployment path", () => {
+  assert.equal(shouldSkipProductionDeployment([
+    ".github/workflows/diagnostic-ai-runner.yml",
+  ]), false);
+});
+
+test("producer or classifier edits cannot hide a deployment workflow change", () => {
+  assert.equal(shouldSkipProductionDeployment([
+    ...manualProducerFiles,
+    ".github/scripts/diagnostic-manual-producer-deploy-classification.mjs",
+    ".github/tests/diagnostic-manual-producer-deploy-classification.test.mjs",
+    ".github/workflows/diagnostic-ai-runner.yml",
+  ]), false);
 });
 
 test("any runtime or unrelated file keeps the normal deployment path", () => {
