@@ -60,6 +60,7 @@ require("./functions/runPublishingLifecycleReadback");
 require("./functions/runGloryReviewRecovery");
 require("./functions/runTitleCommissioningSourceRegistration");
 require("./functions/runJackieTitleSystemAcceptance");
+require("./functions/readStage07Receipts");
 require("./functions/runEnterpriseMailboxReadbackHealth");
 require("./functions/runCommercialEligibilityA2");
 require("./functions/runStripeConnectReminderMonitor");
