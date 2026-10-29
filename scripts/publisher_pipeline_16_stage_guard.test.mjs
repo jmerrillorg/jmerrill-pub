@@ -10,6 +10,8 @@ const model = readFileSync('lib/publishing/lifecycle/human-pipeline-read-model.t
 const page = readFileSync('app/publisher/pipeline/page.tsx', 'utf8')
 const client = readFileSync('app/publisher/_components/PublisherPipelineClient.tsx', 'utf8')
 const operatingCenterClient = readFileSync('app/publisher/_components/PublisherOperatingCenterClient.tsx', 'utf8')
+const operatingCenterPage = readFileSync('app/publisher/operating-center/page.tsx', 'utf8')
+const operatingCenterModel = readFileSync('lib/server/publisher-operating-center.ts', 'utf8')
 
 function matchesSuppressionContract(card) {
   return (
@@ -61,6 +63,30 @@ test('Pipeline is a projection over the Operating Center snapshot, not a new lif
   assert.match(page, /buildPublisherOperatingCenterSnapshot/)
   assert.match(page, /buildHumanPublishingPipelineView\(snapshot\.titleOperatingView\.cards/)
   assert.doesNotMatch(client, /localStorage|indexedDB|IndexedDB/)
+})
+
+test('Historical certification snapshots never supply live title cards', () => {
+  assert.doesNotMatch(operatingCenterModel, /loadCertifiedTitleProjectionItems/)
+  assert.doesNotMatch(operatingCenterModel, /certifiedProjectionItems/)
+  assert.match(operatingCenterModel, /\.\.\.input\.workload\.map\(workloadToTodayItem\)/)
+  assert.match(operatingCenterModel, /item\.portfolioState === 'active_pipeline'/)
+  assert.match(operatingCenterModel, /currentWorkloadTitleIds\.has\(item\.titleId\)/)
+})
+
+test('The Operating Center opens on the 16-stage board while detail links retain diagnostics', () => {
+  assert.match(operatingCenterPage, /if \(session && !requestedDetails\) redirect\('\/publisher\/pipeline'\)/)
+  assert.match(client, /href="\/publisher\/operating-center\?view=diagnostics"/)
+  assert.match(operatingCenterClient, /Supporting title readback/)
+})
+
+test('Cards show current action ownership, required action, and wait age', () => {
+  assert.match(model, /card\.waitingOn === 'Publishing Team'\) return 'JM Publishing'/)
+  assert.match(model, /waitingSince: card\.canonicalLifecycle\.waitingTruth\.waitingStartedAt/)
+  assert.match(model, /waitAgeDays: card\.canonicalLifecycle\.waitingTruth\.elapsedDays/)
+  assert.match(client, /card\.nextAction \|\| card\.conciseStatus/)
+  assert.match(client, /card\.waitAgeDays/)
+  assert.match(client, /Blocked: \{card\.blocker\}/)
+  assert.match(client, /Workspace state gap/)
 })
 
 test('Ambiguous title state is surfaced for reconciliation instead of silently placed', () => {
@@ -124,11 +150,10 @@ test('Pipeline 004 protects royalty decision and active workstream names from hi
   assert.doesNotMatch(registryText, /Before You Were Born/)
   assert.doesNotMatch(registryText, /Indomitable/)
   assert.doesNotMatch(registryText, /Establishing Glory/)
-  assert.match(client, /Historical refs/)
   assert.match(client, /Archived duplicate references/)
 })
 
 test('Pipeline and Operating Center link to each other', () => {
-  assert.match(client, /href="\/publisher\/operating-center"/)
+  assert.match(client, /href="\/publisher\/operating-center\?view=diagnostics"/)
   assert.match(operatingCenterClient, /href="\/publisher\/pipeline"/)
 })

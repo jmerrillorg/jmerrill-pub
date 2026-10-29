@@ -1573,8 +1573,8 @@ function TitlePipelineBoard({
     <section className="border border-blue-300/20 bg-blue-950/15 p-5">
       <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
         <div>
-          <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-blue-300">Title Pipeline Board</p>
-          <h2 className="mt-2 text-3xl font-semibold">Process as the interface</h2>
+          <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-blue-300">Supporting title readback</p>
+          <h2 className="mt-2 text-3xl font-semibold">Title diagnostics</h2>
           <p className="mt-2 max-w-3xl text-[13px] leading-6 text-white/55">
             One real title appears once, projected through JMP_PUBLISHING_LIFECYCLE_v1.0, with what it is waiting on and what can happen next.
           </p>
