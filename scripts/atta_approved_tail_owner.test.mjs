@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict'
-import test from 'node:test'
+import test, { beforeEach } from 'node:test'
 import { readFileSync } from 'node:fs'
 import { createHash } from 'node:crypto'
 import { createJiti } from 'jiti'
@@ -10,6 +10,9 @@ const { AgreementPaymentGuard, paymentMutationHash } = await j.import('../lib/se
 const { calculateAgreementPaymentState } = await j.import('../lib/server/stripe/publishing-agreement-payment.ts')
 const { ATTA_TAIL: P, ATTA_TAIL_PAYLOAD: payload } = plan
 const copy = structuredClone
+
+// Fixtures model the approved September execution window, independently of wall-clock time.
+beforeEach(t => t.mock.timers.enable({ apis: ['Date'], now: new Date('2026-09-27T00:00:00Z') }))
 
 function fixture() {
   const requirements = Array.from({ length: 8 }, (_, i) => ({ jmpv2_paymentrequirementid:
@@ -80,6 +83,13 @@ test('normalization removes receipt transport only, not tax, payments or identit
   assert.deepEqual(plan.tailNormalize(a), plan.tailNormalize({ ...a, receipt_url: 'signed-b' }))
   for (const field of ['amount_received', 'tax', 'customer']) assert.notDeepEqual(plan.tailNormalize(a), plan.tailNormalize({ ...a, [field]: 'changed' }))
 })
+test('expired authority fails closed before provider effects', async t => {
+  t.mock.timers.setTime(1792498739 * 1000)
+  const f = fixture()
+  await assert.rejects(executeAttaApprovedTail(f.io, f.ledger, f.authority), /ATTA_TAIL_AUTHORITY_WINDOW_EXPIRED/)
+  assert.deepEqual(f.counts, { stripe: 0, projection: 0, intent: 0 })
+})
+
 test('fresh bounded execution and replay yield one provider effect and one result audit', async () => {
   const f = fixture()
   assert.equal((await executeAttaApprovedTail(f.io, f.ledger, f.authority)).status, 'APPLIED_VERIFIED')
