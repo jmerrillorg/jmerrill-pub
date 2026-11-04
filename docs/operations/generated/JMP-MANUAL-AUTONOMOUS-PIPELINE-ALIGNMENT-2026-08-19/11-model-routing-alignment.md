@@ -1,0 +1,4 @@
+# Model Routing Alignment
+ALIGNED at the provider-family level: Editorial Review/Developmental/Line resolve to Claude via Microsoft Foundry (claude-sonnet-5); Copy/Proofreading resolve to Azure OpenAI. Confirmed via governedRouteRegistry.js and editorialExecutionRuntime.js's preferredDeploymentAliasForStage, not just policy documents.
+No silent fallback: ALIGNED — allowFallback:false is hardcoded for all 5 stages in the live executor; providerRouter.js's design explicitly never falls through silently (typed errors instead). The one place fallback is permitted (Stage 0 shadow runner) records fallbackFromAlias/fallbackReason/selectionReason.
+Drift flag: PARTIAL — a second, aspirational registry (editorialModelRoutingRegistry.js) targets GPT-5 for Copy/Proof and is never actually consulted by the live executor, which uses the shared gpt-4o-mini baseline instead. Not a safety issue, but a documentation/reality drift worth reconciling.
