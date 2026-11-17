@@ -75,7 +75,9 @@ function buildAuthorAcknowledgmentPayload(intake: AcknowledgmentIntake) {
 }
 
 function authorFacingNextStep(intake: AcknowledgmentIntake) {
-  if (intake.manuscriptSubmissionChoice === 'later') {
+  // The original submission choice survives a subsequent upload. Use the
+  // current receipt state so an uploaded manuscript is not requested again.
+  if (intake.manuscriptLifecycleState === 'PENDING_UPLOAD') {
     return 'Your inquiry has been received. Please use the secure continuation link to add the manuscript when you are ready. The Publishing team will review your inquiry.'
   }
 
