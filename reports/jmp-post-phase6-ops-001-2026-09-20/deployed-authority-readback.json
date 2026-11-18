@@ -1,0 +1,32 @@
+{
+  "observedAt": "2026-09-20T12:57:00Z",
+  "canonicalMain": {
+    "sha": "24636a79d2336ac93b249f7f5cabab3eb9500780",
+    "authority": "origin/main"
+  },
+  "web": {
+    "endpoint": "https://jmerrill.pub/api/health",
+    "httpStatus": 200,
+    "releaseSha": "8c177ab77c4b87e7137ef34ea766b91fec1f5ea4",
+    "status": "ready",
+    "dependencies": "ready"
+  },
+  "function": {
+    "endpoint": "https://func-jm1-diagnostic-ai-runner.azurewebsites.net/api/health",
+    "releaseSha": "f7d5442a583229863b2fcd085569f565f797bf64",
+    "productionReleaseSha": "f7d5442a583229863b2fcd085569f565f797bf64",
+    "nodeVersion": "22.23.2",
+    "status": "ready"
+  },
+  "classification": {
+    "mainVsWeb": "EVIDENCE_ONLY_MAIN_ADVANCE",
+    "mainVsFunction": "RUNTIME_EQUIVALENT_DIFFERENT_SHA_BY_SURFACE",
+    "overall": "NO_REAL_RUNTIME_DRIFT",
+    "basis": "The post-web main change modifies only the inbound validation manifest. Changes after the Function release are web registry and evidence files, not Function runtime source."
+  },
+  "mutations": {
+    "deployments": 0,
+    "approvals": 0,
+    "cancellations": 0
+  }
+}
