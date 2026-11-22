@@ -6,6 +6,7 @@ import { BookCard } from '@/components/content/BookCard'
 import { CTASection } from '@/components/content/CTASection'
 import { catalogAuthorDisplayName, catalogTitleToBookCardRecord } from '@/lib/catalog/display'
 import { publicCatalogPageUrls, canonicalPublicTitleSlug } from '@/lib/catalog/public-projection'
+import { withTitlePageAttribution } from '@/lib/catalog/title-page-attribution'
 import type { CatalogTitleDetail } from '@/lib/catalog/types'
 import { getPublicCatalogTitleBySlug } from '@/lib/server/dataverse/catalog'
 import { getImprintStrategyByLabel } from '@/data/imprints'
@@ -72,7 +73,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
   if (!result.data) return { title: 'Book Not Found' }
 
-  const book = result.data
+  const book = withTitlePageAttribution(result.data)
   return {
     title: `${book.title} by ${catalogAuthorDisplayName(book)}`,
     description: book.shortDescription || `Book details for ${book.title} from J Merrill Publishing.`,
@@ -97,7 +98,7 @@ export default async function BookPage({ params }: Props) {
   if (!result.ok) return <CatalogUnavailable />
   if (!result.data) notFound()
 
-  const book = result.data
+  const book = withTitlePageAttribution(result.data)
   const bookCard = catalogTitleToBookCardRecord(book)
   const authorName = catalogAuthorDisplayName(book)
   const authorSlug = book.authors[0]?.slug || ''
