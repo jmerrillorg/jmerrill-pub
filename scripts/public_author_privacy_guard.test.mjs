@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 import test from 'node:test'
+import { withTitlePageAttribution } from '../lib/catalog/title-page-attribution.ts'
 import {
   isSuppressedPublicAuthorSlug,
   resolvePublicAuthorIdentity,
@@ -271,4 +272,37 @@ test('legal/internal records remain intact outside public projection', () => {
   assert.equal(legalRecord.contractRelationship, true)
   assert.equal(legalRecord.royaltyRelationship, true)
   assert.equal(JSON.stringify(publicTitle).includes('John Smith'), false)
+})
+
+
+test('Damaged title page attribution changes only the named title and exposes no linked profile', () => {
+  const authors = Object.freeze([{ name: 'Internal Name Fixture', slug: 'internal-name-fixture' }])
+  const book = Object.freeze({
+    id: '33106fd3-c27a-f111-ab0f-6045bdd69435',
+    slug: 'damaged',
+    authorDisplayName: 'Internal Name Fixture',
+    authors,
+    formats: ['Paperback', 'eBook'],
+    coverUrl: '/cover.jpg',
+    relatedTitles: [{ slug: 'unrelated' }],
+  })
+
+  const displayed = withTitlePageAttribution(book)
+  assert.deepEqual(displayed, { ...book, authorDisplayName: 'Taye Knox', authors: [] })
+  assert.equal(displayed.formats, book.formats)
+  assert.equal(displayed.relatedTitles, book.relatedTitles)
+  assert.equal(book.authors, authors)
+  assert.equal(book.authorDisplayName, 'Internal Name Fixture')
+
+  for (const unrelated of [{ ...book, id: 'another-title' }, { ...book, slug: 'another-book' }]) {
+    assert.equal(withTitlePageAttribution(unrelated), unrelated)
+  }
+})
+
+test('book detail rendering and metadata use the same page-only attribution projection', () => {
+  const source = readFileSync(new URL('../app/books/[id]/page.tsx', import.meta.url), 'utf8')
+  assert.equal(source.match(/const book = withTitlePageAttribution\(result\.data\)/g)?.length, 2)
+  assert.match(source, /<ContributorByline book=\{book\} \/>/)
+  assert.match(source, /author: book\.authors\.length/)
+  assert.match(source, /const authorSlug = book\.authors\[0\]\?\.slug/)
 })
